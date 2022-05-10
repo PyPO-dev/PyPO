@@ -8,7 +8,14 @@ class System(object):
     def __init__(self):
         self.num_ref = 0
         self.system = {}
+        
+    def __str__(self):
+        pass
     
+    def __iter__(self):
+        pass
+    
+    #### ADD REFLECTOR METHODS
     def addParabola(self, name="Parabola", a=1, b=1, cRot=np.zeros(3), offTrans=np.zeros(3), offRot=np.zeros(3)):
         if name == "Parabola":
             name = name + "_{}".format(self.sys_id)
@@ -19,7 +26,7 @@ class System(object):
         self.num_ref += 1
         
     def addHyperbola(self, name="Hyperbola", a=1, b=1, c=1, cRot=np.zeros(3), offTrans=np.zeros(3), offRot=np.zeros(3)):
-        if name == "Parabola":
+        if name == "Hyperbola":
             name = name + "_{}".format(self.sys_id)
             
         h = Reflectors.Hyperbola(a, b, c, cRot, offTrans, offRot)
@@ -27,6 +34,16 @@ class System(object):
         self.system["{}".format(name)] = h
         self.num_ref += 1
         
+    def addEllipse(self, name="Ellipse", a=2, b=3, c=5, cRot=np.zeros(3), offTrans=np.zeros(3), offRot=np.zeros(3)):
+        if name == "Ellipse":
+            name = name + "_{}".format(self.sys_id)
+            
+        e = Reflectors.Ellipse(a, b, c, cRot, offTrans, offRot)
+        
+        self.system["{}".format(name)] = e
+        self.num_ref += 1
+        
+    #### PLOTTING OPTICAL SYSTEM
     def plotSystem(self):
         fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
         

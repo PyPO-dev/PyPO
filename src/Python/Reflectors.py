@@ -98,7 +98,7 @@ class Hyperbola(Reflector):
     Derived class from Reflector. Creates a Hyperboloid mirror.
     """
     
-    def __init__(self, a = 1, b = 1, c = 2, cRot = np.zeros(3), offTrans = np.zeros(3), offRot = np.zeros(3)):
+    def __init__(self, a, b, c, cRot = np.zeros(3), offTrans = np.zeros(3), offRot = np.zeros(3)):
         Reflector.__init__(self, a, b, cRot, offTrans, offRot)
         self.c = c
         
@@ -118,7 +118,7 @@ class Ellipse(Reflector):
     Derived class from Reflector. Creates an Ellipsoid mirror.
     """
     
-    def __init__(self, a = 2, b = 3, c = 5, cRot = np.zeros(3), offTrans = np.zeros(3), offRot = np.zeros(3)):
+    def __init__(self, a, b, c, cRot, offTrans, offRot):
         Reflector.__init__(self, a, b, cRot, offTrans, offRot)
         self.c = c
         
@@ -136,36 +136,7 @@ class Ellipse(Reflector):
 
 
 if __name__ == "__main__":
-    rot = np.radians([25, 70.33, 4])
-    cRot = np.array([25, 70.33, 4])
-    
-    p = Parabola(b = 1000, cRot = cRot, offRot = rot)
-    h = Hyperbola()#offRot = rot)
-    e = Ellipse(b = 1000)
-    #print(help(e))
-    print(p)
-    print(h)
-    print(e)
-    limsa = 1
-    limsb = 10
-    
-    
-    range_x = np.linspace(-limsa, limsa, 100)
-    range_y = np.linspace(-limsb, limsb, 100)
-    
-    grid_x, grid_y = np.meshgrid(range_x, range_y)
-    
-    p.setGrid(grid_x, grid_y)
-    p.rotateGrid()
-    p.plotReflector()
-    
-    h.setGrid(grid_x, grid_y)
-    h.rotateGrid()
-    h.plotReflector()
-    
-    e.setGrid(grid_x, grid_y)
-    e.rotateGrid()
-    e.plotReflector()
+    print("These classes represent reflectors that can be used in POPPy simulations.")
     
     
     

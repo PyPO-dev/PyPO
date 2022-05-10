@@ -50,19 +50,25 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
         self.grid_z = gridRot[2]
         
     
-    def plotReflector(self):
-        fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
+    def plotReflector(self, color='blue', returns=False, ax_append=False):
+        if not ax_append:
+            fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
+            ax_append = ax
 
-        reflector = ax.plot_surface(self.grid_x, self.grid_y, self.grid_z,
-                       linewidth=0, antialiased=False, alpha=0.5)
+        reflector = ax_append.plot_surface(self.grid_x, self.grid_y, self.grid_z,
+                       linewidth=0, antialiased=False, alpha=0.5, color=color)
         
-        ax.set_ylabel(r"$y$ / [mm]", labelpad=20)
-        ax.set_xlabel(r"$x$ / [mm]", labelpad=10)
-        ax.set_zlabel(r"$z$ / [mm]", labelpad=50)
-        world_limits = ax.get_w_lims()
-        ax.set_box_aspect((world_limits[1]-world_limits[0],world_limits[3]-world_limits[2],world_limits[5]-world_limits[4]))
-        ax.tick_params(axis='x', which='major', pad=-3)
-        pt.show()
+        if not returns:
+            ax_append.set_ylabel(r"$y$ / [mm]", labelpad=20)
+            ax_append.set_xlabel(r"$x$ / [mm]", labelpad=10)
+            ax_append.set_zlabel(r"$z$ / [mm]", labelpad=50)
+            world_limits = ax_append.get_w_lims()
+            ax_append.set_box_aspect((world_limits[1]-world_limits[0],world_limits[3]-world_limits[2],world_limits[5]-world_limits[4]))
+            ax_append.tick_params(axis='x', which='major', pad=-3)
+            pt.show()
+            
+        else:
+            return ax_append
         
         
 
@@ -71,7 +77,7 @@ class Parabola(Reflector):
     Derived class from Reflector. Creates a paraboloid mirror.
     """
     
-    def __init__(self, a = 1, b = 1, cRot = np.zeros(3), offTrans = np.zeros(3), offRot = np.zeros(3)):
+    def __init__(self, a, b, cRot, offTrans, offRot):
         Reflector.__init__(self, a, b, cRot, offTrans, offRot)
         self.c = "N/A"
         
@@ -81,7 +87,10 @@ class Parabola(Reflector):
     def setGrid(self, grid_x, grid_y):
         self.grid_x = grid_x
         self.grid_y = grid_y
-        self.grid_z = grid_x**2 / self.a**2 + grid_y**2 / self.b**2
+        self.grid_z = grid_x**2 / self.a**2 + grid_y**2 / self.b**2 + self.offTrans[2]
+        
+        self.grid_x = self.grid_x + self.offTrans[0]
+        self.grid_y = self.grid_y + self.offTrans[1]
     
 
 class Hyperbola(Reflector):
@@ -99,7 +108,10 @@ class Hyperbola(Reflector):
     def setGrid(self, grid_x, grid_y):
         self.grid_x = grid_x
         self.grid_y = grid_y
-        self.grid_z = self.c * np.sqrt(grid_x ** 2 / self.a ** 2 + grid_y ** 2 / self.b ** 2 + 1)
+        self.grid_z = self.c * np.sqrt(grid_x ** 2 / self.a ** 2 + grid_y ** 2 / self.b ** 2 + 1) + self.offTrans[2] - 1
+        
+        self.grid_x = self.grid_x + self.offTrans[0]
+        self.grid_y = self.grid_y + self.offTrans[1]
         
 class Ellipse(Reflector):
     """
@@ -116,7 +128,10 @@ class Ellipse(Reflector):
     def setGrid(self, grid_x, grid_y):
         self.grid_x = grid_x
         self.grid_y = grid_y
-        self.grid_z = -self.c * (np.sqrt(1 - grid_x ** 2 / self.a ** 2 - grid_y ** 2 / self.b ** 2) + 1)
+        self.grid_z = -self.c * (np.sqrt(1 - grid_x ** 2 / self.a ** 2 - grid_y ** 2 / self.b ** 2) + 1) + self.offTrans[2]
+        
+        self.grid_x = self.grid_x + self.offTrans[0]
+        self.grid_y = self.grid_y + self.offTrans[1]
         
 
 

@@ -1,7 +1,11 @@
+# Standard Python imports
+import numbers
 import numpy as np
 import matplotlib.pyplot as pt
 
+# POPPy-specific modules
 import src.Python.Reflectors as Reflectors
+import src.Python.RayTrace as RayTrace
 
 class System(object):
     
@@ -16,7 +20,8 @@ class System(object):
         pass
     
     #### ADD REFLECTOR METHODS
-    def addParabola(self, name="Parabola", a=1, b=1, cRot=np.zeros(3), offTrans=np.zeros(3), offRot=np.zeros(3)):
+    # Takes as input a and b
+    def addParabola_ab(self, name="Parabola", a=1, b=1, cRot=np.zeros(3), offTrans=np.zeros(3), offRot=np.zeros(3)):
         if name == "Parabola":
             name = name + "_{}".format(self.sys_id)
             
@@ -24,8 +29,21 @@ class System(object):
         
         self.system["{}".format(name)] = p
         self.num_ref += 1
+    
+    # Takes as input focus_1 position. If created with this funcy=tion, automatically a=b
+    def addParabola_foc(self, name="Parabola", focus_1=np.array([0,0,1]), cRot=np.zeros(3), offTrans=np.zeros(3), offRot=np.zeros(3)):
+        if name == "Parabola":
+            name = name + "_{}".format(self.sys_id)
         
-    def addHyperbola(self, name="Hyperbola", a=1, b=1, c=1, cRot=np.zeros(3), offTrans=np.zeros(3), offRot=np.zeros(3)):
+        a = 2 * np.sqrt(focus_1[2])
+        b = a
+        
+        p = Reflectors.Parabola(a, b, cRot, offTrans, offRot)
+        
+        self.system["{}".format(name)] = p
+        self.num_ref += 1
+        
+    def addHyperbola_ab(self, name="Hyperbola", a=1, b=1, c=1, cRot=np.zeros(3), offTrans=np.zeros(3), offRot=np.zeros(3)):
         if name == "Hyperbola":
             name = name + "_{}".format(self.sys_id)
             
@@ -34,21 +52,40 @@ class System(object):
         self.system["{}".format(name)] = h
         self.num_ref += 1
         
-    def addEllipse(self, name="Ellipse", a=2, b=3, c=5, cRot=np.zeros(3), offTrans=np.zeros(3), offRot=np.zeros(3)):
-        if name == "Ellipse":
+    def addHyperbola_foc(self, name="Hyperbola", a=1, b=1, c=1, cRot=np.zeros(3), offTrans=np.zeros(3), offRot=np.zeros(3)):
+        if name == "Hyperbola":
             name = name + "_{}".format(self.sys_id)
             
+        h = Reflectors.Hyperbola(a, b, c, cRot, offTrans, offRot)
+        
+        self.system["{}".format(name)] = h
+        self.num_ref += 1
+        
+    def addEllipse_ab(self, name="Ellipse", a=2, b=3, c=5, cRot=np.zeros(3), offTrans=np.zeros(3), offRot=np.zeros(3)):
+        if name == "Ellipse":
+            name = name + "_{}".format(self.sys_id)
+        
         e = Reflectors.Ellipse(a, b, c, cRot, offTrans, offRot)
         
         self.system["{}".format(name)] = e
         self.num_ref += 1
         
+    # Place and create ellipse using focus_1 and confocal distance c. Automatically creates a symmetric ellipsoid
+    def addEllipse_foc(self, name="Ellipse", focus_1=np.array([0,0,1]), focus_2=np.array([0,0,1]), cRot=np.zeros(3), offTrans=np.zeros(3), offRot=np.zeros(3)):
+        if name == "Ellipse":
+            name = name + "_{}".format(self.sys_id)
+
+        e = Reflectors.Ellipse(a, b, c, cRot, offTrans, offRot)
+        
+        self.system["{}".format(name)] = e
+        self.num_ref += 1
+    
     #### PLOTTING OPTICAL SYSTEM
-    def plotSystem(self):
+    def plotSystem(self, focus_1=False, focus_2=False):
         fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
         
         for refl in self.system.values():
-            ax = refl.plotReflector(returns=True, ax_append=ax)
+            ax = refl.plotReflector(returns=True, ax_append=ax, focus_1=focus_1, focus_2=focus_2)
             
         ax.set_ylabel(r"$y$ / [mm]", labelpad=20)
         ax.set_xlabel(r"$x$ / [mm]", labelpad=10)

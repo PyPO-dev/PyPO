@@ -1,6 +1,6 @@
 import numpy as np
 
-def MatRotate(theta, points, origin=np.zeros(3), vecRot = False):
+def MatRotate(theta, points, origin=np.zeros(3), vecRot=False):
     
     """
     Create 3D rotation matrix.

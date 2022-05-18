@@ -3,6 +3,7 @@ import math
 import numpy as np
 import matplotlib.pyplot as pt
 import matplotlib.tri as mtri
+import scipy.interpolate as interp
 
 # POPPy-specific modules
 import src.Python.MatRotate as MatRotate
@@ -83,24 +84,34 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
             grid_z_o = grid_x_o**2 / self.a**2 + grid_y_o**2 / self.b**2
             
             self.grid_z = grid_x**2 / self.a**2 + grid_y**2 / self.b**2 + self.offTrans[2]
-            self.grid_nx = 2 * grid_x / self.a**2
-            self.grid_ny = 2 * grid_y / self.b**2
+            grid_nx = 2 * grid_x / self.a**2
+            grid_ny = 2 * grid_y / self.b**2
             
         elif self.reflectorType == "Hyperboloid":
             grid_z_o = self.c * np.sqrt(grid_x_o**2 / self.a**2 + grid_y_o**2 / self.b**2 + 1)
             
             self.grid_z = self.c * np.sqrt(grid_x ** 2 / self.a ** 2 + grid_y ** 2 / self.b ** 2 + 1) + self.offTrans[2]
-            self.grid_nx = self.c * 2 * grid_x / self.a**2 * (grid_x ** 2 / self.a ** 2 + grid_y ** 2 / self.b ** 2 + 1)**(-1/2)
-            self.grid_ny = self.c * 2 * grid_y / self.b**2 * (grid_x ** 2 / self.a ** 2 + grid_y ** 2 / self.b ** 2 + 1)**(-1/2)
+            grid_nx = self.c * 2 * grid_x / self.a**2 * (grid_x ** 2 / self.a ** 2 + grid_y ** 2 / self.b ** 2 + 1)**(-1/2)
+            grid_ny = self.c * 2 * grid_y / self.b**2 * (grid_x ** 2 / self.a ** 2 + grid_y ** 2 / self.b ** 2 + 1)**(-1/2)
             
         elif self.reflectorType == "Ellipsoid":
             grid_z_o = -self.c * (np.sqrt(1 - grid_x_o ** 2 / self.a ** 2 - grid_y_o ** 2 / self.b ** 2) - 1)
             
             self.grid_z = -self.c * (np.sqrt(1 - grid_x ** 2 / self.a ** 2 - grid_y ** 2 / self.b ** 2) - 1) + self.offTrans[2]
-            self.grid_nx = self.c * 2 * grid_x / self.a**2 * (1 - grid_x ** 2 / self.a ** 2 - grid_y ** 2 / self.b ** 2)**(-1/2)
-            self.grid_ny = self.c * 2 * grid_y / self.b**2 * (1 - grid_x ** 2 / self.a ** 2 - grid_y ** 2 / self.b ** 2)**(-1/2)
+            grid_nx = self.c * 2 * grid_x / self.a**2 * (1 - grid_x ** 2 / self.a ** 2 - grid_y ** 2 / self.b ** 2)**(-1/2)
+            grid_ny = self.c * 2 * grid_y / self.b**2 * (1 - grid_x ** 2 / self.a ** 2 - grid_y ** 2 / self.b ** 2)**(-1/2)
             
-        self.grid_nz = np.ones(self.grid_nx.shape)
+        grid_nz = -np.ones(grid_nx.shape)
+        
+        self.grid_nx = grid_nx.flatten()
+        self.grid_ny = grid_ny.flatten()
+        self.grid_nz = grid_nz.flatten()
+        
+        norm = np.sqrt(self.grid_nx**2 + self.grid_ny**2 + self.grid_nz**2)
+        
+        self.grid_nx /= norm
+        self.grid_ny /= norm
+        self.grid_nz /= norm
         
         grids_o = [grid_x_o, grid_y_o, grid_z_o]
         self.calcArea(grids_o)
@@ -136,7 +147,6 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
         z = grids_o[2]
         
         A = np.zeros((x.shape[0]-1, x.shape[1]-1))
-        print(A.shape)
 
         for i in range(A.shape[0]):
             for j in range(A.shape[1]):
@@ -156,7 +166,6 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
                 A[i,j] = np.sqrt(np.dot(outer, outer))
         
         # Flatten array containing area elements now for easier analysis
-        print(A.shape)
         self.area = A.flatten()
     
     # Function to truncate with an ellipse in xy plane
@@ -171,16 +180,28 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
         to_check = 4 * (self.grid_x**2 / (lim_x_neg - lim_x_pos)**2 + self.grid_y**2 / (lim_y_neg - lim_y_pos)**2)
         
         idx_in_ellipse = to_check < 1
-
-        x_t = self.grid_x
-        y_t = self.grid_y
-        z_t = self.grid_z
-        A = self.area
         
-        self.grid_x = x_t[idx_in_ellipse]
-        self.grid_y = y_t[idx_in_ellipse]
-        self.grid_z = z_t[idx_in_ellipse]
-        self.area = A[idx_in_ellipse]
+        self.grid_x = self.grid_x[idx_in_ellipse]
+        self.grid_y = self.grid_y[idx_in_ellipse]
+        self.grid_z = self.grid_z[idx_in_ellipse]
+        
+        self.grid_nx = self.grid_nx[idx_in_ellipse]
+        self.grid_ny = self.grid_ny[idx_in_ellipse]
+        self.grid_nz = self.grid_nz[idx_in_ellipse]
+        
+        self.area = self.area[idx_in_ellipse]
+        
+    def interpReflector(self, res=100):
+        tcks_p = interp.bisplrep(self.grid_x, self.grid_y, self.grid_z)
+        
+        u_interp = interp.bisplrep(self.grid_x, self.grid_y, self.grid_nx)
+        v_interp = interp.bisplrep(self.grid_x, self.grid_y, self.grid_ny)
+        w_interp = interp.bisplrep(self.grid_x, self.grid_y, self.grid_nz)
+        
+        tcks = [tcks_p, u_interp, v_interp, w_interp]
+        
+        # Store interpolation parameters as members
+        self.tcks = tcks
     
     def plotReflector(self, color='blue', returns=False, ax_append=False, focus_1=False, focus_2=False, fine=50):
         
@@ -222,7 +243,7 @@ class Parabola(Reflector):
         
         if math.isclose(a, b, rel_tol=1e-6):
             self.focus_1 = np.array([offTrans[0], offTrans[1], offTrans[2] + a**2 / 4])
-            self.focus_1 = MatRotate.MatRotate(self.offRot, self.focus_1)
+            #self.focus_1 = MatRotate.MatRotate(self.offRot, self.focus_1)
             self.focus_2 = np.ones(len(self.focus_1)) * float("NaN")
         else:
             self.focus_1 = np.ones(len(offTrans)) * float("NaN")
@@ -250,8 +271,8 @@ class Hyperbola(Reflector):
             self.focus_1 = np.array([offTrans[0], offTrans[1], offTrans[2] + self.c])
             self.focus_2 = np.array([offTrans[0], offTrans[1], offTrans[2] - self.c])
             
-            self.focus_1 = MatRotate.MatRotate(self.offRot, self.focus_1)
-            self.focus_2 = MatRotate.MatRotate(self.offRot, self.focus_2)
+            #self.focus_1 = MatRotate.MatRotate(self.offRot, self.focus_1)
+            #self.focus_2 = MatRotate.MatRotate(self.offRot, self.focus_2)
 
         else:
             self.focus_1 = np.ones(len(offTrans)) * float("NaN")

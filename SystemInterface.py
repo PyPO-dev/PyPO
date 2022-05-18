@@ -14,15 +14,16 @@ def SystemInterface():
     
     rot_e1 = np.radians([0, 0, 0])
     offTrans_e1 = np.array([0, 0, 697])
-    cRot_e1 = offTrans_e1
+    cRot_e1 = np.array([0, 0, 0])
     
     # Parabola p1 initialization
-    '''
+
     lims_x_p1 = [-5000, 5000]
     lims_y_p1 = [-5000, 5000]
     '''
-    lims_x_p1 = [-5000, 5000]
-    lims_y_p1 = [-5000, 5000]
+    lims_x_p1 = [-1000, 1000]
+    lims_y_p1 = [-1000, 1000]
+    '''
     gridsize_p1 = [501, 501]
 
     # Hyperbola h1 initialization
@@ -33,7 +34,7 @@ def SystemInterface():
     
     ####
     s = System.System()
-    #s.addParabola_ab(name = "p1", a = 3700, b = 37, cRot = cRot_p1, offRot = rot_p1, offTrans = offTrans_p1)
+    #s.addParabola_ab(name = "p1", a = 3700, b = 100, cRot = cRot_p1, offRot = rot_p1, offTrans = offTrans_p1)
     s.addParabola_foc(name = "p1", focus_1 = np.array([0,0,3500]), cRot = cRot_p1, offRot = rot_p1, offTrans = offTrans_p1)
     s.addHyperbola_ab(name = "h1", a = 2590.5, b = 2590.5, c = 5606 / 2, cRot = cRot_e1, offRot = rot_e1, offTrans = offTrans_e1)
     
@@ -42,7 +43,7 @@ def SystemInterface():
     
     s.system["p1"].setGrid(lims_x_p1, lims_y_p1, gridsize_p1)
     s.system["p1"].rotateGrid()
-    s.system["p1"].plotReflector(focus_1=True, focus_2=True)
+    s.system["p1"].plotReflector(focus_1=False, focus_2=True)
     
     s.system["h1"].setGrid(lims_x_h1, lims_y_h1, gridsize_h1)
     s.system["h1"].rotateGrid()
@@ -54,5 +55,19 @@ def SystemInterface():
     pt.show()
     print(s.system["p1"].area)
     '''
+    
+    s.initRaytracer(rCirc=1000, NraysCirc=20, originChief=np.array([2000,0,5000]), nomChief=np.array([0,0,-1]), div_ang_x=0, div_ang_y=0)
+    print(s.Raytracer)
+    s.Raytracer.plotRays()
+    
+    s.system["p1"].interpReflector()
+    #print(s.system["p1"].tcks)
+    
+    s.startRaytracer(surface="p1")
+    s.Raytracer.plotRays(frame=1)
+    s.startRaytracer(surface="h1")
+
+    s.plotSystem(focus_1=True, focus_2=True, plotRaytrace=True)
+    
 if __name__ == "__main__":
     SystemInterface()

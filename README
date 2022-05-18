@@ -14,6 +14,7 @@ Optical system:
     CRITICAL:
     - include correct definition of Ellipse focii
     - calculate the more general focal geometries for ALL reflectors
+    - off-axis selection of reflector
     
     KIND OF CRITICAL
     - include aperture class

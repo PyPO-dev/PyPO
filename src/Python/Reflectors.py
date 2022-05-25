@@ -39,16 +39,18 @@ Reflector ID        : {}
 Focus 1 position    : [{:.3f}, {:.3f}, {:.3f}] [mm]
 Focus 2 position    : [{:.3f}, {:.3f}, {:.3f}] [mm]
 
-Semi-major axis     : {} [mm]
-Semi-minor axis     : {} [mm]
-Foci distance       : {} [mm]
+3D:
+a                   : {} [mm]
+b                   : {} [mm]
+c                   : {} [mm]
+
 Off [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
 Rot [rx, ry, rz]    : [{:.3f}, {:.3f}, {:.3f}] [deg]
 COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
 ######################### REFLECTOR INFO #########################\n""".format(self.reflectorType, self.reflectorId, 
                                                                                self.focus_1[0], self.focus_1[1], self.focus_1[2],
                                                                                self.focus_2[0], self.focus_2[1], self.focus_2[2],
-                                                                               self.a, self.b, 2 * self.c,
+                                                                               self.a, self.b, self.c,
                                               self.offTrans[0], self.offTrans[1], self.offTrans[2],
                                               offRotDeg[0], offRotDeg[1], offRotDeg[2],
                                               self.cRot[0], self.cRot[1], self.cRot[2])
@@ -395,8 +397,8 @@ class Hyperbola(Reflector):
         
         prefac = 1 / np.sqrt(self.b**2 * self.c**2 * (u**2 - 1) * np.cos(v)**2 + self.a**2 * self.c**2 * (u**2 - 1) * np.sin(v)**2 + self.a**2 * self.b**2 * u**2)
         
-        nx = -self.b * self.c * (u**2 - 1) * np.cos(v) * prefac
-        ny = -self.a * self.c * (u**2 - 1) * np.sin(v) * prefac
+        nx = -self.b * self.c * np.sqrt(u**2 - 1) * np.cos(v) * prefac
+        ny = -self.a * self.c * np.sqrt(u**2 - 1) * np.sin(v) * prefac
         nz = self.a * self.b * u * prefac
         
         return x, y, z, nx, ny, nz

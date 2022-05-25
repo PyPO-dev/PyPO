@@ -74,7 +74,12 @@ class System(object):
             diff = f1 - f2
             c = np.sqrt(np.dot(diff, diff)) / 2
             a = c / ecc
-            b = a
+            b = np.sqrt(c**2 - a**2)
+            
+            # Convert 2D hyperbola a,b,c to 3D hyperboloid a,b,c
+            a3 = b
+            b3 = b
+            c3 = a
         
             # Find direction between focii
             orientation = diff / np.sqrt(np.dot(diff, diff))
@@ -91,7 +96,7 @@ class System(object):
             offRot = np.array([rx, ry, rz])
             cRot = offTrans
         
-        h = Reflectors.Hyperbola(a, b, c, cRot, offTrans, offRot, name)
+        h = Reflectors.Hyperbola(a3, b3, c3, cRot, offTrans, offRot, name)
         
         self.system["{}".format(name)] = h
         self.num_ref += 1

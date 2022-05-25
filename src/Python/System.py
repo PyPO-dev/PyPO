@@ -6,11 +6,13 @@ import matplotlib.pyplot as pt
 # POPPy-specific modules
 import src.Python.Reflectors as Reflectors
 import src.Python.RayTrace as RayTrace
+import src.Python.Camera as Camera
 
 class System(object):
     
     def __init__(self):
         self.num_ref = 0
+        self.num_cam = 0
         self.system = {}
         
     def __str__(self):
@@ -20,43 +22,76 @@ class System(object):
         pass
     
     #### ADD REFLECTOR METHODS
-    # Takes as input a and b
-    def addParabola_ab(self, name="Parabola", a=1, b=1, cRot=np.zeros(3), offTrans=np.zeros(3), offRot=np.zeros(3)):
+    def addParabola(self, coef, mode='man', cRot=np.zeros(3), offTrans=np.zeros(3), offRot=np.zeros(3), name="Parabola"):
         if name == "Parabola":
             name = name + "_{}".format(self.sys_id)
             
-        p = Reflectors.Parabola(a, b, cRot, offTrans, offRot)
+        if mode == 'man':
+            a = coef[0]
+            b = coef[1]
+            
+        elif mode == 'foc':
+            f1 = coef[0] # Focal point position
+            ve = coef[1] # Vertex position
+            
+            diff = f1 - ve
+
+            df = np.sqrt(np.dot(diff, diff))
+            a = 2 * np.sqrt(df)
+            b = a
+            
+            orientation = diff / np.sqrt(np.dot(diff, diff))
+            offTrans = ve
+            
+            # Find rotation in frame of vertex
+            rx = np.arccos(1 - np.dot(np.array([1,0,0]), orientation))
+            ry = np.arccos(1 - np.dot(np.array([0,1,0]), orientation))
+            rz = 0#np.arccos(np.dot(np.array([0,0,1]), orientation))
+        
+            offRot = np.array([rx, ry, rz])
+            cRot = offTrans
+        
+        p = Reflectors.Parabola(a, b, cRot, offTrans, offRot, name)
         
         self.system["{}".format(name)] = p
         self.num_ref += 1
-    
-    # Takes as input focus_1 position. If created with this funcy=tion, automatically a=b
-    def addParabola_foc(self, name="Parabola", focus_1=np.array([0,0,1]), cRot=np.zeros(3), offTrans=np.zeros(3), offRot=np.zeros(3)):
-        if name == "Parabola":
-            name = name + "_{}".format(self.sys_id)
-        
-        a = 2 * np.sqrt(focus_1[2])
-        b = a
-        
-        p = Reflectors.Parabola(a, b, cRot, offTrans, offRot)
-        
-        self.system["{}".format(name)] = p
-        self.num_ref += 1
-        
-    def addHyperbola_ab(self, name="Hyperbola", a=1, b=1, c=1, cRot=np.zeros(3), offTrans=np.zeros(3), offRot=np.zeros(3)):
+
+    def addHyperbola(self, coef, mode='man', cRot=np.zeros(3), offTrans=np.zeros(3), offRot=np.zeros(3), name="Hyperbola"):
         if name == "Hyperbola":
             name = name + "_{}".format(self.sys_id)
-            
-        h = Reflectors.Hyperbola(a, b, c, cRot, offTrans, offRot)
         
-        self.system["{}".format(name)] = h
-        self.num_ref += 1
+        if mode == 'man':
+            a = coef[0]
+            b = coef[1]
+            c = coef[2]
         
-    def addHyperbola_foc(self, name="Hyperbola", a=1, b=1, c=1, cRot=np.zeros(3), offTrans=np.zeros(3), offRot=np.zeros(3)):
-        if name == "Hyperbola":
-            name = name + "_{}".format(self.sys_id)
+        elif mode == 'foc':
+            # Calculate a, b, c of hyperbola
+            f1 = coef[0] # Focal point 1 position
+            f2 = coef[1] # Focal point 2 position
+            ecc = coef[2] # Eccentricity of hyperbola
             
-        h = Reflectors.Hyperbola(a, b, c, cRot, offTrans, offRot)
+            diff = f1 - f2
+            c = np.sqrt(np.dot(diff, diff)) / 2
+            a = c / ecc
+            b = a
+        
+            # Find direction between focii
+            orientation = diff / np.sqrt(np.dot(diff, diff))
+        
+            # Find offset from center. Use offset as rotation origin for simplicity
+            center = (f1 + f2) / 2
+            offTrans = center
+        
+            # Find rotation in frame of center
+            rx = np.arccos(1 - np.dot(np.array([1,0,0]), orientation))
+            ry = np.arccos(1 - np.dot(np.array([0,1,0]), orientation))
+            rz = 0#np.arccos(np.dot(np.array([0,0,1]), orientation))
+        
+            offRot = np.array([rx, ry, rz])
+            cRot = offTrans
+        
+        h = Reflectors.Hyperbola(a, b, c, cRot, offTrans, offRot, name)
         
         self.system["{}".format(name)] = h
         self.num_ref += 1
@@ -65,7 +100,7 @@ class System(object):
         if name == "Ellipse":
             name = name + "_{}".format(self.sys_id)
         
-        e = Reflectors.Ellipse(a, b, c, cRot, offTrans, offRot)
+        e = Reflectors.Ellipse(a, b, c, cRot, offTrans, offRot, name)
         
         self.system["{}".format(name)] = e
         self.num_ref += 1
@@ -75,10 +110,16 @@ class System(object):
         if name == "Ellipse":
             name = name + "_{}".format(self.sys_id)
 
-        e = Reflectors.Ellipse(a, b, c, cRot, offTrans, offRot)
+        e = Reflectors.Ellipse(a, b, c, cRot, offTrans, offRot, name)
         
         self.system["{}".format(name)] = e
         self.num_ref += 1
+    
+    def addCamera(self, name="Camera", center=np.array([0,0,0]), offTrans=np.array([0,0,0]), offRot=np.array([0,0,0])):
+        cam = Camera.Camera(center, offTrans, offRot, name)
+        
+        self.system["{}".format(name)] = cam
+        self.num_cam += 1
         
     def removeElement(self, name):
         del self.system[name]
@@ -88,8 +129,12 @@ class System(object):
     def plotSystem(self, focus_1=False, focus_2=False, plotRaytrace=False):
         fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
         
-        for refl in self.system.values():
-            ax = refl.plotReflector(returns=True, ax_append=ax, focus_1=focus_1, focus_2=focus_2)
+        for elem in self.system.values():
+            if elem.elType == "Reflector":
+                ax = elem.plotReflector(returns=True, ax_append=ax, focus_1=focus_1, focus_2=focus_2)
+            
+            elif elem.elType == "Camera":
+                ax = elem.plotCamera(returns=True, ax_append=ax)
             
         if plotRaytrace:
             ax = self.Raytracer.plotRaysSystem(ax_append=ax)
@@ -111,15 +156,21 @@ class System(object):
         
         self.Raytracer = rt
         
-    def startRaytracer(self, surface):
+    def startRaytracer(self, surface, a_init=100, verbose=False):
         """
         Propagate rays in RayTracer to a surface.
         Adds new frame to rays, containing point of intersection and reflected direction.
         """
+        if not hasattr(self.system[surface], 'tcks'):
+            
+            if self.system[surface].elType == "Reflector":
+                self.system[surface].interpReflector(verbose=verbose)
+                
+            elif self.system[surface].elType == "Camera":
+                self.system[surface].interpCamera()
         
-        self.system[surface].interpReflector()
         self.Raytracer.set_tcks(self.system[surface].tcks)
-        self.Raytracer.propagateRays(a_init=100)
+        self.Raytracer.propagateRays(a_init=a_init)
         
 if __name__ == "__main__":
     print("Please run System.py from the SystemInterface.py, located in the POPPy directory.")

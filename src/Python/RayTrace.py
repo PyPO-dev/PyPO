@@ -98,10 +98,17 @@ Chief ray direction : [{:.4f}, {:.4f}, {:.4f}]
         return interp_z
         
     def interpEval_n(self, x, y):
-        interp_u = interp.bisplev(x, y, self.tcks[1])
-        interp_v = interp.bisplev(x, y, self.tcks[2])
-        interp_w = interp.bisplev(x, y, self.tcks[3])
-        return np.array([interp_u, interp_v, interp_w])
+        interp_nx = interp.bisplev(x, y, self.tcks[1])
+        interp_ny = interp.bisplev(x, y, self.tcks[2])
+        interp_nz = interp.bisplev(x, y, self.tcks[3])
+        
+        norm = np.sqrt(interp_nz**2 + interp_ny**2 + interp_nx**2)
+        
+        interp_nx /= norm
+        interp_ny /= norm
+        interp_nz /= norm
+        
+        return np.array([interp_nx, interp_ny, interp_nz])
     
     def optLine_z(self, a, ray):
         """
@@ -119,17 +126,32 @@ Chief ray direction : [{:.4f}, {:.4f}, {:.4f}]
         for i, (key, ray) in enumerate(self.rays.items()):
             part_optLine_z = partial(self.optLine_z, ray=ray)
             
-            a_opt = optimize.fmin(part_optLine_z, a_init, disp=0)
-            #print(a_opt)
+            a_opt = optimize.fmin(part_optLine_z, a_init, disp=0, xtol=1e-10, ftol=1e-10)
             
             position = a_opt*ray["directions"][-1] + ray["positions"][-1]
-            #print(position[2])
+
             interp_n = self.interpEval_n(position[0], position[1])
             
             direction = ray["directions"][-1] - 2 * np.dot(ray["directions"][-1], interp_n) * interp_n
-            #print(interp_n)
+            
+            norm = np.sqrt(np.dot(direction, direction))
+            #direction /= norm
+            '''
+            # Diagnostics - remove when fixed
+            print("Incoming ray direction at surface:")
+            print(ray["directions"][-1])
+            print("Normal vector at surface:")
+            print(interp_n)
+            print("ray direction at surface")
+            print(direction)
+            
+            '''
+            
+            
             ray["positions"].append(position)
             ray["directions"].append(direction)
+            
+        print(self.rays["ray_4"]["positions"][-1])
     
     def plotRays(self, quiv=True, frame=0):
         fig, ax = pt.subplots(1,1)
@@ -143,12 +165,15 @@ Chief ray direction : [{:.4f}, {:.4f}, {:.4f}]
                 ax.scatter(ray["positions"][-1][0], ray["positions"][-1][1], color='black')
             '''
             ax.scatter(ray["positions"][frame][0], ray["positions"][frame][1], color='black', s=10)
-            ax.quiver(ray["positions"][frame][0], ray["positions"][frame][1], 10 * ray["directions"][frame][0], 10 * ray["directions"][frame][1], color='black', width=0.005, scale=10)
             
-        ax.set_aspect(1)
+            if quiv:
+                ax.quiver(ray["positions"][frame][0], ray["positions"][frame][1], 10 * ray["directions"][frame][0], 10 * ray["directions"][frame][1], color='black', width=0.005, scale=10)
+            
+        #ax.set_aspect(1)
         pt.show()
         
     def plotRaysSystem(self, ax_append):
+        
         for i, (key, ray) in enumerate(self.rays.items()):
             x = []
             y = []

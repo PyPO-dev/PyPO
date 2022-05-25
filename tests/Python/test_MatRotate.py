@@ -9,6 +9,10 @@ import src.Python.MatRotate as MatRotate
 
 class TestMatRotate(unittest.TestCase):
     
+    @classmethod
+    def setUpClass(cls):
+        print("\nTesting MatRotate")
+    
     def setUp(self):
         self.theta1 = np.radians(np.array([0,0,180]))
         self.theta2 = np.radians(np.array([0,180,0]))
@@ -22,7 +26,6 @@ class TestMatRotate(unittest.TestCase):
         pass
     
     def test_MatRotate(self):
-        print("test_MatRotate")
         result, mat = MatRotate.MatRotate(theta=self.theta1, points=self.point1, matOut=True)
         self.assertEqual(result[0], -1)
         

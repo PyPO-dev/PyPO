@@ -24,10 +24,10 @@ class TestParabola(unittest.TestCase):
         self.lims_x = [-5000, 5000]
         self.lims_y = [-5000, 5000]
         
-        self.lims_u = [200 / self.a, 5000/ self.a]
+        self.lims_u = [0, 5000/ self.a]
         self.lims_v = [0, 2*np.pi]
         
-        self.gridsize = [101, 101]
+        self.gridsize = [201, 201]
         
         self.parabola = Reflectors.Parabola(a = self.a, b = self.b, cRot = self.cRot, offRot = self.rot, offTrans = self.offTrans, name = "p")
         
@@ -110,7 +110,7 @@ class TestParabola(unittest.TestCase):
             self.assertAlmostEqual(nx.ravel()[i], interp_nx.ravel()[i], places=3)
             self.assertAlmostEqual(ny.ravel()[i], interp_ny.ravel()[i], places=3)
             self.assertAlmostEqual(nz.ravel()[i], interp_nz.ravel()[i], places=3)
-            
+
     def test_uvParabola(self):
         u = np.array([100]).astype(float)
         v = 1/4 * np.pi
@@ -153,12 +153,12 @@ class TestHyperbola(unittest.TestCase):
         self.lims_x = [-310, 310]
         self.lims_y = [-310, 310]
         
-        self.lims_u = [1, 100]
+        self.lims_u = [1, 1.045]
         self.lims_v = [0, 2*np.pi]
         
-        self.gridsize = [101, 101]
+        self.gridsize = [201, 201]
         
-        self.hyperbola = Reflectors.Hyperbola(a = 2590.5, b = 2590.5, c = 5606 / 2, cRot = self.cRot, offRot = self.rot, offTrans = self.offTrans, name = "h")
+        self.hyperbola = Reflectors.Hyperbola(a = 1070, b = 1070, c = 2590, cRot = self.cRot, offRot = self.rot, offTrans = self.offTrans, name = "h")
         
     def TearDown(self):
         pass
@@ -239,7 +239,7 @@ class TestHyperbola(unittest.TestCase):
             self.assertAlmostEqual(nx.ravel()[i], interp_nx.ravel()[i], places=3)
             self.assertAlmostEqual(ny.ravel()[i], interp_ny.ravel()[i], places=3)
             self.assertAlmostEqual(nz.ravel()[i], interp_nz.ravel()[i], places=3)
-    
+            
     def test_uvHyperbola(self):
         u = np.array([100]).astype(float)
         v = 1/4 * np.pi

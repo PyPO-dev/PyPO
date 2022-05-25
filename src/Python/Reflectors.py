@@ -256,15 +256,7 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
         skip = slice(None,None,res)
         if verbose:
             print("Calculating interpolation of {}".format(self.name))
-        '''
-        posInterp = interp.bisplrep(self.grid_x.ravel()[skip], self.grid_y.ravel()[skip], self.grid_z.ravel()[skip], kx=3, ky=3)
-        
-        nxInterp = interp.bisplrep(self.grid_x.ravel()[skip], self.grid_y.ravel()[skip], self.grid_nx.ravel()[skip], kx=3, ky=3)
-        nyInterp = interp.bisplrep(self.grid_x.ravel()[skip], self.grid_y.ravel()[skip], self.grid_ny.ravel()[skip], kx=3, ky=3)
-        nzInterp = interp.bisplrep(self.grid_x.ravel()[skip], self.grid_y.ravel()[skip], self.grid_nz.ravel()[skip], kx=3, ky=3)
-        
-        tcks = [posInterp, nxInterp, nyInterp, nzInterp]
-        '''
+            
         posInterp = interp.bisplrep(self.grid_x, self.grid_y, self.grid_z, kx=3, ky=3, s=0.000001)
         
         nxInterp = interp.bisplrep(self.grid_x.ravel()[skip], self.grid_y.ravel()[skip], self.grid_nx.ravel()[skip], kx=3, ky=3, s=0.000001)
@@ -274,22 +266,7 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
         tcks = [posInterp, nxInterp, nyInterp, nzInterp]
         # Store interpolations as members
         self.tcks = tcks
-        '''
-        # TEST interpolation on same grid
-        skip = slice(None,None,100)
-        pt.plot(self.grid_x)
-        pt.show()
-        interp_z = interp.bisplev(self.edge_x, self.edge_y, tcks_p)
-        fig, ax = pt.subplots(1,2, figsize=(10,10), subplot_kw={"projection": "3d"})
-        
-        ax[0].plot_trisurf(self.grid_x, self.grid_y, self.grid_z,
-                       linewidth=0, antialiased=False, alpha=0.5)#, color=color)
-        
-        ax[1].plot_trisurf(self.grid_x, self.grid_y, interp_z,
-                       linewidth=0, antialiased=False, alpha=0.5)#, color=color)
-        '''
 
-    
     def plotReflector(self, color='blue', returns=False, ax_append=False, focus_1=False, focus_2=False, fine=2, norm=False):
         
         skip = slice(None,None,fine)

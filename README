@@ -1,27 +1,8 @@
-LIST OF TODO'S:
+Welcome to the POPPy (Physical OPtics for Python) package!
 
-C++:
-Physical optics:
-    CRITICAL:
-    - general reflector implementation
-    - cleaner file I/O with Python
-    
-    KIND OF CRITICAL:
-    - CUDA (or OpenGL)
-
-PYTHON:
-Optical system:
-    CRITICAL:
-    - include correct definition of Ellipse focii
-    - calculate the more general focal geometries for ALL reflectors
-    - off-axis selection of reflector
-    
-    KIND OF CRITICAL
-    - include aperture class
-    - include lenses
-    
-Ray-tracer:
-    CRITICAL:
-    - implement actual ray-tracer
-    
-
+-- TESTING --
+To run the Python unittests:
+```
+cd ./tests/python/
+nosetests
+```

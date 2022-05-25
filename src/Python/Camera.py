@@ -28,8 +28,7 @@ Current Rotation    : [{:.3f}, {:.3f}, {:.3f}] [mm]
     def setGrid(self, lims_x, lims_y, gridsize):
         range_x = np.linspace(lims_x[0], lims_x[1], gridsize[0])
         range_y = np.linspace(lims_y[0], lims_y[1], gridsize[1])
-        
-        #grid_x, grid_y = np.meshgrid(range_x, range_y)
+
         grid_x, grid_y = np.mgrid[lims_x[0]:lims_x[1]:gridsize[0]*1j, lims_y[0]:lims_y[1]:gridsize[1]*1j]
         
         self.grid_x = grid_x + self.center[0]

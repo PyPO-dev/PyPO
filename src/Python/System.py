@@ -30,6 +30,8 @@ class System(object):
             a = coef[0]
             b = coef[1]
             
+            p = Reflectors.Parabola(a, b, cRot, offTrans, offRot, name)
+            
         elif mode == 'foc':
             f1 = coef[0] # Focal point position
             ve = coef[1] # Vertex position
@@ -51,7 +53,9 @@ class System(object):
             offRot = np.array([rx, ry, rz])
             cRot = offTrans
         
-        p = Reflectors.Parabola(a, b, cRot, offTrans, offRot, name)
+            p = Reflectors.Parabola(a, b, cRot, offTrans, offRot, name)
+            
+            p.focus_1 = f1
         
         self.system["{}".format(name)] = p
         self.num_ref += 1
@@ -64,6 +68,8 @@ class System(object):
             a = coef[0]
             b = coef[1]
             c = coef[2]
+            
+            h = Reflectors.Hyperbola(a, b, c, cRot, offTrans, offRot, name)
         
         elif mode == 'foc':
             # Calculate a, b, c of hyperbola
@@ -96,7 +102,10 @@ class System(object):
             offRot = np.array([rx, ry, rz])
             cRot = offTrans
         
-        h = Reflectors.Hyperbola(a3, b3, c3, cRot, offTrans, offRot, name)
+            h = Reflectors.Hyperbola(a3, b3, c3, cRot, offTrans, offRot, name)
+            
+            h.focus_1 = f1
+            h.focus_2 = f2
         
         self.system["{}".format(name)] = h
         self.num_ref += 1

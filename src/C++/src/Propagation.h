@@ -22,89 +22,51 @@ class Propagation
 {
     double k;
     int numThreads;
-    int gridsize_i;
-    int gridsize_h;
-    int gridsize_e;
-    int gridsize_sec;
-    int step_h;
-    int step_e;
-    int step_sec;
+    int gridsize_s;
+    int gridsize_t;
+
+    int step;
     
     double thres;
     
     std::complex<double> j;
     std::complex<double> z0;
-    
-    std::vector<double> n0;
-    std::vector<double> p0;
-    double source_area;
-    
 public:
     
     std::vector<std::thread> threadPool;
-    std::vector<std::vector<std::complex<double>>> beam_container_e;
-    std::vector<std::vector<std::complex<double>>> beam_container_h;
+    std::vector<std::vector<std::complex<double>>> Et_container;
+    std::vector<std::vector<std::complex<double>>> Ht_container;
     
-    std::vector<std::vector<std::complex<double>>> j_1_container;
-    std::vector<std::vector<std::complex<double>>> m_1_container;
-    
-    std::vector<std::vector<std::complex<double>>> j_2_container;
-    std::vector<std::vector<std::complex<double>>> m_2_container;
+    std::vector<std::vector<std::complex<double>>> Jt_container;
+    std::vector<std::vector<std::complex<double>>> Mt_container;
 
-    Propagation(double k, int numThreads, 
-                int gridsize_i, int gridsize_h, int gridsize_e, int gridsize_sec, 
-                std::vector<double> n0, std::vector<double> p0, 
-                double &source_area, double thres);
+    Propagation(double k, int numThreads, int gridsize_s, int gridsize_t, double thres);
     
     Utils ut;
-    
-    void propagateBeamFoc(int start, int stop,
-                       const std::vector<std::vector<double>> &grid_target,
-                       const std::vector<std::vector<double>> &grid_source,
-                       const std::vector<double> &source_area);
 
     void propagateBeam(int start, int stop,
                        const std::vector<std::vector<double>> &grid_target,
                        const std::vector<std::vector<double>> &grid_source, 
-                       const std::vector<double> &source_area,
-                       const std::vector<std::vector<double>> &ell_n);
-
-    void propagateBeamInit(int start, int stop,
-                       const std::vector<std::vector<double>> &grid_target,
-                       const std::vector<std::vector<double>> &grid_source, 
-                       const std::vector<std::complex<double>> &beam_source,
-                       const std::vector<std::vector<double>> &hyp_n);
-    
-    std::vector<std::vector<std::complex<double>>> fieldAtFoc(const std::vector<std::vector<double>> &grid_source,
-                                      const std::vector<double> &point_target,
-                                      const std::vector<double> &source_area);
+                       const std::vector<std::vector<double>> &norm_target, 
+                       const std::vector<std::vector<std::complex<double>>> &Js,
+                       const std::vector<std::vector<std::complex<double>>> &Ms,
+                       const std::vector<double> &source_area);
 
     std::vector<std::vector<std::complex<double>>> fieldAtPoint(const std::vector<std::vector<double>> &grid_source,
+                                      const std::vector<std::vector<std::complex<double>>> &Js,
+                                      const std::vector<std::vector<std::complex<double>>> &Ms,
                                       const std::vector<double> &point_target,
                                       const std::vector<double> &source_area,
                                       const int start);
 
-    std::vector<std::vector<std::complex<double>>> fieldAtPointInit(const std::vector<std::vector<double>> &grid_source,
-                                      const std::vector<std::complex<double>> &beam_source,
-                                      const std::vector<double> &point_target,
-                                      const double max_beam);
-    
-    void parallelPropFoc(const std::vector<std::vector<double>> &grid_target,
-                      const std::vector<std::vector<double>> &grid_source, 
-                      const std::vector<double> &source_area);
-
     void parallelProp(const std::vector<std::vector<double>> &grid_target,
                       const std::vector<std::vector<double>> &grid_source, 
-                      const std::vector<double> &source_area,
-                      const std::vector<std::vector<double>> &ell_n);
+                      const std::vector<std::vector<double>> &norm_target,
+                      const std::vector<std::vector<std::complex<double>>> &Js,
+                      const std::vector<std::vector<std::complex<double>>> &Ms,
+                      const std::vector<double> &source_area);
 
-    void parallelPropInit(const std::vector<std::vector<double>> &grid_target,
-                      const std::vector<std::vector<double>> &grid_source, 
-                      const std::vector<std::complex<double>> &beam_source,
-                      const std::vector<std::vector<double>> &hyp_n);
-    
     void joinThreads();
-    void emptyContainer();
 };
 #endif
     

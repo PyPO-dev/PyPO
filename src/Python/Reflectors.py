@@ -39,7 +39,7 @@ Reflector ID        : {}
 Focus 1 position    : [{:.3f}, {:.3f}, {:.3f}] [mm]
 Focus 2 position    : [{:.3f}, {:.3f}, {:.3f}] [mm]
 
-3D:
+3D reflector parameters:
 a                   : {} [mm]
 b                   : {} [mm]
 c                   : {} [mm]
@@ -365,6 +365,14 @@ class Parabola(Reflector):
             nz = -1
         
         return x, y, z, nx, ny, nz
+    
+    def r_to_u(self, r, axis='a'):
+        if axis == 'a':
+            u = r / self.a
+        elif axis == 'b':
+            u = r / self.b
+            
+        return u
 
 class Hyperbola(Reflector):
     """
@@ -423,6 +431,14 @@ class Hyperbola(Reflector):
             nz = -2 * z / self.c**2
         
         return x, y, z, nx, ny, nz
+    
+    def r_to_u(self, r, axis='a'):
+        if axis == 'a':
+            u = np.sqrt((r / self.a)**2 + 1)
+        elif axis == 'b':
+            u = np.sqrt((r / self.b)**2 + 1)
+            
+        return u
         
 class Ellipse(Reflector):
     """

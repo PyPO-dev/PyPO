@@ -17,12 +17,14 @@ public:
     
     DataHandler() {};
     std::vector<double> readFile(std::ifstream &file);
-    std::vector<std::vector<double>> readGrid3D(int mode);
-    std::vector<std::complex<double>> readBeamInit(std::string &fileName);
-    std::vector<double> readArea(std::string &fileName);
-    std::vector<std::vector<double>> readNormals(int mode);
+    std::vector<double> readPars();
+    std::vector<std::vector<double>> readGrid3D(std::string &mode);
+    std::vector<std::vector<std::complex<double>>> read_Js();
+    std::vector<std::vector<std::complex<double>>> read_Ms();
+    std::vector<double> readArea();
+    std::vector<std::vector<double>> readNormals();
     
-    void writeBeam(std::vector<std::vector<std::complex<double>>> &beam, std::string &fileName);
+    void writeOut(std::vector<std::vector<std::complex<double>>> &out, std::string &fileName);
     
 };
 #endif 

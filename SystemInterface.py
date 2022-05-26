@@ -27,7 +27,7 @@ def SystemInterface():
     lims_u_p1 = [200/118, 5000/118]
     lims_v_p1 = [0, 2*np.pi]
     
-    lims_u_h1 = [1, 1.045]
+    lims_u_h1 = [1, (3500 - 106.285 - 696)/2590]
     lims_v_h1 = [0, 2*np.pi]
 
     gridsize_p1 = [501, 501]
@@ -95,7 +95,7 @@ def SystemInterface():
     s.startRaytracer(surface="cam1")
     s.Raytracer.plotRays(frame=-1, quiv=False)
 
-    s.plotSystem(focus_1=True, focus_2=True, plotRaytrace=True)#, exclude=[0,1,2])
+    s.plotSystem(focus_1=False, focus_2=False, plotRaytrace=True)#, exclude=[0,1,2])
     
 if __name__ == "__main__":
     SystemInterface()

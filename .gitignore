@@ -128,6 +128,14 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# C++ object files and executables
+*.o
+*.exe
+
+# User-specific folders
+src/C++/input/
+src/C++/output/
+
 # Personal projects/files
 personal/
 literature/

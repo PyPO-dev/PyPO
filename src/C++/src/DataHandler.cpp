@@ -204,12 +204,12 @@ void DataHandler::writeOut(std::vector<std::vector<std::complex<double>>> &out, 
     for (int k=0; k<3; k++)
     {
     
-        std::ofstream out_r;
-        std::ofstream out_i;
+        std::fstream out_r;
+        std::fstream out_i;
     
-        out_r.open("output/r" + fileName + xyz[k] + ".txt");
-        out_i.open("output/i" + fileName + xyz[k] + ".txt");
-    
+        out_r.open("output/r" + fileName + xyz[k] + ".txt", std::fstream::out);
+        out_i.open("output/i" + fileName + xyz[k] + ".txt", std::fstream::out);
+        
         out_r << std::setprecision(prec);
         out_i << std::setprecision(prec);
 
@@ -221,6 +221,9 @@ void DataHandler::writeOut(std::vector<std::vector<std::complex<double>>> &out, 
         }
         out_r << std::endl;
         out_i << std::endl;
+        
+        out_r.close();
+        out_i.close();
     }
 }
 

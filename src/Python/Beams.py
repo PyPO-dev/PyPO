@@ -11,7 +11,7 @@ class Beams(object):
     The beam values are unchanged.
     """
     
-    def __init__(self, x_lims, y_lims, gridsize):
+    def __init__(self, x_lims, y_lims, gridsize, flip):
         self.cl = 299792458e3 # [mm]
         
         grid_x, grid_y = np.mgrid[x_lims[0]:x_lims[1]:gridsize[0]*1j, y_lims[0]:y_lims[1]:gridsize[1]*1j]
@@ -20,19 +20,27 @@ class Beams(object):
         self.grid_y = grid_y
         self.grid_z = np.zeros(grid_x.shape)
         
-        self.norm = np.array([0,0,1])
+        if flip:
+            self.norm = np.array([0,0,-1])
+        else:
+            self.norm = np.array([0,0,1])
+            
+    def transBeam(self, offTrans):
+        self.grid_x += offTrans[0]
+        self.grid_y += offTrans[1]
+        self.grid_z += offTrans[2]
         
-    def calc_Js(self, mode='None'):
-        Jx = []
-        Jy = []
-        Jz = []
+    def calcJM(self, mode='None'):
+        Jx = np.zeros(self.Ex.ravel().shape).astype(complex)
+        Jy = np.zeros(self.Ex.ravel().shape).astype(complex)
+        Jz = np.zeros(self.Ex.ravel().shape).astype(complex)
         
-        Mx = []
-        My = []
-        Mz = []
+        Mx = np.zeros(self.Ex.ravel().shape).astype(complex)
+        My = np.zeros(self.Ex.ravel().shape).astype(complex)
+        Mz = np.zeros(self.Ex.ravel().shape).astype(complex)
         
         if mode == 'None':
-            for ex,ey,ez,hx,hy,hz in zip(self.Ex.ravel(), self.Ey.ravel(), self.Ez.ravel(), self.Hx.ravel(), self.Hy.ravel(), self.Hz.ravel()):
+            for i,ex,ey,ez,hx,hy,hz in enumerate(zip(self.Ex.ravel(), self.Ey.ravel(), self.Ez.ravel(), self.Hx.ravel(), self.Hy.ravel(), self.Hz.ravel())):
                 e_arr = np.array([ex,ey,ez])
                 h_arr = np.array([hx,hy,hz])
                 
@@ -48,32 +56,27 @@ class Beams(object):
                 Mz.append(ms[2])
                 
         elif mode == 'PMC':
-            for ex,ey,ez in zip(self.Ex.ravel(), self.Ey.ravel(), self.Ez.ravel()):
+            for i,(ex,ey,ez) in enumerate(zip(self.Ex.ravel(), self.Ey.ravel(), self.Ez.ravel())):
                 e_arr = np.array([ex,ey,ez])
-                
-                js = 0
+
                 ms = -2 * np.cross(self.norm, e_arr)
                 
-                Jx.append(js)
-                Jy.append(js)
-                Jz.append(js)
-                
-                Mx.append(ms[0])
-                My.append(ms[1])
-                Mz.append(ms[2])
-                
-        Jx = np.array(Jx).reshape(self.grid_x.shape)
-        Jy = np.array(Jy).reshape(self.grid_x.shape)
-        Jz = np.array(Jz).reshape(self.grid_x.shape)
-                
-        Mx = np.array(Mx).reshape(self.grid_x.shape)
-        My = np.array(My).reshape(self.grid_x.shape)
-        Mz = np.array(Mz).reshape(self.grid_x.shape)
+                Mx[i] = ms[0]
+                My[i] = ms[1]
+                Mz[i] = ms[2]
+        
+        self.Jx = np.array(Jx).reshape(self.grid_x.shape)
+        self.Jy = np.array(Jy).reshape(self.grid_x.shape)
+        self.Jz = np.array(Jz).reshape(self.grid_x.shape)
+        
+        self.Mx = np.array(Mx).reshape(self.grid_x.shape)
+        self.My = np.array(My).reshape(self.grid_x.shape)
+        self.Mz = np.array(Mz).reshape(self.grid_x.shape)
 
 class PlaneWave(Beams):
     
-    def __init__(self, x_lims, y_lims, gridsize, pol=np.array([1,0,0]), amp=1, phase=0):
-        Beams.__init__(self, x_lims, y_lims, gridsize)
+    def __init__(self, x_lims, y_lims, gridsize, pol, amp, phase, flip):
+        Beams.__init__(self, x_lims, y_lims, gridsize, flip)
         
         self.Ex = pol[0] * amp * np.exp(1j * phase) * np.ones(self.grid_x.shape)
         self.Ey = pol[1] * amp * np.exp(1j * phase) * np.ones(self.grid_x.shape)

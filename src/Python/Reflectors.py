@@ -121,14 +121,19 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
             range_u = np.linspace(lims_x[0], lims_x[1], gridsize[0])# TODO remove this hack
             range_v = np.linspace(lims_y[0], lims_y[1], gridsize[1])
             
+            du = range_u[1] - range_u[0]
+            dv = range_v[1] - range_v[0]
+            
             #grid_u, grid_v = np.meshgrid(range_u, range_v)
             grid_u, grid_v = np.mgrid[lims_x[0]:lims_x[1]:gridsize[0]*1j, lims_y[0]:lims_y[1]:gridsize[1]*1j]
             
             if self.reflectorType == "Paraboloid":
-                grid_x, grid_y, grid_z, grid_nx, grid_ny, grid_nz = self.uvParabola(grid_u, grid_v)
+                grid_x, grid_y, grid_z, grid_nx, grid_ny, grid_nz, area = self.uvParabola(grid_u, grid_v, du, dv)
                 
             if self.reflectorType == "Hyperboloid":
-                grid_x, grid_y, grid_z, grid_nx, grid_ny, grid_nz = self.uvHyperbola(grid_u, grid_v)
+                grid_x, grid_y, grid_z, grid_nx, grid_ny, grid_nz, area = self.uvHyperbola(grid_u, grid_v, du, dv)
+            
+            self.area = area
             
             grid_nx *= mult
             grid_ny *= mult
@@ -155,12 +160,6 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
             grid_ny = self.c * 2 * grid_y / self.b**2 * (1 - grid_x ** 2 / self.a ** 2 - grid_y ** 2 / self.b ** 2)**(-1/2)
 
         #grids_o = [grid_x_o, grid_y_o, grid_z_o]
-
-        if calcArea:
-            #self.calcArea(grids_o, verbose)
-            pass
-        else:
-            self.area = np.ones(grid_x.shape)
 
         if trunc:
             self.truncateGrid(verbose=verbose)
@@ -321,7 +320,7 @@ class Parabola(Reflector):
         self.reflectorId = self.id
         self.reflectorType = "Paraboloid"
         
-    def uvParabola(self, u, v):
+    def uvParabola(self, u, v, du, dv):
         """
         Create paraboloid from uv points.
         @param u Height parameter (number/array).
@@ -341,7 +340,9 @@ class Parabola(Reflector):
         ny = -2 * self.a * u * np.sin(v) * prefac
         nz = self.a * self.b * prefac
         
-        return x, y, z, nx, ny, nz
+        area = u * np.sqrt(4 * self.b**2 * u**2 * np.cos(v)**2 + 4 * self.a**2 * u**2 * np.sin(v)**2 + self.a**2 * self.b**2) * du * dv
+        
+        return x, y, z, nx, ny, nz, area
     
     def xyParabola(self, x, y):
         """
@@ -397,7 +398,7 @@ class Hyperbola(Reflector):
         self.reflectorId = self.id
         self.reflectorType = "Hyperboloid"
     
-    def uvHyperbola(self, u, v):
+    def uvHyperbola(self, u, v, du, dv):
         
         x = self.a * np.sqrt(u**2 - 1) * np.cos(v)
         y = self.b * np.sqrt(u**2 - 1) * np.sin(v)
@@ -409,7 +410,9 @@ class Hyperbola(Reflector):
         ny = -self.a * self.c * np.sqrt(u**2 - 1) * np.sin(v) * prefac
         nz = self.a * self.b * u * prefac
         
-        return x, y, z, nx, ny, nz
+        area = np.sqrt(self.b**2 * self.c**2 * (u**2 - 1) * np.cos(v)**2 + self.a**2 * self.c**2 * (u**2 - 1) * np.sin(v)**2 + self.a**2 * self.b**2 * u**2) * du * dv
+        
+        return x, y, z, nx, ny, nz, area
         
     
     def xyHyperbola(self, x, y):

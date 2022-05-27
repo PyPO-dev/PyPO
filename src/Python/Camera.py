@@ -28,6 +28,9 @@ Current Rotation    : [{:.3f}, {:.3f}, {:.3f}] [mm]
     def setGrid(self, lims_x, lims_y, gridsize):
         range_x = np.linspace(lims_x[0], lims_x[1], gridsize[0])
         range_y = np.linspace(lims_y[0], lims_y[1], gridsize[1])
+        
+        dx = range_x[1] - range_x[0]
+        dy = range_y[1] - range_y[0]
 
         grid_x, grid_y = np.mgrid[lims_x[0]:lims_x[1]:gridsize[0]*1j, lims_y[0]:lims_y[1]:gridsize[1]*1j]
         
@@ -38,6 +41,8 @@ Current Rotation    : [{:.3f}, {:.3f}, {:.3f}] [mm]
         self.grid_nx = np.zeros(self.grid_x.shape)
         self.grid_ny = np.zeros(self.grid_y.shape)
         self.grid_nz = np.ones(self.grid_z.shape)
+        
+        self.area = np.ones(self.grid_x.shape) * dx * dy
         
     def interpCamera(self, res=100):
         skip = slice(None,None,res)

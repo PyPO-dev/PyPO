@@ -2,6 +2,11 @@
 
 Propagation::Propagation(double k, int numThreads, int gridsize_s, int gridsize_t, double thres)
 {
+    std::complex<double> j(0., 1.);
+    std::complex<double> z0(0., 0.);
+    this->j = j;
+    this->z0 = z0;
+    
     this->k = k;
 
     this->numThreads = numThreads;
@@ -9,20 +14,21 @@ Propagation::Propagation(double k, int numThreads, int gridsize_s, int gridsize_
     this->gridsize_t = gridsize_t;
     
     this->step = ceil(gridsize_t / numThreads);
-    
+
     // Convert decibels to E-field values now to save log10 evaluation time
     double exponent = -1 * thres / 20.;
     this->thres = pow(10., exponent);
     
     threadPool.resize(numThreads);
     
-    j_container.resize(gridsize_t);
-    m_container.resize(gridsize_t);
-
-    std::complex<double> j(0., 1.);
-    std::complex<double> z0(0., 0.);
-    this->j = j;
-    this->z0 = z0;
+    std::vector<std::complex<double>> grid(gridsize_t, z0);
+    std::vector<std::vector<std::complex<double>>> grid3D(3, grid);
+    
+    this->Jt_container = grid3D;
+    this->Mt_container = grid3D;
+    
+    this->Et_container = grid3D;
+    this->Ht_container = grid3D;
 }
 
 
@@ -35,6 +41,7 @@ void Propagation::propagateBeam(int start, int stop,
                                 const std::vector<std::vector<std::complex<double>>> &Ms,
                                 const std::vector<double> &source_area)
 {
+    
     // For performance gain, allocate ALL data structures before the main loop
     std::vector<std::complex<double>> h_conj(3, z0);
     std::vector<std::complex<double>> e_out_h(3, z0);
@@ -69,6 +76,7 @@ void Propagation::propagateBeam(int start, int stop,
     
     for(int i=start; i<stop; i++)
     {
+        
         point[0] = grid_target[0][i];
         point[1] = grid_target[1][i];
         point[2] = grid_target[2][i];
@@ -79,7 +87,6 @@ void Propagation::propagateBeam(int start, int stop,
         
         // Calculate total incoming E and H field at point on target
         beam_e_h = fieldAtPoint(grid_source, Js, Ms, point, source_area, start);
-        
         // Calculate normalised incoming poynting vector.
         h_conj = ut.conj(beam_e_h[1]);
         e_out_h = ut.ext(beam_e_h[0], h_conj);
@@ -91,7 +98,7 @@ void Propagation::propagateBeam(int start, int stop,
             this->Et_container[k][i] = beam_e_h[0][k];
             this->Ht_container[k][i] = beam_e_h[1][k];
         }
-        
+
         S_i_norm = ut.normalize(e_out_h_r); // Missing factor of 0.5: normalized anyways right?
         
         // Calculate incoming polarization vectors
@@ -132,14 +139,13 @@ void Propagation::propagateBeam(int start, int stop,
         // Fill arrays containing the currents on the target. Note m should be multiplied with - before usage
         for (int k=0; k<3; k++)
         {
-            this->Jt_container[k][i] = n_out_h_i_r[k]
-            this->Mt_container[k][i] = n_out_e_i_r[k]
+            this->Jt_container[k][i] = n_out_h_i_r[k];
+            this->Mt_container[k][i] = n_out_e_i_r[k];
         }
         
-        if(i % 100 == 0 and start == 0 * step_e)
+        if(i % 100 == 0 and start == 0 * this->step)
         {
-            int toPrint = gridsize_e / numThreads;
-            std::cout << "    " << i << " / " << toPrint << std::endl;
+            std::cout << i << " / " << this->step << std::endl;
         }
     }
 }
@@ -151,28 +157,28 @@ std::vector<std::vector<std::complex<double>>> Propagation::fieldAtPoint(const s
                                                const std::vector<double> &source_area,
                                                const int start)
 {
+    
     std::vector<std::complex<double>> e_field(3, z0);
     std::vector<std::complex<double>> h_field(3, z0);
 
     std::vector<double> source_point(3, 0.);
-    std::vector<double> source_norm(3, 0.);
     
     std::vector<std::vector<std::complex<double>>> e_h_field(2, e_field);
-    std::vector<std::complex<double>> j(3, z0);
-    std::vector<std::complex<double>> m(3, z0);
+    std::vector<std::complex<double>> js(3, z0);
+    std::vector<std::complex<double>> ms(3, z0);
     std::vector<double> r_vec(3, 0.);
     double r = 0.;
     
-    std::complex<double> r_in_j = z0;
+    std::complex<double> r_in_js = z0;
     std::vector<std::complex<double>> temp2_e(3, z0);
     std::vector<std::complex<double>> temp1_e(3, z0);
     std::vector<std::complex<double>> e_vec_thing(3, z0);
         
-    std::vector<std::complex<double>> k_out_m(3, z0);
+    std::vector<std::complex<double>> k_out_ms(3, z0);
 
-    std::vector<std::complex<double>> k_out_j(3, z0);
+    std::vector<std::complex<double>> k_out_js(3, z0);
         
-    std::complex<double> r_in_m = z0;
+    std::complex<double> r_in_ms = z0;
     std::vector<std::complex<double>> temp2_h(3, z0);
     std::vector<std::complex<double>> temp1_h(3, z0);
     std::vector<std::complex<double>> h_vec_thing(3, z0);
@@ -180,14 +186,14 @@ std::vector<std::vector<std::complex<double>>> Propagation::fieldAtPoint(const s
     
     for(int i=0; i<gridsize_s; i++)
     {
+        
         for (int k=0; k<3; k++)
         {
             source_point[k] = grid_source[k][i];
-            source_norm[k] = norm_source[k][i];
-        
             js[k] = Js[k][i];
             ms[k] = Ms[k][i];
         }
+        //std::cout << i << std::endl;
         r_vec = ut.diff(point_target, source_point);
         r = ut.abs(r_vec);
         
@@ -216,6 +222,7 @@ std::vector<std::vector<std::complex<double>>> Propagation::fieldAtPoint(const s
             h_field[k] += -C_L * EPS_ALU * h_vec_thing[k] / r * Green - k_out_js[k] * Green;
         }  
     }
+    
     // Pack e and h together in single container 
     e_h_field[0] = e_field;
     e_h_field[1] = h_field;
@@ -229,30 +236,23 @@ void Propagation::parallelProp(const std::vector<std::vector<double>> &grid_targ
                                const std::vector<std::vector<std::complex<double>>> &Ms,
                                const std::vector<double> &source_area)
 {
-    // Resize J, M, E, H containers.
-    Jt_container.resize(gridsize_t);
-    Mt_container.resize(gridsize_t);
-    
-    Et_container.resize(gridsize_t);
-    Ht_container.resize(gridsize_t);
-    
     int final_step; 
     
     for(int n=0; n<numThreads; n++)
     {
         if(n == (numThreads-1))
         {
-            final_step = gridsize_e;
+            final_step = gridsize_t;
         }
         
         else
         {
-            final_step = (n+1) * step_e;
+            final_step = (n+1) * step;
         }
         
         threadPool[n] = std::thread(&Propagation::propagateBeam, 
-                                    this, n * step_e, final_step, 
-                                    grid_target, grid_source, norm_target, norm_source, Js, Ms, source_area);
+                                    this, n * step, final_step, 
+                                    grid_target, grid_source, norm_target, Js, Ms, source_area);
     }
 }
 

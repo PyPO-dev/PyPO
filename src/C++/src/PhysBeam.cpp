@@ -64,7 +64,7 @@ int main(int argc, char *argv [])
     // Start timer
     
     begin = std::chrono::steady_clock::now();
-    std::cout << "    Calculating beam on hyperboloid..." << std::endl;
+    std::cout << "Calculating beam on target..." << std::endl;
     prop.parallelProp(grid_target, grid_source, norm_target, Js, Ms, source_area);
     prop.joinThreads();
     
@@ -75,8 +75,8 @@ int main(int argc, char *argv [])
     
         std::string Jt_file = "Jt";
         std::string Mt_file = "Mt";
-        handler.writeBeam(Jt, Jt_file);
-        handler.writeBeam(Mt, Mt_file);
+        handler.writeOut(Jt, Jt_file);
+        handler.writeOut(Mt, Mt_file);
     }
     
     else if (toPrint == 1)
@@ -86,8 +86,8 @@ int main(int argc, char *argv [])
     
         std::string Et_file = "Et";
         std::string Ht_file = "Ht";
-        handler.writeBeam(Et, Et_file);
-        handler.writeBeam(Ht, Ht_file);
+        handler.writeOut(Et, Et_file);
+        handler.writeOut(Ht, Ht_file);
     }
     
     else if (toPrint == 2)
@@ -97,24 +97,24 @@ int main(int argc, char *argv [])
     
         std::string Jt_file = "Jt";
         std::string Mt_file = "Mt";
-        handler.writeBeam(Jt, Jt_file);
-        handler.writeBeam(Mt, Mt_file);
+        handler.writeOut(Jt, Jt_file);
+        handler.writeOut(Mt, Mt_file);
         
         std::vector<std::vector<std::complex<double>>> Et = prop.Et_container;
         std::vector<std::vector<std::complex<double>>> Ht = prop.Ht_container;
     
         std::string Et_file = "Et";
         std::string Ht_file = "Ht";
-        handler.writeBeam(Et, Et_file);
-        handler.writeBeam(Ht, Ht_file);
+        handler.writeOut(Et, Et_file);
+        handler.writeOut(Ht, Ht_file);
     }
     
     // End timer
     end = std::chrono::steady_clock::now();
     
-    std::cout << "    Calculation time = " 
+    std::cout << "Calculation time = " 
         << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() 
-        << " [s]" << std::endl;
+        << " [s]\n" << std::endl;
 
     return 0;
 }

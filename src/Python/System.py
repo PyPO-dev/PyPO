@@ -7,6 +7,8 @@ import matplotlib.pyplot as pt
 import src.Python.Reflectors as Reflectors
 import src.Python.RayTrace as RayTrace
 import src.Python.Camera as Camera
+import src.Python.Beams as Beams
+import src.Python.PhysOptics as PO
 
 class System(object):
     
@@ -185,6 +187,91 @@ class System(object):
         
         self.Raytracer.set_tcks(self.system[surface].tcks)
         self.Raytracer.propagateRays(a_init=a_init)
+        
+    def addBeam(self, x_lims, y_lims, gridsize, beam='pw', pol=np.array([1,0,0]), amp=1, phase=0, flip=False):
+        if beam == 'pw':
+            self.inputBeam = Beams.PlaneWave(x_lims, y_lims, gridsize, pol, amp, phase, flip)
+            
+    #### TODO: make following two functions look less horrible
+    def initPhysOptics(self, target, k, thres=-50, numThreads=1, inputPath='./src/C++/input/', outputPath='./src/C++/output/'):
+        """
+        Create a PO object that will act as the 'translator' between POPPy and PhysBeam.
+        Also performs the initial propagation from beam to target.
+        Should be called once per system.
+        """
+        
+        self.PO = PO.PhysOptics(inputPath, outputPath, k, numThreads, thres)
+
+        # Write beam to input
+        self.PO.writeInput('grid_s_x.txt', self.inputBeam.grid_x)
+        self.PO.writeInput('grid_s_y.txt', self.inputBeam.grid_y)
+        self.PO.writeInput('grid_s_z.txt', self.inputBeam.grid_z)
+        
+        self.PO.writeInput('rJs_x.txt', np.real(self.inputBeam.Jx))
+        self.PO.writeInput('rJs_y.txt', np.real(self.inputBeam.Jy))
+        self.PO.writeInput('rJs_z.txt', np.real(self.inputBeam.Jz))
+        
+        self.PO.writeInput('iJs_x.txt', np.imag(self.inputBeam.Jx))
+        self.PO.writeInput('iJs_y.txt', np.imag(self.inputBeam.Jy))
+        self.PO.writeInput('iJs_z.txt', np.imag(self.inputBeam.Jz))
+        
+        self.PO.writeInput('rMs_x.txt', np.real(self.inputBeam.Mx))
+        self.PO.writeInput('rMs_y.txt', np.real(self.inputBeam.My))
+        self.PO.writeInput('rMs_z.txt', np.real(self.inputBeam.Mz))
+        
+        self.PO.writeInput('iMs_x.txt', np.imag(self.inputBeam.Mx))
+        self.PO.writeInput('iMs_y.txt', np.imag(self.inputBeam.My))
+        self.PO.writeInput('iMs_z.txt', np.imag(self.inputBeam.Mz))
+        
+        # Write target grid
+        self.PO.writeInput('grid_t_x.txt', target.grid_x)
+        self.PO.writeInput('grid_t_y.txt', target.grid_y)
+        self.PO.writeInput('grid_t_z.txt', target.grid_z)
+        
+        self.PO.writeInput('norm_t_nx.txt', target.grid_nx)
+        self.PO.writeInput('norm_t_ny.txt', target.grid_ny)
+        self.PO.writeInput('norm_t_nz.txt', target.grid_nz)
+        
+        self.PO.writeInput('As.txt', target.area)
+
+    def nextPhysOptics(self, target):
+        """
+        Perform a physical optics propagation from source to target.
+        Automatically continues from last propagation by copying currents and gird to input
+        """
+        self.PO.copyToInput('grid_t_x.txt', 'grid_s_x.txt', grid=True)
+        self.PO.copyToInput('grid_t_y.txt', 'grid_s_y.txt', grid=True)
+        self.PO.copyToInput('grid_t_z.txt', 'grid_s_z.txt', grid=True)
+        
+        self.PO.copyToInput('rJt_x.txt', 'rJs_x.txt')
+        self.PO.copyToInput('rJt_y.txt', 'rJs_y.txt')
+        self.PO.copyToInput('rJt_z.txt', 'rJs_z.txt')
+        
+        self.PO.copyToInput('iJt_x.txt', 'iJs_x.txt')
+        self.PO.copyToInput('iJt_y.txt', 'iJs_y.txt')
+        self.PO.copyToInput('iJt_z.txt', 'iJs_z.txt')
+        
+        self.PO.copyToInput('rMt_x.txt', 'rMs_x.txt')
+        self.PO.copyToInput('rMt_y.txt', 'rMs_y.txt')
+        self.PO.copyToInput('rMt_z.txt', 'rMs_z.txt')
+        
+        self.PO.copyToInput('iMt_x.txt', 'iMs_x.txt')
+        self.PO.copyToInput('iMt_y.txt', 'iMs_y.txt')
+        self.PO.copyToInput('iMt_z.txt', 'iMs_z.txt')
+        
+        # Write target grid
+        self.PO.writeInput('grid_t_x.txt', target.grid_x)
+        self.PO.writeInput('grid_t_y.txt', target.grid_y)
+        self.PO.writeInput('grid_t_z.txt', target.grid_z)
+        
+        self.PO.writeInput('norm_t_nx.txt', target.grid_nx)
+        self.PO.writeInput('norm_t_ny.txt', target.grid_ny)
+        self.PO.writeInput('norm_t_nz.txt', target.grid_nz)
+        
+        self.PO.writeInput('As.txt', target.area)
+    
+    def runPhysOptics(self, save=0):
+        self.PO.runPhysOptics(save)
         
 if __name__ == "__main__":
     print("Please run System.py from the SystemInterface.py, located in the POPPy directory.")

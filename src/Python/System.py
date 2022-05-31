@@ -9,8 +9,15 @@ import src.Python.RayTrace as RayTrace
 import src.Python.Camera as Camera
 import src.Python.Beams as Beams
 import src.Python.PhysOptics as PO
+import src.Python.FourierOptics as FO
 
 class System(object):
+    
+    fileNames_s = ['grid_s_x.txt', 'grid_s_y.txt', 'grid_s_z.txt', 'As.txt', 'Js_x.txt', 'Js_y.txt', 'Js_z.txt', 'Ms_x.txt', 'Ms_y.txt', 'Ms_z.txt']
+    
+    fileNames_t = ['grid_t_x.txt', 'grid_t_y.txt', 'grid_t_z.txt', 'As.txt', 'norm_t_nx.txt', 'norm_t_ny.txt', 'norm_t_nz.txt']
+    
+    fileNames_tc = ['Jt_x.txt', 'Jt_y.txt', 'Jt_z.txt', 'Mt_x.txt', 'Mt_y.txt', 'Mt_z.txt']
     
     def __init__(self):
         self.num_ref = 0
@@ -20,13 +27,10 @@ class System(object):
     def __str__(self):
         pass
     
-    def __iter__(self):
-        pass
-    
     #### ADD REFLECTOR METHODS
     def addParabola(self, coef, mode='man', cRot=np.zeros(3), offTrans=np.zeros(3), offRot=np.zeros(3), name="Parabola"):
         if name == "Parabola":
-            name = name + "_{}".format(self.sys_id)
+            name = name + "_{}".format(self.num_ref)
             
         if mode == 'man':
             a = coef[0]
@@ -64,7 +68,7 @@ class System(object):
 
     def addHyperbola(self, coef, mode='man', cRot=np.zeros(3), offTrans=np.zeros(3), offRot=np.zeros(3), name="Hyperbola"):
         if name == "Hyperbola":
-            name = name + "_{}".format(self.sys_id)
+            name = name + "_{}".format(self.num_ref)
         
         if mode == 'man':
             a = coef[0]
@@ -114,7 +118,7 @@ class System(object):
         
     def addEllipse_ab(self, name="Ellipse", a=2, b=3, c=5, cRot=np.zeros(3), offTrans=np.zeros(3), offRot=np.zeros(3)):
         if name == "Ellipse":
-            name = name + "_{}".format(self.sys_id)
+            name = name + "_{}".format(self.num_ref)
         
         e = Reflectors.Ellipse(a, b, c, cRot, offTrans, offRot, name)
         
@@ -124,7 +128,7 @@ class System(object):
     # Place and create ellipse using focus_1 and confocal distance c. Automatically creates a symmetric ellipsoid
     def addEllipse_foc(self, name="Ellipse", focus_1=np.array([0,0,1]), focus_2=np.array([0,0,1]), cRot=np.zeros(3), offTrans=np.zeros(3), offRot=np.zeros(3)):
         if name == "Ellipse":
-            name = name + "_{}".format(self.sys_id)
+            name = name + "_{}".format(self.num_ref)
 
         e = Reflectors.Ellipse(a, b, c, cRot, offTrans, offRot, name)
         
@@ -192,7 +196,6 @@ class System(object):
         if beam == 'pw':
             self.inputBeam = Beams.PlaneWave(x_lims, y_lims, gridsize, pol, amp, phase, flip)
             
-    #### TODO: make following two functions look less horrible
     def initPhysOptics(self, target, k, thres=-50, numThreads=1, inputPath='./src/C++/input/', outputPath='./src/C++/output/'):
         """
         Create a PO object that will act as the 'translator' between POPPy and PhysBeam.
@@ -202,73 +205,36 @@ class System(object):
         
         self.PO = PO.PhysOptics(inputPath, outputPath, k, numThreads, thres)
 
-        # Write beam to input
-        self.PO.writeInput('grid_s_x.txt', self.inputBeam.grid_x)
-        self.PO.writeInput('grid_s_y.txt', self.inputBeam.grid_y)
-        self.PO.writeInput('grid_s_z.txt', self.inputBeam.grid_z)
-        
-        self.PO.writeInput('rJs_x.txt', np.real(self.inputBeam.Jx))
-        self.PO.writeInput('rJs_y.txt', np.real(self.inputBeam.Jy))
-        self.PO.writeInput('rJs_z.txt', np.real(self.inputBeam.Jz))
-        
-        self.PO.writeInput('iJs_x.txt', np.imag(self.inputBeam.Jx))
-        self.PO.writeInput('iJs_y.txt', np.imag(self.inputBeam.Jy))
-        self.PO.writeInput('iJs_z.txt', np.imag(self.inputBeam.Jz))
-        
-        self.PO.writeInput('rMs_x.txt', np.real(self.inputBeam.Mx))
-        self.PO.writeInput('rMs_y.txt', np.real(self.inputBeam.My))
-        self.PO.writeInput('rMs_z.txt', np.real(self.inputBeam.Mz))
-        
-        self.PO.writeInput('iMs_x.txt', np.imag(self.inputBeam.Mx))
-        self.PO.writeInput('iMs_y.txt', np.imag(self.inputBeam.My))
-        self.PO.writeInput('iMs_z.txt', np.imag(self.inputBeam.Mz))
-        
-        # Write target grid
-        self.PO.writeInput('grid_t_x.txt', target.grid_x)
-        self.PO.writeInput('grid_t_y.txt', target.grid_y)
-        self.PO.writeInput('grid_t_z.txt', target.grid_z)
-        
-        self.PO.writeInput('norm_t_nx.txt', target.grid_nx)
-        self.PO.writeInput('norm_t_ny.txt', target.grid_ny)
-        self.PO.writeInput('norm_t_nz.txt', target.grid_nz)
-        
-        self.PO.writeInput('As.txt', target.area)
-
-    def nextPhysOptics(self, target):
+        # Write input beam to input
+        for i, attr in enumerate(self.inputBeam):
+            self.PO.writeInput(self.fileNames_s[i], attr)
+            
+        for i, attr in enumerate(target):
+            if i == 3:
+                # Dont write area of target
+                pass
+            else:
+                self.PO.writeInput(self.fileNames_t[i], attr)
+       
+    def nextPhysOptics(self, source, target):
         """
         Perform a physical optics propagation from source to target.
         Automatically continues from last propagation by copying currents and gird to input
         """
-        self.PO.copyToInput('grid_t_x.txt', 'grid_s_x.txt', grid=True)
-        self.PO.copyToInput('grid_t_y.txt', 'grid_s_y.txt', grid=True)
-        self.PO.copyToInput('grid_t_z.txt', 'grid_s_z.txt', grid=True)
-        
-        self.PO.copyToInput('rJt_x.txt', 'rJs_x.txt')
-        self.PO.copyToInput('rJt_y.txt', 'rJs_y.txt')
-        self.PO.copyToInput('rJt_z.txt', 'rJs_z.txt')
-        
-        self.PO.copyToInput('iJt_x.txt', 'iJs_x.txt')
-        self.PO.copyToInput('iJt_y.txt', 'iJs_y.txt')
-        self.PO.copyToInput('iJt_z.txt', 'iJs_z.txt')
-        
-        self.PO.copyToInput('rMt_x.txt', 'rMs_x.txt')
-        self.PO.copyToInput('rMt_y.txt', 'rMs_y.txt')
-        self.PO.copyToInput('rMt_z.txt', 'rMs_z.txt')
-        
-        self.PO.copyToInput('iMt_x.txt', 'iMs_x.txt')
-        self.PO.copyToInput('iMt_y.txt', 'iMs_y.txt')
-        self.PO.copyToInput('iMt_z.txt', 'iMs_z.txt')
+        for i, attr in enumerate(source):
+            if i <= 3:
+                self.PO.writeInput(self.fileNames_s[i], attr)
+                
+            else:
+                self.PO.copyToInput(self.fileNames_tc[i-4], self.fileNames_s[i])
         
         # Write target grid
-        self.PO.writeInput('grid_t_x.txt', target.grid_x)
-        self.PO.writeInput('grid_t_y.txt', target.grid_y)
-        self.PO.writeInput('grid_t_z.txt', target.grid_z)
-        
-        self.PO.writeInput('norm_t_nx.txt', target.grid_nx)
-        self.PO.writeInput('norm_t_ny.txt', target.grid_ny)
-        self.PO.writeInput('norm_t_nz.txt', target.grid_nz)
-        
-        self.PO.writeInput('As.txt', target.area)
+        for i, attr in enumerate(target):
+            if i == 3:
+                # Dont write area of target
+                pass
+            else:
+                self.PO.writeInput(self.fileNames_t[i], attr)
     
     def runPhysOptics(self, save=0):
         self.PO.runPhysOptics(save)

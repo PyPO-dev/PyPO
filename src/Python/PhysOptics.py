@@ -3,6 +3,7 @@ import os
 import matplotlib.pyplot as pt
 import matplotlib.cm as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+import scipy.fft as ft
 
 import src.Python.Colormaps as cmaps
 
@@ -29,13 +30,20 @@ class PhysOptics(object):
         self.thres = thres
         
     def writeInput(self, name, toWrite):
-        np.savetxt(self.inputPath + name, toWrite)
+        if np.any(np.iscomplexobj(toWrite)):
+            re = np.real(toWrite)
+            im = np.imag(toWrite)
+            
+            np.savetxt(self.inputPath + "r" + name, re)
+            np.savetxt(self.inputPath + "i" + name, im)
         
-    def copyToInput(self, name, nameNew, grid=False):
-        if grid:
-            os.system('cp {} {}'.format(self.inputPath + name, self.inputPath + nameNew))
         else:
-            os.system('cp {} {}'.format(self.outputPath + name, self.inputPath + nameNew))
+            np.savetxt(self.inputPath + name, toWrite)
+        
+    def copyToInput(self, name, nameNew):
+            os.system('cp {} {}'.format(self.outputPath + "r" + name, self.inputPath + "r" + nameNew))
+            
+            os.system('cp {} {}'.format(self.outputPath + "i" + name, self.inputPath + "i" + nameNew))
         
     def runPhysOptics(self, save=0):
         os.chdir('./src/C++/')
@@ -50,10 +58,31 @@ class PhysOptics(object):
         
         re = re.reshape(shape)
         im = im.reshape(shape)
-
-        return re + 1j * im
         
-    def plotField(self, grid_x, grid_y, mode='Ex'):
+        self.field = re + 1j * im
+
+        return self.field
+    
+    def FF_fromFocus(self, grid_x, grid_y, padding_range=(1000,1000)):
+        noise_level = 1e-12 + 1j * 1e-12
+        
+        field_pad = np.pad(self.field, padding_range, 'constant', constant_values=(noise_level, noise_level))
+        
+        grid_x_pad = np.pad(grid_x, padding_range, 'reflect', reflect_type='odd')
+        grid_y_pad = np.pad(grid_y, padding_range, 'reflect', reflect_type='odd')
+        
+        # Update gridsize_foc correspondingly
+        gridsize_pad = field_pad.shape
+        
+        ff_field = ft.fftshift(ft.ifft2(ft.ifftshift(field_pad)))
+        
+        pt.imshow(20 * np.log10(np.absolute(ff_field) / np.max(np.absolute(ff_field))), cmap=cmaps.parula, vmax=0, vmin=-50)
+        pt.show()
+        
+        theta_x = np.degrees(grid_foc_pad[1]*1e-3 / f_sys) * 3600
+        theta_y = np.degrees((grid_foc_pad[2] - z0)*1e-3 / f_sys) * 3600
+        
+    def plotField(self, grid_x, grid_y, mode='Ex', vmax=0, vmin=-30, ff=0):
         fig, ax = pt.subplots(1,2, figsize=(10,5), gridspec_kw={'wspace':0.5})
     
         divider1 = make_axes_locatable(ax[0])
@@ -64,18 +93,28 @@ class PhysOptics(object):
         
         field = self.loadField(shape=grid_x.shape, mode=mode)
         max_field = np.max(np.absolute(field))
-    
-        extent = [grid_x[0,0], grid_x[-1,0], grid_y[0,0], grid_y[0,-1]]
-        ampfig = ax[0].imshow(20 * np.log10(np.absolute(field) / max_field), origin='lower', extent=extent, cmap=cmaps.parula, vmin=-30, vmax=0)
+        
+        if not ff:
+            extent = [grid_x[0,0], grid_x[-1,0], grid_y[0,0], grid_y[0,-1]]
+            ax[0].set_ylabel(r"$z$ / [mm]")
+            ax[0].set_xlabel(r"$y$ / [mm]")
+            ax[1].set_ylabel(r"$z$ / [mm]")
+            ax[1].set_xlabel(r"$y$ / [mm]")
+            
+        else:
+            extent = [grid_x[0,0] / ff * 3600, grid_x[-1,0] / ff * 3600, grid_y[0,0] / ff * 3600, grid_y[0,-1] / ff * 3600]
+            ax[0].set_ylabel(r"El / [as]")
+            ax[0].set_xlabel(r"Az / [as]")
+            ax[1].set_ylabel(r"El / [as]")
+            ax[1].set_xlabel(r"Az / [as]")
+        
+        
+        ampfig = ax[0].imshow(20 * np.log10(np.absolute(field) / max_field), origin='lower', extent=extent, cmap=cmaps.parula, vmin=vmin, vmax=vmax)
         phasefig = ax[1].imshow(np.angle(field), origin='lower', extent=extent, cmap=cmaps.parula)
 
         ax[0].set_title("PNA / [dB]", y=1.08)
         ax[0].set_box_aspect(1)
-        ax[0].set_ylabel(r"$z$ / [mm]")
-        ax[0].set_xlabel(r"$y$ / [mm]")
         ax[1].set_title("Phase / [rad]", y=1.08)
-        ax[1].set_ylabel(r"$z$ / [mm]")
-        ax[1].set_xlabel(r"$y$ / [mm]")
         ax[1].set_box_aspect(1)
     
         c1 = fig.colorbar(ampfig, cax=cax1, orientation='vertical')

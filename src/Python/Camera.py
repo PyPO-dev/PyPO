@@ -14,6 +14,9 @@ class Camera(object):
         self.elType = "Camera"
         self.name = name
         
+        # Use internal list of references to iterable attributes
+        self._iterList = [0 for _ in range(7)]
+        
     def __str__(self):
         offRotDeg = np.degrees(self.offRot)
         s = """\n######################### CAMERA INFO #########################
@@ -24,6 +27,20 @@ Current Rotation    : [{:.3f}, {:.3f}, {:.3f}] [mm]
                                               self.offTrans[0], self.offTrans[1], self.offTrans[2],
                                               offRotDeg[0], offRotDeg[1], offRotDeg[2])
         return s
+    
+    def __iter__(self):
+        self._iterIdx = 0
+        return self
+    
+    def __next__(self):
+        if self._iterIdx < len(self._iterList):
+            result = self._iterList[self._iterIdx]
+            self._iterIdx += 1
+            
+            return result
+        
+        else:
+            raise StopIteration
         
     def setGrid(self, lims_x, lims_y, gridsize):
         range_x = np.linspace(lims_x[0], lims_x[1], gridsize[0])
@@ -43,6 +60,18 @@ Current Rotation    : [{:.3f}, {:.3f}, {:.3f}] [mm]
         self.grid_nz = np.ones(self.grid_z.shape)
         
         self.area = np.ones(self.grid_x.shape) * dx * dy
+        
+        self._iterList[0] = self.grid_x
+        self._iterList[1] = self.grid_y
+        self._iterList[2] = self.grid_z
+        
+        self._iterList[3] = self.area
+        
+        self._iterList[4] = self.grid_nx
+        self._iterList[5] = self.grid_ny
+        self._iterList[6] = self.grid_nz
+        
+        
         
     def interpCamera(self, res=100):
         skip = slice(None,None,res)

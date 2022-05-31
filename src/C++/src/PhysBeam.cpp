@@ -34,7 +34,7 @@ int main(int argc, char *argv [])
     int numThreads  = atoi(argv[1]); // Number of CPU threads to use
     double k        = atof(argv[2]); // Wavenumber of field to be propagated
     double thres    = atof(argv[3]); // Threshold in dB for propagation performance
-    int toPrint     = atoi(argv[4]); // 0 for printing J and M, 1 for E and H and 2 for all four
+    int toPrint     = atoi(argv[4]); // 0 for printing J and M, 1 for E and H and 2 for all fields
     
     // Initialize timer to assess performance
     std::chrono::steady_clock::time_point begin;

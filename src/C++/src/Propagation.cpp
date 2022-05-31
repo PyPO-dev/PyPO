@@ -140,7 +140,7 @@ void Propagation::propagateBeam(int start, int stop,
         for (int k=0; k<3; k++)
         {
             this->Jt_container[k][i] = n_out_h_i_r[k];
-            this->Mt_container[k][i] = n_out_e_i_r[k];
+            this->Mt_container[k][i] = -n_out_e_i_r[k];
         }
         
         if(i % 100 == 0 and start == 0 * this->step)
@@ -193,9 +193,12 @@ std::vector<std::vector<std::complex<double>>> Propagation::fieldAtPoint(const s
             js[k] = Js[k][i];
             ms[k] = Ms[k][i];
         }
-        //std::cout << i << std::endl;
+        //std::cout << source_point[0] << " " << source_point[1] << " " << source_point[2] << std::endl;
+        //std::cout << point_target[0] << " " << point_target[1] << " " << point_target[2] << std::endl;
+        
         r_vec = ut.diff(point_target, source_point);
         r = ut.abs(r_vec);
+        //std::cout << r << std::endl;
         
         // This outer products are necessary for the e-field. Assume MU_ALU = MU_0
         r_in_js = ut.dot(r_vec, js);
@@ -226,6 +229,9 @@ std::vector<std::vector<std::complex<double>>> Propagation::fieldAtPoint(const s
     // Pack e and h together in single container 
     e_h_field[0] = e_field;
     e_h_field[1] = h_field;
+    
+    //std::cout << ut.abs(e_field) << std::endl;
+    
     return e_h_field;
 }
 

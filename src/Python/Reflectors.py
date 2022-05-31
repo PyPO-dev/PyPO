@@ -30,6 +30,9 @@ class Reflector(object):
         self.elType = "Reflector"
         self.name = name
         
+        # Use internal list of references to iterable attributes
+        self._iterList = [0 for _ in range(7)]
+        
     def __str__(self):#, reflectorType, reflectorId, a, b, offTrans, offRot):
         offRotDeg = np.degrees(self.offRot)
         s = """\n######################### REFLECTOR INFO #########################
@@ -56,6 +59,21 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
                                               self.cRot[0], self.cRot[1], self.cRot[2])
         
         return s
+    
+    def __iter__(self):
+        self._iterIdx = 0
+        return self
+    
+    def __next__(self):
+        if self._iterIdx < len(self._iterList):
+            result = self._iterList[self._iterIdx]
+            self._iterIdx += 1
+            
+            return result
+        
+        else:
+            raise StopIteration
+        
     
     #### SETTERS ###
     def set_cRot(self, cRot):
@@ -102,20 +120,36 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
             #grid_x, grid_y = np.meshgrid(range_x, range_y)
             grid_x, grid_y = np.mgrid[lims_x[0]:lims_x[1]:gridsize[0]*1j, lims_y[0]:lims_y[1]:gridsize[1]*1j]
             
+            # Calculate oversized grid for area elements
+            min_xo = lims_x[0] - self.dx/2
+            max_xo = lims_x[1] + self.dx/2
+            num_x = gridsize[0]+1
+            
+            min_yo = lims_y[0] - self.dy/2
+            max_yo = lims_y[1] + self.dy/2
+            num_y = gridsize[1]+1
+
+            grid_xo, grid_yo = np.mgrid[min_xo:max_xo:num_x*1j, min_yo:max_yo:num_y*1j]
+            
             if self.reflectorType == "Paraboloid":
                 grid_x, grid_y, grid_z, grid_nx, grid_ny, grid_nz = self.xyParabola(grid_x, grid_y)
+                grid_xo, grid_yo, grid_zo, _, _, _ = self.xyParabola(grid_xo, grid_yo)
                 
             elif self.reflectorType == "Hyperboloid":
                 grid_x, grid_y, grid_z, grid_nx, grid_ny, grid_nz = self.xyHyperbola(grid_x, grid_y)
+                grid_xo, grid_yo, grid_zo, _, _, _ = self.xyHyperbola(grid_xo, grid_yo)
                 
             elif self.reflectorType == "Ellipsoid":
                 grid_x, grid_y, grid_z, grid_nx, grid_ny, grid_nz = self.xyParabola(grid_x, grid_y)
+                grid_xo, grid_yo, grid_zo, _, _, _ = self.xyHyperbola(grid_xo, grid_yo)
                 
             norm = np.sqrt(grid_nx**2 + grid_ny**2 + grid_nz**2)
                 
             grid_nx *= mult / norm
             grid_ny *= mult / norm
             grid_nz *= mult / norm
+            
+            
             
         elif param == 'uv':
             range_u = np.linspace(lims_x[0], lims_x[1], gridsize[0])# TODO remove this hack
@@ -138,19 +172,9 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
             grid_nx *= mult
             grid_ny *= mult
             grid_nz *= mult
-            
-            '''
-            fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
-            ax.plot_surface(grid_x, grid_y, grid_z)
-            pt.show()
-            '''
+
             range_x = grid_x[:,0]
             range_y = grid_y[0,:]
-            
-        # Oversized grid not flattened to work easy with current algorithm
-        #range_x_o = np.linspace(lims_x[0] - self.dx/2, lims_x[1] + self.dx/2, gridsize[0]+1)
-        #range_y_o = np.linspace(lims_y[0] - self.dy/2, lims_y[1] + self.dy/2, gridsize[1]+1)
-        #grid_x_o, grid_y_o = np.meshgrid(range_x_o, range_y_o)
             
         elif self.reflectorType == "Ellipsoid":
             #grid_z_o = -self.c * (np.sqrt(1 - grid_x_o ** 2 / self.a ** 2 - grid_y_o ** 2 / self.b ** 2) - 1)
@@ -179,7 +203,17 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
         # save edges of rectangular grid
         self.edge_x = range_x + self.offTrans[0]
         self.edge_y = range_y + self.offTrans[1]
-    
+        
+        self._iterList[0] = self.grid_x
+        self._iterList[1] = self.grid_y
+        self._iterList[2] = self.grid_z
+        
+        self._iterList[3] = self.area
+        
+        self._iterList[4] = self.grid_nx
+        self._iterList[5] = self.grid_ny
+        self._iterList[6] = self.grid_nz
+        
     def rotateGrid(self):
         gridRot = MatRotate.MatRotate(self.offRot, [self.grid_x, self.grid_y, self.grid_z], self.cRot)
         
@@ -226,7 +260,7 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
                 A[i,j] = np.sqrt(np.dot(outer, outer))
         
         # Flatten array containing area elements now for easier analysis
-        self.area = A.flatten()
+        self.area = A
     
     # Function to truncate with an ellipse in xy plane
     # TODO: plane with any orientation wrt xy plane

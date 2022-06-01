@@ -143,6 +143,8 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
                 grid_x, grid_y, grid_z, grid_nx, grid_ny, grid_nz = self.xyParabola(grid_x, grid_y)
                 grid_xo, grid_yo, grid_zo, _, _, _ = self.xyHyperbola(grid_xo, grid_yo)
                 
+            self.calcArea([grid_xo, grid_yo, grid_zo])
+                
             norm = np.sqrt(grid_nx**2 + grid_ny**2 + grid_nz**2)
                 
             grid_nx *= mult / norm

@@ -19,6 +19,8 @@ class System(object):
     
     fileNames_tc = ['Jt_x.txt', 'Jt_y.txt', 'Jt_z.txt', 'Mt_x.txt', 'Mt_y.txt', 'Mt_z.txt']
     
+    customBeamPath = './custom/beam/'
+    
     def __init__(self):
         self.num_ref = 0
         self.num_cam = 0
@@ -26,6 +28,12 @@ class System(object):
         
     def __str__(self):
         pass
+    
+    def setCustomBeamPath(self, path, append=False):
+        if append:
+            self.customBeamPath += path
+        else:
+            self.customBeamPath = path
     
     #### ADD REFLECTOR METHODS
     def addParabola(self, coef, mode='man', cRot=np.zeros(3), offTrans=np.zeros(3), offRot=np.zeros(3), name="Parabola"):
@@ -192,9 +200,13 @@ class System(object):
         self.Raytracer.set_tcks(self.system[surface].tcks)
         self.Raytracer.propagateRays(a_init=a_init)
         
-    def addBeam(self, x_lims, y_lims, gridsize, beam='pw', pol=np.array([1,0,0]), amp=1, phase=0, flip=False):
+    def addBeam(self, x_lims, y_lims, gridsize, beam='pw', pol=np.array([1,0,0]), amp=1, phase=0, flip=False, name='', comp='Ex'):
         if beam == 'pw':
             self.inputBeam = Beams.PlaneWave(x_lims, y_lims, gridsize, pol, amp, phase, flip)
+            
+        elif beam == 'custom':
+            pathsToFields = [self.customBeamPath + 'r' + name, self.customBeamPath + 'i' + name]
+            self.inputBeam = Beams.CustomBeam(x_lims, y_lims, gridsize, comp, pathsToFields, flip)
             
     def initPhysOptics(self, target, k, thres=-50, numThreads=1, inputPath='./src/C++/input/', outputPath='./src/C++/output/'):
         """
@@ -238,6 +250,9 @@ class System(object):
     
     def runPhysOptics(self, save=0):
         self.PO.runPhysOptics(save)
+        
+    def initFourierOptics(self, k=10):
+        self.FO = FO.FourierOptics(k=k)
         
 if __name__ == "__main__":
     print("Please run System.py from the SystemInterface.py, located in the POPPy directory.")

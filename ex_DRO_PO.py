@@ -36,7 +36,10 @@ def ex_DRO():
     # Use uv definition of parabola & hyperbola for interpolation in ray trace
     lims_u_p1       = [u_min_p1, u_max_p1]
     lims_v_p1       = [0, 2*np.pi]
-    gridsize_p1     = [201, 201] # The gridsizes along the u and v axes
+    
+    lims_x_p1       = [-R_pri, R_pri]
+    lims_y_p1       = [-R_pri, R_pri]
+    gridsize_p1     = [201, 201] # The gridsizes along the x and y axes
 
     # Instantiate camera surface. Size does not matter, as long as z coordinate agrees
     center_cam = foc_pri + np.array([0,0,0])
@@ -50,8 +53,17 @@ def ex_DRO():
     print(s.system["p1"])
     print(s.system["cam1"])
 
-    s.system["p1"].setGrid(lims_u_p1, lims_v_p1, gridsize_p1, calcArea=False, trunc=False, param='uv')
-    s.system["p1"].rotateGrid()
+    #s.system["p1"].setGrid(lims_u_p1, lims_v_p1, gridsize_p1, calcArea=False, trunc=False, param='uv')
+    s.system["p1"].setGrid(lims_x_p1, lims_y_p1, gridsize_p1, calcArea=True, trunc=False, param='xy')
+    print(np.max(s.system["p1"].grid_x))
+    print(np.max(s.system["p1"].grid_y))
+    
+    fig, ax = pt.subplots(1,4)
+    ax[0].imshow(s.system["p1"].grid_x)
+    ax[1].imshow(s.system["p1"].grid_y)
+    ax[2].imshow(s.system["p1"].grid_z)
+    ax[3].imshow(s.system["p1"].area)
+    pt.show()
 
     s.system["cam1"].setGrid(lims_x_cam, lims_y_cam, gridsize_cam)
     
@@ -83,6 +95,7 @@ def ex_DRO():
     s.plotSystem(focus_1=False, focus_2=False)#, exclude=[0,1,2])
 
     s.PO.plotField(s.system["cam1"].grid_x, s.system["cam1"].grid_y, mode='Ex', ff=12e3, vmin=-3)
+    #s.PO.plotField(s.system["cam1"].grid_x, s.system["cam1"].grid_y, mode='Ex', vmin=-30)
     
     s.PO.FF_fromFocus(s.system["cam1"].grid_x, s.system["cam1"].grid_y)
     

@@ -1,5 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as pt
+import matplotlib.cm as cm
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+import src.Python.Colormaps as cmaps
+import src.Python.Plotter as Plotter
 
 class Beams(object):
     """
@@ -11,10 +16,13 @@ class Beams(object):
     The beam values are unchanged.
     """
     
+    compList_eh = ['Ex', 'Ey', 'Ez', 'Hx', 'Hy', 'Hz']
+    
     def __init__(self, x_lims, y_lims, gridsize, flip):
         self.cl = 299792458e3 # [mm]
         # Use internal list of references to iterable attributes
         self._iterList = [0 for _ in range(10)]
+        self._compList = [0 for _ in range(6)]
         
         grid_x, grid_y = np.mgrid[x_lims[0]:x_lims[1]:gridsize[0]*1j, y_lims[0]:y_lims[1]:gridsize[1]*1j]
         
@@ -44,6 +52,8 @@ class Beams(object):
         else:
             self.norm = np.array([0,0,1])
             
+        self.plotter = Plotter.Plotter()
+            
         
     
     def __iter__(self):
@@ -66,18 +76,18 @@ class Beams(object):
         self.grid_z += offTrans[2]
         
     def calcJM(self, mode='None'):
-        Jx = np.zeros(self.Ex.ravel().shape).astype(complex)
-        Jy = np.zeros(self.Ex.ravel().shape).astype(complex)
-        Jz = np.zeros(self.Ex.ravel().shape).astype(complex)
+        Jx = np.zeros(self._compList[0].ravel().shape).astype(complex)
+        Jy = np.zeros(self._compList[0].ravel().shape).astype(complex)
+        Jz = np.zeros(self._compList[0].ravel().shape).astype(complex)
         
-        Mx = np.zeros(self.Ex.ravel().shape).astype(complex)
-        My = np.zeros(self.Ex.ravel().shape).astype(complex)
-        Mz = np.zeros(self.Ex.ravel().shape).astype(complex)
+        Mx = np.zeros(self._compList[0].ravel().shape).astype(complex)
+        My = np.zeros(self._compList[0].ravel().shape).astype(complex)
+        Mz = np.zeros(self._compList[0].ravel().shape).astype(complex)
         
         print(type(My))
         
         if mode == 'None':
-            for i,ex,ey,ez,hx,hy,hz in enumerate(zip(self.Ex.ravel(), self.Ey.ravel(), self.Ez.ravel(), self.Hx.ravel(), self.Hy.ravel(), self.Hz.ravel())):
+            for i,ex,ey,ez,hx,hy,hz in enumerate(zip(self._compList[0].ravel(), self._compList[1].ravel(), self._compList[2].ravel(), self._compList[3].ravel(), self._compList[4].ravel(), self._compList[5].ravel())):
                 e_arr = np.array([ex,ey,ez])
                 h_arr = np.array([hx,hy,hz])
                 
@@ -93,7 +103,7 @@ class Beams(object):
                 Mz.append(ms[2])
                 
         elif mode == 'PMC':
-            for i,(ex,ey,ez) in enumerate(zip(self.Ex.ravel(), self.Ey.ravel(), self.Ez.ravel())):
+            for i,(ex,ey,ez) in enumerate(zip(self._compList[0].ravel(), self._compList[1].ravel(), self._compList[2].ravel())):
                 e_arr = np.array([ex,ey,ez])
 
                 ms = -2 * np.cross(self.norm, e_arr)
@@ -117,28 +127,58 @@ class Beams(object):
         self._iterList[7] = self.Mx
         self._iterList[8] = self.My
         self._iterList[9] = self.Mz
+
+    def plotBeam(self, comp='Ex', mode='linear', vmin=-30, vmax=0):
+        idxComp = self.compList_eh.index(comp)
         
-        print(type(self.My[0,0]))
+        self.plotter.plotBeam2D(self.grid_x, self.grid_y, self._compList[idxComp])
 
 class PlaneWave(Beams):
-    
     def __init__(self, x_lims, y_lims, gridsize, pol, amp, phase, flip):
         Beams.__init__(self, x_lims, y_lims, gridsize, flip)
         
-        self.Ex = pol[0] * amp * np.exp(1j * phase) * np.ones(self.grid_x.shape)
-        self.Ey = pol[1] * amp * np.exp(1j * phase) * np.ones(self.grid_x.shape)
-        self.Ez = pol[2] * amp * np.exp(1j * phase) * np.ones(self.grid_x.shape)
+        for i, co in enumerate(self.compList_eh):
+            if i <= 2:
+                self._compList[i] = pol[i] * amp * np.exp(1j * phase) * np.ones(self.grid_x.shape)
+            
+            else:
+                self._compList[i] = np.zeros(self.grid_x.shape)
+                
+        self.Ex = self._compList[0]
+        self.Ey = self._compList[1]
+        self.Ez = self._compList[2]
         
-        self.Hx = np.zeros(self.grid_x.shape)
-        self.Hy = np.zeros(self.grid_x.shape)
-        self.Hz = np.zeros(self.grid_x.shape)
+        self.Hx = self._compList[3]
+        self.Hy = self._compList[4]
+        self.Hz = self._compList[5]
+
+class CustomBeam(Beams):
+    def __init__(self, x_lims, y_lims, gridsize, comp, pathsToField, flip):
+        idxComp = self.compList_eh.index(comp)
         
-    def plotBeam(self):
-        fig, ax = pt.subplots(1,2)
-        ax[0].imshow(np.absolute(self.Ex))
-        ax[1].imshow(np.angle(self.Ex))
+        Beams.__init__(self, x_lims, y_lims, gridsize, flip)
         
-        pt.show()
+        rfield = np.loadtxt(pathsToField[0])
+        ifield = np.loadtxt(pathsToField[1])
+        
+        field = rfield.reshape(self.grid_x.shape) + 1j * ifield.reshape(self.grid_x.shape)
+        
+        for i, co in enumerate(self.compList_eh):
+            if i == idxComp:
+                self._compList[i] = field
+            
+            else:
+                self._compList[i] = np.zeros(self.grid_x.shape)
+                
+        self.Ex = self._compList[0]
+        self.Ey = self._compList[1]
+        self.Ez = self._compList[2]
+        
+        self.Hx = self._compList[3]
+        self.Hy = self._compList[4]
+        self.Hz = self._compList[5]
+        
+    
         
         
         

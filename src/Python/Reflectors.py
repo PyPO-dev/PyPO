@@ -16,14 +16,16 @@ class Reflector(object):
     
     _counter = 0
     
-    def __init__(self, a, b, cRot, offTrans, offRot, name):
+    def __init__(self, a, b, cRot, name):
         
         self.a = a
         self.b = b
         
+        self.focus_1 = np.ones(3) * float("NaN")
+        self.focus_2 = np.ones(3) * float("NaN")
+        
         self.cRot     = cRot
-        self.offTrans = offTrans
-        self.offRot   = offRot
+        self
         
         Reflector._counter += 1
         self.id = Reflector._counter
@@ -34,29 +36,26 @@ class Reflector(object):
         self._iterList = [0 for _ in range(7)]
         
     def __str__(self):#, reflectorType, reflectorId, a, b, offTrans, offRot):
-        offRotDeg = np.degrees(self.offRot)
         s = """\n######################### REFLECTOR INFO #########################
 Reflector type      : {}
 Reflector ID        : {}
 
 Focus 1 position    : [{:.3f}, {:.3f}, {:.3f}] [mm]
 Focus 2 position    : [{:.3f}, {:.3f}, {:.3f}] [mm]
+Vertex position     : [{:.3f}, {:.3f}, {:.3f}] [mm]
 
 3D reflector parameters:
 a                   : {} [mm]
 b                   : {} [mm]
 c                   : {} [mm]
 
-Off [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
-Rot [rx, ry, rz]    : [{:.3f}, {:.3f}, {:.3f}] [deg]
 COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
 ######################### REFLECTOR INFO #########################\n""".format(self.reflectorType, self.reflectorId, 
                                                                                self.focus_1[0], self.focus_1[1], self.focus_1[2],
                                                                                self.focus_2[0], self.focus_2[1], self.focus_2[2],
+                                                                               self.vertex[0], self.vertex[1], self.vertex[2],
                                                                                self.a, self.b, self.c,
-                                              self.offTrans[0], self.offTrans[1], self.offTrans[2],
-                                              offRotDeg[0], offRotDeg[1], offRotDeg[2],
-                                              self.cRot[0], self.cRot[1], self.cRot[2])
+                                                                               self.cRot[0], self.cRot[1], self.cRot[2])
         
         return s
     
@@ -78,14 +77,8 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
     #### SETTERS ###
     def set_cRot(self, cRot):
         self.cRot = cRot
-        
-    def set_offTrans(self, offTrans):
-        self.offTrans = offTrans
-        
-    def set_offRot(self, offRot):
-        self.offRot = offRot
-    
-    def setGrid(self, lims_x, lims_y, gridsize, trunc=False, orientation='inside', calcArea=False, verbose=False, param='xy'):
+
+    def setGrid(self, lims_x, lims_y, gridsize, gmode, trunc, flip, axis):
         """
         Takes limits in x and y directions, gridsize in x and y. 
         Per default, truncates the grid.
@@ -102,46 +95,30 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
             TODO: test Ellipsoid normal vectors
         """
         
-        if orientation == 'inside':
-            mult = 1
-        else:
+        if flip:
             mult = -1
-            
-        if verbose:
-            print("Setting grids and normal vectors to {}".format(self.name))
-        
-        if param == 'xy':
-            range_x = np.linspace(lims_x[0], lims_x[1], gridsize[0])
-            range_y = np.linspace(lims_y[0], lims_y[1], gridsize[1])
-            
-            self.dx = np.absolute(range_x[0] - range_x[1]) # Store dx for possible future usage
-            self.dy = np.absolute(range_y[0] - range_y[1]) # Store dy for possible future usage
-            
-            #grid_x, grid_y = np.meshgrid(range_x, range_y)
+        else:
+            mult = 1
+
+        if gmode == 'xy':
             grid_x, grid_y = np.mgrid[lims_x[0]:lims_x[1]:gridsize[0]*1j, lims_y[0]:lims_y[1]:gridsize[1]*1j]
             
+            dx = grid_x[1,0] - grid_x[0,0]
+            dy = grid_y[0,1] - grid_y[0,0]
+            
             # Calculate oversized grid for area elements
-            min_xo = lims_x[0] - self.dx/2
-            max_xo = lims_x[1] + self.dx/2
+            min_xo = lims_x[0] - dx/2
+            max_xo = lims_x[1] + dx/2
             num_x = gridsize[0]+1
             
-            min_yo = lims_y[0] - self.dy/2
-            max_yo = lims_y[1] + self.dy/2
+            min_yo = lims_y[0] - dy/2
+            max_yo = lims_y[1] + dy/2
             num_y = gridsize[1]+1
 
             grid_xo, grid_yo = np.mgrid[min_xo:max_xo:num_x*1j, min_yo:max_yo:num_y*1j]
-            
-            if self.reflectorType == "Paraboloid":
-                grid_x, grid_y, grid_z, grid_nx, grid_ny, grid_nz = self.xyParabola(grid_x, grid_y)
-                grid_xo, grid_yo, grid_zo, _, _, _ = self.xyParabola(grid_xo, grid_yo)
-                
-            elif self.reflectorType == "Hyperboloid":
-                grid_x, grid_y, grid_z, grid_nx, grid_ny, grid_nz = self.xyHyperbola(grid_x, grid_y)
-                grid_xo, grid_yo, grid_zo, _, _, _ = self.xyHyperbola(grid_xo, grid_yo)
-                
-            elif self.reflectorType == "Ellipsoid":
-                grid_x, grid_y, grid_z, grid_nx, grid_ny, grid_nz = self.xyParabola(grid_x, grid_y)
-                grid_xo, grid_yo, grid_zo, _, _, _ = self.xyHyperbola(grid_xo, grid_yo)
+
+            grid_x, grid_y, grid_z, grid_nx, grid_ny, grid_nz = self.xyGrid(grid_x, grid_y)
+            grid_xo, grid_yo, grid_zo, _, _, _ = self.xyGrid(grid_xo, grid_yo)
                 
             self.calcArea([grid_xo, grid_yo, grid_zo])
                 
@@ -151,24 +128,18 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
             grid_ny *= mult / norm
             grid_nz *= mult / norm
             
+        elif gmode == 'uv':
+            # Assume now lims_x represent smallest aperture and largest aperture radii
+            # Convert radii to u values
+            lims_x = [self.r_to_u(lims_x[0], axis=axis), self.r_to_u(lims_x[1], axis=axis)]
             
-            
-        elif param == 'uv':
-            range_u = np.linspace(lims_x[0], lims_x[1], gridsize[0])# TODO remove this hack
-            range_v = np.linspace(lims_y[0], lims_y[1], gridsize[1])
-            
-            du = range_u[1] - range_u[0]
-            dv = range_v[1] - range_v[0]
-            
-            #grid_u, grid_v = np.meshgrid(range_u, range_v)
             grid_u, grid_v = np.mgrid[lims_x[0]:lims_x[1]:gridsize[0]*1j, lims_y[0]:lims_y[1]:gridsize[1]*1j]
             
-            if self.reflectorType == "Paraboloid":
-                grid_x, grid_y, grid_z, grid_nx, grid_ny, grid_nz, area = self.uvParabola(grid_u, grid_v, du, dv)
-                
-            if self.reflectorType == "Hyperboloid":
-                grid_x, grid_y, grid_z, grid_nx, grid_ny, grid_nz, area = self.uvHyperbola(grid_u, grid_v, du, dv)
-            
+            du = grid_u[1,0] - grid_u[0,0]
+            dv = grid_v[0,1] - grid_v[0,0]
+
+            grid_x, grid_y, grid_z, grid_nx, grid_ny, grid_nz, area = self.uvGrid(grid_u, grid_v, du, dv)
+
             self.area = area
             
             grid_nx *= mult
@@ -177,18 +148,9 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
 
             range_x = grid_x[:,0]
             range_y = grid_y[0,:]
-            
-        elif self.reflectorType == "Ellipsoid":
-            #grid_z_o = -self.c * (np.sqrt(1 - grid_x_o ** 2 / self.a ** 2 - grid_y_o ** 2 / self.b ** 2) - 1)
-            
-            grid_z = -self.c * (np.sqrt(1 - grid_x ** 2 / self.a ** 2 - grid_y ** 2 / self.b ** 2) - 1)
-            grid_nx = self.c * 2 * grid_x / self.a**2 * (1 - grid_x ** 2 / self.a ** 2 - grid_y ** 2 / self.b ** 2)**(-1/2)
-            grid_ny = self.c * 2 * grid_y / self.b**2 * (1 - grid_x ** 2 / self.a ** 2 - grid_y ** 2 / self.b ** 2)**(-1/2)
-
-        #grids_o = [grid_x_o, grid_y_o, grid_z_o]
 
         if trunc:
-            self.truncateGrid(verbose=verbose)
+            self.truncateGrid()
         
         self.grid_x = grid_x
         self.grid_y = grid_y
@@ -197,15 +159,7 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
         self.grid_nx = grid_nx
         self.grid_ny = grid_ny
         self.grid_nz = grid_nz
-        
-        self.grid_x += self.offTrans[0]
-        self.grid_y += self.offTrans[1]
-        self.grid_z += self.offTrans[2]
-        
-        # save edges of rectangular grid
-        self.edge_x = range_x + self.offTrans[0]
-        self.edge_y = range_y + self.offTrans[1]
-        
+
         self._iterList[0] = self.grid_x
         self._iterList[1] = self.grid_y
         self._iterList[2] = self.grid_z
@@ -216,28 +170,35 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
         self._iterList[5] = self.grid_ny
         self._iterList[6] = self.grid_nz
         
-    def rotateGrid(self):
-        gridRot = MatRotate.MatRotate(self.offRot, [self.grid_x, self.grid_y, self.grid_z], self.cRot)
+    def translateGrid(self, offTrans):
+        self.grid_x += offTrans[0]
+        self.grid_y += offTrans[1]
+        self.grid_z += offTrans[2]
+        
+        self.focus_1 += offTrans
+        self.focus_2 += offTrans
+        self.vertex += offTrans
+        
+    def rotateGrid(self, offRot):
+        gridRot = MatRotate.MatRotate(offRot, [self.grid_x, self.grid_y, self.grid_z], self.cRot)
         
         self.grid_x = gridRot[0]
         self.grid_y = gridRot[1]
         self.grid_z = gridRot[2]
         
-        grid_nRot = MatRotate.MatRotate(self.offRot, [self.grid_nx, self.grid_ny, self.grid_nz], self.cRot, vecRot=True)
+        grid_nRot = MatRotate.MatRotate(offRot, [self.grid_nx, self.grid_ny, self.grid_nz], self.cRot, vecRot=True)
         
         self.grid_nx = grid_nRot[0]
         self.grid_ny = grid_nRot[1]
         self.grid_nz = grid_nRot[2]
         
-        self.focus_1 = MatRotate.MatRotate(self.offRot, self.focus_1, self.cRot)
-        self.focus_2 = MatRotate.MatRotate(self.offRot, self.focus_2, self.cRot)
+        self.focus_1 = MatRotate.MatRotate(offRot, self.focus_1, self.cRot)
+        self.focus_2 = MatRotate.MatRotate(offRot, self.focus_2, self.cRot)
+        self.vertex = MatRotate.MatRotate(offRot, self.vertex, self.cRot)
     
-    def calcArea(self, grids_o, verbose=False):
+    def calcArea(self, grids_o):
         # Calculate surface approximations from oversized grids
         # Do this before grid truncation!
-        if verbose:
-            print("Calculating surface area of elements on {}".format(self.name))
-            
         x = grids_o[0]
         y = grids_o[1]
         z = grids_o[2]
@@ -266,9 +227,7 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
     
     # Function to truncate with an ellipse in xy plane
     # TODO: plane with any orientation wrt xy plane
-    def truncateGrid(self, verbose=False):
-        if verbose:
-            print("Truncating grids of {}".format(self.name))
+    def truncateGrid(self):
         lim_x_neg = np.amin(self.grid_x)
         lim_x_pos = np.amax(self.grid_x)
         
@@ -289,16 +248,14 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
         
         self.area = self.area[idx_in_ellipse]
         
-    def interpReflector(self, res=1, verbose=False):
+    def interpReflector(self, res=1):
         skip = slice(None,None,res)
-        if verbose:
-            print("Calculating interpolation of {}".format(self.name))
-            
-        posInterp = interp.bisplrep(self.grid_x, self.grid_y, self.grid_z, kx=3, ky=3, s=0.000001)
+
+        posInterp = interp.bisplrep(self.grid_x, self.grid_y, self.grid_z, kx=3, ky=3, s=1e-6)
         
-        nxInterp = interp.bisplrep(self.grid_x.ravel()[skip], self.grid_y.ravel()[skip], self.grid_nx.ravel()[skip], kx=3, ky=3, s=0.000001)
-        nyInterp = interp.bisplrep(self.grid_x.ravel()[skip], self.grid_y.ravel()[skip], self.grid_ny.ravel()[skip], kx=3, ky=3, s=0.000001)
-        nzInterp = interp.bisplrep(self.grid_x.ravel()[skip], self.grid_y.ravel()[skip], self.grid_nz.ravel()[skip], kx=3, ky=3, s=0.000001)
+        nxInterp = interp.bisplrep(self.grid_x.ravel()[skip], self.grid_y.ravel()[skip], self.grid_nx.ravel()[skip], kx=3, ky=3, s=1e-6)
+        nyInterp = interp.bisplrep(self.grid_x.ravel()[skip], self.grid_y.ravel()[skip], self.grid_ny.ravel()[skip], kx=3, ky=3, s=1e-6)
+        nzInterp = interp.bisplrep(self.grid_x.ravel()[skip], self.grid_y.ravel()[skip], self.grid_nz.ravel()[skip], kx=3, ky=3, s=1e-6)
         
         tcks = [posInterp, nxInterp, nyInterp, nzInterp]
         # Store interpolations as members
@@ -342,21 +299,16 @@ class Parabola(Reflector):
     Derived class from Reflector. Creates a paraboloid mirror.
     """
     
-    def __init__(self, a, b, cRot, offTrans, offRot, name):
-        Reflector.__init__(self, a, b, cRot, offTrans, offRot, name)
+    def __init__(self, a, b, cRot, name):
+        Reflector.__init__(self, a, b, cRot, name)
         self.c = float("NaN")
-        
-        if math.isclose(a, b, rel_tol=1e-6):
-            self.focus_1 = np.array([offTrans[0], offTrans[1], offTrans[2] + a**2 / 4])
-            self.focus_2 = np.ones(len(self.focus_1)) * float("NaN")
-        else:
-            self.focus_1 = np.ones(len(offTrans)) * float("NaN")
-            self.focus_2 = np.ones(len(offTrans)) * float("NaN")
+
+        self.vertex = np.zeros(3)
 
         self.reflectorId = self.id
         self.reflectorType = "Paraboloid"
         
-    def uvParabola(self, u, v, du, dv):
+    def uvGrid(self, u, v, du, dv):
         """
         Create paraboloid from uv points.
         @param u Height parameter (number/array).
@@ -380,7 +332,7 @@ class Parabola(Reflector):
         
         return x, y, z, nx, ny, nz, area
     
-    def xyParabola(self, x, y):
+    def xyGrid(self, x, y):
         """
         Create paraboloid from xy points.
         @param x X coordinate(s) (number/array).
@@ -416,25 +368,16 @@ class Hyperbola(Reflector):
     Derived class from Reflector. Creates a Hyperboloid mirror.
     """
     
-    def __init__(self, a, b, c, cRot, offTrans, offRot, name):
-        Reflector.__init__(self, a, b, cRot, offTrans, offRot, name)
+    def __init__(self, a, b, c, cRot, name):
+        Reflector.__init__(self, a, b, cRot, name)
         self.c = c
         
-        self.ecc = np.sqrt(1 - self.a**2/self.c**2)
-        # TODO: correct implementation of secondary ecc and focus
-        
-        if math.isclose(a, b, rel_tol=1e-6):
-            self.focus_1 = np.array([offTrans[0], offTrans[1], offTrans[2] + self.c])
-            self.focus_2 = np.array([offTrans[0], offTrans[1], offTrans[2] - self.c])
-
-        else:
-            self.focus_1 = np.ones(len(offTrans)) * float("NaN")
-            self.focus_2 = np.ones(len(offTrans)) * float("NaN")
+        self.vertex = np.array([0,0,self.c])
         
         self.reflectorId = self.id
         self.reflectorType = "Hyperboloid"
     
-    def uvHyperbola(self, u, v, du, dv):
+    def uvGrid(self, u, v, du, dv):
         
         x = self.a * np.sqrt(u**2 - 1) * np.cos(v)
         y = self.b * np.sqrt(u**2 - 1) * np.sin(v)
@@ -451,12 +394,8 @@ class Hyperbola(Reflector):
         return x, y, z, nx, ny, nz, area
         
     
-    def xyHyperbola(self, x, y):
+    def xyGrid(self, x, y):
         z = self.c * np.sqrt(x ** 2 / self.a ** 2 + y ** 2 / self.b ** 2 + 1)
-        '''
-        nx = self.c * 2 * x / self.a**2 * (x ** 2 / self.a ** 2 + y ** 2 / self.b ** 2 + 1)**(-1/2)
-        ny = self.c * 2 * y / self.b**2 * (x ** 2 / self.a ** 2 + y ** 2 / self.b ** 2 + 1)**(-1/2)
-        '''
         
         nx = 2 * x / self.a**2
         ny = 2 * y / self.b**2

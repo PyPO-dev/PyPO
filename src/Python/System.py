@@ -36,17 +36,23 @@ class System(object):
             self.customBeamPath = path
     
     #### ADD REFLECTOR METHODS
-    def addParabola(self, coef, mode='man', cRot=np.zeros(3), offTrans=np.zeros(3), offRot=np.zeros(3), name="Parabola"):
+    def addParabola(self, coef, lims_x, lims_y, gridsize, cRot=np.zeros(3), pmode='man', gmode='xy', name="Parabola", axis='a', trunc=False, flip=False):
+        """
+        Function for adding paraboloid reflector to system. If gmode='uv', lims_x should contain the smallest and largest radius and lims_y 
+        should contain rotation.
+        """
         if name == "Parabola":
             name = name + "_{}".format(self.num_ref)
             
-        if mode == 'man':
+        if pmode == 'man':
             a = coef[0]
             b = coef[1]
             
-            p = Reflectors.Parabola(a, b, cRot, offTrans, offRot, name)
+            p = Reflectors.Parabola(a, b, cRot, name)
             
-        elif mode == 'foc':
+            p.setGrid(lims_x, lims_y, gridsize, gmode, trunc, flip, axis)
+            
+        elif pmode == 'foc':
             f1 = coef[0] # Focal point position
             ve = coef[1] # Vertex position
             
@@ -67,25 +73,33 @@ class System(object):
             offRot = np.array([rx, ry, rz])
             cRot = offTrans
         
-            p = Reflectors.Parabola(a, b, cRot, offTrans, offRot, name)
+            p = Reflectors.Parabola(a, b, cRot, name)
             
             p.focus_1 = f1
+            p.focus_2 = np.ones(3) * float("NaN")
+            
+            p.setGrid(lims_x, lims_y, gridsize, gmode, trunc, flip, axis)
+            
+            p.rotateGrid(offRot)
+            p.translateGrid(offTrans)
         
         self.system["{}".format(name)] = p
         self.num_ref += 1
 
-    def addHyperbola(self, coef, mode='man', cRot=np.zeros(3), offTrans=np.zeros(3), offRot=np.zeros(3), name="Hyperbola"):
+    def addHyperbola(self, coef, lims_x, lims_y, gridsize, cRot=np.zeros(3), pmode='man', gmode='xy', name="Hyperbola", axis='a', trunc=False, flip=False):
         if name == "Hyperbola":
             name = name + "_{}".format(self.num_ref)
         
-        if mode == 'man':
+        if pmode == 'man':
             a = coef[0]
             b = coef[1]
             c = coef[2]
             
-            h = Reflectors.Hyperbola(a, b, c, cRot, offTrans, offRot, name)
+            h = Reflectors.Hyperbola(a, b, c, cRot, name)
+
+            h.setGrid(lims_x, lims_y, gridsize, gmode, trunc, flip, axis)
         
-        elif mode == 'foc':
+        elif pmode == 'foc':
             # Calculate a, b, c of hyperbola
             f1 = coef[0] # Focal point 1 position
             f2 = coef[1] # Focal point 2 position
@@ -116,11 +130,16 @@ class System(object):
             offRot = np.array([rx, ry, rz])
             cRot = offTrans
         
-            h = Reflectors.Hyperbola(a3, b3, c3, cRot, offTrans, offRot, name)
+            h = Reflectors.Hyperbola(a3, b3, c3, cRot, name)
+            
+            h.setGrid(lims_x, lims_y, gridsize, gmode, trunc, flip, axis)
+            
+            h.rotateGrid(offRot)
+            h.translateGrid(offTrans)
             
             h.focus_1 = f1
             h.focus_2 = f2
-        
+            
         self.system["{}".format(name)] = h
         self.num_ref += 1
         

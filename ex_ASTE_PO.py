@@ -12,13 +12,17 @@ def ex_ASTE():
     """
     
     # Primary parameters
-    R_pri           = 6e3 # Radius in [mm]
+    R_pri           = 5e3 # Radius in [mm]
     R_aper          = 0#200 # Vertex hole radius in [mm]
     foc_pri         = np.array([0,0,3.5e3]) # Coordinates of focal point in [mm]
     ver_pri         = np.zeros(3) # Coordinates of vertex point in [mm]
     
     # Pack coefficients together for instantiating parabola: [focus, vertex]
-    coef_p1 = [foc_pri, ver_pri]
+    coef_p1         = [foc_pri, ver_pri]
+    gridsize_p1     = [201, 201] # The gridsizes along the u and v axes
+    
+    lims_r_p1       = [R_aper, R_pri]
+    lims_v_p1       = [0, 2*np.pi]
     
     # Secondary parameters
     R_sec           = 310
@@ -28,30 +32,18 @@ def ex_ASTE():
     ecc_h1          =  1.08208248
     
     # Pack coefficients together for instantiating hyperbola: [focus 1, focus 2, eccentricity]
-    coef_h1 = [foc_1_h1, foc_2_h1, ecc_h1]
+    coef_h1         = [foc_1_h1, foc_2_h1, ecc_h1]
+    gridsize_h1     = [201, 201]
+    
+    lims_r_h1       = [R_aper, R_sec]
+    lims_v_h1       = [0, 2*np.pi]
 
     # Initialize system
     s = System.System()
     
     # Add parabolic reflector and hyperbolic reflector by focus, vertex and two foci and eccentricity
-    s.addParabola(name = "p1", coef=coef_p1, mode='foc')
-    s.addHyperbola(name = "h1", coef=coef_h1, mode='foc')
-    
-    # Calculate upper u-limits for uv initialization of surfaces
-    u_max_p1 = s.system["p1"].r_to_u(R_pri)
-    u_max_h1 = s.system["h1"].r_to_u(R_sec)
-    
-    # Calculate lower limit of u for parabola, to plot cabin hole
-    u_min_p1 = s.system["p1"].r_to_u(R_aper)
-    
-    # Use uv definition of parabola & hyperbola for interpolation in ray trace
-    lims_u_p1       = [u_min_p1, u_max_p1]
-    lims_v_p1       = [0, 2*np.pi]
-    gridsize_p1     = [201, 201] # The gridsizes along the u and v axes
-    
-    lims_u_h1       = [1, u_max_h1]
-    lims_v_h1       = [0, 2*np.pi]
-    gridsize_h1     = [201, 201]
+    s.addParabola(name = "p1", coef=coef_p1, lims_x=lims_r_p1, lims_y=lims_v_p1, gridsize=gridsize_p1, pmode='foc', gmode='uv')
+    s.addHyperbola(name = "h1", coef=coef_h1, lims_x=lims_r_h1, lims_y=lims_v_h1, gridsize=gridsize_h1, pmode='foc', gmode='uv')
 
     # Instantiate camera surface. Size does not matter, as long as z coordinate agrees
     center_cam = foc_1_h1#foc_2_h1 # Place the camera at the z coordinate of the hyperbolic secondary focus
@@ -65,14 +57,6 @@ def ex_ASTE():
     print(s.system["p1"])
     print(s.system["h1"])
     print(s.system["cam1"])
-
-    s.system["p1"].setGrid(lims_u_p1, lims_v_p1, gridsize_p1, calcArea=False, trunc=False, param='uv')
-    s.system["p1"].rotateGrid()
-    #s.system["p1"].plotReflector(focus_1=False, focus_2=True, norm=True)
-
-    s.system["h1"].setGrid(lims_u_h1, lims_v_h1, gridsize_h1, orientation='outside', trunc=False, param='uv')
-    s.system["h1"].rotateGrid()
-    #s.system["h1"].plotReflector(focus_1=True, focus_2=False, norm=True)
 
     s.system["cam1"].setGrid(lims_x_cam, lims_y_cam, gridsize_cam)
     #s.system["cam1"].plotCamera()

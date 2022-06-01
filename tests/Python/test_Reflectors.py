@@ -29,7 +29,7 @@ class TestParabola(unittest.TestCase):
         
         self.gridsize = [201, 201]
         
-        self.parabola = Reflectors.Parabola(a = self.a, b = self.b, cRot = self.cRot, offRot = self.rot, offTrans = self.offTrans, name = "p")
+        self.parabola = Reflectors.Parabola(a = self.a, b = self.b, cRot = self.cRot, name = "p")
         
     def TearDown(self):
         pass
@@ -41,25 +41,9 @@ class TestParabola(unittest.TestCase):
         
         for x, y in zip(cRot_test, self.parabola.cRot):
             self.assertEqual(x, y)
-            
-    def test_set_offTrans(self):
-        offTrans_test = np.array([345, 129, 2343])
-        
-        self.parabola.set_offTrans(offTrans=offTrans_test)
-        
-        for x, y in zip(offTrans_test, self.parabola.offTrans):
-            self.assertEqual(x, y)
-            
-    def test_set_offRot(self):
-        offRot_test = np.array([47, 124, 36])
-        
-        self.parabola.set_offRot(offRot=offRot_test)
-        
-        for x, y in zip(offRot_test, self.parabola.offRot):
-            self.assertEqual(x, y)
-            
+    
     def test_setGrid(self):
-        self.parabola.setGrid(self.lims_x, self.lims_y, self.gridsize, param='xy')
+        self.parabola.setGrid(self.lims_x, self.lims_y, self.gridsize, gmode='xy', axis='a', trunc=False, flip=False)
         
         self.assertEqual(self.parabola.grid_x.shape, (self.gridsize[0], self.gridsize[1]))
         self.assertEqual(self.parabola.grid_y.shape, (self.gridsize[0], self.gridsize[1]))
@@ -69,7 +53,7 @@ class TestParabola(unittest.TestCase):
         self.assertEqual(self.parabola.grid_ny.shape, (self.gridsize[0], self.gridsize[1]))
         self.assertEqual(self.parabola.grid_nz.shape, (self.gridsize[0], self.gridsize[1]))
         
-        self.parabola.setGrid(self.lims_u, self.lims_v, self.gridsize, param='uv')
+        self.parabola.setGrid(self.lims_u, self.lims_v, self.gridsize, gmode='uv', axis='a', trunc=False, flip=False)
         
         self.assertEqual(self.parabola.grid_x.shape, (self.gridsize[0], self.gridsize[1]))
         self.assertEqual(self.parabola.grid_y.shape, (self.gridsize[0], self.gridsize[1]))
@@ -80,7 +64,7 @@ class TestParabola(unittest.TestCase):
         self.assertEqual(self.parabola.grid_nz.shape, (self.gridsize[0], self.gridsize[1]))
     
     def test_interpReflector(self):
-        self.parabola.setGrid(self.lims_x, self.lims_y, self.gridsize, param='xy')
+        self.parabola.setGrid(self.lims_x, self.lims_y, self.gridsize, gmode='xy', axis='a', trunc=False, flip=False)
         
         self.parabola.interpReflector(res=1)
         
@@ -111,11 +95,13 @@ class TestParabola(unittest.TestCase):
             self.assertAlmostEqual(ny.ravel()[i], interp_ny.ravel()[i], places=3)
             self.assertAlmostEqual(nz.ravel()[i], interp_nz.ravel()[i], places=3)
 
-    def test_uvParabola(self):
+    def test_uvGrid(self):
         u = np.array([100]).astype(float)
         v = 1/4 * np.pi
+        du = 1
+        dv = 1
         
-        x, y, z, nx, ny, nz = self.parabola.uvParabola(u, v)
+        x, y, z, nx, ny, nz, area = self.parabola.uvGrid(u, v, du=1, dv=1)
         
         self.assertEqual(type(u), type(x))
         self.assertEqual(type(u), type(y))
@@ -125,11 +111,11 @@ class TestParabola(unittest.TestCase):
         self.assertEqual(type(u), type(ny))
         self.assertEqual(type(u), type(nz))
         
-    def test_xyParabola(self):
+    def test_xyGrid(self):
         x = np.array([100]).astype(float)
         y = np.array([1/4 * np.pi]).astype(float)
         
-        x, y, z, nx, ny, nz = self.parabola.xyParabola(x, y)
+        x, y, z, nx, ny, nz = self.parabola.xyGrid(x, y)
         
         self.assertEqual(type(x), type(x))
         self.assertEqual(type(x), type(y))
@@ -158,7 +144,7 @@ class TestHyperbola(unittest.TestCase):
         
         self.gridsize = [201, 201]
         
-        self.hyperbola = Reflectors.Hyperbola(a = 1070, b = 1070, c = 2590, cRot = self.cRot, offRot = self.rot, offTrans = self.offTrans, name = "h")
+        self.hyperbola = Reflectors.Hyperbola(a = 1070, b = 1070, c = 2590, cRot = self.cRot, name = "h")
         
     def TearDown(self):
         pass
@@ -171,24 +157,8 @@ class TestHyperbola(unittest.TestCase):
         for x, y in zip(cRot_test, self.hyperbola.cRot):
             self.assertEqual(x, y)
             
-    def test_set_offTrans(self):
-        offTrans_test = np.array([345, 129, 2343])
-        
-        self.hyperbola.set_offTrans(offTrans=offTrans_test)
-        
-        for x, y in zip(offTrans_test, self.hyperbola.offTrans):
-            self.assertEqual(x, y)
-            
-    def test_set_offRot(self):
-        offRot_test = np.array([47, 124, 36])
-        
-        self.hyperbola.set_offRot(offRot=offRot_test)
-        
-        for x, y in zip(offRot_test, self.hyperbola.offRot):
-            self.assertEqual(x, y)
-    
     def test_setGrid(self):
-        self.hyperbola.setGrid(self.lims_x, self.lims_y, self.gridsize, param='xy')
+        self.hyperbola.setGrid(self.lims_x, self.lims_y, self.gridsize, gmode='xy', axis='a', trunc=False, flip=False)
         
         self.assertEqual(self.hyperbola.grid_x.shape, (self.gridsize[0], self.gridsize[1]))
         self.assertEqual(self.hyperbola.grid_y.shape, (self.gridsize[0], self.gridsize[1]))
@@ -198,7 +168,7 @@ class TestHyperbola(unittest.TestCase):
         self.assertEqual(self.hyperbola.grid_ny.shape, (self.gridsize[0], self.gridsize[1]))
         self.assertEqual(self.hyperbola.grid_nz.shape, (self.gridsize[0], self.gridsize[1]))
         
-        self.hyperbola.setGrid(self.lims_u, self.lims_v, self.gridsize, param='uv')
+        self.hyperbola.setGrid(self.lims_u, self.lims_v, self.gridsize, gmode='uv', axis='a', trunc=False, flip=False)
         
         self.assertEqual(self.hyperbola.grid_x.shape, (self.gridsize[0], self.gridsize[1]))
         self.assertEqual(self.hyperbola.grid_y.shape, (self.gridsize[0], self.gridsize[1]))
@@ -209,7 +179,7 @@ class TestHyperbola(unittest.TestCase):
         self.assertEqual(self.hyperbola.grid_nz.shape, (self.gridsize[0], self.gridsize[1]))
     
     def test_interpReflector(self):
-        self.hyperbola.setGrid(self.lims_x, self.lims_y, self.gridsize, calcArea=False, trunc=False, param='xy')
+        self.hyperbola.setGrid(self.lims_x, self.lims_y, self.gridsize, gmode='xy', axis='a', trunc=False, flip=False)
         
         self.hyperbola.interpReflector(res=1)
         
@@ -240,11 +210,11 @@ class TestHyperbola(unittest.TestCase):
             self.assertAlmostEqual(ny.ravel()[i], interp_ny.ravel()[i], places=3)
             self.assertAlmostEqual(nz.ravel()[i], interp_nz.ravel()[i], places=3)
             
-    def test_uvHyperbola(self):
+    def test_uvGrid(self):
         u = np.array([100]).astype(float)
         v = 1/4 * np.pi
         
-        x, y, z, nx, ny, nz = self.hyperbola.uvHyperbola(u, v)
+        x, y, z, nx, ny, nz, area = self.hyperbola.uvGrid(u, v, du=1, dv=1)
         
         self.assertEqual(type(u), type(x))
         self.assertEqual(type(u), type(y))
@@ -253,12 +223,12 @@ class TestHyperbola(unittest.TestCase):
         self.assertEqual(type(u), type(nx))
         self.assertEqual(type(u), type(ny))
         self.assertEqual(type(u), type(nz))
-        
-    def test_xyHyperbola(self):
+
+    def test_xyGrid(self):
         x = np.array([100]).astype(float)
         y = np.array([1/4 * np.pi]).astype(float)
         
-        x, y, z, nx, ny, nz = self.hyperbola.xyHyperbola(x, y)
+        x, y, z, nx, ny, nz = self.hyperbola.xyGrid(x, y)
         
         self.assertEqual(type(x), type(x))
         self.assertEqual(type(x), type(y))

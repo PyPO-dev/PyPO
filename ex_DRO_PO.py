@@ -14,34 +14,25 @@ def ex_DRO():
     
     # Primary parameters
     R_pri           = 12.5e3 # Radius in [mm]
-    R_aper          = 10 # Vertex hole radius in [mm]
+    R_aper          = 0 # Vertex hole radius in [mm]
     foc_pri         = np.array([0,0,12e3]) # Coordinates of focal point in [mm]
     ver_pri         = np.zeros(3) # Coordinates of vertex point in [mm]
     
     # Pack coefficients together for instantiating parabola: [focus, vertex]
     coef_p1 = [foc_pri, ver_pri]
 
+    lims_r_p1       = [R_aper, R_pri]
+    lims_v_p1       = [0, 2*np.pi]
+
+    gridsize_p1     = [201, 201] # The gridsizes along the x and y axes
+
     # Initialize system
     s = System.System()
     
     # Add parabolic reflector and hyperbolic reflector by focus, vertex and two foci and eccentricity
-    s.addParabola(name = "p1", coef=coef_p1, mode='foc')
+    s.addParabola(name="p1", coef=coef_p1, lims_x=lims_r_p1, lims_y=lims_v_p1, gridsize=gridsize_p1, pmode='foc', gmode='uv')
     
-    # Calculate upper u-limits for uv initialization of surfaces
-    u_max_p1 = s.system["p1"].r_to_u(R_pri)
-    
-    # Calculate lower limit of u for parabola, to plot cabin hole
-    u_min_p1 = s.system["p1"].r_to_u(R_aper)
-    
-    # Use uv definition of parabola & hyperbola for interpolation in ray trace
-    lims_u_p1       = [u_min_p1, u_max_p1]
-    lims_v_p1       = [0, 2*np.pi]
-    
-    lims_x_p1       = [-R_pri, R_pri]
-    lims_y_p1       = [-R_pri, R_pri]
-    gridsize_p1     = [201, 201] # The gridsizes along the x and y axes
-
-    # Instantiate camera surface. Size does not matter, as long as z coordinate agrees
+    # Instantiate camera surface. 
     center_cam = foc_pri + np.array([0,0,0])
     lims_x_cam = [-100, 100]
     lims_y_cam = [-100, 100]
@@ -52,18 +43,6 @@ def ex_DRO():
     
     print(s.system["p1"])
     print(s.system["cam1"])
-
-    #s.system["p1"].setGrid(lims_u_p1, lims_v_p1, gridsize_p1, calcArea=False, trunc=False, param='uv')
-    s.system["p1"].setGrid(lims_x_p1, lims_y_p1, gridsize_p1, calcArea=True, trunc=False, param='xy')
-    print(np.max(s.system["p1"].grid_x))
-    print(np.max(s.system["p1"].grid_y))
-    
-    fig, ax = pt.subplots(1,4)
-    ax[0].imshow(s.system["p1"].grid_x)
-    ax[1].imshow(s.system["p1"].grid_y)
-    ax[2].imshow(s.system["p1"].grid_z)
-    ax[3].imshow(s.system["p1"].area)
-    pt.show()
 
     s.system["cam1"].setGrid(lims_x_cam, lims_y_cam, gridsize_cam)
     

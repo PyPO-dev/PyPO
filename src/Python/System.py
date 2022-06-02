@@ -162,8 +162,10 @@ class System(object):
         self.system["{}".format(name)] = e
         self.num_ref += 1
     
-    def addCamera(self, name="Camera", center=np.array([0,0,0]), offTrans=np.array([0,0,0]), offRot=np.array([0,0,0])):
-        cam = Camera.Camera(center, offTrans, offRot, name)
+    def addCamera(self, lims_x, lims_y, gridsize, center=np.zeros(3), name="Camera"):
+        cam = Camera.Camera(center, name)
+        
+        cam.setGrid(lims_x, lims_y, gridsize)
         
         self.system["{}".format(name)] = cam
         self.num_cam += 1

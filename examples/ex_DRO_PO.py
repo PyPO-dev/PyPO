@@ -1,7 +1,11 @@
 import numpy as np
+import sys
+sys.path.append('../')
+
 import matplotlib.pyplot as pt
 
-import src.Python.System as System
+#import src.Python.System as System
+from src.Python.System import System
 
 def ex_DRO():
     """
@@ -27,7 +31,7 @@ def ex_DRO():
     gridsize_p1     = [201, 201] # The gridsizes along the x and y axes
 
     # Initialize system
-    s = System.System()
+    s = System()
     
     # Add parabolic reflector and hyperbolic reflector by focus, vertex and two foci and eccentricity
     s.addParabola(name="p1", coef=coef_p1, lims_x=lims_r_p1, lims_y=lims_v_p1, gridsize=gridsize_p1, pmode='foc', gmode='uv')
@@ -39,13 +43,10 @@ def ex_DRO():
     gridsize_cam = [201, 201]
     
     # Add camera surface to optical system
-    s.addCamera(name = "cam1", center=center_cam)
+    s.addCamera(lims_x_cam, lims_y_cam, gridsize_cam, center=center_cam, name = "cam1")
     
     print(s.system["p1"])
     print(s.system["cam1"])
-
-    s.system["cam1"].setGrid(lims_x_cam, lims_y_cam, gridsize_cam)
-    
     s.plotSystem(focus_1=True, focus_2=True)
     
     # Initialize a plane wave illuminating the primary from above. Place at height of primary focus.

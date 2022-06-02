@@ -1,4 +1,7 @@
 import numpy as np
+import sys
+sys.path.append('../')
+
 import matplotlib.pyplot as pt
 
 import src.Python.System as System

@@ -6,11 +6,10 @@ import src.Python.MatRotate as MatRotate
 
 class Camera(object):
     
-    def __init__(self, center, offTrans, offRot, name):
+    def __init__(self, center, name):
         self.center = center
+        self.cRot = center
         
-        self.offTrans = offTrans
-        self.offRot = offRot
         self.elType = "Camera"
         self.name = name
         
@@ -18,14 +17,9 @@ class Camera(object):
         self._iterList = [0 for _ in range(7)]
         
     def __str__(self):
-        offRotDeg = np.degrees(self.offRot)
         s = """\n######################### CAMERA INFO #########################
 Center position     : [{:.3f}, {:.3f}, {:.3f}] [mm]
-Current translation : [{:.3f}, {:.3f}, {:.3f}] [mm]
-Current Rotation    : [{:.3f}, {:.3f}, {:.3f}] [mm]
-######################### CAMERA INFO #########################\n""".format(self.center[0], self.center[1], self.center[2],
-                                              self.offTrans[0], self.offTrans[1], self.offTrans[2],
-                                              offRotDeg[0], offRotDeg[1], offRotDeg[2])
+######################### CAMERA INFO #########################\n""".format(self.center[0], self.center[1], self.center[2])
         return s
     
     def __iter__(self):
@@ -43,13 +37,10 @@ Current Rotation    : [{:.3f}, {:.3f}, {:.3f}] [mm]
             raise StopIteration
         
     def setGrid(self, lims_x, lims_y, gridsize):
-        range_x = np.linspace(lims_x[0], lims_x[1], gridsize[0])
-        range_y = np.linspace(lims_y[0], lims_y[1], gridsize[1])
-        
-        dx = range_x[1] - range_x[0]
-        dy = range_y[1] - range_y[0]
-
         grid_x, grid_y = np.mgrid[lims_x[0]:lims_x[1]:gridsize[0]*1j, lims_y[0]:lims_y[1]:gridsize[1]*1j]
+        
+        dx = grid_x[1,0] - grid_x[0,0]
+        dy = grid_y[0,1] - grid_y[0,0]
         
         self.grid_x = grid_x + self.center[0]
         self.grid_y = grid_y + self.center[1]
@@ -70,9 +61,32 @@ Current Rotation    : [{:.3f}, {:.3f}, {:.3f}] [mm]
         self._iterList[4] = self.grid_nx
         self._iterList[5] = self.grid_ny
         self._iterList[6] = self.grid_nz
+       
+    def set_cRot(self, cRot):
+        self.cRot = cRot   
+    
+    def translateGrid(self, offTrans):
+        self.grid_x += offTrans[0]
+        self.grid_y += offTrans[1]
+        self.grid_z += offTrans[2]
         
+        self.center += offTrans
         
+    def rotateGrid(self, offRot):
+        gridRot = MatRotate.MatRotate(offRot, [self.grid_x, self.grid_y, self.grid_z], self.cRot)
         
+        self.grid_x = gridRot[0]
+        self.grid_y = gridRot[1]
+        self.grid_z = gridRot[2]
+        
+        grid_nRot = MatRotate.MatRotate(offRot, [self.grid_nx, self.grid_ny, self.grid_nz], self.cRot, vecRot=True)
+        
+        self.grid_nx = grid_nRot[0]
+        self.grid_ny = grid_nRot[1]
+        self.grid_nz = grid_nRot[2]
+        
+        self.center = MatRotate.MatRotate(offRot, self.center, self.cRot)
+    
     def interpCamera(self, res=100):
         skip = slice(None,None,res)
 

@@ -22,25 +22,19 @@ def ex_DRO():
     ver_pri         = np.zeros(3) # Coordinates of vertex point in [mm]
     
     # Pack coefficients together for instantiating parabola: [focus, vertex]
+    # Use xy definition of parabola for interpolation in ray trace
+    lims_x_p1       = [-R_pri, R_pri]
+    lims_y_p1       = [-R_pri, R_pri]
+    gridsize_p1     = [201, 201] # The gridsizes along the x and y axes
+    
     coef_p1 = [foc_pri, ver_pri]
 
     # Initialize system
     s = System.System()
-    
-    # Add parabolic reflector and hyperbolic reflector by focus, vertex and two foci and eccentricity
-    s.addParabola(name = "p1", coef=coef_p1, mode='foc')
-    
-    # Calculate upper u-limits for uv initialization of surfaces
-    u_max_p1 = s.system["p1"].r_to_u(R_pri)
-    
-    # Calculate lower limit of u for parabola, to plot cabin hole
-    u_min_p1 = s.system["p1"].r_to_u(R_aper)
-    
-    # Use uv definition of parabola & hyperbola for interpolation in ray trace
-    lims_u_p1       = [u_min_p1, u_max_p1]
-    lims_v_p1       = [0, 2*np.pi]
-    gridsize_p1     = [201, 201] # The gridsizes along the u and v axes
 
+    # Add parabolic reflector and hyperbolic reflector by focus, vertex and two foci and eccentricity
+    s.addParabola(name="p1", coef=coef_p1, lims_x=lims_x_p1, lims_y=lims_y_p1, gridsize=gridsize_p1, pmode='foc', gmode='xy')
+    
     # Instantiate camera surface. Size does not matter, as long as z coordinate agrees
     center_cam = foc_pri + np.array([0,0,0])
     lims_x_cam = [-2000, 2000]
@@ -48,23 +42,18 @@ def ex_DRO():
     gridsize_cam = [201, 201]
     
     # Add camera surface to optical system
-    s.addCamera(name = "cam1", center=center_cam)
+    s.addCamera(lims_x_cam, lims_y_cam, gridsize_cam, center=center_cam, name = "cam1")
     
     print(s.system["p1"])
     print(s.system["cam1"])
 
-    s.system["p1"].setGrid(lims_u_p1, lims_v_p1, gridsize_p1, calcArea=False, trunc=False, param='uv')
-    s.system["p1"].rotateGrid()
-
-    s.system["cam1"].setGrid(lims_x_cam, lims_y_cam, gridsize_cam)
-    
     s.plotSystem(focus_1=True, focus_2=True)
     
     # Initialize a raytrace beam illuminating the parabolic reflector from above
     
     R_rt = R_pri - lam
     
-    s.initRaytracer(rCirc=R_rt, NraysCirc=20, originChief=foc_pri, nomChief=np.array([0,0,-1]), div_ang_x=0, div_ang_y=0)
+    s.initRaytracer(rCirc=R_rt, nRays=20, nCirc=10, originChief=foc_pri, nomChief=np.array([0,0,-1]), div_ang_x=0, div_ang_y=0)
     
     s.startRaytracer(surface="p1")
     s.startRaytracer(surface="cam1")

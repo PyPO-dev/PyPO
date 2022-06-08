@@ -51,11 +51,7 @@ class Beams(object):
             self.norm = np.array([0,0,-1])
         else:
             self.norm = np.array([0,0,1])
-            
-        self.plotter = Plotter.Plotter()
-            
-        
-    
+
     def __iter__(self):
         self._iterIdx = 0
         return self
@@ -127,11 +123,6 @@ class Beams(object):
         self._iterList[7] = self.Mx
         self._iterList[8] = self.My
         self._iterList[9] = self.Mz
-
-    def plotBeam(self, comp='Ex', mode='linear', vmin=-30, vmax=0):
-        idxComp = self.compList_eh.index(comp)
-        
-        self.plotter.plotBeam2D(self.grid_x, self.grid_y, self._compList[idxComp])
 
 class PlaneWave(Beams):
     def __init__(self, x_lims, y_lims, gridsize, pol, amp, phase, flip):

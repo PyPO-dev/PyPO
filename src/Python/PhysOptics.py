@@ -13,21 +13,23 @@ class PhysOptics(object):
     Methods in this class are mostly for interaction with the C++ .exe located in /src/C++.
     """
     
-    def __init__(self, inputPath, outputPath, k, numThreads, thres):
-        existInput = os.path.isdir(inputPath)
-        existOutput = os.path.isdir(outputPath)
+    def __init__(self, k, numThreads, thres, cpp_path):
+        self.inputPath = cpp_path + "input/"
+        self.outputPath = cpp_path + "output/"
+        
+        existInput = os.path.isdir(self.inputPath)
+        existOutput = os.path.isdir(self.outputPath)
         
         if not existInput:
             os.makedirs(inputPath)
     
         if not existOutput:
             os.makedirs(outputPath)
-            
-        self.inputPath = inputPath
-        self.outputPath = outputPath
+        
         self.k = k
         self.numThreads = numThreads
         self.thres = thres
+        self.cpp_path = cpp_path
         
     def writeInput(self, name, toWrite):
         if np.any(np.iscomplexobj(toWrite)):
@@ -46,22 +48,23 @@ class PhysOptics(object):
             os.system('cp {} {}'.format(self.outputPath + "i" + name, self.inputPath + "i" + nameNew))
         
     def runPhysOptics(self, save=0):
-        os.chdir('./src/C++/')
+        cwd = os.getcwd()
+        os.chdir(self.cpp_path)
         os.system('./PhysBeam.exe {} {} {} {}'.format(self.numThreads, self.k, self.thres, save))
-        os.chdir('../../')
+        os.chdir(cwd)
         
     def loadField(self, shape, mode='Ex'):
         mode = list(mode)
 
-        re = np.loadtxt("./src/C++/output/r{}t_{}.txt".format(mode[0], mode[1]))
-        im = np.loadtxt("./src/C++/output/i{}t_{}.txt".format(mode[0], mode[1]))
+        re = np.loadtxt(self.outputPath + "r{}t_{}.txt".format(mode[0], mode[1]))
+        im = np.loadtxt(self.outputPath + "i{}t_{}.txt".format(mode[0], mode[1]))
         
         re = re.reshape(shape)
         im = im.reshape(shape)
         
-        self.field = re + 1j * im
+        field = re + 1j * im
 
-        return self.field
+        return [field, mode]
     
     def FF_fromFocus(self, grid_x, grid_y, padding_range=(1000,1000)):
         noise_level = 1e-12 + 1j * 1e-12
@@ -113,9 +116,9 @@ class PhysOptics(object):
         phasefig = ax[1].imshow(np.angle(field), origin='lower', extent=extent, cmap=cmaps.parula)
 
         ax[0].set_title("PNA / [dB]", y=1.08)
-        ax[0].set_box_aspect(1)
+        ax[0].set_aspect(1)
         ax[1].set_title("Phase / [rad]", y=1.08)
-        ax[1].set_box_aspect(1)
+        ax[1].set_aspect(1)
     
         c1 = fig.colorbar(ampfig, cax=cax1, orientation='vertical')
         c2 = fig.colorbar(phasefig, cax=cax2, orientation='vertical')

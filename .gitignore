@@ -135,6 +135,7 @@ dmypy.json
 # User-specific folders
 src/C++/input/
 src/C++/output/
+images/
 
 # Personal projects/files
 personal/
@@ -142,4 +143,4 @@ literature/
 movie/
 ex_APWS.py
 custom/
-
+buildSystem.py

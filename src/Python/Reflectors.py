@@ -25,7 +25,6 @@ class Reflector(object):
         self.focus_2 = np.ones(3) * float("NaN")
         
         self.cRot     = cRot
-        self
         
         Reflector._counter += 1
         self.id = Reflector._counter
@@ -100,6 +99,8 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
         else:
             mult = 1
 
+        self.shape = gridsize
+        
         if gmode == 'xy':
             grid_x, grid_y = np.mgrid[lims_x[0]:lims_x[1]:gridsize[0]*1j, lims_y[0]:lims_y[1]:gridsize[1]*1j]
             

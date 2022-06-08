@@ -17,294 +17,255 @@ class Utils
 {
 public:
     // Dot products
-    double dot(const std::vector<double> &v1, const std::vector<double> &v2);
-    std::complex<double> dot(const std::vector<std::complex<double>> &cv1, const std::vector<std::complex<double>> &cv2);
-    std::complex<double> dot(const std::vector<std::complex<double>> &cv1, const std::vector<double> &v2);
-    std::complex<double> dot(const std::vector<double> &v1, const std::vector<std::complex<double>> &cv2);
+    void dot(const std::array<double, 3> &v1, const std::array<double, 3> &v2, double &out);
+    void dot(const std::array<std::complex<double>, 3> &cv1, const std::array<std::complex<double>, 3> &cv2, std::complex<double> &out);
+    void dot(const std::array<std::complex<double>, 3> &cv1, const std::array<double, 3> &v2, std::complex<double> &out);
+    void dot(const std::array<double, 3> &v1, const std::array<std::complex<double>, 3> &cv2, std::complex<double> &out);
     
     // Overloaded cross products
-    std::vector<double> ext(const std::vector<double> &v1, const std::vector<double> &v2);
-    std::vector<std::complex<double>> ext(const std::vector<std::complex<double>> &cv1, const std::vector<std::complex<double>> &cv2);
-    std::vector<std::complex<double>> ext(const std::vector<std::complex<double>> &cv1, const std::vector<double> &v2);
-    std::vector<std::complex<double>> ext(const std::vector<double> &v1, const std::vector<std::complex<double>> &cv2);
+    void ext(const std::array<double, 3> &v1, const std::array<double, 3> &v2, std::array<double, 3> &out);
+    void ext(const std::array<std::complex<double>, 3> &cv1, const std::array<std::complex<double>, 3> &cv2, std::array<std::complex<double>, 3> &out);
+    void ext(const std::array<std::complex<double>, 3> &cv1, const std::array<double, 3> &v2, std::array<std::complex<double>, 3> &out);
+    void ext(const std::array<double, 3> &v1, const std::array<std::complex<double>, 3> &cv2, std::array<std::complex<double>, 3> &out);
     
     // Overloaded absolute value
-    double abs(const std::vector<double> &v);
-    std::complex<double> abs(const std::vector<std::complex<double>> &cv);
+    void abs(const std::array<double, 3> &v, double &out);
+    void abs(const std::array<std::complex<double>, 3> &cv, std::complex<double> &out);
     
     // Difference vectors
-    std::vector<double> diff(const std::vector<double> &v1, const std::vector<double> &v2);
-    std::vector<std::complex<double>> diff(const std::vector<std::complex<double>> &cv1, const std::vector<std::complex<double>> &cv2);
+    void diff(const std::array<double, 3> &v1, const std::array<double, 3> &v2, std::array<double, 3> &out);
+    void diff(const std::array<std::complex<double>, 3> &cv1, const std::array<std::complex<double>, 3> &cv2, std::array<std::complex<double>, 3> &out);
     
     // Normalization
-    std::vector<double> normalize(const std::vector<double> &v);
-    std::vector<std::complex<double>> normalize(const std::vector<std::complex<double>> &cv);
+    void normalize(const std::array<double, 3> &v, std::array<double, 3> &out);
+    void normalize(const std::array<std::complex<double>, 3> &cv, std::array<std::complex<double>, 3> &out);
     
     // Scalar multiplication
-    std::vector<double> s_mult(const std::vector<double> &v, const double &s);
-    std::vector<std::complex<double>> s_mult(const std::vector<std::complex<double>> &cv, const std::complex<double> &cs);
-    std::vector<std::complex<double>> s_mult(const std::vector<double> &v, const std::complex<double> &cs);
-    std::vector<std::complex<double>> s_mult(const std::vector<std::complex<double>> &cv, const double &s);
+    void s_mult(const std::array<double, 3> &v, const double &s, std::array<double, 3> &out);
+    void s_mult(const std::array<std::complex<double>, 3> &cv, const std::complex<double> &cs, std::array<std::complex<double>, 3> &out);
+    void s_mult(const std::array<double, 3> &v, const std::complex<double> &cs, std::array<std::complex<double>, 3> &out);
+    void s_mult(const std::array<std::complex<double>, 3> &cv, const double &s, std::array<std::complex<double>, 3> &out);
     
     // Conjugation of complex vector
-    std::vector<std::complex<double>> conj(const std::vector<std::complex<double>> &cv);
+    void conj(const std::array<std::complex<double>, 3> &cv, std::array<std::complex<double>, 3> &out);
     
     // Snell's function
-    std::vector<std::complex<double>> snell(const std::vector<std::complex<double>> &cvin, const std::vector<double> &normal);
-    std::vector<double> snell(const std::vector<double> &vin, const std::vector<double> &normal);
+    void snell(const std::array<std::complex<double>, 3> &cvin, const std::array<double, 3> &normal, std::array<std::complex<double>, 3> &out);
+    void snell(const std::array<double, 3> &vin, const std::array<double, 3> &normal, std::array<double, 3> &out);
     
 };
 #endif 
 
 // Real dot-product
-inline double Utils::dot(const std::vector<double> &v1, const std::vector<double> &v2)
+inline void Utils::dot(const std::array<double, 3> &v1, const std::array<double, 3> &v2, double &out)
 {
-    double out = 0.;
+    out = 0;
     
     for(int n=0; n<3; n++)
     {
         out += v1[n] * v2[n];
     }
-    return out;
 }
 
 
 // Complex hermitian conjugate inner-product
-inline std::complex<double> Utils::dot(const std::vector<std::complex<double>> &cv1, const std::vector<std::complex<double>> &cv2)
+inline void Utils::dot(const std::array<std::complex<double>, 3> &cv1, const std::array<std::complex<double>, 3> &cv2, std::complex<double> &out)
 {
-    std::complex<double> out(0., 0.);
+    out = (0, 0);
     
     for(int n=0; n<3; n++)
     {
         out += std::conj(cv1[n]) * cv2[n];
     }
-    return out;
 }
 
 // Complex vector - real vector dot-product
-inline std::complex<double> Utils::dot(const std::vector<std::complex<double>> &cv1, const std::vector<double> &v2)
+inline void Utils::dot(const std::array<std::complex<double>, 3> &cv1, const std::array<double, 3> &v2, std::complex<double> &out)
 {
-    std::complex<double> out(0., 0.);
+    out = (0, 0);
     
     for(int n=0; n<3; n++)
     {
         out += std::conj(cv1[n]) * v2[n];
     }
-    return out;
 }
 
 // Real vector - complex vector dot-product
-inline std::complex<double> Utils::dot(const std::vector<double> &v1, const std::vector<std::complex<double>> &cv2)
+inline void Utils::dot(const std::array<double, 3> &v1, const std::array<std::complex<double>, 3> &cv2, std::complex<double> &out)
 {
-    std::complex<double> out(0., 0.);
+    out = (0, 0);
     
     for(int n=0; n<3; n++)
     {
         out += v1[n] * cv2[n];
     }
-    return out;
 }
 
 // Real cross-product
-inline std::vector<double> Utils::ext(const std::vector<double> &v1, const std::vector<double> &v2)
+inline void Utils::ext(const std::array<double, 3> &v1, const std::array<double, 3> &v2, std::array<double, 3> &out)
 {
-    std::vector<double> out(3, 0.);
     out[0] = v1[1]*v2[2] - v1[2]*v2[1];
     out[1] = v1[2]*v2[0] - v1[0]*v2[2];
     out[2] = v1[0]*v2[1] - v1[1]*v2[0];
-    
-    return out;
 }
 
 
 // Complex conjugate of cross product
-inline std::vector<std::complex<double>> Utils::ext(const std::vector<std::complex<double>> &cv1, const std::vector<std::complex<double>> &cv2)
+inline void Utils::ext(const std::array<std::complex<double>, 3> &cv1, const std::array<std::complex<double>, 3> &cv2, std::array<std::complex<double>, 3> &out)
 {
-    std::vector<std::complex<double>> out(3, (0., 0.));
     out[0] = cv1[1]*cv2[2] - cv1[2]*cv2[1];
     out[1] = cv1[2]*cv2[0] - cv1[0]*cv2[2];
     out[2] = cv1[0]*cv2[1] - cv1[1]*cv2[0];
-    
-    return out;
 }
 
 // Cross product between an complex and a real vector
-inline std::vector<std::complex<double>> Utils::ext(const std::vector<std::complex<double>> &cv1, const std::vector<double> &v2)
+inline void Utils::ext(const std::array<std::complex<double>, 3> &cv1, const std::array<double, 3> &v2, std::array<std::complex<double>, 3> &out)
 {
-    std::vector<std::complex<double>> out(3, (0., 0.));
     out[0] = cv1[1]*v2[2] - cv1[2]*v2[1];
     out[1] = cv1[2]*v2[0] - cv1[0]*v2[2];
     out[2] = cv1[0]*v2[1] - cv1[1]*v2[0];
-    
-    return out;
 }
 
 // Cross product between a real vector and a complex vector
-inline std::vector<std::complex<double>> Utils::ext(const std::vector<double> &v1, const std::vector<std::complex<double>> &cv2)
+inline void Utils::ext(const std::array<double, 3> &v1, const std::array<std::complex<double>, 3> &cv2, std::array<std::complex<double>, 3> &out)
 {
-    std::vector<std::complex<double>> out(3, (0., 0.));
     out[0] = v1[1]*cv2[2] - v1[2]*cv2[1];
     out[1] = v1[2]*cv2[0] - v1[0]*cv2[2];
     out[2] = v1[0]*cv2[1] - v1[1]*cv2[0];
-    
-    return out;
 }
 
 // Difference between two real vectors
-inline std::vector<double> Utils::diff(const std::vector<double> &v1, const std::vector<double> &v2)
+inline void Utils::diff(const std::array<double, 3> &v1, const std::array<double, 3> &v2, std::array<double, 3> &out)
 {
-    std::vector<double> out(3, 0.);
-    
     for(int n=0; n<3; n++)
     {
         out[n] = v1[n] - v2[n];
     }
-    return out;
 }
 
 // Difference between two complex valued vectors
-inline std::vector<std::complex<double>> Utils::diff(const std::vector<std::complex<double>> &cv1, const std::vector<std::complex<double>> &cv2)
+inline void Utils::diff(const std::array<std::complex<double>, 3> &cv1, const std::array<std::complex<double>, 3> &cv2, std::array<std::complex<double>, 3> &out)
 {
-    std::vector<std::complex<double>> out(3, (0., 0.));
-    
     for(int n=0; n<3; n++)
     {
         out[n] = cv1[n] - cv2[n];
     }
-    return out;
 }
 
 // Absolute value of real vector
-inline double Utils::abs(const std::vector<double> &v)
+inline void Utils::abs(const std::array<double, 3> &v, double &out)
 {
-    double out = dot(v, v);
+    dot(v, v, out);
     out = std::sqrt(out);
-    
-    return out;
 }
 
 // Absolute value of a complex vector. Still returns a complex number!
-inline std::complex<double> Utils::abs(const std::vector<std::complex<double>> &cv)
+inline void Utils::abs(const std::array<std::complex<double>, 3> &cv, std::complex<double> &out)
 {
-    std::vector<std::complex<double>> cv_conj = conj(cv);
-    std::complex<double> out = dot(cv, cv_conj);
+    std::array<std::complex<double>, 3> cv_conj;
+    conj(cv, cv_conj);
+    dot(cv, cv_conj, out);
     out = std::sqrt(out);
-    
-    return out;
 }
 
 // Return normalized real vector from vector
-inline std::vector<double> Utils::normalize(const std::vector<double> &v)
+inline void Utils::normalize(const std::array<double, 3> &v, std::array<double, 3> &out)
 {
-    std::vector<double> out(3, 0.);
-    double norm = abs(v);
+    double norm;
+    abs(v, norm);
     
     for( int n=0; n<3; n++)
     {
         out[n] = v[n] / norm;
     }
-    return out;
 }
 
 // Normalize complex vector
-inline std::vector<std::complex<double>> Utils::normalize(const std::vector<std::complex<double>> &cv)
+inline void Utils::normalize(const std::array<std::complex<double>, 3> &cv, std::array<std::complex<double>, 3> &out)
 {
-    std::vector<std::complex<double>> out(3, (0., 0.));
-    std::complex<double> cnorm = abs(cv);
-    //double norm = cnorm.real();
+    std::complex<double> cnorm;
+    abs(cv, cnorm);
     
     for( int n=0; n<3; n++)
     {
         out[n] = cv[n] / cnorm;
     }
-    return out;
 }
 
 // Apply standard real s-multiplication on a real vector
-inline std::vector<double> Utils::s_mult(const std::vector<double> &v, const double &s)
+inline void Utils::s_mult(const std::array<double, 3> &v, const double &s, std::array<double, 3> &out)
 {
-    std::vector<double> out(3, 0.);
-    
     for(int n=0; n<3; n++)
     {
         out[n] = s * v[n];
     }
-    return out;
 }
 
 
 // Multiply complex vector by complex scalar
-inline std::vector<std::complex<double>> Utils::s_mult(const std::vector<std::complex<double>> &cv, const std::complex<double> &cs)
+inline void Utils::s_mult(const std::array<std::complex<double>, 3> &cv, const std::complex<double> &cs, std::array<std::complex<double>, 3> &out)
 {
-    std::vector<std::complex<double>> out(3, (0., 0.));
-    
     for(int n=0; n<3; n++)
     {
         out[n] = cs * cv[n];
     }
-    return out;
 }
 
 // Multiply real vector by complex scalar
-inline std::vector<std::complex<double>> Utils::s_mult(const std::vector<double> &v, const std::complex<double> &cs)
+inline void Utils::s_mult(const std::array<double, 3> &v, const std::complex<double> &cs, std::array<std::complex<double>, 3> &out)
 {
-    std::vector<std::complex<double>> out(3, (0., 0.));
-    
     for(int n=0; n<3; n++)
     {
         out[n] = cs * v[n];
     }
-    return out;
 }
 
 // Multiply complex vector by real scalar
-inline std::vector<std::complex<double>> Utils::s_mult(const std::vector<std::complex<double>> &cv, const double &s)
+inline void Utils::s_mult(const std::array<std::complex<double>, 3> &cv, const double &s, std::array<std::complex<double>, 3> &out)
 {
-    std::vector<std::complex<double>> out(3, (0., 0.));
-    
     for(int n=0; n<3; n++)
     {
         out[n] = s * cv[n];
     }
-    return out;
 }
 
 
 
 // Return complex conjugate of complex vector
-inline std::vector<std::complex<double>> Utils::conj(const std::vector<std::complex<double>> &cv)
+inline void Utils::conj(const std::array<std::complex<double>, 3> &cv, std::array<std::complex<double>, 3> &out)
 {
-    std::vector<std::complex<double>> out(3, (0., 0.));
-    
     for(int n=0; n<3; n++)
     {
         out[n] = std::conj(cv[n]);
     }
-    return out;
 }
 
 // Calculate refected vector from surface using complex incoming vector and real normal vector to surface
-inline std::vector<std::complex<double>> Utils::snell(const std::vector<std::complex<double>> &cvin, const std::vector<double> &normal)
+inline void Utils::snell(const std::array<std::complex<double>, 3> &cvin, const std::array<double, 3> &normal, std::array<std::complex<double>, 3> &out)
 {
-    std::vector<std::complex<double>> out(3, (0., 0.));
-    std::complex<double> cfactor = 2. * dot(cvin, normal);
+    std::complex<double> cfactor;
+    dot(cvin, normal, cfactor);
     
-    std::vector<std::complex<double>> rhs = s_mult(normal, cfactor);
+    cfactor = 2. * cfactor;
     
-    out = diff(cvin, rhs);
-    return out;
+    std::array<std::complex<double>, 3> rhs;
+    s_mult(normal, cfactor, rhs);
+    
+    diff(cvin, rhs, out);
 }
 
 // Calculate refected vector from surface using complex incoming vector and real normal vector to surface
-inline std::vector<double> Utils::snell(const std::vector<double> &vin, const std::vector<double> &normal)
+inline void Utils::snell(const std::array<double, 3> &vin, const std::array<double, 3> &normal, std::array<double, 3> &out)
 {
-    std::vector<double> out(3, 0.);
-    double factor = 2. * dot(vin, normal);
+    double factor;
+    dot(vin, normal, factor);
     
-    std::vector<double> rhs = s_mult(normal, factor);
+    factor = 2. * factor;
     
-    out = diff(vin, rhs);
-    return out;
+    std::array<double, 3> rhs;
+    s_mult(normal, factor, rhs);
+    
+    diff(vin, rhs, out);
 }
 
 

@@ -43,80 +43,75 @@ void Propagation::propagateBeam(int start, int stop,
 {
     
     // For performance gain, allocate ALL data structures before the main loop
-    std::vector<std::complex<double>> h_conj(3, z0);
-    std::vector<std::complex<double>> e_out_h(3, z0);
-    std::vector<std::vector<std::complex<double>>> beam_e_h(3, h_conj);
+    std::array<std::array<std::complex<double>, 3>, 2> beam_e_h;
     
-    std::vector<double> S_i_norm(3, 0.);
-    std::vector<double> S_i_out_n(3, 0.);
-    std::vector<double> p_i_perp(3, 0.);
-    std::vector<double> p_i_parr(3, 0.);
-    std::vector<double> S_r_norm(3, 0.);
-    std::vector<double> S_r_out_n(3, 0.);
-    std::vector<double> p_r_perp(3, 0.);
-    std::vector<double> p_r_parr(3, 0.);
+    std::array<double, 3> S_i_norm;
+    std::array<double, 3> p_i_perp;
+    std::array<double, 3> p_i_parr;
+    
+    std::array<double, 3> S_r_norm;
+    std::array<double, 3> p_r_perp;
+    std::array<double, 3> p_r_parr;
 
-    std::vector<std::complex<double>> e_r(3, z0);
+    std::array<std::complex<double>, 3> e_r;
+    std::array<std::complex<double>, 3> h_r;
         
-    std::complex<double> e_dot_p_r_perp = z0;
-    std::complex<double> e_dot_p_r_parr = z0;
+    std::complex<double> e_dot_p_r_perp;
+    std::complex<double> e_dot_p_r_parr;
     
-    std::vector<double> point(3, 0.);
-    std::vector<double> norms(3, 0.);
+    std::array<double, 3> point;
+    std::array<double, 3> norms;
     
-    std::vector<double> e_out_h_r(3, 0.);
+    std::array<std::complex<double>, 3> n_out_e_i_r; 
+    std::array<std::complex<double>, 3> n_out_h_i_r; 
     
-    std::vector<std::complex<double>> h_r_temp(3, z0);
-    std::vector<std::complex<double>> h_r(3, z0);
-
-    std::vector<std::complex<double>> e_i_r(3, z0);
-    std::vector<std::complex<double>> h_i_r(3, z0);
-    std::vector<std::complex<double>> n_out_e_i_r(3, z0); 
-    std::vector<std::complex<double>> n_out_h_i_r(3, z0); 
+    // Utility arrays
+    std::array<double, 3> out1;
+    std::array<double, 3> out2;
+    
+    std::array<std::complex<double>, 3> cout1;
+    std::array<std::complex<double>, 3> cout2;
     
     for(int i=start; i<stop; i++)
     {
-        
-        point[0] = grid_target[0][i];
-        point[1] = grid_target[1][i];
-        point[2] = grid_target[2][i];
-
-        norms[0] = norm_target[0][i];
-        norms[1] = norm_target[1][i];
-        norms[2] = norm_target[2][i];
+        for(int k=0; k<3; k++)
+        {
+            point[k] = grid_target[k][i];
+            norms[k] = norm_target[k][i];
+        }
         
         // Calculate total incoming E and H field at point on target
         beam_e_h = fieldAtPoint(grid_source, Js, Ms, point, source_area, start);
         // Calculate normalised incoming poynting vector.
-        h_conj = ut.conj(beam_e_h[1]);
-        e_out_h = ut.ext(beam_e_h[0], h_conj);
+        ut.conj(beam_e_h[1], cout1);                        // h_conj
+        ut.ext(beam_e_h[0], cout1, cout2);                  // e_out_h
         
         for (int k=0; k<3; k++) 
         {
-            e_out_h_r[k] = e_out_h[k].real();
+            out1[k] = cout2[k].real();                      // e_out_h_r
             
             this->Et_container[k][i] = beam_e_h[0][k];
             this->Ht_container[k][i] = beam_e_h[1][k];
         }
 
-        S_i_norm = ut.normalize(e_out_h_r); // Missing factor of 0.5: normalized anyways right?
+        ut.normalize(out1, S_i_norm);                       // S_i_norm                   
         
         // Calculate incoming polarization vectors
-        S_i_out_n = ut.ext(S_i_norm, norms);
-        p_i_perp = ut.normalize(S_i_out_n);
-        p_i_parr = ut.ext(p_i_perp, S_i_norm);
+        ut.ext(S_i_norm, norms, out1);                      // S_i_out_n
+        ut.normalize(out1, p_i_perp);                       // p_i_perp                   
+        ut.ext(p_i_perp, S_i_norm, p_i_parr);               // p_i_parr                     
         
         // Now calculate reflected poynting vector.
-        S_r_norm = ut.snell(S_i_norm, norms);
+        ut.snell(S_i_norm, norms, S_r_norm);                // S_r_norm            
         
         // Calculate normalised reflected polarization vectors
-        S_r_out_n = ut.ext(S_r_norm, norms);
-        p_r_perp = ut.normalize(S_r_out_n);
-        p_r_parr = ut.ext(S_r_norm, p_r_perp);
+        ut.ext(S_r_norm, norms, out1);                      // S_r_out_n
+        ut.normalize(out1, p_r_perp);                       // p_r_perp                   
+        ut.ext(S_r_norm, p_r_perp, p_r_parr);               // p_r_parr                     
         
         // Now, calculate reflected field from target
-        e_dot_p_r_perp = ut.dot(beam_e_h[0], p_r_perp);
-        e_dot_p_r_parr = ut.dot(beam_e_h[0], p_r_parr);
+        ut.dot(beam_e_h[0], p_r_perp, e_dot_p_r_perp);      // e_dot_p_r_perp
+        ut.dot(beam_e_h[0], p_r_parr, e_dot_p_r_parr);      // e_dot_p_r_parr
         
         // Calculate reflected field from reflection matrix
         for(int k=0; k<3; k++)
@@ -124,18 +119,18 @@ void Propagation::propagateBeam(int start, int stop,
             e_r[k] = -e_dot_p_r_perp * p_i_perp[k] - e_dot_p_r_parr * p_i_parr[k];
         }
 
-        h_r_temp = ut.ext(S_r_norm, e_r);
-        h_r = ut.s_mult(h_r_temp, ZETA_0_INV);
+        ut.ext(S_r_norm, e_r, cout1);                       // h_r_temp
+        ut.s_mult(cout1, ZETA_0_INV, h_r);                  // h_r       
         
         // Now calculate j and m
         for(int k=0; k<3; k++)
         {
-            e_i_r[k] = e_r[k] + beam_e_h[0][k];
-            h_i_r[k] = h_r[k] + beam_e_h[1][k];
-        }
+            cout1[k] = e_r[k] + beam_e_h[0][k];             // e_i_r
+            cout2[k] = h_r[k] + beam_e_h[1][k];             // h_i_r
+        } 
         
-        n_out_h_i_r = ut.ext(norms, h_i_r);
-        n_out_e_i_r = ut.ext(norms, e_i_r);
+        ut.ext(norms, cout2, n_out_h_i_r);                  // n_out_h_i_r
+        ut.ext(norms, cout1, n_out_e_i_r);                  // n_out_e_i_r
         // Fill arrays containing the currents on the target. Note m should be multiplied with - before usage
         for (int k=0; k<3; k++)
         {
@@ -150,38 +145,36 @@ void Propagation::propagateBeam(int start, int stop,
     }
 }
 
-std::vector<std::vector<std::complex<double>>> Propagation::fieldAtPoint(const std::vector<std::vector<double>> &grid_source,
+std::array<std::array<std::complex<double>, 3>, 2> Propagation::fieldAtPoint(const std::vector<std::vector<double>> &grid_source,
                                                const std::vector<std::vector<std::complex<double>>> &Js,
                                                const std::vector<std::vector<std::complex<double>>> &Ms,
-                                               const std::vector<double> &point_target,
+                                               const std::array<double, 3> &point_target,
                                                const std::vector<double> &source_area,
                                                const int start)
 {
     
-    std::vector<std::complex<double>> e_field(3, z0);
-    std::vector<std::complex<double>> h_field(3, z0);
+    std::array<std::complex<double>, 3> e_field;
+    std::array<std::complex<double>, 3> h_field;
 
-    std::vector<double> source_point(3, 0.);
+    std::array<double, 3> source_point;
     
-    std::vector<std::vector<std::complex<double>>> e_h_field(2, e_field);
-    std::vector<std::complex<double>> js(3, z0);
-    std::vector<std::complex<double>> ms(3, z0);
-    std::vector<double> r_vec(3, 0.);
+    std::array<std::array<std::complex<double>, 3>, 2> e_h_field;
+    
+    std::array<std::complex<double>, 3> js;
+    std::array<std::complex<double>, 3> ms;
+    std::array<double, 3> r_vec;
     double r = 0.;
     
-    std::complex<double> r_in_js = z0;
-    std::vector<std::complex<double>> temp2_e(3, z0);
-    std::vector<std::complex<double>> temp1_e(3, z0);
-    std::vector<std::complex<double>> e_vec_thing(3, z0);
+    std::complex<double> r_in_s = z0;
+    std::array<std::complex<double>, 3> temp2;
+    std::array<std::complex<double>, 3> temp1;
+    std::array<std::complex<double>, 3> e_vec_thing;
+    std::array<std::complex<double>, 3> h_vec_thing;
         
-    std::vector<std::complex<double>> k_out_ms(3, z0);
+    std::array<std::complex<double>, 3> k_out_ms;
 
-    std::vector<std::complex<double>> k_out_js(3, z0);
-        
-    std::complex<double> r_in_ms = z0;
-    std::vector<std::complex<double>> temp2_h(3, z0);
-    std::vector<std::complex<double>> temp1_h(3, z0);
-    std::vector<std::complex<double>> h_vec_thing(3, z0);
+    std::array<std::complex<double>, 3> k_out_js;
+
     std::complex<double> Green = z0;
     
     for(int i=0; i<gridsize_s; i++)
@@ -196,25 +189,26 @@ std::vector<std::vector<std::complex<double>>> Propagation::fieldAtPoint(const s
         //std::cout << source_point[0] << " " << source_point[1] << " " << source_point[2] << std::endl;
         //std::cout << point_target[0] << " " << point_target[1] << " " << point_target[2] << std::endl;
         
-        r_vec = ut.diff(point_target, source_point);
-        r = ut.abs(r_vec);
+        ut.diff(point_target, source_point, r_vec);     // r_vec
+        ut.abs(r_vec, r);                               // r
         //std::cout << r << std::endl;
         
         // This outer products are necessary for the e-field. Assume MU_ALU = MU_0
-        r_in_js = ut.dot(r_vec, js);
-        temp2_e = ut.s_mult(r_vec, r_in_js);
-        temp1_e = ut.s_mult(js, r*r);
-        e_vec_thing = ut.diff(temp1_e, temp2_e);
+        ut.dot(r_vec, js, r_in_s);                      // r_in_js
+        ut.s_mult(r_vec, r_in_s, temp2);                // temp2
+        ut.s_mult(js, r*r, temp1);                      // temp1
+        ut.diff(temp1, temp2, e_vec_thing);             // e_vec_thing
         
-        k_out_ms = ut.ext(r_vec, ms);
+        ut.ext(r_vec, ms, k_out_ms);                    // k_out_ms
         
         // This part is for h-field.
-        k_out_js = ut.ext(r_vec, js);
+        ut.ext(r_vec, js, k_out_js);                    // k_out_js
         
-        r_in_ms = ut.dot(r_vec, ms);
-        temp2_h = ut.s_mult(r_vec, r_in_ms);
-        temp1_h = ut.s_mult(ms, r*r);
-        h_vec_thing = ut.diff(temp1_h, temp2_h);
+        ut.dot(r_vec, ms, r_in_s);                      // r_in_ms
+        ut.s_mult(r_vec, r_in_s, temp2);                // temp2
+        ut.s_mult(ms, r*r, temp1);                      // temp1
+        
+        ut.diff(temp1, temp2, h_vec_thing);             // h_vec_thing
         
         // Technically every similar term for e and h is calculated here, not just greens function...
         Green = k * exp(-j * k * r) / (4 * M_PI * r*r) * source_area[i] * j;

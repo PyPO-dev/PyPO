@@ -10,6 +10,7 @@ import src.Python.Camera as Camera
 import src.Python.Beams as Beams
 import src.Python.PhysOptics as PO
 import src.Python.FourierOptics as FO
+from src.Python.Plotter import Plotter
 
 class System(object):
     
@@ -34,6 +35,9 @@ class System(object):
             self.customBeamPath += path
         else:
             self.customBeamPath = path
+            
+    def addPlotter(self, save='./images/'):
+        self.plotter = Plotter(save='./images/')
     
     #### ADD REFLECTOR METHODS
     def addParabola(self, coef, lims_x, lims_y, gridsize, cRot=np.zeros(3), pmode='man', gmode='xy', name="Parabola", axis='a', trunc=False, flip=False):
@@ -196,16 +200,16 @@ class System(object):
         ax.tick_params(axis='x', which='major', pad=-3)
         pt.show()
         
-    def initRaytracer(self, NraysCirc=0, NraysCross=0, 
+    def initRaytracer(self, nRays=0, nCirc=1, 
                  rCirc=0, div_ang_x=2*np.pi, div_ang_y=2*np.pi,
                  originChief=np.array([0,0,0]), 
                  tiltChief=np.array([0,0,0]), nomChief = np.array([0,0,1])):
         
-        rt = RayTrace.RayTrace(NraysCirc, NraysCross, rCirc, div_ang_x, div_ang_y, originChief, tiltChief, nomChief)
+        rt = RayTrace.RayTrace(nRays, nCirc, rCirc, div_ang_x, div_ang_y, originChief, tiltChief, nomChief)
         
         self.Raytracer = rt
         
-    def startRaytracer(self, surface, a_init=100, verbose=False):
+    def startRaytracer(self, surface, a_init=100):
         """
         Propagate rays in RayTracer to a surface.
         Adds new frame to rays, containing point of intersection and reflected direction.
@@ -213,7 +217,7 @@ class System(object):
         if not hasattr(self.system[surface], 'tcks'):
             
             if self.system[surface].elType == "Reflector":
-                self.system[surface].interpReflector(verbose=verbose)
+                self.system[surface].interpReflector()
                 
             elif self.system[surface].elType == "Camera":
                 self.system[surface].interpCamera()
@@ -229,14 +233,14 @@ class System(object):
             pathsToFields = [self.customBeamPath + 'r' + name, self.customBeamPath + 'i' + name]
             self.inputBeam = Beams.CustomBeam(x_lims, y_lims, gridsize, comp, pathsToFields, flip)
             
-    def initPhysOptics(self, target, k, thres=-50, numThreads=1, inputPath='./src/C++/input/', outputPath='./src/C++/output/'):
+    def initPhysOptics(self, target, k, thres=-50, numThreads=1, cpp_path='./src/C++/'):
         """
         Create a PO object that will act as the 'translator' between POPPy and PhysBeam.
         Also performs the initial propagation from beam to target.
         Should be called once per system.
         """
         
-        self.PO = PO.PhysOptics(inputPath, outputPath, k, numThreads, thres)
+        self.PO = PO.PhysOptics(k, numThreads, thres, cpp_path)
 
         # Write input beam to input
         for i, attr in enumerate(self.inputBeam):
@@ -272,7 +276,12 @@ class System(object):
     def runPhysOptics(self, save=0):
         self.PO.runPhysOptics(save)
         
-    def initFourierOptics(self, k=10):
+    def loadField(self, surface, mode='Ex'):
+        field = self.PO.loadField(surface.shape, mode)
+        
+        return field
+        
+    def initFourierOptics(self, k):
         self.FO = FO.FourierOptics(k=k)
         
 if __name__ == "__main__":

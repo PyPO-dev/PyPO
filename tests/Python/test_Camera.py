@@ -26,7 +26,7 @@ class TestMatRotate(unittest.TestCase):
         self.offTrans = np.array([0, 0, 0])
         self.offRot = np.radians([0, 0, 0])
         
-        self.camera = Camera.Camera(center=self.center, offTrans=self.offTrans, offRot=self.offRot, name=self.name)
+        self.camera = Camera.Camera(center=self.center, name=self.name)
         
     def test_setGrid(self):
         self.camera.setGrid(self.lims_x, self.lims_y, self.gridsize)

@@ -8,7 +8,7 @@ import scipy.optimize as optimize
 import src.Python.MatRotate as MatRotate
 
 class RayTrace(object):
-    def __init__(self, NraysCirc, NraysCross, 
+    def __init__(self, nRays, nCirc, 
                  rCirc, div_ang_x, div_ang_y,
                  originChief, tiltChief, nomChief):
         
@@ -21,54 +21,45 @@ class RayTrace(object):
         self.originChief = originChief
         self.directionChief = MatRotate.MatRotate(np.radians(tiltChief), nomChief, vecRot=True)
         
-        self.rays = {"ray_{}".format(n) : {} for n in range(1 + 4*NraysCirc + 4*NraysCross)}
+        self.nTot = 1 + nCirc * 4 * nRays
         
-        if NraysCirc > 0:
+        self.rays = {"ray_{}".format(n) : {} for n in range(self.nTot)}
+
+        
+        if nRays > 0:
             alpha = 0.0                             # Set first circle ray in the right of beam
-            d_alpha = 2 * np.pi / (4 * NraysCirc)   # Set spacing in clockwise angle
-        
-        if NraysCross > 0:
-            d_beta_x = div_ang_x / (NraysCross + 2) 
-            d_beta_y = div_ang_y / (NraysCross + 2) 
-            
-            beta_x = np.linspace(d_beta_x, div_ang_x - d_beta_x, num=NraysCross)
-            beta_y = np.linspace(d_beta_y, div_ang_y - d_beta_y, num=NraysCross)
-            
-            beta_x_pm = np.concatenate((-beta_x, beta_x))
-            beta_y_pm = np.concatenate((-beta_y, beta_y))
-            
-            beta_tot = np.concatenate((beta_x_pm, beta_y_pm))
+            d_alpha = 2 * np.pi / (4 * nRays)   # Set spacing in clockwise angle
         
         # Ray initialization:
         # every ray gets two lists: one for position, one for direction
         # For each element encountered, a new entry will be made in each list:
         # we append a 3D array of the point to the position list and a 3D array to direction list
+        
+        n = 1
+        
         for i, (key, ray) in enumerate(self.rays.items()):
             ray["positions"]  = []
             ray["directions"] = []
+            
             if i == 0: # Chief ray
                 ray["positions"].append(self.originChief)
                 ray["directions"].append(self.directionChief)
+
+            pos_ray = MatRotate.MatRotate(np.array([0,0,alpha]), np.array([rCirc / nCirc * n,0,0]))
                 
-            elif i > 0 and i <= 4 * NraysCirc:
-                pos_ray = MatRotate.MatRotate(np.array([0,0,alpha]), np.array([rCirc,0,0]))
-                
-                rotation = np.array([np.radians(div_ang_x) * np.sin(alpha), np.radians(div_ang_y) * np.cos(alpha), 2*alpha])
-                direction = MatRotate.MatRotate(rotation, nomChief, vecRot=True)
-                direction = MatRotate.MatRotate(np.radians(tiltChief), direction, vecRot=True)
+            rotation = np.array([np.radians(div_ang_x) * np.sin(alpha), np.radians(div_ang_y) * np.cos(alpha), 2*alpha]) / nCirc * n
+            direction = MatRotate.MatRotate(rotation, nomChief, vecRot=True)
+            direction = MatRotate.MatRotate(np.radians(tiltChief), direction, vecRot=True)
     
-                ray["positions"].append(self.originChief + pos_ray)
-                ray["directions"].append(direction)
+            ray["positions"].append(self.originChief + pos_ray)
+            ray["directions"].append(direction)
                 
-                alpha += d_alpha
-                
-            elif i > 4 * NraysCirc and i <= (4 * NraysCirc + 2 * NraysCross):
-                beta_cur = beta_tot[i - 4 * NraysCirc - 1]
-                pos_ray = np.array([0,rCirc,0])
-                
-                rotation = np.array([np.radians(div_ang_x) * np.sin(beta_cur), np.radians(div_ang_y) * np.cos(beta_cur), 0])
-                direction = MatRotate.MatRotate(rotation, nomChief, vecRot=True)
-                ray["positions"].append(pos_ray)
+            alpha += d_alpha
+            
+            if i == int(self.nTot / nCirc) * n:
+                print(int(self.nTot / nCirc) * n)
+                n += 1
+                alpha = 0
         
     def __len__(self):
         return len(self.rays.keys())
@@ -169,7 +160,7 @@ Chief ray direction : [{:.4f}, {:.4f}, {:.4f}]
             if quiv:
                 ax.quiver(ray["positions"][frame][0], ray["positions"][frame][1], 10 * ray["directions"][frame][0], 10 * ray["directions"][frame][1], color='black', width=0.005, scale=10)
             
-        #ax.set_aspect(1)
+        ax.set_aspect(1)
         pt.show()
         
     def plotRaysSystem(self, ax_append):

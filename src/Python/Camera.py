@@ -37,6 +37,8 @@ Center position     : [{:.3f}, {:.3f}, {:.3f}] [mm]
             raise StopIteration
         
     def setGrid(self, lims_x, lims_y, gridsize):
+        self.shape = gridsize
+        
         grid_x, grid_y = np.mgrid[lims_x[0]:lims_x[1]:gridsize[0]*1j, lims_y[0]:lims_y[1]:gridsize[1]*1j]
         
         dx = grid_x[1,0] - grid_x[0,0]

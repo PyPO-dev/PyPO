@@ -134,6 +134,10 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
             # Convert radii to u values
             lims_x = [self.r_to_u(lims_x[0], axis=axis), self.r_to_u(lims_x[1], axis=axis)]
             
+            v_open = (lims_y[1] - lims_y[0]) / gridsize[1]
+            
+            #lims_y[1] -= v_open
+            
             grid_u, grid_v = np.mgrid[lims_x[0]:lims_x[1]:gridsize[0]*1j, lims_y[0]:lims_y[1]:gridsize[1]*1j]
             
             du = grid_u[1,0] - grid_u[0,0]

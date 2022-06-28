@@ -5,6 +5,7 @@ sys.path.append('../../')
 import unittest
 import numpy as np
 
+import src.Python.Copy as Copy
 import src.Python.System as System
 
 class TestParabola(unittest.TestCase): 
@@ -13,19 +14,29 @@ class TestParabola(unittest.TestCase):
         print("\nTesting System") 
         
     def setUp(self):
+        lims_x = [-100, 100]
+        lims_y = [-100, 100]
+        gridsize = [101, 101]
         self.system = System.System()
-    
+        
+    def test_setCustomBeamPath(self):
+        test_path = '/this/is/the/path/to/test/'
+        self.system.setCustomBeamPath(test_path)
+        self.assertEqual(test_path, self.system.customBeamPath)
+        
+        to_append = 'and/the/test/goes/on/'
+        self.system.setCustomBeamPath(to_append, append=True)
+        self.assertEqual(test_path + to_append, self.system.customBeamPath)
+        
     def test_addParabola(self):
-        """
-        Use the ASTE primary to test the parabola function.
-        """
+        a = 100
+        b = 100
+        #### TODO: write tests
         
-        a = 118.32159566199232
-        b = 118.32159566199232
         
-        foc = np.array([0, 0, 3500])
-        ver = np.zeros(3)
         
+if __name__ == "__main__":
+    unittest.main()
         
         
         

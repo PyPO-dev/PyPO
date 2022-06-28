@@ -144,3 +144,7 @@ movie/
 ex_APWS.py
 custom/
 buildSystem.py
+ChopperPointing.py
+Plot_spillover.py
+*.png
+test_Parallel.py

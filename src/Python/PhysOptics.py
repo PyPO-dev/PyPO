@@ -43,9 +43,8 @@ class PhysOptics(object):
             np.savetxt(self.inputPath + name, toWrite)
         
     def copyToInput(self, name, nameNew):
-            os.system('cp {} {}'.format(self.outputPath + "r" + name, self.inputPath + "r" + nameNew))
-            
-            os.system('cp {} {}'.format(self.outputPath + "i" + name, self.inputPath + "i" + nameNew))
+        os.system('cp {} {}'.format(self.outputPath + "r" + name, self.inputPath + "r" + nameNew))
+        os.system('cp {} {}'.format(self.outputPath + "i" + name, self.inputPath + "i" + nameNew))
         
     def runPhysOptics(self, save=0):
         cwd = os.getcwd()
@@ -62,7 +61,7 @@ class PhysOptics(object):
         re = re.reshape(shape)
         im = im.reshape(shape)
         
-        field = re + 1j * im
+        field = re.T + 1j * im.T # Transpose to respect original orientation of grids
 
         return [field, mode]
     
@@ -85,7 +84,13 @@ class PhysOptics(object):
         theta_x = np.degrees(grid_foc_pad[1]*1e-3 / f_sys) * 3600
         theta_y = np.degrees((grid_foc_pad[2] - z0)*1e-3 / f_sys) * 3600
         
-    def plotField(self, grid_x, grid_y, mode='Ex', vmax=0, vmin=-30, ff=0):
+    def plotField(self, grid_x, grid_y, mode='Ex', title='', vmax=0, vmin=-30, ff=0, show=True, save=False, polar=False):
+        '''
+        if polar:
+            fig, ax = pt.subplots(1,2, figsize=(10,5), gridspec_kw={'wspace':0.5}, subplot_kw=dict(projection='polar'))
+        else:
+            fig, ax = pt.subplots(1,2, figsize=(10,5), gridspec_kw={'wspace':0.5})
+        '''
         fig, ax = pt.subplots(1,2, figsize=(10,5), gridspec_kw={'wspace':0.5})
     
         divider1 = make_axes_locatable(ax[0])
@@ -95,14 +100,14 @@ class PhysOptics(object):
         cax2 = divider2.append_axes('right', size='5%', pad=0.05)
         
         field = self.loadField(shape=grid_x.shape, mode=mode)
-        max_field = np.max(np.absolute(field))
+        max_field = np.max(np.absolute(field[0]))
         
         if not ff:
-            extent = [grid_x[0,0], grid_x[-1,0], grid_y[0,0], grid_y[0,-1]]
-            ax[0].set_ylabel(r"$z$ / [mm]")
-            ax[0].set_xlabel(r"$y$ / [mm]")
-            ax[1].set_ylabel(r"$z$ / [mm]")
-            ax[1].set_xlabel(r"$y$ / [mm]")
+            extent = [np.min(grid_x), np.max(grid_x), np.min(grid_y), np.max(grid_y)]
+            ax[0].set_ylabel(r"$y$ / [mm]")
+            ax[0].set_xlabel(r"$x$ / [mm]")
+            ax[1].set_ylabel(r"$y$ / [mm]")
+            ax[1].set_xlabel(r"$x$ / [mm]")
             
         else:
             extent = [grid_x[0,0] / ff * 3600, grid_x[-1,0] / ff * 3600, grid_y[0,0] / ff * 3600, grid_y[0,-1] / ff * 3600]
@@ -111,9 +116,16 @@ class PhysOptics(object):
             ax[1].set_ylabel(r"El / [as]")
             ax[1].set_xlabel(r"Az / [as]")
         
+        if polar:
+            x_vals = grid_x# * np.cos(grid_y)
+            y_vals = grid_y# * np.sin(grid_y)
+            
+            ampfig = ax[0].pcolormesh(x_vals, y_vals, 20 * np.log10(np.absolute(field[0].T) / max_field), vmin=vmin, vmax=vmax, cmap=cmaps.parula)#, origin='lower', extent=extent, cmap=cmaps.parula, vmin=vmin, vmax=vmax)
+            phasefig = ax[1].pcolormesh(x_vals, y_vals, np.angle(field[0].T), cmap=cmaps.parula)#, origin='lower', extent=extent, cmap=cmaps.parula)
         
-        ampfig = ax[0].imshow(20 * np.log10(np.absolute(field) / max_field), origin='lower', extent=extent, cmap=cmaps.parula, vmin=vmin, vmax=vmax)
-        phasefig = ax[1].imshow(np.angle(field), origin='lower', extent=extent, cmap=cmaps.parula)
+        else:
+            ampfig = ax[0].imshow(20 * np.log10(np.absolute(field[0]) / max_field), origin='lower', extent=extent, cmap=cmaps.parula, vmin=vmin, vmax=vmax)
+            phasefig = ax[1].imshow(np.angle(field[0]), origin='lower', extent=extent, cmap=cmaps.parula)
 
         ax[0].set_title("PNA / [dB]", y=1.08)
         ax[0].set_aspect(1)
@@ -122,7 +134,12 @@ class PhysOptics(object):
     
         c1 = fig.colorbar(ampfig, cax=cax1, orientation='vertical')
         c2 = fig.colorbar(phasefig, cax=cax2, orientation='vertical')
+        pt.suptitle(title)
         #pt.savefig(fname="PhysBeam/images/beam_focus",bbox_inches='tight', dpi=300)
-    
-        pt.show()
+        if save:
+            pt.savefig(save + '.jpg',bbox_inches='tight', dpi=300)
+            
+        if show:
+            pt.show()
+
         pt.close()

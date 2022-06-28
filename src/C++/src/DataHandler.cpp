@@ -207,8 +207,8 @@ void DataHandler::writeOut(std::vector<std::vector<std::complex<double>>> &out, 
         std::fstream out_r;
         std::fstream out_i;
     
-        out_r.open("output/r" + fileName + xyz[k] + ".txt", std::fstream::out);
-        out_i.open("output/i" + fileName + xyz[k] + ".txt", std::fstream::out);
+        out_r.open("output/r" + fileName + xyz[k] + ".txt", std::fstream::out | std::fstream::trunc);
+        out_i.open("output/i" + fileName + xyz[k] + ".txt", std::fstream::out | std::fstream::trunc);
         
         out_r << std::setprecision(prec);
         out_i << std::setprecision(prec);

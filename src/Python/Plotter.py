@@ -6,6 +6,12 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import src.Python.Colormaps as cmaps
 
+pt.rcParams['xtick.top'] = True
+pt.rcParams['ytick.right'] = True
+
+pt.rcParams['xtick.direction'] = "in"
+pt.rcParams['ytick.direction'] = "in"
+
 class Plotter(object):
     """
     Class for plotting stuff. Can plot beams n stuff
@@ -34,7 +40,7 @@ class Plotter(object):
         
         
         if not amp_only:
-            fig, ax = pt.subplots(1,2)
+            fig, ax = pt.subplots(1,2, figsize=(10,5), gridspec_kw={'wspace':0.5})
         
             divider1 = make_axes_locatable(ax[0])
             divider2 = make_axes_locatable(ax[1])
@@ -71,7 +77,7 @@ class Plotter(object):
             c2 = fig.colorbar(phasefig, cax=cax2, orientation='vertical')
             
         else:
-            fig, ax = pt.subplots(1,1)
+            fig, ax = pt.subplots(1,1, figsize=(5,5))
         
             divider = make_axes_locatable(ax)
 
@@ -145,3 +151,50 @@ class Plotter(object):
          
         if returns:
             return ax_append
+        
+    def beamCut(self, plotObject, field, vmin=-50, vmax=0, frac=1, show=True, save=True):
+        x_center = int((plotObject.shape[0] - 1) / 2)
+        y_center = int((plotObject.shape[1] - 1) / 2)
+        
+        #pt.plot(plotObject.grid_x[:, y_center])
+        #pt.plot(plotObject.grid_y[:, y_center])
+        
+        comp = field[1]
+        field = field[0]
+        
+        field_dB = 20 * np.log10(np.absolute(field) / np.max(np.absolute(field)))
+        
+        H_cut = field_dB[:,y_center]
+        E_cut = field_dB[x_center,:]
+        
+        fig, ax = pt.subplots(1,1, figsize=(7,5))
+        
+        ax.plot(H_cut, color='blue')
+        ax.plot(E_cut, color='red', ls='--')
+        ax.set_box_aspect(1)
+        ax.set_ylim(vmin, vmax)
+        #ax.set_xlim(-10, 10)
+        if save:
+            pt.savefig(fname=self.savePath + 'EH_cut_{}.jpg'.format(plotObject.name),bbox_inches='tight', dpi=300)
+            
+        if show:
+            pt.show()
+        
+        pt.close()
+        
+        diff_abs = np.absolute(field[:,y_center]) - np.absolute(field[x_center,:])
+        diff_ang = np.angle(field[:,y_center]) - np.angle(field[x_center,:])
+        
+        fig, ax = pt.subplots(1,3)
+        ax[0].plot(np.absolute(field[:,y_center]))
+        ax[0].plot(np.absolute(field[x_center,:]))
+        ax[1].plot(diff_abs)
+        ax[2].plot(diff_ang)
+        pt.show()
+        
+        
+        
+        
+        
+        
+        

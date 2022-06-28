@@ -126,23 +126,9 @@ Chief ray direction : [{:.4f}, {:.4f}, {:.4f}]
             direction = ray["directions"][-1] - 2 * np.dot(ray["directions"][-1], interp_n) * interp_n
             
             norm = np.sqrt(np.dot(direction, direction))
-            #direction /= norm
-            '''
-            # Diagnostics - remove when fixed
-            print("Incoming ray direction at surface:")
-            print(ray["directions"][-1])
-            print("Normal vector at surface:")
-            print(interp_n)
-            print("ray direction at surface")
-            print(direction)
-            
-            '''
-            
             
             ray["positions"].append(position)
             ray["directions"].append(direction)
-            
-        print(self.rays["ray_4"]["positions"][-1])
     
     def plotRays(self, quiv=True, frame=0):
         fig, ax = pt.subplots(1,1)

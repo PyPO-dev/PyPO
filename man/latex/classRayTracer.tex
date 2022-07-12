@@ -1,0 +1,116 @@
+\hypertarget{classRayTracer}{}\doxysection{Ray\+Tracer\texorpdfstring{$<$}{<} T, U, V \texorpdfstring{$>$}{>} Class Template Reference}
+\label{classRayTracer}\index{RayTracer$<$ T, U, V $>$@{RayTracer$<$ T, U, V $>$}}
+
+
+{\ttfamily \#include $<$Ray\+Trace.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classRayTracer_a8637057563c675eac417c202277a8b27}{Ray\+Tracer}} (int num\+Threads, int n\+Tot, V epsilon, bool verbose=false)
+\item 
+void \mbox{\hyperlink{classRayTracer_a54308039ddbee81e5c2d2cb0cc7f992f}{transf\+Rays}} (T ctp, U $\ast$fr, bool inv=false)
+\item 
+void \mbox{\hyperlink{classRayTracer_a6ddfa49541d8ade725ce2dab3dad9e5e}{propagate\+Rays\+ToP}} (int start, int stop, T ctp, U $\ast$fr\+\_\+in, U $\ast$fr\+\_\+out, V t0)
+\item 
+void \mbox{\hyperlink{classRayTracer_a1a45997e63a0c8fc6c89b8bc2ee2f910}{propagate\+Rays\+ToH}} (int start, int stop, T ctp, U $\ast$fr\+\_\+in, U $\ast$fr\+\_\+out, V t0)
+\item 
+void \mbox{\hyperlink{classRayTracer_a9783a3d259b040aa3b6a2d975e7c978f}{propagate\+Rays\+ToE}} (int start, int stop, T ctp, U $\ast$fr\+\_\+in, U $\ast$fr\+\_\+out, V t0)
+\item 
+void \mbox{\hyperlink{classRayTracer_acc4e49f68bb791d3658c2ca1a3844b01}{propagate\+Rays\+To\+Pl}} (int start, int stop, T ctp, U $\ast$fr\+\_\+in, U $\ast$fr\+\_\+out, V t0)
+\item 
+void \mbox{\hyperlink{classRayTracer_a5210ca2a5e832bf732529c2b2f7c6da5}{parallel\+Rays}} (T ctp, U $\ast$fr\+\_\+in, U $\ast$fr\+\_\+out, V t0)
+\item 
+void \mbox{\hyperlink{classRayTracer_a04fea6a2fba981f6d4a1b9a00a5e4bb5}{join\+Threads}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classUtils}{Utils}}$<$ V $>$ \mbox{\hyperlink{classRayTracer_a2f9aaccce6775a7b69c02700c6077805}{ut}}
+\item 
+std\+::vector$<$ std\+::thread $>$ \mbox{\hyperlink{classRayTracer_a20d7d1fcca98cb681c8436a024b2092b}{thread\+Pool}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classRayTracer_a8637057563c675eac417c202277a8b27}\label{classRayTracer_a8637057563c675eac417c202277a8b27}} 
+\index{RayTracer$<$ T, U, V $>$@{RayTracer$<$ T, U, V $>$}!RayTracer@{RayTracer}}
+\index{RayTracer@{RayTracer}!RayTracer$<$ T, U, V $>$@{RayTracer$<$ T, U, V $>$}}
+\doxysubsubsection{\texorpdfstring{RayTracer()}{RayTracer()}}
+{\footnotesize\ttfamily template$<$class T , class U , class V $>$ \\
+\mbox{\hyperlink{classRayTracer}{Ray\+Tracer}}$<$ T, U, V $>$\mbox{\hyperlink{classRayTracer}{\+::\+Ray\+Tracer}} (\begin{DoxyParamCaption}\item[{int}]{num\+Threads,  }\item[{int}]{n\+Tot,  }\item[{V}]{epsilon,  }\item[{bool}]{verbose = {\ttfamily false} }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classRayTracer_a04fea6a2fba981f6d4a1b9a00a5e4bb5}\label{classRayTracer_a04fea6a2fba981f6d4a1b9a00a5e4bb5}} 
+\index{RayTracer$<$ T, U, V $>$@{RayTracer$<$ T, U, V $>$}!joinThreads@{joinThreads}}
+\index{joinThreads@{joinThreads}!RayTracer$<$ T, U, V $>$@{RayTracer$<$ T, U, V $>$}}
+\doxysubsubsection{\texorpdfstring{joinThreads()}{joinThreads()}}
+{\footnotesize\ttfamily template$<$class T , class U , class V $>$ \\
+void \mbox{\hyperlink{classRayTracer}{Ray\+Tracer}}$<$ T, U, V $>$\+::join\+Threads}
+
+\mbox{\Hypertarget{classRayTracer_a5210ca2a5e832bf732529c2b2f7c6da5}\label{classRayTracer_a5210ca2a5e832bf732529c2b2f7c6da5}} 
+\index{RayTracer$<$ T, U, V $>$@{RayTracer$<$ T, U, V $>$}!parallelRays@{parallelRays}}
+\index{parallelRays@{parallelRays}!RayTracer$<$ T, U, V $>$@{RayTracer$<$ T, U, V $>$}}
+\doxysubsubsection{\texorpdfstring{parallelRays()}{parallelRays()}}
+{\footnotesize\ttfamily template$<$class T , class U , class V $>$ \\
+void \mbox{\hyperlink{classRayTracer}{Ray\+Tracer}}$<$ T, U, V $>$\+::parallel\+Rays (\begin{DoxyParamCaption}\item[{T}]{ctp,  }\item[{U $\ast$}]{fr\+\_\+in,  }\item[{U $\ast$}]{fr\+\_\+out,  }\item[{V}]{t0 }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classRayTracer_a9783a3d259b040aa3b6a2d975e7c978f}\label{classRayTracer_a9783a3d259b040aa3b6a2d975e7c978f}} 
+\index{RayTracer$<$ T, U, V $>$@{RayTracer$<$ T, U, V $>$}!propagateRaysToE@{propagateRaysToE}}
+\index{propagateRaysToE@{propagateRaysToE}!RayTracer$<$ T, U, V $>$@{RayTracer$<$ T, U, V $>$}}
+\doxysubsubsection{\texorpdfstring{propagateRaysToE()}{propagateRaysToE()}}
+{\footnotesize\ttfamily template$<$class T , class U , class V $>$ \\
+void \mbox{\hyperlink{classRayTracer}{Ray\+Tracer}}$<$ T, U, V $>$\+::propagate\+Rays\+ToE (\begin{DoxyParamCaption}\item[{int}]{start,  }\item[{int}]{stop,  }\item[{T}]{ctp,  }\item[{U $\ast$}]{fr\+\_\+in,  }\item[{U $\ast$}]{fr\+\_\+out,  }\item[{V}]{t0 }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classRayTracer_a1a45997e63a0c8fc6c89b8bc2ee2f910}\label{classRayTracer_a1a45997e63a0c8fc6c89b8bc2ee2f910}} 
+\index{RayTracer$<$ T, U, V $>$@{RayTracer$<$ T, U, V $>$}!propagateRaysToH@{propagateRaysToH}}
+\index{propagateRaysToH@{propagateRaysToH}!RayTracer$<$ T, U, V $>$@{RayTracer$<$ T, U, V $>$}}
+\doxysubsubsection{\texorpdfstring{propagateRaysToH()}{propagateRaysToH()}}
+{\footnotesize\ttfamily template$<$class T , class U , class V $>$ \\
+void \mbox{\hyperlink{classRayTracer}{Ray\+Tracer}}$<$ T, U, V $>$\+::propagate\+Rays\+ToH (\begin{DoxyParamCaption}\item[{int}]{start,  }\item[{int}]{stop,  }\item[{T}]{ctp,  }\item[{U $\ast$}]{fr\+\_\+in,  }\item[{U $\ast$}]{fr\+\_\+out,  }\item[{V}]{t0 }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classRayTracer_a6ddfa49541d8ade725ce2dab3dad9e5e}\label{classRayTracer_a6ddfa49541d8ade725ce2dab3dad9e5e}} 
+\index{RayTracer$<$ T, U, V $>$@{RayTracer$<$ T, U, V $>$}!propagateRaysToP@{propagateRaysToP}}
+\index{propagateRaysToP@{propagateRaysToP}!RayTracer$<$ T, U, V $>$@{RayTracer$<$ T, U, V $>$}}
+\doxysubsubsection{\texorpdfstring{propagateRaysToP()}{propagateRaysToP()}}
+{\footnotesize\ttfamily template$<$class T , class U , class V $>$ \\
+void \mbox{\hyperlink{classRayTracer}{Ray\+Tracer}}$<$ T, U, V $>$\+::propagate\+Rays\+ToP (\begin{DoxyParamCaption}\item[{int}]{start,  }\item[{int}]{stop,  }\item[{T}]{ctp,  }\item[{U $\ast$}]{fr\+\_\+in,  }\item[{U $\ast$}]{fr\+\_\+out,  }\item[{V}]{t0 }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classRayTracer_acc4e49f68bb791d3658c2ca1a3844b01}\label{classRayTracer_acc4e49f68bb791d3658c2ca1a3844b01}} 
+\index{RayTracer$<$ T, U, V $>$@{RayTracer$<$ T, U, V $>$}!propagateRaysToPl@{propagateRaysToPl}}
+\index{propagateRaysToPl@{propagateRaysToPl}!RayTracer$<$ T, U, V $>$@{RayTracer$<$ T, U, V $>$}}
+\doxysubsubsection{\texorpdfstring{propagateRaysToPl()}{propagateRaysToPl()}}
+{\footnotesize\ttfamily template$<$class T , class U , class V $>$ \\
+void \mbox{\hyperlink{classRayTracer}{Ray\+Tracer}}$<$ T, U, V $>$\+::propagate\+Rays\+To\+Pl (\begin{DoxyParamCaption}\item[{int}]{start,  }\item[{int}]{stop,  }\item[{T}]{ctp,  }\item[{U $\ast$}]{fr\+\_\+in,  }\item[{U $\ast$}]{fr\+\_\+out,  }\item[{V}]{t0 }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classRayTracer_a54308039ddbee81e5c2d2cb0cc7f992f}\label{classRayTracer_a54308039ddbee81e5c2d2cb0cc7f992f}} 
+\index{RayTracer$<$ T, U, V $>$@{RayTracer$<$ T, U, V $>$}!transfRays@{transfRays}}
+\index{transfRays@{transfRays}!RayTracer$<$ T, U, V $>$@{RayTracer$<$ T, U, V $>$}}
+\doxysubsubsection{\texorpdfstring{transfRays()}{transfRays()}}
+{\footnotesize\ttfamily template$<$class T , class U , class V $>$ \\
+void \mbox{\hyperlink{classRayTracer}{Ray\+Tracer}}$<$ T, U, V $>$\+::transf\+Rays (\begin{DoxyParamCaption}\item[{T}]{ctp,  }\item[{U $\ast$}]{fr,  }\item[{bool}]{inv = {\ttfamily false} }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classRayTracer_a20d7d1fcca98cb681c8436a024b2092b}\label{classRayTracer_a20d7d1fcca98cb681c8436a024b2092b}} 
+\index{RayTracer$<$ T, U, V $>$@{RayTracer$<$ T, U, V $>$}!threadPool@{threadPool}}
+\index{threadPool@{threadPool}!RayTracer$<$ T, U, V $>$@{RayTracer$<$ T, U, V $>$}}
+\doxysubsubsection{\texorpdfstring{threadPool}{threadPool}}
+{\footnotesize\ttfamily template$<$class T , class U , class V $>$ \\
+std\+::vector$<$std\+::thread$>$ \mbox{\hyperlink{classRayTracer}{Ray\+Tracer}}$<$ T, U, V $>$\+::thread\+Pool}
+
+\mbox{\Hypertarget{classRayTracer_a2f9aaccce6775a7b69c02700c6077805}\label{classRayTracer_a2f9aaccce6775a7b69c02700c6077805}} 
+\index{RayTracer$<$ T, U, V $>$@{RayTracer$<$ T, U, V $>$}!ut@{ut}}
+\index{ut@{ut}!RayTracer$<$ T, U, V $>$@{RayTracer$<$ T, U, V $>$}}
+\doxysubsubsection{\texorpdfstring{ut}{ut}}
+{\footnotesize\ttfamily template$<$class T , class U , class V $>$ \\
+\mbox{\hyperlink{classUtils}{Utils}}$<$V$>$ \mbox{\hyperlink{classRayTracer}{Ray\+Tracer}}$<$ T, U, V $>$\+::ut}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/\+CPU/\mbox{\hyperlink{RayTrace_8h}{Ray\+Trace.\+h}}\end{DoxyCompactItemize}

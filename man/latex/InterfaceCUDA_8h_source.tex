@@ -1,0 +1,75 @@
+\hypertarget{InterfaceCUDA_8h_source}{}\doxysection{Interface\+CUDA.\+h}
+\label{InterfaceCUDA_8h_source}\index{src/CUDA/InterfaceCUDA.h@{src/CUDA/InterfaceCUDA.h}}
+\mbox{\hyperlink{InterfaceCUDA_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{preprocessor}{\#include <iostream>}}
+\DoxyCodeLine{2 \textcolor{preprocessor}{\#include <chrono>}}
+\DoxyCodeLine{3 \textcolor{preprocessor}{\#include <string>}}
+\DoxyCodeLine{4 \textcolor{preprocessor}{\#include <cmath>}}
+\DoxyCodeLine{5 \textcolor{preprocessor}{\#include <array>}}
+\DoxyCodeLine{6 }
+\DoxyCodeLine{7 \textcolor{comment}{//\#include <cuda.h>}}
+\DoxyCodeLine{8 \textcolor{comment}{//\#include <cuComplex.h>}}
+\DoxyCodeLine{9 \textcolor{comment}{//\#include <cuda\_runtime.h>}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{GUtils_8h}{GUtils.h}}"{}}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{Structs_8h}{Structs.h}}"{}}}
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{InterfaceReflector_8h}{InterfaceReflector.h}}"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{preprocessor}{\#define CSIZE 10}}
+\DoxyCodeLine{16 \textcolor{preprocessor}{\#define CSIZERT 5}}
+\DoxyCodeLine{17 \textcolor{preprocessor}{\#define MILLISECOND 1000}}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19 \textcolor{preprocessor}{\#ifdef \_WIN32}}
+\DoxyCodeLine{20 \textcolor{preprocessor}{\#   define POPPY\_DLL \_\_declspec(dllexport);}}
+\DoxyCodeLine{21 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{22 \textcolor{preprocessor}{\#   define POPPY\_DLL}}
+\DoxyCodeLine{23 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{24 }
+\DoxyCodeLine{25 \textcolor{preprocessor}{\#ifndef \_\_InterfaceCUDA\_h}}
+\DoxyCodeLine{26 \textcolor{preprocessor}{\#define \_\_InterfaceCUDA\_h}}
+\DoxyCodeLine{27 \textcolor{comment}{/* Kernels for single precision PO.}}
+\DoxyCodeLine{28 \textcolor{comment}{ * Author: Arend Moerman}}
+\DoxyCodeLine{29 \textcolor{comment}{ * For questions, contact: arendmoerman@gmail.com}}
+\DoxyCodeLine{30 \textcolor{comment}{ */}}
+\DoxyCodeLine{31 }
+\DoxyCodeLine{32 \textcolor{keyword}{extern} \textcolor{stringliteral}{"{}C"{}}}
+\DoxyCodeLine{33 \{}
+\DoxyCodeLine{34     \mbox{\hyperlink{InterfaceCUDA_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\_DLL}} \textcolor{keywordtype}{void} \mbox{\hyperlink{InterfaceCUDA_8h_aa1a707203d559a80446ca7434909fddb}{callKernelf\_JM}}(\mbox{\hyperlink{structc2Bundlef}{c2Bundlef}} *res, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} source, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} target,}
+\DoxyCodeLine{35                \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} *cs, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} *ct,}
+\DoxyCodeLine{36                \mbox{\hyperlink{structc2Bundlef}{c2Bundlef}} *currents,}
+\DoxyCodeLine{37                \textcolor{keywordtype}{float} k, \textcolor{keywordtype}{float} epsilon,}
+\DoxyCodeLine{38                \textcolor{keywordtype}{float} t\_direction, \textcolor{keywordtype}{int} nBlocks, \textcolor{keywordtype}{int} nThreads);}
+\DoxyCodeLine{39 }
+\DoxyCodeLine{40     \mbox{\hyperlink{InterfaceCUDA_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\_DLL}} \textcolor{keywordtype}{void} \mbox{\hyperlink{InterfaceCUDA_8h_a811facec3128e4c15df8da9f640a1959}{callKernelf\_EH}}(\mbox{\hyperlink{structc2Bundlef}{c2Bundlef}} *res, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} source, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} target,}
+\DoxyCodeLine{41                \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} *cs, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} *ct,}
+\DoxyCodeLine{42                \mbox{\hyperlink{structc2Bundlef}{c2Bundlef}} *currents,}
+\DoxyCodeLine{43                \textcolor{keywordtype}{float} k, \textcolor{keywordtype}{float} epsilon,}
+\DoxyCodeLine{44                \textcolor{keywordtype}{float} t\_direction, \textcolor{keywordtype}{int} nBlocks, \textcolor{keywordtype}{int} nThreads);}
+\DoxyCodeLine{45 }
+\DoxyCodeLine{46     \mbox{\hyperlink{InterfaceCUDA_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\_DLL}} \textcolor{keywordtype}{void} \mbox{\hyperlink{InterfaceCUDA_8h_ae7e01f3a5cc154fe04edc961e5b188ac}{callKernelf\_JMEH}}(\mbox{\hyperlink{structc4Bundlef}{c4Bundlef}} *res, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} source, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} target,}
+\DoxyCodeLine{47                \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} *cs, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} *ct,}
+\DoxyCodeLine{48                \mbox{\hyperlink{structc2Bundlef}{c2Bundlef}} *currents,}
+\DoxyCodeLine{49                \textcolor{keywordtype}{float} k, \textcolor{keywordtype}{float} epsilon,}
+\DoxyCodeLine{50                \textcolor{keywordtype}{float} t\_direction, \textcolor{keywordtype}{int} nBlocks, \textcolor{keywordtype}{int} nThreads);}
+\DoxyCodeLine{51 }
+\DoxyCodeLine{52     \mbox{\hyperlink{InterfaceCUDA_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\_DLL}} \textcolor{keywordtype}{void} \mbox{\hyperlink{InterfaceCUDA_8h_a910351583951dd88a360f281f1dea1c0}{callKernelf\_EHP}}(\mbox{\hyperlink{structc2rBundlef}{c2rBundlef}} *res, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} source, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} target,}
+\DoxyCodeLine{53                \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} *cs, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} *ct,}
+\DoxyCodeLine{54                \mbox{\hyperlink{structc2Bundlef}{c2Bundlef}} *currents,}
+\DoxyCodeLine{55                \textcolor{keywordtype}{float} k, \textcolor{keywordtype}{float} epsilon,}
+\DoxyCodeLine{56                \textcolor{keywordtype}{float} t\_direction, \textcolor{keywordtype}{int} nBlocks, \textcolor{keywordtype}{int} nThreads);}
+\DoxyCodeLine{57 }
+\DoxyCodeLine{58     \mbox{\hyperlink{InterfaceCUDA_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\_DLL}} \textcolor{keywordtype}{void} \mbox{\hyperlink{InterfaceCUDA_8h_a2f0d426988d0d767a3367e1caaca19fa}{callKernelf\_FF}}(\mbox{\hyperlink{structc2Bundlef}{c2Bundlef}} *res, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} source, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} target,}
+\DoxyCodeLine{59                \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} *cs, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} *ct,}
+\DoxyCodeLine{60                \mbox{\hyperlink{structc2Bundlef}{c2Bundlef}} *currents,}
+\DoxyCodeLine{61                \textcolor{keywordtype}{float} k, \textcolor{keywordtype}{float} epsilon,}
+\DoxyCodeLine{62                \textcolor{keywordtype}{float} t\_direction, \textcolor{keywordtype}{int} nBlocks, \textcolor{keywordtype}{int} nThreads);}
+\DoxyCodeLine{63     }
+\DoxyCodeLine{64     \mbox{\hyperlink{InterfaceCUDA_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\_DLL}} \textcolor{keywordtype}{void} \mbox{\hyperlink{InterfaceCUDA_8h_afbc53793101a259c5aad4bd77a1a3346}{callRTKernel}}(\mbox{\hyperlink{structreflparamsf}{reflparamsf}} ctp, \mbox{\hyperlink{structcframef}{cframef}} *fr\_in,}
+\DoxyCodeLine{65                \mbox{\hyperlink{structcframef}{cframef}} *fr\_out, \textcolor{keywordtype}{float} epsilon, \textcolor{keywordtype}{float} t0,}
+\DoxyCodeLine{66                \textcolor{keywordtype}{int} nBlocks, \textcolor{keywordtype}{int} nThreads);}
+\DoxyCodeLine{67 \}}
+\DoxyCodeLine{68 }
+\DoxyCodeLine{69 \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

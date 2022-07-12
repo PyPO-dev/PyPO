@@ -1,0 +1,56 @@
+\hypertarget{InterfaceBeam_8h}{}\doxysection{src/common/\+Interface\+Beam.h File Reference}
+\label{InterfaceBeam_8h}\index{src/common/InterfaceBeam.h@{src/common/InterfaceBeam.h}}
+{\ttfamily \#include \char`\"{}Beam\+Init.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Structs.\+h\char`\"{}}\newline
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{InterfaceBeam_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\+\_\+\+DLL}}
+\item 
+\#define \mbox{\hyperlink{InterfaceBeam_8h_a2b29593476f9601ed7aced7f5593c80c}{Interface\+Beam\+\_\+h}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{InterfaceBeam_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\+\_\+\+DLL}} void \mbox{\hyperlink{InterfaceBeam_8h_a07afc337cd0ca77ef49a91674f69cdf1}{make\+RTframe}} (\mbox{\hyperlink{structRTDict}{RTDict}} rdict, \mbox{\hyperlink{structcframe}{cframe}} $\ast$fr)
+\item 
+\mbox{\hyperlink{InterfaceBeam_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\+\_\+\+DLL}} void \mbox{\hyperlink{InterfaceBeam_8h_a801447bd7a10abcc25a4a006641832ea}{make\+Gauss}} (\mbox{\hyperlink{structGDict}{GDict}} gdict, \mbox{\hyperlink{structreflparams}{reflparams}} plane, \mbox{\hyperlink{structc2Bundle}{c2\+Bundle}} $\ast$res\+\_\+field, \mbox{\hyperlink{structc2Bundle}{c2\+Bundle}} $\ast$res\+\_\+current)
+\item 
+\mbox{\hyperlink{InterfaceBeam_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\+\_\+\+DLL}} void \mbox{\hyperlink{InterfaceBeam_8h_af52c0201de26dafaee392350284884ee}{calc\+Currents}} (\mbox{\hyperlink{structc2Bundle}{c2\+Bundle}} $\ast$res\+\_\+field, \mbox{\hyperlink{structc2Bundle}{c2\+Bundle}} $\ast$res\+\_\+current, \mbox{\hyperlink{structreflparams}{reflparams}} rdict, int mode)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{InterfaceBeam_8h_a2b29593476f9601ed7aced7f5593c80c}\label{InterfaceBeam_8h_a2b29593476f9601ed7aced7f5593c80c}} 
+\index{InterfaceBeam.h@{InterfaceBeam.h}!InterfaceBeam\_h@{InterfaceBeam\_h}}
+\index{InterfaceBeam\_h@{InterfaceBeam\_h}!InterfaceBeam.h@{InterfaceBeam.h}}
+\doxysubsubsection{\texorpdfstring{InterfaceBeam\_h}{InterfaceBeam\_h}}
+{\footnotesize\ttfamily \#define Interface\+Beam\+\_\+h}
+
+\mbox{\Hypertarget{InterfaceBeam_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}\label{InterfaceBeam_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}} 
+\index{InterfaceBeam.h@{InterfaceBeam.h}!POPPY\_DLL@{POPPY\_DLL}}
+\index{POPPY\_DLL@{POPPY\_DLL}!InterfaceBeam.h@{InterfaceBeam.h}}
+\doxysubsubsection{\texorpdfstring{POPPY\_DLL}{POPPY\_DLL}}
+{\footnotesize\ttfamily \#define POPPY\+\_\+\+DLL}
+
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{InterfaceBeam_8h_af52c0201de26dafaee392350284884ee}\label{InterfaceBeam_8h_af52c0201de26dafaee392350284884ee}} 
+\index{InterfaceBeam.h@{InterfaceBeam.h}!calcCurrents@{calcCurrents}}
+\index{calcCurrents@{calcCurrents}!InterfaceBeam.h@{InterfaceBeam.h}}
+\doxysubsubsection{\texorpdfstring{calcCurrents()}{calcCurrents()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{InterfaceBeam_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\+\_\+\+DLL}} void calc\+Currents (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structc2Bundle}{c2\+Bundle}} $\ast$}]{res\+\_\+field,  }\item[{\mbox{\hyperlink{structc2Bundle}{c2\+Bundle}} $\ast$}]{res\+\_\+current,  }\item[{\mbox{\hyperlink{structreflparams}{reflparams}}}]{rdict,  }\item[{int}]{mode }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InterfaceBeam_8h_a801447bd7a10abcc25a4a006641832ea}\label{InterfaceBeam_8h_a801447bd7a10abcc25a4a006641832ea}} 
+\index{InterfaceBeam.h@{InterfaceBeam.h}!makeGauss@{makeGauss}}
+\index{makeGauss@{makeGauss}!InterfaceBeam.h@{InterfaceBeam.h}}
+\doxysubsubsection{\texorpdfstring{makeGauss()}{makeGauss()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{InterfaceBeam_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\+\_\+\+DLL}} void make\+Gauss (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structGDict}{GDict}}}]{gdict,  }\item[{\mbox{\hyperlink{structreflparams}{reflparams}}}]{plane,  }\item[{\mbox{\hyperlink{structc2Bundle}{c2\+Bundle}} $\ast$}]{res\+\_\+field,  }\item[{\mbox{\hyperlink{structc2Bundle}{c2\+Bundle}} $\ast$}]{res\+\_\+current }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InterfaceBeam_8h_a07afc337cd0ca77ef49a91674f69cdf1}\label{InterfaceBeam_8h_a07afc337cd0ca77ef49a91674f69cdf1}} 
+\index{InterfaceBeam.h@{InterfaceBeam.h}!makeRTframe@{makeRTframe}}
+\index{makeRTframe@{makeRTframe}!InterfaceBeam.h@{InterfaceBeam.h}}
+\doxysubsubsection{\texorpdfstring{makeRTframe()}{makeRTframe()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{InterfaceBeam_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\+\_\+\+DLL}} void make\+RTframe (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structRTDict}{RTDict}}}]{rdict,  }\item[{\mbox{\hyperlink{structcframe}{cframe}} $\ast$}]{fr }\end{DoxyParamCaption})}
+

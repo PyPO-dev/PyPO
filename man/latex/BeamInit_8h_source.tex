@@ -1,0 +1,369 @@
+\hypertarget{BeamInit_8h_source}{}\doxysection{Beam\+Init.\+h}
+\label{BeamInit_8h_source}\index{src/common/BeamInit.h@{src/common/BeamInit.h}}
+\mbox{\hyperlink{BeamInit_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{preprocessor}{\#include <iostream>}}
+\DoxyCodeLine{2 \textcolor{preprocessor}{\#include <array>}}
+\DoxyCodeLine{3 }
+\DoxyCodeLine{4 \textcolor{preprocessor}{\#include <cmath>}}
+\DoxyCodeLine{5 \textcolor{preprocessor}{\#include <complex>}}
+\DoxyCodeLine{6 }
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{Utils_8h}{Utils.h}}"{}}}
+\DoxyCodeLine{8 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{Structs_8h}{Structs.h}}"{}}}
+\DoxyCodeLine{9 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{InterfaceReflector_8h}{InterfaceReflector.h}}"{}}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define \_USE\_MATH\_DEFINES}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#ifndef \_\_BeamInit\_h}}
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#define \_\_BeamInit\_h}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 }
+\DoxyCodeLine{26 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} U, \textcolor{keyword}{typename} V>}
+\DoxyCodeLine{27 \textcolor{keywordtype}{void} \mbox{\hyperlink{BeamInit_8h_aa1ee8f6478af52fd972fc68bb5a5c6a6}{initFrame}}(T rdict, U *fr);}
+\DoxyCodeLine{28 }
+\DoxyCodeLine{41 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} U, \textcolor{keyword}{typename} V, \textcolor{keyword}{typename} W, \textcolor{keyword}{typename} G>}
+\DoxyCodeLine{42 \textcolor{keywordtype}{void} \mbox{\hyperlink{BeamInit_8h_aebee209858ba31b61058c5691e9a7cba}{initGauss}}(T gdict, U refldict, V *res\_field, V *res\_current);}
+\DoxyCodeLine{43 }
+\DoxyCodeLine{44 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} U, \textcolor{keyword}{typename} V, \textcolor{keyword}{typename} W>}
+\DoxyCodeLine{45 \textcolor{keywordtype}{void} \mbox{\hyperlink{BeamInit_8h_a67eccde05e6b150b5d77f81f11f7a883}{calcJM}}(T *res\_field, T *res\_current, V rdict, \textcolor{keywordtype}{int} mode);}
+\DoxyCodeLine{46 }
+\DoxyCodeLine{47 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} U, \textcolor{keyword}{typename} V>}
+\DoxyCodeLine{48 \textcolor{keywordtype}{void} \mbox{\hyperlink{BeamInit_8h_aa1ee8f6478af52fd972fc68bb5a5c6a6}{initFrame}}(T rdict, U *fr)}
+\DoxyCodeLine{49 \{}
+\DoxyCodeLine{50     std::array<V, 3> nomChief = \{0, 0, 1\};}
+\DoxyCodeLine{51     std::array<V, 3> zero = \{0, 0, 0\};}
+\DoxyCodeLine{52 }
+\DoxyCodeLine{53     \mbox{\hyperlink{classUtils}{Utils<V>}} ut;}
+\DoxyCodeLine{54 }
+\DoxyCodeLine{55     \textcolor{keywordtype}{int} \mbox{\hyperlink{KernelsRTf_8cu_a01cc92fb289b3db0f5ecb2afd9dd896a}{nTot}} = 1 + rdict.nRing * 4 * rdict.nRays;}
+\DoxyCodeLine{56 }
+\DoxyCodeLine{57     fr-\/>size = \mbox{\hyperlink{KernelsRTf_8cu_a01cc92fb289b3db0f5ecb2afd9dd896a}{nTot}};}
+\DoxyCodeLine{58 }
+\DoxyCodeLine{59     V alpha = 0; \textcolor{comment}{// Set first circle ray in the right of beam}}
+\DoxyCodeLine{60     V d\_alpha = 0;}
+\DoxyCodeLine{61 }
+\DoxyCodeLine{62     \textcolor{keywordflow}{if} (rdict.nRays > 0) \{d\_alpha = 2 * M\_PI / (4 * rdict.nRays);\}}
+\DoxyCodeLine{63 }
+\DoxyCodeLine{64     \textcolor{keywordtype}{int} n = 1;}
+\DoxyCodeLine{65 }
+\DoxyCodeLine{66     std::array<V, 3> tChief;}
+\DoxyCodeLine{67     std::array<V, 3> oChief;}
+\DoxyCodeLine{68     std::array<V, 3> rotation;}
+\DoxyCodeLine{69     std::array<V, 3> \_direction;}
+\DoxyCodeLine{70     std::array<V, 3> direction;}
+\DoxyCodeLine{71 }
+\DoxyCodeLine{72     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} n=0; n<3; n++) \{tChief[n] = rdict.tChief[n];\}}
+\DoxyCodeLine{73     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} n=0; n<3; n++) \{oChief[n] = rdict.oChief[n];\}}
+\DoxyCodeLine{74 }
+\DoxyCodeLine{75     ut.\mbox{\hyperlink{classUtils_af5406438a51050ae51ff8fe6080bae92}{matRot}}(tChief, nomChief, zero, direction);}
+\DoxyCodeLine{76 }
+\DoxyCodeLine{77     fr-\/>x[0] = oChief[0];}
+\DoxyCodeLine{78     fr-\/>y[0] = oChief[1];}
+\DoxyCodeLine{79     fr-\/>z[0] = oChief[2];}
+\DoxyCodeLine{80 }
+\DoxyCodeLine{81     fr-\/>dx[0] = direction[0];}
+\DoxyCodeLine{82     fr-\/>dy[0] = direction[1];}
+\DoxyCodeLine{83     fr-\/>dz[0] = direction[2];}
+\DoxyCodeLine{84 }
+\DoxyCodeLine{85     std::array<V, 3> \_pos;}
+\DoxyCodeLine{86     std::array<V, 3> pos;}
+\DoxyCodeLine{87 }
+\DoxyCodeLine{88     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i=1; i<\mbox{\hyperlink{KernelsRTf_8cu_a01cc92fb289b3db0f5ecb2afd9dd896a}{nTot}}; i++)}
+\DoxyCodeLine{89     \{}
+\DoxyCodeLine{90         \_pos[0] = rdict.a * cos(alpha) / rdict.nRing * n + rdict.oChief[0];}
+\DoxyCodeLine{91         \_pos[1] = rdict.b * sin(alpha) / rdict.nRing * n + rdict.oChief[1];}
+\DoxyCodeLine{92         \_pos[2] = rdict.oChief[2];}
+\DoxyCodeLine{93 }
+\DoxyCodeLine{94         rotation[0] = rdict.angy * sin(alpha) / rdict.nRing * n;}
+\DoxyCodeLine{95         rotation[1] = rdict.angx * cos(alpha) / rdict.nRing * n;}
+\DoxyCodeLine{96         rotation[2] = 2 * alpha;}
+\DoxyCodeLine{97 }
+\DoxyCodeLine{98         ut.\mbox{\hyperlink{classUtils_af5406438a51050ae51ff8fe6080bae92}{matRot}}(rotation, nomChief, zero, \_direction);}
+\DoxyCodeLine{99         ut.\mbox{\hyperlink{classUtils_af5406438a51050ae51ff8fe6080bae92}{matRot}}(tChief, \_direction, zero, direction);}
+\DoxyCodeLine{100 }
+\DoxyCodeLine{101         ut.\mbox{\hyperlink{classUtils_af5406438a51050ae51ff8fe6080bae92}{matRot}}(tChief, \_pos, oChief, pos);}
+\DoxyCodeLine{102 }
+\DoxyCodeLine{103         fr-\/>x[i] = pos[0];}
+\DoxyCodeLine{104         fr-\/>y[i] = pos[1];}
+\DoxyCodeLine{105         fr-\/>z[i] = pos[2];}
+\DoxyCodeLine{106 }
+\DoxyCodeLine{107         fr-\/>dx[i] = direction[0];}
+\DoxyCodeLine{108         fr-\/>dy[i] = direction[1];}
+\DoxyCodeLine{109         fr-\/>dz[i] = direction[2];}
+\DoxyCodeLine{110 }
+\DoxyCodeLine{111         alpha += d\_alpha;}
+\DoxyCodeLine{112 }
+\DoxyCodeLine{113         \textcolor{keywordflow}{if} (i == \textcolor{keywordtype}{int}(\mbox{\hyperlink{KernelsRTf_8cu_a01cc92fb289b3db0f5ecb2afd9dd896a}{nTot}} / rdict.nRing) * n)}
+\DoxyCodeLine{114         \{}
+\DoxyCodeLine{115             n += 1;}
+\DoxyCodeLine{116             alpha = 0;}
+\DoxyCodeLine{117         \}}
+\DoxyCodeLine{118     \}}
+\DoxyCodeLine{119 \}}
+\DoxyCodeLine{120 }
+\DoxyCodeLine{121 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} U, \textcolor{keyword}{typename} V, \textcolor{keyword}{typename} W, \textcolor{keyword}{typename} G>}
+\DoxyCodeLine{122 \textcolor{keywordtype}{void} \mbox{\hyperlink{BeamInit_8h_aebee209858ba31b61058c5691e9a7cba}{initGauss}}(T gdict, U refldict, V *res\_field, V *res\_current)}
+\DoxyCodeLine{123 \{}
+\DoxyCodeLine{124     \textcolor{keywordtype}{int} \mbox{\hyperlink{KernelsRTf_8cu_a01cc92fb289b3db0f5ecb2afd9dd896a}{nTot}} = refldict.n\_cells[0] * refldict.n\_cells[1];}
+\DoxyCodeLine{125 }
+\DoxyCodeLine{126     W reflc;}
+\DoxyCodeLine{127 }
+\DoxyCodeLine{128     reflc.size = \mbox{\hyperlink{KernelsRTf_8cu_a01cc92fb289b3db0f5ecb2afd9dd896a}{nTot}};}
+\DoxyCodeLine{129 }
+\DoxyCodeLine{130     reflc.x = \textcolor{keyword}{new} G[\mbox{\hyperlink{KernelsRTf_8cu_a01cc92fb289b3db0f5ecb2afd9dd896a}{nTot}}];}
+\DoxyCodeLine{131     reflc.y = \textcolor{keyword}{new} G[\mbox{\hyperlink{KernelsRTf_8cu_a01cc92fb289b3db0f5ecb2afd9dd896a}{nTot}}];}
+\DoxyCodeLine{132     reflc.z = \textcolor{keyword}{new} G[\mbox{\hyperlink{KernelsRTf_8cu_a01cc92fb289b3db0f5ecb2afd9dd896a}{nTot}}];}
+\DoxyCodeLine{133 }
+\DoxyCodeLine{134     reflc.nx = \textcolor{keyword}{new} G[\mbox{\hyperlink{KernelsRTf_8cu_a01cc92fb289b3db0f5ecb2afd9dd896a}{nTot}}];}
+\DoxyCodeLine{135     reflc.ny = \textcolor{keyword}{new} G[\mbox{\hyperlink{KernelsRTf_8cu_a01cc92fb289b3db0f5ecb2afd9dd896a}{nTot}}];}
+\DoxyCodeLine{136     reflc.nz = \textcolor{keyword}{new} G[\mbox{\hyperlink{KernelsRTf_8cu_a01cc92fb289b3db0f5ecb2afd9dd896a}{nTot}}];}
+\DoxyCodeLine{137 }
+\DoxyCodeLine{138     reflc.area = \textcolor{keyword}{new} G[\mbox{\hyperlink{KernelsRTf_8cu_a01cc92fb289b3db0f5ecb2afd9dd896a}{nTot}}];}
+\DoxyCodeLine{139 }
+\DoxyCodeLine{140     \mbox{\hyperlink{classUtils}{Utils<G>}} ut;}
+\DoxyCodeLine{141 }
+\DoxyCodeLine{142     \textcolor{keywordtype}{bool} transform = \textcolor{keyword}{false};}
+\DoxyCodeLine{143     \mbox{\hyperlink{InterfaceReflector_8cpp_a8a80fa7c30c6a5599a71cc0a95e0c89a}{generateGrid}}(refldict, \&reflc, transform);}
+\DoxyCodeLine{144 }
+\DoxyCodeLine{145 }
+\DoxyCodeLine{146     G zRx      = M\_PI * gdict.w0x*gdict.w0x * gdict.n / gdict.lam;}
+\DoxyCodeLine{147     G zRy      = M\_PI * gdict.w0x*gdict.w0x * gdict.n / gdict.lam;}
+\DoxyCodeLine{148     G wzx      = gdict.w0x * sqrt(1 + (gdict.z / zRx)*(gdict.z / zRx));}
+\DoxyCodeLine{149     G wzy      = gdict.w0y * sqrt(1 + (gdict.z / zRy)*(gdict.z / zRy));}
+\DoxyCodeLine{150     G Rzx\_inv  = gdict.z / (gdict.z*gdict.z + zRx*zRx);}
+\DoxyCodeLine{151     G Rzy\_inv  = gdict.z / (gdict.z*gdict.z + zRy*zRy);}
+\DoxyCodeLine{152     G phizx    = atan(gdict.z / zRx);}
+\DoxyCodeLine{153     G phizy    = atan(gdict.z / zRy);}
+\DoxyCodeLine{154     G k       = 2 * M\_PI / gdict.lam;}
+\DoxyCodeLine{155 }
+\DoxyCodeLine{156     G r2;}
+\DoxyCodeLine{157 }
+\DoxyCodeLine{158     std::complex<G> j(0, 1);}
+\DoxyCodeLine{159 }
+\DoxyCodeLine{160     std::complex<G> field\_atPoint;}
+\DoxyCodeLine{161     std::array<std::complex<G>, 3> efield;}
+\DoxyCodeLine{162     std::array<G, 3> n\_source;}
+\DoxyCodeLine{163     std::array<std::complex<G>, 3> m;}
+\DoxyCodeLine{164 }
+\DoxyCodeLine{165     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i=0; i<\mbox{\hyperlink{KernelsRTf_8cu_a01cc92fb289b3db0f5ecb2afd9dd896a}{nTot}}; i++)}
+\DoxyCodeLine{166     \{}
+\DoxyCodeLine{167         r2 = reflc.x[i]*reflc.x[i] + reflc.y[i]*reflc.y[i];}
+\DoxyCodeLine{168 }
+\DoxyCodeLine{169         \textcolor{comment}{//field\_atPoint = gdict.E0 * gdict.w0/wz * exp(-\/r2/(wz*wz)) * exp(-\/j * (k*gdict.z + k*r2*Rz\_inv/2 -\/ phiz));}}
+\DoxyCodeLine{170         field\_atPoint = gdict.E0 * sqrt(2 / (M\_PI * wzx * wzy)) * exp(-\/(reflc.x[i]/wzx)*(reflc.x[i]/wzx) -\/ (reflc.y[i]/wzy)*(reflc.y[i]/wzy) -\/}
+\DoxyCodeLine{171                 j*M\_PI/gdict.lam * (reflc.x[i]*reflc.x[i]*Rzx\_inv + reflc.y[i]*reflc.y[i]*Rzy\_inv) -\/ j*k*gdict.z + j*(phizx -\/ phizy)*0.5);}
+\DoxyCodeLine{172         }
+\DoxyCodeLine{173         efield[0] = field\_atPoint * gdict.pol[0];}
+\DoxyCodeLine{174         efield[1] = field\_atPoint * gdict.pol[1];}
+\DoxyCodeLine{175         efield[2] = field\_atPoint * gdict.pol[2];}
+\DoxyCodeLine{176 }
+\DoxyCodeLine{177         n\_source[0] = reflc.nx[i];}
+\DoxyCodeLine{178         n\_source[1] = reflc.ny[i];}
+\DoxyCodeLine{179         n\_source[2] = reflc.nz[i];}
+\DoxyCodeLine{180 }
+\DoxyCodeLine{181         ut.\mbox{\hyperlink{classUtils_a4163d15a6221dd9feb9263d770119c9b}{ext}}(n\_source, efield, m);}
+\DoxyCodeLine{182 }
+\DoxyCodeLine{183         res\_field-\/>r1x[i] = efield[0].real();}
+\DoxyCodeLine{184         res\_field-\/>i1x[i] = efield[0].imag();}
+\DoxyCodeLine{185 }
+\DoxyCodeLine{186         res\_field-\/>r1y[i] = efield[1].real();}
+\DoxyCodeLine{187         res\_field-\/>i1y[i] = efield[1].imag();}
+\DoxyCodeLine{188 }
+\DoxyCodeLine{189         res\_field-\/>r1z[i] = efield[2].real();}
+\DoxyCodeLine{190         res\_field-\/>i1z[i] = efield[2].imag();}
+\DoxyCodeLine{191 }
+\DoxyCodeLine{192         \textcolor{comment}{// Set H to zero}}
+\DoxyCodeLine{193         res\_field-\/>r2x[i] = 0;}
+\DoxyCodeLine{194         res\_field-\/>i2x[i] = 0;}
+\DoxyCodeLine{195 }
+\DoxyCodeLine{196         res\_field-\/>r2y[i] = 0;}
+\DoxyCodeLine{197         res\_field-\/>i2y[i] = 0;}
+\DoxyCodeLine{198 }
+\DoxyCodeLine{199         res\_field-\/>r2z[i] = 0;}
+\DoxyCodeLine{200         res\_field-\/>i2z[i] = 0;}
+\DoxyCodeLine{201 }
+\DoxyCodeLine{202         \textcolor{comment}{// Fill currents}}
+\DoxyCodeLine{203         res\_current-\/>r1x[i] = 0;}
+\DoxyCodeLine{204         res\_current-\/>i1x[i] = 0;}
+\DoxyCodeLine{205 }
+\DoxyCodeLine{206         res\_current-\/>r1y[i] = 0;}
+\DoxyCodeLine{207         res\_current-\/>i1y[i] = 0;}
+\DoxyCodeLine{208 }
+\DoxyCodeLine{209         res\_current-\/>r1z[i] = 0;}
+\DoxyCodeLine{210         res\_current-\/>i1z[i] = 0;}
+\DoxyCodeLine{211 }
+\DoxyCodeLine{212         \textcolor{comment}{// Set H to zero}}
+\DoxyCodeLine{213         res\_current-\/>r2x[i] = -\/2*m[0].real();}
+\DoxyCodeLine{214         res\_current-\/>i2x[i] = -\/2*m[0].imag();}
+\DoxyCodeLine{215 }
+\DoxyCodeLine{216         res\_current-\/>r2y[i] = -\/2*m[1].real();}
+\DoxyCodeLine{217         res\_current-\/>i2y[i] = -\/2*m[1].imag();}
+\DoxyCodeLine{218 }
+\DoxyCodeLine{219         res\_current-\/>r2z[i] = -\/2*m[2].real();}
+\DoxyCodeLine{220         res\_current-\/>i2z[i] = -\/2*m[2].imag();}
+\DoxyCodeLine{221     \}}
+\DoxyCodeLine{222 }
+\DoxyCodeLine{223     \textcolor{keyword}{delete} reflc.x;}
+\DoxyCodeLine{224     \textcolor{keyword}{delete} reflc.y;}
+\DoxyCodeLine{225     \textcolor{keyword}{delete} reflc.z;}
+\DoxyCodeLine{226 }
+\DoxyCodeLine{227     \textcolor{keyword}{delete} reflc.nx;}
+\DoxyCodeLine{228     \textcolor{keyword}{delete} reflc.ny;}
+\DoxyCodeLine{229     \textcolor{keyword}{delete} reflc.nz;}
+\DoxyCodeLine{230 }
+\DoxyCodeLine{231     \textcolor{keyword}{delete} reflc.area;}
+\DoxyCodeLine{232 \}}
+\DoxyCodeLine{233 }
+\DoxyCodeLine{234 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} U, \textcolor{keyword}{typename} V, \textcolor{keyword}{typename} W>}
+\DoxyCodeLine{235 \textcolor{keywordtype}{void} \mbox{\hyperlink{BeamInit_8h_a67eccde05e6b150b5d77f81f11f7a883}{calcJM}}(T *res\_field, T *res\_current, V rdict, \textcolor{keywordtype}{int} mode)}
+\DoxyCodeLine{236 \{}
+\DoxyCodeLine{237     W reflc;}
+\DoxyCodeLine{238     \textcolor{keywordtype}{int} \mbox{\hyperlink{KernelsRTf_8cu_a01cc92fb289b3db0f5ecb2afd9dd896a}{nTot}} = rdict.n\_cells[0] * rdict.n\_cells[1];}
+\DoxyCodeLine{239 }
+\DoxyCodeLine{240     reflc.size = \mbox{\hyperlink{KernelsRTf_8cu_a01cc92fb289b3db0f5ecb2afd9dd896a}{nTot}};}
+\DoxyCodeLine{241 }
+\DoxyCodeLine{242     reflc.x = \textcolor{keyword}{new} U[\mbox{\hyperlink{KernelsRTf_8cu_a01cc92fb289b3db0f5ecb2afd9dd896a}{nTot}}];}
+\DoxyCodeLine{243     reflc.y = \textcolor{keyword}{new} U[\mbox{\hyperlink{KernelsRTf_8cu_a01cc92fb289b3db0f5ecb2afd9dd896a}{nTot}}];}
+\DoxyCodeLine{244     reflc.z = \textcolor{keyword}{new} U[\mbox{\hyperlink{KernelsRTf_8cu_a01cc92fb289b3db0f5ecb2afd9dd896a}{nTot}}];}
+\DoxyCodeLine{245 }
+\DoxyCodeLine{246     reflc.nx = \textcolor{keyword}{new} U[\mbox{\hyperlink{KernelsRTf_8cu_a01cc92fb289b3db0f5ecb2afd9dd896a}{nTot}}];}
+\DoxyCodeLine{247     reflc.ny = \textcolor{keyword}{new} U[\mbox{\hyperlink{KernelsRTf_8cu_a01cc92fb289b3db0f5ecb2afd9dd896a}{nTot}}];}
+\DoxyCodeLine{248     reflc.nz = \textcolor{keyword}{new} U[\mbox{\hyperlink{KernelsRTf_8cu_a01cc92fb289b3db0f5ecb2afd9dd896a}{nTot}}];}
+\DoxyCodeLine{249 }
+\DoxyCodeLine{250     reflc.area = \textcolor{keyword}{new} U[\mbox{\hyperlink{KernelsRTf_8cu_a01cc92fb289b3db0f5ecb2afd9dd896a}{nTot}}];}
+\DoxyCodeLine{251 }
+\DoxyCodeLine{252     \textcolor{keywordtype}{bool} transform = \textcolor{keyword}{true};}
+\DoxyCodeLine{253     \mbox{\hyperlink{InterfaceReflector_8cpp_a8a80fa7c30c6a5599a71cc0a95e0c89a}{generateGrid}}(rdict, \&reflc, transform);}
+\DoxyCodeLine{254 }
+\DoxyCodeLine{255     \mbox{\hyperlink{classUtils}{Utils<U>}} ut;}
+\DoxyCodeLine{256 }
+\DoxyCodeLine{257     std::array<std::complex<U>, 3> field;}
+\DoxyCodeLine{258     std::array<U, 3> n\_source;}
+\DoxyCodeLine{259 }
+\DoxyCodeLine{260     std::array<std::complex<U>, 3> js;}
+\DoxyCodeLine{261     std::array<std::complex<U>, 3> ms;}
+\DoxyCodeLine{262 }
+\DoxyCodeLine{263     \textcolor{comment}{// full currents}}
+\DoxyCodeLine{264     \textcolor{keywordflow}{if} (mode == 0)}
+\DoxyCodeLine{265     \{}
+\DoxyCodeLine{266         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i=0; i<\mbox{\hyperlink{KernelsRTf_8cu_a01cc92fb289b3db0f5ecb2afd9dd896a}{nTot}}; i++)}
+\DoxyCodeLine{267         \{}
+\DoxyCodeLine{268             field[0] = \{res\_field-\/>r1x[i], res\_field-\/>i1x[i]\};}
+\DoxyCodeLine{269             field[1] = \{res\_field-\/>r1y[i], res\_field-\/>i1y[i]\};}
+\DoxyCodeLine{270             field[2] = \{res\_field-\/>r1z[i], res\_field-\/>i1z[i]\};}
+\DoxyCodeLine{271 }
+\DoxyCodeLine{272             n\_source[0] = reflc.nx[i];}
+\DoxyCodeLine{273             n\_source[1] = reflc.ny[i];}
+\DoxyCodeLine{274             n\_source[2] = reflc.nz[i];}
+\DoxyCodeLine{275 }
+\DoxyCodeLine{276             ut.\mbox{\hyperlink{classUtils_a4163d15a6221dd9feb9263d770119c9b}{ext}}(n\_source, field, ms);}
+\DoxyCodeLine{277 }
+\DoxyCodeLine{278             res\_current-\/>r2x[i] = -\/ms[0].real();}
+\DoxyCodeLine{279             res\_current-\/>i2x[i] = -\/ms[0].imag();}
+\DoxyCodeLine{280 }
+\DoxyCodeLine{281             res\_current-\/>r2y[i] = -\/ms[1].real();}
+\DoxyCodeLine{282             res\_current-\/>i2y[i] = -\/ms[1].imag();}
+\DoxyCodeLine{283 }
+\DoxyCodeLine{284             res\_current-\/>r2z[i] = -\/ms[2].real();}
+\DoxyCodeLine{285             res\_current-\/>i2z[i] = -\/ms[2].imag();}
+\DoxyCodeLine{286 }
+\DoxyCodeLine{287             field[0] = \{res\_field-\/>r2x[i], res\_field-\/>i2x[i]\};}
+\DoxyCodeLine{288             field[1] = \{res\_field-\/>r2y[i], res\_field-\/>i2y[i]\};}
+\DoxyCodeLine{289             field[2] = \{res\_field-\/>r2z[i], res\_field-\/>i2z[i]\};}
+\DoxyCodeLine{290 }
+\DoxyCodeLine{291             ut.\mbox{\hyperlink{classUtils_a4163d15a6221dd9feb9263d770119c9b}{ext}}(n\_source, field, js);}
+\DoxyCodeLine{292 }
+\DoxyCodeLine{293             res\_current-\/>r1x[i] = js[0].real();}
+\DoxyCodeLine{294             res\_current-\/>i1x[i] = js[0].imag();}
+\DoxyCodeLine{295 }
+\DoxyCodeLine{296             res\_current-\/>r1y[i] = js[1].real();}
+\DoxyCodeLine{297             res\_current-\/>i1y[i] = js[1].imag();}
+\DoxyCodeLine{298 }
+\DoxyCodeLine{299             res\_current-\/>r1z[i] = js[2].real();}
+\DoxyCodeLine{300             res\_current-\/>i1z[i] = js[2].imag();}
+\DoxyCodeLine{301         \}}
+\DoxyCodeLine{302     \}}
+\DoxyCodeLine{303 }
+\DoxyCodeLine{304     \textcolor{comment}{// PMC}}
+\DoxyCodeLine{305     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (mode == 1)}
+\DoxyCodeLine{306     \{}
+\DoxyCodeLine{307         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i=0; i<\mbox{\hyperlink{KernelsRTf_8cu_a01cc92fb289b3db0f5ecb2afd9dd896a}{nTot}}; i++)}
+\DoxyCodeLine{308         \{}
+\DoxyCodeLine{309             field[0] = \{res\_field-\/>r1x[i], res\_field-\/>i1x[i]\};}
+\DoxyCodeLine{310             field[1] = \{res\_field-\/>r1y[i], res\_field-\/>i1y[i]\};}
+\DoxyCodeLine{311             field[2] = \{res\_field-\/>r1z[i], res\_field-\/>i1z[i]\};}
+\DoxyCodeLine{312 }
+\DoxyCodeLine{313             n\_source[0] = reflc.nx[i];}
+\DoxyCodeLine{314             n\_source[1] = reflc.ny[i];}
+\DoxyCodeLine{315             n\_source[2] = reflc.nz[i];}
+\DoxyCodeLine{316 }
+\DoxyCodeLine{317             ut.\mbox{\hyperlink{classUtils_a4163d15a6221dd9feb9263d770119c9b}{ext}}(n\_source, field, ms);}
+\DoxyCodeLine{318 }
+\DoxyCodeLine{319             res\_current-\/>r2x[i] = -\/2*ms[0].real();}
+\DoxyCodeLine{320             res\_current-\/>i2x[i] = -\/2*ms[0].imag();}
+\DoxyCodeLine{321 }
+\DoxyCodeLine{322             res\_current-\/>r2y[i] = -\/2*ms[1].real();}
+\DoxyCodeLine{323             res\_current-\/>i2y[i] = -\/2*ms[1].imag();}
+\DoxyCodeLine{324 }
+\DoxyCodeLine{325             res\_current-\/>r2z[i] = -\/2*ms[2].real();}
+\DoxyCodeLine{326             res\_current-\/>i2z[i] = -\/2*ms[2].imag();}
+\DoxyCodeLine{327 }
+\DoxyCodeLine{328             res\_current-\/>r1x[i] = 0;}
+\DoxyCodeLine{329             res\_current-\/>i1x[i] = 0;}
+\DoxyCodeLine{330 }
+\DoxyCodeLine{331             res\_current-\/>r1y[i] = 0;}
+\DoxyCodeLine{332             res\_current-\/>i1y[i] = 0;}
+\DoxyCodeLine{333 }
+\DoxyCodeLine{334             res\_current-\/>r1z[i] = 0;}
+\DoxyCodeLine{335             res\_current-\/>i1z[i] = 0;}
+\DoxyCodeLine{336         \}}
+\DoxyCodeLine{337     \}}
+\DoxyCodeLine{338 }
+\DoxyCodeLine{339     \textcolor{comment}{// PEC}}
+\DoxyCodeLine{340     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (mode == 2)}
+\DoxyCodeLine{341     \{}
+\DoxyCodeLine{342         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i=0; i<\mbox{\hyperlink{KernelsRTf_8cu_a01cc92fb289b3db0f5ecb2afd9dd896a}{nTot}}; i++)}
+\DoxyCodeLine{343         \{}
+\DoxyCodeLine{344             field[0] = \{res\_field-\/>r2x[i], res\_field-\/>i2x[i]\};}
+\DoxyCodeLine{345             field[1] = \{res\_field-\/>r2y[i], res\_field-\/>i2y[i]\};}
+\DoxyCodeLine{346             field[2] = \{res\_field-\/>r2z[i], res\_field-\/>i2z[i]\};}
+\DoxyCodeLine{347 }
+\DoxyCodeLine{348             n\_source[0] = reflc.nx[i];}
+\DoxyCodeLine{349             n\_source[1] = reflc.ny[i];}
+\DoxyCodeLine{350             n\_source[2] = reflc.nz[i];}
+\DoxyCodeLine{351 }
+\DoxyCodeLine{352             ut.\mbox{\hyperlink{classUtils_a4163d15a6221dd9feb9263d770119c9b}{ext}}(n\_source, field, js);}
+\DoxyCodeLine{353 }
+\DoxyCodeLine{354             res\_current-\/>r1x[i] = 2*js[0].real();}
+\DoxyCodeLine{355             res\_current-\/>i1x[i] = 2*js[0].imag();}
+\DoxyCodeLine{356 }
+\DoxyCodeLine{357             res\_current-\/>r1y[i] = 2*js[1].real();}
+\DoxyCodeLine{358             res\_current-\/>i1y[i] = 2*js[1].imag();}
+\DoxyCodeLine{359 }
+\DoxyCodeLine{360             res\_current-\/>r1z[i] = 2*js[2].real();}
+\DoxyCodeLine{361             res\_current-\/>i1z[i] = 2*js[2].imag();}
+\DoxyCodeLine{362 }
+\DoxyCodeLine{363             res\_current-\/>r2x[i] = 0;}
+\DoxyCodeLine{364             res\_current-\/>i2x[i] = 0;}
+\DoxyCodeLine{365 }
+\DoxyCodeLine{366             res\_current-\/>r2y[i] = 0;}
+\DoxyCodeLine{367             res\_current-\/>i2y[i] = 0;}
+\DoxyCodeLine{368 }
+\DoxyCodeLine{369             res\_current-\/>r2z[i] = 0;}
+\DoxyCodeLine{370             res\_current-\/>i2z[i] = 0;}
+\DoxyCodeLine{371         \}}
+\DoxyCodeLine{372     \}}
+\DoxyCodeLine{373 }
+\DoxyCodeLine{374     \textcolor{keyword}{delete} reflc.x;}
+\DoxyCodeLine{375     \textcolor{keyword}{delete} reflc.y;}
+\DoxyCodeLine{376     \textcolor{keyword}{delete} reflc.z;}
+\DoxyCodeLine{377 }
+\DoxyCodeLine{378     \textcolor{keyword}{delete} reflc.nx;}
+\DoxyCodeLine{379     \textcolor{keyword}{delete} reflc.ny;}
+\DoxyCodeLine{380     \textcolor{keyword}{delete} reflc.nz;}
+\DoxyCodeLine{381 }
+\DoxyCodeLine{382     \textcolor{keyword}{delete} reflc.area;}
+\DoxyCodeLine{383 \}}
+\DoxyCodeLine{384 \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

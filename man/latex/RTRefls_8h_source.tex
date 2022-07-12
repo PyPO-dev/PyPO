@@ -1,0 +1,155 @@
+\hypertarget{RTRefls_8h_source}{}\doxysection{RTRefls.\+h}
+\label{RTRefls_8h_source}\index{src/include/RTRefls.h@{src/include/RTRefls.h}}
+\mbox{\hyperlink{RTRefls_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{// Simple, bare-\/bones definitions of reflectors for CPU/GPU RT.}}
+\DoxyCodeLine{2 \textcolor{comment}{// Use only for raytracing; for PO, use the elaborate definitions}}
+\DoxyCodeLine{3 \textcolor{comment}{// Include derivatives necessary for Newton method}}
+\DoxyCodeLine{4 \textcolor{preprocessor}{\#include <cmath>}}
+\DoxyCodeLine{5 \textcolor{preprocessor}{\#define FLEPS 1.0E-\/8}}
+\DoxyCodeLine{6 }
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{Utils_8h}{Utils.h}}"{}}}
+\DoxyCodeLine{8 }
+\DoxyCodeLine{9 \textcolor{preprocessor}{\#ifndef \_\_RTRefls\_h}}
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#define \_\_RTRefls\_h}}
+\DoxyCodeLine{11 }
+\DoxyCodeLine{12 \textcolor{keyword}{template}<\textcolor{keyword}{class} T>}
+\DoxyCodeLine{13 \textcolor{keyword}{class }\mbox{\hyperlink{classRTRefls}{RTRefls}}}
+\DoxyCodeLine{14 \{}
+\DoxyCodeLine{15     T a, b, c;}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17 \textcolor{keyword}{public}:}
+\DoxyCodeLine{18     \mbox{\hyperlink{classRTRefls}{RTRefls}}(T a, T b, T c);}
+\DoxyCodeLine{19 }
+\DoxyCodeLine{20     \mbox{\hyperlink{classUtils}{Utils<T>}} \mbox{\hyperlink{classRTRefls_a4b1256e7fe900b5b5a95d22c2589d91e}{ut}};}
+\DoxyCodeLine{21 }
+\DoxyCodeLine{22     T \mbox{\hyperlink{classRTRefls_a9e7c464884f4b187d6cc6a80e4466472}{common1}}(T t, T xr, T yr, T dxr, T dyr);}
+\DoxyCodeLine{23     T \mbox{\hyperlink{classRTRefls_aed04e2f40daa72c5339557bd3a397a5b}{common2}}(T t, T xr, T yr, T dxr, T dyr);}
+\DoxyCodeLine{24     T \mbox{\hyperlink{classRTRefls_aa92969671a27dbc1fed7b39ce42cdba7}{gp}}(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr);}
+\DoxyCodeLine{25     T \mbox{\hyperlink{classRTRefls_ad8faa309cf84020f9cbdc1e377b7f619}{gh}}(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr);}
+\DoxyCodeLine{26     T \mbox{\hyperlink{classRTRefls_aba6423f67d87022681cd6fdc35bfbcc5}{ge}}(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr);}
+\DoxyCodeLine{27     T \mbox{\hyperlink{classRTRefls_a834d24129d68eed262c8d4db67400f10}{gpl}}(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr);}
+\DoxyCodeLine{28 }
+\DoxyCodeLine{29     std::array<T, 3> \mbox{\hyperlink{classRTRefls_af3a809bc5021ac4abaf9fc32888cbd2f}{np}}(T xr, T yr, T zr, \textcolor{keywordtype}{int} flip);}
+\DoxyCodeLine{30     std::array<T, 3> \mbox{\hyperlink{classRTRefls_aad2f7720a62683d2505130cbdd7e50a1}{nh}}(T xr, T yr, T zr, \textcolor{keywordtype}{int} flip);}
+\DoxyCodeLine{31     std::array<T, 3> \mbox{\hyperlink{classRTRefls_a66edec57e54602c6c1304a2cab5238d3}{ne}}(T xr, T yr, T zr, \textcolor{keywordtype}{int} flip);}
+\DoxyCodeLine{32     std::array<T, 3> \mbox{\hyperlink{classRTRefls_a8adb0add912ae72df0afe6fa87c3f812}{npl}}(T xr, T yr, T zr, \textcolor{keywordtype}{int} flip);}
+\DoxyCodeLine{33 \};}
+\DoxyCodeLine{34 }
+\DoxyCodeLine{35 \textcolor{keyword}{template}<\textcolor{keyword}{class} T>}
+\DoxyCodeLine{36 \mbox{\hyperlink{classRTRefls_af12c61211b9f8bf494b68f4d4935644f}{RTRefls<T>::RTRefls}}(T a, T b, T c)}
+\DoxyCodeLine{37 \{}
+\DoxyCodeLine{38     this-\/>a = a;}
+\DoxyCodeLine{39     this-\/>b = b;}
+\DoxyCodeLine{40     this-\/>c = c;}
+\DoxyCodeLine{41 \}}
+\DoxyCodeLine{42 }
+\DoxyCodeLine{43 \textcolor{keyword}{template}<\textcolor{keyword}{class} T>}
+\DoxyCodeLine{44 \textcolor{keyword}{inline} T \mbox{\hyperlink{classRTRefls_a9e7c464884f4b187d6cc6a80e4466472}{RTRefls<T>::common1}}(T t, T xr, T yr, T dxr, T dyr)}
+\DoxyCodeLine{45 \{}
+\DoxyCodeLine{46     \textcolor{keywordflow}{return} (xr + t*dxr)*(xr + t*dxr)/(a*a) + (yr + t*dyr)*(yr + t*dyr)/(b*b);}
+\DoxyCodeLine{47 \}}
+\DoxyCodeLine{48 }
+\DoxyCodeLine{49 \textcolor{keyword}{template}<\textcolor{keyword}{class} T>}
+\DoxyCodeLine{50 \textcolor{keyword}{inline} T \mbox{\hyperlink{classRTRefls_aed04e2f40daa72c5339557bd3a397a5b}{RTRefls<T>::common2}}(T t, T xr, T yr, T dxr, T dyr)}
+\DoxyCodeLine{51 \{}
+\DoxyCodeLine{52     \textcolor{keywordflow}{return} (xr + t*dxr)*2*dxr/(a*a) + (yr + t*dyr)*2*dyr/(b*b);}
+\DoxyCodeLine{53 \}}
+\DoxyCodeLine{54 }
+\DoxyCodeLine{55 \textcolor{keyword}{template}<\textcolor{keyword}{class} T>}
+\DoxyCodeLine{56 \textcolor{keyword}{inline} T \mbox{\hyperlink{classRTRefls_aa92969671a27dbc1fed7b39ce42cdba7}{RTRefls<T>::gp}}(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr)}
+\DoxyCodeLine{57 \{}
+\DoxyCodeLine{58     \textcolor{keywordflow}{return} t -\/ (zr + t*dzr -\/ \mbox{\hyperlink{KernelsRTf_8cu_aac840d4bd76922cd0ed1d526ce810fa4}{common1}}(t, xr, yr, dxr, dyr)) /}
+\DoxyCodeLine{59                 (dzr -\/ \mbox{\hyperlink{KernelsRTf_8cu_ad3601bc881564bd384f1313a7d36e5c8}{common2}}(t, xr, yr, dxr, dyr));}
+\DoxyCodeLine{60 \}}
+\DoxyCodeLine{61 }
+\DoxyCodeLine{62 \textcolor{keyword}{template}<\textcolor{keyword}{class} T>}
+\DoxyCodeLine{63 \textcolor{keyword}{inline} T \mbox{\hyperlink{classRTRefls_ad8faa309cf84020f9cbdc1e377b7f619}{RTRefls<T>::gh}}(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr)}
+\DoxyCodeLine{64 \{}
+\DoxyCodeLine{65     \textcolor{keywordflow}{return} t -\/ (zr + t*dzr -\/ c*sqrt(\mbox{\hyperlink{KernelsRTf_8cu_aac840d4bd76922cd0ed1d526ce810fa4}{common1}}(t, xr, yr, dxr, dyr) + 1)) /}
+\DoxyCodeLine{66                 (dzr -\/ c/(2*sqrt(\mbox{\hyperlink{KernelsRTf_8cu_aac840d4bd76922cd0ed1d526ce810fa4}{common1}}(t, xr, yr, dxr, dyr) + 1)) *}
+\DoxyCodeLine{67                 \mbox{\hyperlink{KernelsRTf_8cu_ad3601bc881564bd384f1313a7d36e5c8}{common2}}(t, xr, yr, dxr, dyr));}
+\DoxyCodeLine{68 \}}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{70 \textcolor{keyword}{template}<\textcolor{keyword}{class} T>}
+\DoxyCodeLine{71 \textcolor{keyword}{inline} T \mbox{\hyperlink{classRTRefls_aba6423f67d87022681cd6fdc35bfbcc5}{RTRefls<T>::ge}}(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr)}
+\DoxyCodeLine{72 \{}
+\DoxyCodeLine{73     \textcolor{keywordflow}{return} t -\/ (zr + t*dzr -\/ c*sqrt(1 -\/ \mbox{\hyperlink{KernelsRTf_8cu_aac840d4bd76922cd0ed1d526ce810fa4}{common1}}(t, xr, yr, dxr, dyr))) /}
+\DoxyCodeLine{74                 (dzr + c/(2*sqrt(1 -\/ \mbox{\hyperlink{KernelsRTf_8cu_aac840d4bd76922cd0ed1d526ce810fa4}{common1}}(t, xr, yr, dxr, dyr))) *}
+\DoxyCodeLine{75                 \mbox{\hyperlink{KernelsRTf_8cu_ad3601bc881564bd384f1313a7d36e5c8}{common2}}(t, xr, yr, dxr, dyr));}
+\DoxyCodeLine{76 \}}
+\DoxyCodeLine{77 }
+\DoxyCodeLine{78 \textcolor{keyword}{template}<\textcolor{keyword}{class} T>}
+\DoxyCodeLine{79 \textcolor{keyword}{inline} T \mbox{\hyperlink{classRTRefls_a834d24129d68eed262c8d4db67400f10}{RTRefls<T>::gpl}}(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr)}
+\DoxyCodeLine{80 \{}
+\DoxyCodeLine{81     \textcolor{keywordflow}{return} t -\/ (zr + t*dzr) / dzr;}
+\DoxyCodeLine{82 \}}
+\DoxyCodeLine{83 }
+\DoxyCodeLine{84 \textcolor{keyword}{template}<\textcolor{keyword}{class} T>}
+\DoxyCodeLine{85 \textcolor{keyword}{inline} std::array<T, 3> \mbox{\hyperlink{classRTRefls_af3a809bc5021ac4abaf9fc32888cbd2f}{RTRefls<T>::np}}(T xr, T yr, T zr, \textcolor{keywordtype}{int} flip)}
+\DoxyCodeLine{86 \{}
+\DoxyCodeLine{87     std::array<T, 3> out;}
+\DoxyCodeLine{88 }
+\DoxyCodeLine{89     out[0] = -\/2 * xr / (a*a) * flip;}
+\DoxyCodeLine{90     out[1] = -\/2 * yr / (b*b) * flip;}
+\DoxyCodeLine{91     out[2] = flip;}
+\DoxyCodeLine{92 }
+\DoxyCodeLine{93     T norm = sqrt(out[0]*out[0] + out[1]*out[1] + out[2]*out[2]);}
+\DoxyCodeLine{94 }
+\DoxyCodeLine{95     out[0] = out[0] / norm;}
+\DoxyCodeLine{96     out[1] = out[1] / norm;}
+\DoxyCodeLine{97     out[2] = out[2] / norm;}
+\DoxyCodeLine{98 }
+\DoxyCodeLine{99     \textcolor{keywordflow}{return} out;}
+\DoxyCodeLine{100 \}}
+\DoxyCodeLine{101 }
+\DoxyCodeLine{102 \textcolor{keyword}{template}<\textcolor{keyword}{class} T>}
+\DoxyCodeLine{103 \textcolor{keyword}{inline} std::array<T, 3> \mbox{\hyperlink{classRTRefls_aad2f7720a62683d2505130cbdd7e50a1}{RTRefls<T>::nh}}(T xr, T yr, T zr, \textcolor{keywordtype}{int} flip)}
+\DoxyCodeLine{104 \{}
+\DoxyCodeLine{105     std::array<T, 3> out;}
+\DoxyCodeLine{106 }
+\DoxyCodeLine{107     out[0] = -\/2 * xr / (a*a) * flip;}
+\DoxyCodeLine{108     out[1] = -\/2 * yr / (b*b) * flip;}
+\DoxyCodeLine{109     out[2] = 2 * zr / (c*c) * flip;}
+\DoxyCodeLine{110 }
+\DoxyCodeLine{111     T norm = sqrt(out[0]*out[0] + out[1]*out[1] + out[2]*out[2]);}
+\DoxyCodeLine{112 }
+\DoxyCodeLine{113     out[0] = out[0] / norm;}
+\DoxyCodeLine{114     out[1] = out[1] / norm;}
+\DoxyCodeLine{115     out[2] = out[2] / norm;}
+\DoxyCodeLine{116 }
+\DoxyCodeLine{117     \textcolor{keywordflow}{return} out;}
+\DoxyCodeLine{118 \}}
+\DoxyCodeLine{119 }
+\DoxyCodeLine{120 \textcolor{keyword}{template}<\textcolor{keyword}{class} T>}
+\DoxyCodeLine{121 \textcolor{keyword}{inline} std::array<T, 3> \mbox{\hyperlink{classRTRefls_a66edec57e54602c6c1304a2cab5238d3}{RTRefls<T>::ne}}(T xr, T yr, T zr, \textcolor{keywordtype}{int} flip)}
+\DoxyCodeLine{122 \{}
+\DoxyCodeLine{123     std::array<T, 3> out;}
+\DoxyCodeLine{124 }
+\DoxyCodeLine{125     out[0] = 2 * xr / (a*a) * flip;}
+\DoxyCodeLine{126     out[1] = 2 * yr / (b*b) * flip;}
+\DoxyCodeLine{127     out[2] = 2 * zr / (c*c) * flip;}
+\DoxyCodeLine{128 }
+\DoxyCodeLine{129     T norm = sqrt(out[0]*out[0] + out[1]*out[1] + out[2]*out[2]);}
+\DoxyCodeLine{130 }
+\DoxyCodeLine{131     out[0] = out[0] / norm;}
+\DoxyCodeLine{132     out[1] = out[1] / norm;}
+\DoxyCodeLine{133     out[2] = out[2] / norm;}
+\DoxyCodeLine{134 }
+\DoxyCodeLine{135     \textcolor{keywordflow}{return} out;}
+\DoxyCodeLine{136 \}}
+\DoxyCodeLine{137 }
+\DoxyCodeLine{138 \textcolor{keyword}{template}<\textcolor{keyword}{class} T>}
+\DoxyCodeLine{139 \textcolor{keyword}{inline} std::array<T, 3> \mbox{\hyperlink{classRTRefls_a8adb0add912ae72df0afe6fa87c3f812}{RTRefls<T>::npl}}(T xr, T yr, T zr, \textcolor{keywordtype}{int} flip)}
+\DoxyCodeLine{140 \{}
+\DoxyCodeLine{141     std::array<T, 3> out;}
+\DoxyCodeLine{142 }
+\DoxyCodeLine{143     out[0] = 0;}
+\DoxyCodeLine{144     out[1] = 0;}
+\DoxyCodeLine{145     out[2] = 1;}
+\DoxyCodeLine{146 }
+\DoxyCodeLine{147     \textcolor{keywordflow}{return} out;}
+\DoxyCodeLine{148 \}}
+\DoxyCodeLine{149 \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

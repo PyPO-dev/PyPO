@@ -1,0 +1,113 @@
+\hypertarget{InterfaceCPU_8cpp}{}\doxysection{src/\+CPU/\+Interface\+CPU.cpp File Reference}
+\label{InterfaceCPU_8cpp}\index{src/CPU/InterfaceCPU.cpp@{src/CPU/InterfaceCPU.cpp}}
+{\ttfamily \#include $<$Interface\+CPU.\+h$>$}\newline
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{InterfaceCPU_8cpp_a360b30c74ed5a4b8a7b2e6651863fb63}{propagate\+To\+Grid\+\_\+\+JM}} (\mbox{\hyperlink{structc2Bundle}{c2\+Bundle}} $\ast$res, \mbox{\hyperlink{structreflparams}{reflparams}} source, \mbox{\hyperlink{structreflparams}{reflparams}} target, \mbox{\hyperlink{structreflcontainer}{reflcontainer}} $\ast$cs, \mbox{\hyperlink{structreflcontainer}{reflcontainer}} $\ast$ct, \mbox{\hyperlink{structc2Bundle}{c2\+Bundle}} $\ast$currents, double k, int num\+Threads, double epsilon, double t\+\_\+direction)
+\item 
+void \mbox{\hyperlink{InterfaceCPU_8cpp_a905911196037f0cbc6540741ef51475b}{propagate\+To\+Grid\+\_\+\+EH}} (\mbox{\hyperlink{structc2Bundle}{c2\+Bundle}} $\ast$res, \mbox{\hyperlink{structreflparams}{reflparams}} source, \mbox{\hyperlink{structreflparams}{reflparams}} target, \mbox{\hyperlink{structreflcontainer}{reflcontainer}} $\ast$cs, \mbox{\hyperlink{structreflcontainer}{reflcontainer}} $\ast$ct, \mbox{\hyperlink{structc2Bundle}{c2\+Bundle}} $\ast$currents, double k, int num\+Threads, double epsilon, double t\+\_\+direction)
+\item 
+void \mbox{\hyperlink{InterfaceCPU_8cpp_a670d73345875b0b304c07d6412ccd2a8}{propagate\+To\+Grid\+\_\+\+JMEH}} (\mbox{\hyperlink{structc4Bundle}{c4\+Bundle}} $\ast$res, \mbox{\hyperlink{structreflparams}{reflparams}} source, \mbox{\hyperlink{structreflparams}{reflparams}} target, \mbox{\hyperlink{structreflcontainer}{reflcontainer}} $\ast$cs, \mbox{\hyperlink{structreflcontainer}{reflcontainer}} $\ast$ct, \mbox{\hyperlink{structc2Bundle}{c2\+Bundle}} $\ast$currents, double k, int num\+Threads, double epsilon, double t\+\_\+direction)
+\item 
+void \mbox{\hyperlink{InterfaceCPU_8cpp_a6078e877ad25a18bcd5243af8a64bb7f}{propagate\+To\+Grid\+\_\+\+EHP}} (\mbox{\hyperlink{structc2rBundle}{c2r\+Bundle}} $\ast$res, \mbox{\hyperlink{structreflparams}{reflparams}} source, \mbox{\hyperlink{structreflparams}{reflparams}} target, \mbox{\hyperlink{structreflcontainer}{reflcontainer}} $\ast$cs, \mbox{\hyperlink{structreflcontainer}{reflcontainer}} $\ast$ct, \mbox{\hyperlink{structc2Bundle}{c2\+Bundle}} $\ast$currents, double k, int num\+Threads, double epsilon, double t\+\_\+direction)
+\item 
+void \mbox{\hyperlink{InterfaceCPU_8cpp_a02a948f5784a1b46eb7b5c42fd6359c7}{propagate\+To\+Grid\+\_\+scalar}} (\mbox{\hyperlink{structarrC1}{arr\+C1}} $\ast$res, \mbox{\hyperlink{structreflparams}{reflparams}} source, \mbox{\hyperlink{structreflparams}{reflparams}} target, \mbox{\hyperlink{structreflcontainer}{reflcontainer}} $\ast$cs, \mbox{\hyperlink{structreflcontainer}{reflcontainer}} $\ast$ct, \mbox{\hyperlink{structarrC1}{arr\+C1}} $\ast$field, double k, int num\+Threads, double epsilon, double t\+\_\+direction)
+\item 
+void \mbox{\hyperlink{InterfaceCPU_8cpp_aa656af678a12de082225acaee9be08ce}{propagate\+To\+Far\+Field}} (\mbox{\hyperlink{structc2Bundle}{c2\+Bundle}} $\ast$res, \mbox{\hyperlink{structreflparams}{reflparams}} source, \mbox{\hyperlink{structreflparams}{reflparams}} target, \mbox{\hyperlink{structreflcontainer}{reflcontainer}} $\ast$cs, \mbox{\hyperlink{structreflcontainer}{reflcontainer}} $\ast$ct, \mbox{\hyperlink{structc2Bundle}{c2\+Bundle}} $\ast$currents, double k, int num\+Threads, double epsilon, double t\+\_\+direction)
+\item 
+void \mbox{\hyperlink{InterfaceCPU_8cpp_acb9b9cd01001f4d9f57f24a6dfc647a4}{propagate\+Rays}} (\mbox{\hyperlink{structreflparams}{reflparams}} ctp, \mbox{\hyperlink{structcframe}{cframe}} $\ast$fr\+\_\+in, \mbox{\hyperlink{structcframe}{cframe}} $\ast$fr\+\_\+out, int num\+Threads, double epsilon, double t0)
+\item 
+void \mbox{\hyperlink{InterfaceCPU_8cpp_adacd15496dc771efb15d912e184c67e5}{propagate\+To\+Gridf\+\_\+\+JM}} (\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$res, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} source, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} target, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$cs, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$ct, \mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$currents, float k, int num\+Threads, float epsilon, float t\+\_\+direction)
+\item 
+void \mbox{\hyperlink{InterfaceCPU_8cpp_a3467d62799c4361c39a7524b6f2c1d77}{propagate\+To\+Gridf\+\_\+\+EH}} (\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$res, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} source, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} target, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$cs, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$ct, \mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$currents, float k, int num\+Threads, float epsilon, float t\+\_\+direction)
+\item 
+void \mbox{\hyperlink{InterfaceCPU_8cpp_adafb851abebcf05fa23ab739545f3357}{propagate\+To\+Gridf\+\_\+\+JMEH}} (\mbox{\hyperlink{structc4Bundlef}{c4\+Bundlef}} $\ast$res, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} source, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} target, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$cs, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$ct, \mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$currents, float k, int num\+Threads, float epsilon, float t\+\_\+direction)
+\item 
+void \mbox{\hyperlink{InterfaceCPU_8cpp_abcb8eed44446509059da113fce1f8bba}{propagate\+To\+Gridf\+\_\+\+EHP}} (\mbox{\hyperlink{structc2rBundlef}{c2r\+Bundlef}} $\ast$res, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} source, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} target, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$cs, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$ct, \mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$currents, float k, int num\+Threads, float epsilon, float t\+\_\+direction)
+\item 
+void \mbox{\hyperlink{InterfaceCPU_8cpp_a01583dcc190a9208838f89af911ca096}{propagate\+To\+Gridf\+\_\+scalar}} (\mbox{\hyperlink{structarrC1f}{arr\+C1f}} $\ast$res, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} source, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} target, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$cs, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$ct, \mbox{\hyperlink{structarrC1f}{arr\+C1f}} $\ast$field, float k, int num\+Threads, float epsilon, float t\+\_\+direction)
+\item 
+void \mbox{\hyperlink{InterfaceCPU_8cpp_a8e24bea65d0a32c1e8e71bb3fb5bc764}{propagate\+To\+Far\+Fieldf}} (\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$res, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} source, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} target, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$cs, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$ct, \mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$currents, float k, int num\+Threads, float epsilon, float t\+\_\+direction)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{InterfaceCPU_8cpp_acb9b9cd01001f4d9f57f24a6dfc647a4}\label{InterfaceCPU_8cpp_acb9b9cd01001f4d9f57f24a6dfc647a4}} 
+\index{InterfaceCPU.cpp@{InterfaceCPU.cpp}!propagateRays@{propagateRays}}
+\index{propagateRays@{propagateRays}!InterfaceCPU.cpp@{InterfaceCPU.cpp}}
+\doxysubsubsection{\texorpdfstring{propagateRays()}{propagateRays()}}
+{\footnotesize\ttfamily void propagate\+Rays (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structreflparams}{reflparams}}}]{ctp,  }\item[{\mbox{\hyperlink{structcframe}{cframe}} $\ast$}]{fr\+\_\+in,  }\item[{\mbox{\hyperlink{structcframe}{cframe}} $\ast$}]{fr\+\_\+out,  }\item[{int}]{num\+Threads,  }\item[{double}]{epsilon,  }\item[{double}]{t0 }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InterfaceCPU_8cpp_aa656af678a12de082225acaee9be08ce}\label{InterfaceCPU_8cpp_aa656af678a12de082225acaee9be08ce}} 
+\index{InterfaceCPU.cpp@{InterfaceCPU.cpp}!propagateToFarField@{propagateToFarField}}
+\index{propagateToFarField@{propagateToFarField}!InterfaceCPU.cpp@{InterfaceCPU.cpp}}
+\doxysubsubsection{\texorpdfstring{propagateToFarField()}{propagateToFarField()}}
+{\footnotesize\ttfamily void propagate\+To\+Far\+Field (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structc2Bundle}{c2\+Bundle}} $\ast$}]{res,  }\item[{\mbox{\hyperlink{structreflparams}{reflparams}}}]{source,  }\item[{\mbox{\hyperlink{structreflparams}{reflparams}}}]{target,  }\item[{\mbox{\hyperlink{structreflcontainer}{reflcontainer}} $\ast$}]{cs,  }\item[{\mbox{\hyperlink{structreflcontainer}{reflcontainer}} $\ast$}]{ct,  }\item[{\mbox{\hyperlink{structc2Bundle}{c2\+Bundle}} $\ast$}]{currents,  }\item[{double}]{k,  }\item[{int}]{num\+Threads,  }\item[{double}]{epsilon,  }\item[{double}]{t\+\_\+direction }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InterfaceCPU_8cpp_a8e24bea65d0a32c1e8e71bb3fb5bc764}\label{InterfaceCPU_8cpp_a8e24bea65d0a32c1e8e71bb3fb5bc764}} 
+\index{InterfaceCPU.cpp@{InterfaceCPU.cpp}!propagateToFarFieldf@{propagateToFarFieldf}}
+\index{propagateToFarFieldf@{propagateToFarFieldf}!InterfaceCPU.cpp@{InterfaceCPU.cpp}}
+\doxysubsubsection{\texorpdfstring{propagateToFarFieldf()}{propagateToFarFieldf()}}
+{\footnotesize\ttfamily void propagate\+To\+Far\+Fieldf (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$}]{res,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{source,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{target,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{cs,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{ct,  }\item[{\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$}]{currents,  }\item[{float}]{k,  }\item[{int}]{num\+Threads,  }\item[{float}]{epsilon,  }\item[{float}]{t\+\_\+direction }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InterfaceCPU_8cpp_a905911196037f0cbc6540741ef51475b}\label{InterfaceCPU_8cpp_a905911196037f0cbc6540741ef51475b}} 
+\index{InterfaceCPU.cpp@{InterfaceCPU.cpp}!propagateToGrid\_EH@{propagateToGrid\_EH}}
+\index{propagateToGrid\_EH@{propagateToGrid\_EH}!InterfaceCPU.cpp@{InterfaceCPU.cpp}}
+\doxysubsubsection{\texorpdfstring{propagateToGrid\_EH()}{propagateToGrid\_EH()}}
+{\footnotesize\ttfamily void propagate\+To\+Grid\+\_\+\+EH (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structc2Bundle}{c2\+Bundle}} $\ast$}]{res,  }\item[{\mbox{\hyperlink{structreflparams}{reflparams}}}]{source,  }\item[{\mbox{\hyperlink{structreflparams}{reflparams}}}]{target,  }\item[{\mbox{\hyperlink{structreflcontainer}{reflcontainer}} $\ast$}]{cs,  }\item[{\mbox{\hyperlink{structreflcontainer}{reflcontainer}} $\ast$}]{ct,  }\item[{\mbox{\hyperlink{structc2Bundle}{c2\+Bundle}} $\ast$}]{currents,  }\item[{double}]{k,  }\item[{int}]{num\+Threads,  }\item[{double}]{epsilon,  }\item[{double}]{t\+\_\+direction }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InterfaceCPU_8cpp_a6078e877ad25a18bcd5243af8a64bb7f}\label{InterfaceCPU_8cpp_a6078e877ad25a18bcd5243af8a64bb7f}} 
+\index{InterfaceCPU.cpp@{InterfaceCPU.cpp}!propagateToGrid\_EHP@{propagateToGrid\_EHP}}
+\index{propagateToGrid\_EHP@{propagateToGrid\_EHP}!InterfaceCPU.cpp@{InterfaceCPU.cpp}}
+\doxysubsubsection{\texorpdfstring{propagateToGrid\_EHP()}{propagateToGrid\_EHP()}}
+{\footnotesize\ttfamily void propagate\+To\+Grid\+\_\+\+EHP (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structc2rBundle}{c2r\+Bundle}} $\ast$}]{res,  }\item[{\mbox{\hyperlink{structreflparams}{reflparams}}}]{source,  }\item[{\mbox{\hyperlink{structreflparams}{reflparams}}}]{target,  }\item[{\mbox{\hyperlink{structreflcontainer}{reflcontainer}} $\ast$}]{cs,  }\item[{\mbox{\hyperlink{structreflcontainer}{reflcontainer}} $\ast$}]{ct,  }\item[{\mbox{\hyperlink{structc2Bundle}{c2\+Bundle}} $\ast$}]{currents,  }\item[{double}]{k,  }\item[{int}]{num\+Threads,  }\item[{double}]{epsilon,  }\item[{double}]{t\+\_\+direction }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InterfaceCPU_8cpp_a360b30c74ed5a4b8a7b2e6651863fb63}\label{InterfaceCPU_8cpp_a360b30c74ed5a4b8a7b2e6651863fb63}} 
+\index{InterfaceCPU.cpp@{InterfaceCPU.cpp}!propagateToGrid\_JM@{propagateToGrid\_JM}}
+\index{propagateToGrid\_JM@{propagateToGrid\_JM}!InterfaceCPU.cpp@{InterfaceCPU.cpp}}
+\doxysubsubsection{\texorpdfstring{propagateToGrid\_JM()}{propagateToGrid\_JM()}}
+{\footnotesize\ttfamily void propagate\+To\+Grid\+\_\+\+JM (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structc2Bundle}{c2\+Bundle}} $\ast$}]{res,  }\item[{\mbox{\hyperlink{structreflparams}{reflparams}}}]{source,  }\item[{\mbox{\hyperlink{structreflparams}{reflparams}}}]{target,  }\item[{\mbox{\hyperlink{structreflcontainer}{reflcontainer}} $\ast$}]{cs,  }\item[{\mbox{\hyperlink{structreflcontainer}{reflcontainer}} $\ast$}]{ct,  }\item[{\mbox{\hyperlink{structc2Bundle}{c2\+Bundle}} $\ast$}]{currents,  }\item[{double}]{k,  }\item[{int}]{num\+Threads,  }\item[{double}]{epsilon,  }\item[{double}]{t\+\_\+direction }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InterfaceCPU_8cpp_a670d73345875b0b304c07d6412ccd2a8}\label{InterfaceCPU_8cpp_a670d73345875b0b304c07d6412ccd2a8}} 
+\index{InterfaceCPU.cpp@{InterfaceCPU.cpp}!propagateToGrid\_JMEH@{propagateToGrid\_JMEH}}
+\index{propagateToGrid\_JMEH@{propagateToGrid\_JMEH}!InterfaceCPU.cpp@{InterfaceCPU.cpp}}
+\doxysubsubsection{\texorpdfstring{propagateToGrid\_JMEH()}{propagateToGrid\_JMEH()}}
+{\footnotesize\ttfamily void propagate\+To\+Grid\+\_\+\+JMEH (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structc4Bundle}{c4\+Bundle}} $\ast$}]{res,  }\item[{\mbox{\hyperlink{structreflparams}{reflparams}}}]{source,  }\item[{\mbox{\hyperlink{structreflparams}{reflparams}}}]{target,  }\item[{\mbox{\hyperlink{structreflcontainer}{reflcontainer}} $\ast$}]{cs,  }\item[{\mbox{\hyperlink{structreflcontainer}{reflcontainer}} $\ast$}]{ct,  }\item[{\mbox{\hyperlink{structc2Bundle}{c2\+Bundle}} $\ast$}]{currents,  }\item[{double}]{k,  }\item[{int}]{num\+Threads,  }\item[{double}]{epsilon,  }\item[{double}]{t\+\_\+direction }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InterfaceCPU_8cpp_a02a948f5784a1b46eb7b5c42fd6359c7}\label{InterfaceCPU_8cpp_a02a948f5784a1b46eb7b5c42fd6359c7}} 
+\index{InterfaceCPU.cpp@{InterfaceCPU.cpp}!propagateToGrid\_scalar@{propagateToGrid\_scalar}}
+\index{propagateToGrid\_scalar@{propagateToGrid\_scalar}!InterfaceCPU.cpp@{InterfaceCPU.cpp}}
+\doxysubsubsection{\texorpdfstring{propagateToGrid\_scalar()}{propagateToGrid\_scalar()}}
+{\footnotesize\ttfamily void propagate\+To\+Grid\+\_\+scalar (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structarrC1}{arr\+C1}} $\ast$}]{res,  }\item[{\mbox{\hyperlink{structreflparams}{reflparams}}}]{source,  }\item[{\mbox{\hyperlink{structreflparams}{reflparams}}}]{target,  }\item[{\mbox{\hyperlink{structreflcontainer}{reflcontainer}} $\ast$}]{cs,  }\item[{\mbox{\hyperlink{structreflcontainer}{reflcontainer}} $\ast$}]{ct,  }\item[{\mbox{\hyperlink{structarrC1}{arr\+C1}} $\ast$}]{field,  }\item[{double}]{k,  }\item[{int}]{num\+Threads,  }\item[{double}]{epsilon,  }\item[{double}]{t\+\_\+direction }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InterfaceCPU_8cpp_a3467d62799c4361c39a7524b6f2c1d77}\label{InterfaceCPU_8cpp_a3467d62799c4361c39a7524b6f2c1d77}} 
+\index{InterfaceCPU.cpp@{InterfaceCPU.cpp}!propagateToGridf\_EH@{propagateToGridf\_EH}}
+\index{propagateToGridf\_EH@{propagateToGridf\_EH}!InterfaceCPU.cpp@{InterfaceCPU.cpp}}
+\doxysubsubsection{\texorpdfstring{propagateToGridf\_EH()}{propagateToGridf\_EH()}}
+{\footnotesize\ttfamily void propagate\+To\+Gridf\+\_\+\+EH (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$}]{res,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{source,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{target,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{cs,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{ct,  }\item[{\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$}]{currents,  }\item[{float}]{k,  }\item[{int}]{num\+Threads,  }\item[{float}]{epsilon,  }\item[{float}]{t\+\_\+direction }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InterfaceCPU_8cpp_abcb8eed44446509059da113fce1f8bba}\label{InterfaceCPU_8cpp_abcb8eed44446509059da113fce1f8bba}} 
+\index{InterfaceCPU.cpp@{InterfaceCPU.cpp}!propagateToGridf\_EHP@{propagateToGridf\_EHP}}
+\index{propagateToGridf\_EHP@{propagateToGridf\_EHP}!InterfaceCPU.cpp@{InterfaceCPU.cpp}}
+\doxysubsubsection{\texorpdfstring{propagateToGridf\_EHP()}{propagateToGridf\_EHP()}}
+{\footnotesize\ttfamily void propagate\+To\+Gridf\+\_\+\+EHP (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structc2rBundlef}{c2r\+Bundlef}} $\ast$}]{res,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{source,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{target,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{cs,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{ct,  }\item[{\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$}]{currents,  }\item[{float}]{k,  }\item[{int}]{num\+Threads,  }\item[{float}]{epsilon,  }\item[{float}]{t\+\_\+direction }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InterfaceCPU_8cpp_adacd15496dc771efb15d912e184c67e5}\label{InterfaceCPU_8cpp_adacd15496dc771efb15d912e184c67e5}} 
+\index{InterfaceCPU.cpp@{InterfaceCPU.cpp}!propagateToGridf\_JM@{propagateToGridf\_JM}}
+\index{propagateToGridf\_JM@{propagateToGridf\_JM}!InterfaceCPU.cpp@{InterfaceCPU.cpp}}
+\doxysubsubsection{\texorpdfstring{propagateToGridf\_JM()}{propagateToGridf\_JM()}}
+{\footnotesize\ttfamily void propagate\+To\+Gridf\+\_\+\+JM (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$}]{res,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{source,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{target,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{cs,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{ct,  }\item[{\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$}]{currents,  }\item[{float}]{k,  }\item[{int}]{num\+Threads,  }\item[{float}]{epsilon,  }\item[{float}]{t\+\_\+direction }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InterfaceCPU_8cpp_adafb851abebcf05fa23ab739545f3357}\label{InterfaceCPU_8cpp_adafb851abebcf05fa23ab739545f3357}} 
+\index{InterfaceCPU.cpp@{InterfaceCPU.cpp}!propagateToGridf\_JMEH@{propagateToGridf\_JMEH}}
+\index{propagateToGridf\_JMEH@{propagateToGridf\_JMEH}!InterfaceCPU.cpp@{InterfaceCPU.cpp}}
+\doxysubsubsection{\texorpdfstring{propagateToGridf\_JMEH()}{propagateToGridf\_JMEH()}}
+{\footnotesize\ttfamily void propagate\+To\+Gridf\+\_\+\+JMEH (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structc4Bundlef}{c4\+Bundlef}} $\ast$}]{res,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{source,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{target,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{cs,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{ct,  }\item[{\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$}]{currents,  }\item[{float}]{k,  }\item[{int}]{num\+Threads,  }\item[{float}]{epsilon,  }\item[{float}]{t\+\_\+direction }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InterfaceCPU_8cpp_a01583dcc190a9208838f89af911ca096}\label{InterfaceCPU_8cpp_a01583dcc190a9208838f89af911ca096}} 
+\index{InterfaceCPU.cpp@{InterfaceCPU.cpp}!propagateToGridf\_scalar@{propagateToGridf\_scalar}}
+\index{propagateToGridf\_scalar@{propagateToGridf\_scalar}!InterfaceCPU.cpp@{InterfaceCPU.cpp}}
+\doxysubsubsection{\texorpdfstring{propagateToGridf\_scalar()}{propagateToGridf\_scalar()}}
+{\footnotesize\ttfamily void propagate\+To\+Gridf\+\_\+scalar (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structarrC1f}{arr\+C1f}} $\ast$}]{res,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{source,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{target,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{cs,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{ct,  }\item[{\mbox{\hyperlink{structarrC1f}{arr\+C1f}} $\ast$}]{field,  }\item[{float}]{k,  }\item[{int}]{num\+Threads,  }\item[{float}]{epsilon,  }\item[{float}]{t\+\_\+direction }\end{DoxyParamCaption})}
+

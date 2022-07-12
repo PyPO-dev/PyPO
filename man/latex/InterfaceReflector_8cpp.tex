@@ -1,0 +1,143 @@
+\hypertarget{InterfaceReflector_8cpp}{}\doxysection{src/common/\+Interface\+Reflector.cpp File Reference}
+\label{InterfaceReflector_8cpp}\index{src/common/InterfaceReflector.cpp@{src/common/InterfaceReflector.cpp}}
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$array$>$}\newline
+{\ttfamily \#include $<$cmath$>$}\newline
+{\ttfamily \#include \char`\"{}Utils.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Interface\+Reflector.\+h\char`\"{}}\newline
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{InterfaceReflector_8cpp_a525335710b53cb064ca56b936120431e}{\+\_\+\+USE\+\_\+\+MATH\+\_\+\+DEFINES}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename T $>$ }\\T \mbox{\hyperlink{InterfaceReflector_8cpp_afc6db2d984002de6d8d50a28fd493c31}{constrain\+Angle}} (T x)
+\item 
+{\footnotesize template$<$typename T , typename U $>$ }\\void \mbox{\hyperlink{InterfaceReflector_8cpp_ac12e89b8d533f7b60f638452323be9a3}{transform\+Grids}} (T $\ast$reflc, int idx, std\+::array$<$ U, 3 $>$ \&inp, std\+::array$<$ U, 3 $>$ \&out, \mbox{\hyperlink{classUtils}{Utils}}$<$ U $>$ $\ast$ut, U \mbox{\hyperlink{KernelsRTf_8cu_a07c1b191d96b17fc9895b0b8c80f5209}{mat}}\mbox{[}16\mbox{]})
+\item 
+{\footnotesize template$<$typename T , typename U $>$ }\\void \mbox{\hyperlink{InterfaceReflector_8cpp_abdbdc51ca1039f6aad9c020e411d643b}{Parabola\+\_\+xy}} (T $\ast$parabola, U xu\+\_\+lo, U xu\+\_\+up, U yv\+\_\+lo, U yv\+\_\+up, U xcenter, U ycenter, U a, U b, int ncx, int ncy, int nfac, U \mbox{\hyperlink{KernelsRTf_8cu_a07c1b191d96b17fc9895b0b8c80f5209}{mat}}\mbox{[}16\mbox{]}, bool transform)
+\item 
+{\footnotesize template$<$typename T , typename U $>$ }\\void \mbox{\hyperlink{InterfaceReflector_8cpp_a87c8fb2472155bc11f132db4392df314}{Parabola\+\_\+uv}} (T $\ast$parabola, U xu\+\_\+lo, U xu\+\_\+up, U yv\+\_\+lo, U yv\+\_\+up, U xcenter, U ycenter, U a, U b, int ncx, int ncy, int nfac, U \mbox{\hyperlink{KernelsRTf_8cu_a07c1b191d96b17fc9895b0b8c80f5209}{mat}}\mbox{[}16\mbox{]}, bool transform)
+\item 
+{\footnotesize template$<$typename T , typename U $>$ }\\void \mbox{\hyperlink{InterfaceReflector_8cpp_a7433b1e9e2c9d8768fa0ec3610315fe2}{Hyperbola\+\_\+xy}} (T $\ast$hyperbola, U xu\+\_\+lo, U xu\+\_\+up, U yv\+\_\+lo, U yv\+\_\+up, U xcenter, U ycenter, U a, U b, U c, int ncx, int ncy, int nfac, U \mbox{\hyperlink{KernelsRTf_8cu_a07c1b191d96b17fc9895b0b8c80f5209}{mat}}\mbox{[}16\mbox{]}, bool transform)
+\item 
+{\footnotesize template$<$typename T , typename U $>$ }\\void \mbox{\hyperlink{InterfaceReflector_8cpp_a8c9e64756fda7a7bdc2dbaffc6c95825}{Hyperbola\+\_\+uv}} (T $\ast$hyperbola, U xu\+\_\+lo, U xu\+\_\+up, U yv\+\_\+lo, U yv\+\_\+up, U xcenter, U ycenter, U a, U b, U c, int ncx, int ncy, int nfac, U \mbox{\hyperlink{KernelsRTf_8cu_a07c1b191d96b17fc9895b0b8c80f5209}{mat}}\mbox{[}16\mbox{]}, bool transform)
+\item 
+{\footnotesize template$<$typename T , typename U $>$ }\\void \mbox{\hyperlink{InterfaceReflector_8cpp_a36627e762f6bb3da0dba1710cf5b1044}{Ellipse\+\_\+xy}} (T $\ast$ellipse, U xu\+\_\+lo, U xu\+\_\+up, U yv\+\_\+lo, U yv\+\_\+up, U xcenter, U ycenter, U a, U b, U c, int ncx, int ncy, int nfac, U \mbox{\hyperlink{KernelsRTf_8cu_a07c1b191d96b17fc9895b0b8c80f5209}{mat}}\mbox{[}16\mbox{]}, bool transform)
+\item 
+{\footnotesize template$<$typename T , typename U $>$ }\\void \mbox{\hyperlink{InterfaceReflector_8cpp_a5083fe3cd8a47fc23abd8a45fc9cbecd}{Ellipse\+\_\+uv}} (T $\ast$ellipse, U xu\+\_\+lo, U xu\+\_\+up, U yv\+\_\+lo, U yv\+\_\+up, U xcenter, U ycenter, U a, U b, U c, int ncx, int ncy, int nfac, U \mbox{\hyperlink{KernelsRTf_8cu_a07c1b191d96b17fc9895b0b8c80f5209}{mat}}\mbox{[}16\mbox{]}, bool transform)
+\item 
+{\footnotesize template$<$typename T , typename U $>$ }\\void \mbox{\hyperlink{InterfaceReflector_8cpp_a879096991990fd0e06926ba6cd866d05}{Plane\+\_\+xy}} (T $\ast$plane, U xu\+\_\+lo, U xu\+\_\+up, U yv\+\_\+lo, U yv\+\_\+up, U xcenter, U ycenter, int ncx, int ncy, int nfac, U \mbox{\hyperlink{KernelsRTf_8cu_a07c1b191d96b17fc9895b0b8c80f5209}{mat}}\mbox{[}16\mbox{]}, bool transform)
+\item 
+{\footnotesize template$<$typename T , typename U $>$ }\\void \mbox{\hyperlink{InterfaceReflector_8cpp_a214d80435a6d8ea208503d933fb16785}{Plane\+\_\+uv}} (T $\ast$plane, U xu\+\_\+lo, U xu\+\_\+up, U yv\+\_\+lo, U yv\+\_\+up, U xcenter, U ycenter, U a, U b, int ncx, int ncy, int nfac, U \mbox{\hyperlink{KernelsRTf_8cu_a07c1b191d96b17fc9895b0b8c80f5209}{mat}}\mbox{[}16\mbox{]}, bool transform)
+\item 
+{\footnotesize template$<$typename T , typename U $>$ }\\void \mbox{\hyperlink{InterfaceReflector_8cpp_ad179666a254cb4e64b2f6ecab5319b38}{Plane\+\_\+\+AoE}} (T $\ast$plane, U xu\+\_\+lo, U xu\+\_\+up, U yv\+\_\+lo, U yv\+\_\+up, U xcenter, U ycenter, int ncx, int ncy, U \mbox{\hyperlink{KernelsRTf_8cu_a07c1b191d96b17fc9895b0b8c80f5209}{mat}}\mbox{[}16\mbox{]}, bool transform, bool spheric)
+\item 
+void \mbox{\hyperlink{InterfaceReflector_8cpp_a8a80fa7c30c6a5599a71cc0a95e0c89a}{generate\+Grid}} (\mbox{\hyperlink{structreflparams}{reflparams}} refl, \mbox{\hyperlink{structreflcontainer}{reflcontainer}} $\ast$container, bool transform, bool spheric)
+\item 
+void \mbox{\hyperlink{InterfaceReflector_8cpp_a22344e70eab920880e0bf3a52afdf55e}{generate\+Gridf}} (\mbox{\hyperlink{structreflparamsf}{reflparamsf}} refl, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$container, bool transform, bool spheric)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{InterfaceReflector_8cpp_a525335710b53cb064ca56b936120431e}\label{InterfaceReflector_8cpp_a525335710b53cb064ca56b936120431e}} 
+\index{InterfaceReflector.cpp@{InterfaceReflector.cpp}!\_USE\_MATH\_DEFINES@{\_USE\_MATH\_DEFINES}}
+\index{\_USE\_MATH\_DEFINES@{\_USE\_MATH\_DEFINES}!InterfaceReflector.cpp@{InterfaceReflector.cpp}}
+\doxysubsubsection{\texorpdfstring{\_USE\_MATH\_DEFINES}{\_USE\_MATH\_DEFINES}}
+{\footnotesize\ttfamily \#define \+\_\+\+USE\+\_\+\+MATH\+\_\+\+DEFINES}
+
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{InterfaceReflector_8cpp_afc6db2d984002de6d8d50a28fd493c31}\label{InterfaceReflector_8cpp_afc6db2d984002de6d8d50a28fd493c31}} 
+\index{InterfaceReflector.cpp@{InterfaceReflector.cpp}!constrainAngle@{constrainAngle}}
+\index{constrainAngle@{constrainAngle}!InterfaceReflector.cpp@{InterfaceReflector.cpp}}
+\doxysubsubsection{\texorpdfstring{constrainAngle()}{constrainAngle()}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+T constrain\+Angle (\begin{DoxyParamCaption}\item[{T}]{x }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InterfaceReflector_8cpp_a5083fe3cd8a47fc23abd8a45fc9cbecd}\label{InterfaceReflector_8cpp_a5083fe3cd8a47fc23abd8a45fc9cbecd}} 
+\index{InterfaceReflector.cpp@{InterfaceReflector.cpp}!Ellipse\_uv@{Ellipse\_uv}}
+\index{Ellipse\_uv@{Ellipse\_uv}!InterfaceReflector.cpp@{InterfaceReflector.cpp}}
+\doxysubsubsection{\texorpdfstring{Ellipse\_uv()}{Ellipse\_uv()}}
+{\footnotesize\ttfamily template$<$typename T , typename U $>$ \\
+void Ellipse\+\_\+uv (\begin{DoxyParamCaption}\item[{T $\ast$}]{ellipse,  }\item[{U}]{xu\+\_\+lo,  }\item[{U}]{xu\+\_\+up,  }\item[{U}]{yv\+\_\+lo,  }\item[{U}]{yv\+\_\+up,  }\item[{U}]{xcenter,  }\item[{U}]{ycenter,  }\item[{U}]{a,  }\item[{U}]{b,  }\item[{U}]{c,  }\item[{int}]{ncx,  }\item[{int}]{ncy,  }\item[{int}]{nfac,  }\item[{U}]{mat\mbox{[}16\mbox{]},  }\item[{bool}]{transform }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InterfaceReflector_8cpp_a36627e762f6bb3da0dba1710cf5b1044}\label{InterfaceReflector_8cpp_a36627e762f6bb3da0dba1710cf5b1044}} 
+\index{InterfaceReflector.cpp@{InterfaceReflector.cpp}!Ellipse\_xy@{Ellipse\_xy}}
+\index{Ellipse\_xy@{Ellipse\_xy}!InterfaceReflector.cpp@{InterfaceReflector.cpp}}
+\doxysubsubsection{\texorpdfstring{Ellipse\_xy()}{Ellipse\_xy()}}
+{\footnotesize\ttfamily template$<$typename T , typename U $>$ \\
+void Ellipse\+\_\+xy (\begin{DoxyParamCaption}\item[{T $\ast$}]{ellipse,  }\item[{U}]{xu\+\_\+lo,  }\item[{U}]{xu\+\_\+up,  }\item[{U}]{yv\+\_\+lo,  }\item[{U}]{yv\+\_\+up,  }\item[{U}]{xcenter,  }\item[{U}]{ycenter,  }\item[{U}]{a,  }\item[{U}]{b,  }\item[{U}]{c,  }\item[{int}]{ncx,  }\item[{int}]{ncy,  }\item[{int}]{nfac,  }\item[{U}]{mat\mbox{[}16\mbox{]},  }\item[{bool}]{transform }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InterfaceReflector_8cpp_a8a80fa7c30c6a5599a71cc0a95e0c89a}\label{InterfaceReflector_8cpp_a8a80fa7c30c6a5599a71cc0a95e0c89a}} 
+\index{InterfaceReflector.cpp@{InterfaceReflector.cpp}!generateGrid@{generateGrid}}
+\index{generateGrid@{generateGrid}!InterfaceReflector.cpp@{InterfaceReflector.cpp}}
+\doxysubsubsection{\texorpdfstring{generateGrid()}{generateGrid()}}
+{\footnotesize\ttfamily void generate\+Grid (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structreflparams}{reflparams}}}]{refl,  }\item[{\mbox{\hyperlink{structreflcontainer}{reflcontainer}} $\ast$}]{container,  }\item[{bool}]{transform,  }\item[{bool}]{spheric }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InterfaceReflector_8cpp_a22344e70eab920880e0bf3a52afdf55e}\label{InterfaceReflector_8cpp_a22344e70eab920880e0bf3a52afdf55e}} 
+\index{InterfaceReflector.cpp@{InterfaceReflector.cpp}!generateGridf@{generateGridf}}
+\index{generateGridf@{generateGridf}!InterfaceReflector.cpp@{InterfaceReflector.cpp}}
+\doxysubsubsection{\texorpdfstring{generateGridf()}{generateGridf()}}
+{\footnotesize\ttfamily void generate\+Gridf (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{refl,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{container,  }\item[{bool}]{transform,  }\item[{bool}]{spheric }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InterfaceReflector_8cpp_a8c9e64756fda7a7bdc2dbaffc6c95825}\label{InterfaceReflector_8cpp_a8c9e64756fda7a7bdc2dbaffc6c95825}} 
+\index{InterfaceReflector.cpp@{InterfaceReflector.cpp}!Hyperbola\_uv@{Hyperbola\_uv}}
+\index{Hyperbola\_uv@{Hyperbola\_uv}!InterfaceReflector.cpp@{InterfaceReflector.cpp}}
+\doxysubsubsection{\texorpdfstring{Hyperbola\_uv()}{Hyperbola\_uv()}}
+{\footnotesize\ttfamily template$<$typename T , typename U $>$ \\
+void Hyperbola\+\_\+uv (\begin{DoxyParamCaption}\item[{T $\ast$}]{hyperbola,  }\item[{U}]{xu\+\_\+lo,  }\item[{U}]{xu\+\_\+up,  }\item[{U}]{yv\+\_\+lo,  }\item[{U}]{yv\+\_\+up,  }\item[{U}]{xcenter,  }\item[{U}]{ycenter,  }\item[{U}]{a,  }\item[{U}]{b,  }\item[{U}]{c,  }\item[{int}]{ncx,  }\item[{int}]{ncy,  }\item[{int}]{nfac,  }\item[{U}]{mat\mbox{[}16\mbox{]},  }\item[{bool}]{transform }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InterfaceReflector_8cpp_a7433b1e9e2c9d8768fa0ec3610315fe2}\label{InterfaceReflector_8cpp_a7433b1e9e2c9d8768fa0ec3610315fe2}} 
+\index{InterfaceReflector.cpp@{InterfaceReflector.cpp}!Hyperbola\_xy@{Hyperbola\_xy}}
+\index{Hyperbola\_xy@{Hyperbola\_xy}!InterfaceReflector.cpp@{InterfaceReflector.cpp}}
+\doxysubsubsection{\texorpdfstring{Hyperbola\_xy()}{Hyperbola\_xy()}}
+{\footnotesize\ttfamily template$<$typename T , typename U $>$ \\
+void Hyperbola\+\_\+xy (\begin{DoxyParamCaption}\item[{T $\ast$}]{hyperbola,  }\item[{U}]{xu\+\_\+lo,  }\item[{U}]{xu\+\_\+up,  }\item[{U}]{yv\+\_\+lo,  }\item[{U}]{yv\+\_\+up,  }\item[{U}]{xcenter,  }\item[{U}]{ycenter,  }\item[{U}]{a,  }\item[{U}]{b,  }\item[{U}]{c,  }\item[{int}]{ncx,  }\item[{int}]{ncy,  }\item[{int}]{nfac,  }\item[{U}]{mat\mbox{[}16\mbox{]},  }\item[{bool}]{transform }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InterfaceReflector_8cpp_a87c8fb2472155bc11f132db4392df314}\label{InterfaceReflector_8cpp_a87c8fb2472155bc11f132db4392df314}} 
+\index{InterfaceReflector.cpp@{InterfaceReflector.cpp}!Parabola\_uv@{Parabola\_uv}}
+\index{Parabola\_uv@{Parabola\_uv}!InterfaceReflector.cpp@{InterfaceReflector.cpp}}
+\doxysubsubsection{\texorpdfstring{Parabola\_uv()}{Parabola\_uv()}}
+{\footnotesize\ttfamily template$<$typename T , typename U $>$ \\
+void Parabola\+\_\+uv (\begin{DoxyParamCaption}\item[{T $\ast$}]{parabola,  }\item[{U}]{xu\+\_\+lo,  }\item[{U}]{xu\+\_\+up,  }\item[{U}]{yv\+\_\+lo,  }\item[{U}]{yv\+\_\+up,  }\item[{U}]{xcenter,  }\item[{U}]{ycenter,  }\item[{U}]{a,  }\item[{U}]{b,  }\item[{int}]{ncx,  }\item[{int}]{ncy,  }\item[{int}]{nfac,  }\item[{U}]{mat\mbox{[}16\mbox{]},  }\item[{bool}]{transform }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InterfaceReflector_8cpp_abdbdc51ca1039f6aad9c020e411d643b}\label{InterfaceReflector_8cpp_abdbdc51ca1039f6aad9c020e411d643b}} 
+\index{InterfaceReflector.cpp@{InterfaceReflector.cpp}!Parabola\_xy@{Parabola\_xy}}
+\index{Parabola\_xy@{Parabola\_xy}!InterfaceReflector.cpp@{InterfaceReflector.cpp}}
+\doxysubsubsection{\texorpdfstring{Parabola\_xy()}{Parabola\_xy()}}
+{\footnotesize\ttfamily template$<$typename T , typename U $>$ \\
+void Parabola\+\_\+xy (\begin{DoxyParamCaption}\item[{T $\ast$}]{parabola,  }\item[{U}]{xu\+\_\+lo,  }\item[{U}]{xu\+\_\+up,  }\item[{U}]{yv\+\_\+lo,  }\item[{U}]{yv\+\_\+up,  }\item[{U}]{xcenter,  }\item[{U}]{ycenter,  }\item[{U}]{a,  }\item[{U}]{b,  }\item[{int}]{ncx,  }\item[{int}]{ncy,  }\item[{int}]{nfac,  }\item[{U}]{mat\mbox{[}16\mbox{]},  }\item[{bool}]{transform }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InterfaceReflector_8cpp_ad179666a254cb4e64b2f6ecab5319b38}\label{InterfaceReflector_8cpp_ad179666a254cb4e64b2f6ecab5319b38}} 
+\index{InterfaceReflector.cpp@{InterfaceReflector.cpp}!Plane\_AoE@{Plane\_AoE}}
+\index{Plane\_AoE@{Plane\_AoE}!InterfaceReflector.cpp@{InterfaceReflector.cpp}}
+\doxysubsubsection{\texorpdfstring{Plane\_AoE()}{Plane\_AoE()}}
+{\footnotesize\ttfamily template$<$typename T , typename U $>$ \\
+void Plane\+\_\+\+AoE (\begin{DoxyParamCaption}\item[{T $\ast$}]{plane,  }\item[{U}]{xu\+\_\+lo,  }\item[{U}]{xu\+\_\+up,  }\item[{U}]{yv\+\_\+lo,  }\item[{U}]{yv\+\_\+up,  }\item[{U}]{xcenter,  }\item[{U}]{ycenter,  }\item[{int}]{ncx,  }\item[{int}]{ncy,  }\item[{U}]{mat\mbox{[}16\mbox{]},  }\item[{bool}]{transform,  }\item[{bool}]{spheric }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InterfaceReflector_8cpp_a214d80435a6d8ea208503d933fb16785}\label{InterfaceReflector_8cpp_a214d80435a6d8ea208503d933fb16785}} 
+\index{InterfaceReflector.cpp@{InterfaceReflector.cpp}!Plane\_uv@{Plane\_uv}}
+\index{Plane\_uv@{Plane\_uv}!InterfaceReflector.cpp@{InterfaceReflector.cpp}}
+\doxysubsubsection{\texorpdfstring{Plane\_uv()}{Plane\_uv()}}
+{\footnotesize\ttfamily template$<$typename T , typename U $>$ \\
+void Plane\+\_\+uv (\begin{DoxyParamCaption}\item[{T $\ast$}]{plane,  }\item[{U}]{xu\+\_\+lo,  }\item[{U}]{xu\+\_\+up,  }\item[{U}]{yv\+\_\+lo,  }\item[{U}]{yv\+\_\+up,  }\item[{U}]{xcenter,  }\item[{U}]{ycenter,  }\item[{U}]{a,  }\item[{U}]{b,  }\item[{int}]{ncx,  }\item[{int}]{ncy,  }\item[{int}]{nfac,  }\item[{U}]{mat\mbox{[}16\mbox{]},  }\item[{bool}]{transform }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InterfaceReflector_8cpp_a879096991990fd0e06926ba6cd866d05}\label{InterfaceReflector_8cpp_a879096991990fd0e06926ba6cd866d05}} 
+\index{InterfaceReflector.cpp@{InterfaceReflector.cpp}!Plane\_xy@{Plane\_xy}}
+\index{Plane\_xy@{Plane\_xy}!InterfaceReflector.cpp@{InterfaceReflector.cpp}}
+\doxysubsubsection{\texorpdfstring{Plane\_xy()}{Plane\_xy()}}
+{\footnotesize\ttfamily template$<$typename T , typename U $>$ \\
+void Plane\+\_\+xy (\begin{DoxyParamCaption}\item[{T $\ast$}]{plane,  }\item[{U}]{xu\+\_\+lo,  }\item[{U}]{xu\+\_\+up,  }\item[{U}]{yv\+\_\+lo,  }\item[{U}]{yv\+\_\+up,  }\item[{U}]{xcenter,  }\item[{U}]{ycenter,  }\item[{int}]{ncx,  }\item[{int}]{ncy,  }\item[{int}]{nfac,  }\item[{U}]{mat\mbox{[}16\mbox{]},  }\item[{bool}]{transform }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{InterfaceReflector_8cpp_ac12e89b8d533f7b60f638452323be9a3}\label{InterfaceReflector_8cpp_ac12e89b8d533f7b60f638452323be9a3}} 
+\index{InterfaceReflector.cpp@{InterfaceReflector.cpp}!transformGrids@{transformGrids}}
+\index{transformGrids@{transformGrids}!InterfaceReflector.cpp@{InterfaceReflector.cpp}}
+\doxysubsubsection{\texorpdfstring{transformGrids()}{transformGrids()}}
+{\footnotesize\ttfamily template$<$typename T , typename U $>$ \\
+void transform\+Grids (\begin{DoxyParamCaption}\item[{T $\ast$}]{reflc,  }\item[{int}]{idx,  }\item[{std\+::array$<$ U, 3 $>$ \&}]{inp,  }\item[{std\+::array$<$ U, 3 $>$ \&}]{out,  }\item[{\mbox{\hyperlink{classUtils}{Utils}}$<$ U $>$ $\ast$}]{ut,  }\item[{U}]{mat\mbox{[}16\mbox{]} }\end{DoxyParamCaption})}
+

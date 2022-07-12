@@ -1,0 +1,28 @@
+\hypertarget{InterfaceBeam_8h_source}{}\doxysection{Interface\+Beam.\+h}
+\label{InterfaceBeam_8h_source}\index{src/common/InterfaceBeam.h@{src/common/InterfaceBeam.h}}
+\mbox{\hyperlink{InterfaceBeam_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{BeamInit_8h}{BeamInit.h}}"{}}}
+\DoxyCodeLine{2 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{Structs_8h}{Structs.h}}"{}}}
+\DoxyCodeLine{3 }
+\DoxyCodeLine{4 \textcolor{preprocessor}{\#ifdef \_WIN32}}
+\DoxyCodeLine{5 \textcolor{preprocessor}{\#   define POPPY\_DLL \_\_declspec(dllexport)}}
+\DoxyCodeLine{6 \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#   define POPPY\_DLL}}
+\DoxyCodeLine{8 \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#ifndef InterfaceBeam\_h}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#define InterfaceBeam\_h}}
+\DoxyCodeLine{12 }
+\DoxyCodeLine{13 \textcolor{keyword}{extern} \textcolor{stringliteral}{"{}C"{}}}
+\DoxyCodeLine{14 \{}
+\DoxyCodeLine{15     \mbox{\hyperlink{InterfaceBeam_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\_DLL}} \textcolor{keywordtype}{void} \mbox{\hyperlink{InterfaceBeam_8h_a07afc337cd0ca77ef49a91674f69cdf1}{makeRTframe}}(\mbox{\hyperlink{structRTDict}{RTDict}} rdict, \mbox{\hyperlink{structcframe}{cframe}} *fr);}
+\DoxyCodeLine{16 }
+\DoxyCodeLine{17     \mbox{\hyperlink{InterfaceBeam_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\_DLL}} \textcolor{keywordtype}{void} \mbox{\hyperlink{InterfaceBeam_8h_a801447bd7a10abcc25a4a006641832ea}{makeGauss}}(\mbox{\hyperlink{structGDict}{GDict}} gdict, \mbox{\hyperlink{structreflparams}{reflparams}} plane, \mbox{\hyperlink{structc2Bundle}{c2Bundle}} *res\_field, \mbox{\hyperlink{structc2Bundle}{c2Bundle}} *res\_current);}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19     \mbox{\hyperlink{InterfaceBeam_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\_DLL}} \textcolor{keywordtype}{void} \mbox{\hyperlink{InterfaceBeam_8h_af52c0201de26dafaee392350284884ee}{calcCurrents}}(\mbox{\hyperlink{structc2Bundle}{c2Bundle}} *res\_field, \mbox{\hyperlink{structc2Bundle}{c2Bundle}} *res\_current, \mbox{\hyperlink{structreflparams}{reflparams}} rdict, \textcolor{keywordtype}{int} mode);}
+\DoxyCodeLine{20 \}}
+\DoxyCodeLine{21 }
+\DoxyCodeLine{22 \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

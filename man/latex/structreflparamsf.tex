@@ -1,0 +1,92 @@
+\hypertarget{structreflparamsf}{}\doxysection{reflparamsf Struct Reference}
+\label{structreflparamsf}\index{reflparamsf@{reflparamsf}}
+
+
+{\ttfamily \#include $<$Structs.\+h$>$}
+
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+float $\ast$ \mbox{\hyperlink{structreflparamsf_a2fc4eeece35ae58d81bc2960c472c1a7}{coeffs}}
+\item 
+float $\ast$ \mbox{\hyperlink{structreflparamsf_a55a1df398503cc1e9fcd63e49bbff8ee}{lxu}}
+\item 
+float $\ast$ \mbox{\hyperlink{structreflparamsf_ab4b1a1219effaf7763896b602d0604a0}{lyv}}
+\item 
+int $\ast$ \mbox{\hyperlink{structreflparamsf_ad7d0eba6186d4faffd405ec456d90f69}{n\+\_\+cells}}
+\item 
+bool \mbox{\hyperlink{structreflparamsf_a7ce43b7389a7b0e38bdad303a93ceab9}{flip}}
+\item 
+int \mbox{\hyperlink{structreflparamsf_a6f435d3f135363253d633ec03c93860c}{gmode}}
+\item 
+float $\ast$ \mbox{\hyperlink{structreflparamsf_a230a70811a8bf6135a7b93d83c133436}{gcenter}}
+\item 
+int \mbox{\hyperlink{structreflparamsf_aee4936b839c62673c1d12a2924579e32}{type}}
+\item 
+float $\ast$ \mbox{\hyperlink{structreflparamsf_a15b792a2a65a1834a09990a17ed649dd}{transf}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Object containing parameters for generating reflector surfaces. 
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{structreflparamsf_a2fc4eeece35ae58d81bc2960c472c1a7}\label{structreflparamsf_a2fc4eeece35ae58d81bc2960c472c1a7}} 
+\index{reflparamsf@{reflparamsf}!coeffs@{coeffs}}
+\index{coeffs@{coeffs}!reflparamsf@{reflparamsf}}
+\doxysubsubsection{\texorpdfstring{coeffs}{coeffs}}
+{\footnotesize\ttfamily float$\ast$ reflparamsf\+::coeffs}
+
+array of 3 float. Contains a, b, c coefficients for reflectors. \mbox{\Hypertarget{structreflparamsf_a7ce43b7389a7b0e38bdad303a93ceab9}\label{structreflparamsf_a7ce43b7389a7b0e38bdad303a93ceab9}} 
+\index{reflparamsf@{reflparamsf}!flip@{flip}}
+\index{flip@{flip}!reflparamsf@{reflparamsf}}
+\doxysubsubsection{\texorpdfstring{flip}{flip}}
+{\footnotesize\ttfamily bool reflparamsf\+::flip}
+
+Whether or not to flip normal vectors. Only relevant for quadric surfaces. \mbox{\Hypertarget{structreflparamsf_a230a70811a8bf6135a7b93d83c133436}\label{structreflparamsf_a230a70811a8bf6135a7b93d83c133436}} 
+\index{reflparamsf@{reflparamsf}!gcenter@{gcenter}}
+\index{gcenter@{gcenter}!reflparamsf@{reflparamsf}}
+\doxysubsubsection{\texorpdfstring{gcenter}{gcenter}}
+{\footnotesize\ttfamily float$\ast$ reflparamsf\+::gcenter}
+
+array of two float. Contains x and y co-\/ordinates for center of selection area. \mbox{\Hypertarget{structreflparamsf_a6f435d3f135363253d633ec03c93860c}\label{structreflparamsf_a6f435d3f135363253d633ec03c93860c}} 
+\index{reflparamsf@{reflparamsf}!gmode@{gmode}}
+\index{gmode@{gmode}!reflparamsf@{reflparamsf}}
+\doxysubsubsection{\texorpdfstring{gmode}{gmode}}
+{\footnotesize\ttfamily int reflparamsf\+::gmode}
+
+How to grid surface. 0 is \char`\"{}xy\char`\"{}, 1 is \char`\"{}uv\char`\"{} and 2 is \char`\"{}\+Ao\+E\char`\"{}. \mbox{\Hypertarget{structreflparamsf_a55a1df398503cc1e9fcd63e49bbff8ee}\label{structreflparamsf_a55a1df398503cc1e9fcd63e49bbff8ee}} 
+\index{reflparamsf@{reflparamsf}!lxu@{lxu}}
+\index{lxu@{lxu}!reflparamsf@{reflparamsf}}
+\doxysubsubsection{\texorpdfstring{lxu}{lxu}}
+{\footnotesize\ttfamily float$\ast$ reflparamsf\+::lxu}
+
+array of 2 float. Contains lower and upper x/u limits. \mbox{\Hypertarget{structreflparamsf_ab4b1a1219effaf7763896b602d0604a0}\label{structreflparamsf_ab4b1a1219effaf7763896b602d0604a0}} 
+\index{reflparamsf@{reflparamsf}!lyv@{lyv}}
+\index{lyv@{lyv}!reflparamsf@{reflparamsf}}
+\doxysubsubsection{\texorpdfstring{lyv}{lyv}}
+{\footnotesize\ttfamily float$\ast$ reflparamsf\+::lyv}
+
+array of 2 float. Contains lower and upper y/v limits. \mbox{\Hypertarget{structreflparamsf_ad7d0eba6186d4faffd405ec456d90f69}\label{structreflparamsf_ad7d0eba6186d4faffd405ec456d90f69}} 
+\index{reflparamsf@{reflparamsf}!n\_cells@{n\_cells}}
+\index{n\_cells@{n\_cells}!reflparamsf@{reflparamsf}}
+\doxysubsubsection{\texorpdfstring{n\_cells}{n\_cells}}
+{\footnotesize\ttfamily int$\ast$ reflparamsf\+::n\+\_\+cells}
+
+array of 2 int. Contains gridsize along x/u and y/v axes. \mbox{\Hypertarget{structreflparamsf_a15b792a2a65a1834a09990a17ed649dd}\label{structreflparamsf_a15b792a2a65a1834a09990a17ed649dd}} 
+\index{reflparamsf@{reflparamsf}!transf@{transf}}
+\index{transf@{transf}!reflparamsf@{reflparamsf}}
+\doxysubsubsection{\texorpdfstring{transf}{transf}}
+{\footnotesize\ttfamily float$\ast$ reflparamsf\+::transf}
+
+array of 16 float. Contains the transformation matrix of reflector surface. \mbox{\Hypertarget{structreflparamsf_aee4936b839c62673c1d12a2924579e32}\label{structreflparamsf_aee4936b839c62673c1d12a2924579e32}} 
+\index{reflparamsf@{reflparamsf}!type@{type}}
+\index{type@{type}!reflparamsf@{reflparamsf}}
+\doxysubsubsection{\texorpdfstring{type}{type}}
+{\footnotesize\ttfamily int reflparamsf\+::type}
+
+What type the reflector is. 0 is paraboloid, 1 is hyperboloid, 2 is ellipsoid and 3 is planar. 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/include/\mbox{\hyperlink{Structs_8h}{Structs.\+h}}\end{DoxyCompactItemize}

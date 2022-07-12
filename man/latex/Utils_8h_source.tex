@@ -1,0 +1,393 @@
+\hypertarget{Utils_8h_source}{}\doxysection{Utils.\+h}
+\label{Utils_8h_source}\index{src/include/Utils.h@{src/include/Utils.h}}
+\mbox{\hyperlink{Utils_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{preprocessor}{\#include <complex>}}
+\DoxyCodeLine{2 \textcolor{preprocessor}{\#include <array>}}
+\DoxyCodeLine{3 \textcolor{preprocessor}{\#include <cmath>}}
+\DoxyCodeLine{4 \textcolor{preprocessor}{\#include <limits>}}
+\DoxyCodeLine{5 }
+\DoxyCodeLine{6 \textcolor{preprocessor}{\#define \_USE\_MATH\_DEFINES}}
+\DoxyCodeLine{7 }
+\DoxyCodeLine{8 \textcolor{preprocessor}{\#ifndef \_\_Utils\_h}}
+\DoxyCodeLine{9 \textcolor{preprocessor}{\#define \_\_Utils\_h}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{22 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{class }\mbox{\hyperlink{classUtils}{Utils}}}
+\DoxyCodeLine{23 \{}
+\DoxyCodeLine{24 \textcolor{keyword}{public}:}
+\DoxyCodeLine{25     \textcolor{comment}{// Dot products}}
+\DoxyCodeLine{26     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_adc5fb35aec20bd543c74b9b8d37c59d2}{dot}}(\textcolor{keyword}{const} std::array<T, 3> \&v1, \textcolor{keyword}{const} std::array<T, 3> \&v2, T \&out);}
+\DoxyCodeLine{27     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a42c70633cdc6fe4912c289c9289bb481}{dot}}(\textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv1, \textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv2, std::complex<T> \&out);}
+\DoxyCodeLine{28     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a4a76c3dadce13a5f00a1256a47c7bd92}{dot}}(\textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv1, \textcolor{keyword}{const} std::array<T, 3> \&v2, std::complex<T> \&out);}
+\DoxyCodeLine{29     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a48d4f0c85d1f8ff8dcd6e7bd0975c61a}{dot}}(\textcolor{keyword}{const} std::array<T, 3> \&v1, \textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv2, std::complex<T> \&out);}
+\DoxyCodeLine{30 }
+\DoxyCodeLine{31     \textcolor{comment}{// Overloaded cross products}}
+\DoxyCodeLine{32     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a4163d15a6221dd9feb9263d770119c9b}{ext}}(\textcolor{keyword}{const} std::array<T, 3> \&v1, \textcolor{keyword}{const} std::array<T, 3> \&v2, std::array<T, 3> \&out);}
+\DoxyCodeLine{33     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a7f1a76dc0efadbc9e8da34d4ce5b80b2}{ext}}(\textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv1, \textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv2, std::array<std::complex<T>, 3> \&out);}
+\DoxyCodeLine{34     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_ad74fd01fa8eb4f82230487b7530752e5}{ext}}(\textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv1, \textcolor{keyword}{const} std::array<T, 3> \&v2, std::array<std::complex<T>, 3> \&out);}
+\DoxyCodeLine{35     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a14648e28f348fe920d6060227c519d87}{ext}}(\textcolor{keyword}{const} std::array<T, 3> \&v1, \textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv2, std::array<std::complex<T>, 3> \&out);}
+\DoxyCodeLine{36 }
+\DoxyCodeLine{37     \textcolor{comment}{// Overloaded absolute value}}
+\DoxyCodeLine{38     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a1576060aa3924e36416eafbcd50b487e}{abs}}(\textcolor{keyword}{const} std::array<T, 3> \&v, T \&out);}
+\DoxyCodeLine{39     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a3e9e9f537e45888bf0c7f7e2b6f939e6}{abs}}(\textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv, std::complex<T> \&out);}
+\DoxyCodeLine{40 }
+\DoxyCodeLine{41     \textcolor{comment}{// Difference vectors}}
+\DoxyCodeLine{42     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a739ead0c32841ad54b998d18447b24f4}{diff}}(\textcolor{keyword}{const} std::array<T, 3> \&v1, \textcolor{keyword}{const} std::array<T, 3> \&v2, std::array<T, 3> \&out);}
+\DoxyCodeLine{43     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a3157197aea47bb63c1595a94a05cfe55}{diff}}(\textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv1, \textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv2, std::array<std::complex<T>, 3> \&out);}
+\DoxyCodeLine{44 }
+\DoxyCodeLine{45     \textcolor{comment}{// Normalization}}
+\DoxyCodeLine{46     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a3db4ae94a1e9d5f55ff5b93a81f718ff}{normalize}}(\textcolor{keyword}{const} std::array<T, 3> \&v, std::array<T, 3> \&out);}
+\DoxyCodeLine{47     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a612bf2bfcd9ebce2a60ce36fe08d8683}{normalize}}(\textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv, std::array<std::complex<T>, 3> \&out);}
+\DoxyCodeLine{48 }
+\DoxyCodeLine{49     \textcolor{comment}{// Scalar multiplication}}
+\DoxyCodeLine{50     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_ac272ece5ff85a591b4ff5a05061aad05}{s\_mult}}(\textcolor{keyword}{const} std::array<T, 3> \&v, \textcolor{keyword}{const} T \&s, std::array<T, 3> \&out);}
+\DoxyCodeLine{51     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a1fe48ee2ed957a7e83cd0d5f9cef863a}{s\_mult}}(\textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv, \textcolor{keyword}{const} std::complex<T> \&cs, std::array<std::complex<T>, 3> \&out);}
+\DoxyCodeLine{52     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a8d969e4b08223d291739400f9e9bbc0c}{s\_mult}}(\textcolor{keyword}{const} std::array<T, 3> \&v, \textcolor{keyword}{const} std::complex<T> \&cs, std::array<std::complex<T>, 3> \&out);}
+\DoxyCodeLine{53     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a5e7a9d33b0969691ffcd1fe90bc2a94e}{s\_mult}}(\textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv, \textcolor{keyword}{const} T \&s, std::array<std::complex<T>, 3> \&out);}
+\DoxyCodeLine{54 }
+\DoxyCodeLine{55     \textcolor{comment}{// Conjugation of complex vector}}
+\DoxyCodeLine{56     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_af77292261574ee7ac7a3a00bfa59302e}{conj}}(\textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv, std::array<std::complex<T>, 3> \&out);}
+\DoxyCodeLine{57 }
+\DoxyCodeLine{58     \textcolor{comment}{// Snell's function}}
+\DoxyCodeLine{59     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a7a84d81e066107eb2024c01e229a2020}{snell}}(\textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cvin, \textcolor{keyword}{const} std::array<T, 3> \&normal, std::array<std::complex<T>, 3> \&out);}
+\DoxyCodeLine{60     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_aed2261b8dbb2e2c4f016838bc2965297}{snell}}(\textcolor{keyword}{const} std::array<T, 3> \&vin, \textcolor{keyword}{const} std::array<T, 3> \&normal, std::array<T, 3> \&out);}
+\DoxyCodeLine{61 }
+\DoxyCodeLine{62     \textcolor{comment}{// Dyadic products}}
+\DoxyCodeLine{63     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a1947abd98bcfe594b950d90db4f12e59}{dyad}}(\textcolor{keyword}{const} std::array<T, 3> \&v1, \textcolor{keyword}{const} std::array<T, 3> \&v2, std::array<std::array<T, 3>, 3> \&out);}
+\DoxyCodeLine{64 }
+\DoxyCodeLine{65     \textcolor{comment}{// Real valued matrix-\/matrix subtraction}}
+\DoxyCodeLine{66     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a8c5357425dca3e1e7c06597c365cd655}{matDiff}}(\textcolor{keyword}{const} std::array<std::array<T, 3>, 3> \&m1, \textcolor{keyword}{const} std::array<std::array<T, 3>, 3> \&m2, std::array<std::array<T, 3>, 3> \&out);}
+\DoxyCodeLine{67 }
+\DoxyCodeLine{68     \textcolor{comment}{// Matrix-\/vector multiplication}}
+\DoxyCodeLine{69     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a4769794046783f0df6f900be0ab07d9b}{matVec}}(\textcolor{keyword}{const} std::array<std::array<T, 3>, 3> \&m1, \textcolor{keyword}{const} std::array<T, 3> \&v1, std::array<T, 3> \&out);}
+\DoxyCodeLine{70     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a6d405a2ad4524034fd592a3905a1b239}{matVec}}(\textcolor{keyword}{const} std::array<std::array<T, 3>, 3> \&m1, \textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv1, std::array<std::complex<T>, 3> \&out);}
+\DoxyCodeLine{71 }
+\DoxyCodeLine{72     \textcolor{comment}{// 4D-\/only need real-\/real method}}
+\DoxyCodeLine{73     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a9ed68613d399c859dc7bbb17c0acde7e}{matVec4}}(\textcolor{keyword}{const} T *m1, \textcolor{keyword}{const} std::array<T, 3> \&v1, std::array<T, 3> \&out, \textcolor{keywordtype}{bool} vec=\textcolor{keyword}{false});}
+\DoxyCodeLine{74 }
+\DoxyCodeLine{75     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a35cba5ab0f77ff7a2d96ca9b72dbc5fd}{invmatVec4}}(\textcolor{keyword}{const} T *m1, \textcolor{keyword}{const} std::array<T, 3> \&v1, std::array<T, 3> \&out, \textcolor{keywordtype}{bool} vec=\textcolor{keyword}{false});}
+\DoxyCodeLine{76     \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_af5406438a51050ae51ff8fe6080bae92}{matRot}}(\textcolor{keyword}{const} std::array<T, 3> \&rot, \textcolor{keyword}{const} std::array<T, 3> \&v1, \textcolor{keyword}{const} std::array<T, 3> \&cRot, std::array<T, 3> \&out);}
+\DoxyCodeLine{77 \};}
+\DoxyCodeLine{78 }
+\DoxyCodeLine{88 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{89 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_adc5fb35aec20bd543c74b9b8d37c59d2}{Utils<T>::dot}}(\textcolor{keyword}{const} std::array<T, 3> \&v1, \textcolor{keyword}{const} std::array<T, 3> \&v2, T \&out)}
+\DoxyCodeLine{90 \{}
+\DoxyCodeLine{91     out = 0;}
+\DoxyCodeLine{92 }
+\DoxyCodeLine{93     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{94     \{}
+\DoxyCodeLine{95         out += v1[n] * v2[n];}
+\DoxyCodeLine{96     \}}
+\DoxyCodeLine{97 \}}
+\DoxyCodeLine{98 }
+\DoxyCodeLine{108 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{109 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_adc5fb35aec20bd543c74b9b8d37c59d2}{Utils<T>::dot}}(\textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv1, \textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv2, std::complex<T> \&out)}
+\DoxyCodeLine{110 \{}
+\DoxyCodeLine{111     out = (0, 0);}
+\DoxyCodeLine{112 }
+\DoxyCodeLine{113     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{114     \{}
+\DoxyCodeLine{115         out += std::conj(cv1[n]) * cv2[n];}
+\DoxyCodeLine{116     \}}
+\DoxyCodeLine{117 \}}
+\DoxyCodeLine{118 }
+\DoxyCodeLine{128 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{129 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_adc5fb35aec20bd543c74b9b8d37c59d2}{Utils<T>::dot}}(\textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv1, \textcolor{keyword}{const} std::array<T, 3> \&v2, std::complex<T> \&out)}
+\DoxyCodeLine{130 \{}
+\DoxyCodeLine{131     out = (0, 0);}
+\DoxyCodeLine{132 }
+\DoxyCodeLine{133     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{134     \{}
+\DoxyCodeLine{135         out += std::conj(cv1[n]) * v2[n];}
+\DoxyCodeLine{136     \}}
+\DoxyCodeLine{137 \}}
+\DoxyCodeLine{138 }
+\DoxyCodeLine{148 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{149 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_adc5fb35aec20bd543c74b9b8d37c59d2}{Utils<T>::dot}}(\textcolor{keyword}{const} std::array<T, 3> \&v1, \textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv2, std::complex<T> \&out)}
+\DoxyCodeLine{150 \{}
+\DoxyCodeLine{151     out = (0, 0);}
+\DoxyCodeLine{152 }
+\DoxyCodeLine{153     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{154     \{}
+\DoxyCodeLine{155         out += v1[n] * cv2[n];}
+\DoxyCodeLine{156     \}}
+\DoxyCodeLine{157 \}}
+\DoxyCodeLine{158 }
+\DoxyCodeLine{168 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{169 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a4163d15a6221dd9feb9263d770119c9b}{Utils<T>::ext}}(\textcolor{keyword}{const} std::array<T, 3> \&v1, \textcolor{keyword}{const} std::array<T, 3> \&v2, std::array<T, 3> \&out)}
+\DoxyCodeLine{170 \{}
+\DoxyCodeLine{171     out[0] = v1[1]*v2[2] -\/ v1[2]*v2[1];}
+\DoxyCodeLine{172     out[1] = v1[2]*v2[0] -\/ v1[0]*v2[2];}
+\DoxyCodeLine{173     out[2] = v1[0]*v2[1] -\/ v1[1]*v2[0];}
+\DoxyCodeLine{174 \}}
+\DoxyCodeLine{175 }
+\DoxyCodeLine{185 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{186 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a4163d15a6221dd9feb9263d770119c9b}{Utils<T>::ext}}(\textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv1, \textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv2, std::array<std::complex<T>, 3> \&out)}
+\DoxyCodeLine{187 \{}
+\DoxyCodeLine{188     out[0] = cv1[1]*cv2[2] -\/ cv1[2]*cv2[1];}
+\DoxyCodeLine{189     out[1] = cv1[2]*cv2[0] -\/ cv1[0]*cv2[2];}
+\DoxyCodeLine{190     out[2] = cv1[0]*cv2[1] -\/ cv1[1]*cv2[0];}
+\DoxyCodeLine{191 \}}
+\DoxyCodeLine{192 }
+\DoxyCodeLine{202 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{203 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a4163d15a6221dd9feb9263d770119c9b}{Utils<T>::ext}}(\textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv1, \textcolor{keyword}{const} std::array<T, 3> \&v2, std::array<std::complex<T>, 3> \&out)}
+\DoxyCodeLine{204 \{}
+\DoxyCodeLine{205     out[0] = cv1[1]*v2[2] -\/ cv1[2]*v2[1];}
+\DoxyCodeLine{206     out[1] = cv1[2]*v2[0] -\/ cv1[0]*v2[2];}
+\DoxyCodeLine{207     out[2] = cv1[0]*v2[1] -\/ cv1[1]*v2[0];}
+\DoxyCodeLine{208 \}}
+\DoxyCodeLine{209 }
+\DoxyCodeLine{219 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{220 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a4163d15a6221dd9feb9263d770119c9b}{Utils<T>::ext}}(\textcolor{keyword}{const} std::array<T, 3> \&v1, \textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv2, std::array<std::complex<T>, 3> \&out)}
+\DoxyCodeLine{221 \{}
+\DoxyCodeLine{222     out[0] = v1[1]*cv2[2] -\/ v1[2]*cv2[1];}
+\DoxyCodeLine{223     out[1] = v1[2]*cv2[0] -\/ v1[0]*cv2[2];}
+\DoxyCodeLine{224     out[2] = v1[0]*cv2[1] -\/ v1[1]*cv2[0];}
+\DoxyCodeLine{225 \}}
+\DoxyCodeLine{226 }
+\DoxyCodeLine{236 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{237 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a739ead0c32841ad54b998d18447b24f4}{Utils<T>::diff}}(\textcolor{keyword}{const} std::array<T, 3> \&v1, \textcolor{keyword}{const} std::array<T, 3> \&v2, std::array<T, 3> \&out)}
+\DoxyCodeLine{238 \{}
+\DoxyCodeLine{239     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{240     \{}
+\DoxyCodeLine{241         out[n] = v1[n] -\/ v2[n];}
+\DoxyCodeLine{242     \}}
+\DoxyCodeLine{243 \}}
+\DoxyCodeLine{244 }
+\DoxyCodeLine{254 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{255 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a739ead0c32841ad54b998d18447b24f4}{Utils<T>::diff}}(\textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv1, \textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv2, std::array<std::complex<T>, 3> \&out)}
+\DoxyCodeLine{256 \{}
+\DoxyCodeLine{257     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{258     \{}
+\DoxyCodeLine{259         out[n] = cv1[n] -\/ cv2[n];}
+\DoxyCodeLine{260     \}}
+\DoxyCodeLine{261 \}}
+\DoxyCodeLine{262 }
+\DoxyCodeLine{271 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{272 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a1576060aa3924e36416eafbcd50b487e}{Utils<T>::abs}}(\textcolor{keyword}{const} std::array<T, 3> \&v, T \&out)}
+\DoxyCodeLine{273 \{}
+\DoxyCodeLine{274     \mbox{\hyperlink{GUtils_8h_a76655de2eb96741171f578c18355af87}{dot}}(v, v, out);}
+\DoxyCodeLine{275     out = std::sqrt(out);}
+\DoxyCodeLine{276 \}}
+\DoxyCodeLine{277 }
+\DoxyCodeLine{286 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{287 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a1576060aa3924e36416eafbcd50b487e}{Utils<T>::abs}}(\textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv, std::complex<T> \&out)}
+\DoxyCodeLine{288 \{}
+\DoxyCodeLine{289     std::array<std::complex<T>, 3> cv\_conj;}
+\DoxyCodeLine{290     conj(cv, cv\_conj);}
+\DoxyCodeLine{291     \mbox{\hyperlink{GUtils_8h_a76655de2eb96741171f578c18355af87}{dot}}(cv, cv\_conj, out);}
+\DoxyCodeLine{292     out = std::sqrt(out);}
+\DoxyCodeLine{293 \}}
+\DoxyCodeLine{294 }
+\DoxyCodeLine{303 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{304 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a3db4ae94a1e9d5f55ff5b93a81f718ff}{Utils<T>::normalize}}(\textcolor{keyword}{const} std::array<T, 3> \&v, std::array<T, 3> \&out)}
+\DoxyCodeLine{305 \{}
+\DoxyCodeLine{306     T norm;}
+\DoxyCodeLine{307     \mbox{\hyperlink{GUtils_8h_a3423e96e5c144c7ca4f19758c4ce6eaf}{abs}}(v, norm);}
+\DoxyCodeLine{308 }
+\DoxyCodeLine{309     \textcolor{keywordflow}{if} (norm <= std::numeric\_limits<T>::denorm\_min())}
+\DoxyCodeLine{310     \{}
+\DoxyCodeLine{311         norm = std::numeric\_limits<T>::denorm\_min();}
+\DoxyCodeLine{312     \}}
+\DoxyCodeLine{313 }
+\DoxyCodeLine{314     \textcolor{keywordflow}{for}( \textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{315     \{}
+\DoxyCodeLine{316         out[n] = v[n] / norm;}
+\DoxyCodeLine{317     \}}
+\DoxyCodeLine{318 \}}
+\DoxyCodeLine{319 }
+\DoxyCodeLine{328 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{329 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a3db4ae94a1e9d5f55ff5b93a81f718ff}{Utils<T>::normalize}}(\textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv, std::array<std::complex<T>, 3> \&out)}
+\DoxyCodeLine{330 \{}
+\DoxyCodeLine{331     std::complex<T> cnorm;}
+\DoxyCodeLine{332     \mbox{\hyperlink{GUtils_8h_a3423e96e5c144c7ca4f19758c4ce6eaf}{abs}}(cv, cnorm);}
+\DoxyCodeLine{333 }
+\DoxyCodeLine{334     \textcolor{keywordflow}{for}( \textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{335     \{}
+\DoxyCodeLine{336         out[n] = cv[n] / cnorm;}
+\DoxyCodeLine{337     \}}
+\DoxyCodeLine{338 \}}
+\DoxyCodeLine{339 }
+\DoxyCodeLine{349 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{350 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_ac272ece5ff85a591b4ff5a05061aad05}{Utils<T>::s\_mult}}(\textcolor{keyword}{const} std::array<T, 3> \&v, \textcolor{keyword}{const} T \&s, std::array<T, 3> \&out)}
+\DoxyCodeLine{351 \{}
+\DoxyCodeLine{352     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{353     \{}
+\DoxyCodeLine{354         out[n] = s * v[n];}
+\DoxyCodeLine{355     \}}
+\DoxyCodeLine{356 \}}
+\DoxyCodeLine{357 }
+\DoxyCodeLine{367 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{368 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_ac272ece5ff85a591b4ff5a05061aad05}{Utils<T>::s\_mult}}(\textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv, \textcolor{keyword}{const} std::complex<T> \&cs, std::array<std::complex<T>, 3> \&out)}
+\DoxyCodeLine{369 \{}
+\DoxyCodeLine{370     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{371     \{}
+\DoxyCodeLine{372         out[n] = cs * cv[n];}
+\DoxyCodeLine{373     \}}
+\DoxyCodeLine{374 \}}
+\DoxyCodeLine{375 }
+\DoxyCodeLine{385 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{386 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_ac272ece5ff85a591b4ff5a05061aad05}{Utils<T>::s\_mult}}(\textcolor{keyword}{const} std::array<T, 3> \&v, \textcolor{keyword}{const} std::complex<T> \&cs, std::array<std::complex<T>, 3> \&out)}
+\DoxyCodeLine{387 \{}
+\DoxyCodeLine{388     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{389     \{}
+\DoxyCodeLine{390         out[n] = cs * v[n];}
+\DoxyCodeLine{391     \}}
+\DoxyCodeLine{392 \}}
+\DoxyCodeLine{393 }
+\DoxyCodeLine{403 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{404 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_ac272ece5ff85a591b4ff5a05061aad05}{Utils<T>::s\_mult}}(\textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv, \textcolor{keyword}{const} T \&s, std::array<std::complex<T>, 3> \&out)}
+\DoxyCodeLine{405 \{}
+\DoxyCodeLine{406     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{407     \{}
+\DoxyCodeLine{408         out[n] = s * cv[n];}
+\DoxyCodeLine{409     \}}
+\DoxyCodeLine{410 \}}
+\DoxyCodeLine{411 }
+\DoxyCodeLine{420 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{421 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_af77292261574ee7ac7a3a00bfa59302e}{Utils<T>::conj}}(\textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv, std::array<std::complex<T>, 3> \&out)}
+\DoxyCodeLine{422 \{}
+\DoxyCodeLine{423     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{424     \{}
+\DoxyCodeLine{425         out[n] = std::conj(cv[n]);}
+\DoxyCodeLine{426     \}}
+\DoxyCodeLine{427 \}}
+\DoxyCodeLine{428 }
+\DoxyCodeLine{438 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{439 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a7a84d81e066107eb2024c01e229a2020}{Utils<T>::snell}}(\textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cvin, \textcolor{keyword}{const} std::array<T, 3> \&normal, std::array<std::complex<T>, 3> \&out)}
+\DoxyCodeLine{440 \{}
+\DoxyCodeLine{441     std::complex<T> cfactor;}
+\DoxyCodeLine{442     \mbox{\hyperlink{GUtils_8h_a76655de2eb96741171f578c18355af87}{dot}}(cvin, normal, cfactor);}
+\DoxyCodeLine{443 }
+\DoxyCodeLine{444     cfactor = 2. * cfactor;}
+\DoxyCodeLine{445 }
+\DoxyCodeLine{446     std::array<std::complex<T>, 3> rhs;}
+\DoxyCodeLine{447     \mbox{\hyperlink{GUtils_8h_ab1fb947f22166aa8bb1f8f36bad597a9}{s\_mult}}(normal, cfactor, rhs);}
+\DoxyCodeLine{448 }
+\DoxyCodeLine{449     \mbox{\hyperlink{GUtils_8h_a07679357f2349bfa8a26447ac2588346}{diff}}(cvin, rhs, out);}
+\DoxyCodeLine{450 \}}
+\DoxyCodeLine{451 }
+\DoxyCodeLine{461 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{462 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a7a84d81e066107eb2024c01e229a2020}{Utils<T>::snell}}(\textcolor{keyword}{const} std::array<T, 3> \&vin, \textcolor{keyword}{const} std::array<T, 3> \&normal, std::array<T, 3> \&out)}
+\DoxyCodeLine{463 \{}
+\DoxyCodeLine{464     T factor;}
+\DoxyCodeLine{465     \mbox{\hyperlink{GUtils_8h_a76655de2eb96741171f578c18355af87}{dot}}(vin, normal, factor);}
+\DoxyCodeLine{466 }
+\DoxyCodeLine{467     factor = 2. * factor;}
+\DoxyCodeLine{468 }
+\DoxyCodeLine{469     std::array<T, 3> rhs;}
+\DoxyCodeLine{470     \mbox{\hyperlink{GUtils_8h_ab1fb947f22166aa8bb1f8f36bad597a9}{s\_mult}}(normal, factor, rhs);}
+\DoxyCodeLine{471 }
+\DoxyCodeLine{472     \mbox{\hyperlink{GUtils_8h_a07679357f2349bfa8a26447ac2588346}{diff}}(vin, rhs, out);}
+\DoxyCodeLine{473 \}}
+\DoxyCodeLine{474 }
+\DoxyCodeLine{484 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{485 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a1947abd98bcfe594b950d90db4f12e59}{Utils<T>::dyad}}(\textcolor{keyword}{const} std::array<T, 3> \&v1, \textcolor{keyword}{const} std::array<T, 3> \&v2, std::array<std::array<T, 3>, 3> \&out)}
+\DoxyCodeLine{486 \{}
+\DoxyCodeLine{487     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{488     \{}
+\DoxyCodeLine{489         out[n][0] = v1[n] * v2[0];}
+\DoxyCodeLine{490         out[n][1] = v1[n] * v2[1];}
+\DoxyCodeLine{491         out[n][2] = v1[n] * v2[2];}
+\DoxyCodeLine{492     \}}
+\DoxyCodeLine{493 \}}
+\DoxyCodeLine{494 }
+\DoxyCodeLine{504 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{505 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a8c5357425dca3e1e7c06597c365cd655}{Utils<T>::matDiff}}(\textcolor{keyword}{const} std::array<std::array<T, 3>, 3> \&m1, \textcolor{keyword}{const} std::array<std::array<T, 3>, 3> \&m2, std::array<std::array<T, 3>, 3> \&out)}
+\DoxyCodeLine{506 \{}
+\DoxyCodeLine{507     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{508     \{}
+\DoxyCodeLine{509         out[n][0] = m1[n][0] -\/ m2[n][0];}
+\DoxyCodeLine{510         out[n][1] = m1[n][1] -\/ m2[n][1];}
+\DoxyCodeLine{511         out[n][2] = m1[n][2] -\/ m2[n][2];}
+\DoxyCodeLine{512     \}}
+\DoxyCodeLine{513 \}}
+\DoxyCodeLine{514 }
+\DoxyCodeLine{524 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{525 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a4769794046783f0df6f900be0ab07d9b}{Utils<T>::matVec}}(\textcolor{keyword}{const} std::array<std::array<T, 3>, 3> \&m1, \textcolor{keyword}{const} std::array<T, 3> \&v1, std::array<T, 3> \&out)}
+\DoxyCodeLine{526 \{}
+\DoxyCodeLine{527     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{528     \{}
+\DoxyCodeLine{529         out[n] = m1[n][0] * v1[0] + m1[n][1] * v1[1] + m1[n][2] * v1[2];}
+\DoxyCodeLine{530     \}}
+\DoxyCodeLine{531 \}}
+\DoxyCodeLine{532 }
+\DoxyCodeLine{542 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{543 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a4769794046783f0df6f900be0ab07d9b}{Utils<T>::matVec}}(\textcolor{keyword}{const} std::array<std::array<T, 3>, 3> \&m1, \textcolor{keyword}{const} std::array<std::complex<T>, 3> \&cv1, std::array<std::complex<T>, 3> \&out)}
+\DoxyCodeLine{544 \{}
+\DoxyCodeLine{545     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{546     \{}
+\DoxyCodeLine{547         out[n] = m1[n][0] * cv1[0] + m1[n][1] * cv1[1] + m1[n][2] * cv1[2];}
+\DoxyCodeLine{548     \}}
+\DoxyCodeLine{549 \}}
+\DoxyCodeLine{550 }
+\DoxyCodeLine{562 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{563 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a9ed68613d399c859dc7bbb17c0acde7e}{Utils<T>::matVec4}}(\textcolor{keyword}{const} T *m1, \textcolor{keyword}{const} std::array<T, 3> \&v1, std::array<T, 3> \&out, \textcolor{keywordtype}{bool} vec)}
+\DoxyCodeLine{564 \{}
+\DoxyCodeLine{565     \textcolor{keywordflow}{if} (vec)}
+\DoxyCodeLine{566     \{}
+\DoxyCodeLine{567         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{568         \{}
+\DoxyCodeLine{569             out[n] = m1[n*4] * v1[0] + m1[1+n*4] * v1[1] + m1[2+n*4] * v1[2];}
+\DoxyCodeLine{570         \}}
+\DoxyCodeLine{571     \}}
+\DoxyCodeLine{572 }
+\DoxyCodeLine{573     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{574     \{}
+\DoxyCodeLine{575         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{576         \{}
+\DoxyCodeLine{577             out[n] = m1[n*4] * v1[0] + m1[1+n*4] * v1[1] + m1[2+n*4] * v1[2] + m1[3+n*4];}
+\DoxyCodeLine{578         \}}
+\DoxyCodeLine{579     \}}
+\DoxyCodeLine{580 \}}
+\DoxyCodeLine{581 }
+\DoxyCodeLine{593 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{594 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_a35cba5ab0f77ff7a2d96ca9b72dbc5fd}{Utils<T>::invmatVec4}}(\textcolor{keyword}{const} T *m1, \textcolor{keyword}{const} std::array<T, 3> \&v1, std::array<T, 3> \&out, \textcolor{keywordtype}{bool} vec)}
+\DoxyCodeLine{595 \{}
+\DoxyCodeLine{596     \textcolor{keywordflow}{if} (vec)}
+\DoxyCodeLine{597     \{}
+\DoxyCodeLine{598         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{599         \{}
+\DoxyCodeLine{600             out[n] = m1[n] * v1[0] + m1[n+4] * v1[1] + m1[n+8] * v1[2];}
+\DoxyCodeLine{601         \}}
+\DoxyCodeLine{602     \}}
+\DoxyCodeLine{603 }
+\DoxyCodeLine{604     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{605     \{}
+\DoxyCodeLine{606         T temp;}
+\DoxyCodeLine{607         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{608         \{}
+\DoxyCodeLine{609             temp = -\/m1[n]*m1[3] -\/ m1[n+4]*m1[7] -\/ m1[n+8]*m1[11];}
+\DoxyCodeLine{610             out[n] = m1[n] * v1[0] + m1[n+4] * v1[1] + m1[n+8] * v1[2] + temp;}
+\DoxyCodeLine{611         \}}
+\DoxyCodeLine{612     \}}
+\DoxyCodeLine{613 \}}
+\DoxyCodeLine{614 }
+\DoxyCodeLine{625 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline}}
+\DoxyCodeLine{626 \textcolor{keywordtype}{void} \mbox{\hyperlink{classUtils_af5406438a51050ae51ff8fe6080bae92}{Utils<T>::matRot}}(\textcolor{keyword}{const} std::array<T, 3> \&rot, \textcolor{keyword}{const} std::array<T, 3> \&v1, \textcolor{keyword}{const} std::array<T, 3> \&cRot, std::array<T, 3> \&out)}
+\DoxyCodeLine{627 \{}
+\DoxyCodeLine{628     T cosx = cos(rot[0]);}
+\DoxyCodeLine{629     T cosy = cos(rot[1]);}
+\DoxyCodeLine{630     T cosz = cos(rot[2]);}
+\DoxyCodeLine{631 }
+\DoxyCodeLine{632     T sinx = sin(rot[0]);}
+\DoxyCodeLine{633     T siny = sin(rot[1]);}
+\DoxyCodeLine{634     T sinz = sin(rot[2]);}
+\DoxyCodeLine{635 }
+\DoxyCodeLine{636     T mu = cosz * siny;}
+\DoxyCodeLine{637     T rho = sinz * siny;}
+\DoxyCodeLine{638 }
+\DoxyCodeLine{639     std::array<T, 3> to\_rot;}
+\DoxyCodeLine{640 }
+\DoxyCodeLine{641     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<3; n++) \{to\_rot[n] = v1[n] -\/ cRot[n];\}}
+\DoxyCodeLine{642 }
+\DoxyCodeLine{643     out[0] = cosz*cosy * to\_rot[0] + (mu*sinx -\/ sinz*cosx) * to\_rot[1] + (mu*cosx + sinz*sinx) * to\_rot[2];}
+\DoxyCodeLine{644     out[1] = sinz*cosy * to\_rot[0] + (rho*sinx + cosz*cosx) * to\_rot[1] + (rho*cosx -\/ cosz*sinx) * to\_rot[2];}
+\DoxyCodeLine{645     out[2] = -\/siny * to\_rot[0] + cosy*sinx * to\_rot[1] + cosy*cosx * to\_rot[2];}
+\DoxyCodeLine{646 }
+\DoxyCodeLine{647     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<3; n++) \{out[n] = out[n] + cRot[n];\}}
+\DoxyCodeLine{648 \}}
+\DoxyCodeLine{649 }
+\DoxyCodeLine{650 \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

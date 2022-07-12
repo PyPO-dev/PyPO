@@ -1,0 +1,785 @@
+\hypertarget{Kernelsf_8cu}{}\doxysection{src/\+CUDA/\+Kernelsf.cu File Reference}
+\label{Kernelsf_8cu}\index{src/CUDA/Kernelsf.cu@{src/CUDA/Kernelsf.cu}}
+{\ttfamily \#include \char`\"{}Interface\+CUDA.\+h\char`\"{}}\newline
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{Kernelsf_8cu_a3f6ea8e9ef58125936d50d7e1181aa7a}{gpu\+Errchk}}(ans)~\{ \mbox{\hyperlink{Kernelsf_8cu_a14ddf96670fa402eda1299ee5a8557cd}{gpu\+Assert}}((ans), \+\_\+\+\_\+\+FILE\+\_\+\+\_\+, \+\_\+\+\_\+\+LINE\+\_\+\+\_\+); \}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Kernelsf_8cu_a14ddf96670fa402eda1299ee5a8557cd}{gpu\+Assert}} (cuda\+Error\+\_\+t code, const char $\ast$file, int line, bool abort=true)
+\item 
+\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ void \mbox{\hyperlink{Kernelsf_8cu_a146353674497932b6434be2591778540}{\+\_\+debug\+Array}} (cu\+Float\+Complex arr\mbox{[}3\mbox{]})
+\item 
+\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ void \mbox{\hyperlink{Kernelsf_8cu_a56648675fedf659b1009262b556ca444}{\+\_\+debug\+Array}} (float arr\mbox{[}3\mbox{]})
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+inline\+\_\+\+\_\+ cu\+Float\+Complex \mbox{\hyperlink{Kernelsf_8cu_a2d622c64cff344e6e8f9bd8013d8c7af}{exp\+Co}} (cu\+Float\+Complex z)
+\item 
+\+\_\+\+\_\+host\+\_\+\+\_\+ std\+::array$<$ dim3, 2 $>$ \mbox{\hyperlink{Kernelsf_8cu_a1017001a73590b48a00c0183812154a1}{\+\_\+init\+CUDA}} (float k, float epsilon, int gt, int gs, float t\+\_\+direction, int n\+Blocks, int n\+Threads)
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \mbox{\hyperlink{Kernelsf_8cu_a6644ba388248099e486d1304f74c65ae}{field\+At\+Point}} (float $\ast$d\+\_\+xs, float $\ast$d\+\_\+ys, float $\ast$d\+\_\+zs, cu\+Float\+Complex $\ast$d\+\_\+\+Jx, cu\+Float\+Complex $\ast$d\+\_\+\+Jy, cu\+Float\+Complex $\ast$d\+\_\+\+Jz, cu\+Float\+Complex $\ast$d\+\_\+\+Mx, cu\+Float\+Complex $\ast$d\+\_\+\+My, cu\+Float\+Complex $\ast$d\+\_\+\+Mz, float(\&point)\mbox{[}3\mbox{]}, float $\ast$d\+\_\+A, cu\+Float\+Complex(\&d\+\_\+ei)\mbox{[}3\mbox{]}, cu\+Float\+Complex(\&d\+\_\+hi)\mbox{[}3\mbox{]})
+\item 
+\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Kernelsf_8cu_afec0b7367ca364416d63530cf23174fc}{Gpropagate\+Beam\+\_\+0}} (float $\ast$d\+\_\+xs, float $\ast$d\+\_\+ys, float $\ast$d\+\_\+zs, float $\ast$d\+\_\+A, float $\ast$d\+\_\+xt, float $\ast$d\+\_\+yt, float $\ast$d\+\_\+zt, float $\ast$d\+\_\+nxt, float $\ast$d\+\_\+nyt, float $\ast$d\+\_\+nzt, cu\+Float\+Complex $\ast$d\+\_\+\+Jx, cu\+Float\+Complex $\ast$d\+\_\+\+Jy, cu\+Float\+Complex $\ast$d\+\_\+\+Jz, cu\+Float\+Complex $\ast$d\+\_\+\+Mx, cu\+Float\+Complex $\ast$d\+\_\+\+My, cu\+Float\+Complex $\ast$d\+\_\+\+Mz, cu\+Float\+Complex $\ast$d\+\_\+\+Jxt, cu\+Float\+Complex $\ast$d\+\_\+\+Jyt, cu\+Float\+Complex $\ast$d\+\_\+\+Jzt, cu\+Float\+Complex $\ast$d\+\_\+\+Mxt, cu\+Float\+Complex $\ast$d\+\_\+\+Myt, cu\+Float\+Complex $\ast$d\+\_\+\+Mzt)
+\item 
+\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Kernelsf_8cu_a8c898e8f7f785a9ec27ecc5450e4d635}{Gpropagate\+Beam\+\_\+1}} (float $\ast$d\+\_\+xs, float $\ast$d\+\_\+ys, float $\ast$d\+\_\+zs, float $\ast$d\+\_\+A, float $\ast$d\+\_\+xt, float $\ast$d\+\_\+yt, float $\ast$d\+\_\+zt, cu\+Float\+Complex $\ast$d\+\_\+\+Jx, cu\+Float\+Complex $\ast$d\+\_\+\+Jy, cu\+Float\+Complex $\ast$d\+\_\+\+Jz, cu\+Float\+Complex $\ast$d\+\_\+\+Mx, cu\+Float\+Complex $\ast$d\+\_\+\+My, cu\+Float\+Complex $\ast$d\+\_\+\+Mz, cu\+Float\+Complex $\ast$d\+\_\+\+Ext, cu\+Float\+Complex $\ast$d\+\_\+\+Eyt, cu\+Float\+Complex $\ast$d\+\_\+\+Ezt, cu\+Float\+Complex $\ast$d\+\_\+\+Hxt, cu\+Float\+Complex $\ast$d\+\_\+\+Hyt, cu\+Float\+Complex $\ast$d\+\_\+\+Hzt)
+\item 
+\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Kernelsf_8cu_a800a4f76192aca1a462e96cf34913e2b}{Gpropagate\+Beam\+\_\+2}} (float $\ast$d\+\_\+xs, float $\ast$d\+\_\+ys, float $\ast$d\+\_\+zs, float $\ast$d\+\_\+A, float $\ast$d\+\_\+xt, float $\ast$d\+\_\+yt, float $\ast$d\+\_\+zt, float $\ast$d\+\_\+nxt, float $\ast$d\+\_\+nyt, float $\ast$d\+\_\+nzt, cu\+Float\+Complex $\ast$d\+\_\+\+Jx, cu\+Float\+Complex $\ast$d\+\_\+\+Jy, cu\+Float\+Complex $\ast$d\+\_\+\+Jz, cu\+Float\+Complex $\ast$d\+\_\+\+Mx, cu\+Float\+Complex $\ast$d\+\_\+\+My, cu\+Float\+Complex $\ast$d\+\_\+\+Mz, cu\+Float\+Complex $\ast$d\+\_\+\+Jxt, cu\+Float\+Complex $\ast$d\+\_\+\+Jyt, cu\+Float\+Complex $\ast$d\+\_\+\+Jzt, cu\+Float\+Complex $\ast$d\+\_\+\+Mxt, cu\+Float\+Complex $\ast$d\+\_\+\+Myt, cu\+Float\+Complex $\ast$d\+\_\+\+Mzt, cu\+Float\+Complex $\ast$d\+\_\+\+Ext, cu\+Float\+Complex $\ast$d\+\_\+\+Eyt, cu\+Float\+Complex $\ast$d\+\_\+\+Ezt, cu\+Float\+Complex $\ast$d\+\_\+\+Hxt, cu\+Float\+Complex $\ast$d\+\_\+\+Hyt, cu\+Float\+Complex $\ast$d\+\_\+\+Hzt)
+\item 
+\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Kernelsf_8cu_a9e755ab27ae2dd346695692259112a93}{Gpropagate\+Beam\+\_\+3}} (float $\ast$d\+\_\+xs, float $\ast$d\+\_\+ys, float $\ast$d\+\_\+zs, float $\ast$d\+\_\+A, float $\ast$d\+\_\+xt, float $\ast$d\+\_\+yt, float $\ast$d\+\_\+zt, float $\ast$d\+\_\+nxt, float $\ast$d\+\_\+nyt, float $\ast$d\+\_\+nzt, cu\+Float\+Complex $\ast$d\+\_\+\+Jx, cu\+Float\+Complex $\ast$d\+\_\+\+Jy, cu\+Float\+Complex $\ast$d\+\_\+\+Jz, cu\+Float\+Complex $\ast$d\+\_\+\+Mx, cu\+Float\+Complex $\ast$d\+\_\+\+My, cu\+Float\+Complex $\ast$d\+\_\+\+Mz, cu\+Float\+Complex $\ast$d\+\_\+\+Ext, cu\+Float\+Complex $\ast$d\+\_\+\+Eyt, cu\+Float\+Complex $\ast$d\+\_\+\+Ezt, cu\+Float\+Complex $\ast$d\+\_\+\+Hxt, cu\+Float\+Complex $\ast$d\+\_\+\+Hyt, cu\+Float\+Complex $\ast$d\+\_\+\+Hzt, float $\ast$d\+\_\+\+Prxt, float $\ast$d\+\_\+\+Pryt, float $\ast$d\+\_\+\+Przt)
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \mbox{\hyperlink{Kernelsf_8cu_a2b2fe507d139af1fc75ec76defbde434}{farfield\+At\+Point}} (float $\ast$d\+\_\+xs, float $\ast$d\+\_\+ys, float $\ast$d\+\_\+zs, cu\+Float\+Complex $\ast$d\+\_\+\+Jx, cu\+Float\+Complex $\ast$d\+\_\+\+Jy, cu\+Float\+Complex $\ast$d\+\_\+\+Jz, cu\+Float\+Complex $\ast$d\+\_\+\+Mx, cu\+Float\+Complex $\ast$d\+\_\+\+My, cu\+Float\+Complex $\ast$d\+\_\+\+Mz, float(\&r\+\_\+hat)\mbox{[}3\mbox{]}, float $\ast$d\+\_\+A, cu\+Float\+Complex(\&e)\mbox{[}3\mbox{]})
+\item 
+void \+\_\+\+\_\+global\+\_\+\+\_\+ \mbox{\hyperlink{Kernelsf_8cu_a17d7044786124f00cc30b2be01a9d91f}{Gpropagate\+Beam\+\_\+4}} (float $\ast$d\+\_\+xs, float $\ast$d\+\_\+ys, float $\ast$d\+\_\+zs, float $\ast$d\+\_\+A, float $\ast$d\+\_\+xt, float $\ast$d\+\_\+yt, cu\+Float\+Complex $\ast$d\+\_\+\+Jx, cu\+Float\+Complex $\ast$d\+\_\+\+Jy, cu\+Float\+Complex $\ast$d\+\_\+\+Jz, cu\+Float\+Complex $\ast$d\+\_\+\+Mx, cu\+Float\+Complex $\ast$d\+\_\+\+My, cu\+Float\+Complex $\ast$d\+\_\+\+Mz, cu\+Float\+Complex $\ast$d\+\_\+\+Ext, cu\+Float\+Complex $\ast$d\+\_\+\+Eyt, cu\+Float\+Complex $\ast$d\+\_\+\+Ezt, cu\+Float\+Complex $\ast$d\+\_\+\+Hxt, cu\+Float\+Complex $\ast$d\+\_\+\+Hyt, cu\+Float\+Complex $\ast$d\+\_\+\+Hzt)
+\item 
+\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Kernelsf_8cu_ad34fc43d9c28f6c83c31fa4d09474c44}{\+\_\+allocate\+Grid\+R1\+To\+GPU}} (float $\ast$d\+\_\+x, float $\ast$h\+\_\+x, int size)
+\item 
+\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Kernelsf_8cu_a9195c282f3195c92dd0fcd0a1f4d263b}{\+\_\+allocate\+Grid\+R3}} (float $\ast$d\+\_\+x, float $\ast$d\+\_\+y, float $\ast$d\+\_\+z, int size)
+\item 
+\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Kernelsf_8cu_abd6693eb3dc9ec9220c8c0f1accd0ea0}{\+\_\+allocate\+Grid\+R2\+To\+GPU}} (float $\ast$d\+\_\+x, float $\ast$d\+\_\+y, float $\ast$h\+\_\+x, float $\ast$h\+\_\+y, int size)
+\item 
+\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Kernelsf_8cu_a85a21f58cee6732b042f57ff96d8b9ec}{\+\_\+allocate\+Grid\+R3\+To\+GPU}} (float $\ast$d\+\_\+x, float $\ast$d\+\_\+y, float $\ast$d\+\_\+z, float $\ast$h\+\_\+x, float $\ast$h\+\_\+y, float $\ast$h\+\_\+z, int size)
+\item 
+\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Kernelsf_8cu_a28de723cebb859df72e80c2ef4f5864d}{\+\_\+allocate\+Grid\+GPUTo\+R3}} (float $\ast$h\+\_\+x, float $\ast$h\+\_\+y, float $\ast$h\+\_\+z, float $\ast$d\+\_\+x, float $\ast$d\+\_\+y, float $\ast$d\+\_\+z, int size)
+\item 
+\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Kernelsf_8cu_ac8122fc972b7f4c0af47784d301da38e}{\+\_\+allocate\+Grid\+C3}} (cu\+Float\+Complex $\ast$d\+\_\+x, cu\+Float\+Complex $\ast$d\+\_\+y, cu\+Float\+Complex $\ast$d\+\_\+z, int size)
+\item 
+\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Kernelsf_8cu_ac1fcdef33382c532a6ea682b6066d435}{\+\_\+allocate\+Grid\+C3\+To\+GPU}} (cu\+Float\+Complex $\ast$d\+\_\+x, cu\+Float\+Complex $\ast$d\+\_\+y, cu\+Float\+Complex $\ast$d\+\_\+z, cu\+Float\+Complex $\ast$h\+\_\+x, cu\+Float\+Complex $\ast$h\+\_\+y, cu\+Float\+Complex $\ast$h\+\_\+z, int size)
+\item 
+\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Kernelsf_8cu_ae0167c30b845b714720abdec930b5626}{\+\_\+allocate\+Grid\+GPUTo\+C3}} (cu\+Float\+Complex $\ast$h\+\_\+x, cu\+Float\+Complex $\ast$h\+\_\+y, cu\+Float\+Complex $\ast$h\+\_\+z, cu\+Float\+Complex $\ast$d\+\_\+x, cu\+Float\+Complex $\ast$d\+\_\+y, cu\+Float\+Complex $\ast$d\+\_\+z, int size)
+\item 
+\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Kernelsf_8cu_aae30c9ec9604fee24c073407233fd9ad}{\+\_\+arr\+To\+CUDAC}} (float $\ast$rarr, float $\ast$iarr, cu\+Float\+Complex $\ast$carr, int size)
+\item 
+\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Kernelsf_8cu_a0a8dc68cd14e31c1262b3f001eeb7374}{\+\_\+arr\+C3\+To\+CUDAC}} (float $\ast$r1arr, float $\ast$r2arr, float $\ast$r3arr, float $\ast$i1arr, float $\ast$i2arr, float $\ast$i3arr, cu\+Float\+Complex $\ast$c1arr, cu\+Float\+Complex $\ast$c2arr, cu\+Float\+Complex $\ast$c3arr, int size)
+\item 
+\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Kernelsf_8cu_a805b8bc67ddbe07929f2d2422ba0f44e}{\+\_\+arr\+CUDACToC}} (cu\+Float\+Complex $\ast$carr, float $\ast$rarr, float $\ast$iarr, int size)
+\item 
+\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Kernelsf_8cu_abb7218865801ebdb834ae6a2be34a35d}{\+\_\+arr\+CUDACTo\+R3}} (cu\+Float\+Complex $\ast$carr, float $\ast$rarr, float $\ast$iarr, int size)
+\item 
+\+\_\+\+\_\+host\+\_\+\+\_\+ void \mbox{\hyperlink{Kernelsf_8cu_a06b277d10f9f9a4e6b233f487c5d6f48}{\+\_\+arr\+CUDACTo\+C3}} (cu\+Float\+Complex $\ast$c1arr, cu\+Float\+Complex $\ast$c2arr, cu\+Float\+Complex $\ast$c3arr, float $\ast$r1arr, float $\ast$r2arr, float $\ast$r3arr, float $\ast$i1arr, float $\ast$i2arr, float $\ast$i3arr, int size)
+\item 
+void \mbox{\hyperlink{Kernelsf_8cu_a369d792b232ead83b2b9db7ae8373a77}{call\+Kernelf\+\_\+\+JM}} (\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$res, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} source, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} target, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$cs, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$ct, \mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$currents, float k, float epsilon, float t\+\_\+direction, int n\+Blocks, int n\+Threads)
+\item 
+void \mbox{\hyperlink{Kernelsf_8cu_adcd1cf7913ba1e02151a13465527e7ae}{call\+Kernelf\+\_\+\+EH}} (\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$res, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} source, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} target, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$cs, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$ct, \mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$currents, float k, float epsilon, float t\+\_\+direction, int n\+Blocks, int n\+Threads)
+\item 
+void \mbox{\hyperlink{Kernelsf_8cu_a107c1d18b23494ca80715743cdca3816}{call\+Kernelf\+\_\+\+JMEH}} (\mbox{\hyperlink{structc4Bundlef}{c4\+Bundlef}} $\ast$res, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} source, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} target, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$cs, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$ct, \mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$currents, float k, float epsilon, float t\+\_\+direction, int n\+Blocks, int n\+Threads)
+\item 
+void \mbox{\hyperlink{Kernelsf_8cu_a782e4edb3dd2bfd699c89f502642722e}{call\+Kernelf\+\_\+\+EHP}} (\mbox{\hyperlink{structc2rBundlef}{c2r\+Bundlef}} $\ast$res, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} source, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} target, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$cs, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$ct, \mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$currents, float k, float epsilon, float t\+\_\+direction, int n\+Blocks, int n\+Threads)
+\item 
+void \mbox{\hyperlink{Kernelsf_8cu_a9513614b1aaf7c6a869edc7693d1d013}{call\+Kernelf\+\_\+\+FF}} (\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$res, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} source, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} target, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$cs, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$ct, \mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$currents, float k, float epsilon, float t\+\_\+direction, int n\+Blocks, int n\+Threads)
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\+\_\+\+\_\+constant\+\_\+\+\_\+ cu\+Float\+Complex \mbox{\hyperlink{Kernelsf_8cu_a957ec837d52e408a79403be3e21c94c3}{con}} \mbox{[}\mbox{\hyperlink{InterfaceCUDA_8h_ad8f114959b29521f5e2bb245cc6bf62a}{CSIZE}}\mbox{]}
+\item 
+\+\_\+\+\_\+constant\+\_\+\+\_\+ float \mbox{\hyperlink{Kernelsf_8cu_ae9e71ffcca414c0956671a1ba54b0f65}{eye}} \mbox{[}3\mbox{]}\mbox{[}3\mbox{]}
+\item 
+\+\_\+\+\_\+constant\+\_\+\+\_\+ int \mbox{\hyperlink{Kernelsf_8cu_a38fbea9d8b7ec420292d15ccadd2c2ae}{g\+\_\+s}}
+\item 
+\+\_\+\+\_\+constant\+\_\+\+\_\+ int \mbox{\hyperlink{Kernelsf_8cu_abb9dcc2740086f6da9380e01633714a5}{g\+\_\+t}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{Kernelsf_8cu_a3f6ea8e9ef58125936d50d7e1181aa7a}\label{Kernelsf_8cu_a3f6ea8e9ef58125936d50d7e1181aa7a}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!gpuErrchk@{gpuErrchk}}
+\index{gpuErrchk@{gpuErrchk}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{gpuErrchk}{gpuErrchk}}
+{\footnotesize\ttfamily \#define gpu\+Errchk(\begin{DoxyParamCaption}\item[{}]{ans }\end{DoxyParamCaption})~\{ \mbox{\hyperlink{Kernelsf_8cu_a14ddf96670fa402eda1299ee5a8557cd}{gpu\+Assert}}((ans), \+\_\+\+\_\+\+FILE\+\_\+\+\_\+, \+\_\+\+\_\+\+LINE\+\_\+\+\_\+); \}}
+
+Wrapper for finding errors in CUDA API calls.
+
+
+\begin{DoxyParams}{Parameters}
+{\em code} & The errorcode returned from failed API call. \\
+\hline
+{\em file} & The file in which failure occured. \\
+\hline
+{\em line} & The line in file in which error occured. \\
+\hline
+{\em abort} & Exit code upon error. \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{Kernelsf_8cu_ac8122fc972b7f4c0af47784d301da38e}\label{Kernelsf_8cu_ac8122fc972b7f4c0af47784d301da38e}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!\_allocateGridC3@{\_allocateGridC3}}
+\index{\_allocateGridC3@{\_allocateGridC3}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{\_allocateGridC3()}{\_allocateGridC3()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+host\+\_\+\+\_\+ void \+\_\+allocate\+Grid\+C3 (\begin{DoxyParamCaption}\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+x,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+y,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+z,  }\item[{int}]{size }\end{DoxyParamCaption})}
+
+(PRIVATE) Allocate C3 to Device.
+
+
+\begin{DoxyParams}{Parameters}
+{\em d\+\_\+x} & Pointer for x array on device. \\
+\hline
+{\em d\+\_\+y} & Pointer for y array on device. \\
+\hline
+{\em d\+\_\+z} & Pointer for z array on device. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{Kernelsf_8cu_ac1fcdef33382c532a6ea682b6066d435}\label{Kernelsf_8cu_ac1fcdef33382c532a6ea682b6066d435}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!\_allocateGridC3ToGPU@{\_allocateGridC3ToGPU}}
+\index{\_allocateGridC3ToGPU@{\_allocateGridC3ToGPU}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{\_allocateGridC3ToGPU()}{\_allocateGridC3ToGPU()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+host\+\_\+\+\_\+ void \+\_\+allocate\+Grid\+C3\+To\+GPU (\begin{DoxyParamCaption}\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+x,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+y,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+z,  }\item[{cu\+Float\+Complex $\ast$}]{h\+\_\+x,  }\item[{cu\+Float\+Complex $\ast$}]{h\+\_\+y,  }\item[{cu\+Float\+Complex $\ast$}]{h\+\_\+z,  }\item[{int}]{size }\end{DoxyParamCaption})}
+
+(PRIVATE) Allocate and copy grid in C3 from Host to Device.
+
+
+\begin{DoxyParams}{Parameters}
+{\em d\+\_\+x} & Pointer for x array on device. \\
+\hline
+{\em d\+\_\+y} & Pointer for y array on device. \\
+\hline
+{\em d\+\_\+z} & Pointer for z array on device. \\
+\hline
+{\em h\+\_\+x} & Pointer for x array on host. \\
+\hline
+{\em h\+\_\+y} & Pointer for y array on host. \\
+\hline
+{\em h\+\_\+z} & Pointer for z array on host. \\
+\hline
+{\em size} & Number of elements of h\+\_\+x/d\+\_\+x. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{Kernelsf_8cu_ae0167c30b845b714720abdec930b5626}\label{Kernelsf_8cu_ae0167c30b845b714720abdec930b5626}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!\_allocateGridGPUToC3@{\_allocateGridGPUToC3}}
+\index{\_allocateGridGPUToC3@{\_allocateGridGPUToC3}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{\_allocateGridGPUToC3()}{\_allocateGridGPUToC3()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+host\+\_\+\+\_\+ void \+\_\+allocate\+Grid\+GPUTo\+C3 (\begin{DoxyParamCaption}\item[{cu\+Float\+Complex $\ast$}]{h\+\_\+x,  }\item[{cu\+Float\+Complex $\ast$}]{h\+\_\+y,  }\item[{cu\+Float\+Complex $\ast$}]{h\+\_\+z,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+x,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+y,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+z,  }\item[{int}]{size }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Kernelsf_8cu_a28de723cebb859df72e80c2ef4f5864d}\label{Kernelsf_8cu_a28de723cebb859df72e80c2ef4f5864d}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!\_allocateGridGPUToR3@{\_allocateGridGPUToR3}}
+\index{\_allocateGridGPUToR3@{\_allocateGridGPUToR3}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{\_allocateGridGPUToR3()}{\_allocateGridGPUToR3()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+host\+\_\+\+\_\+ void \+\_\+allocate\+Grid\+GPUTo\+R3 (\begin{DoxyParamCaption}\item[{float $\ast$}]{h\+\_\+x,  }\item[{float $\ast$}]{h\+\_\+y,  }\item[{float $\ast$}]{h\+\_\+z,  }\item[{float $\ast$}]{d\+\_\+x,  }\item[{float $\ast$}]{d\+\_\+y,  }\item[{float $\ast$}]{d\+\_\+z,  }\item[{int}]{size }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Kernelsf_8cu_ad34fc43d9c28f6c83c31fa4d09474c44}\label{Kernelsf_8cu_ad34fc43d9c28f6c83c31fa4d09474c44}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!\_allocateGridR1ToGPU@{\_allocateGridR1ToGPU}}
+\index{\_allocateGridR1ToGPU@{\_allocateGridR1ToGPU}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{\_allocateGridR1ToGPU()}{\_allocateGridR1ToGPU()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+host\+\_\+\+\_\+ void \+\_\+allocate\+Grid\+R1\+To\+GPU (\begin{DoxyParamCaption}\item[{float $\ast$}]{d\+\_\+x,  }\item[{float $\ast$}]{h\+\_\+x,  }\item[{int}]{size }\end{DoxyParamCaption})}
+
+(PRIVATE) Allocate and copy grid in R1 from Host to Device.
+
+
+\begin{DoxyParams}{Parameters}
+{\em d\+\_\+x} & Pointer for array on device. \\
+\hline
+{\em h\+\_\+x} & Pointer for array on host. \\
+\hline
+{\em size} & Number of elements of h\+\_\+x/d\+\_\+x. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{Kernelsf_8cu_abd6693eb3dc9ec9220c8c0f1accd0ea0}\label{Kernelsf_8cu_abd6693eb3dc9ec9220c8c0f1accd0ea0}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!\_allocateGridR2ToGPU@{\_allocateGridR2ToGPU}}
+\index{\_allocateGridR2ToGPU@{\_allocateGridR2ToGPU}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{\_allocateGridR2ToGPU()}{\_allocateGridR2ToGPU()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+host\+\_\+\+\_\+ void \+\_\+allocate\+Grid\+R2\+To\+GPU (\begin{DoxyParamCaption}\item[{float $\ast$}]{d\+\_\+x,  }\item[{float $\ast$}]{d\+\_\+y,  }\item[{float $\ast$}]{h\+\_\+x,  }\item[{float $\ast$}]{h\+\_\+y,  }\item[{int}]{size }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Kernelsf_8cu_a9195c282f3195c92dd0fcd0a1f4d263b}\label{Kernelsf_8cu_a9195c282f3195c92dd0fcd0a1f4d263b}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!\_allocateGridR3@{\_allocateGridR3}}
+\index{\_allocateGridR3@{\_allocateGridR3}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{\_allocateGridR3()}{\_allocateGridR3()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+host\+\_\+\+\_\+ void \+\_\+allocate\+Grid\+R3 (\begin{DoxyParamCaption}\item[{float $\ast$}]{d\+\_\+x,  }\item[{float $\ast$}]{d\+\_\+y,  }\item[{float $\ast$}]{d\+\_\+z,  }\item[{int}]{size }\end{DoxyParamCaption})}
+
+(PRIVATE) Allocate R3 to Device.
+
+
+\begin{DoxyParams}{Parameters}
+{\em d\+\_\+x} & Pointer for x array on device. \\
+\hline
+{\em d\+\_\+y} & Pointer for y array on device. \\
+\hline
+{\em d\+\_\+z} & Pointer for z array on device. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{Kernelsf_8cu_a85a21f58cee6732b042f57ff96d8b9ec}\label{Kernelsf_8cu_a85a21f58cee6732b042f57ff96d8b9ec}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!\_allocateGridR3ToGPU@{\_allocateGridR3ToGPU}}
+\index{\_allocateGridR3ToGPU@{\_allocateGridR3ToGPU}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{\_allocateGridR3ToGPU()}{\_allocateGridR3ToGPU()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+host\+\_\+\+\_\+ void \+\_\+allocate\+Grid\+R3\+To\+GPU (\begin{DoxyParamCaption}\item[{float $\ast$}]{d\+\_\+x,  }\item[{float $\ast$}]{d\+\_\+y,  }\item[{float $\ast$}]{d\+\_\+z,  }\item[{float $\ast$}]{h\+\_\+x,  }\item[{float $\ast$}]{h\+\_\+y,  }\item[{float $\ast$}]{h\+\_\+z,  }\item[{int}]{size }\end{DoxyParamCaption})}
+
+(PRIVATE) Allocate and copy grid in R3 from Host to Device.
+
+
+\begin{DoxyParams}{Parameters}
+{\em d\+\_\+x} & Pointer for x array on device. \\
+\hline
+{\em d\+\_\+y} & Pointer for y array on device. \\
+\hline
+{\em d\+\_\+z} & Pointer for z array on device. \\
+\hline
+{\em h\+\_\+x} & Pointer for x array on host. \\
+\hline
+{\em h\+\_\+y} & Pointer for y array on host. \\
+\hline
+{\em h\+\_\+z} & Pointer for z array on host. \\
+\hline
+{\em size} & Number of elements of h\+\_\+x/d\+\_\+x. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{Kernelsf_8cu_a0a8dc68cd14e31c1262b3f001eeb7374}\label{Kernelsf_8cu_a0a8dc68cd14e31c1262b3f001eeb7374}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!\_arrC3ToCUDAC@{\_arrC3ToCUDAC}}
+\index{\_arrC3ToCUDAC@{\_arrC3ToCUDAC}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{\_arrC3ToCUDAC()}{\_arrC3ToCUDAC()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+host\+\_\+\+\_\+ void \+\_\+arr\+C3\+To\+CUDAC (\begin{DoxyParamCaption}\item[{float $\ast$}]{r1arr,  }\item[{float $\ast$}]{r2arr,  }\item[{float $\ast$}]{r3arr,  }\item[{float $\ast$}]{i1arr,  }\item[{float $\ast$}]{i2arr,  }\item[{float $\ast$}]{i3arr,  }\item[{cu\+Float\+Complex $\ast$}]{c1arr,  }\item[{cu\+Float\+Complex $\ast$}]{c2arr,  }\item[{cu\+Float\+Complex $\ast$}]{c3arr,  }\item[{int}]{size }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Kernelsf_8cu_a805b8bc67ddbe07929f2d2422ba0f44e}\label{Kernelsf_8cu_a805b8bc67ddbe07929f2d2422ba0f44e}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!\_arrCUDACToC@{\_arrCUDACToC}}
+\index{\_arrCUDACToC@{\_arrCUDACToC}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{\_arrCUDACToC()}{\_arrCUDACToC()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+host\+\_\+\+\_\+ void \+\_\+arr\+CUDACToC (\begin{DoxyParamCaption}\item[{cu\+Float\+Complex $\ast$}]{carr,  }\item[{float $\ast$}]{rarr,  }\item[{float $\ast$}]{iarr,  }\item[{int}]{size }\end{DoxyParamCaption})}
+
+(PRIVATE) Convert array of cu\+Complex to two arrays of floats.
+
+
+\begin{DoxyParams}{Parameters}
+{\em carr} & Array of cu\+Float\+Complex. \\
+\hline
+{\em rarr} & Real part of complex array, to be filled. \\
+\hline
+{\em iarr} & Imaginary part of complex array, to be filled. \\
+\hline
+{\em size} & Size of arrays. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{Kernelsf_8cu_a06b277d10f9f9a4e6b233f487c5d6f48}\label{Kernelsf_8cu_a06b277d10f9f9a4e6b233f487c5d6f48}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!\_arrCUDACToC3@{\_arrCUDACToC3}}
+\index{\_arrCUDACToC3@{\_arrCUDACToC3}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{\_arrCUDACToC3()}{\_arrCUDACToC3()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+host\+\_\+\+\_\+ void \+\_\+arr\+CUDACTo\+C3 (\begin{DoxyParamCaption}\item[{cu\+Float\+Complex $\ast$}]{c1arr,  }\item[{cu\+Float\+Complex $\ast$}]{c2arr,  }\item[{cu\+Float\+Complex $\ast$}]{c3arr,  }\item[{float $\ast$}]{r1arr,  }\item[{float $\ast$}]{r2arr,  }\item[{float $\ast$}]{r3arr,  }\item[{float $\ast$}]{i1arr,  }\item[{float $\ast$}]{i2arr,  }\item[{float $\ast$}]{i3arr,  }\item[{int}]{size }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Kernelsf_8cu_abb7218865801ebdb834ae6a2be34a35d}\label{Kernelsf_8cu_abb7218865801ebdb834ae6a2be34a35d}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!\_arrCUDACToR3@{\_arrCUDACToR3}}
+\index{\_arrCUDACToR3@{\_arrCUDACToR3}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{\_arrCUDACToR3()}{\_arrCUDACToR3()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+host\+\_\+\+\_\+ void \+\_\+arr\+CUDACTo\+R3 (\begin{DoxyParamCaption}\item[{cu\+Float\+Complex $\ast$}]{carr,  }\item[{float $\ast$}]{rarr,  }\item[{float $\ast$}]{iarr,  }\item[{int}]{size }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Kernelsf_8cu_aae30c9ec9604fee24c073407233fd9ad}\label{Kernelsf_8cu_aae30c9ec9604fee24c073407233fd9ad}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!\_arrToCUDAC@{\_arrToCUDAC}}
+\index{\_arrToCUDAC@{\_arrToCUDAC}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{\_arrToCUDAC()}{\_arrToCUDAC()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+host\+\_\+\+\_\+ void \+\_\+arr\+To\+CUDAC (\begin{DoxyParamCaption}\item[{float $\ast$}]{rarr,  }\item[{float $\ast$}]{iarr,  }\item[{cu\+Float\+Complex $\ast$}]{carr,  }\item[{int}]{size }\end{DoxyParamCaption})}
+
+(PRIVATE) Convert two arrays of floats to array of cu\+Complex
+
+
+\begin{DoxyParams}{Parameters}
+{\em rarr} & Real part of complex array. \\
+\hline
+{\em iarr} & Imaginary part of complex array. \\
+\hline
+{\em carr} & Array of cu\+Float\+Complex, to be filled. \\
+\hline
+{\em size} & Size of arrays. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{Kernelsf_8cu_a146353674497932b6434be2591778540}\label{Kernelsf_8cu_a146353674497932b6434be2591778540}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!\_debugArray@{\_debugArray}}
+\index{\_debugArray@{\_debugArray}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{\_debugArray()}{\_debugArray()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ void \+\_\+debug\+Array (\begin{DoxyParamCaption}\item[{cu\+Float\+Complex}]{arr\mbox{[}3\mbox{]} }\end{DoxyParamCaption})}
+
+Print complex array of len 3. Useful for debugging 
+\begin{DoxyParams}{Parameters}
+{\em arr} & Array of cu\+Float\+Complex len 3 \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{Kernelsf_8cu_a56648675fedf659b1009262b556ca444}\label{Kernelsf_8cu_a56648675fedf659b1009262b556ca444}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!\_debugArray@{\_debugArray}}
+\index{\_debugArray@{\_debugArray}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{\_debugArray()}{\_debugArray()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ void \+\_\+debug\+Array (\begin{DoxyParamCaption}\item[{float}]{arr\mbox{[}3\mbox{]} }\end{DoxyParamCaption})}
+
+Print float array of len 3 
+\begin{DoxyParams}{Parameters}
+{\em arr} & Array of cu\+Float\+Complex len 3 \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{Kernelsf_8cu_a1017001a73590b48a00c0183812154a1}\label{Kernelsf_8cu_a1017001a73590b48a00c0183812154a1}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!\_initCUDA@{\_initCUDA}}
+\index{\_initCUDA@{\_initCUDA}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{\_initCUDA()}{\_initCUDA()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+host\+\_\+\+\_\+ std\+::array$<$ dim3, 2 $>$ \+\_\+init\+CUDA (\begin{DoxyParamCaption}\item[{float}]{k,  }\item[{float}]{epsilon,  }\item[{int}]{gt,  }\item[{int}]{gs,  }\item[{float}]{t\+\_\+direction,  }\item[{int}]{n\+Blocks,  }\item[{int}]{n\+Threads }\end{DoxyParamCaption})}
+
+Instantiate program and populate constant memory.
+
+
+\begin{DoxyParams}{Parameters}
+{\em k} & Wavenumber of incoming field. \\
+\hline
+{\em epsilon} & Relative permittivity of source. \\
+\hline
+{\em gt} & Number of elements in target. \\
+\hline
+{\em gs} & Number of elements in source. \\
+\hline
+{\em t\+\_\+direction} & Sign of exponent in Green function. \\
+\hline
+{\em n\+Block} & Number of blocks per grid. \\
+\hline
+{\em n\+Threads} & Number of threads per block.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+BT Array of two dim3 objects. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{Kernelsf_8cu_adcd1cf7913ba1e02151a13465527e7ae}\label{Kernelsf_8cu_adcd1cf7913ba1e02151a13465527e7ae}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!callKernelf\_EH@{callKernelf\_EH}}
+\index{callKernelf\_EH@{callKernelf\_EH}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{callKernelf\_EH()}{callKernelf\_EH()}}
+{\footnotesize\ttfamily void call\+Kernelf\+\_\+\+EH (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$}]{res,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{source,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{target,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{cs,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{ct,  }\item[{\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$}]{currents,  }\item[{float}]{k,  }\item[{float}]{epsilon,  }\item[{float}]{t\+\_\+direction,  }\item[{int}]{n\+Blocks,  }\item[{int}]{n\+Threads }\end{DoxyParamCaption})}
+
+(PUBLIC) Wrapper for calling kernel 1.
+
+
+\begin{DoxyParams}{Parameters}
+{\em d\+\_\+x} & Pointer for x array on device. \\
+\hline
+{\em d\+\_\+y} & Pointer for y array on device. \\
+\hline
+{\em d\+\_\+z} & Pointer for z array on device. \\
+\hline
+{\em h\+\_\+x} & Pointer for x array on host. \\
+\hline
+{\em h\+\_\+y} & Pointer for y array on host. \\
+\hline
+{\em h\+\_\+z} & Pointer for z array on host. \\
+\hline
+{\em size} & Number of elements of h\+\_\+x/d\+\_\+x. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{Kernelsf_8cu_a782e4edb3dd2bfd699c89f502642722e}\label{Kernelsf_8cu_a782e4edb3dd2bfd699c89f502642722e}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!callKernelf\_EHP@{callKernelf\_EHP}}
+\index{callKernelf\_EHP@{callKernelf\_EHP}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{callKernelf\_EHP()}{callKernelf\_EHP()}}
+{\footnotesize\ttfamily void call\+Kernelf\+\_\+\+EHP (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structc2rBundlef}{c2r\+Bundlef}} $\ast$}]{res,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{source,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{target,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{cs,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{ct,  }\item[{\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$}]{currents,  }\item[{float}]{k,  }\item[{float}]{epsilon,  }\item[{float}]{t\+\_\+direction,  }\item[{int}]{n\+Blocks,  }\item[{int}]{n\+Threads }\end{DoxyParamCaption})}
+
+(PUBLIC) Wrapper for calling kernel 3.
+
+
+\begin{DoxyParams}{Parameters}
+{\em d\+\_\+x} & Pointer for x array on device. \\
+\hline
+{\em d\+\_\+y} & Pointer for y array on device. \\
+\hline
+{\em d\+\_\+z} & Pointer for z array on device. \\
+\hline
+{\em h\+\_\+x} & Pointer for x array on host. \\
+\hline
+{\em h\+\_\+y} & Pointer for y array on host. \\
+\hline
+{\em h\+\_\+z} & Pointer for z array on host. \\
+\hline
+{\em size} & Number of elements of h\+\_\+x/d\+\_\+x. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{Kernelsf_8cu_a9513614b1aaf7c6a869edc7693d1d013}\label{Kernelsf_8cu_a9513614b1aaf7c6a869edc7693d1d013}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!callKernelf\_FF@{callKernelf\_FF}}
+\index{callKernelf\_FF@{callKernelf\_FF}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{callKernelf\_FF()}{callKernelf\_FF()}}
+{\footnotesize\ttfamily void call\+Kernelf\+\_\+\+FF (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$}]{res,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{source,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{target,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{cs,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{ct,  }\item[{\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$}]{currents,  }\item[{float}]{k,  }\item[{float}]{epsilon,  }\item[{float}]{t\+\_\+direction,  }\item[{int}]{n\+Blocks,  }\item[{int}]{n\+Threads }\end{DoxyParamCaption})}
+
+(PUBLIC) Wrapper for calling kernel 4 (far-\/field).
+
+
+\begin{DoxyParams}{Parameters}
+{\em d\+\_\+x} & Pointer for x array on device. \\
+\hline
+{\em d\+\_\+y} & Pointer for y array on device. \\
+\hline
+{\em d\+\_\+z} & Pointer for z array on device. \\
+\hline
+{\em h\+\_\+x} & Pointer for x array on host. \\
+\hline
+{\em h\+\_\+y} & Pointer for y array on host. \\
+\hline
+{\em h\+\_\+z} & Pointer for z array on host. \\
+\hline
+{\em size} & Number of elements of h\+\_\+x/d\+\_\+x. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{Kernelsf_8cu_a369d792b232ead83b2b9db7ae8373a77}\label{Kernelsf_8cu_a369d792b232ead83b2b9db7ae8373a77}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!callKernelf\_JM@{callKernelf\_JM}}
+\index{callKernelf\_JM@{callKernelf\_JM}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{callKernelf\_JM()}{callKernelf\_JM()}}
+{\footnotesize\ttfamily void call\+Kernelf\+\_\+\+JM (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$}]{res,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{source,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{target,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{cs,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{ct,  }\item[{\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$}]{currents,  }\item[{float}]{k,  }\item[{float}]{epsilon,  }\item[{float}]{t\+\_\+direction,  }\item[{int}]{n\+Blocks,  }\item[{int}]{n\+Threads }\end{DoxyParamCaption})}
+
+(PUBLIC) Wrapper for calling kernel 0.
+
+
+\begin{DoxyParams}{Parameters}
+{\em d\+\_\+x} & Pointer for x array on device. \\
+\hline
+{\em d\+\_\+y} & Pointer for y array on device. \\
+\hline
+{\em d\+\_\+z} & Pointer for z array on device. \\
+\hline
+{\em h\+\_\+x} & Pointer for x array on host. \\
+\hline
+{\em h\+\_\+y} & Pointer for y array on host. \\
+\hline
+{\em h\+\_\+z} & Pointer for z array on host. \\
+\hline
+{\em size} & Number of elements of h\+\_\+x/d\+\_\+x. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{Kernelsf_8cu_a107c1d18b23494ca80715743cdca3816}\label{Kernelsf_8cu_a107c1d18b23494ca80715743cdca3816}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!callKernelf\_JMEH@{callKernelf\_JMEH}}
+\index{callKernelf\_JMEH@{callKernelf\_JMEH}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{callKernelf\_JMEH()}{callKernelf\_JMEH()}}
+{\footnotesize\ttfamily void call\+Kernelf\+\_\+\+JMEH (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structc4Bundlef}{c4\+Bundlef}} $\ast$}]{res,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{source,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{target,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{cs,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{ct,  }\item[{\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$}]{currents,  }\item[{float}]{k,  }\item[{float}]{epsilon,  }\item[{float}]{t\+\_\+direction,  }\item[{int}]{n\+Blocks,  }\item[{int}]{n\+Threads }\end{DoxyParamCaption})}
+
+(PUBLIC) Wrapper for calling kernel 2.
+
+
+\begin{DoxyParams}{Parameters}
+{\em d\+\_\+x} & Pointer for x array on device. \\
+\hline
+{\em d\+\_\+y} & Pointer for y array on device. \\
+\hline
+{\em d\+\_\+z} & Pointer for z array on device. \\
+\hline
+{\em h\+\_\+x} & Pointer for x array on host. \\
+\hline
+{\em h\+\_\+y} & Pointer for y array on host. \\
+\hline
+{\em h\+\_\+z} & Pointer for z array on host. \\
+\hline
+{\em size} & Number of elements of h\+\_\+x/d\+\_\+x. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{Kernelsf_8cu_a2d622c64cff344e6e8f9bd8013d8c7af}\label{Kernelsf_8cu_a2d622c64cff344e6e8f9bd8013d8c7af}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!expCo@{expCo}}
+\index{expCo@{expCo}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{expCo()}{expCo()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+inline\+\_\+\+\_\+ cu\+Float\+Complex exp\+Co (\begin{DoxyParamCaption}\item[{cu\+Float\+Complex}]{z }\end{DoxyParamCaption})}
+
+Take complex exponential. 
+\begin{DoxyParams}{Parameters}
+{\em z} & Complex number\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+res Complex number 
+\end{DoxyReturn}
+\mbox{\Hypertarget{Kernelsf_8cu_a2b2fe507d139af1fc75ec76defbde434}\label{Kernelsf_8cu_a2b2fe507d139af1fc75ec76defbde434}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!farfieldAtPoint@{farfieldAtPoint}}
+\index{farfieldAtPoint@{farfieldAtPoint}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{farfieldAtPoint()}{farfieldAtPoint()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+device\+\_\+\+\_\+ void farfield\+At\+Point (\begin{DoxyParamCaption}\item[{float $\ast$}]{d\+\_\+xs,  }\item[{float $\ast$}]{d\+\_\+ys,  }\item[{float $\ast$}]{d\+\_\+zs,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Jx,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Jy,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Jz,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Mx,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+My,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Mz,  }\item[{float(\&)}]{r\+\_\+hat\mbox{[}3\mbox{]},  }\item[{float $\ast$}]{d\+\_\+A,  }\item[{cu\+Float\+Complex(\&)}]{e\mbox{[}3\mbox{]} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Kernelsf_8cu_a6644ba388248099e486d1304f74c65ae}\label{Kernelsf_8cu_a6644ba388248099e486d1304f74c65ae}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!fieldAtPoint@{fieldAtPoint}}
+\index{fieldAtPoint@{fieldAtPoint}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{fieldAtPoint()}{fieldAtPoint()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+device\+\_\+\+\_\+ void field\+At\+Point (\begin{DoxyParamCaption}\item[{float $\ast$}]{d\+\_\+xs,  }\item[{float $\ast$}]{d\+\_\+ys,  }\item[{float $\ast$}]{d\+\_\+zs,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Jx,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Jy,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Jz,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Mx,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+My,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Mz,  }\item[{float(\&)}]{point\mbox{[}3\mbox{]},  }\item[{float $\ast$}]{d\+\_\+A,  }\item[{cu\+Float\+Complex(\&)}]{d\+\_\+ei\mbox{[}3\mbox{]},  }\item[{cu\+Float\+Complex(\&)}]{d\+\_\+hi\mbox{[}3\mbox{]} }\end{DoxyParamCaption})}
+
+Calculate total field at point on target.
+
+
+\begin{DoxyParams}{Parameters}
+{\em d\+\_\+xs} & array containing source points x-\/coordinate. \\
+\hline
+{\em d\+\_\+ys} & array containing source points y-\/coordinate. \\
+\hline
+{\em d\+\_\+zs} & array containing source points z-\/coordinate. \\
+\hline
+{\em d\+\_\+\+Jx} & array containing source J x-\/component. \\
+\hline
+{\em d\+\_\+\+Jy} & array containing source J y-\/component. \\
+\hline
+{\em d\+\_\+\+Jz} & array containing source J z-\/component. \\
+\hline
+{\em d\+\_\+\+Mx} & array containing source M x-\/component. \\
+\hline
+{\em d\+\_\+\+My} & array containing source M y-\/component. \\
+\hline
+{\em d\+\_\+\+Mz} & array containing source M z-\/component. \\
+\hline
+{\em point} & array of len 3 containing xyz coordinates of target point. \\
+\hline
+{\em d\+\_\+A} & array containing area elements. \\
+\hline
+{\em d\+\_\+ei} & array of len 3 to be filled with E-\/field at point. \\
+\hline
+{\em d\+\_\+hi} & array of len 3 to be filled with H-\/field at point. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{Kernelsf_8cu_afec0b7367ca364416d63530cf23174fc}\label{Kernelsf_8cu_afec0b7367ca364416d63530cf23174fc}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!GpropagateBeam\_0@{GpropagateBeam\_0}}
+\index{GpropagateBeam\_0@{GpropagateBeam\_0}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{GpropagateBeam\_0()}{GpropagateBeam\_0()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+global\+\_\+\+\_\+ void Gpropagate\+Beam\+\_\+0 (\begin{DoxyParamCaption}\item[{float $\ast$}]{d\+\_\+xs,  }\item[{float $\ast$}]{d\+\_\+ys,  }\item[{float $\ast$}]{d\+\_\+zs,  }\item[{float $\ast$}]{d\+\_\+A,  }\item[{float $\ast$}]{d\+\_\+xt,  }\item[{float $\ast$}]{d\+\_\+yt,  }\item[{float $\ast$}]{d\+\_\+zt,  }\item[{float $\ast$}]{d\+\_\+nxt,  }\item[{float $\ast$}]{d\+\_\+nyt,  }\item[{float $\ast$}]{d\+\_\+nzt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Jx,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Jy,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Jz,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Mx,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+My,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Mz,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Jxt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Jyt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Jzt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Mxt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Myt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Mzt }\end{DoxyParamCaption})}
+
+Kernel for to\+Print == 0\+: save J and M.
+
+
+\begin{DoxyParams}{Parameters}
+{\em d\+\_\+xs} & C-\/style array containing source points x-\/coordinate. \\
+\hline
+{\em d\+\_\+ys} & C-\/style array containing source points y-\/coordinate. \\
+\hline
+{\em d\+\_\+zs} & C-\/style array containing source points z-\/coordinate. \\
+\hline
+{\em d\+\_\+A} & C-\/style array containing area elements. \\
+\hline
+{\em d\+\_\+xt} & C-\/style array containing target points x-\/coordinate. \\
+\hline
+{\em d\+\_\+yt} & C-\/style array containing target points y-\/coordinate. \\
+\hline
+{\em d\+\_\+zt} & C-\/style array containing target points z-\/coordinate. \\
+\hline
+{\em d\+\_\+nxt} & C-\/style array containing target norms x-\/component. \\
+\hline
+{\em d\+\_\+nyt} & C-\/style array containing target norms y-\/component. \\
+\hline
+{\em d\+\_\+nzt} & C-\/style array containing target norms z-\/component. \\
+\hline
+{\em d\+\_\+\+Jx} & C-\/style array containing source J x-\/component. \\
+\hline
+{\em d\+\_\+\+Jy} & C-\/style array containing source J y-\/component. \\
+\hline
+{\em d\+\_\+\+Jz} & C-\/style array containing source J z-\/component. \\
+\hline
+{\em d\+\_\+\+Mx} & C-\/style array containing source M x-\/component. \\
+\hline
+{\em d\+\_\+\+My} & C-\/style array containing source M y-\/component. \\
+\hline
+{\em d\+\_\+\+Mz} & C-\/style array containing source M z-\/component. \\
+\hline
+{\em d\+\_\+\+Jxt} & C-\/style array to be filled with target J x-\/component. \\
+\hline
+{\em d\+\_\+\+Jyt} & C-\/style array to be filled with target J y-\/component. \\
+\hline
+{\em d\+\_\+\+Jzt} & C-\/style array to be filled with target J z-\/component. \\
+\hline
+{\em d\+\_\+\+Mxt} & C-\/style array to be filled with target M x-\/component. \\
+\hline
+{\em d\+\_\+\+Myt} & C-\/style array to be filled with target M y-\/component. \\
+\hline
+{\em d\+\_\+\+Mzt} & C-\/style array to be filled with target M z-\/component. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{Kernelsf_8cu_a8c898e8f7f785a9ec27ecc5450e4d635}\label{Kernelsf_8cu_a8c898e8f7f785a9ec27ecc5450e4d635}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!GpropagateBeam\_1@{GpropagateBeam\_1}}
+\index{GpropagateBeam\_1@{GpropagateBeam\_1}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{GpropagateBeam\_1()}{GpropagateBeam\_1()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+global\+\_\+\+\_\+ void Gpropagate\+Beam\+\_\+1 (\begin{DoxyParamCaption}\item[{float $\ast$}]{d\+\_\+xs,  }\item[{float $\ast$}]{d\+\_\+ys,  }\item[{float $\ast$}]{d\+\_\+zs,  }\item[{float $\ast$}]{d\+\_\+A,  }\item[{float $\ast$}]{d\+\_\+xt,  }\item[{float $\ast$}]{d\+\_\+yt,  }\item[{float $\ast$}]{d\+\_\+zt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Jx,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Jy,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Jz,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Mx,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+My,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Mz,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Ext,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Eyt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Ezt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Hxt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Hyt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Hzt }\end{DoxyParamCaption})}
+
+Kernel for to\+Print == 1\+: save Ei and Hi.
+
+
+\begin{DoxyParams}{Parameters}
+{\em d\+\_\+xs} & C-\/style array containing source points x-\/coordinate. \\
+\hline
+{\em d\+\_\+ys} & C-\/style array containing source points y-\/coordinate. \\
+\hline
+{\em d\+\_\+zs} & C-\/style array containing source points z-\/coordinate. \\
+\hline
+{\em d\+\_\+A} & C-\/style array containing area elements. \\
+\hline
+{\em d\+\_\+xt} & C-\/style array containing target points x-\/coordinate. \\
+\hline
+{\em d\+\_\+yt} & C-\/style array containing target points y-\/coordinate. \\
+\hline
+{\em d\+\_\+zt} & C-\/style array containing target points z-\/coordinate. \\
+\hline
+{\em d\+\_\+\+Jx} & C-\/style array containing source J x-\/component. \\
+\hline
+{\em d\+\_\+\+Jy} & C-\/style array containing source J y-\/component. \\
+\hline
+{\em d\+\_\+\+Jz} & C-\/style array containing source J z-\/component. \\
+\hline
+{\em d\+\_\+\+Mx} & C-\/style array containing source M x-\/component. \\
+\hline
+{\em d\+\_\+\+My} & C-\/style array containing source M y-\/component. \\
+\hline
+{\em d\+\_\+\+Mz} & C-\/style array containing source M z-\/component. \\
+\hline
+{\em d\+\_\+\+Ext} & C-\/style array to be filled with target Ei x-\/component. \\
+\hline
+{\em d\+\_\+\+Eyt} & C-\/style array to be filled with target Ei y-\/component. \\
+\hline
+{\em d\+\_\+\+Ezt} & C-\/style array to be filled with target Ei z-\/component. \\
+\hline
+{\em d\+\_\+\+Hxt} & C-\/style array to be filled with target Hi x-\/component. \\
+\hline
+{\em d\+\_\+\+Hyt} & C-\/style array to be filled with target Hi y-\/component. \\
+\hline
+{\em d\+\_\+\+Hzt} & C-\/style array to be filled with target Hi z-\/component. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{Kernelsf_8cu_a800a4f76192aca1a462e96cf34913e2b}\label{Kernelsf_8cu_a800a4f76192aca1a462e96cf34913e2b}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!GpropagateBeam\_2@{GpropagateBeam\_2}}
+\index{GpropagateBeam\_2@{GpropagateBeam\_2}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{GpropagateBeam\_2()}{GpropagateBeam\_2()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+global\+\_\+\+\_\+ void Gpropagate\+Beam\+\_\+2 (\begin{DoxyParamCaption}\item[{float $\ast$}]{d\+\_\+xs,  }\item[{float $\ast$}]{d\+\_\+ys,  }\item[{float $\ast$}]{d\+\_\+zs,  }\item[{float $\ast$}]{d\+\_\+A,  }\item[{float $\ast$}]{d\+\_\+xt,  }\item[{float $\ast$}]{d\+\_\+yt,  }\item[{float $\ast$}]{d\+\_\+zt,  }\item[{float $\ast$}]{d\+\_\+nxt,  }\item[{float $\ast$}]{d\+\_\+nyt,  }\item[{float $\ast$}]{d\+\_\+nzt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Jx,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Jy,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Jz,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Mx,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+My,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Mz,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Jxt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Jyt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Jzt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Mxt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Myt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Mzt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Ext,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Eyt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Ezt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Hxt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Hyt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Hzt }\end{DoxyParamCaption})}
+
+Kernel for to\+Print == 2\+: save J, M, Ei and Hi.
+
+
+\begin{DoxyParams}{Parameters}
+{\em d\+\_\+xs} & C-\/style array containing source points x-\/coordinate. \\
+\hline
+{\em d\+\_\+ys} & C-\/style array containing source points y-\/coordinate. \\
+\hline
+{\em d\+\_\+zs} & C-\/style array containing source points z-\/coordinate. \\
+\hline
+{\em d\+\_\+A} & C-\/style array containing area elements. \\
+\hline
+{\em d\+\_\+xt} & C-\/style array containing target points x-\/coordinate. \\
+\hline
+{\em d\+\_\+yt} & C-\/style array containing target points y-\/coordinate. \\
+\hline
+{\em d\+\_\+zt} & C-\/style array containing target points z-\/coordinate. \\
+\hline
+{\em d\+\_\+nxt} & C-\/style array containing target norms x-\/component. \\
+\hline
+{\em d\+\_\+nyt} & C-\/style array containing target norms y-\/component. \\
+\hline
+{\em d\+\_\+nzt} & C-\/style array containing target norms z-\/component. \\
+\hline
+{\em d\+\_\+\+Jx} & C-\/style array containing source J x-\/component. \\
+\hline
+{\em d\+\_\+\+Jy} & C-\/style array containing source J y-\/component. \\
+\hline
+{\em d\+\_\+\+Jz} & C-\/style array containing source J z-\/component. \\
+\hline
+{\em d\+\_\+\+Mx} & C-\/style array containing source M x-\/component. \\
+\hline
+{\em d\+\_\+\+My} & C-\/style array containing source M y-\/component. \\
+\hline
+{\em d\+\_\+\+Mz} & C-\/style array containing source M z-\/component. \\
+\hline
+{\em d\+\_\+\+Jxt} & C-\/style array to be filled with target J x-\/component. \\
+\hline
+{\em d\+\_\+\+Jyt} & C-\/style array to be filled with target J y-\/component. \\
+\hline
+{\em d\+\_\+\+Jzt} & C-\/style array to be filled with target J z-\/component. \\
+\hline
+{\em d\+\_\+\+Mxt} & C-\/style array to be filled with target M x-\/component. \\
+\hline
+{\em d\+\_\+\+Myt} & C-\/style array to be filled with target M y-\/component. \\
+\hline
+{\em d\+\_\+\+Mzt} & C-\/style array to be filled with target M z-\/component. \\
+\hline
+{\em d\+\_\+\+Ext} & C-\/style array to be filled with target Ei x-\/component. \\
+\hline
+{\em d\+\_\+\+Eyt} & C-\/style array to be filled with target Ei y-\/component. \\
+\hline
+{\em d\+\_\+\+Ezt} & C-\/style array to be filled with target Ei z-\/component. \\
+\hline
+{\em d\+\_\+\+Hxt} & C-\/style array to be filled with target Hi x-\/component. \\
+\hline
+{\em d\+\_\+\+Hyt} & C-\/style array to be filled with target Hi y-\/component. \\
+\hline
+{\em d\+\_\+\+Hzt} & C-\/style array to be filled with target Hi z-\/component. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{Kernelsf_8cu_a9e755ab27ae2dd346695692259112a93}\label{Kernelsf_8cu_a9e755ab27ae2dd346695692259112a93}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!GpropagateBeam\_3@{GpropagateBeam\_3}}
+\index{GpropagateBeam\_3@{GpropagateBeam\_3}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{GpropagateBeam\_3()}{GpropagateBeam\_3()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+global\+\_\+\+\_\+ void Gpropagate\+Beam\+\_\+3 (\begin{DoxyParamCaption}\item[{float $\ast$}]{d\+\_\+xs,  }\item[{float $\ast$}]{d\+\_\+ys,  }\item[{float $\ast$}]{d\+\_\+zs,  }\item[{float $\ast$}]{d\+\_\+A,  }\item[{float $\ast$}]{d\+\_\+xt,  }\item[{float $\ast$}]{d\+\_\+yt,  }\item[{float $\ast$}]{d\+\_\+zt,  }\item[{float $\ast$}]{d\+\_\+nxt,  }\item[{float $\ast$}]{d\+\_\+nyt,  }\item[{float $\ast$}]{d\+\_\+nzt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Jx,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Jy,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Jz,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Mx,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+My,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Mz,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Ext,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Eyt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Ezt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Hxt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Hyt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Hzt,  }\item[{float $\ast$}]{d\+\_\+\+Prxt,  }\item[{float $\ast$}]{d\+\_\+\+Pryt,  }\item[{float $\ast$}]{d\+\_\+\+Przt }\end{DoxyParamCaption})}
+
+Kernel for to\+Print == 3\+: save Pr, Er and Hr.
+
+
+\begin{DoxyParams}{Parameters}
+{\em d\+\_\+xs} & C-\/style array containing source points x-\/coordinate. \\
+\hline
+{\em d\+\_\+ys} & C-\/style array containing source points y-\/coordinate. \\
+\hline
+{\em d\+\_\+zs} & C-\/style array containing source points z-\/coordinate. \\
+\hline
+{\em d\+\_\+A} & C-\/style array containing area elements. \\
+\hline
+{\em d\+\_\+xt} & C-\/style array containing target points x-\/coordinate. \\
+\hline
+{\em d\+\_\+yt} & C-\/style array containing target points y-\/coordinate. \\
+\hline
+{\em d\+\_\+zt} & C-\/style array containing target points z-\/coordinate. \\
+\hline
+{\em d\+\_\+nxt} & C-\/style array containing target norms x-\/component. \\
+\hline
+{\em d\+\_\+nyt} & C-\/style array containing target norms y-\/component. \\
+\hline
+{\em d\+\_\+nzt} & C-\/style array containing target norms z-\/component. \\
+\hline
+{\em d\+\_\+\+Jx} & C-\/style array containing source J x-\/component. \\
+\hline
+{\em d\+\_\+\+Jy} & C-\/style array containing source J y-\/component. \\
+\hline
+{\em d\+\_\+\+Jz} & C-\/style array containing source J z-\/component. \\
+\hline
+{\em d\+\_\+\+Mx} & C-\/style array containing source M x-\/component. \\
+\hline
+{\em d\+\_\+\+My} & C-\/style array containing source M y-\/component. \\
+\hline
+{\em d\+\_\+\+Mz} & C-\/style array containing source M z-\/component. \\
+\hline
+{\em d\+\_\+\+Prxt} & C-\/style array to be filled with Pr x-\/component. \\
+\hline
+{\em d\+\_\+\+Pryt} & C-\/style array to be filled with Pr y-\/component. \\
+\hline
+{\em d\+\_\+\+Przt} & C-\/style array to be filled with Pr z-\/component. \\
+\hline
+{\em d\+\_\+\+Ext} & C-\/style array to be filled with target Er x-\/component. \\
+\hline
+{\em d\+\_\+\+Eyt} & C-\/style array to be filled with target Er y-\/component. \\
+\hline
+{\em d\+\_\+\+Ezt} & C-\/style array to be filled with target Er z-\/component. \\
+\hline
+{\em d\+\_\+\+Hxt} & C-\/style array to be filled with target Hr x-\/component. \\
+\hline
+{\em d\+\_\+\+Hyt} & C-\/style array to be filled with target Hr y-\/component. \\
+\hline
+{\em d\+\_\+\+Hzt} & C-\/style array to be filled with target Hr z-\/component. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{Kernelsf_8cu_a17d7044786124f00cc30b2be01a9d91f}\label{Kernelsf_8cu_a17d7044786124f00cc30b2be01a9d91f}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!GpropagateBeam\_4@{GpropagateBeam\_4}}
+\index{GpropagateBeam\_4@{GpropagateBeam\_4}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{GpropagateBeam\_4()}{GpropagateBeam\_4()}}
+{\footnotesize\ttfamily void \+\_\+\+\_\+global\+\_\+\+\_\+ Gpropagate\+Beam\+\_\+4 (\begin{DoxyParamCaption}\item[{float $\ast$}]{d\+\_\+xs,  }\item[{float $\ast$}]{d\+\_\+ys,  }\item[{float $\ast$}]{d\+\_\+zs,  }\item[{float $\ast$}]{d\+\_\+A,  }\item[{float $\ast$}]{d\+\_\+xt,  }\item[{float $\ast$}]{d\+\_\+yt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Jx,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Jy,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Jz,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Mx,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+My,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Mz,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Ext,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Eyt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Ezt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Hxt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Hyt,  }\item[{cu\+Float\+Complex $\ast$}]{d\+\_\+\+Hzt }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Kernelsf_8cu_a14ddf96670fa402eda1299ee5a8557cd}\label{Kernelsf_8cu_a14ddf96670fa402eda1299ee5a8557cd}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!gpuAssert@{gpuAssert}}
+\index{gpuAssert@{gpuAssert}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{gpuAssert()}{gpuAssert()}}
+{\footnotesize\ttfamily \+\_\+\+\_\+host\+\_\+\+\_\+ void gpu\+Assert (\begin{DoxyParamCaption}\item[{cuda\+Error\+\_\+t}]{code,  }\item[{const char $\ast$}]{file,  }\item[{int}]{line,  }\item[{bool}]{abort = {\ttfamily true} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{Kernelsf_8cu_a957ec837d52e408a79403be3e21c94c3}\label{Kernelsf_8cu_a957ec837d52e408a79403be3e21c94c3}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!con@{con}}
+\index{con@{con}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{con}{con}}
+{\footnotesize\ttfamily \+\_\+\+\_\+constant\+\_\+\+\_\+ cu\+Float\+Complex con\mbox{[}\mbox{\hyperlink{InterfaceCUDA_8h_ad8f114959b29521f5e2bb245cc6bf62a}{CSIZE}}\mbox{]}}
+
+\mbox{\Hypertarget{Kernelsf_8cu_ae9e71ffcca414c0956671a1ba54b0f65}\label{Kernelsf_8cu_ae9e71ffcca414c0956671a1ba54b0f65}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!eye@{eye}}
+\index{eye@{eye}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{eye}{eye}}
+{\footnotesize\ttfamily \+\_\+\+\_\+constant\+\_\+\+\_\+ float eye\mbox{[}3\mbox{]}\mbox{[}3\mbox{]}}
+
+\mbox{\Hypertarget{Kernelsf_8cu_a38fbea9d8b7ec420292d15ccadd2c2ae}\label{Kernelsf_8cu_a38fbea9d8b7ec420292d15ccadd2c2ae}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!g\_s@{g\_s}}
+\index{g\_s@{g\_s}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{g\_s}{g\_s}}
+{\footnotesize\ttfamily \+\_\+\+\_\+constant\+\_\+\+\_\+ int g\+\_\+s}
+
+\mbox{\Hypertarget{Kernelsf_8cu_abb9dcc2740086f6da9380e01633714a5}\label{Kernelsf_8cu_abb9dcc2740086f6da9380e01633714a5}} 
+\index{Kernelsf.cu@{Kernelsf.cu}!g\_t@{g\_t}}
+\index{g\_t@{g\_t}!Kernelsf.cu@{Kernelsf.cu}}
+\doxysubsubsection{\texorpdfstring{g\_t}{g\_t}}
+{\footnotesize\ttfamily \+\_\+\+\_\+constant\+\_\+\+\_\+ int g\+\_\+t}
+

@@ -1,0 +1,1107 @@
+\hypertarget{Propagation_8h_source}{}\doxysection{Propagation.\+h}
+\label{Propagation_8h_source}\index{src/CPU/Propagation.h@{src/CPU/Propagation.h}}
+\mbox{\hyperlink{Propagation_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{preprocessor}{\#include <iostream>}}
+\DoxyCodeLine{2 \textcolor{preprocessor}{\#include <vector>}}
+\DoxyCodeLine{3 \textcolor{preprocessor}{\#include <complex>}}
+\DoxyCodeLine{4 \textcolor{preprocessor}{\#include <array>}}
+\DoxyCodeLine{5 \textcolor{preprocessor}{\#include <cmath>}}
+\DoxyCodeLine{6 \textcolor{preprocessor}{\#include <thread>}}
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#include <iomanip>}}
+\DoxyCodeLine{8 \textcolor{preprocessor}{\#include <algorithm>}}
+\DoxyCodeLine{9 \textcolor{preprocessor}{\#include <new>}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{Utils_8h}{Utils.h}}"{}}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{Structs_8h}{Structs.h}}"{}}}
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{InterfaceReflector_8h}{InterfaceReflector.h}}"{}}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{preprocessor}{\#ifndef \_\_Propagation\_h}}
+\DoxyCodeLine{16 \textcolor{preprocessor}{\#define \_\_Propagation\_h}}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 \textcolor{comment}{// T is either double or float, U is return struct (double or float as well)}}
+\DoxyCodeLine{19 \textcolor{keyword}{template} <\textcolor{keyword}{class} T, \textcolor{keyword}{class} U, \textcolor{keyword}{class} V, \textcolor{keyword}{class} W>}
+\DoxyCodeLine{20 \textcolor{keyword}{class }\mbox{\hyperlink{classPropagation}{Propagation}}}
+\DoxyCodeLine{21 \{}
+\DoxyCodeLine{22     T k;                   \textcolor{comment}{// Wavenumber}}
+\DoxyCodeLine{23     \textcolor{keywordtype}{int} numThreads;             \textcolor{comment}{// Number of CPU threads used}}
+\DoxyCodeLine{24     \textcolor{keywordtype}{int} gs;             \textcolor{comment}{// Flattened gridsize of source grids}}
+\DoxyCodeLine{25     \textcolor{keywordtype}{int} gt;             \textcolor{comment}{// Flattened gridsize of target grids}}
+\DoxyCodeLine{26 }
+\DoxyCodeLine{27     \textcolor{keywordtype}{int} step;                   \textcolor{comment}{// Number of points calculated by n-\/1 threads.}}
+\DoxyCodeLine{28                                 \textcolor{comment}{// Thread n gets slightly different amount, possibly}}
+\DoxyCodeLine{29     T t\_direction;         \textcolor{comment}{// Time direction. If -\/1, propagate field forward in time}}
+\DoxyCodeLine{30                                 \textcolor{comment}{// If 1, propagate backwards in time}}
+\DoxyCodeLine{31     T EPS;}
+\DoxyCodeLine{32 }
+\DoxyCodeLine{33     \textcolor{keywordtype}{int} toPrint;}
+\DoxyCodeLine{34 }
+\DoxyCodeLine{35     \textcolor{keywordtype}{float} C\_L;}
+\DoxyCodeLine{36     \textcolor{keywordtype}{float} MU\_0;}
+\DoxyCodeLine{37     \textcolor{keywordtype}{float} EPS\_VAC;}
+\DoxyCodeLine{38     \textcolor{keywordtype}{float} ZETA\_0\_INV;}
+\DoxyCodeLine{39     \textcolor{keywordtype}{float} M\_PIf;}
+\DoxyCodeLine{40 }
+\DoxyCodeLine{41 }
+\DoxyCodeLine{42     std::complex<T> j;}
+\DoxyCodeLine{43     std::complex<T> z0;}
+\DoxyCodeLine{44 }
+\DoxyCodeLine{45     std::array<std::array<T, 3>, 3> eye;}
+\DoxyCodeLine{46 }
+\DoxyCodeLine{47 \textcolor{keyword}{public}:}
+\DoxyCodeLine{48 }
+\DoxyCodeLine{49     std::vector<std::thread> \mbox{\hyperlink{classPropagation_a2a5c3d3e2dfef55d84e3c561db8e5610}{threadPool}};}
+\DoxyCodeLine{50 }
+\DoxyCodeLine{51     \mbox{\hyperlink{classPropagation}{Propagation}}(T k, \textcolor{keywordtype}{int} numThreads, \textcolor{keywordtype}{int} gs, \textcolor{keywordtype}{int} gt, T epsilon, T t\_direction, \textcolor{keywordtype}{bool} verbose = \textcolor{keyword}{false});}
+\DoxyCodeLine{52 }
+\DoxyCodeLine{53     \textcolor{comment}{// Make T precision utility kit}}
+\DoxyCodeLine{54     \mbox{\hyperlink{classUtils}{Utils<T>}} \mbox{\hyperlink{classPropagation_a03debe9247f26aae02e9c2979251bdde}{ut}};}
+\DoxyCodeLine{55 }
+\DoxyCodeLine{56     \textcolor{comment}{// Functions for propagating fields between two surfaces}}
+\DoxyCodeLine{57     \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_a136bdc69dd60382a95bac0798374ed21}{propagateBeam\_JM}}(\textcolor{keywordtype}{int} start, \textcolor{keywordtype}{int} stop,}
+\DoxyCodeLine{58                           V *cs, V *ct,}
+\DoxyCodeLine{59                           W *currents, U *res);}
+\DoxyCodeLine{60 }
+\DoxyCodeLine{61     \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_a35b8b78ab563e6c096c10627febcc347}{propagateBeam\_EH}}(\textcolor{keywordtype}{int} start, \textcolor{keywordtype}{int} stop,}
+\DoxyCodeLine{62                           V *cs, V *ct,}
+\DoxyCodeLine{63                           W *currents, U *res);}
+\DoxyCodeLine{64 }
+\DoxyCodeLine{65     \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_a8f163f7d0e473d5126b7ff6b01751844}{propagateBeam\_JMEH}}(\textcolor{keywordtype}{int} start, \textcolor{keywordtype}{int} stop,}
+\DoxyCodeLine{66                           V *cs, V *ct,}
+\DoxyCodeLine{67                           W *currents, U *res);}
+\DoxyCodeLine{68 }
+\DoxyCodeLine{69     \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_a7f06156ddc121930016a279ca04aa8b0}{propagateBeam\_EHP}}(\textcolor{keywordtype}{int} start, \textcolor{keywordtype}{int} stop,}
+\DoxyCodeLine{70                           V *cs, V *ct,}
+\DoxyCodeLine{71                           W *currents, U *res);}
+\DoxyCodeLine{72 }
+\DoxyCodeLine{73     std::array<std::array<std::complex<T>, 3>, 2> \mbox{\hyperlink{classPropagation_a624b50b5c7b44511575b290a81b6567a}{fieldAtPoint}}(V *cs, W *currents,}
+\DoxyCodeLine{74                                               \textcolor{keyword}{const} std::array<T, 3> \&point\_target);}
+\DoxyCodeLine{75 }
+\DoxyCodeLine{76 }
+\DoxyCodeLine{77     \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_a7c860baa0bad0cc6fb5c7a7d61321d39}{parallelProp\_JM}}(V *cs, V *ct,}
+\DoxyCodeLine{78                         W *currents, U *res);}
+\DoxyCodeLine{79 }
+\DoxyCodeLine{80     \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_ab6eb3104c44500c824ab8d644c1271f4}{parallelProp\_EH}}(V *cs, V *ct,}
+\DoxyCodeLine{81                         W *currents, U *res);}
+\DoxyCodeLine{82 }
+\DoxyCodeLine{83     \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_a276633d37065f34d3b92dfce1580aee8}{parallelProp\_JMEH}}(V *cs, V *ct,}
+\DoxyCodeLine{84                         W *currents, U *res);}
+\DoxyCodeLine{85 }
+\DoxyCodeLine{86     \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_a4c6b6b9d6eb99727a17b5b3fe75e1356}{parallelProp\_EHP}}(V *cs, V *ct,}
+\DoxyCodeLine{87                         W *currents, U *res);}
+\DoxyCodeLine{88 }
+\DoxyCodeLine{89     \textcolor{comment}{// Functions for calculating angular far-\/field from reflector directly -\/ no phase term}}
+\DoxyCodeLine{90     \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_acd65676ef3ba92011b64ec1b827b9699}{propagateToFarField}}(\textcolor{keywordtype}{int} start, \textcolor{keywordtype}{int} stop,}
+\DoxyCodeLine{91                               V *cs, V *ct,}
+\DoxyCodeLine{92                               W *currents, U *res);}
+\DoxyCodeLine{93 }
+\DoxyCodeLine{94     std::array<std::complex<T>, 3> \mbox{\hyperlink{classPropagation_aca73accdb96a817422b87479693e6323}{farfieldAtPoint}}(V *cs, W *currents,}
+\DoxyCodeLine{95                                               \textcolor{keyword}{const} std::array<T, 3> \&point\_target, \textcolor{keywordtype}{int} start);}
+\DoxyCodeLine{96 }
+\DoxyCodeLine{97     \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_a5f99e065919ac64c1c2a4c091fa84ccd}{parallelFarField}}(V *cs, V *ct,}
+\DoxyCodeLine{98                         W *currents, U *res);}
+\DoxyCodeLine{99 }
+\DoxyCodeLine{100     \textcolor{comment}{// Scalar propagation}}
+\DoxyCodeLine{101     \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_a49e12495563317c7af2f6cdff8b8ff08}{propagateScalarBeam}}(\textcolor{keywordtype}{int} start, \textcolor{keywordtype}{int} stop,}
+\DoxyCodeLine{102                           V *cs, V *ct,}
+\DoxyCodeLine{103                           W *field, U *res);}
+\DoxyCodeLine{104 }
+\DoxyCodeLine{105 }
+\DoxyCodeLine{106     std::complex<T> \mbox{\hyperlink{classPropagation_a68b38f577289a8b480597a96991cbb42}{fieldScalarAtPoint}}(V *cs, W *field,}
+\DoxyCodeLine{107                                       \textcolor{keyword}{const} std::array<T, 3> \&point\_target);}
+\DoxyCodeLine{108 }
+\DoxyCodeLine{109     \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_a8ffee67b3ba634090bd277ef87eead7e}{parallelPropScalar}}(V *cs, V *ct,}
+\DoxyCodeLine{110                             W *field, U *res);}
+\DoxyCodeLine{111 }
+\DoxyCodeLine{112     \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_aed85769a47000071dbc274ecd4718496}{joinThreads}}();}
+\DoxyCodeLine{113 }
+\DoxyCodeLine{114     \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_a253971a4781c8da9e4adf8ed428e3fd6}{\_debugArray}}(T *arr, \textcolor{keywordtype}{int} idx);}
+\DoxyCodeLine{115     \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_a253971a4781c8da9e4adf8ed428e3fd6}{\_debugArray}}(std::array<T, 3> arr);}
+\DoxyCodeLine{116     \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_a253971a4781c8da9e4adf8ed428e3fd6}{\_debugArray}}(std::array<std::complex<T>, 3> arr);}
+\DoxyCodeLine{117 \};}
+\DoxyCodeLine{118 }
+\DoxyCodeLine{119 \textcolor{keyword}{template} <\textcolor{keyword}{class} T, \textcolor{keyword}{class} U, \textcolor{keyword}{class} V, \textcolor{keyword}{class} W>}
+\DoxyCodeLine{120 \mbox{\hyperlink{classPropagation_a8d976cf710f1ab5bd3c68fd2134261af}{Propagation<T, U, V, W>::Propagation}}(T k, \textcolor{keywordtype}{int} numThreads, \textcolor{keywordtype}{int} gs, \textcolor{keywordtype}{int} gt, T epsilon, T t\_direction, \textcolor{keywordtype}{bool} verbose)}
+\DoxyCodeLine{121 \{}
+\DoxyCodeLine{122     this-\/>M\_PIf = 3.14159265359f;}
+\DoxyCodeLine{123     this-\/>C\_L = 2.99792458e11f; \textcolor{comment}{// mm s\string^-\/1}}
+\DoxyCodeLine{124     this-\/>MU\_0 = 1.2566370614e-\/3f; \textcolor{comment}{// kg mm s\string^-\/2 A\string^-\/2}}
+\DoxyCodeLine{125     this-\/>EPS\_VAC = 1 / (MU\_0 * C\_L*C\_L);}
+\DoxyCodeLine{126     this-\/>ZETA\_0\_INV = 1 / (C\_L * MU\_0);}
+\DoxyCodeLine{127 }
+\DoxyCodeLine{128     std::complex<T> j(0., 1.);}
+\DoxyCodeLine{129     std::complex<T> z0(0., 0.);}
+\DoxyCodeLine{130     this-\/>j = j;}
+\DoxyCodeLine{131     this-\/>z0 = z0;}
+\DoxyCodeLine{132 }
+\DoxyCodeLine{133     this-\/>k = k;}
+\DoxyCodeLine{134 }
+\DoxyCodeLine{135     this-\/>EPS = epsilon * EPS\_VAC; \textcolor{comment}{// epsilon is relative permeability}}
+\DoxyCodeLine{136 }
+\DoxyCodeLine{137     this-\/>numThreads = numThreads;}
+\DoxyCodeLine{138     this-\/>gs = gs;}
+\DoxyCodeLine{139     this-\/>gt = gt;}
+\DoxyCodeLine{140 }
+\DoxyCodeLine{141     this-\/>step = ceil(gt / numThreads);}
+\DoxyCodeLine{142 }
+\DoxyCodeLine{143     threadPool.resize(numThreads);}
+\DoxyCodeLine{144 }
+\DoxyCodeLine{145     this-\/>t\_direction = t\_direction;}
+\DoxyCodeLine{146 }
+\DoxyCodeLine{147     this-\/>\mbox{\hyperlink{Kernelsf_8cu_ae9e71ffcca414c0956671a1ba54b0f65}{eye}}[0].fill(0);}
+\DoxyCodeLine{148     this-\/>\mbox{\hyperlink{Kernelsf_8cu_ae9e71ffcca414c0956671a1ba54b0f65}{eye}}[1].fill(0);}
+\DoxyCodeLine{149     this-\/>\mbox{\hyperlink{Kernelsf_8cu_ae9e71ffcca414c0956671a1ba54b0f65}{eye}}[2].fill(0);}
+\DoxyCodeLine{150 }
+\DoxyCodeLine{151     this-\/>\mbox{\hyperlink{Kernelsf_8cu_ae9e71ffcca414c0956671a1ba54b0f65}{eye}}[0][0] = 1;}
+\DoxyCodeLine{152     this-\/>\mbox{\hyperlink{Kernelsf_8cu_ae9e71ffcca414c0956671a1ba54b0f65}{eye}}[1][1] = 1;}
+\DoxyCodeLine{153     this-\/>\mbox{\hyperlink{Kernelsf_8cu_ae9e71ffcca414c0956671a1ba54b0f65}{eye}}[2][2] = 1;}
+\DoxyCodeLine{154 }
+\DoxyCodeLine{155     \textcolor{keywordflow}{if} (verbose)}
+\DoxyCodeLine{156     \{}
+\DoxyCodeLine{157         printf(\textcolor{stringliteral}{"{}***-\/-\/-\/-\/-\/-\/-\/-\/-\/ PO info -\/-\/-\/-\/-\/-\/-\/-\/-\/***\(\backslash\)n"{}});}
+\DoxyCodeLine{158         printf(\textcolor{stringliteral}{"{}-\/-\/-\/ Source         :   \%d cells\(\backslash\)n"{}}, gs);}
+\DoxyCodeLine{159         printf(\textcolor{stringliteral}{"{}-\/-\/-\/ Target         :   \%d cells\(\backslash\)n"{}}, gt);}
+\DoxyCodeLine{160         printf(\textcolor{stringliteral}{"{}-\/-\/-\/ Wavenumber     :   \%.3f / mm\(\backslash\)n"{}}, k);}
+\DoxyCodeLine{161         printf(\textcolor{stringliteral}{"{}-\/-\/-\/ Threads        :   \%d\(\backslash\)n"{}}, numThreads);}
+\DoxyCodeLine{162         printf(\textcolor{stringliteral}{"{}-\/-\/-\/ Device         :   CPU\(\backslash\)n"{}});}
+\DoxyCodeLine{163         printf(\textcolor{stringliteral}{"{}***-\/-\/-\/-\/-\/-\/-\/-\/-\/ PO info -\/-\/-\/-\/-\/-\/-\/-\/-\/***\(\backslash\)n"{}});}
+\DoxyCodeLine{164         printf(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{165     \}}
+\DoxyCodeLine{166 \}}
+\DoxyCodeLine{167 }
+\DoxyCodeLine{168 \textcolor{comment}{// This function calculates the propagation between source and target, calculates currents}}
+\DoxyCodeLine{169 \textcolor{keyword}{template} <\textcolor{keyword}{class} T, \textcolor{keyword}{class} U, \textcolor{keyword}{class} V, \textcolor{keyword}{class} W>}
+\DoxyCodeLine{170 \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_a136bdc69dd60382a95bac0798374ed21}{Propagation<T,U, V, W>::propagateBeam\_JM}}(\textcolor{keywordtype}{int} start, \textcolor{keywordtype}{int} stop,}
+\DoxyCodeLine{171                                               V *cs, V *ct,}
+\DoxyCodeLine{172                                               W *currents, U *res)}
+\DoxyCodeLine{173 \{}
+\DoxyCodeLine{174     \textcolor{comment}{// Scalars (T \& complex T)}}
+\DoxyCodeLine{175     std::complex<T> e\_dot\_p\_r\_perp;    \textcolor{comment}{// E-\/field -\/ perpendicular reflected POI polarization vector dot product}}
+\DoxyCodeLine{176     std::complex<T> e\_dot\_p\_r\_parr;    \textcolor{comment}{// E-\/field -\/ parallel reflected POI polarization vector dot product}}
+\DoxyCodeLine{177 }
+\DoxyCodeLine{178     \textcolor{comment}{// Arrays of Ts}}
+\DoxyCodeLine{179     std::array<T, 3> S\_i\_norm;         \textcolor{comment}{// Normalized incoming Poynting vector}}
+\DoxyCodeLine{180     std::array<T, 3> p\_i\_perp;         \textcolor{comment}{// Perpendicular incoming POI polarization vector}}
+\DoxyCodeLine{181     std::array<T, 3> p\_i\_parr;         \textcolor{comment}{// Parallel incoming POI polarization vector}}
+\DoxyCodeLine{182     std::array<T, 3> S\_r\_norm;         \textcolor{comment}{// Normalized reflected Poynting vector}}
+\DoxyCodeLine{183     std::array<T, 3> p\_r\_perp;         \textcolor{comment}{// Perpendicular reflected POI polarization vector}}
+\DoxyCodeLine{184     std::array<T, 3> p\_r\_parr;         \textcolor{comment}{// Parallel reflected POI polarization vector}}
+\DoxyCodeLine{185     std::array<T, 3> S\_out\_n;          \textcolor{comment}{// Container for Poynting-\/normal ext products}}
+\DoxyCodeLine{186     std::array<T, 3> point;            \textcolor{comment}{// Point on target}}
+\DoxyCodeLine{187     std::array<T, 3> norms;            \textcolor{comment}{// Normal vector at point}}
+\DoxyCodeLine{188     std::array<T, 3> e\_out\_h\_r;        \textcolor{comment}{// Real part of E-\/field -\/ H-\/field ext product}}
+\DoxyCodeLine{189 }
+\DoxyCodeLine{190     \textcolor{comment}{// Arrays of complex Ts}}
+\DoxyCodeLine{191     std::array<std::complex<T>, 3> e\_r;            \textcolor{comment}{// Reflected E-\/field}}
+\DoxyCodeLine{192     std::array<std::complex<T>, 3> h\_r;            \textcolor{comment}{// Reflected H-\/field}}
+\DoxyCodeLine{193     std::array<std::complex<T>, 3> n\_out\_e\_i\_r;    \textcolor{comment}{// Electric current}}
+\DoxyCodeLine{194     std::array<std::complex<T>, 3> temp1;          \textcolor{comment}{// Temporary container 1 for intermediate irrelevant values}}
+\DoxyCodeLine{195     std::array<std::complex<T>, 3> temp2;          \textcolor{comment}{// Temporary container 2}}
+\DoxyCodeLine{196 }
+\DoxyCodeLine{197     std::array<std::complex<T>, 3> jt;}
+\DoxyCodeLine{198     std::array<std::complex<T>, 3> mt;}
+\DoxyCodeLine{199 }
+\DoxyCodeLine{200     \textcolor{comment}{// Return containers}}
+\DoxyCodeLine{201     std::array<std::array<std::complex<T>, 3>, 2> beam\_e\_h; \textcolor{comment}{// Container for storing fieldAtPoint return}}
+\DoxyCodeLine{202 }
+\DoxyCodeLine{203     \textcolor{keywordtype}{int} jc = 0; \textcolor{comment}{// Counter}}
+\DoxyCodeLine{204 }
+\DoxyCodeLine{205     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=start; i<stop; i++)}
+\DoxyCodeLine{206     \{}
+\DoxyCodeLine{207 }
+\DoxyCodeLine{208         point[0] = ct-\/>x[i];}
+\DoxyCodeLine{209         point[1] = ct-\/>y[i];}
+\DoxyCodeLine{210         point[2] = ct-\/>z[i];}
+\DoxyCodeLine{211 }
+\DoxyCodeLine{212         norms[0] = ct-\/>nx[i];}
+\DoxyCodeLine{213         norms[1] = ct-\/>ny[i];}
+\DoxyCodeLine{214         norms[2] = ct-\/>nz[i];}
+\DoxyCodeLine{215 }
+\DoxyCodeLine{216         \textcolor{comment}{// Calculate total incoming E and H field at point on target}}
+\DoxyCodeLine{217         beam\_e\_h = \mbox{\hyperlink{Kernelsf_8cu_a6644ba388248099e486d1304f74c65ae}{fieldAtPoint}}(cs, currents, point);}
+\DoxyCodeLine{218 }
+\DoxyCodeLine{219         \textcolor{comment}{// Calculate normalised incoming poynting vector.}}
+\DoxyCodeLine{220         ut.conj(beam\_e\_h[1], temp1);                        \textcolor{comment}{// h\_conj}}
+\DoxyCodeLine{221         ut.ext(beam\_e\_h[0], temp1, temp2);                  \textcolor{comment}{// e\_out\_h}}
+\DoxyCodeLine{222 }
+\DoxyCodeLine{223         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{224         \{}
+\DoxyCodeLine{225             e\_out\_h\_r[n] = temp2[n].real();                      \textcolor{comment}{// e\_out\_h\_r}}
+\DoxyCodeLine{226         \}}
+\DoxyCodeLine{227 }
+\DoxyCodeLine{228         \textcolor{comment}{//std::cout << this-\/>Et\_container.size() << std::endl;}}
+\DoxyCodeLine{229 }
+\DoxyCodeLine{230         ut.normalize(e\_out\_h\_r, S\_i\_norm);                       \textcolor{comment}{// S\_i\_norm}}
+\DoxyCodeLine{231 }
+\DoxyCodeLine{232         \textcolor{comment}{// Calculate incoming polarization vectors}}
+\DoxyCodeLine{233         ut.ext(S\_i\_norm, norms, S\_out\_n);                      \textcolor{comment}{// S\_i\_out\_n}}
+\DoxyCodeLine{234         ut.normalize(S\_out\_n, p\_i\_perp);                       \textcolor{comment}{// p\_i\_perp}}
+\DoxyCodeLine{235         ut.ext(p\_i\_perp, S\_i\_norm, p\_i\_parr);               \textcolor{comment}{// p\_i\_parr}}
+\DoxyCodeLine{236 }
+\DoxyCodeLine{237         \textcolor{comment}{// Now calculate reflected poynting vector.}}
+\DoxyCodeLine{238         ut.snell(S\_i\_norm, norms, S\_r\_norm);                \textcolor{comment}{// S\_r\_norm}}
+\DoxyCodeLine{239 }
+\DoxyCodeLine{240         \textcolor{comment}{// Calculate normalised reflected polarization vectors}}
+\DoxyCodeLine{241         ut.ext(S\_r\_norm, norms, S\_out\_n);                      \textcolor{comment}{// S\_r\_out\_n}}
+\DoxyCodeLine{242         ut.normalize(S\_out\_n, p\_r\_perp);                       \textcolor{comment}{// p\_r\_perp}}
+\DoxyCodeLine{243         ut.ext(S\_r\_norm, p\_r\_perp, p\_r\_parr);               \textcolor{comment}{// p\_r\_parr}}
+\DoxyCodeLine{244 }
+\DoxyCodeLine{245         \textcolor{comment}{// Now, calculate reflected field from target}}
+\DoxyCodeLine{246         ut.dot(beam\_e\_h[0], p\_r\_perp, e\_dot\_p\_r\_perp);      \textcolor{comment}{// e\_dot\_p\_r\_perp}}
+\DoxyCodeLine{247         ut.dot(beam\_e\_h[0], p\_r\_parr, e\_dot\_p\_r\_parr);      \textcolor{comment}{// e\_dot\_p\_r\_parr}}
+\DoxyCodeLine{248 }
+\DoxyCodeLine{249         \textcolor{comment}{// Calculate reflected field from reflection matrix}}
+\DoxyCodeLine{250         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{251         \{}
+\DoxyCodeLine{252             e\_r[n] = -\/e\_dot\_p\_r\_perp * p\_i\_perp[n] -\/ e\_dot\_p\_r\_parr * p\_i\_parr[n];}
+\DoxyCodeLine{253 }
+\DoxyCodeLine{254             \textcolor{comment}{//this-\/>Et\_container[k][i] = e\_r[k];}}
+\DoxyCodeLine{255         \}}
+\DoxyCodeLine{256 }
+\DoxyCodeLine{257         ut.ext(S\_r\_norm, e\_r, temp1);                       \textcolor{comment}{// h\_r\_temp}}
+\DoxyCodeLine{258         ut.s\_mult(temp1, ZETA\_0\_INV, h\_r);                  \textcolor{comment}{// h\_r}}
+\DoxyCodeLine{259 }
+\DoxyCodeLine{260         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{261         \{}
+\DoxyCodeLine{262             temp1[n] = e\_r[n] + beam\_e\_h[0][n]; \textcolor{comment}{// e\_i\_r}}
+\DoxyCodeLine{263             temp2[n] = h\_r[n] + beam\_e\_h[1][n]; \textcolor{comment}{// h\_i\_r}}
+\DoxyCodeLine{264         \}}
+\DoxyCodeLine{265 }
+\DoxyCodeLine{266         ut.ext(norms, temp2, jt);}
+\DoxyCodeLine{267         ut.ext(norms, temp1, n\_out\_e\_i\_r);}
+\DoxyCodeLine{268         ut.s\_mult(n\_out\_e\_i\_r, -\/1., mt);}
+\DoxyCodeLine{269 }
+\DoxyCodeLine{270         res-\/>r1x[i] = jt[0].real();}
+\DoxyCodeLine{271         res-\/>r1y[i] = jt[1].real();}
+\DoxyCodeLine{272         res-\/>r1z[i] = jt[2].real();}
+\DoxyCodeLine{273 }
+\DoxyCodeLine{274         res-\/>i1x[i] = jt[0].imag();}
+\DoxyCodeLine{275         res-\/>i1y[i] = jt[1].imag();}
+\DoxyCodeLine{276         res-\/>i1z[i] = jt[2].imag();}
+\DoxyCodeLine{277 }
+\DoxyCodeLine{278         res-\/>r2x[i] = mt[0].real();}
+\DoxyCodeLine{279         res-\/>r2y[i] = mt[1].real();}
+\DoxyCodeLine{280         res-\/>r2z[i] = mt[2].real();}
+\DoxyCodeLine{281 }
+\DoxyCodeLine{282         res-\/>i2x[i] = mt[0].imag();}
+\DoxyCodeLine{283         res-\/>i2y[i] = mt[1].imag();}
+\DoxyCodeLine{284         res-\/>i2z[i] = mt[2].imag();}
+\DoxyCodeLine{285 }
+\DoxyCodeLine{286         \textcolor{keywordflow}{if}((i * 100 / this-\/>step) > jc \&\& start == 0 * this-\/>step)}
+\DoxyCodeLine{287         \{}
+\DoxyCodeLine{288             std::cout << jc << \textcolor{stringliteral}{"{} / 100"{}} << \textcolor{charliteral}{'\(\backslash\)r'};}
+\DoxyCodeLine{289             std::cout.flush();}
+\DoxyCodeLine{290             jc++;}
+\DoxyCodeLine{291         \}}
+\DoxyCodeLine{292 }
+\DoxyCodeLine{293     \}}
+\DoxyCodeLine{294 \}}
+\DoxyCodeLine{295 }
+\DoxyCodeLine{296 \textcolor{keyword}{template} <\textcolor{keyword}{class} T, \textcolor{keyword}{class} U, \textcolor{keyword}{class} V, \textcolor{keyword}{class} W>}
+\DoxyCodeLine{297 \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_a35b8b78ab563e6c096c10627febcc347}{Propagation<T, U, V, W>::propagateBeam\_EH}}(\textcolor{keywordtype}{int} start, \textcolor{keywordtype}{int} stop,}
+\DoxyCodeLine{298                                               V *cs, V *ct,}
+\DoxyCodeLine{299                                               W *currents, U *res)}
+\DoxyCodeLine{300 \{}
+\DoxyCodeLine{301     \textcolor{comment}{// Arrays of Ts}}
+\DoxyCodeLine{302     std::array<T, 3> point;            \textcolor{comment}{// Point on target}}
+\DoxyCodeLine{303 }
+\DoxyCodeLine{304     \textcolor{comment}{// Return containers}}
+\DoxyCodeLine{305     std::array<std::array<std::complex<T>, 3>, 2> beam\_e\_h; \textcolor{comment}{// Container for storing fieldAtPoint return}}
+\DoxyCodeLine{306 }
+\DoxyCodeLine{307     \textcolor{keywordtype}{int} jc = 0; \textcolor{comment}{// Counter}}
+\DoxyCodeLine{308 }
+\DoxyCodeLine{309     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=start; i<stop; i++)}
+\DoxyCodeLine{310     \{}
+\DoxyCodeLine{311 }
+\DoxyCodeLine{312         point[0] = ct-\/>x[i];}
+\DoxyCodeLine{313         point[1] = ct-\/>y[i];}
+\DoxyCodeLine{314         point[2] = ct-\/>z[i];}
+\DoxyCodeLine{315 }
+\DoxyCodeLine{316         \textcolor{comment}{// Calculate total incoming E and H field at point on target}}
+\DoxyCodeLine{317         beam\_e\_h = \mbox{\hyperlink{Kernelsf_8cu_a6644ba388248099e486d1304f74c65ae}{fieldAtPoint}}(cs, currents, point);}
+\DoxyCodeLine{318 }
+\DoxyCodeLine{319         res-\/>r1x[i] = beam\_e\_h[0][0].real();}
+\DoxyCodeLine{320         res-\/>r1y[i] = beam\_e\_h[0][1].real();}
+\DoxyCodeLine{321         res-\/>r1z[i] = beam\_e\_h[0][2].real();}
+\DoxyCodeLine{322 }
+\DoxyCodeLine{323         res-\/>i1x[i] = beam\_e\_h[0][0].imag();}
+\DoxyCodeLine{324         res-\/>i1y[i] = beam\_e\_h[0][1].imag();}
+\DoxyCodeLine{325         res-\/>i1z[i] = beam\_e\_h[0][2].imag();}
+\DoxyCodeLine{326 }
+\DoxyCodeLine{327         res-\/>r2x[i] = beam\_e\_h[1][0].real();}
+\DoxyCodeLine{328         res-\/>r2y[i] = beam\_e\_h[1][1].real();}
+\DoxyCodeLine{329         res-\/>r2z[i] = beam\_e\_h[1][2].real();}
+\DoxyCodeLine{330 }
+\DoxyCodeLine{331         res-\/>i2x[i] = beam\_e\_h[1][0].imag();}
+\DoxyCodeLine{332         res-\/>i2y[i] = beam\_e\_h[1][1].imag();}
+\DoxyCodeLine{333         res-\/>i2z[i] = beam\_e\_h[1][2].imag();}
+\DoxyCodeLine{334 }
+\DoxyCodeLine{335         \textcolor{keywordflow}{if}((i * 100 / this-\/>step) > jc \&\& start == 0 * this-\/>step)}
+\DoxyCodeLine{336         \{}
+\DoxyCodeLine{337             std::cout << jc << \textcolor{stringliteral}{"{} / 100"{}} << \textcolor{charliteral}{'\(\backslash\)r'};}
+\DoxyCodeLine{338             std::cout.flush();}
+\DoxyCodeLine{339             jc++;}
+\DoxyCodeLine{340         \}}
+\DoxyCodeLine{341     \}}
+\DoxyCodeLine{342 \}}
+\DoxyCodeLine{343 }
+\DoxyCodeLine{344 \textcolor{keyword}{template} <\textcolor{keyword}{class} T, \textcolor{keyword}{class} U, \textcolor{keyword}{class} V, \textcolor{keyword}{class} W>}
+\DoxyCodeLine{345 \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_a8f163f7d0e473d5126b7ff6b01751844}{Propagation<T, U, V, W>::propagateBeam\_JMEH}}(\textcolor{keywordtype}{int} start, \textcolor{keywordtype}{int} stop,}
+\DoxyCodeLine{346                                                 V *cs, V *ct,}
+\DoxyCodeLine{347                                                 W *currents, U *res)}
+\DoxyCodeLine{348 \{}
+\DoxyCodeLine{349     \textcolor{comment}{// Scalars (T \& complex T)}}
+\DoxyCodeLine{350     std::complex<T> e\_dot\_p\_r\_perp;    \textcolor{comment}{// E-\/field -\/ perpendicular reflected POI polarization vector dot product}}
+\DoxyCodeLine{351     std::complex<T> e\_dot\_p\_r\_parr;    \textcolor{comment}{// E-\/field -\/ parallel reflected POI polarization vector dot product}}
+\DoxyCodeLine{352 }
+\DoxyCodeLine{353     \textcolor{comment}{// Arrays of Ts}}
+\DoxyCodeLine{354     std::array<T, 3> S\_i\_norm;         \textcolor{comment}{// Normalized incoming Poynting vector}}
+\DoxyCodeLine{355     std::array<T, 3> p\_i\_perp;         \textcolor{comment}{// Perpendicular incoming POI polarization vector}}
+\DoxyCodeLine{356     std::array<T, 3> p\_i\_parr;         \textcolor{comment}{// Parallel incoming POI polarization vector}}
+\DoxyCodeLine{357     std::array<T, 3> S\_r\_norm;         \textcolor{comment}{// Normalized reflected Poynting vector}}
+\DoxyCodeLine{358     std::array<T, 3> p\_r\_perp;         \textcolor{comment}{// Perpendicular reflected POI polarization vector}}
+\DoxyCodeLine{359     std::array<T, 3> p\_r\_parr;         \textcolor{comment}{// Parallel reflected POI polarization vector}}
+\DoxyCodeLine{360     std::array<T, 3> S\_out\_n;          \textcolor{comment}{// Container for Poynting-\/normal ext products}}
+\DoxyCodeLine{361     std::array<T, 3> point;            \textcolor{comment}{// Point on target}}
+\DoxyCodeLine{362     std::array<T, 3> norms;            \textcolor{comment}{// Normal vector at point}}
+\DoxyCodeLine{363     std::array<T, 3> e\_out\_h\_r;        \textcolor{comment}{// Real part of E-\/field -\/ H-\/field ext product}}
+\DoxyCodeLine{364 }
+\DoxyCodeLine{365     \textcolor{comment}{// Arrays of complex Ts}}
+\DoxyCodeLine{366     std::array<std::complex<T>, 3> e\_r;            \textcolor{comment}{// Reflected E-\/field}}
+\DoxyCodeLine{367     std::array<std::complex<T>, 3> h\_r;            \textcolor{comment}{// Reflected H-\/field}}
+\DoxyCodeLine{368     std::array<std::complex<T>, 3> n\_out\_e\_i\_r;    \textcolor{comment}{// Electric current}}
+\DoxyCodeLine{369     std::array<std::complex<T>, 3> temp1;          \textcolor{comment}{// Temporary container 1 for intermediate irrelevant values}}
+\DoxyCodeLine{370     std::array<std::complex<T>, 3> temp2;          \textcolor{comment}{// Temporary container 2}}
+\DoxyCodeLine{371 }
+\DoxyCodeLine{372     std::array<std::complex<T>, 3> jt;}
+\DoxyCodeLine{373     std::array<std::complex<T>, 3> mt;}
+\DoxyCodeLine{374 }
+\DoxyCodeLine{375     \textcolor{comment}{// Return containers}}
+\DoxyCodeLine{376     std::array<std::array<std::complex<T>, 3>, 2> beam\_e\_h; \textcolor{comment}{// Container for storing fieldAtPoint return}}
+\DoxyCodeLine{377 }
+\DoxyCodeLine{378     \textcolor{keywordtype}{int} jc = 0; \textcolor{comment}{// Counter}}
+\DoxyCodeLine{379 }
+\DoxyCodeLine{380     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=start; i<stop; i++)}
+\DoxyCodeLine{381     \{}
+\DoxyCodeLine{382 }
+\DoxyCodeLine{383         point[0] = ct-\/>x[i];}
+\DoxyCodeLine{384         point[1] = ct-\/>y[i];}
+\DoxyCodeLine{385         point[2] = ct-\/>z[i];}
+\DoxyCodeLine{386 }
+\DoxyCodeLine{387         norms[0] = ct-\/>nx[i];}
+\DoxyCodeLine{388         norms[1] = ct-\/>ny[i];}
+\DoxyCodeLine{389         norms[2] = ct-\/>nz[i];}
+\DoxyCodeLine{390 }
+\DoxyCodeLine{391         \textcolor{comment}{// Calculate total incoming E and H field at point on target}}
+\DoxyCodeLine{392         beam\_e\_h = \mbox{\hyperlink{Kernelsf_8cu_a6644ba388248099e486d1304f74c65ae}{fieldAtPoint}}(cs, currents, point);}
+\DoxyCodeLine{393 }
+\DoxyCodeLine{394         \textcolor{comment}{//res-\/>r1x[i] = 0.;//beam\_e\_h[0][0].real();}}
+\DoxyCodeLine{395 }
+\DoxyCodeLine{396         res-\/>r3x[i] = beam\_e\_h[0][0].real();}
+\DoxyCodeLine{397         res-\/>r3y[i] = beam\_e\_h[0][1].real();}
+\DoxyCodeLine{398         res-\/>r3z[i] = beam\_e\_h[0][2].real();}
+\DoxyCodeLine{399 }
+\DoxyCodeLine{400         res-\/>i3x[i] = beam\_e\_h[0][0].imag();}
+\DoxyCodeLine{401         res-\/>i3y[i] = beam\_e\_h[0][1].imag();}
+\DoxyCodeLine{402         res-\/>i3z[i] = beam\_e\_h[0][2].imag();}
+\DoxyCodeLine{403 }
+\DoxyCodeLine{404         res-\/>r4x[i] = beam\_e\_h[1][0].real();}
+\DoxyCodeLine{405         res-\/>r4y[i] = beam\_e\_h[1][1].real();}
+\DoxyCodeLine{406         res-\/>r4z[i] = beam\_e\_h[1][2].real();}
+\DoxyCodeLine{407 }
+\DoxyCodeLine{408         res-\/>i4x[i] = beam\_e\_h[1][0].imag();}
+\DoxyCodeLine{409         res-\/>i4y[i] = beam\_e\_h[1][1].imag();}
+\DoxyCodeLine{410         res-\/>i4z[i] = beam\_e\_h[1][2].imag();}
+\DoxyCodeLine{411 }
+\DoxyCodeLine{412         \textcolor{comment}{// Calculate normalised incoming poynting vector.}}
+\DoxyCodeLine{413         ut.conj(beam\_e\_h[1], temp1);                        \textcolor{comment}{// h\_conj}}
+\DoxyCodeLine{414 }
+\DoxyCodeLine{415         ut.ext(beam\_e\_h[0], temp1, temp2);                  \textcolor{comment}{// e\_out\_h}}
+\DoxyCodeLine{416 }
+\DoxyCodeLine{417         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{418         \{}
+\DoxyCodeLine{419             e\_out\_h\_r[n] = temp2[n].real();                      \textcolor{comment}{// e\_out\_h\_r}}
+\DoxyCodeLine{420         \}}
+\DoxyCodeLine{421 }
+\DoxyCodeLine{422         \textcolor{comment}{//std::cout << this-\/>Et\_container.size() << std::endl;}}
+\DoxyCodeLine{423 }
+\DoxyCodeLine{424         ut.normalize(e\_out\_h\_r, S\_i\_norm);                       \textcolor{comment}{// S\_i\_norm}}
+\DoxyCodeLine{425 }
+\DoxyCodeLine{426         \textcolor{comment}{// Calculate incoming polarization vectors}}
+\DoxyCodeLine{427         ut.ext(S\_i\_norm, norms, S\_out\_n);                      \textcolor{comment}{// S\_i\_out\_n}}
+\DoxyCodeLine{428 }
+\DoxyCodeLine{429         ut.normalize(S\_out\_n, p\_i\_perp);                       \textcolor{comment}{// p\_i\_perp}}
+\DoxyCodeLine{430         ut.ext(p\_i\_perp, S\_i\_norm, p\_i\_parr);               \textcolor{comment}{// p\_i\_parr}}
+\DoxyCodeLine{431 }
+\DoxyCodeLine{432         \textcolor{comment}{// Now calculate reflected poynting vector.}}
+\DoxyCodeLine{433         ut.snell(S\_i\_norm, norms, S\_r\_norm);                \textcolor{comment}{// S\_r\_norm}}
+\DoxyCodeLine{434 }
+\DoxyCodeLine{435         \textcolor{comment}{// Calculate normalised reflected polarization vectors}}
+\DoxyCodeLine{436         ut.ext(S\_r\_norm, norms, S\_out\_n);                      \textcolor{comment}{// S\_r\_out\_n}}
+\DoxyCodeLine{437 }
+\DoxyCodeLine{438         ut.normalize(S\_out\_n, p\_r\_perp);                       \textcolor{comment}{// p\_r\_perp}}
+\DoxyCodeLine{439         ut.ext(S\_r\_norm, p\_r\_perp, p\_r\_parr);               \textcolor{comment}{// p\_r\_parr}}
+\DoxyCodeLine{440 }
+\DoxyCodeLine{441         \textcolor{comment}{// Now, calculate reflected field from target}}
+\DoxyCodeLine{442         ut.dot(beam\_e\_h[0], p\_r\_perp, e\_dot\_p\_r\_perp);      \textcolor{comment}{// e\_dot\_p\_r\_perp}}
+\DoxyCodeLine{443         ut.dot(beam\_e\_h[0], p\_r\_parr, e\_dot\_p\_r\_parr);      \textcolor{comment}{// e\_dot\_p\_r\_parr}}
+\DoxyCodeLine{444 }
+\DoxyCodeLine{445         \textcolor{comment}{//res-\/>r1x[i] = beam\_e\_h[0][0].real();}}
+\DoxyCodeLine{446 }
+\DoxyCodeLine{447         \textcolor{comment}{// Calculate reflected field from reflection matrix}}
+\DoxyCodeLine{448         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{449         \{}
+\DoxyCodeLine{450             e\_r[n] = -\/e\_dot\_p\_r\_perp * p\_i\_perp[n] -\/ e\_dot\_p\_r\_parr * p\_i\_parr[n];}
+\DoxyCodeLine{451 }
+\DoxyCodeLine{452             \textcolor{comment}{//this-\/>Et\_container[k][i] = e\_r[k];}}
+\DoxyCodeLine{453         \}}
+\DoxyCodeLine{454 }
+\DoxyCodeLine{455         ut.ext(S\_r\_norm, e\_r, temp1);                       \textcolor{comment}{// h\_r\_temp}}
+\DoxyCodeLine{456         ut.s\_mult(temp1, ZETA\_0\_INV, h\_r);                  \textcolor{comment}{// h\_r}}
+\DoxyCodeLine{457 }
+\DoxyCodeLine{458         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{459         \{}
+\DoxyCodeLine{460             temp1[n] = e\_r[n] + beam\_e\_h[0][n]; \textcolor{comment}{// e\_i\_r}}
+\DoxyCodeLine{461             temp2[n] = h\_r[n] + beam\_e\_h[1][n]; \textcolor{comment}{// h\_i\_r}}
+\DoxyCodeLine{462         \}}
+\DoxyCodeLine{463 }
+\DoxyCodeLine{464         ut.ext(norms, temp2, jt);}
+\DoxyCodeLine{465         ut.ext(norms, temp1, n\_out\_e\_i\_r);}
+\DoxyCodeLine{466         ut.s\_mult(n\_out\_e\_i\_r, -\/1., mt);}
+\DoxyCodeLine{467 }
+\DoxyCodeLine{468 }
+\DoxyCodeLine{469 }
+\DoxyCodeLine{470         res-\/>r1x[i] = jt[0].real();}
+\DoxyCodeLine{471         res-\/>r1y[i] = jt[1].real();}
+\DoxyCodeLine{472         res-\/>r1z[i] = jt[2].real();}
+\DoxyCodeLine{473 }
+\DoxyCodeLine{474         res-\/>i1x[i] = jt[0].imag();}
+\DoxyCodeLine{475         res-\/>i1y[i] = jt[1].imag();}
+\DoxyCodeLine{476         res-\/>i1z[i] = jt[2].imag();}
+\DoxyCodeLine{477 }
+\DoxyCodeLine{478         res-\/>r2x[i] = mt[0].real();}
+\DoxyCodeLine{479         res-\/>r2y[i] = mt[1].real();}
+\DoxyCodeLine{480         res-\/>r2z[i] = mt[2].real();}
+\DoxyCodeLine{481 }
+\DoxyCodeLine{482         res-\/>i2x[i] = mt[0].imag();}
+\DoxyCodeLine{483         res-\/>i2y[i] = mt[1].imag();}
+\DoxyCodeLine{484         res-\/>i2z[i] = mt[2].imag();}
+\DoxyCodeLine{485 }
+\DoxyCodeLine{486 }
+\DoxyCodeLine{487 }
+\DoxyCodeLine{488         \textcolor{keywordflow}{if}((i * 100 / this-\/>step) > jc \&\& start == 0 * this-\/>step)}
+\DoxyCodeLine{489         \{}
+\DoxyCodeLine{490             std::cout << jc << \textcolor{stringliteral}{"{} / 100"{}} << \textcolor{charliteral}{'\(\backslash\)r'};}
+\DoxyCodeLine{491             std::cout.flush();}
+\DoxyCodeLine{492             jc++;}
+\DoxyCodeLine{493         \}}
+\DoxyCodeLine{494     \}}
+\DoxyCodeLine{495 \}}
+\DoxyCodeLine{496 }
+\DoxyCodeLine{497 \textcolor{keyword}{template} <\textcolor{keyword}{class} T, \textcolor{keyword}{class} U, \textcolor{keyword}{class} V, \textcolor{keyword}{class} W>}
+\DoxyCodeLine{498 \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_a7f06156ddc121930016a279ca04aa8b0}{Propagation<T, U, V, W>::propagateBeam\_EHP}}(\textcolor{keywordtype}{int} start, \textcolor{keywordtype}{int} stop,}
+\DoxyCodeLine{499                                                 V *cs, V *ct,}
+\DoxyCodeLine{500                                                 W *currents, U *res)}
+\DoxyCodeLine{501 \{}
+\DoxyCodeLine{502     \textcolor{comment}{// Scalars (T \& complex T)}}
+\DoxyCodeLine{503     std::complex<T> e\_dot\_p\_r\_perp;    \textcolor{comment}{// E-\/field -\/ perpendicular reflected POI polarization vector dot product}}
+\DoxyCodeLine{504     std::complex<T> e\_dot\_p\_r\_parr;    \textcolor{comment}{// E-\/field -\/ parallel reflected POI polarization vector dot product}}
+\DoxyCodeLine{505 }
+\DoxyCodeLine{506     \textcolor{comment}{// Arrays of Ts}}
+\DoxyCodeLine{507     std::array<T, 3> S\_i\_norm;         \textcolor{comment}{// Normalized incoming Poynting vector}}
+\DoxyCodeLine{508     std::array<T, 3> p\_i\_perp;         \textcolor{comment}{// Perpendicular incoming POI polarization vector}}
+\DoxyCodeLine{509     std::array<T, 3> p\_i\_parr;         \textcolor{comment}{// Parallel incoming POI polarization vector}}
+\DoxyCodeLine{510     std::array<T, 3> S\_r\_norm;         \textcolor{comment}{// Normalized reflected Poynting vector}}
+\DoxyCodeLine{511     std::array<T, 3> p\_r\_perp;         \textcolor{comment}{// Perpendicular reflected POI polarization vector}}
+\DoxyCodeLine{512     std::array<T, 3> p\_r\_parr;         \textcolor{comment}{// Parallel reflected POI polarization vector}}
+\DoxyCodeLine{513     std::array<T, 3> S\_out\_n;          \textcolor{comment}{// Container for Poynting-\/normal ext products}}
+\DoxyCodeLine{514     std::array<T, 3> point;            \textcolor{comment}{// Point on target}}
+\DoxyCodeLine{515     std::array<T, 3> norms;            \textcolor{comment}{// Normal vector at point}}
+\DoxyCodeLine{516     std::array<T, 3> e\_out\_h\_r;        \textcolor{comment}{// Real part of E-\/field -\/ H-\/field ext product}}
+\DoxyCodeLine{517 }
+\DoxyCodeLine{518     \textcolor{comment}{// Arrays of complex Ts}}
+\DoxyCodeLine{519     std::array<std::complex<T>, 3> e\_r;            \textcolor{comment}{// Reflected E-\/field}}
+\DoxyCodeLine{520     std::array<std::complex<T>, 3> h\_r;            \textcolor{comment}{// Reflected H-\/field}}
+\DoxyCodeLine{521     std::array<std::complex<T>, 3> n\_out\_e\_i\_r;    \textcolor{comment}{// Electric current}}
+\DoxyCodeLine{522     std::array<std::complex<T>, 3> temp1;          \textcolor{comment}{// Temporary container 1 for intermediate irrelevant values}}
+\DoxyCodeLine{523     std::array<std::complex<T>, 3> temp2;          \textcolor{comment}{// Temporary container 2}}
+\DoxyCodeLine{524 }
+\DoxyCodeLine{525     \textcolor{comment}{// Return containers}}
+\DoxyCodeLine{526     std::array<std::array<std::complex<T>, 3>, 2> beam\_e\_h; \textcolor{comment}{// Container for storing fieldAtPoint return}}
+\DoxyCodeLine{527 }
+\DoxyCodeLine{528     \textcolor{keywordtype}{int} jc = 0; \textcolor{comment}{// Counter}}
+\DoxyCodeLine{529 }
+\DoxyCodeLine{530     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=start; i<stop; i++)}
+\DoxyCodeLine{531     \{}
+\DoxyCodeLine{532 }
+\DoxyCodeLine{533         point[0] = ct-\/>x[i];}
+\DoxyCodeLine{534         point[1] = ct-\/>y[i];}
+\DoxyCodeLine{535         point[2] = ct-\/>z[i];}
+\DoxyCodeLine{536 }
+\DoxyCodeLine{537         norms[0] = ct-\/>nx[i];}
+\DoxyCodeLine{538         norms[1] = ct-\/>ny[i];}
+\DoxyCodeLine{539         norms[2] = ct-\/>nz[i];}
+\DoxyCodeLine{540 }
+\DoxyCodeLine{541         \textcolor{comment}{// Calculate total incoming E and H field at point on target}}
+\DoxyCodeLine{542         beam\_e\_h = \mbox{\hyperlink{Kernelsf_8cu_a6644ba388248099e486d1304f74c65ae}{fieldAtPoint}}(cs, currents, point);}
+\DoxyCodeLine{543 }
+\DoxyCodeLine{544         \textcolor{comment}{// Calculate normalised incoming poynting vector.}}
+\DoxyCodeLine{545         ut.conj(beam\_e\_h[1], temp1);                        \textcolor{comment}{// h\_conj}}
+\DoxyCodeLine{546         ut.ext(beam\_e\_h[0], temp1, temp2);                  \textcolor{comment}{// e\_out\_h}}
+\DoxyCodeLine{547 }
+\DoxyCodeLine{548         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{549         \{}
+\DoxyCodeLine{550             e\_out\_h\_r[n] = temp2[n].real();                      \textcolor{comment}{// e\_out\_h\_r}}
+\DoxyCodeLine{551         \}}
+\DoxyCodeLine{552 }
+\DoxyCodeLine{553         \textcolor{comment}{//std::cout << this-\/>Et\_container.size() << std::endl;}}
+\DoxyCodeLine{554 }
+\DoxyCodeLine{555         ut.normalize(e\_out\_h\_r, S\_i\_norm);                       \textcolor{comment}{// S\_i\_norm}}
+\DoxyCodeLine{556 }
+\DoxyCodeLine{557         \textcolor{comment}{// Calculate incoming polarization vectors}}
+\DoxyCodeLine{558         ut.ext(S\_i\_norm, norms, S\_out\_n);                      \textcolor{comment}{// S\_i\_out\_n}}
+\DoxyCodeLine{559         ut.normalize(S\_out\_n, p\_i\_perp);                       \textcolor{comment}{// p\_i\_perp}}
+\DoxyCodeLine{560         ut.ext(p\_i\_perp, S\_i\_norm, p\_i\_parr);               \textcolor{comment}{// p\_i\_parr}}
+\DoxyCodeLine{561 }
+\DoxyCodeLine{562         \textcolor{comment}{// Now calculate reflected poynting vector.}}
+\DoxyCodeLine{563         ut.snell(S\_i\_norm, norms, S\_r\_norm);                \textcolor{comment}{// S\_r\_norm}}
+\DoxyCodeLine{564 }
+\DoxyCodeLine{565         \textcolor{comment}{// Calculate normalised reflected polarization vectors}}
+\DoxyCodeLine{566         ut.ext(S\_r\_norm, norms, S\_out\_n);                      \textcolor{comment}{// S\_r\_out\_n}}
+\DoxyCodeLine{567         ut.normalize(S\_out\_n, p\_r\_perp);                       \textcolor{comment}{// p\_r\_perp}}
+\DoxyCodeLine{568         ut.ext(S\_r\_norm, p\_r\_perp, p\_r\_parr);               \textcolor{comment}{// p\_r\_parr}}
+\DoxyCodeLine{569 }
+\DoxyCodeLine{570         \textcolor{comment}{// Now, calculate reflected field from target}}
+\DoxyCodeLine{571         ut.dot(beam\_e\_h[0], p\_r\_perp, e\_dot\_p\_r\_perp);      \textcolor{comment}{// e\_dot\_p\_r\_perp}}
+\DoxyCodeLine{572         ut.dot(beam\_e\_h[0], p\_r\_parr, e\_dot\_p\_r\_parr);      \textcolor{comment}{// e\_dot\_p\_r\_parr}}
+\DoxyCodeLine{573 }
+\DoxyCodeLine{574         \textcolor{comment}{// Calculate reflected field from reflection matrix}}
+\DoxyCodeLine{575         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{576         \{}
+\DoxyCodeLine{577             e\_r[n] = -\/e\_dot\_p\_r\_perp * p\_i\_perp[n] -\/ e\_dot\_p\_r\_parr * p\_i\_parr[n];}
+\DoxyCodeLine{578         \}}
+\DoxyCodeLine{579 }
+\DoxyCodeLine{580         ut.ext(S\_r\_norm, e\_r, temp1);                       \textcolor{comment}{// h\_r\_temp}}
+\DoxyCodeLine{581         ut.s\_mult(temp1, ZETA\_0\_INV, h\_r);                  \textcolor{comment}{// h\_r}}
+\DoxyCodeLine{582 }
+\DoxyCodeLine{583         res-\/>r1x[i] = e\_r[0].real();}
+\DoxyCodeLine{584         res-\/>r1y[i] = e\_r[1].real();}
+\DoxyCodeLine{585         res-\/>r1z[i] = e\_r[2].real();}
+\DoxyCodeLine{586 }
+\DoxyCodeLine{587         res-\/>i1x[i] = e\_r[0].imag();}
+\DoxyCodeLine{588         res-\/>i1y[i] = e\_r[1].imag();}
+\DoxyCodeLine{589         res-\/>i1z[i] = e\_r[2].imag();}
+\DoxyCodeLine{590 }
+\DoxyCodeLine{591         res-\/>r2x[i] = h\_r[0].real();}
+\DoxyCodeLine{592         res-\/>r2y[i] = h\_r[1].real();}
+\DoxyCodeLine{593         res-\/>r2z[i] = h\_r[2].real();}
+\DoxyCodeLine{594 }
+\DoxyCodeLine{595         res-\/>i2x[i] = h\_r[0].imag();}
+\DoxyCodeLine{596         res-\/>i2y[i] = h\_r[1].imag();}
+\DoxyCodeLine{597         res-\/>i2z[i] = h\_r[2].imag();}
+\DoxyCodeLine{598 }
+\DoxyCodeLine{599         res-\/>r3x[i] = S\_r\_norm[0];}
+\DoxyCodeLine{600         res-\/>r3y[i] = S\_r\_norm[1];}
+\DoxyCodeLine{601         res-\/>r3z[i] = S\_r\_norm[2];}
+\DoxyCodeLine{602 }
+\DoxyCodeLine{603         \textcolor{keywordflow}{if}((i * 100 / this-\/>step) > jc \&\& start == 0 * this-\/>step)}
+\DoxyCodeLine{604         \{}
+\DoxyCodeLine{605             std::cout << jc << \textcolor{stringliteral}{"{} / 100"{}} << \textcolor{charliteral}{'\(\backslash\)r'};}
+\DoxyCodeLine{606             std::cout.flush();}
+\DoxyCodeLine{607             jc++;}
+\DoxyCodeLine{608         \}}
+\DoxyCodeLine{609     \}}
+\DoxyCodeLine{610 \}}
+\DoxyCodeLine{611 }
+\DoxyCodeLine{612 \textcolor{keyword}{template} <\textcolor{keyword}{class} T, \textcolor{keyword}{class} U, \textcolor{keyword}{class} V, \textcolor{keyword}{class} W>}
+\DoxyCodeLine{613 \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_a49e12495563317c7af2f6cdff8b8ff08}{Propagation<T, U, V, W>::propagateScalarBeam}}(\textcolor{keywordtype}{int} start, \textcolor{keywordtype}{int} stop,}
+\DoxyCodeLine{614                                                   V *cs, V *ct,}
+\DoxyCodeLine{615                                                   W *field, U *res)}
+\DoxyCodeLine{616 \{}
+\DoxyCodeLine{617     std::array<T, 3> point\_target;}
+\DoxyCodeLine{618     std::complex<T> ets;}
+\DoxyCodeLine{619 }
+\DoxyCodeLine{620     \textcolor{keywordtype}{int} jc = 0;}
+\DoxyCodeLine{621 }
+\DoxyCodeLine{622     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=start; i<stop; i++)}
+\DoxyCodeLine{623     \{}
+\DoxyCodeLine{624         point\_target[0] = ct-\/>x[i];}
+\DoxyCodeLine{625         point\_target[1] = ct-\/>y[i];}
+\DoxyCodeLine{626         point\_target[2] = ct-\/>z[i];}
+\DoxyCodeLine{627 }
+\DoxyCodeLine{628         ets = fieldScalarAtPoint(cs, field, point\_target);}
+\DoxyCodeLine{629 }
+\DoxyCodeLine{630         res-\/>rx[i] = ets.real();}
+\DoxyCodeLine{631         res-\/>ix[i] = ets.imag();}
+\DoxyCodeLine{632 }
+\DoxyCodeLine{633         \textcolor{keywordflow}{if}((i * 100 / this-\/>step) > jc \&\& start == 0 * this-\/>step)}
+\DoxyCodeLine{634         \{}
+\DoxyCodeLine{635             std::cout << jc << \textcolor{stringliteral}{"{} / 100"{}} << \textcolor{charliteral}{'\(\backslash\)r'};}
+\DoxyCodeLine{636             std::cout.flush();}
+\DoxyCodeLine{637             jc++;}
+\DoxyCodeLine{638         \}}
+\DoxyCodeLine{639     \}}
+\DoxyCodeLine{640 \}}
+\DoxyCodeLine{641 }
+\DoxyCodeLine{642 \textcolor{keyword}{template} <\textcolor{keyword}{class} T, \textcolor{keyword}{class} U, \textcolor{keyword}{class} V, \textcolor{keyword}{class} W>}
+\DoxyCodeLine{643 std::array<std::array<std::complex<T>, 3>, 2> \mbox{\hyperlink{classPropagation_a624b50b5c7b44511575b290a81b6567a}{Propagation<T, U, V, W>::fieldAtPoint}}(V *cs,}
+\DoxyCodeLine{644                                                                              W *currents, \textcolor{keyword}{const} std::array<T, 3> \&point\_target)}
+\DoxyCodeLine{645 \{}
+\DoxyCodeLine{646     \textcolor{comment}{// Scalars (T \& complex T)}}
+\DoxyCodeLine{647     T r;                           \textcolor{comment}{// Distance between source and target points}}
+\DoxyCodeLine{648     T r\_inv;                       \textcolor{comment}{// 1 / r}}
+\DoxyCodeLine{649     T omega;                       \textcolor{comment}{// Angular frequency of field}}
+\DoxyCodeLine{650     std::complex<T> Green;         \textcolor{comment}{// Container for Green's function}}
+\DoxyCodeLine{651     std::complex<T> r\_in\_s;        \textcolor{comment}{// Container for inner products between wavevctor and currents}}
+\DoxyCodeLine{652 }
+\DoxyCodeLine{653     \textcolor{comment}{// Arrays of Ts}}
+\DoxyCodeLine{654     std::array<T, 3> source\_point; \textcolor{comment}{// Container for xyz co-\/ordinates}}
+\DoxyCodeLine{655     std::array<T, 3> r\_vec;        \textcolor{comment}{// Distance vector between source and target points}}
+\DoxyCodeLine{656     std::array<T, 3> k\_hat;        \textcolor{comment}{// Unit wavevctor}}
+\DoxyCodeLine{657     std::array<T, 3> k\_arr;        \textcolor{comment}{// Wavevector}}
+\DoxyCodeLine{658 }
+\DoxyCodeLine{659     \textcolor{comment}{// Arrays of complex Ts}}
+\DoxyCodeLine{660     std::array<std::complex<T>, 3> e\_field;        \textcolor{comment}{// Electric field on target}}
+\DoxyCodeLine{661     std::array<std::complex<T>, 3> h\_field;        \textcolor{comment}{// Magnetic field on target}}
+\DoxyCodeLine{662     std::array<std::complex<T>, 3> js;             \textcolor{comment}{// Electric current at source point}}
+\DoxyCodeLine{663     std::array<std::complex<T>, 3> ms;             \textcolor{comment}{// Magnetic current at source point}}
+\DoxyCodeLine{664     std::array<std::complex<T>, 3> e\_vec\_thing;    \textcolor{comment}{// Electric current contribution to e-\/field}}
+\DoxyCodeLine{665     std::array<std::complex<T>, 3> h\_vec\_thing;    \textcolor{comment}{// Magnetic current contribution to h-\/field}}
+\DoxyCodeLine{666     std::array<std::complex<T>, 3> k\_out\_ms;       \textcolor{comment}{// Outer product between k and ms}}
+\DoxyCodeLine{667     std::array<std::complex<T>, 3> k\_out\_js;       \textcolor{comment}{// Outer product between k and js}}
+\DoxyCodeLine{668     std::array<std::complex<T>, 3> temp;           \textcolor{comment}{// Temporary container for intermediate values}}
+\DoxyCodeLine{669 }
+\DoxyCodeLine{670     \textcolor{comment}{// Return container}}
+\DoxyCodeLine{671     std::array<std::array<std::complex<T>, 3>, 2> e\_h\_field; \textcolor{comment}{// Return container containing e and h-\/fields}}
+\DoxyCodeLine{672 }
+\DoxyCodeLine{673     e\_field.fill(z0);}
+\DoxyCodeLine{674     h\_field.fill(z0);}
+\DoxyCodeLine{675 }
+\DoxyCodeLine{676     omega = C\_L * k;}
+\DoxyCodeLine{677 }
+\DoxyCodeLine{678     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<gs; i++)}
+\DoxyCodeLine{679     \{}
+\DoxyCodeLine{680         source\_point[0] = cs-\/>x[i];}
+\DoxyCodeLine{681         source\_point[1] = cs-\/>y[i];}
+\DoxyCodeLine{682         source\_point[2] = cs-\/>z[i];}
+\DoxyCodeLine{683 }
+\DoxyCodeLine{684         js[0] = \{currents-\/>r1x[i], currents-\/>i1x[i]\};}
+\DoxyCodeLine{685         js[1] = \{currents-\/>r1y[i], currents-\/>i1y[i]\};}
+\DoxyCodeLine{686         js[2] = \{currents-\/>r1z[i], currents-\/>i1z[i]\};}
+\DoxyCodeLine{687 }
+\DoxyCodeLine{688         ms[0] = \{currents-\/>r2x[i], currents-\/>i2x[i]\};}
+\DoxyCodeLine{689         ms[1] = \{currents-\/>r2y[i], currents-\/>i2y[i]\};}
+\DoxyCodeLine{690         ms[2] = \{currents-\/>r2z[i], currents-\/>i2z[i]\};}
+\DoxyCodeLine{691 }
+\DoxyCodeLine{692         ut.diff(point\_target, source\_point, r\_vec);}
+\DoxyCodeLine{693         ut.abs(r\_vec, r);}
+\DoxyCodeLine{694 }
+\DoxyCodeLine{695         r\_inv = 1 / r;}
+\DoxyCodeLine{696 }
+\DoxyCodeLine{697         ut.s\_mult(r\_vec, r\_inv, k\_hat);}
+\DoxyCodeLine{698         ut.s\_mult(k\_hat, k, k\_arr);}
+\DoxyCodeLine{699 }
+\DoxyCodeLine{700         \textcolor{comment}{// e-\/field}}
+\DoxyCodeLine{701         ut.dot(k\_hat, js, r\_in\_s);}
+\DoxyCodeLine{702         ut.s\_mult(k\_hat, r\_in\_s, temp);}
+\DoxyCodeLine{703         ut.diff(js, temp, e\_vec\_thing);}
+\DoxyCodeLine{704 }
+\DoxyCodeLine{705         ut.ext(k\_arr, ms, k\_out\_ms);}
+\DoxyCodeLine{706 }
+\DoxyCodeLine{707         \textcolor{comment}{// h-\/field}}
+\DoxyCodeLine{708         ut.dot(k\_hat, ms, r\_in\_s);}
+\DoxyCodeLine{709         ut.s\_mult(k\_hat, r\_in\_s, temp);}
+\DoxyCodeLine{710         ut.diff(ms, temp, h\_vec\_thing);}
+\DoxyCodeLine{711 }
+\DoxyCodeLine{712         ut.ext(k\_arr, js, k\_out\_js);}
+\DoxyCodeLine{713 }
+\DoxyCodeLine{714         \textcolor{comment}{//printf("{}\%.16g\(\backslash\)n"{}, r);}}
+\DoxyCodeLine{715 }
+\DoxyCodeLine{716         Green = exp(this-\/>t\_direction * j * k * r) / (4 * M\_PIf * r) * cs-\/>area[i] * j;}
+\DoxyCodeLine{717 }
+\DoxyCodeLine{718         \textcolor{keywordflow}{for}( \textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{719         \{}
+\DoxyCodeLine{720             e\_field[n] += (-\/omega * MU\_0 * e\_vec\_thing[n] + k\_out\_ms[n]) * Green;}
+\DoxyCodeLine{721             h\_field[n] += (-\/omega * EPS * h\_vec\_thing[n] -\/ k\_out\_js[n]) * Green;}
+\DoxyCodeLine{722         \}}
+\DoxyCodeLine{723         \textcolor{comment}{//printf("{}\%.16g, \%.16g\(\backslash\)n"{}, Green.real(), Green.imag()); // \%s is format specifier}}
+\DoxyCodeLine{724     \}}
+\DoxyCodeLine{725 }
+\DoxyCodeLine{726     \textcolor{comment}{// Pack e and h together in single container}}
+\DoxyCodeLine{727     e\_h\_field[0] = e\_field;}
+\DoxyCodeLine{728     e\_h\_field[1] = h\_field;}
+\DoxyCodeLine{729 }
+\DoxyCodeLine{730     \textcolor{comment}{//std::cout << ut.abs(e\_field) << std::endl;}}
+\DoxyCodeLine{731 }
+\DoxyCodeLine{732     \textcolor{keywordflow}{return} e\_h\_field;}
+\DoxyCodeLine{733 \}}
+\DoxyCodeLine{734 }
+\DoxyCodeLine{735 \textcolor{keyword}{template} <\textcolor{keyword}{class} T, \textcolor{keyword}{class} U, \textcolor{keyword}{class} V, \textcolor{keyword}{class} W>}
+\DoxyCodeLine{736 std::complex<T> \mbox{\hyperlink{classPropagation_a68b38f577289a8b480597a96991cbb42}{Propagation<T, U, V, W>::fieldScalarAtPoint}}(V *cs,}
+\DoxyCodeLine{737                                    W *field, \textcolor{keyword}{const} std::array<T, 3> \&point\_target)}
+\DoxyCodeLine{738 \{}
+\DoxyCodeLine{739     std::complex<T> out(0., 0.);}
+\DoxyCodeLine{740     std::complex<T> j(0., 1.);}
+\DoxyCodeLine{741     std::complex<T> \_field;}
+\DoxyCodeLine{742 }
+\DoxyCodeLine{743     T r;}
+\DoxyCodeLine{744     std::array<T, 3> r\_vec;}
+\DoxyCodeLine{745     std::array<T, 3> source\_point;}
+\DoxyCodeLine{746 }
+\DoxyCodeLine{747     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<gs; i++)}
+\DoxyCodeLine{748     \{}
+\DoxyCodeLine{749         source\_point[0] = cs-\/>x[i];}
+\DoxyCodeLine{750         source\_point[1] = cs-\/>y[i];}
+\DoxyCodeLine{751         source\_point[2] = cs-\/>z[i];}
+\DoxyCodeLine{752 }
+\DoxyCodeLine{753         \_field = \{field-\/>rx[i], field-\/>ix[i]\};}
+\DoxyCodeLine{754 }
+\DoxyCodeLine{755         ut.diff(point\_target, source\_point, r\_vec);}
+\DoxyCodeLine{756         ut.abs(r\_vec, r);}
+\DoxyCodeLine{757 }
+\DoxyCodeLine{758         out += -\/ k * k * \_field * exp(-\/j * k * r) / (4 * M\_PIf * r) * cs-\/>area[i];}
+\DoxyCodeLine{759 }
+\DoxyCodeLine{760     \}}
+\DoxyCodeLine{761     \textcolor{keywordflow}{return} out;}
+\DoxyCodeLine{762 \}}
+\DoxyCodeLine{763 }
+\DoxyCodeLine{764 \textcolor{keyword}{template} <\textcolor{keyword}{class} T, \textcolor{keyword}{class} U, \textcolor{keyword}{class} V, \textcolor{keyword}{class} W>}
+\DoxyCodeLine{765 \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_a7c860baa0bad0cc6fb5c7a7d61321d39}{Propagation<T, U, V, W>::parallelProp\_JM}}(V *cs, V *ct,}
+\DoxyCodeLine{766                                               W *currents, U *res)}
+\DoxyCodeLine{767 \{}
+\DoxyCodeLine{768     \textcolor{keywordtype}{int} final\_step;}
+\DoxyCodeLine{769 }
+\DoxyCodeLine{770     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<numThreads; n++)}
+\DoxyCodeLine{771     \{}
+\DoxyCodeLine{772         \textcolor{comment}{//std::cout << n << std::endl;}}
+\DoxyCodeLine{773         \textcolor{keywordflow}{if}(n == (numThreads-\/1))}
+\DoxyCodeLine{774         \{}
+\DoxyCodeLine{775             final\_step = gt;}
+\DoxyCodeLine{776         \}}
+\DoxyCodeLine{777 }
+\DoxyCodeLine{778         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{779         \{}
+\DoxyCodeLine{780             final\_step = (n+1) * step;}
+\DoxyCodeLine{781         \}}
+\DoxyCodeLine{782 }
+\DoxyCodeLine{783         \textcolor{comment}{//std::cout << final\_step << std::endl;}}
+\DoxyCodeLine{784 }
+\DoxyCodeLine{785         threadPool[n] = std::thread(\&\mbox{\hyperlink{classPropagation_a136bdc69dd60382a95bac0798374ed21}{Propagation::propagateBeam\_JM}},}
+\DoxyCodeLine{786                                     \textcolor{keyword}{this}, n * step, final\_step,}
+\DoxyCodeLine{787                                     cs, ct, currents, res);}
+\DoxyCodeLine{788     \}}
+\DoxyCodeLine{789     joinThreads();}
+\DoxyCodeLine{790 \}}
+\DoxyCodeLine{791 }
+\DoxyCodeLine{792 \textcolor{keyword}{template} <\textcolor{keyword}{class} T, \textcolor{keyword}{class} U, \textcolor{keyword}{class} V, \textcolor{keyword}{class} W>}
+\DoxyCodeLine{793 \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_ab6eb3104c44500c824ab8d644c1271f4}{Propagation<T, U, V, W>::parallelProp\_EH}}(V *cs, V *ct,}
+\DoxyCodeLine{794                                               W *currents, U *res)}
+\DoxyCodeLine{795 \{}
+\DoxyCodeLine{796     \textcolor{keywordtype}{int} final\_step;}
+\DoxyCodeLine{797 }
+\DoxyCodeLine{798     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<numThreads; n++)}
+\DoxyCodeLine{799     \{}
+\DoxyCodeLine{800         \textcolor{comment}{//std::cout << n << std::endl;}}
+\DoxyCodeLine{801         \textcolor{keywordflow}{if}(n == (numThreads-\/1))}
+\DoxyCodeLine{802         \{}
+\DoxyCodeLine{803             final\_step = gt;}
+\DoxyCodeLine{804         \}}
+\DoxyCodeLine{805 }
+\DoxyCodeLine{806         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{807         \{}
+\DoxyCodeLine{808             final\_step = (n+1) * step;}
+\DoxyCodeLine{809         \}}
+\DoxyCodeLine{810 }
+\DoxyCodeLine{811         \textcolor{comment}{//std::cout << final\_step << std::endl;}}
+\DoxyCodeLine{812 }
+\DoxyCodeLine{813         threadPool[n] = std::thread(\&\mbox{\hyperlink{classPropagation_a35b8b78ab563e6c096c10627febcc347}{Propagation::propagateBeam\_EH}},}
+\DoxyCodeLine{814                                     \textcolor{keyword}{this}, n * step, final\_step,}
+\DoxyCodeLine{815                                     cs, ct, currents, res);}
+\DoxyCodeLine{816     \}}
+\DoxyCodeLine{817     joinThreads();}
+\DoxyCodeLine{818 \}}
+\DoxyCodeLine{819 }
+\DoxyCodeLine{820 \textcolor{keyword}{template} <\textcolor{keyword}{class} T, \textcolor{keyword}{class} U, \textcolor{keyword}{class} V, \textcolor{keyword}{class} W>}
+\DoxyCodeLine{821 \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_a276633d37065f34d3b92dfce1580aee8}{Propagation<T, U, V, W>::parallelProp\_JMEH}}(V *cs, V *ct,}
+\DoxyCodeLine{822                                                 W *currents, U *res)}
+\DoxyCodeLine{823 \{}
+\DoxyCodeLine{824     \textcolor{keywordtype}{int} final\_step;}
+\DoxyCodeLine{825 }
+\DoxyCodeLine{826     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<numThreads; n++)}
+\DoxyCodeLine{827     \{}
+\DoxyCodeLine{828         \textcolor{keywordflow}{if}(n == (numThreads-\/1))}
+\DoxyCodeLine{829         \{}
+\DoxyCodeLine{830             final\_step = gt;}
+\DoxyCodeLine{831         \}}
+\DoxyCodeLine{832 }
+\DoxyCodeLine{833         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{834         \{}
+\DoxyCodeLine{835             final\_step = (n+1) * step;}
+\DoxyCodeLine{836         \}}
+\DoxyCodeLine{837 }
+\DoxyCodeLine{838         threadPool[n] = std::thread(\&\mbox{\hyperlink{classPropagation_a8f163f7d0e473d5126b7ff6b01751844}{Propagation::propagateBeam\_JMEH}},}
+\DoxyCodeLine{839                                     \textcolor{keyword}{this}, n * step, final\_step,}
+\DoxyCodeLine{840                                     cs, ct, currents, res);}
+\DoxyCodeLine{841     \}}
+\DoxyCodeLine{842     joinThreads();}
+\DoxyCodeLine{843 \}}
+\DoxyCodeLine{844 }
+\DoxyCodeLine{845 \textcolor{keyword}{template} <\textcolor{keyword}{class} T, \textcolor{keyword}{class} U, \textcolor{keyword}{class} V, \textcolor{keyword}{class} W>}
+\DoxyCodeLine{846 \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_a4c6b6b9d6eb99727a17b5b3fe75e1356}{Propagation<T, U, V, W>::parallelProp\_EHP}}(V *cs, V *ct,}
+\DoxyCodeLine{847                                               W *currents, U *res)}
+\DoxyCodeLine{848 \{}
+\DoxyCodeLine{849     \textcolor{keywordtype}{int} final\_step;}
+\DoxyCodeLine{850 }
+\DoxyCodeLine{851     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<numThreads; n++)}
+\DoxyCodeLine{852     \{}
+\DoxyCodeLine{853         \textcolor{comment}{//std::cout << n << std::endl;}}
+\DoxyCodeLine{854         \textcolor{keywordflow}{if}(n == (numThreads-\/1))}
+\DoxyCodeLine{855         \{}
+\DoxyCodeLine{856             final\_step = gt;}
+\DoxyCodeLine{857         \}}
+\DoxyCodeLine{858 }
+\DoxyCodeLine{859         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{860         \{}
+\DoxyCodeLine{861             final\_step = (n+1) * step;}
+\DoxyCodeLine{862         \}}
+\DoxyCodeLine{863 }
+\DoxyCodeLine{864         threadPool[n] = std::thread(\&\mbox{\hyperlink{classPropagation_a7f06156ddc121930016a279ca04aa8b0}{Propagation::propagateBeam\_EHP}},}
+\DoxyCodeLine{865                                     \textcolor{keyword}{this}, n * step, final\_step,}
+\DoxyCodeLine{866                                     cs, ct, currents, res);}
+\DoxyCodeLine{867     \}}
+\DoxyCodeLine{868     joinThreads();}
+\DoxyCodeLine{869 \}}
+\DoxyCodeLine{870 }
+\DoxyCodeLine{871 \textcolor{keyword}{template} <\textcolor{keyword}{class} T, \textcolor{keyword}{class} U, \textcolor{keyword}{class} V, \textcolor{keyword}{class} W>}
+\DoxyCodeLine{872 \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_a8ffee67b3ba634090bd277ef87eead7e}{Propagation<T, U, V, W>::parallelPropScalar}}(V *cs, V *ct,}
+\DoxyCodeLine{873                                               W *field, U *res)}
+\DoxyCodeLine{874 \{}
+\DoxyCodeLine{875     \textcolor{keywordtype}{int} final\_step;}
+\DoxyCodeLine{876 }
+\DoxyCodeLine{877     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<numThreads; n++)}
+\DoxyCodeLine{878     \{}
+\DoxyCodeLine{879         \textcolor{keywordflow}{if}(n == (numThreads-\/1))}
+\DoxyCodeLine{880         \{}
+\DoxyCodeLine{881             final\_step = gt;}
+\DoxyCodeLine{882         \}}
+\DoxyCodeLine{883 }
+\DoxyCodeLine{884         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{885         \{}
+\DoxyCodeLine{886             final\_step = (n+1) * step;}
+\DoxyCodeLine{887         \}}
+\DoxyCodeLine{888 }
+\DoxyCodeLine{889         threadPool[n] = std::thread(\&\mbox{\hyperlink{classPropagation_a49e12495563317c7af2f6cdff8b8ff08}{Propagation::propagateScalarBeam}},}
+\DoxyCodeLine{890                                     \textcolor{keyword}{this}, n * step, final\_step,}
+\DoxyCodeLine{891                                     cs, ct, field, res);}
+\DoxyCodeLine{892     \}}
+\DoxyCodeLine{893     joinThreads();}
+\DoxyCodeLine{894 \}}
+\DoxyCodeLine{895 }
+\DoxyCodeLine{896 \textcolor{comment}{// Far-\/field functions to calculate E-\/vector in far-\/field}}
+\DoxyCodeLine{897 \textcolor{keyword}{template} <\textcolor{keyword}{class} T, \textcolor{keyword}{class} U, \textcolor{keyword}{class} V, \textcolor{keyword}{class} W>}
+\DoxyCodeLine{898 \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_acd65676ef3ba92011b64ec1b827b9699}{Propagation<T, U, V, W>::propagateToFarField}}(\textcolor{keywordtype}{int} start, \textcolor{keywordtype}{int} stop,}
+\DoxyCodeLine{899                                               V *cs, V *ct,}
+\DoxyCodeLine{900                                               W *currents, U *res)}
+\DoxyCodeLine{901 \{}
+\DoxyCodeLine{902     \textcolor{comment}{// Scalars (T \& complex T)}}
+\DoxyCodeLine{903     T theta;}
+\DoxyCodeLine{904     T phi;}
+\DoxyCodeLine{905     T cosEl;}
+\DoxyCodeLine{906 }
+\DoxyCodeLine{907     std::complex<T> e\_th;}
+\DoxyCodeLine{908     std::complex<T> e\_ph;}
+\DoxyCodeLine{909 }
+\DoxyCodeLine{910     std::complex<T> e\_Az;}
+\DoxyCodeLine{911     std::complex<T> e\_El;}
+\DoxyCodeLine{912 }
+\DoxyCodeLine{913     \textcolor{comment}{// Arrays of Ts}}
+\DoxyCodeLine{914     std::array<T, 2> point\_ff;            \textcolor{comment}{// Angular point on far-\/field}}
+\DoxyCodeLine{915     std::array<T, 3> r\_hat;                \textcolor{comment}{// Unit vector in far-\/field point direction}}
+\DoxyCodeLine{916 }
+\DoxyCodeLine{917     \textcolor{comment}{// Arrays of complex Ts}}
+\DoxyCodeLine{918     std::array<std::complex<T>, 3> e;            \textcolor{comment}{// far-\/field E-\/field}}
+\DoxyCodeLine{919 }
+\DoxyCodeLine{920     \textcolor{keywordtype}{int} jc = 0;}
+\DoxyCodeLine{921     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=start; i<stop; i++)}
+\DoxyCodeLine{922     \{}
+\DoxyCodeLine{923         phi     = ct-\/>x[i];}
+\DoxyCodeLine{924         theta   = ct-\/>y[i];}
+\DoxyCodeLine{925         cosEl   = std::sqrt(1 -\/ sin(theta) * sin(phi) * sin(theta) * sin(phi));}
+\DoxyCodeLine{926 }
+\DoxyCodeLine{927         r\_hat[0] = cos(theta) * sin(phi);}
+\DoxyCodeLine{928         r\_hat[1] = sin(theta) * sin(phi);}
+\DoxyCodeLine{929         r\_hat[2] = cos(phi);}
+\DoxyCodeLine{930 }
+\DoxyCodeLine{931         \textcolor{comment}{// Calculate total incoming E and H field at point on target}}
+\DoxyCodeLine{932         e = \mbox{\hyperlink{Kernelsf_8cu_a2b2fe507d139af1fc75ec76defbde434}{farfieldAtPoint}}(cs, currents, r\_hat, start);}
+\DoxyCodeLine{933 }
+\DoxyCodeLine{934         res-\/>r1x[i] = e[0].real();}
+\DoxyCodeLine{935         res-\/>r1y[i] = e[1].real();}
+\DoxyCodeLine{936         res-\/>r1z[i] = e[2].real();}
+\DoxyCodeLine{937 }
+\DoxyCodeLine{938         res-\/>i1x[i] = e[0].imag();}
+\DoxyCodeLine{939         res-\/>i1y[i] = e[1].imag();}
+\DoxyCodeLine{940         res-\/>i1z[i] = e[2].imag();}
+\DoxyCodeLine{941 }
+\DoxyCodeLine{942         \textcolor{comment}{// TODO: Calculate H far fields}}
+\DoxyCodeLine{943         res-\/>r2x[i] = 0.;}
+\DoxyCodeLine{944         res-\/>r2y[i] = 0.;}
+\DoxyCodeLine{945         res-\/>r2z[i] = 0.;}
+\DoxyCodeLine{946 }
+\DoxyCodeLine{947         res-\/>i2x[i] = 0.;}
+\DoxyCodeLine{948         res-\/>i2y[i] = 0.;}
+\DoxyCodeLine{949         res-\/>i2z[i] = 0.;}
+\DoxyCodeLine{950 }
+\DoxyCodeLine{951         \textcolor{keywordflow}{if}((i * 100 / this-\/>step) > jc \&\& start == 0 * this-\/>step)}
+\DoxyCodeLine{952         \{}
+\DoxyCodeLine{953             std::cout << jc << \textcolor{stringliteral}{"{} / 100"{}} << \textcolor{charliteral}{'\(\backslash\)r'};}
+\DoxyCodeLine{954             std::cout.flush();}
+\DoxyCodeLine{955             jc++;}
+\DoxyCodeLine{956         \}}
+\DoxyCodeLine{957     \}}
+\DoxyCodeLine{958 \}}
+\DoxyCodeLine{959 }
+\DoxyCodeLine{960 \textcolor{keyword}{template} <\textcolor{keyword}{class} T, \textcolor{keyword}{class} U, \textcolor{keyword}{class} V, \textcolor{keyword}{class} W>}
+\DoxyCodeLine{961 std::array<std::complex<T>, 3> \mbox{\hyperlink{classPropagation_aca73accdb96a817422b87479693e6323}{Propagation<T, U, V, W>::farfieldAtPoint}}(V *cs,}
+\DoxyCodeLine{962                                                 W *currents,}
+\DoxyCodeLine{963                                                 \textcolor{keyword}{const} std::array<T, 3> \&r\_hat, \textcolor{keywordtype}{int} start)}
+\DoxyCodeLine{964 \{}
+\DoxyCodeLine{965     \textcolor{comment}{// Scalars (T \& complex T)}}
+\DoxyCodeLine{966     T omega\_mu;                       \textcolor{comment}{// Angular frequency of field times mu}}
+\DoxyCodeLine{967     T r\_hat\_in\_rp;                 \textcolor{comment}{// r\_hat dot product r\_prime}}
+\DoxyCodeLine{968     std::complex<T> r\_in\_s;        \textcolor{comment}{// Container for inner products between wavevctor and currents}}
+\DoxyCodeLine{969     std::complex<T> expo;}
+\DoxyCodeLine{970     T area;}
+\DoxyCodeLine{971 }
+\DoxyCodeLine{972     \textcolor{comment}{// Arrays of Ts}}
+\DoxyCodeLine{973     std::array<T, 3> source\_point; \textcolor{comment}{// Container for xyz co-\/ordinates}}
+\DoxyCodeLine{974 }
+\DoxyCodeLine{975     \textcolor{comment}{// Arrays of complex Ts}}
+\DoxyCodeLine{976     std::array<std::complex<T>, 3> e;        \textcolor{comment}{// Electric field on far-\/field point}}
+\DoxyCodeLine{977     std::array<std::complex<T>, 3> \_js;      \textcolor{comment}{// Temporary Electric current at source point}}
+\DoxyCodeLine{978     std::array<std::complex<T>, 3> \_ms;      \textcolor{comment}{// Temporary Magnetic current at source point}}
+\DoxyCodeLine{979 }
+\DoxyCodeLine{980     std::array<std::complex<T>, 3> js;      \textcolor{comment}{// Build radiation integral}}
+\DoxyCodeLine{981     std::array<std::complex<T>, 3> ms;      \textcolor{comment}{// Build radiation integral}}
+\DoxyCodeLine{982 }
+\DoxyCodeLine{983     std::array<std::complex<T>, 3> \_ctemp;}
+\DoxyCodeLine{984     std::array<std::complex<T>, 3> js\_tot\_factor;}
+\DoxyCodeLine{985     std::array<std::complex<T>, 3> ms\_tot\_factor;}
+\DoxyCodeLine{986 }
+\DoxyCodeLine{987     \textcolor{comment}{// Matrices}}
+\DoxyCodeLine{988     std::array<std::array<T, 3>, 3> rr\_dyad;       \textcolor{comment}{// Dyadic product between r\_hat -\/ r\_hat}}
+\DoxyCodeLine{989     std::array<std::array<T, 3>, 3> eye\_min\_rr;    \textcolor{comment}{// I -\/ rr}}
+\DoxyCodeLine{990 }
+\DoxyCodeLine{991     e.fill(z0);}
+\DoxyCodeLine{992     js.fill(z0);}
+\DoxyCodeLine{993     ms.fill(z0);}
+\DoxyCodeLine{994 }
+\DoxyCodeLine{995     omega\_mu = C\_L * k * MU\_0;}
+\DoxyCodeLine{996 }
+\DoxyCodeLine{997     ut.dyad(r\_hat, r\_hat, rr\_dyad);}
+\DoxyCodeLine{998     ut.matDiff(this-\/>\mbox{\hyperlink{Kernelsf_8cu_ae9e71ffcca414c0956671a1ba54b0f65}{eye}}, rr\_dyad, eye\_min\_rr);}
+\DoxyCodeLine{999 }
+\DoxyCodeLine{1000     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<gs; i++)}
+\DoxyCodeLine{1001     \{}
+\DoxyCodeLine{1002         source\_point[0] = cs-\/>x[i];}
+\DoxyCodeLine{1003         source\_point[1] = cs-\/>y[i];}
+\DoxyCodeLine{1004         source\_point[2] = cs-\/>z[i];}
+\DoxyCodeLine{1005 }
+\DoxyCodeLine{1006         ut.dot(r\_hat, source\_point, r\_hat\_in\_rp);}
+\DoxyCodeLine{1007 }
+\DoxyCodeLine{1008         expo = exp(j * k * r\_hat\_in\_rp);}
+\DoxyCodeLine{1009         area = cs-\/>area[i];}
+\DoxyCodeLine{1010 }
+\DoxyCodeLine{1011         \_js[0] = \{currents-\/>r1x[i], currents-\/>i1x[i]\};}
+\DoxyCodeLine{1012         \_js[1] = \{currents-\/>r1y[i], currents-\/>i1y[i]\};}
+\DoxyCodeLine{1013         \_js[2] = \{currents-\/>r1z[i], currents-\/>i1z[i]\};}
+\DoxyCodeLine{1014 }
+\DoxyCodeLine{1015         \_ms[0] = \{currents-\/>r2x[i], currents-\/>i2x[i]\};}
+\DoxyCodeLine{1016         \_ms[1] = \{currents-\/>r2y[i], currents-\/>i2y[i]\};}
+\DoxyCodeLine{1017         \_ms[2] = \{currents-\/>r2z[i], currents-\/>i2z[i]\};}
+\DoxyCodeLine{1018 }
+\DoxyCodeLine{1019         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{1020         \{}
+\DoxyCodeLine{1021             js[n] += \_js[n] * expo * area;}
+\DoxyCodeLine{1022             ms[n] += \_ms[n] * expo * area;}
+\DoxyCodeLine{1023         \}}
+\DoxyCodeLine{1024     \}}
+\DoxyCodeLine{1025 }
+\DoxyCodeLine{1026     ut.matVec(eye\_min\_rr, js, \_ctemp);}
+\DoxyCodeLine{1027 }
+\DoxyCodeLine{1028     ut.s\_mult(\_ctemp, omega\_mu, js\_tot\_factor);}
+\DoxyCodeLine{1029 }
+\DoxyCodeLine{1030     ut.ext(r\_hat, ms, \_ctemp);}
+\DoxyCodeLine{1031     ut.s\_mult(\_ctemp, k, ms\_tot\_factor);}
+\DoxyCodeLine{1032 }
+\DoxyCodeLine{1033     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} n=0; n<3; n++)}
+\DoxyCodeLine{1034     \{}
+\DoxyCodeLine{1035         e[n] = -\/js\_tot\_factor[n] + ms\_tot\_factor[n];}
+\DoxyCodeLine{1036     \}}
+\DoxyCodeLine{1037 }
+\DoxyCodeLine{1038     \textcolor{keywordflow}{return} e;}
+\DoxyCodeLine{1039 \}}
+\DoxyCodeLine{1040 }
+\DoxyCodeLine{1041 \textcolor{keyword}{template} <\textcolor{keyword}{class} T, \textcolor{keyword}{class} U, \textcolor{keyword}{class} V, \textcolor{keyword}{class} W>}
+\DoxyCodeLine{1042 \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_a5f99e065919ac64c1c2a4c091fa84ccd}{Propagation<T, U, V, W>::parallelFarField}}(V *cs, V *ct,}
+\DoxyCodeLine{1043                                               W *currents, U *res)}
+\DoxyCodeLine{1044 \{}
+\DoxyCodeLine{1045     \textcolor{keywordtype}{int} final\_step;}
+\DoxyCodeLine{1046 }
+\DoxyCodeLine{1047     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<numThreads; n++)}
+\DoxyCodeLine{1048     \{}
+\DoxyCodeLine{1049         \textcolor{keywordflow}{if}(n == (numThreads-\/1))}
+\DoxyCodeLine{1050         \{}
+\DoxyCodeLine{1051             final\_step = gt;}
+\DoxyCodeLine{1052         \}}
+\DoxyCodeLine{1053 }
+\DoxyCodeLine{1054         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{1055         \{}
+\DoxyCodeLine{1056             final\_step = (n+1) * step;}
+\DoxyCodeLine{1057         \}}
+\DoxyCodeLine{1058 }
+\DoxyCodeLine{1059         threadPool[n] = std::thread(\&\mbox{\hyperlink{classPropagation_acd65676ef3ba92011b64ec1b827b9699}{Propagation::propagateToFarField}},}
+\DoxyCodeLine{1060                                     \textcolor{keyword}{this}, n * step, final\_step,}
+\DoxyCodeLine{1061                                     cs, ct, currents, res);}
+\DoxyCodeLine{1062     \}}
+\DoxyCodeLine{1063     joinThreads();}
+\DoxyCodeLine{1064 \}}
+\DoxyCodeLine{1065 }
+\DoxyCodeLine{1066 \textcolor{keyword}{template} <\textcolor{keyword}{class} T, \textcolor{keyword}{class} U, \textcolor{keyword}{class} V, \textcolor{keyword}{class} W>}
+\DoxyCodeLine{1067 \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_aed85769a47000071dbc274ecd4718496}{Propagation<T, U, V, W>::joinThreads}}()}
+\DoxyCodeLine{1068 \{}
+\DoxyCodeLine{1069     \textcolor{keywordflow}{for} (std::thread \&t : threadPool)}
+\DoxyCodeLine{1070     \{}
+\DoxyCodeLine{1071         \textcolor{keywordflow}{if} (t.joinable())}
+\DoxyCodeLine{1072         \{}
+\DoxyCodeLine{1073             t.join();}
+\DoxyCodeLine{1074         \}}
+\DoxyCodeLine{1075     \}}
+\DoxyCodeLine{1076 \}}
+\DoxyCodeLine{1077 }
+\DoxyCodeLine{1078 \textcolor{keyword}{template} <\textcolor{keyword}{class} T, \textcolor{keyword}{class} U, \textcolor{keyword}{class} V, \textcolor{keyword}{class} W>}
+\DoxyCodeLine{1079 \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_a253971a4781c8da9e4adf8ed428e3fd6}{Propagation<T, U, V, W>::\_debugArray}}(T *arr, \textcolor{keywordtype}{int} idx)}
+\DoxyCodeLine{1080 \{}
+\DoxyCodeLine{1081     T toPrint = arr[idx];}
+\DoxyCodeLine{1082     std::cout << \textcolor{stringliteral}{"{}Value of c-\/style array, element "{}} << idx << \textcolor{stringliteral}{"{}, is : "{}} << toPrint << std::endl;}
+\DoxyCodeLine{1083 \}}
+\DoxyCodeLine{1084 }
+\DoxyCodeLine{1085 \textcolor{keyword}{template} <\textcolor{keyword}{class} T, \textcolor{keyword}{class} U, \textcolor{keyword}{class} V, \textcolor{keyword}{class} W>}
+\DoxyCodeLine{1086 \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_a253971a4781c8da9e4adf8ed428e3fd6}{Propagation<T, U, V, W>::\_debugArray}}(std::array<T, 3> arr)}
+\DoxyCodeLine{1087 \{}
+\DoxyCodeLine{1088     std::cout << arr[0] << \textcolor{stringliteral}{"{}, "{}} << arr[1] << \textcolor{stringliteral}{"{}, "{}} << arr[2] << std::endl;}
+\DoxyCodeLine{1089 \}}
+\DoxyCodeLine{1090 }
+\DoxyCodeLine{1091 \textcolor{keyword}{template} <\textcolor{keyword}{class} T, \textcolor{keyword}{class} U, \textcolor{keyword}{class} V, \textcolor{keyword}{class} W>}
+\DoxyCodeLine{1092 \textcolor{keywordtype}{void} \mbox{\hyperlink{classPropagation_a253971a4781c8da9e4adf8ed428e3fd6}{Propagation<T, U, V, W>::\_debugArray}}(std::array<std::complex<T>, 3> arr)}
+\DoxyCodeLine{1093 \{}
+\DoxyCodeLine{1094     std::cout << arr[0].real() << \textcolor{stringliteral}{"{} + "{}} << arr[0].imag() << \textcolor{stringliteral}{"{}j"{}}}
+\DoxyCodeLine{1095                 <<  \textcolor{stringliteral}{"{}, "{}} << arr[1].real() << \textcolor{stringliteral}{"{} + "{}} << arr[1].imag() << \textcolor{stringliteral}{"{}j"{}}}
+\DoxyCodeLine{1096                 <<  \textcolor{stringliteral}{"{}, "{}} << arr[2].real() << \textcolor{stringliteral}{"{} + "{}} << arr[2].imag() << \textcolor{stringliteral}{"{}j"{}}}
+\DoxyCodeLine{1097                 <<  std::endl;}
+\DoxyCodeLine{1098 \}}
+\DoxyCodeLine{1099 }
+\DoxyCodeLine{1100 }
+\DoxyCodeLine{1101 \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

@@ -1,0 +1,205 @@
+\hypertarget{InterfaceCUDA_8h}{}\doxysection{src/\+CUDA/\+Interface\+CUDA.h File Reference}
+\label{InterfaceCUDA_8h}\index{src/CUDA/InterfaceCUDA.h@{src/CUDA/InterfaceCUDA.h}}
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$chrono$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$cmath$>$}\newline
+{\ttfamily \#include $<$array$>$}\newline
+{\ttfamily \#include \char`\"{}GUtils.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Structs.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Interface\+Reflector.\+h\char`\"{}}\newline
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{InterfaceCUDA_8h_ad8f114959b29521f5e2bb245cc6bf62a}{CSIZE}}~10
+\item 
+\#define \mbox{\hyperlink{InterfaceCUDA_8h_a4a6b1e825b1f397db65418925a6786ae}{CSIZERT}}~5
+\item 
+\#define \mbox{\hyperlink{InterfaceCUDA_8h_a6f1e731907521317e8a272d5ae57364e}{MILLISECOND}}~1000
+\item 
+\#define \mbox{\hyperlink{InterfaceCUDA_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\+\_\+\+DLL}}
+\item 
+\#define \mbox{\hyperlink{InterfaceCUDA_8h_a72625f23fcc160102c7d8a4671fcbdab}{\+\_\+\+\_\+\+Interface\+CUDA\+\_\+h}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{InterfaceBeam_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\+\_\+\+DLL}} void \mbox{\hyperlink{InterfaceCUDA_8h_aa1a707203d559a80446ca7434909fddb}{call\+Kernelf\+\_\+\+JM}} (\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$res, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} source, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} target, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$cs, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$ct, \mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$currents, float k, float epsilon, float t\+\_\+direction, int n\+Blocks, int n\+Threads)
+\item 
+\mbox{\hyperlink{InterfaceBeam_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\+\_\+\+DLL}} void \mbox{\hyperlink{InterfaceCUDA_8h_a811facec3128e4c15df8da9f640a1959}{call\+Kernelf\+\_\+\+EH}} (\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$res, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} source, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} target, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$cs, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$ct, \mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$currents, float k, float epsilon, float t\+\_\+direction, int n\+Blocks, int n\+Threads)
+\item 
+\mbox{\hyperlink{InterfaceBeam_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\+\_\+\+DLL}} void \mbox{\hyperlink{InterfaceCUDA_8h_ae7e01f3a5cc154fe04edc961e5b188ac}{call\+Kernelf\+\_\+\+JMEH}} (\mbox{\hyperlink{structc4Bundlef}{c4\+Bundlef}} $\ast$res, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} source, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} target, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$cs, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$ct, \mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$currents, float k, float epsilon, float t\+\_\+direction, int n\+Blocks, int n\+Threads)
+\item 
+\mbox{\hyperlink{InterfaceBeam_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\+\_\+\+DLL}} void \mbox{\hyperlink{InterfaceCUDA_8h_a910351583951dd88a360f281f1dea1c0}{call\+Kernelf\+\_\+\+EHP}} (\mbox{\hyperlink{structc2rBundlef}{c2r\+Bundlef}} $\ast$res, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} source, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} target, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$cs, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$ct, \mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$currents, float k, float epsilon, float t\+\_\+direction, int n\+Blocks, int n\+Threads)
+\item 
+\mbox{\hyperlink{InterfaceBeam_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\+\_\+\+DLL}} void \mbox{\hyperlink{InterfaceCUDA_8h_a2f0d426988d0d767a3367e1caaca19fa}{call\+Kernelf\+\_\+\+FF}} (\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$res, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} source, \mbox{\hyperlink{structreflparamsf}{reflparamsf}} target, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$cs, \mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$ct, \mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$currents, float k, float epsilon, float t\+\_\+direction, int n\+Blocks, int n\+Threads)
+\item 
+\mbox{\hyperlink{InterfaceBeam_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\+\_\+\+DLL}} void \mbox{\hyperlink{InterfaceCUDA_8h_afbc53793101a259c5aad4bd77a1a3346}{call\+RTKernel}} (\mbox{\hyperlink{structreflparamsf}{reflparamsf}} ctp, \mbox{\hyperlink{structcframef}{cframef}} $\ast$fr\+\_\+in, \mbox{\hyperlink{structcframef}{cframef}} $\ast$fr\+\_\+out, float epsilon, float t0, int n\+Blocks, int n\+Threads)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{InterfaceCUDA_8h_a72625f23fcc160102c7d8a4671fcbdab}\label{InterfaceCUDA_8h_a72625f23fcc160102c7d8a4671fcbdab}} 
+\index{InterfaceCUDA.h@{InterfaceCUDA.h}!\_\_InterfaceCUDA\_h@{\_\_InterfaceCUDA\_h}}
+\index{\_\_InterfaceCUDA\_h@{\_\_InterfaceCUDA\_h}!InterfaceCUDA.h@{InterfaceCUDA.h}}
+\doxysubsubsection{\texorpdfstring{\_\_InterfaceCUDA\_h}{\_\_InterfaceCUDA\_h}}
+{\footnotesize\ttfamily \#define \+\_\+\+\_\+\+Interface\+CUDA\+\_\+h}
+
+\mbox{\Hypertarget{InterfaceCUDA_8h_ad8f114959b29521f5e2bb245cc6bf62a}\label{InterfaceCUDA_8h_ad8f114959b29521f5e2bb245cc6bf62a}} 
+\index{InterfaceCUDA.h@{InterfaceCUDA.h}!CSIZE@{CSIZE}}
+\index{CSIZE@{CSIZE}!InterfaceCUDA.h@{InterfaceCUDA.h}}
+\doxysubsubsection{\texorpdfstring{CSIZE}{CSIZE}}
+{\footnotesize\ttfamily \#define CSIZE~10}
+
+\mbox{\Hypertarget{InterfaceCUDA_8h_a4a6b1e825b1f397db65418925a6786ae}\label{InterfaceCUDA_8h_a4a6b1e825b1f397db65418925a6786ae}} 
+\index{InterfaceCUDA.h@{InterfaceCUDA.h}!CSIZERT@{CSIZERT}}
+\index{CSIZERT@{CSIZERT}!InterfaceCUDA.h@{InterfaceCUDA.h}}
+\doxysubsubsection{\texorpdfstring{CSIZERT}{CSIZERT}}
+{\footnotesize\ttfamily \#define CSIZERT~5}
+
+\mbox{\Hypertarget{InterfaceCUDA_8h_a6f1e731907521317e8a272d5ae57364e}\label{InterfaceCUDA_8h_a6f1e731907521317e8a272d5ae57364e}} 
+\index{InterfaceCUDA.h@{InterfaceCUDA.h}!MILLISECOND@{MILLISECOND}}
+\index{MILLISECOND@{MILLISECOND}!InterfaceCUDA.h@{InterfaceCUDA.h}}
+\doxysubsubsection{\texorpdfstring{MILLISECOND}{MILLISECOND}}
+{\footnotesize\ttfamily \#define MILLISECOND~1000}
+
+\mbox{\Hypertarget{InterfaceCUDA_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}\label{InterfaceCUDA_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}} 
+\index{InterfaceCUDA.h@{InterfaceCUDA.h}!POPPY\_DLL@{POPPY\_DLL}}
+\index{POPPY\_DLL@{POPPY\_DLL}!InterfaceCUDA.h@{InterfaceCUDA.h}}
+\doxysubsubsection{\texorpdfstring{POPPY\_DLL}{POPPY\_DLL}}
+{\footnotesize\ttfamily \#define POPPY\+\_\+\+DLL}
+
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{InterfaceCUDA_8h_a811facec3128e4c15df8da9f640a1959}\label{InterfaceCUDA_8h_a811facec3128e4c15df8da9f640a1959}} 
+\index{InterfaceCUDA.h@{InterfaceCUDA.h}!callKernelf\_EH@{callKernelf\_EH}}
+\index{callKernelf\_EH@{callKernelf\_EH}!InterfaceCUDA.h@{InterfaceCUDA.h}}
+\doxysubsubsection{\texorpdfstring{callKernelf\_EH()}{callKernelf\_EH()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{InterfaceBeam_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\+\_\+\+DLL}} void call\+Kernelf\+\_\+\+EH (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$}]{res,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{source,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{target,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{cs,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{ct,  }\item[{\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$}]{currents,  }\item[{float}]{k,  }\item[{float}]{epsilon,  }\item[{float}]{t\+\_\+direction,  }\item[{int}]{n\+Blocks,  }\item[{int}]{n\+Threads }\end{DoxyParamCaption})}
+
+(PUBLIC) Wrapper for calling kernel 1.
+
+
+\begin{DoxyParams}{Parameters}
+{\em d\+\_\+x} & Pointer for x array on device. \\
+\hline
+{\em d\+\_\+y} & Pointer for y array on device. \\
+\hline
+{\em d\+\_\+z} & Pointer for z array on device. \\
+\hline
+{\em h\+\_\+x} & Pointer for x array on host. \\
+\hline
+{\em h\+\_\+y} & Pointer for y array on host. \\
+\hline
+{\em h\+\_\+z} & Pointer for z array on host. \\
+\hline
+{\em size} & Number of elements of h\+\_\+x/d\+\_\+x. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{InterfaceCUDA_8h_a910351583951dd88a360f281f1dea1c0}\label{InterfaceCUDA_8h_a910351583951dd88a360f281f1dea1c0}} 
+\index{InterfaceCUDA.h@{InterfaceCUDA.h}!callKernelf\_EHP@{callKernelf\_EHP}}
+\index{callKernelf\_EHP@{callKernelf\_EHP}!InterfaceCUDA.h@{InterfaceCUDA.h}}
+\doxysubsubsection{\texorpdfstring{callKernelf\_EHP()}{callKernelf\_EHP()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{InterfaceBeam_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\+\_\+\+DLL}} void call\+Kernelf\+\_\+\+EHP (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structc2rBundlef}{c2r\+Bundlef}} $\ast$}]{res,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{source,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{target,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{cs,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{ct,  }\item[{\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$}]{currents,  }\item[{float}]{k,  }\item[{float}]{epsilon,  }\item[{float}]{t\+\_\+direction,  }\item[{int}]{n\+Blocks,  }\item[{int}]{n\+Threads }\end{DoxyParamCaption})}
+
+(PUBLIC) Wrapper for calling kernel 3.
+
+
+\begin{DoxyParams}{Parameters}
+{\em d\+\_\+x} & Pointer for x array on device. \\
+\hline
+{\em d\+\_\+y} & Pointer for y array on device. \\
+\hline
+{\em d\+\_\+z} & Pointer for z array on device. \\
+\hline
+{\em h\+\_\+x} & Pointer for x array on host. \\
+\hline
+{\em h\+\_\+y} & Pointer for y array on host. \\
+\hline
+{\em h\+\_\+z} & Pointer for z array on host. \\
+\hline
+{\em size} & Number of elements of h\+\_\+x/d\+\_\+x. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{InterfaceCUDA_8h_a2f0d426988d0d767a3367e1caaca19fa}\label{InterfaceCUDA_8h_a2f0d426988d0d767a3367e1caaca19fa}} 
+\index{InterfaceCUDA.h@{InterfaceCUDA.h}!callKernelf\_FF@{callKernelf\_FF}}
+\index{callKernelf\_FF@{callKernelf\_FF}!InterfaceCUDA.h@{InterfaceCUDA.h}}
+\doxysubsubsection{\texorpdfstring{callKernelf\_FF()}{callKernelf\_FF()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{InterfaceBeam_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\+\_\+\+DLL}} void call\+Kernelf\+\_\+\+FF (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$}]{res,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{source,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{target,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{cs,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{ct,  }\item[{\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$}]{currents,  }\item[{float}]{k,  }\item[{float}]{epsilon,  }\item[{float}]{t\+\_\+direction,  }\item[{int}]{n\+Blocks,  }\item[{int}]{n\+Threads }\end{DoxyParamCaption})}
+
+(PUBLIC) Wrapper for calling kernel 4 (far-\/field).
+
+
+\begin{DoxyParams}{Parameters}
+{\em d\+\_\+x} & Pointer for x array on device. \\
+\hline
+{\em d\+\_\+y} & Pointer for y array on device. \\
+\hline
+{\em d\+\_\+z} & Pointer for z array on device. \\
+\hline
+{\em h\+\_\+x} & Pointer for x array on host. \\
+\hline
+{\em h\+\_\+y} & Pointer for y array on host. \\
+\hline
+{\em h\+\_\+z} & Pointer for z array on host. \\
+\hline
+{\em size} & Number of elements of h\+\_\+x/d\+\_\+x. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{InterfaceCUDA_8h_aa1a707203d559a80446ca7434909fddb}\label{InterfaceCUDA_8h_aa1a707203d559a80446ca7434909fddb}} 
+\index{InterfaceCUDA.h@{InterfaceCUDA.h}!callKernelf\_JM@{callKernelf\_JM}}
+\index{callKernelf\_JM@{callKernelf\_JM}!InterfaceCUDA.h@{InterfaceCUDA.h}}
+\doxysubsubsection{\texorpdfstring{callKernelf\_JM()}{callKernelf\_JM()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{InterfaceBeam_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\+\_\+\+DLL}} void call\+Kernelf\+\_\+\+JM (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$}]{res,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{source,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{target,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{cs,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{ct,  }\item[{\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$}]{currents,  }\item[{float}]{k,  }\item[{float}]{epsilon,  }\item[{float}]{t\+\_\+direction,  }\item[{int}]{n\+Blocks,  }\item[{int}]{n\+Threads }\end{DoxyParamCaption})}
+
+(PUBLIC) Wrapper for calling kernel 0.
+
+
+\begin{DoxyParams}{Parameters}
+{\em d\+\_\+x} & Pointer for x array on device. \\
+\hline
+{\em d\+\_\+y} & Pointer for y array on device. \\
+\hline
+{\em d\+\_\+z} & Pointer for z array on device. \\
+\hline
+{\em h\+\_\+x} & Pointer for x array on host. \\
+\hline
+{\em h\+\_\+y} & Pointer for y array on host. \\
+\hline
+{\em h\+\_\+z} & Pointer for z array on host. \\
+\hline
+{\em size} & Number of elements of h\+\_\+x/d\+\_\+x. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{InterfaceCUDA_8h_ae7e01f3a5cc154fe04edc961e5b188ac}\label{InterfaceCUDA_8h_ae7e01f3a5cc154fe04edc961e5b188ac}} 
+\index{InterfaceCUDA.h@{InterfaceCUDA.h}!callKernelf\_JMEH@{callKernelf\_JMEH}}
+\index{callKernelf\_JMEH@{callKernelf\_JMEH}!InterfaceCUDA.h@{InterfaceCUDA.h}}
+\doxysubsubsection{\texorpdfstring{callKernelf\_JMEH()}{callKernelf\_JMEH()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{InterfaceBeam_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\+\_\+\+DLL}} void call\+Kernelf\+\_\+\+JMEH (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structc4Bundlef}{c4\+Bundlef}} $\ast$}]{res,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{source,  }\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{target,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{cs,  }\item[{\mbox{\hyperlink{structreflcontainerf}{reflcontainerf}} $\ast$}]{ct,  }\item[{\mbox{\hyperlink{structc2Bundlef}{c2\+Bundlef}} $\ast$}]{currents,  }\item[{float}]{k,  }\item[{float}]{epsilon,  }\item[{float}]{t\+\_\+direction,  }\item[{int}]{n\+Blocks,  }\item[{int}]{n\+Threads }\end{DoxyParamCaption})}
+
+(PUBLIC) Wrapper for calling kernel 2.
+
+
+\begin{DoxyParams}{Parameters}
+{\em d\+\_\+x} & Pointer for x array on device. \\
+\hline
+{\em d\+\_\+y} & Pointer for y array on device. \\
+\hline
+{\em d\+\_\+z} & Pointer for z array on device. \\
+\hline
+{\em h\+\_\+x} & Pointer for x array on host. \\
+\hline
+{\em h\+\_\+y} & Pointer for y array on host. \\
+\hline
+{\em h\+\_\+z} & Pointer for z array on host. \\
+\hline
+{\em size} & Number of elements of h\+\_\+x/d\+\_\+x. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{InterfaceCUDA_8h_afbc53793101a259c5aad4bd77a1a3346}\label{InterfaceCUDA_8h_afbc53793101a259c5aad4bd77a1a3346}} 
+\index{InterfaceCUDA.h@{InterfaceCUDA.h}!callRTKernel@{callRTKernel}}
+\index{callRTKernel@{callRTKernel}!InterfaceCUDA.h@{InterfaceCUDA.h}}
+\doxysubsubsection{\texorpdfstring{callRTKernel()}{callRTKernel()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{InterfaceBeam_8h_a5b061ddfa5d5076e6f151d94c1b1bb8c}{POPPY\+\_\+\+DLL}} void call\+RTKernel (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structreflparamsf}{reflparamsf}}}]{ctp,  }\item[{\mbox{\hyperlink{structcframef}{cframef}} $\ast$}]{fr\+\_\+in,  }\item[{\mbox{\hyperlink{structcframef}{cframef}} $\ast$}]{fr\+\_\+out,  }\item[{float}]{epsilon,  }\item[{float}]{t0,  }\item[{int}]{n\+Blocks,  }\item[{int}]{n\+Threads }\end{DoxyParamCaption})}
+

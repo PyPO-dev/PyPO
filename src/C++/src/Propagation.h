@@ -52,10 +52,10 @@ public:
                        const std::vector<std::vector<std::complex<double>>> &Ms,
                        const std::vector<double> &source_area);
 
-    std::vector<std::vector<std::complex<double>>> fieldAtPoint(const std::vector<std::vector<double>> &grid_source,
+    std::array<std::array<std::complex<double>, 3>, 2> fieldAtPoint(const std::vector<std::vector<double>> &grid_source,
                                       const std::vector<std::vector<std::complex<double>>> &Js,
                                       const std::vector<std::vector<std::complex<double>>> &Ms,
-                                      const std::vector<double> &point_target,
+                                      const std::array<double, 3> &point_target,
                                       const std::vector<double> &source_area,
                                       const int start);
 

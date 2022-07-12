@@ -6,6 +6,8 @@ import unittest
 import numpy as np
 import scipy.interpolate as interp
 
+import src.Python.Copy as Copy
+import src.Python.MatRotate as MatRotate
 import src.Python.Reflectors as Reflectors
 
 class TestParabola(unittest.TestCase): 
@@ -62,7 +64,62 @@ class TestParabola(unittest.TestCase):
         self.assertEqual(self.parabola.grid_nx.shape, (self.gridsize[0], self.gridsize[1]))
         self.assertEqual(self.parabola.grid_ny.shape, (self.gridsize[0], self.gridsize[1]))
         self.assertEqual(self.parabola.grid_nz.shape, (self.gridsize[0], self.gridsize[1]))
-    
+        
+    def test_translateGrid(self):
+        offTrans = np.array([3, 1, -5])
+        
+        self.parabola.setGrid(self.lims_x, self.lims_y, self.gridsize, gmode='xy', axis='a', trunc=False, flip=False)
+        
+        x0 = Copy.copyGrid(self.parabola.grid_x.ravel())
+        y0 = Copy.copyGrid(self.parabola.grid_y.ravel())
+        z0 = Copy.copyGrid(self.parabola.grid_z.ravel())
+
+        self.parabola.translateGrid(offTrans)
+        
+        x = self.parabola.grid_x.ravel()
+        y = self.parabola.grid_y.ravel()
+        z = self.parabola.grid_z.ravel()
+        
+        for (xx0, yy0, zz0, xx, yy, zz) in zip(x0, y0, z0, x, y, z):
+            self.assertEqual(xx0 + offTrans[0], xx)
+            self.assertEqual(yy0 + offTrans[1], yy)
+            self.assertEqual(zz0 + offTrans[2], zz)
+            
+    def test_rotateGrid(self):
+        offRot = np.array([34, 21, 178])
+        
+        self.parabola.setGrid(self.lims_x, self.lims_y, self.gridsize, gmode='xy', axis='a', trunc=False, flip=False)
+        
+        x0 = Copy.copyGrid(self.parabola.grid_x.ravel())
+        y0 = Copy.copyGrid(self.parabola.grid_y.ravel())
+        z0 = Copy.copyGrid(self.parabola.grid_z.ravel())
+        
+        nx0 = Copy.copyGrid(self.parabola.grid_nx.ravel())
+        ny0 = Copy.copyGrid(self.parabola.grid_ny.ravel())
+        nz0 = Copy.copyGrid(self.parabola.grid_nz.ravel())
+
+        self.parabola.rotateGrid(offRot)
+        
+        x = self.parabola.grid_x.ravel()
+        y = self.parabola.grid_y.ravel()
+        z = self.parabola.grid_z.ravel()
+        
+        nx = self.parabola.grid_nx.ravel()
+        ny = self.parabola.grid_ny.ravel()
+        nz = self.parabola.grid_nz.ravel()
+        
+        for xx0, yy0, zz0, xx, yy, zz, nxx0, nyy0, nzz0, nxx, nyy, nzz in zip(x0, y0, z0, x, y, z, nx0, ny0, nz0, nx, ny, nz):
+            pos_t = MatRotate.MatRotate(offRot, [xx0, yy0, zz0], origin=self.cRot)
+            norm_t = MatRotate.MatRotate(offRot, [nxx0, nyy0, nzz0], vecRot=True)
+            
+            self.assertEqual(pos_t[0], xx)
+            self.assertEqual(pos_t[1], yy)
+            self.assertEqual(pos_t[2], zz)
+            
+            self.assertEqual(norm_t[0], nxx)
+            self.assertEqual(norm_t[1], nyy)
+            self.assertEqual(norm_t[2], nzz)
+
     def test_interpReflector(self):
         self.parabola.setGrid(self.lims_x, self.lims_y, self.gridsize, gmode='xy', axis='a', trunc=False, flip=False)
         
@@ -177,6 +234,61 @@ class TestHyperbola(unittest.TestCase):
         self.assertEqual(self.hyperbola.grid_nx.shape, (self.gridsize[0], self.gridsize[1]))
         self.assertEqual(self.hyperbola.grid_ny.shape, (self.gridsize[0], self.gridsize[1]))
         self.assertEqual(self.hyperbola.grid_nz.shape, (self.gridsize[0], self.gridsize[1]))
+    
+    def test_translateGrid(self):
+        offTrans = np.array([3, 1, -5])
+        
+        self.hyperbola.setGrid(self.lims_x, self.lims_y, self.gridsize, gmode='xy', axis='a', trunc=False, flip=False)
+        
+        x0 = Copy.copyGrid(self.hyperbola.grid_x.ravel())
+        y0 = Copy.copyGrid(self.hyperbola.grid_y.ravel())
+        z0 = Copy.copyGrid(self.hyperbola.grid_z.ravel())
+
+        self.hyperbola.translateGrid(offTrans)
+        
+        x = self.hyperbola.grid_x.ravel()
+        y = self.hyperbola.grid_y.ravel()
+        z = self.hyperbola.grid_z.ravel()
+        
+        for (xx0, yy0, zz0, xx, yy, zz) in zip(x0, y0, z0, x, y, z):
+            self.assertEqual(xx0 + offTrans[0], xx)
+            self.assertEqual(yy0 + offTrans[1], yy)
+            self.assertEqual(zz0 + offTrans[2], zz)
+    
+    def test_rotateGrid(self):
+        offRot = np.array([34, 21, 178])
+        
+        self.hyperbola.setGrid(self.lims_x, self.lims_y, self.gridsize, gmode='xy', axis='a', trunc=False, flip=False)
+        
+        x0 = Copy.copyGrid(self.hyperbola.grid_x.ravel())
+        y0 = Copy.copyGrid(self.hyperbola.grid_y.ravel())
+        z0 = Copy.copyGrid(self.hyperbola.grid_z.ravel())
+        
+        nx0 = Copy.copyGrid(self.hyperbola.grid_nx.ravel())
+        ny0 = Copy.copyGrid(self.hyperbola.grid_ny.ravel())
+        nz0 = Copy.copyGrid(self.hyperbola.grid_nz.ravel())
+
+        self.hyperbola.rotateGrid(offRot)
+        
+        x = self.hyperbola.grid_x.ravel()
+        y = self.hyperbola.grid_y.ravel()
+        z = self.hyperbola.grid_z.ravel()
+        
+        nx = self.hyperbola.grid_nx.ravel()
+        ny = self.hyperbola.grid_ny.ravel()
+        nz = self.hyperbola.grid_nz.ravel()
+        
+        for xx0, yy0, zz0, xx, yy, zz, nxx0, nyy0, nzz0, nxx, nyy, nzz in zip(x0, y0, z0, x, y, z, nx0, ny0, nz0, nx, ny, nz):
+            pos_t = MatRotate.MatRotate(offRot, [xx0, yy0, zz0], origin=self.cRot)
+            norm_t = MatRotate.MatRotate(offRot, [nxx0, nyy0, nzz0], vecRot=True)
+            
+            self.assertEqual(pos_t[0], xx)
+            self.assertEqual(pos_t[1], yy)
+            self.assertEqual(pos_t[2], zz)
+            
+            self.assertEqual(norm_t[0], nxx)
+            self.assertEqual(norm_t[1], nyy)
+            self.assertEqual(norm_t[2], nzz)
     
     def test_interpReflector(self):
         self.hyperbola.setGrid(self.lims_x, self.lims_y, self.gridsize, gmode='xy', axis='a', trunc=False, flip=False)

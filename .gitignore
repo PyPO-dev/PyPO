@@ -143,3 +143,4 @@ movie/
 ex_APWS.py
 custom/
 
+.vscode/settings.json

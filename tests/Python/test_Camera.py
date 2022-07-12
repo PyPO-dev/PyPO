@@ -6,9 +6,12 @@ import unittest
 import numpy as np
 import scipy.interpolate as interp
 
-import src.Python.Camera as Camera
+import src.Python.MatRotate as MatRotate
 
-class TestMatRotate(unittest.TestCase):
+import src.Python.Camera as Camera
+import src.Python.Copy as Copy
+
+class TestCamera(unittest.TestCase):
     
     @classmethod
     def setUpClass(cls):
@@ -23,10 +26,10 @@ class TestMatRotate(unittest.TestCase):
         
         self.name = "cam_test"
         
-        self.offTrans = np.array([0, 0, 0])
+        
         self.offRot = np.radians([0, 0, 0])
         
-        self.camera = Camera.Camera(center=self.center, offTrans=self.offTrans, offRot=self.offRot, name=self.name)
+        self.camera = Camera.Camera(center=self.center, name=self.name)
         
     def test_setGrid(self):
         self.camera.setGrid(self.lims_x, self.lims_y, self.gridsize)
@@ -38,6 +41,73 @@ class TestMatRotate(unittest.TestCase):
         self.assertEqual(self.camera.grid_nx.shape, (self.gridsize[0], self.gridsize[1]))
         self.assertEqual(self.camera.grid_ny.shape, (self.gridsize[0], self.gridsize[1]))
         self.assertEqual(self.camera.grid_nz.shape, (self.gridsize[0], self.gridsize[1]))
+        
+    def test_translateGrid(self):
+        offTrans = np.array([3, 1, -5])
+        
+        self.camera.setGrid(self.lims_x, self.lims_y, self.gridsize)
+        
+        x0 = Copy.copyGrid(self.camera.grid_x.ravel())
+        y0 = Copy.copyGrid(self.camera.grid_y.ravel())
+        z0 = Copy.copyGrid(self.camera.grid_z.ravel())
+        
+        c0 = Copy.copyGrid(self.camera.center)
+        
+        self.camera.translateGrid(offTrans)
+        
+        x = self.camera.grid_x.ravel()
+        y = self.camera.grid_y.ravel()
+        z = self.camera.grid_z.ravel()
+        
+        for (xx0, yy0, zz0, xx, yy, zz) in zip(x0, y0, z0, x, y, z):
+            self.assertEqual(xx0 + offTrans[0], xx)
+            self.assertEqual(yy0 + offTrans[1], yy)
+            self.assertEqual(zz0 + offTrans[2], zz)
+            
+        for cc0, cc, tr in zip(c0, self.camera.center, offTrans):
+            self.assertEqual(cc0 + tr, cc)
+        
+    def test_rotateGrid(self):
+        offRot = np.array([34, 21, 178])
+        
+        self.camera.setGrid(self.lims_x, self.lims_y, self.gridsize)
+        
+        x0 = Copy.copyGrid(self.camera.grid_x.ravel())
+        y0 = Copy.copyGrid(self.camera.grid_y.ravel())
+        z0 = Copy.copyGrid(self.camera.grid_z.ravel())
+        
+        nx0 = Copy.copyGrid(self.camera.grid_nx.ravel())
+        ny0 = Copy.copyGrid(self.camera.grid_ny.ravel())
+        nz0 = Copy.copyGrid(self.camera.grid_nz.ravel())
+        
+        c0 = Copy.copyGrid(self.camera.center)
+        
+        self.camera.rotateGrid(offRot)
+        
+        x = self.camera.grid_x.ravel()
+        y = self.camera.grid_y.ravel()
+        z = self.camera.grid_z.ravel()
+        
+        nx = self.camera.grid_nx.ravel()
+        ny = self.camera.grid_ny.ravel()
+        nz = self.camera.grid_nz.ravel()
+        
+        for xx0, yy0, zz0, xx, yy, zz, nxx0, nyy0, nzz0, nxx, nyy, nzz in zip(x0, y0, z0, x, y, z, nx0, ny0, nz0, nx, ny, nz):
+            pos_t = MatRotate.MatRotate(offRot, [xx0, yy0, zz0], origin=self.center)
+            norm_t = MatRotate.MatRotate(offRot, [nxx0, nyy0, nzz0], vecRot=True)
+            
+            self.assertEqual(pos_t[0], xx)
+            self.assertEqual(pos_t[1], yy)
+            self.assertEqual(pos_t[2], zz)
+            
+            self.assertEqual(norm_t[0], nxx)
+            self.assertEqual(norm_t[1], nyy)
+            self.assertEqual(norm_t[2], nzz)
+            
+            
+        c0_t = MatRotate.MatRotate(offRot, c0, origin=self.center)
+        for cc0, cc in zip(c0, self.camera.center):
+            self.assertEqual(cc0, cc)
         
     def test_interpCamera(self):
         self.camera.setGrid(self.lims_x, self.lims_y, self.gridsize)

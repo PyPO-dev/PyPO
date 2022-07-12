@@ -10,6 +10,9 @@ import src.Python.Camera as Camera
 import src.Python.Beams as Beams
 import src.Python.PhysOptics as PO
 import src.Python.FourierOptics as FO
+from src.Python.Plotter import Plotter
+import src.Python.Aperture as Aperture
+#from src.Python.Fitting import Fitting
 
 class System(object):
     
@@ -34,6 +37,9 @@ class System(object):
             self.customBeamPath += path
         else:
             self.customBeamPath = path
+            
+    def addPlotter(self, save='./images/'):
+        self.plotter = Plotter(save='./images/')
     
     #### ADD REFLECTOR METHODS
     def addParabola(self, coef, lims_x, lims_y, gridsize, cRot=np.zeros(3), pmode='man', gmode='xy', name="Parabola", axis='a', trunc=False, flip=False):
@@ -162,8 +168,10 @@ class System(object):
         self.system["{}".format(name)] = e
         self.num_ref += 1
     
-    def addCamera(self, name="Camera", center=np.array([0,0,0]), offTrans=np.array([0,0,0]), offRot=np.array([0,0,0])):
-        cam = Camera.Camera(center, offTrans, offRot, name)
+    def addCamera(self, lims_x, lims_y, gridsize, center=np.zeros(3), name="Camera"):
+        cam = Camera.Camera(center, name)
+        
+        cam.setGrid(lims_x, lims_y, gridsize)
         
         self.system["{}".format(name)] = cam
         self.num_cam += 1
@@ -182,6 +190,9 @@ class System(object):
             
             elif elem.elType == "Camera":
                 ax = elem.plotCamera(returns=True, ax_append=ax)
+                
+            elif elem.elType == "Aperture":
+                ax = elem.plotAperture(returns=True, ax_append=ax)
             
         if plotRaytrace:
             ax = self.Raytracer.plotRaysSystem(ax_append=ax)
@@ -194,16 +205,16 @@ class System(object):
         ax.tick_params(axis='x', which='major', pad=-3)
         pt.show()
         
-    def initRaytracer(self, NraysCirc=0, NraysCross=0, 
+    def initRaytracer(self, nRays=0, nCirc=1, 
                  rCirc=0, div_ang_x=2*np.pi, div_ang_y=2*np.pi,
                  originChief=np.array([0,0,0]), 
                  tiltChief=np.array([0,0,0]), nomChief = np.array([0,0,1])):
         
-        rt = RayTrace.RayTrace(NraysCirc, NraysCross, rCirc, div_ang_x, div_ang_y, originChief, tiltChief, nomChief)
+        rt = RayTrace.RayTrace(nRays, nCirc, rCirc, div_ang_x, div_ang_y, originChief, tiltChief, nomChief)
         
         self.Raytracer = rt
         
-    def startRaytracer(self, surface, a_init=100, verbose=False):
+    def startRaytracer(self, surface, a_init=100):
         """
         Propagate rays in RayTracer to a surface.
         Adds new frame to rays, containing point of intersection and reflected direction.
@@ -211,7 +222,7 @@ class System(object):
         if not hasattr(self.system[surface], 'tcks'):
             
             if self.system[surface].elType == "Reflector":
-                self.system[surface].interpReflector(verbose=verbose)
+                self.system[surface].interpReflector()
                 
             elif self.system[surface].elType == "Camera":
                 self.system[surface].interpCamera()
@@ -219,22 +230,25 @@ class System(object):
         self.Raytracer.set_tcks(self.system[surface].tcks)
         self.Raytracer.propagateRays(a_init=a_init)
         
-    def addBeam(self, x_lims, y_lims, gridsize, beam='pw', pol=np.array([1,0,0]), amp=1, phase=0, flip=False, name='', comp='Ex'):
+    def addBeam(self, lims_x, lims_y, gridsize, beam='pw', pol=np.array([1,0,0]), amp=1, phase=0, flip=False, name='', comp='Ex'):
         if beam == 'pw':
-            self.inputBeam = Beams.PlaneWave(x_lims, y_lims, gridsize, pol, amp, phase, flip)
+            self.inputBeam = Beams.PlaneWave(lims_x, lims_y, gridsize, pol, amp, phase, flip, name)
             
         elif beam == 'custom':
             pathsToFields = [self.customBeamPath + 'r' + name, self.customBeamPath + 'i' + name]
-            self.inputBeam = Beams.CustomBeam(x_lims, y_lims, gridsize, comp, pathsToFields, flip)
+            self.inputBeam = Beams.CustomBeam(lims_x, lims_y, gridsize, comp, pathsToFields, flip, name)
             
-    def initPhysOptics(self, target, k, thres=-50, numThreads=1, inputPath='./src/C++/input/', outputPath='./src/C++/output/'):
+    def addPointSource(self, area=1, pol=np.array([1,0,0]), amp=1, phase=0, flip=False, name='', n=3):
+        self.inputBeam = Beams.PointSource(area, pol, amp, phase, flip, name, n)
+            
+    def initPhysOptics(self, target, k, thres=-50, numThreads=1, cpp_path='./src/C++/'):
         """
         Create a PO object that will act as the 'translator' between POPPy and PhysBeam.
         Also performs the initial propagation from beam to target.
         Should be called once per system.
         """
         
-        self.PO = PO.PhysOptics(inputPath, outputPath, k, numThreads, thres)
+        self.PO = PO.PhysOptics(k, numThreads, thres, cpp_path)
 
         # Write input beam to input
         for i, attr in enumerate(self.inputBeam):
@@ -253,11 +267,16 @@ class System(object):
         Automatically continues from last propagation by copying currents and gird to input
         """
         for i, attr in enumerate(source):
+            # Only write xyz and area
             if i <= 3:
                 self.PO.writeInput(self.fileNames_s[i], attr)
                 
             else:
-                self.PO.copyToInput(self.fileNames_tc[i-4], self.fileNames_s[i])
+                continue
+        
+        for i, field in enumerate(self.fileNames_tc):
+            # Copy J and M from output to input
+            self.PO.copyToInput(self.fileNames_tc[i], self.fileNames_s[i+4])
         
         # Write target grid
         for i, attr in enumerate(target):
@@ -270,8 +289,27 @@ class System(object):
     def runPhysOptics(self, save=0):
         self.PO.runPhysOptics(save)
         
-    def initFourierOptics(self, k=10):
+    def loadField(self, surface, mode='Ex'):
+        field = self.PO.loadField(surface.shape, mode)
+        
+        return field
+        
+    def initFourierOptics(self, k):
         self.FO = FO.FourierOptics(k=k)
         
+    def addCircAper(self, r_max, gridsize, cRot=np.zeros(3), name=''):
+        ap = Aperture.Aperture(cRot, name)
+        ap.makeCircAper(r_max, gridsize)
+        self.system["{}".format(name)] = ap
+        
+    
+    '''
+    def addFitter(self):
+        self.FI = Fitting()
+        
+    def fitGauss(self, mode='abs', thres=-11):
+        #TODO Implement fitting object
+        pass
+    '''    
 if __name__ == "__main__":
     print("Please run System.py from the SystemInterface.py, located in the POPPy directory.")

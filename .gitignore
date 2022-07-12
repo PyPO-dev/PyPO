@@ -135,6 +135,7 @@ dmypy.json
 # User-specific folders
 src/C++/input/
 src/C++/output/
+images/
 
 # Personal projects/files
 personal/
@@ -143,4 +144,11 @@ movie/
 ex_APWS.py
 custom/
 
+buildSystem.py
+ChopperPointing.py
+Plot_spillover.py
+*.png
+test_Parallel.py
+
+#vscode specific
 .vscode/settings.json

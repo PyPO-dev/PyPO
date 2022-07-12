@@ -1,7 +1,13 @@
 import numpy as np
+import sys
+
+sys.path.append('../')
+
 import matplotlib.pyplot as pt
 
 import src.Python.System as System
+
+
 
 def ex_ASTE():
     """
@@ -10,6 +16,8 @@ def ex_ASTE():
     This example showcases how one can construct reflectors by using the functions
     supplied by POPPy
     """
+    
+    cpp_path = '../src/C++/'
     
     # Primary parameters
     R_pri           = 5e3 # Radius in [mm]
@@ -81,7 +89,7 @@ def ex_ASTE():
     offTrans_pw = foc_pri + np.array([0,0,100])
     s.inputBeam.transBeam(offTrans=offTrans_pw)
     
-    s.initPhysOptics(target=s.system["p1"], k=k, numThreads=11)
+    s.initPhysOptics(target=s.system["p1"], k=k, numThreads=11, cpp_path=cpp_path)
     #s.initPhysOptics(target=s.system["cam1"], k=k, numThreads=11)
     s.runPhysOptics()
     #s.nextPhysOptics(target=s.system["h1"])

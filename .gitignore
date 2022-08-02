@@ -152,3 +152,11 @@ test_Parallel.py
 
 #vscode specific
 .vscode/settings.json
+.idea/misc.xml
+.idea/modules.xml
+.idea/POPPy.iml
+.gitignore
+.idea/vcs.xml
+.idea/inspectionProfiles/profiles_settings.xml
+fromDesigner.py
+src/GUI/fromDesigner.ui

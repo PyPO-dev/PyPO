@@ -1,7 +1,9 @@
 from xml.etree.ElementTree import tostring
 from PyQt5 import QtWidgets as qtw
-from ElementsColumn import ElementsWindow
-from src.Python.System import System
+from SystemTab import SystemTab
+from PyQt5 import QtCore
+
+# from src.Python.System import System
 
 
 class MainWindow(qtw.QWidget):
@@ -10,7 +12,7 @@ class MainWindow(qtw.QWidget):
         self.sysNumber = 1
         self.setWindowTitle("POPPy")
 
-        self.Systems = []
+        self.SystemTabs = []
 
 
         MainVBox = qtw.QVBoxLayout()
@@ -22,30 +24,33 @@ class MainWindow(qtw.QWidget):
         # add tabWidget
         self.tabWidget = qtw.QTabWidget()
         MainVBox.addWidget(self.tabWidget)
+        self.addTab()
 
         self.setLayout(MainVBox)
+
         self.show()
 
 
     def addTab(self):
-        tab = qtw.QWidget()
-        self.SysWidget = qtw.QWidget(tab)
+        tab = SystemTab()
+        # self.SysWidget = qtw.QWidget(tab)
+        # self.SysWidget.setGeometry(QtCore.QRect(190, 110, 411, 81))
 
         self.tabWidget.addTab(tab,"System %s" %self.sysNumber)
         self.sysNumber += 1
 
 
         # init System
-        s = System()
-        self.Systems.append(s)
+        # s = System()
+        # self.Systems.append(s)
 
 
 
 
 app = qtw.QApplication([])
 mw = MainWindow()
-mw.setStyleSheet("background: #f6e2f9")
-mw.resize(800,600)
+mw.setStyleSheet("background: #5A0168; color:white")
+# mw.resize(800,600)
 app.exec_()
 
 

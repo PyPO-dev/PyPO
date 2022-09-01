@@ -53,6 +53,16 @@ public:
     void snell(const std::array<std::complex<double>, 3> &cvin, const std::array<double, 3> &normal, std::array<std::complex<double>, 3> &out);
     void snell(const std::array<double, 3> &vin, const std::array<double, 3> &normal, std::array<double, 3> &out);
     
+    // Dyadic products
+    void dyad(const std::array<double, 3> &v1, const std::array<double, 3> &v2, std::array<std::array<double, 3>, 3> &out);
+    
+    // Real valued matrix-matrix subtraction
+    void matDiff(const std::array<std::array<double, 3>, 3> &m1, const std::array<std::array<double, 3>, 3> &m2, std::array<std::array<double, 3>, 3> &out);
+    
+    // Matrix-vector multiplication
+    void matVec(const std::array<std::array<double, 3>, 3> &m1, const std::array<double, 3> &v1, std::array<double, 3> &out);
+    void matVec(const std::array<std::array<double, 3>, 3> &m1, const std::array<std::complex<double>, 3> &cv1, std::array<std::complex<double>, 3> &out);
+    
 };
 #endif 
 
@@ -268,5 +278,44 @@ inline void Utils::snell(const std::array<double, 3> &vin, const std::array<doub
     diff(vin, rhs, out);
 }
 
+// Calculate Dyadic product between two real vectors
+// Returns array of length 3, containing 3 arrays representing ROWS in the resulting matrix
+inline void Utils::dyad(const std::array<double, 3> &v1, const std::array<double, 3> &v2, std::array<std::array<double, 3>, 3> &out)
+{
+    for(int n=0; n<3; n++)
+    {
+        out[n][0] = v1[n] * v2[0];
+        out[n][1] = v1[n] * v2[1];
+        out[n][2] = v1[n] * v2[2];
+    }
+}
+
+// Subtract matrix from another matrix element-wise
+inline void Utils::matDiff(const std::array<std::array<double, 3>, 3> &m1, const std::array<std::array<double, 3>, 3> &m2, std::array<std::array<double, 3>, 3> &out)
+{
+    for(int n=0; n<3; n++)
+    {
+        out[n][0] = m1[n][0] - m2[n][0];
+        out[n][1] = m1[n][1] - m2[n][1];
+        out[n][2] = m1[n][2] - m2[n][2];
+    }
+}
+
+// Multiply matrix with vector to return vector
+inline void Utils::matVec(const std::array<std::array<double, 3>, 3> &m1, const std::array<double, 3> &v1, std::array<double, 3> &out)
+{
+    for(int n=0; n<3; n++)
+    {
+        out[n] = m1[n][0] * v1[0] + m1[n][1] * v1[1] + m1[n][2] * v1[2];
+    }
+}
+
+inline void Utils::matVec(const std::array<std::array<double, 3>, 3> &m1, const std::array<std::complex<double>, 3> &cv1, std::array<std::complex<double>, 3> &out)
+{
+    for(int n=0; n<3; n++)
+    {
+        out[n] = m1[n][0] * cv1[0] + m1[n][1] * cv1[1] + m1[n][2] * cv1[2];
+    }
+}
 
 

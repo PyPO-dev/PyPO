@@ -24,7 +24,7 @@ class Plotter(object):
         if not existSave:
             os.makedirs(self.savePath)
     
-    def plotBeam2D(self, surfaceObject, field, vmin=-30, vmax=0, ff=0, show=True, amp_only=False, save=True, interpolation=None, mode='dB'):
+    def plotBeam2D(self, surfaceObject, field, vmin=-30, vmax=0, ff=0, show=True, amp_only=False, save=False, interpolation=None, mode='dB'):
         
         titleAmp = "PNA / [dB]"
         titlePhase = "Phase / [rad]"

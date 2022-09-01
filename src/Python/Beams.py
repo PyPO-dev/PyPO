@@ -195,6 +195,41 @@ class CustomBeam(Beams):
         self.Hy = self._compList[4]
         self.Hz = self._compList[5]
         
+class CustomBeamGrid(Beams):
+    def __init__(self, comp, pathsToField, flip, name):
+        idxComp = self.compList_eh.index(comp)
+        
+        rfield = np.loadtxt(pathsToField[0])
+        ifield = np.loadtxt(pathsToField[1])
+        
+        gridsize = np.loadtxt(pathsToField[0] + "gridsize.txt")
+        
+        self.grid_x = np.loadtxt(pathsToField[2] + "x.txt").reshape(gridsize)
+        self.grid_y = np.loadtxt(pathsToField[2] + "y.txt").reshape(gridsize)
+        self.grid_z = np.loadtxt(pathsToField[2] + "z.txt").reshape(gridsize)
+        
+        dx = self.grid_x[1,0] - self.grid_x[0,0]
+        dy = self.grid_y[0,1] - self.grid_y[0,0]
+        
+        self.area = dx * dy * np.ones(grid_x.shape)
+        
+        field = rfield.reshape(gridsize) + 1j * ifield.reshape(gridsize)
+        
+        for i, co in enumerate(self.compList_eh):
+            if i == idxComp:
+                self._compList[i] = field
+            
+            else:
+                self._compList[i] = np.zeros(gridsize)
+
+        self.Ex = self._compList[0]
+        self.Ey = self._compList[1]
+        self.Ez = self._compList[2]
+        
+        self.Hx = self._compList[3]
+        self.Hy = self._compList[4]
+        self.Hz = self._compList[5]
+        
     
         
         

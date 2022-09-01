@@ -67,10 +67,10 @@ class Aperture(object):
         self._iterList[5] = self.grid_ny
         self._iterList[6] = self.grid_nz
         
-    def makeCircAper(self, r_max, gridsize):
-        dr = r_max / gridsize[0]
+    def makeCircAper(self, r_max, r_min, gridsize):
+        dr = (r_max-r_min) / gridsize[0]
         dphi = 2*np.pi / gridsize[1]
-        r, phi = np.mgrid[0:r_max:1j*gridsize[0], 0:2*np.pi:1j*gridsize[1]]
+        r, phi = np.mgrid[r_min:r_max:1j*gridsize[0], 0:2*np.pi:1j*gridsize[1]]
         
         self.grid_r = r
         self.grid_phi = phi

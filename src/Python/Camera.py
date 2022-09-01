@@ -5,7 +5,9 @@ import scipy.interpolate as interp
 import src.Python.MatRotate as MatRotate
 
 class Camera(object):
-    
+    """
+    NOTE: if prop_mode for PO == 1, it is assumed camera is in FAR-FIELD. x and y then correspond to Az-El, center only affects pointing then
+    """
     def __init__(self, center, name):
         self.center = center
         self.cRot = center

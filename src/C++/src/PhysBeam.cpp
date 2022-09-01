@@ -36,6 +36,9 @@ int main(int argc, char *argv [])
     double thres    = atof(argv[3]); // Threshold in dB for propagation performance
     int toPrint     = atoi(argv[4]); // 0 for printing J and M, 1 for E and H and 2 for all fields
     
+    double epsilon  = atof(argv[5]); // Relative electric permeability
+    int prop_mode   = atoi(argv[6]); // Whether to propagate to surface or to far-field
+    
     // Initialize timer to assess performance
     std::chrono::steady_clock::time_point begin;
     std::chrono::steady_clock::time_point end; 
@@ -49,23 +52,37 @@ int main(int argc, char *argv [])
     std::vector<double> source_area = handler.readArea();
     
     std::vector<std::vector<double>> grid_source = handler.readGrid3D(source);
-    std::vector<std::vector<double>> grid_target = handler.readGrid3D(target);
-
-    std::vector<std::vector<double>> norm_target = handler.readNormals();
+    std::vector<std::vector<double>> grid_target;
+    std::vector<std::vector<double>> norm_target;
     
-    std::vector<std::vector<std::complex<double>>> Js = handler.read_Js();
-    std::vector<std::vector<std::complex<double>>> Ms = handler.read_Ms();
+    if (prop_mode == 0)
+    {
+        grid_target = handler.readGrid3D(target);
+        norm_target = handler.readNormals();
+    }
+    
+    else if (prop_mode == 1)
+    {
+        grid_target = handler.readGrid2D(prop_mode);
+    }
     
     int gridsize_s = grid_source[0].size();
     int gridsize_t = grid_target[0].size();
+    
+    std::cout << gridsize_t << std::endl;
+    
+    std::vector<std::vector<std::complex<double>>> Js = handler.read_Js();
+    std::vector<std::vector<std::complex<double>>> Ms = handler.read_Ms();
 
-    Propagation prop(k, numThreads, gridsize_s, gridsize_t, thres);
+    Propagation prop(k, numThreads, gridsize_s, gridsize_t, thres, epsilon);
         
     // Start timer
     
     begin = std::chrono::steady_clock::now();
-    std::cout << "Calculating beam on target..." << std::endl;
-    prop.parallelProp(grid_target, grid_source, norm_target, Js, Ms, source_area);
+    std::cout << "Calculating fields on target..." << std::endl;
+    if (prop_mode == 0) {prop.parallelProp(grid_target, grid_source, norm_target, Js, Ms, source_area);}
+    else if (prop_mode == 1) {prop.parallelFarField(grid_target, grid_source, Js, Ms, source_area);}
+    
     prop.joinThreads();
     
     if (toPrint == 0)

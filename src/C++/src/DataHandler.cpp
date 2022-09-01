@@ -6,7 +6,7 @@
  * @param file An ifstream object to the .txt file to be read.
  * @return data Container of doubles containing the contents of .txt file.
  */
-std::vector<double> DataHandler::readFile(std::ifstream &file)
+std::vector<double> DataHandler::readFile(std::ifstream &file, double factor = 1.)
 {
     std::string value;
     std::vector<double> data;
@@ -15,7 +15,7 @@ std::vector<double> DataHandler::readFile(std::ifstream &file)
     {
         while (file >> value)
         {
-            double val = atof(value.c_str());
+            double val = factor * atof(value.c_str());
             data.push_back(val);
         }
     }
@@ -61,6 +61,39 @@ std::vector<std::vector<double>> DataHandler::readGrid3D(std::string &mode)
         std::ifstream coord;
         coord.open("input/grid_" + mode + xyz[k] + ".txt");
         grid.push_back(readFile(coord));
+    
+        coord.close();
+    }
+    
+    return grid;
+}
+
+/**
+ * Read a position grid in 2D Eucliean space. Use for azimuth-elevation far-field.
+ * 
+ * @param mode Optical element to read. 
+ *    mode = s corresponds to the initial beam grid.
+ *    mode = t corresponds to target grid.
+ * @return grid Container of length 3 with at each element the position grid in x,y,z respectively.
+ */
+std::vector<std::vector<double>> DataHandler::readGrid2D(int prop_mode) 
+{
+    std::vector<std::vector<double>> grid;
+
+    std::vector<std::string> azel = {"_x", "_y"};
+    double factor = 1.;
+    
+    if (prop_mode == 1)
+    {
+        // Convert arcseconds to radians
+        factor = M_PI / (180. * 3600.); 
+    }
+    
+    for(int k=0; k<2; k++)
+    {
+        std::ifstream coord;
+        coord.open("input/grid_t" + azel[k] + ".txt");
+        grid.push_back(readFile(coord, factor));
     
         coord.close();
     }

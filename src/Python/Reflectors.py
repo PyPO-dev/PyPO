@@ -83,7 +83,7 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
         Per default, truncates the grid.
         
         @param lims_x The negative and positive extents of the reflector in the x-direction: list, arr
-        @param lims_y The negative and positive extents of the reflector in the x-direction: list, arr
+        @param lims_y The negative and positive extents of the reflector in the y-direction: list, arr
         @param gridsize Gridding resolutions along x and y axes: list, arr
         @param trunc Whether to truncate grid by elliptic aperture: bool
             TODO: make elliptic from circular truncation
@@ -451,7 +451,49 @@ class Ellipse(Reflector):
         self.reflectorId = self.id
         self.reflectorType = "Ellipsoid"
         
+class Custom(Reflector):
+    """
+    Derived from reflector. Creates a custom reflector from supplied x,y,z and nx,ny,nz and area grids.
+    The grids should be supplied in flattened format, in the custom/reflector folder
+    Requires a gridsize.txt to be present, which contains the gridsizes for reshaping
+    """
+    
+    def __init__(self, cRot, name, path):
+        a = 0
+        b = 0
+        
+        Reflector.__init__(self, a, b, cRot, name)
+        self.c = 0
+        
+        self.vertex = np.array([0,0,self.c])
+        
+        self.reflectorId = self.id
+        self.reflectorType = "Custom"
+        
+        gridsize = np.loadtxt(path + "gridsize.txt")
+        gridsize = [int(gridsize[0]), int(gridsize[1])]
+            
+        self.grid_x = np.loadtxt(path + "x.txt").reshape(gridsize)
+        self.grid_y = np.loadtxt(path + "y.txt").reshape(gridsize)
+        self.grid_z = np.loadtxt(path + "z.txt").reshape(gridsize)
+        
+        self.area = np.loadtxt(path + "A.txt").reshape(gridsize)
+        
+        self.grid_nx = np.loadtxt(path + "nx.txt").reshape(gridsize)
+        self.grid_ny = np.loadtxt(path + "ny.txt").reshape(gridsize)
+        self.grid_nz = np.loadtxt(path + "nz.txt").reshape(gridsize)
 
+        self._iterList[0] = self.grid_x
+        self._iterList[1] = self.grid_y
+        self._iterList[2] = self.grid_z
+        
+        self._iterList[3] = self.area
+        
+        self._iterList[4] = self.grid_nx
+        self._iterList[5] = self.grid_ny
+        self._iterList[6] = self.grid_nz
+            
+        
 
 if __name__ == "__main__":
     print("These classes represent reflectors that can be used in POPPy simulations.")

@@ -23,6 +23,7 @@ class System(object):
     fileNames_tc = ['Jt_x.txt', 'Jt_y.txt', 'Jt_z.txt', 'Mt_x.txt', 'Mt_y.txt', 'Mt_z.txt']
     
     customBeamPath = './custom/beam/'
+    customReflPath = './custom/reflector/'
     
     def __init__(self):
         self.num_ref = 0
@@ -37,6 +38,12 @@ class System(object):
             self.customBeamPath += path
         else:
             self.customBeamPath = path
+            
+    def setCustomReflPath(self, path, append=False):
+        if append:
+            self.customReflPath += path
+        else:
+            self.customReflPath = path
             
     def addPlotter(self, save='./images/'):
         self.plotter = Plotter(save='./images/')
@@ -168,6 +175,16 @@ class System(object):
         self.system["{}".format(name)] = e
         self.num_ref += 1
     
+    def addCustomReflector(self, location, name="Custom", cRot=np.zeros(3), offTrans=np.zeros(3)):
+        if name == "Custom":
+            name = name + "_{}".format(self.num_ref)
+            
+        path = self.customReflPath + location
+        custom = Reflectors.Custom(cRot, name, path)
+        
+        self.system["{}".format(name)] = custom
+        self.num_ref += 1
+    
     def addCamera(self, lims_x, lims_y, gridsize, center=np.zeros(3), name="Camera"):
         cam = Camera.Camera(center, name)
         
@@ -235,13 +252,15 @@ class System(object):
             self.inputBeam = Beams.PlaneWave(lims_x, lims_y, gridsize, pol, amp, phase, flip, name)
             
         elif beam == 'custom':
-            pathsToFields = [self.customBeamPath + 'r' + name, self.customBeamPath + 'i' + name]
+            pathsToFields = [self.customBeamPath + 'r' + name, self.customBeamPath + 'i' + name, self.customBeamPath]
             self.inputBeam = Beams.CustomBeam(lims_x, lims_y, gridsize, comp, pathsToFields, flip, name)
+            
+    def addCustomBeamGrid(, comp, pathsToField, flip, name)
             
     def addPointSource(self, area=1, pol=np.array([1,0,0]), amp=1, phase=0, flip=False, name='', n=3):
         self.inputBeam = Beams.PointSource(area, pol, amp, phase, flip, name, n)
             
-    def initPhysOptics(self, target, k, thres=-50, numThreads=1, cpp_path='./src/C++/'):
+    def initPhysOptics(self, target, k, thres=-50, numThreads=1, cpp_path='./src/C++/', contd=False):
         """
         Create a PO object that will act as the 'translator' between POPPy and PhysBeam.
         Also performs the initial propagation from beam to target.
@@ -260,7 +279,7 @@ class System(object):
                 pass
             else:
                 self.PO.writeInput(self.fileNames_t[i], attr)
-       
+
     def nextPhysOptics(self, source, target):
         """
         Perform a physical optics propagation from source to target.
@@ -270,7 +289,6 @@ class System(object):
             # Only write xyz and area
             if i <= 3:
                 self.PO.writeInput(self.fileNames_s[i], attr)
-                
             else:
                 continue
         
@@ -286,8 +304,8 @@ class System(object):
             else:
                 self.PO.writeInput(self.fileNames_t[i], attr)
     
-    def runPhysOptics(self, save=0):
-        self.PO.runPhysOptics(save)
+    def runPhysOptics(self, save=0, material_source='vac', prop_mode=0):
+        self.PO.runPhysOptics(save, material_source, prop_mode)
         
     def loadField(self, surface, mode='Ex'):
         field = self.PO.loadField(surface.shape, mode)
@@ -297,9 +315,9 @@ class System(object):
     def initFourierOptics(self, k):
         self.FO = FO.FourierOptics(k=k)
         
-    def addCircAper(self, r_max, gridsize, cRot=np.zeros(3), name=''):
+    def addCircAper(self, r_max, gridsize, r_min=1e-3, cRot=np.zeros(3), name=''):
         ap = Aperture.Aperture(cRot, name)
-        ap.makeCircAper(r_max, gridsize)
+        ap.makeCircAper(r_max, r_min, gridsize)
         self.system["{}".format(name)] = ap
         
     

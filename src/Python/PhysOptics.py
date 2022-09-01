@@ -46,10 +46,20 @@ class PhysOptics(object):
         os.system('cp {} {}'.format(self.outputPath + "r" + name, self.inputPath + "r" + nameNew))
         os.system('cp {} {}'.format(self.outputPath + "i" + name, self.inputPath + "i" + nameNew))
         
-    def runPhysOptics(self, save=0):
+    def runPhysOptics(self, save, material_source, prop_mode):
+        """
+        Call PhysBeam.exe and do hardcore PO stuff.
+        @param save 
+        @param prop_mode 
+        """
+        if material_source == 'vac':
+            epsilon = 1.0
+        elif material_source == 'alu':
+            epsilon = 10.0
+
         cwd = os.getcwd()
         os.chdir(self.cpp_path)
-        os.system('./PhysBeam.exe {} {} {} {}'.format(self.numThreads, self.k, self.thres, save))
+        os.system('./PhysBeam.exe {} {} {} {} {} {}'.format(self.numThreads, self.k, self.thres, save, epsilon, prop_mode))
         os.chdir(cwd)
         
     def loadField(self, shape, mode='Ex'):

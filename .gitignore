@@ -143,8 +143,20 @@ literature/
 movie/
 ex_APWS.py
 custom/
+
 buildSystem.py
 ChopperPointing.py
 Plot_spillover.py
 *.png
 test_Parallel.py
+
+#vscode specific
+.vscode/settings.json
+.idea/misc.xml
+.idea/modules.xml
+.idea/POPPy.iml
+.gitignore
+.idea/vcs.xml
+.idea/inspectionProfiles/profiles_settings.xml
+fromDesigner.py
+src/GUI/fromDesigner.ui

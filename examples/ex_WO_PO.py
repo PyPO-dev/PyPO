@@ -14,53 +14,31 @@ def ex_DRO():
     """
     
     cpp_path = '../src/C++/'
-    
-    lam = 210 # [mm]
-    k = 2 * np.pi / lam
-    
-    # Primary parameters
-    R_pri           = 12.5e3 # Radius in [mm]
-    R_aper          = 300 # Vertex hole radius in [mm]
-    foc_pri         = np.array([0,0,12e3]) # Coordinates of focal point in [mm]
-    ver_pri         = np.zeros(3) # Coordinates of vertex point in [mm]
-    
-    # Pack coefficients together for instantiating parabola: [focus, vertex]
-    coef_p1 = [foc_pri, ver_pri]
-
-    lims_r_p1       = [R_aper, R_pri]
-    lims_v_p1       = [0, 2*np.pi]
-    
-    lims_x_p1 = [-R_pri, R_pri]
-    lims_y_p1 = [-R_pri, R_pri]
-
-    gridsize_p1     = [501, 501] # The gridsizes along the x and y axes
 
     # Initialize system
     s = System()
+    s.setCustomBeamPath("../custom/beam/")
+    s.setCustomReflPath("../custom/reflector/")
     
     # Add parabolic reflector and hyperbolic reflector by focus, vertex and two foci and eccentricity
-    s.addParabola(name="p1", coef=coef_p1, lims_x=lims_r_p1, lims_y=lims_v_p1, gridsize=gridsize_p1, pmode='foc', gmode='uv')
-    #s.addParabola(name="p1", coef=coef_p1, lims_x=lims_x_p1, lims_y=lims_y_p1, gridsize=gridsize_p1, pmode='foc', gmode='xy')
-    #s.system["p1"].cRot = foc_pri
-    #s.system["p1"].rotateGrid(np.array([30, 0, 0]))
+    s.addCustomReflector(location="WO_M1_240GHz/", name="h1")
+    s.addCustomReflector(location="WO_M2_240GHz/", name="e1")
+
+    # Warm focus
+    wf = np.array([486.3974883317985, 0.0, 1371.340617233771])
     
-    #print(s.system["p1"].grid_x[0,:])
     
-    pt.imshow(s.system["p1"].area)
-    pt.show()
-    
+
     # Instantiate camera surface. 
-    center_cam = foc_pri + np.array([0,0,100000])
-    lims_x_cam = [-1000, 1000]
-    lims_y_cam = [-1000, 1000]
+    center_cam = wf
+    lims_x_cam = [-30, 30]
+    lims_y_cam = [-30, 30]
     gridsize_cam = [201, 201]
     
     # Add camera surface to optical system
     s.addCamera(lims_x_cam, lims_y_cam, gridsize_cam, center=center_cam, name = "cam1")
 
-    print(s.system["p1"])
-    print(s.system["cam1"])
-    s.plotSystem(focus_1=True, focus_2=True)
+    s.plotSystem(focus_1=False, focus_2=False)
     
     # Initialize a plane wave illuminating the primary from above. Place at height of primary focus.
     # Apply mask to plane wave grid corresponding to secondary mirror size. Make slightly oversized to minimize numerical
@@ -72,7 +50,7 @@ def ex_DRO():
     lims_y_pw = [-R_pw, R_pw]
     gridsize_pw = [501, 501]
     
-    s.addPointSource(area=1, n=3, amp=1e16)
+    s.addCustomBeamGrid(area=1, n=3, amp=1e16)
     s.inputBeam.calcJM(mode='PMC')
     
     offTrans_ps = np.array([0,0,1e16])

@@ -28,6 +28,15 @@ class TestParabola(unittest.TestCase):
         self.system.setCustomBeamPath(to_append, append=True)
         self.assertEqual(test_path + to_append, self.system.customBeamPath)
         
+    def test_setCustomReflPath(self):
+        test_path = '/this/is/the/path/to/test/'
+        self.system.setCustomReflPath(test_path)
+        self.assertEqual(test_path, self.system.customReflPath)
+        
+        to_append = 'and/the/test/goes/on/'
+        self.system.setCustomReflPath(to_append, append=True)
+        self.assertEqual(test_path + to_append, self.system.customReflPath)
+        
     def test_addParabola(self):
         a = 100
         b = 100

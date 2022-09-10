@@ -6,6 +6,9 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 import src.Python.Colormaps as cmaps
 import src.Python.Plotter as Plotter
 
+# POPPy-specific modules
+import src.Python.MatRotate as MatRotate
+
 class Beams(object):
     """
     Class that contains templates for commonly used beam patterns.
@@ -18,12 +21,16 @@ class Beams(object):
     
     compList_eh = ['Ex', 'Ey', 'Ez', 'Hx', 'Hy', 'Hz']
     
-    def __init__(self, x_lims, y_lims, gridsize, flip, name):
+    def __init__(self, x_lims, y_lims, gridsize, flip, name, cRot):
         self.cl = 299792458e3 # [mm]
         # Use internal list of references to iterable attributes
         self._iterList = [0 for _ in range(10)]
         self._compList = [0 for _ in range(6)]
         self.name = name
+        self.cRot = cRot
+        
+        # Default to coherent field as input
+        self.status = 'coherent'
         
         grid_x, grid_y = np.mgrid[x_lims[0]:x_lims[1]:gridsize[0]*1j, y_lims[0]:y_lims[1]:gridsize[1]*1j]
         
@@ -60,54 +67,54 @@ class Beams(object):
         
         else:
             raise StopIteration
-    
-    def transBeam(self, offTrans):
-        self.grid_x += offTrans[0]
-        self.grid_y += offTrans[1]
-        self.grid_z += offTrans[2]
-        
+
     def calcJM(self, mode='None'):
-        Jx = np.zeros(self._compList[0].ravel().shape).astype(complex)
-        Jy = np.zeros(self._compList[0].ravel().shape).astype(complex)
-        Jz = np.zeros(self._compList[0].ravel().shape).astype(complex)
+        temp = np.zeros(self.grid_x.shape, dtype=np.ndarray)
         
-        Mx = np.zeros(self._compList[0].ravel().shape).astype(complex)
-        My = np.zeros(self._compList[0].ravel().shape).astype(complex)
-        Mz = np.zeros(self._compList[0].ravel().shape).astype(complex)
+        norm_arr = temp.fill(self.norm)
+
+        e_arr = temp
+        h_arr = temp
+        
+        self.Jx = np.zeros(self.grid_x.shape, dtype=complex)
+        self.Jy = np.zeros(self.grid_x.shape, dtype=complex)
+        self.Jz = np.zeros(self.grid_x.shape, dtype=complex)
+        
+        self.Mx = np.zeros(self.grid_x.shape, dtype=complex)
+        self.My = np.zeros(self.grid_x.shape, dtype=complex)
+        self.Mz = np.zeros(self.grid_x.shape, dtype=complex)
+
+        comps_M = np.zeros((self.grid_x.shape[0], self.grid_x.shape[1], 3), dtype=complex)
+        np.stack((self._compList[0], self._compList[1], self._compList[2]), axis=2, out=comps_M)
+        
+        comps_J = np.zeros((self.grid_x.shape[0], self.grid_x.shape[1], 3), dtype=complex)
+        np.stack((self._compList[3], self._compList[4], self._compList[5]), axis=2, out=comps_J)
 
         if mode == 'None':
-            for i,(ex,ey,ez,hx,hy,hz) in enumerate(zip(self._compList[0].ravel(), self._compList[1].ravel(), self._compList[2].ravel(), self._compList[3].ravel(), self._compList[4].ravel(), self._compList[5].ravel())):
-                e_arr = np.array([ex,ey,ez])
-                h_arr = np.array([hx,hy,hz])
-                
-                js = np.cross(self.norm, h_arr)
-                ms = -np.cross(self.norm, e_arr)
+            M = -np.cross(self.norm, comps_M, axisb=2)
+            J = np.cross(self.norm, comps_J, axisb=2)
 
-                Jx[i] = js[0]
-                Jy[i] = js[1]
-                Jz[i] = js[2]
-                
-                Mx[i] = ms[0]
-                My[i] = ms[1]
-                Mz[i] = ms[2]
-                
+            self.Mx = M[:,:,0]
+            self.My = M[:,:,1]
+            self.Mz = M[:,:,2]
+            
+            self.Jx = J[:,:,0]
+            self.Jy = J[:,:,1]
+            self.Jz = J[:,:,2]
+
         elif mode == 'PMC':
-            for i,(ex,ey,ez) in enumerate(zip(self._compList[0].ravel(), self._compList[1].ravel(), self._compList[2].ravel())):
-                e_arr = np.array([ex,ey,ez])
+            M = -2 * np.cross(self.norm, comps_M, axisb=2)
 
-                ms = -2 * np.cross(self.norm, e_arr)
-                
-                Mx[i] = ms[0]
-                My[i] = ms[1]
-                Mz[i] = ms[2]
+            self.Mx = M[:,:,0]
+            self.My = M[:,:,1]
+            self.Mz = M[:,:,2]
+            
+        elif mode == 'PEC':
+            J = 2 * np.cross(self.norm, comps_J, axisb=2)
 
-        self.Jx = Jx.reshape(self.grid_x.shape).astype(complex)
-        self.Jy = Jy.reshape(self.grid_x.shape).astype(complex)
-        self.Jz = Jz.reshape(self.grid_x.shape).astype(complex)
-        
-        self.Mx = Mx.reshape(self.grid_x.shape).astype(complex)
-        self.My = My.reshape(self.grid_x.shape).astype(complex)
-        self.Mz = Mz.reshape(self.grid_x.shape).astype(complex)
+            self.Jx = J[:,:,0]
+            self.Jy = J[:,:,1]
+            self.Jz = J[:,:,2]
         
         self._iterList[4] = self.Jx
         self._iterList[5] = self.Jy
@@ -116,69 +123,107 @@ class Beams(object):
         self._iterList[7] = self.Mx
         self._iterList[8] = self.My
         self._iterList[9] = self.Mz
+        
+    def translateBeam(self, offTrans):
+        self.grid_x += offTrans[0]
+        self.grid_y += offTrans[1]
+        self.grid_z += offTrans[2]
+        
+        self.updateIterlist()
+        
+    def rotateBeam(self, offRot, radians=False):
+        gridRot = MatRotate.MatRotate(offRot, [self.grid_x, self.grid_y, self.grid_z], self.cRot, radians=radians)
+        
+        self.grid_x = gridRot[0]
+        self.grid_y = gridRot[1]
+        self.grid_z = gridRot[2]
+        
+        self.norm = MatRotate.MatRotate(offRot, self.norm, self.cRot, vecRot=True, radians=radians)
+        print(self.norm)
+        
+        self.updateIterlist()
+        
+    def updateIterlist(self):
+        self._iterList[0] = self.grid_x
+        self._iterList[1] = self.grid_y
+        self._iterList[2] = self.grid_z
 
 class PlaneWave(Beams):
-    def __init__(self, x_lims, y_lims, gridsize, pol, amp, phase, flip, name):
-        Beams.__init__(self, x_lims, y_lims, gridsize, flip, name)
+    def __init__(self, x_lims, y_lims, gridsize, pol, amp, phase, flip, name, cRot):
+        Beams.__init__(self, x_lims, y_lims, gridsize, flip, name, cRot)
         
         amp_B = amp / self.cl * np.cross(self.norm, pol)
         
-        for i, co in enumerate(self.compList_eh):
-            if i <= 2:
-                self._compList[i] = pol[i] * amp * np.exp(1j * phase) * np.ones(self.grid_x.shape)
+        if not isinstance(pol, str):
+            for i, co in enumerate(self.compList_eh):
+                if i <= 2:
+                    self._compList[i] = pol[i] * amp * np.exp(1j * phase) * np.ones(self.grid_x.shape)
             
-            else:
-                self._compList[i] = amp_B[i-3] * np.exp(1j * phase) * np.ones(self.grid_x.shape)
+                else:
+                    self._compList[i] = amp_B[i-3] * np.exp(1j * phase) * np.ones(self.grid_x.shape)
                 
-        self.Ex = self._compList[0]
-        self.Ey = self._compList[1]
-        self.Ez = self._compList[2]
+            self.Ex = self._compList[0]
+            self.Ey = self._compList[1]
+            self.Ez = self._compList[2]
         
-        self.Hx = self._compList[3]
-        self.Hy = self._compList[4]
-        self.Hz = self._compList[5]
+            self.Hx = self._compList[3]
+            self.Hy = self._compList[4]
+            self.Hz = self._compList[5]
         
 class PointSource(Beams):
-    def __init__(self, area, pol, amp, phase, flip, name, n):
+    def __init__(self, area, pol, amp, phase, flip, name, n, cRot):
         x_lims = [-np.sqrt(area)*1.5, np.sqrt(area)*1.5]
         y_lims = [-np.sqrt(area)*1.5, np.sqrt(area)*1.5]
         
         gridsize = [n, n]
         
-        Beams.__init__(self, x_lims, y_lims, gridsize, flip, name)
+        Beams.__init__(self, x_lims, y_lims, gridsize, flip, name, cRot)
         
         idx = int((n - 1) / 2)
         
         field = np.zeros((n,n))
         field[idx, idx] = 1
         
-        amp_B = amp / self.cl * np.cross(self.norm, pol)
-        
-        for i, co in enumerate(self.compList_eh):
-            if i <= 2:
-                self._compList[i] = pol[i] * amp * np.exp(1j * phase) * field
+        if not isinstance(pol, str):
+            amp_B = amp / self.cl * np.cross(self.norm, pol)
             
-            else:
-                self._compList[i] = amp_B[i-3] * np.exp(1j * phase) * field
+            for i, co in enumerate(self.compList_eh):
+                if i <= 2:
+                    self._compList[i] = pol[i] * amp * np.exp(1j * phase) * field
+            
+                else:
+                    self._compList[i] = amp_B[i-3] * np.exp(1j * phase) * field
                 
-        self.Ex = self._compList[0]
-        self.Ey = self._compList[1]
-        self.Ez = self._compList[2]
+            self.Ex = self._compList[0]
+            self.Ey = self._compList[1]
+            self.Ez = self._compList[2]
         
-        self.Hx = self._compList[3]
-        self.Hy = self._compList[4]
-        self.Hz = self._compList[5]
+            self.Hx = self._compList[3]
+            self.Hy = self._compList[4]
+            self.Hz = self._compList[5]
+            
+        if pol == 'incoherent':
+            # For incoherent source, immediately adjust _iterlist. No need for calculating J or M
+            self._compList[0] = amp * np.exp(1j * phase) * field
+            self.Field = self._compList[0]
+            self._iterList[4] = self._compList[0]
+
+            self._compList = self._compList[:len(self._compList)-5]
+            self._iterList = self._iterList[:len(self._iterList)-5]
+            
+            self.status = 'incoherent'
+            
 
 class CustomBeam(Beams):
-    def __init__(self, x_lims, y_lims, gridsize, comp, pathsToField, flip, name):
+    def __init__(self, x_lims, y_lims, gridsize, comp, pathsToField, flip, name, cRot):
         idxComp = self.compList_eh.index(comp)
         
-        Beams.__init__(self, x_lims, y_lims, gridsize, flip, name)
+        Beams.__init__(self, x_lims, y_lims, gridsize, flip, name, cRot)
         
         rfield = np.loadtxt(pathsToField[0])
         ifield = np.loadtxt(pathsToField[1])
         
-        field = rfield.reshape(self.grid_x.shape) + 1j * ifield.reshape(self.grid_x.shape)
+        field = rfield + 1j * ifield
         
         for i, co in enumerate(self.compList_eh):
             if i == idxComp:
@@ -194,45 +239,4 @@ class CustomBeam(Beams):
         self.Hx = self._compList[3]
         self.Hy = self._compList[4]
         self.Hz = self._compList[5]
-        
-class CustomBeamGrid(Beams):
-    def __init__(self, comp, pathsToField, flip, name):
-        idxComp = self.compList_eh.index(comp)
-        
-        rfield = np.loadtxt(pathsToField[0])
-        ifield = np.loadtxt(pathsToField[1])
-        
-        gridsize = np.loadtxt(pathsToField[0] + "gridsize.txt")
-        
-        self.grid_x = np.loadtxt(pathsToField[2] + "x.txt").reshape(gridsize)
-        self.grid_y = np.loadtxt(pathsToField[2] + "y.txt").reshape(gridsize)
-        self.grid_z = np.loadtxt(pathsToField[2] + "z.txt").reshape(gridsize)
-        
-        dx = self.grid_x[1,0] - self.grid_x[0,0]
-        dy = self.grid_y[0,1] - self.grid_y[0,0]
-        
-        self.area = dx * dy * np.ones(grid_x.shape)
-        
-        field = rfield.reshape(gridsize) + 1j * ifield.reshape(gridsize)
-        
-        for i, co in enumerate(self.compList_eh):
-            if i == idxComp:
-                self._compList[i] = field
-            
-            else:
-                self._compList[i] = np.zeros(gridsize)
-
-        self.Ex = self._compList[0]
-        self.Ey = self._compList[1]
-        self.Ez = self._compList[2]
-        
-        self.Hx = self._compList[3]
-        self.Hy = self._compList[4]
-        self.Hz = self._compList[5]
-        
-    
-        
-        
-        
-        
 

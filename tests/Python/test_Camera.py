@@ -112,7 +112,7 @@ class TestCamera(unittest.TestCase):
     def test_interpCamera(self):
         self.camera.setGrid(self.lims_x, self.lims_y, self.gridsize)
         
-        self.camera.interpCamera(res=1)
+        self.camera.interpCamera(res=1, mode='z')
         
         x = self.camera.grid_x
         y = self.camera.grid_y

@@ -2,6 +2,7 @@
 import numbers
 import numpy as np
 import matplotlib.pyplot as pt
+import time
 
 # POPPy-specific modules
 import src.Python.Reflectors as Reflectors
@@ -16,11 +17,15 @@ import src.Python.Aperture as Aperture
 
 class System(object):
     
+    # Coherent propagation labels
     fileNames_s = ['grid_s_x.txt', 'grid_s_y.txt', 'grid_s_z.txt', 'As.txt', 'Js_x.txt', 'Js_y.txt', 'Js_z.txt', 'Ms_x.txt', 'Ms_y.txt', 'Ms_z.txt']
-    
     fileNames_t = ['grid_t_x.txt', 'grid_t_y.txt', 'grid_t_z.txt', 'As.txt', 'norm_t_nx.txt', 'norm_t_ny.txt', 'norm_t_nz.txt']
-    
     fileNames_tc = ['Jt_x.txt', 'Jt_y.txt', 'Jt_z.txt', 'Mt_x.txt', 'Mt_y.txt', 'Mt_z.txt']
+    
+    # Incoherent propagation labels
+    fileNames_ss = ['grid_s_x.txt', 'grid_s_y.txt', 'grid_s_z.txt', 'As.txt', 'Fs.txt']
+    fileNames_ts = ['grid_t_x.txt', 'grid_t_y.txt', 'grid_t_z.txt', 'As.txt']
+    fileNames_tcs = ['Ft.txt']
     
     customBeamPath = './custom/beam/'
     customReflPath = './custom/reflector/'
@@ -99,7 +104,7 @@ class System(object):
         self.system["{}".format(name)] = p
         self.num_ref += 1
 
-    def addHyperbola(self, coef, lims_x, lims_y, gridsize, cRot=np.zeros(3), pmode='man', gmode='xy', name="Hyperbola", axis='a', trunc=False, flip=False):
+    def addHyperbola(self, coef, lims_x, lims_y, gridsize, cRot=np.zeros(3), pmode='man', gmode='xy', name="Hyperbola", axis='a', trunc=False, flip=False, sec='upper'):
         if name == "Hyperbola":
             name = name + "_{}".format(self.num_ref)
         
@@ -108,7 +113,7 @@ class System(object):
             b = coef[1]
             c = coef[2]
             
-            h = Reflectors.Hyperbola(a, b, c, cRot, name)
+            h = Reflectors.Hyperbola(a, b, c, cRot, name, sec)
 
             h.setGrid(lims_x, lims_y, gridsize, gmode, trunc, flip, axis)
         
@@ -143,7 +148,7 @@ class System(object):
             offRot = np.array([rx, ry, rz])
             cRot = offTrans
         
-            h = Reflectors.Hyperbola(a3, b3, c3, cRot, name)
+            h = Reflectors.Hyperbola(a3, b3, c3, cRot, name, sec)
             
             h.setGrid(lims_x, lims_y, gridsize, gmode, trunc, flip, axis)
             
@@ -156,22 +161,19 @@ class System(object):
         self.system["{}".format(name)] = h
         self.num_ref += 1
         
-    def addEllipse_ab(self, name="Ellipse", a=2, b=3, c=5, cRot=np.zeros(3), offTrans=np.zeros(3), offRot=np.zeros(3)):
+    def addEllipse(self, coef, lims_x, lims_y, gridsize, cRot=np.zeros(3), pmode='man', gmode='xy', name="Ellipse", axis='a', trunc=False, flip=False, ori='vertical'):
         if name == "Ellipse":
             name = name + "_{}".format(self.num_ref)
-        
-        e = Reflectors.Ellipse(a, b, c, cRot, offTrans, offRot, name)
-        
-        self.system["{}".format(name)] = e
-        self.num_ref += 1
-        
-    # Place and create ellipse using focus_1 and confocal distance c. Automatically creates a symmetric ellipsoid
-    def addEllipse_foc(self, name="Ellipse", focus_1=np.array([0,0,1]), focus_2=np.array([0,0,1]), cRot=np.zeros(3), offTrans=np.zeros(3), offRot=np.zeros(3)):
-        if name == "Ellipse":
-            name = name + "_{}".format(self.num_ref)
+            
+        if pmode == 'man':
+            a = coef[0]
+            b = coef[1]
+            c = coef[2]
+            
+            e = Reflectors.Ellipse(a, b, c, cRot, name, ori)
 
-        e = Reflectors.Ellipse(a, b, c, cRot, offTrans, offRot, name)
-        
+            e.setGrid(lims_x, lims_y, gridsize, gmode, trunc, flip, axis)
+
         self.system["{}".format(name)] = e
         self.num_ref += 1
     
@@ -198,12 +200,12 @@ class System(object):
         self.num_ref -= 1
     
     #### PLOTTING OPTICAL SYSTEM
-    def plotSystem(self, focus_1=False, focus_2=False, plotRaytrace=False):
+    def plotSystem(self, focus_1=False, focus_2=False, plotRaytrace=False, norm=False):
         fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
         
         for elem in self.system.values():
             if elem.elType == "Reflector":
-                ax = elem.plotReflector(returns=True, ax_append=ax, focus_1=focus_1, focus_2=focus_2)
+                ax = elem.plotReflector(returns=True, ax_append=ax, focus_1=focus_1, focus_2=focus_2, norm=norm)
             
             elif elem.elType == "Camera":
                 ax = elem.plotCamera(returns=True, ax_append=ax)
@@ -225,42 +227,50 @@ class System(object):
     def initRaytracer(self, nRays=0, nCirc=1, 
                  rCirc=0, div_ang_x=2*np.pi, div_ang_y=2*np.pi,
                  originChief=np.array([0,0,0]), 
-                 tiltChief=np.array([0,0,0]), nomChief = np.array([0,0,1])):
+                 tiltChief=np.array([0,0,0]), nomChief = np.array([0,0,1]), mode='auto'):
         
-        rt = RayTrace.RayTrace(nRays, nCirc, rCirc, div_ang_x, div_ang_y, originChief, tiltChief, nomChief)
+        rt = RayTrace.RayTrace(nRays, nCirc, rCirc, div_ang_x, div_ang_y, originChief, tiltChief, nomChief, mode)
         
         self.Raytracer = rt
         
-    def startRaytracer(self, surface, a_init=100):
+    def startRaytracer(self, surface, a_init=100, res=1, mode='auto'):
         """
         Propagate rays in RayTracer to a surface.
         Adds new frame to rays, containing point of intersection and reflected direction.
         """
+                
+        print("Raytracing to {}".format(surface))
+        start = time.time()
+        
+        if mode == 'auto':
+            mode = self.Raytracer.getMode()
+        
         if not hasattr(self.system[surface], 'tcks'):
             
             if self.system[surface].elType == "Reflector":
-                self.system[surface].interpReflector()
+                self.system[surface].interpReflector(res, mode)
                 
             elif self.system[surface].elType == "Camera":
-                self.system[surface].interpCamera()
+                self.system[surface].interpCamera(res, mode)
         
         self.Raytracer.set_tcks(self.system[surface].tcks)
-        self.Raytracer.propagateRays(a_init=a_init)
+
+        self.Raytracer.propagateRays(a_init=a_init, mode=mode)
+        end = time.time()
+        print("Elapsed time: {} s\n".format(end - start))
         
-    def addBeam(self, lims_x, lims_y, gridsize, beam='pw', pol=np.array([1,0,0]), amp=1, phase=0, flip=False, name='', comp='Ex'):
+    def addBeam(self, lims_x, lims_y, gridsize, beam='pw', pol=np.array([1,0,0]), amp=1, phase=0, flip=False, name='', comp='Ex', cRot=np.zeros(3)):
         if beam == 'pw':
-            self.inputBeam = Beams.PlaneWave(lims_x, lims_y, gridsize, pol, amp, phase, flip, name)
+            self.inputBeam = Beams.PlaneWave(lims_x, lims_y, gridsize, pol, amp, phase, flip, name, cRot)
             
         elif beam == 'custom':
             pathsToFields = [self.customBeamPath + 'r' + name, self.customBeamPath + 'i' + name, self.customBeamPath]
-            self.inputBeam = Beams.CustomBeam(lims_x, lims_y, gridsize, comp, pathsToFields, flip, name)
+            self.inputBeam = Beams.CustomBeam(lims_x, lims_y, gridsize, comp, pathsToFields, flip, name, cRot)
+
+    def addPointSource(self, area=1, pol='incoherent', amp=1, phase=0, flip=False, name='', n=3, cRot=np.zeros(3)):
+        self.inputBeam = Beams.PointSource(area, pol, amp, phase, flip, name, n, cRot)
             
-    def addCustomBeamGrid(, comp, pathsToField, flip, name)
-            
-    def addPointSource(self, area=1, pol=np.array([1,0,0]), amp=1, phase=0, flip=False, name='', n=3):
-        self.inputBeam = Beams.PointSource(area, pol, amp, phase, flip, name, n)
-            
-    def initPhysOptics(self, target, k, thres=-50, numThreads=1, cpp_path='./src/C++/', contd=False):
+    def initPhysOptics(self, target=None, k=1, thres=-50, numThreads=1, cpp_path='./src/C++/', cont=False):
         """
         Create a PO object that will act as the 'translator' between POPPy and PhysBeam.
         Also performs the initial propagation from beam to target.
@@ -268,23 +278,97 @@ class System(object):
         """
         
         self.PO = PO.PhysOptics(k, numThreads, thres, cpp_path)
-
-        # Write input beam to input
-        for i, attr in enumerate(self.inputBeam):
-            self.PO.writeInput(self.fileNames_s[i], attr)
+        self.PO.propType = self.inputBeam.status
+        
+        if self.PO.propType == 'coherent':
+            if not cont:
+                # Write input beam to input
+                for i, attr in enumerate(self.inputBeam):
+                    self.PO.writeInput(self.fileNames_s[i], attr)
             
-        for i, attr in enumerate(target):
-            if i == 3:
-                # Dont write area of target
-                pass
-            else:
-                self.PO.writeInput(self.fileNames_t[i], attr)
+                for i, attr in enumerate(target):
+                    if i == 3:
+                        # Dont write area of target
+                        pass
+                    else:
+                        self.PO.writeInput(self.fileNames_t[i], attr)
+                        
+        elif self.PO.propType == 'incoherent':
+            if not cont:
+                # Write input beam to input
+                for i, attr in enumerate(self.inputBeam):
+                    self.PO.writeInput(self.fileNames_ss[i], attr)
+            
+                for i, attr in enumerate(target):
+                    if i >= 3:
+                        # Dont write area of target
+                        pass
+                    else:
+                        self.PO.writeInput(self.fileNames_ts[i], attr)
+        
 
     def nextPhysOptics(self, source, target):
         """
         Perform a physical optics propagation from source to target.
         Automatically continues from last propagation by copying currents and gird to input
         """
+        
+        if self.PO.propType == 'coherent':
+            for i, attr in enumerate(source):
+                # Only write xyz and area
+                if i <= 3:
+                    self.PO.writeInput(self.fileNames_s[i], attr)
+                else:
+                    continue
+        
+            for i, field in enumerate(self.fileNames_tc):
+                # Copy J and M from output to input
+                self.PO.copyToInput(self.fileNames_tc[i], self.fileNames_s[i+4])
+        
+            # Write target grid
+            for i, attr in enumerate(target):
+                if i == 3:
+                    # Dont write area of target
+                    pass
+                else:
+                    self.PO.writeInput(self.fileNames_t[i], attr)
+                    
+        elif self.PO.propType == 'incoherent':
+            for i, attr in enumerate(source):
+                # Only write xyz and area
+                if i <= 3:
+                    self.PO.writeInput(self.fileNames_ss[i], attr)
+                else:
+                    continue
+        
+            for i, field in enumerate(self.fileNames_tcs):
+                # Copy J and M from output to input
+                self.PO.copyToInput(self.fileNames_tcs[i], self.fileNames_ss[i+4])
+        
+            # Write target grid
+            for i, attr in enumerate(target):
+                if i >= 3:
+                    # Dont write area of target
+                    pass
+                else:
+                    self.PO.writeInput(self.fileNames_ts[i], attr)
+                
+    def folderPhysOptics(self, folder, source, target):
+        """
+        Perform a physical optics propagation from folder with saved input/output to target.
+        Automatically continues from last propagation by copying currents and grid to input
+        """
+        
+        # First, copy input/ to cpp_path. Do this first so that copy operations are performed
+        # in the cpp_path input/ folder. This preserves the saved data
+        self.PO.copyFromFolder(folder)
+        
+        # Now, copy J and M from local output/ to input/ in cpp_path
+        outpath = folder + 'output/'
+
+        for i, field in enumerate(self.fileNames_tc):
+            self.PO.copyToInput(self.fileNames_tc[i], self.fileNames_s[i+4], outpath=outpath)
+        
         for i, attr in enumerate(source):
             # Only write xyz and area
             if i <= 3:
@@ -292,11 +376,7 @@ class System(object):
             else:
                 continue
         
-        for i, field in enumerate(self.fileNames_tc):
-            # Copy J and M from output to input
-            self.PO.copyToInput(self.fileNames_tc[i], self.fileNames_s[i+4])
-        
-        # Write target grid
+        # Write target grid in copied input/ folder
         for i, attr in enumerate(target):
             if i == 3:
                 # Dont write area of target
@@ -304,8 +384,11 @@ class System(object):
             else:
                 self.PO.writeInput(self.fileNames_t[i], attr)
     
-    def runPhysOptics(self, save=0, material_source='vac', prop_mode=0):
-        self.PO.runPhysOptics(save, material_source, prop_mode)
+    def runPhysOptics(self, save=0, material_source='vac', prop_mode=0, t_direction='forward', folder=''):
+        self.PO.runPhysOptics(save, material_source, prop_mode, t_direction)
+        
+        if folder != '':
+            self.PO.copyToFolder(folder)
         
     def loadField(self, surface, mode='Ex'):
         field = self.PO.loadField(surface.shape, mode)

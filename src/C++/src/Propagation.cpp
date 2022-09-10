@@ -1,6 +1,6 @@
 #include "Propagation.h"
 
-Propagation::Propagation(double k, int numThreads, int gridsize_s, int gridsize_t, double thres, double epsilon)
+Propagation::Propagation(double k, int numThreads, int gridsize_s, int gridsize_t, double thres, double epsilon, double t_direction)
 {
     std::complex<double> j(0., 1.);
     std::complex<double> z0(0., 0.);
@@ -22,15 +22,23 @@ Propagation::Propagation(double k, int numThreads, int gridsize_s, int gridsize_
     this->thres = pow(10., exponent);
     
     threadPool.resize(numThreads);
+    std::array<std::complex<double>, 3> arr;
     
-    std::vector<std::complex<double>> grid(gridsize_t, z0);
-    std::vector<std::vector<std::complex<double>>> grid3D(3, grid);
-    
+    std::vector<std::array<std::complex<double>, 3>> grid3D(gridsize_t, arr);
+    /*
     this->Jt_container = grid3D;
     this->Mt_container = grid3D;
     
     this->Et_container = grid3D;
     this->Ht_container = grid3D;
+    */
+    this->Jt_container.resize(gridsize_t);
+    this->Mt_container.resize(gridsize_t);
+    
+    this->Et_container.resize(gridsize_t);
+    this->Ht_container.resize(gridsize_t);
+    
+    this->t_direction = t_direction;
     
     std::array<std::array<double, 3>, 3> eye;
     eye[0].fill(0.);
@@ -45,11 +53,11 @@ Propagation::Propagation(double k, int numThreads, int gridsize_s, int gridsize_
 
 // This function calculates the propagation between source and target
 void Propagation::propagateBeam(int start, int stop,
-                                const std::vector<std::vector<double>> &grid_target,
-                                const std::vector<std::vector<double>> &grid_source,
-                                const std::vector<std::vector<double>> &norm_target,
-                                const std::vector<std::vector<std::complex<double>>> &Js,
-                                const std::vector<std::vector<std::complex<double>>> &Ms,
+                                const std::vector<std::array<double, 3>> &grid_target,
+                                const std::vector<std::array<double, 3>> &grid_source,
+                                const std::vector<std::array<double, 3>> &norm_target,
+                                const std::vector<std::array<std::complex<double>, 3>> &Js,
+                                const std::vector<std::array<std::complex<double>, 3>> &Ms,
                                 const std::vector<double> &source_area)
 {
     // Scalars (double & complex double)
@@ -72,7 +80,6 @@ void Propagation::propagateBeam(int start, int stop,
     std::array<std::complex<double>, 3> e_r;            // Reflected E-field
     std::array<std::complex<double>, 3> h_r;            // Reflected H-field
     std::array<std::complex<double>, 3> n_out_e_i_r;    // Electric current
-    std::array<std::complex<double>, 3> n_out_h_i_r;    // Magnetic current
     std::array<std::complex<double>, 3> temp1;          // Temporary container 1 for intermediate irrelevant values
     std::array<std::complex<double>, 3> temp2;          // Temporary container 2
     
@@ -81,14 +88,15 @@ void Propagation::propagateBeam(int start, int stop,
     
     for(int i=start; i<stop; i++)
     {
-        for(int n=0; n<3; n++)
-        {
-            point[n] = grid_target[n][i];
-            norms[n] = norm_target[n][i];
-        }
+        
+        point = grid_target[i];
+        norms = norm_target[i];
         
         // Calculate total incoming E and H field at point on target
         beam_e_h = fieldAtPoint(grid_source, Js, Ms, point, source_area, start);
+        
+        
+        
         // Calculate normalised incoming poynting vector.
         ut.conj(beam_e_h[1], temp1);                        // h_conj
         ut.ext(beam_e_h[0], temp1, temp2);                  // e_out_h
@@ -96,11 +104,12 @@ void Propagation::propagateBeam(int start, int stop,
         for (int n=0; n<3; n++) 
         {
             e_out_h_r[n] = temp2[n].real();                      // e_out_h_r
-            
-            this->Et_container[n][i] = beam_e_h[0][n];
-            this->Ht_container[n][i] = beam_e_h[1][n];
         }
-
+            
+        this->Et_container[i] = beam_e_h[0];
+        this->Ht_container[i] = beam_e_h[1];
+        //std::cout << this->Et_container.size() << std::endl;
+        
         ut.normalize(e_out_h_r, S_i_norm);                       // S_i_norm                   
         
         // Calculate incoming polarization vectors
@@ -139,16 +148,12 @@ void Propagation::propagateBeam(int start, int stop,
             temp1[n] = e_r[n] + beam_e_h[0][n]; // e_i_r
             temp2[n] = h_r[n] + beam_e_h[1][n]; // h_i_r
         } 
-        
-        ut.ext(norms, temp2, n_out_h_i_r);
+        //std::cout << "check" << std::endl;
+        ut.ext(norms, temp2, this->Jt_container[i]);
         ut.ext(norms, temp1, n_out_e_i_r);
 
-        for (int n=0; n<3; n++)
-        {
-            this->Jt_container[n][i] = n_out_h_i_r[n];
-            this->Mt_container[n][i] = -n_out_e_i_r[n];
-        }
-
+        ut.s_mult(n_out_e_i_r, -1., this->Mt_container[i]);//this->Mt_container[i] = -n_out_e_i_r;
+        //std::cout << "jooo" << std::endl;
         if(i % 100 == 0 and start == 0 * this->step)
         {
             //std::cout << p_i_perp[0] << std::endl;
@@ -157,9 +162,9 @@ void Propagation::propagateBeam(int start, int stop,
     }
 }
 
-std::array<std::array<std::complex<double>, 3>, 2> Propagation::fieldAtPoint(const std::vector<std::vector<double>> &grid_source,
-                                               const std::vector<std::vector<std::complex<double>>> &Js,
-                                               const std::vector<std::vector<std::complex<double>>> &Ms,
+std::array<std::array<std::complex<double>, 3>, 2> Propagation::fieldAtPoint(const std::vector<std::array<double, 3>> &grid_source,
+                                               const std::vector<std::array<std::complex<double>, 3>> &Js,
+                                               const std::vector<std::array<std::complex<double>, 3>> &Ms,
                                                const std::array<double, 3> &point_target,
                                                const std::vector<double> &source_area,
                                                const int start)
@@ -198,16 +203,7 @@ std::array<std::array<std::complex<double>, 3>, 2> Propagation::fieldAtPoint(con
     
     for(int i=0; i<gridsize_s; i++)
     {
-        for (int n=0; n<3; n++)
-        {
-            source_point[n] = grid_source[n][i];
-            js[n] = Js[n][i];
-            ms[n] = Ms[n][i];
-        }
-        //std::cout << source_point[0] << " " << source_point[1] << " " << source_point[2] << std::endl;
-        //std::cout << point_target[0] << " " << point_target[1] << " " << point_target[2] << std::endl;
-        
-        ut.diff(point_target, source_point, r_vec);
+        ut.diff(point_target, grid_source[i], r_vec);
         ut.abs(r_vec, r);                              
         
         r_inv = 1 / r;
@@ -216,20 +212,20 @@ std::array<std::array<std::complex<double>, 3>, 2> Propagation::fieldAtPoint(con
         ut.s_mult(k_hat, k, k_arr);
         
         // e-field
-        ut.dot(k_hat, js, r_in_s);
+        ut.dot(k_hat, Js[i], r_in_s);
         ut.s_mult(k_hat, r_in_s, temp);
-        ut.diff(js, temp, e_vec_thing);
+        ut.diff(Js[i], temp, e_vec_thing);
         
-        ut.ext(k_arr, ms, k_out_ms);
+        ut.ext(k_arr, Ms[i], k_out_ms);
         
         // h-field
-        ut.dot(k_hat, ms, r_in_s);
+        ut.dot(k_hat, Ms[i], r_in_s);
         ut.s_mult(k_hat, r_in_s, temp);
-        ut.diff(ms, temp, h_vec_thing);
+        ut.diff(Ms[i], temp, h_vec_thing);
         
-        ut.ext(k_arr, js, k_out_js);
+        ut.ext(k_arr, Js[i], k_out_js);
         
-        Green = exp(-j * k * r) / (4 * M_PI * r) * source_area[i] * j;
+        Green = exp(this->t_direction * j * k * r) / (4 * M_PI * r) * source_area[i] * j;
         
         for( int n=0; n<3; n++)
         {
@@ -247,20 +243,21 @@ std::array<std::array<std::complex<double>, 3>, 2> Propagation::fieldAtPoint(con
     return e_h_field;
 }
 
-void Propagation::parallelProp(const std::vector<std::vector<double>> &grid_target,
-                               const std::vector<std::vector<double>> &grid_source,
-                               const std::vector<std::vector<double>> &norm_target,
-                               const std::vector<std::vector<std::complex<double>>> &Js,
-                               const std::vector<std::vector<std::complex<double>>> &Ms,
+void Propagation::parallelProp(const std::vector<std::array<double, 3>> &grid_target,
+                               const std::vector<std::array<double, 3>> &grid_source,
+                               const std::vector<std::array<double, 3>> &norm_target,
+                               const std::vector<std::array<std::complex<double>, 3>> &Js,
+                               const std::vector<std::array<std::complex<double>, 3>> &Ms,
                                const std::vector<double> &source_area)
 {
     int final_step; 
     
-    std::cout << gridsize_t << std::endl;
+    //std::cout << gridsize_t << std::endl;
     
     
     for(int n=0; n<numThreads; n++)
     {
+        //std::cout << n << std::endl;
         if(n == (numThreads-1))
         {
             final_step = gridsize_t;
@@ -271,7 +268,7 @@ void Propagation::parallelProp(const std::vector<std::vector<double>> &grid_targ
             final_step = (n+1) * step;
         }
         
-        std::cout << final_step << std::endl;
+        //std::cout << final_step << std::endl;
         
         threadPool[n] = std::thread(&Propagation::propagateBeam, 
                                     this, n * step, final_step, 
@@ -407,7 +404,7 @@ void Propagation::parallelFarField(const std::vector<std::vector<double>> &grid_
 {
     int final_step; 
     
-    std::cout << gridsize_t << std::endl;
+    //std::cout << gridsize_t << std::endl;
     
     
     for(int n=0; n<numThreads; n++)
@@ -422,7 +419,7 @@ void Propagation::parallelFarField(const std::vector<std::vector<double>> &grid_
             final_step = (n+1) * step;
         }
         
-        std::cout << final_step << std::endl;
+        //std::cout << final_step << std::endl;
         
         threadPool[n] = std::thread(&Propagation::calculateFarField, 
                                     this, n * step, final_step, 

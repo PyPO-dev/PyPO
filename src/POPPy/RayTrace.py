@@ -5,23 +5,24 @@ import matplotlib.pyplot as pt
 import scipy.interpolate as interp
 import scipy.optimize as optimize
 
-import src.Python.MatRotate as MatRotate
+import src.POPPy.MatRotate as MatRotate
 
 class RayTrace(object):
-    def __init__(self, nRays, nCirc, 
-                 rCirc, div_ang_x, div_ang_y,
-                 originChief, tiltChief, nomChief, mode):
+    def __init__(self, nRays, nRing, 
+                 a, b, angx, angy,
+                 originChief, tiltChief):
         
         # This is the main ray container
         # ray_0 : chief ray
         # ray_1 - ray_(4*NraysCirc) : rays distributed in circle around chief ray (multiples of four)
         # ray_(4*NraysCirc+1) - ray_(4*NraysCirc + 4*NraysCross) : rays distributed in cross around chief ray (multiples of four)
         
+        nomChief = np.array([0,0,1]) # Always initialize raytrace beam along z-axis
         
         self.originChief = originChief
-        self.directionChief = MatRotate.MatRotate(np.radians(tiltChief), nomChief, vecRot=True)
+        self.directionChief = MatRotate.MatRotate(tiltChief, nomChief, vecRot=True)
         
-        self.nTot = 1 + nCirc * 4 * nRays
+        self.nTot = 1 + nRing * 4 * nRays
         
         self.rays = {"ray_{}".format(n) : {} for n in range(self.nTot)}
 
@@ -47,35 +48,23 @@ class RayTrace(object):
             if i == 0: # Chief ray
                 ray["positions"].append(self.originChief)
                 ray["directions"].append(self.directionChief)
-                
-                if mode == 'auto':
-                    mode = self.getMode()
-                
-                #if nRays == 0:
+
                 continue
             
-            if mode == 'z':
-                pos_ray = MatRotate.MatRotate(np.array([0,0,alpha]), np.array([rCirc / nCirc * n,0,0]), radians=True)
-                rotation = np.array([np.radians(div_ang_x) * np.sin(alpha), np.radians(div_ang_y) * np.cos(alpha), 2*alpha]) / nCirc * n
-                
-            elif mode == 'x':
-                pos_ray = MatRotate.MatRotate(np.array([alpha,0,0]), np.array([0,rCirc / nCirc * n,0]), radians=True)
-                rotation = np.array([2*alpha, np.radians(div_ang_x) * np.sin(alpha), np.radians(div_ang_y) * np.cos(alpha)]) / nCirc * n
-                
-            elif mode == 'y':
-                pos_ray = MatRotate.MatRotate(np.array([0,alpha,0]), np.array([0,0,rCirc / nCirc * n]), radians=True)
-                rotation = np.array([np.radians(div_ang_y) * np.cos(alpha), np.radians(div_ang_x) * np.sin(alpha), 2*alpha]) / nCirc * n
-            
+            pos_ray = np.array([a * np.cos(alpha), b * np.sin(alpha), 0]) / nRing * n
+            rotation = np.array([np.radians(angy) * np.sin(alpha) / nRing * n, np.radians(angx) * np.cos(alpha) / nRing * n, 2*alpha])
+
             direction = MatRotate.MatRotate(rotation, nomChief, vecRot=True, radians=True)
             direction = MatRotate.MatRotate(tiltChief, direction, vecRot=True)
     
-            ray["positions"].append(self.originChief + pos_ray)
+            pos_r = MatRotate.MatRotate(tiltChief, self.originChief + pos_ray, origin=self.originChief)
+    
+            ray["positions"].append(pos_r)
             ray["directions"].append(direction)
 
             alpha += d_alpha
             
-            if i == int(self.nTot / nCirc) * n:
-                #print(int(self.nTot / nCirc) * n)
+            if i == int(self.nTot / nRing) * n:
                 n += 1
                 alpha = 0
         
@@ -168,7 +157,7 @@ Chief ray direction : [{:.4f}, {:.4f}, {:.4f}]
         
         return np.absolute(interp_y - position[1])
     
-    def propagateRays(self, a_init, mode):
+    def propagateRays(self, a0, mode):
         for i, (key, ray) in enumerate(self.rays.items()):
 
             if mode == 'z':
@@ -186,15 +175,13 @@ Chief ray direction : [{:.4f}, {:.4f}, {:.4f}]
                 x1 = 2
                 x2 = 0
                 
-            a_opt = optimize.fmin(part_optLine, a_init, disp=0, xtol=1e-10, ftol=1e-10)
+            a_opt = optimize.fmin(part_optLine, a0, disp=0, xtol=1e-15, ftol=1e-15)
             
             position = a_opt*ray["directions"][-1] + ray["positions"][-1]
             
             interp_n = self.interpEval_n(position[x1], position[x2])
             
             direction = ray["directions"][-1] - 2 * np.dot(ray["directions"][-1], interp_n) * interp_n
-            
-            norm = np.sqrt(np.dot(direction, direction))
             
             ray["positions"].append(position)
             ray["directions"].append(direction)
@@ -203,30 +190,24 @@ Chief ray direction : [{:.4f}, {:.4f}, {:.4f}]
         fig, ax = pt.subplots(1,1)
         
         for i, (key, ray) in enumerate(self.rays.items()):
-            '''
-            if i == 1:
-                ax.scatter(ray["positions"][-1][0], ray["positions"][-1][1], color='red', s=1)
-                
-            else:
-                ax.scatter(ray["positions"][-1][0], ray["positions"][-1][1], color='black')
-            '''
+
             if mode == 'z':
                 ax.scatter(ray["positions"][frame][0], ray["positions"][frame][1], color='black', s=10)
             
                 if quiv:
-                    ax.quiver(ray["positions"][frame][0], ray["positions"][frame][1], 10 * ray["directions"][frame][0], 10 * ray["directions"][frame][1], color='black', width=0.005, scale=1000)
+                    ax.quiver(ray["positions"][frame][0], ray["positions"][frame][1], 10 * ray["directions"][frame][0], 10 * ray["directions"][frame][1], color='black', width=0.005, scale=10)
                     
             elif mode == 'x':
                 ax.scatter(ray["positions"][frame][1], ray["positions"][frame][2], color='black', s=10)
             
                 if quiv:
-                    ax.quiver(ray["positions"][frame][1], ray["positions"][frame][2], 10 * ray["directions"][frame][1], 10 * ray["directions"][frame][2], color='black', width=0.005, scale=1000)
+                    ax.quiver(ray["positions"][frame][1], ray["positions"][frame][2], 10 * ray["directions"][frame][1], 10 * ray["directions"][frame][2], color='black', width=0.005, scale=10)
                     
             elif mode == 'y':
                 ax.scatter(ray["positions"][frame][2], ray["positions"][frame][0], color='black', s=10)
             
                 if quiv:
-                    ax.quiver(ray["positions"][frame][2], ray["positions"][frame][0], 10 * ray["directions"][frame][2], 10 * ray["directions"][frame][0], color='black', width=0.005, scale=1000)
+                    ax.quiver(ray["positions"][frame][2], ray["positions"][frame][0], 10 * ray["directions"][frame][2], 10 * ray["directions"][frame][0], color='black', width=0.005, scale=10)
             
         ax.set_aspect(1)
         pt.show()

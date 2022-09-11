@@ -3,11 +3,11 @@ import matplotlib.pyplot as pt
 import matplotlib.cm as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-import src.Python.Colormaps as cmaps
-import src.Python.Plotter as Plotter
+import src.POPPy.Colormaps as cmaps
+import src.POPPy.Plotter as Plotter
 
 # POPPy-specific modules
-import src.Python.MatRotate as MatRotate
+import src.POPPy.MatRotate as MatRotate
 
 class Beams(object):
     """

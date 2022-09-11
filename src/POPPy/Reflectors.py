@@ -6,7 +6,7 @@ from matplotlib import cm
 import scipy.interpolate as interp
 
 # POPPy-specific modules
-import src.Python.MatRotate as MatRotate
+import src.POPPy.MatRotate as MatRotate
 
 class Reflector(object):
     """

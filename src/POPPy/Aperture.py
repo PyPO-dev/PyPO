@@ -5,7 +5,7 @@ import matplotlib.pyplot as pt
 from matplotlib import cm
 
 # POPPy-specific modules
-import src.Python.MatRotate as MatRotate 
+import src.POPPy.MatRotate as MatRotate 
 
 class Aperture(object):
     """

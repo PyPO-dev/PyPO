@@ -5,7 +5,7 @@ sys.path.append('../')
 
 import matplotlib.pyplot as pt
 
-import src.Python.System as System
+import src.POPPy.System as System
 
 
 
@@ -30,7 +30,7 @@ def ex_ASTE():
     
     # Pack coefficients together for instantiating parabola: [focus, vertex]
     coef_p1         = [foc_pri, ver_pri]
-    gridsize_p1     = [2501, 801] # The gridsizes along the u and v axes
+    gridsize_p1     = [3001, 801] # The gridsizes along the u and v axes
     
     lims_r_p1       = [R_aper, R_pri]
     lims_v_p1       = [0, 2*np.pi]
@@ -44,7 +44,7 @@ def ex_ASTE():
     
     # Pack coefficients together for instantiating hyperbola: [focus 1, focus 2, eccentricity]
     coef_h1         = [foc_1_h1, foc_2_h1, ecc_h1]
-    gridsize_h1     = [401, 201]
+    gridsize_h1     = [501, 301]
     
     lims_r_h1       = [0, R_sec]
     lims_v_h1       = [0, 2*np.pi]
@@ -93,7 +93,7 @@ def ex_ASTE():
     s.nextPhysOptics(source=s.system["h1"], target=s.system["cam1"])
     s.runPhysOptics(save=2, material_source='vac')
     
-    s.PO.plotField(s.system["cam1"].grid_x, s.system["cam1"].grid_y, mode='Field', polar=True)
+    s.PO.plotField(s.system["cam1"].grid_x, s.system["cam1"].grid_y, mode='Field', polar=False)
     #'''
     field = s.loadField(s.system["cam1"], mode='Field')
     

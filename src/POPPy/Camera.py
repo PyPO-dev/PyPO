@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as pt
 import scipy.interpolate as interp
 
-import src.Python.MatRotate as MatRotate
+import src.POPPy.MatRotate as MatRotate
 
 class Camera(object):
     """

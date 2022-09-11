@@ -6,7 +6,7 @@ sys.path.append('../../')
 import unittest
 import numpy as np
 
-from src.Python.PhysOptics import PhysOptics
+from src.POPPy.PhysOptics import PhysOptics
 
 class TestPhysOptics(unittest.TestCase): 
     @classmethod

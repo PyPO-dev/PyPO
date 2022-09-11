@@ -6,10 +6,10 @@ import unittest
 import numpy as np
 import scipy.interpolate as interp
 
-import src.Python.MatRotate as MatRotate
+import src.POPPy.MatRotate as MatRotate
 
-import src.Python.Camera as Camera
-import src.Python.Copy as Copy
+import src.POPPy.Camera as Camera
+import src.POPPy.Copy as Copy
 
 class TestCamera(unittest.TestCase):
     
@@ -25,7 +25,6 @@ class TestCamera(unittest.TestCase):
         self.gridsize = [501, 501]
         
         self.name = "cam_test"
-        
         
         self.offRot = np.radians([0, 0, 0])
         

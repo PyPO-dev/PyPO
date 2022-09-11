@@ -5,8 +5,8 @@ sys.path.append('../../')
 import unittest
 import numpy as np
 
-import src.Python.Copy as Copy
-import src.Python.System as System
+import src.POPPy.Copy as Copy
+import src.POPPy.System as System
 
 class TestParabola(unittest.TestCase): 
     @classmethod

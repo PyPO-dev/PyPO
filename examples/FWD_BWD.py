@@ -5,8 +5,7 @@ sys.path.append('../')
 import matplotlib.pyplot as pt
 
 #import src.Python.System as System
-from src.Python.System import System
-import matplotlib.pyplot as pt
+from src.POPPy.System import System
 
 def ex_DRO():
     """

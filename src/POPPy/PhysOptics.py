@@ -5,7 +5,7 @@ import matplotlib.cm as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import scipy.fft as ft
 
-import src.Python.Colormaps as cmaps
+import src.POPPy.Colormaps as cmaps
 
 class PhysOptics(object):
     """

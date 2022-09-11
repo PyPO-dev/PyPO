@@ -4,7 +4,7 @@ sys.path.append('../')
 
 import matplotlib.pyplot as pt
 
-import src.Python.System as System
+import src.POPPy.System as System
 
 def ex_DRO():
     """
@@ -49,13 +49,10 @@ def ex_DRO():
     s.plotSystem(focus_1=True, focus_2=True)
     
     # Initialize a raytrace beam illuminating the parabolic reflector from above
+    s.initRaytracer(nRays=20, nRing=10, a=R_pri, b=R_pri, originChief=foc_pri, tiltChief=np.array([0,180,0]))
     
-    R_rt = R_pri - lam
-    
-    s.initRaytracer(rCirc=R_rt, nRays=20, nCirc=10, originChief=foc_pri, nomChief=np.array([0,0,-1]), div_ang_x=0, div_ang_y=0)
-    
-    s.startRaytracer(surface="p1")
-    s.startRaytracer(surface="cam1")
+    s.startRaytracer(target=s.system["p1"])
+    s.startRaytracer(target=s.system["cam1"])
     
     s.Raytracer.plotRays(frame=-1, quiv=False)
     

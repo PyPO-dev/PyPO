@@ -5,7 +5,7 @@ sys.path.append('../')
 import matplotlib.pyplot as pt
 
 #import src.Python.System as System
-from src.Python.System import System
+from src.POPPy.System import System
 import matplotlib.pyplot as pt
 from examples.BuildWO import MakeWO
 
@@ -40,7 +40,7 @@ def ASTE_full():
     center_cam = wf
     lims_x_cam = [-5e2, 5e2]
     lims_y_cam = [-5e2, 5e2]
-    gridsize_cam = [1001, 1001]
+    gridsize_cam = [101, 101]
     #rotcam = np.array([0, 90, 0])
     
     # Primary parameters
@@ -51,7 +51,7 @@ def ASTE_full():
     
     # Pack coefficients together for instantiating parabola: [focus, vertex]
     coef_p1         = [foc_pri, ver_pri]
-    gridsize_p1     = [3001, 801] # The gridsizes along the u and v axes
+    gridsize_p1     = [351, 801] # The gridsizes along the u and v axes
     
     lims_r_p1       = [R_aper, R_pri]
     lims_v_p1       = [0, 2*np.pi]
@@ -85,24 +85,26 @@ def ASTE_full():
     #s.system["cam1"].rotateGrid(rotcam)
     #s.system["cam1"].translateGrid(trans_cam_cf)
     s.plotSystem(focus_1=True, focus_2=True, plotRaytrace=False)
-    '''
-    s.initRaytracer(nRays=10, nCirc=4, 
-                 rCirc=0, div_ang_x=6, div_ang_y=6,
-                 originChief=np.array([0,0,0]), 
-                 tiltChief=np.array([0,0,0]), nomChief = np.array([1,0,0]))
-    
-    s.startRaytracer(surface="h1")
-    s.startRaytracer(surface="e1")
-    s.startRaytracer(surface="sec")
-    s.startRaytracer(surface="pri")
-    s.startRaytracer(surface="cam1")
-    
-    s.Raytracer.plotRays(mode='x')
-    s.Raytracer.plotRays(mode='z', frame=-1)
-    '''
-    #s.plotSystem(focus_1=True, focus_2=True, plotRaytrace=True)
 
-    s.plotSystem(focus_1=False, focus_2=False, plotRaytrace=False)
+    s.initRaytracer(nRays=10, nRing=0, 
+                 a=0, b=0, angx=6, angy=6,
+                 originChief=np.array([0,0,0]), 
+                 tiltChief=np.array([0,90,0]))
+    
+    s.Raytracer.plotRays(mode='x', quiv=True)
+    
+    s.startRaytracer(target=s.system["h1"])
+    s.startRaytracer(target=s.system["e1"])
+    s.startRaytracer(target=s.system["sec"])
+    s.startRaytracer(target=s.system["pri"])
+    s.startRaytracer(target=s.system["cam1"])
+    
+    
+    s.Raytracer.plotRays(mode='z', frame=-1)
+
+    s.plotSystem(focus_1=True, focus_2=True, plotRaytrace=True)
+
+    #s.plotSystem(focus_1=False, focus_2=False, plotRaytrace=False)
     
     
     bpath = '240GHz/'

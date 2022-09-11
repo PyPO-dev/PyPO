@@ -5,14 +5,14 @@ import matplotlib.pyplot as pt
 import time
 
 # POPPy-specific modules
-import src.Python.Reflectors as Reflectors
-import src.Python.RayTrace as RayTrace
-import src.Python.Camera as Camera
-import src.Python.Beams as Beams
-import src.Python.PhysOptics as PO
-import src.Python.FourierOptics as FO
-from src.Python.Plotter import Plotter
-import src.Python.Aperture as Aperture
+import src.POPPy.Reflectors as Reflectors
+import src.POPPy.RayTrace as RayTrace
+import src.POPPy.Camera as Camera
+import src.POPPy.Beams as Beams
+import src.POPPy.PhysOptics as PO
+import src.POPPy.FourierOptics as FO
+from src.POPPy.Plotter import Plotter
+import src.POPPy.Aperture as Aperture
 #from src.Python.Fitting import Fitting
 
 class System(object):
@@ -104,7 +104,7 @@ class System(object):
         self.system["{}".format(name)] = p
         self.num_ref += 1
 
-    def addHyperbola(self, coef, lims_x, lims_y, gridsize, cRot=np.zeros(3), pmode='man', gmode='xy', name="Hyperbola", axis='a', trunc=False, flip=False, sec='upper'):
+    def addHyperbola(self, coef, lims_x, lims_y, gridsize, cRot=np.zeros(3), pmode='man', gmode='xy', name="Hyperbola", axis='a', sec='upper', trunc=False, flip=False):
         if name == "Hyperbola":
             name = name + "_{}".format(self.num_ref)
         
@@ -224,38 +224,38 @@ class System(object):
         ax.tick_params(axis='x', which='major', pad=-3)
         pt.show()
         
-    def initRaytracer(self, nRays=0, nCirc=1, 
-                 rCirc=0, div_ang_x=2*np.pi, div_ang_y=2*np.pi,
-                 originChief=np.array([0,0,0]), 
-                 tiltChief=np.array([0,0,0]), nomChief = np.array([0,0,1]), mode='auto'):
+    def initRaytracer(self, nRays=0, nRing=0, 
+                 a=0, b=0, angx=0, angy=0,
+                 originChief=np.zeros(3), 
+                 tiltChief=np.zeros(3)):
         
-        rt = RayTrace.RayTrace(nRays, nCirc, rCirc, div_ang_x, div_ang_y, originChief, tiltChief, nomChief, mode)
+        rt = RayTrace.RayTrace(nRays, nRing, a, b, angx, angy, originChief, tiltChief)
         
         self.Raytracer = rt
         
-    def startRaytracer(self, surface, a_init=100, res=1, mode='auto'):
+    def startRaytracer(self, target, a0=100, res=1, mode='auto'):
         """
         Propagate rays in RayTracer to a surface.
         Adds new frame to rays, containing point of intersection and reflected direction.
         """
                 
-        print("Raytracing to {}".format(surface))
+        print("Raytracing to {}".format(target.name))
         start = time.time()
         
         if mode == 'auto':
             mode = self.Raytracer.getMode()
         
-        if not hasattr(self.system[surface], 'tcks'):
+        if not hasattr(target, 'tcks'):
             
-            if self.system[surface].elType == "Reflector":
-                self.system[surface].interpReflector(res, mode)
+            if target.elType == "Reflector":
+                target.interpReflector(res, mode)
                 
-            elif self.system[surface].elType == "Camera":
-                self.system[surface].interpCamera(res, mode)
+            elif target.elType == "Camera":
+                target.interpCamera(res, mode)
         
-        self.Raytracer.set_tcks(self.system[surface].tcks)
+        self.Raytracer.set_tcks(target.tcks)
 
-        self.Raytracer.propagateRays(a_init=a_init, mode=mode)
+        self.Raytracer.propagateRays(a0=a0, mode=mode)
         end = time.time()
         print("Elapsed time: {} s\n".format(end - start))
         

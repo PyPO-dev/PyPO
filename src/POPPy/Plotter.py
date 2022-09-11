@@ -4,7 +4,7 @@ import matplotlib.pyplot as pt
 import matplotlib.cm as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-import src.Python.Colormaps as cmaps
+import src.POPPy.Colormaps as cmaps
 
 pt.rcParams['xtick.top'] = True
 pt.rcParams['ytick.right'] = True

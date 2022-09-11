@@ -4,7 +4,7 @@ sys.path.append('../')
 
 import matplotlib.pyplot as pt
 
-import src.Python.System as System
+import src.POPPy.System as System
 
 def ex_ASTE():
     """
@@ -21,40 +21,32 @@ def ex_ASTE():
     ver_pri         = np.zeros(3) # Coordinates of vertex point in [mm]
     
     # Pack coefficients together for instantiating parabola: [focus, vertex]
-    coef_p1 = [foc_pri, ver_pri]
+    coef_p1         = [foc_pri, ver_pri]
+    gridsize_p1     = [501, 501] # The gridsizes along the u and v axes
+    
+    lims_r_p1       = [R_aper, R_pri]
+    lims_v_p1       = [0, 2*np.pi]
     
     # Secondary parameters
     R_sec           = 310
     d_foc           = 5606.286
     foc_1_h1        = np.array([0,0,3.5e3])
     foc_2_h1        = np.array([0,0,3.5e3 -  d_foc])
-    ecc_h1          =  1.08208248
-    gridsize_h1     = [301, 301]
+    ecc_h1          = 1.08208248
     
     # Pack coefficients together for instantiating hyperbola: [focus 1, focus 2, eccentricity]
-    coef_h1 = [foc_1_h1, foc_2_h1, ecc_h1]
-
+    coef_h1         = [foc_1_h1, foc_2_h1, ecc_h1]
+    gridsize_h1     = [301, 301]
+    
+    lims_r_h1       = [0, R_sec]
+    lims_v_h1       = [0, 2*np.pi]
+    
     # Initialize system
     s = System.System()
     
     # Add parabolic reflector and hyperbolic reflector by focus, vertex and two foci and eccentricity
-    s.addParabola(name = "p1", coef=coef_p1, mode='foc')
-    s.addHyperbola(name = "h1", coef=coef_h1, mode='foc')
-    
-    # Calculate upper u-limits for uv initialization of surfaces
-    u_max_p1 = s.system["p1"].r_to_u(R_pri)
-    u_max_h1 = s.system["h1"].r_to_u(R_sec)
-    
-    # Calculate lower limit of u for parabola, to plot cabin hole
-    u_min_p1 = s.system["p1"].r_to_u(R_aper)
-    
-    # Use uv definition of parabola & hyperbola for interpolation in ray trace
-    lims_u_p1       = [u_min_p1, u_max_p1]
-    lims_v_p1       = [0, 2*np.pi]
-    gridsize_p1     = [501, 501] # The gridsizes along the u and v axes
-    
-    lims_u_h1       = [1, u_max_h1]
-    lims_v_h1       = [0, 2*np.pi]
+    s.addParabola(name = "pri", coef=coef_p1, lims_x=lims_r_p1, lims_y=lims_v_p1, gridsize=gridsize_p1, pmode='foc', gmode='uv')
+    s.addHyperbola(name = "sec", coef=coef_h1, lims_x=lims_r_h1, lims_y=lims_v_h1, gridsize=gridsize_h1, pmode='foc', gmode='uv')
 
     # Instantiate camera surface. Size does not matter, as long as z coordinate agrees
     center_cam = foc_2_h1 # Place the camera at the z coordinate of the hyperbolic secondary focus
@@ -63,31 +55,17 @@ def ex_ASTE():
     gridsize_cam = [101, 101]
     
     # Add camera surface to optical system
-    s.addCamera(name = "cam1", center=center_cam)
-    
-    print(s.system["p1"])
-    print(s.system["h1"])
-    print(s.system["cam1"])
-
-    s.system["p1"].setGrid(lims_u_p1, lims_v_p1, gridsize_p1, calcArea=False, trunc=False, param='uv')
-    s.system["p1"].rotateGrid()
-    s.system["p1"].plotReflector(focus_1=False, focus_2=True, norm=True)
-
-    s.system["h1"].setGrid(lims_u_h1, lims_v_h1, gridsize_h1, orientation='outside', trunc=False, param='uv')
-    s.system["h1"].rotateGrid()
-    s.system["h1"].plotReflector(focus_1=True, focus_2=False, norm=True)
-
-    s.system["cam1"].setGrid(lims_x_cam, lims_y_cam, gridsize_cam)
-    s.system["cam1"].plotCamera()
+    s.addCamera(lims_x_cam, lims_y_cam, gridsize_cam, center=center_cam, name = "cam")
     
     s.plotSystem(focus_1=True, focus_2=True)
     
     # Illuminate primary from above
-    s.initRaytracer(rCirc=4500, NraysCirc=20, originChief=foc_pri, nomChief=np.array([0,0,-1]), div_ang_x=0, div_ang_y=0)
+    s.initRaytracer(nRays=20, nRing=10, a=R_pri, b=R_pri, originChief=foc_pri, tiltChief=np.array([0,180,0]))
+    s.Raytracer.plotRays(frame=0, quiv=False)
     
-    s.startRaytracer(surface="p1")
-    s.startRaytracer(surface="h1")
-    s.startRaytracer(surface="cam1")
+    s.startRaytracer(target=s.system["pri"])
+    s.startRaytracer(target=s.system["sec"])
+    s.startRaytracer(target=s.system["cam"])
     
     s.Raytracer.plotRays(frame=-1, quiv=False)
 

@@ -86,8 +86,8 @@ def ASTE_full():
     #s.system["cam1"].translateGrid(trans_cam_cf)
     s.plotSystem(focus_1=True, focus_2=True, plotRaytrace=False)
 
-    s.initRaytracer(nRays=10, nRing=0, 
-                 a=0, b=0, angx=6, angy=6,
+    s.initRaytracer(nRays=10, nRing=4, 
+                 a=2, b=2, angx=0, angy=0,
                  originChief=np.array([0,0,0]), 
                  tiltChief=np.array([0,90,0]))
     

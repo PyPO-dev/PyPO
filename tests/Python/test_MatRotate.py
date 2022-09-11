@@ -5,7 +5,7 @@ sys.path.append('../../')
 import unittest
 import numpy as np
 
-import src.Python.MatRotate as MatRotate
+import src.POPPy.MatRotate as MatRotate
 
 class TestMatRotate(unittest.TestCase):
     

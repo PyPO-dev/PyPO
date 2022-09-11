@@ -6,9 +6,9 @@ import unittest
 import numpy as np
 import scipy.interpolate as interp
 
-import src.Python.Copy as Copy
-import src.Python.MatRotate as MatRotate
-import src.Python.Reflectors as Reflectors
+import src.POPPy.Copy as Copy
+import src.POPPy.MatRotate as MatRotate
+import src.POPPy.Reflectors as Reflectors
 
 class TestParabola(unittest.TestCase): 
     @classmethod

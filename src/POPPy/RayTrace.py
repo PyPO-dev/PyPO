@@ -101,6 +101,7 @@ Chief ray direction : [{:.4f}, {:.4f}, {:.4f}]
         
         axes = ['x', 'y', 'z']
         axis = np.argmax(np.absolute(self.rays["ray_0"]["directions"][-1]))
+        
         mode = axes[axis]
         return mode
         
@@ -121,61 +122,39 @@ Chief ray direction : [{:.4f}, {:.4f}, {:.4f}]
         
         return np.array([interp_nx, interp_ny, interp_nz])
     
-    def optLine_z(self, a, ray):
+    def optLine(self, a, ray, x1, x2, x3):
         """
-        This function calculates the difference between a line z-coordinate and the 
-        interpolated mirror z-coordinate. Should be used inside optimize.fmin functions
-        """
-        
-        position = a * ray["directions"][-1] + ray["positions"][-1]
-        
-        interp_z = self.interpEval(position[0], position[1])
-        
-        return np.absolute(interp_z - position[2])
-    
-    def optLine_x(self, a, ray):
-        """
-        This function calculates the difference between a line x-coordinate and the 
-        interpolated mirror x-coordinate. Should be used inside optimize.fmin functions
+        This function calculates the difference between a line xyz-coordinate and the 
+        interpolated mirror xyz-coordinate. Should be used inside optimize.fmin functions
         """
         
         position = a * ray["directions"][-1] + ray["positions"][-1]
         
-        interp_x = self.interpEval(position[1], position[2])
+        interp_z = self.interpEval(position[x1], position[x2])
         
-        return np.absolute(interp_x - position[0])
-    
-    def optLine_y(self, a, ray):
-        """
-        This function calculates the difference between a line x-coordinate and the 
-        interpolated mirror y-coordinate. Should be used inside optimize.fmin functions
-        """
-        
-        position = a * ray["directions"][-1] + ray["positions"][-1]
-        
-        interp_y = self.interpEval(position[2], position[0])
-        
-        return np.absolute(interp_y - position[1])
+        return np.absolute(interp_z - position[x3])
     
     def propagateRays(self, a0, mode):
         for i, (key, ray) in enumerate(self.rays.items()):
 
             if mode == 'z':
-                part_optLine = partial(self.optLine_z, ray=ray)
                 x1 = 0
                 x2 = 1
+                x3 = 2
                 
             elif mode == 'x':
-                part_optLine = partial(self.optLine_x, ray=ray)
                 x1 = 1
                 x2 = 2
+                x3 = 0
                 
             elif mode == 'y':
-                part_optLine = partial(self.optLine_y, ray=ray)
                 x1 = 2
                 x2 = 0
+                x3 = 1
+            
+            part_optLine = partial(self.optLine, ray=ray, x1=x1, x2=x2, x3=x3)
                 
-            a_opt = optimize.fmin(part_optLine, a0, disp=0, xtol=1e-15, ftol=1e-15)
+            a_opt = optimize.fmin(part_optLine, a0, disp=0, xtol=1e-16, ftol=1e-16)
             
             position = a_opt*ray["directions"][-1] + ray["positions"][-1]
             

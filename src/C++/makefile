@@ -7,15 +7,23 @@ CC  = $(COMP) $(CFLAGS) -c
 CO  = $(COMP) $(CFLAGS) -o
 ######################################################################################
 EXE = PhysBeam.exe
-all: $(EXE)
+EXE_S = PhysBeamScalar.exe
+all: $(EXE) $(EXE_S)
 ######################################################################################
 PhysBeam.exe: PhysBeam.o Propagation.o DataHandler.o
 	$(CO) PhysBeam.exe PhysBeam.o Propagation.o DataHandler.o
 ######################################################################################
+PhysBeamScalar.exe: PhysBeamScalar.o PropagationScalar.o DataHandler.o
+	$(CO) PhysBeamScalar.exe PhysBeamScalar.o PropagationScalar.o DataHandler.o
+######################################################################################
 PhysBeam.o: $(DIRSRC)PhysBeam.cpp Propagation.o DataHandler.o
 	$(CC) $(DIRSRC)PhysBeam.cpp -I$(DIRSRC)
+PhysBeamScalar.o: $(DIRSRC)PhysBeamScalar.cpp PropagationScalar.o DataHandler.o
+	$(CC) $(DIRSRC)PhysBeamScalar.cpp -I$(DIRSRC)
 Propagation.o: $(DIRSRC)Propagation.h $(DIRSRC)Propagation.cpp 
 	$(CC) $(DIRSRC)Propagation.cpp -I$(DIRSRC)
+PropagationScalar.o: $(DIRSRC)PropagationScalar.h $(DIRSRC)PropagationScalar.cpp 
+	$(CC) $(DIRSRC)PropagationScalar.cpp -I$(DIRSRC)
 DataHandler.o: $(DIRSRC)DataHandler.h $(DIRSRC)DataHandler.cpp
 	$(CC) $(DIRSRC)DataHandler.cpp -I$(DIRSRC)
 ######################################################################################

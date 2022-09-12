@@ -5,7 +5,7 @@ sys.path.append('../../')
 import unittest
 import numpy as np
 
-import src.Python.Copy as Copy
+import src.POPPy.Copy as Copy
 
 class TestCopy(unittest.TestCase):
    

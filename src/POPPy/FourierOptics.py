@@ -25,10 +25,10 @@ class FourierOptics(object):
     def padGrids(self, grid_x, grid_y, field, pad_range=(1000,1000), noise=1e-12):
         noise_level = noise + 1j * noise
         
-        field_pad = np.pad(field, padding_range, 'constant', constant_values=(noise_level, noise_level))
+        field_pad = np.pad(field, pad_range, 'constant', constant_values=(noise_level, noise_level))
         
-        grid_x_pad = np.pad(grid_x, padding_range, 'reflect', reflect_type='odd')
-        grid_y_pad = np.pad(grid_y, padding_range, 'reflect', reflect_type='odd')
+        grid_x_pad = np.pad(grid_x, pad_range, 'reflect', reflect_type='odd')
+        grid_y_pad = np.pad(grid_y, pad_range, 'reflect', reflect_type='odd')
         
         return grid_x_pad, grid_y_pad, field_pad
         
@@ -65,19 +65,25 @@ class FourierOptics(object):
         
         kx = 2 * np.pi * fx
         ky = 2 * np.pi * fy
-        
-        check = np.sqrt(self.k**2 - kx**2 - ky**2)
+        print(self.k)
+        print(np.max(kx))
+        check = self.k**2 - kx**2 - ky**2
         check[check < 0] = 0
         kz = np.sqrt(check)
-        H = np.exp(1j * z * kz)
+        H = np.exp(-1j * z * kz)
         
         APWS_target = APWS_source * H
         
         if returns == 'field':
             return self.ift2(APWS_target)
         
-        else:
+        elif returns == 'APWS_k':
             return kx, ky, APWS_target
+        
+        elif returns == 'APWS_a':
+            theta_x = np.degrees(np.arctan(kx / self.k))
+            theta_y = np.degrees(np.arctan(ky / self.k))
+            return theta_x, theta_y, APWS_target
         
         
         

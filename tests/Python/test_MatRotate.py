@@ -5,7 +5,7 @@ sys.path.append('../../')
 import unittest
 import numpy as np
 
-import src.Python.MatRotate as MatRotate
+import src.POPPy.MatRotate as MatRotate
 
 class TestMatRotate(unittest.TestCase):
     
@@ -14,9 +14,9 @@ class TestMatRotate(unittest.TestCase):
         print("\nTesting MatRotate")
     
     def setUp(self):
-        self.theta1 = np.radians(np.array([0,0,180]))
-        self.theta2 = np.radians(np.array([0,180,0]))
-        self.theta3 = np.radians(np.array([90,90,-90]))
+        self.theta1 = np.array([0,0,180])
+        self.theta2 = np.array([0,180,0])
+        self.theta3 = np.array([90,90,-90])
         
         self.point1 = np.array([1,0,0])
         self.point2 = np.array([0,0,1])

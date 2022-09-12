@@ -2,10 +2,12 @@ import numpy as np
 import matplotlib.pyplot as pt
 import scipy.interpolate as interp
 
-import src.Python.MatRotate as MatRotate
+import src.POPPy.MatRotate as MatRotate
 
 class Camera(object):
-    
+    """
+    NOTE: if prop_mode for PO == 1, it is assumed camera is in FAR-FIELD. x and y then correspond to Az-El, center only affects pointing then
+    """
     def __init__(self, center, name):
         self.center = center
         self.cRot = center
@@ -15,6 +17,8 @@ class Camera(object):
         
         # Use internal list of references to iterable attributes
         self._iterList = [0 for _ in range(7)]
+        
+        self.norm = np.array([0,0,1])
         
     def __str__(self):
         s = """\n######################### CAMERA INFO #########################
@@ -63,6 +67,17 @@ Center position     : [{:.3f}, {:.3f}, {:.3f}] [mm]
         self._iterList[4] = self.grid_nx
         self._iterList[5] = self.grid_ny
         self._iterList[6] = self.grid_nz
+        
+    def updateIterlist(self):
+        self._iterList[0] = self.grid_x
+        self._iterList[1] = self.grid_y
+        self._iterList[2] = self.grid_z
+        
+        self._iterList[3] = self.area
+        
+        self._iterList[4] = self.grid_nx
+        self._iterList[5] = self.grid_ny
+        self._iterList[6] = self.grid_nz
        
     def set_cRot(self, cRot):
         self.cRot = cRot   
@@ -74,29 +89,49 @@ Center position     : [{:.3f}, {:.3f}, {:.3f}] [mm]
         
         self.center += offTrans
         
-    def rotateGrid(self, offRot):
-        gridRot = MatRotate.MatRotate(offRot, [self.grid_x, self.grid_y, self.grid_z], self.cRot)
+        self.updateIterlist()
+        
+    def rotateGrid(self, offRot, radians=False):
+        gridRot = MatRotate.MatRotate(offRot, [self.grid_x, self.grid_y, self.grid_z], self.cRot, radians=radians)
         
         self.grid_x = gridRot[0]
         self.grid_y = gridRot[1]
         self.grid_z = gridRot[2]
         
-        grid_nRot = MatRotate.MatRotate(offRot, [self.grid_nx, self.grid_ny, self.grid_nz], self.cRot, vecRot=True)
+        grid_nRot = MatRotate.MatRotate(offRot, [self.grid_nx, self.grid_ny, self.grid_nz], self.cRot, vecRot=True, radians=radians)
         
         self.grid_nx = grid_nRot[0]
         self.grid_ny = grid_nRot[1]
         self.grid_nz = grid_nRot[2]
         
-        self.center = MatRotate.MatRotate(offRot, self.center, self.cRot)
+        self.center = MatRotate.MatRotate(offRot, self.center, self.cRot, radians=radians)
+        self.norm = MatRotate.MatRotate(offRot, self.norm, self.cRot, vecRot=True, radians=radians)
+        
+        self.updateIterlist()
     
-    def interpCamera(self, res=100):
+    def interpCamera(self, res, mode):
         skip = slice(None,None,res)
 
-        posInterp = interp.bisplrep(self.grid_x.ravel()[skip], self.grid_y.ravel()[skip], self.grid_z.ravel()[skip])
+        if mode == 'z':
+            posInterp = interp.bisplrep(self.grid_x, self.grid_y, self.grid_z)
         
-        nxInterp = interp.bisplrep(self.grid_x.ravel()[skip], self.grid_y.ravel()[skip], self.grid_nx.ravel()[skip])
-        nyInterp = interp.bisplrep(self.grid_x.ravel()[skip], self.grid_y.ravel()[skip], self.grid_ny.ravel()[skip])
-        nzInterp = interp.bisplrep(self.grid_x.ravel()[skip], self.grid_y.ravel()[skip], self.grid_nz.ravel()[skip])
+            nxInterp = interp.bisplrep(self.grid_x.ravel()[skip], self.grid_y.ravel()[skip], self.grid_nx.ravel()[skip])
+            nyInterp = interp.bisplrep(self.grid_x.ravel()[skip], self.grid_y.ravel()[skip], self.grid_ny.ravel()[skip])
+            nzInterp = interp.bisplrep(self.grid_x.ravel()[skip], self.grid_y.ravel()[skip], self.grid_nz.ravel()[skip])
+
+        elif mode == 'x':
+            posInterp = interp.bisplrep(self.grid_y, self.grid_z, self.grid_x)
+        
+            nxInterp = interp.bisplrep(self.grid_y.ravel()[skip], self.grid_z.ravel()[skip], self.grid_nx.ravel()[skip])
+            nyInterp = interp.bisplrep(self.grid_y.ravel()[skip], self.grid_z.ravel()[skip], self.grid_ny.ravel()[skip])
+            nzInterp = interp.bisplrep(self.grid_y.ravel()[skip], self.grid_z.ravel()[skip], self.grid_nz.ravel()[skip])
+            
+        elif mode == 'y':
+            posInterp = interp.bisplrep(self.grid_z, self.grid_x, self.grid_y)
+        
+            nxInterp = interp.bisplrep(self.grid_z.ravel()[skip], self.grid_x.ravel()[skip], self.grid_nx.ravel()[skip])
+            nyInterp = interp.bisplrep(self.grid_z.ravel()[skip], self.grid_x.ravel()[skip], self.grid_ny.ravel()[skip])
+            nzInterp = interp.bisplrep(self.grid_z.ravel()[skip], self.grid_x.ravel()[skip], self.grid_nz.ravel()[skip])
         
         tcks = [posInterp, nxInterp, nyInterp, nzInterp]
         

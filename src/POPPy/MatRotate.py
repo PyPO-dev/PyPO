@@ -1,21 +1,26 @@
 import numpy as np
 
-def MatRotate(theta, points, origin=np.zeros(3), vecRot=False, matOut=False):
+def MatRotate(theta, points, origin=np.zeros(3), vecRot=False, matOut=False, radians=False):
     
     """
     Create 3D rotation matrix and rotate grids of points.
     
-    @param theta Container containing rotations around x,y,z axes.
+    @param theta Array containing rotations around x,y,z axes in degrees.
     @param points Containers of 3D points to be rotated.
     @param origin Origin of rotation.
     @param vecRot Whether points or vector components are to be rotated.
     @param matOut Return full rotation matrix yes or no.
+    @param radians Whether theta is in degrees or radians.
     
     @return pointsRot 3D rotated points.
     @return matOut Full rotation matrix, for taking inverse rotations: R^-1 = R^T.
     """
+    if radians:
+        theta_x, theta_y, theta_z = theta
     
-    theta_x, theta_y, theta_z = theta
+    else:
+        theta_x, theta_y, theta_z = np.radians(theta)
+    
     px, py, pz = points
     
     rotX = np.array([[1, 0, 0],

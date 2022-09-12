@@ -6,9 +6,9 @@ import unittest
 import numpy as np
 import scipy.interpolate as interp
 
-import src.Python.Copy as Copy
-import src.Python.MatRotate as MatRotate
-import src.Python.Reflectors as Reflectors
+import src.POPPy.Copy as Copy
+import src.POPPy.MatRotate as MatRotate
+import src.POPPy.Reflectors as Reflectors
 
 class TestParabola(unittest.TestCase): 
     @classmethod
@@ -20,13 +20,13 @@ class TestParabola(unittest.TestCase):
         self.rot = np.radians([0, 0, 0])
         self.cRot = np.array([0, 0, 0])
         
-        self.a = 100
-        self.b = 100
+        self.a = 10
+        self.b = 10
         
-        self.lims_x = [-5000, 5000]
-        self.lims_y = [-5000, 5000]
+        self.lims_x = [-500, 500]
+        self.lims_y = [-500, 500]
         
-        self.lims_u = [0, 5000/ self.a]
+        self.lims_u = [0, 500/ self.a]
         self.lims_v = [0, 2*np.pi]
         
         self.gridsize = [201, 201]
@@ -119,11 +119,11 @@ class TestParabola(unittest.TestCase):
             self.assertEqual(norm_t[0], nxx)
             self.assertEqual(norm_t[1], nyy)
             self.assertEqual(norm_t[2], nzz)
-
+            
     def test_interpReflector(self):
         self.parabola.setGrid(self.lims_x, self.lims_y, self.gridsize, gmode='xy', axis='a', trunc=False, flip=False)
         
-        self.parabola.interpReflector(res=1)
+        self.parabola.interpReflector(res=1, mode='z')
         
         x = self.parabola.grid_x
         y = self.parabola.grid_y
@@ -200,8 +200,9 @@ class TestHyperbola(unittest.TestCase):
         self.lims_v = [0, 2*np.pi]
         
         self.gridsize = [201, 201]
+        self.sec = 'upper'
         
-        self.hyperbola = Reflectors.Hyperbola(a = 1070, b = 1070, c = 2590, cRot = self.cRot, name = "h")
+        self.hyperbola = Reflectors.Hyperbola(a = 1070, b = 1070, c = 2590, cRot = self.cRot, name = "h", sec = self.sec)
         
     def TearDown(self):
         pass
@@ -293,7 +294,7 @@ class TestHyperbola(unittest.TestCase):
     def test_interpReflector(self):
         self.hyperbola.setGrid(self.lims_x, self.lims_y, self.gridsize, gmode='xy', axis='a', trunc=False, flip=False)
         
-        self.hyperbola.interpReflector(res=1)
+        self.hyperbola.interpReflector(res=1, mode='z')
         
         x = self.hyperbola.grid_x
         y = self.hyperbola.grid_y

@@ -5,8 +5,8 @@ sys.path.append('../../')
 import unittest
 import numpy as np
 
-import src.Python.Copy as Copy
-import src.Python.System as System
+import src.POPPy.Copy as Copy
+import src.POPPy.System as System
 
 class TestParabola(unittest.TestCase): 
     @classmethod
@@ -27,6 +27,15 @@ class TestParabola(unittest.TestCase):
         to_append = 'and/the/test/goes/on/'
         self.system.setCustomBeamPath(to_append, append=True)
         self.assertEqual(test_path + to_append, self.system.customBeamPath)
+        
+    def test_setCustomReflPath(self):
+        test_path = '/this/is/the/path/to/test/'
+        self.system.setCustomReflPath(test_path)
+        self.assertEqual(test_path, self.system.customReflPath)
+        
+        to_append = 'and/the/test/goes/on/'
+        self.system.setCustomReflPath(to_append, append=True)
+        self.assertEqual(test_path + to_append, self.system.customReflPath)
         
     def test_addParabola(self):
         a = 100

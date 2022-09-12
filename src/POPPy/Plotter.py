@@ -4,7 +4,7 @@ import matplotlib.pyplot as pt
 import matplotlib.cm as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-import src.Python.Colormaps as cmaps
+import src.POPPy.Colormaps as cmaps
 
 pt.rcParams['xtick.top'] = True
 pt.rcParams['ytick.right'] = True
@@ -24,7 +24,7 @@ class Plotter(object):
         if not existSave:
             os.makedirs(self.savePath)
     
-    def plotBeam2D(self, surfaceObject, field, vmin=-30, vmax=0, ff=0, show=True, amp_only=False, save=True, interpolation=None, mode='dB'):
+    def plotBeam2D(self, surfaceObject, field, vmin=-30, vmax=0, ff=0, show=True, amp_only=False, save=False, interpolation=None, mode='dB'):
         
         titleAmp = "PNA / [dB]"
         titlePhase = "Phase / [rad]"

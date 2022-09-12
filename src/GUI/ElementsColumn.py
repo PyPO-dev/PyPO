@@ -8,6 +8,8 @@ class ElementsWindow(qtw.QWidget):
 
         
 
+
+
         elementsColumn = qtw.QVBoxLayout()
         elementsColumn.addWidget(btn)
         for elem in elements:
@@ -15,7 +17,7 @@ class ElementsWindow(qtw.QWidget):
             label.setFixedHeight(32)
             elementsColumn.addWidget(label)
 
-        self.setStyleSheet("background: pink;")
+        # self.setStyleSheet("background: #5A0168; color:white")
         self.setLayout(elementsColumn)
         
 if __name__ == '__main__':

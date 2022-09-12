@@ -6,11 +6,10 @@ from PyQt5 import QtCore
 # from src.Python.System import System
 
 
-class MainWindow(qtw.QWidget):
+class MainWidget(qtw.QWidget):
     def __init__ (self):
         super().__init__()
         self.sysNumber = 1
-        self.setWindowTitle("POPPy")
 
         self.SystemTabs = []
 
@@ -33,9 +32,7 @@ class MainWindow(qtw.QWidget):
 
     def addTab(self):
         tab = SystemTab()
-        # self.SysWidget = qtw.QWidget(tab)
-        # self.SysWidget.setGeometry(QtCore.QRect(190, 110, 411, 81))
-
+        
         self.tabWidget.addTab(tab,"System %s" %self.sysNumber)
         self.sysNumber += 1
 
@@ -44,14 +41,15 @@ class MainWindow(qtw.QWidget):
         # s = System()
         # self.Systems.append(s)
 
+    
 
 
 
-app = qtw.QApplication([])
-mw = MainWindow()
-mw.setStyleSheet("background: #5A0168; color:white")
-# mw.resize(800,600)
-app.exec_()
+if __name__ == "__main__":
+
+    app = qtw.QApplication([])
+    mainwindow = MainWidget()
+    app.exec_()
 
 
 

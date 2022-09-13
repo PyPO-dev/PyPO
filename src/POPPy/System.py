@@ -200,7 +200,7 @@ class System(object):
         self.num_ref -= 1
     
     #### PLOTTING OPTICAL SYSTEM
-    def plotSystem(self, focus_1=False, focus_2=False, plotRaytrace=False, norm=False):
+    def plotSystem(self, focus_1=False, focus_2=False, plotRaytrace=False, norm=False, ret = False):
         fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
         
         for elem in self.system.values():
@@ -222,6 +222,8 @@ class System(object):
         world_limits = ax.get_w_lims()
         ax.set_box_aspect((world_limits[1]-world_limits[0],world_limits[3]-world_limits[2],world_limits[5]-world_limits[4]))
         ax.tick_params(axis='x', which='major', pad=-3)
+        if ret:
+            return fig
         pt.show()
         
     def initRaytracer(self, nRays=0, nRing=0, 

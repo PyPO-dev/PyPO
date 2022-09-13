@@ -46,17 +46,18 @@ def ex_DRO():
     # Add camera surface to optical system
     s.addCamera(lims_x_cam, lims_y_cam, gridsize_cam, center=center_cam, name = "cam1")
 
-    s.plotSystem(focus_1=True, focus_2=True)
+    # s.plotSystem(focus_1=True, focus_2=True)
     
     # Initialize a raytrace beam illuminating the parabolic reflector from above
-    s.initRaytracer(nRays=20, nRing=10, a=R_pri, b=R_pri, originChief=foc_pri, tiltChief=np.array([0,180,0]))
+    # s.initRaytracer(nRays=20, nRing=10, a=R_pri, b=R_pri, originChief=foc_pri, tiltChief=np.array([0,180,0]))
     
-    s.startRaytracer(target=s.system["p1"])
-    s.startRaytracer(target=s.system["cam1"])
+    # s.startRaytracer(target=s.system["p1"])
+    # s.startRaytracer(target=s.system["cam1"])
     
-    s.Raytracer.plotRays(frame=-1, quiv=False)
+    # s.Raytracer.plotRays(frame=-1, quiv=False)
     
-    s.plotSystem(focus_1=False, focus_2=False, plotRaytrace=True)#, exclude=[0,1,2])
+    testplot = s.plotSystem(focus_1=False, focus_2=False, plotRaytrace=False, ret = True)#, exclude=[0,1,2])
+    return testplot
     
 if __name__ == "__main__":
     ex_DRO()

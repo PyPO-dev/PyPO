@@ -19,7 +19,7 @@ public:
     std::vector<double> readFile(std::ifstream &file, double factor);
     std::vector<double> readPars();
     std::vector<std::array<double, 3>> readGrid3D(std::string &mode);
-    std::vector<std::vector<double>> readGrid2D(int prop_mode);
+    std::vector<std::array<double, 2>> readGrid2D();
     std::vector<std::array<std::complex<double>, 3>> read_Js();
     std::vector<std::array<std::complex<double>, 3>> read_Ms();
     std::vector<std::complex<double>> readScalarField();

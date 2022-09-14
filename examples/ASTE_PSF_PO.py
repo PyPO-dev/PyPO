@@ -19,7 +19,7 @@ def ex_ASTE():
     
     cpp_path = '../src/C++/'
 
-    lam = 12.49135 # [mm]
+    lam = 1.249135 # [mm]
     k = 2 * np.pi / lam
     
     # Primary parameters
@@ -30,7 +30,7 @@ def ex_ASTE():
     
     # Pack coefficients together for instantiating parabola: [focus, vertex]
     coef_p1         = [foc_pri, ver_pri]
-    gridsize_p1     = [3001, 801] # The gridsizes along the u and v axes
+    gridsize_p1     = [3501, 1501] # The gridsizes along the u and v axes
     
     lims_r_p1       = [R_aper, R_pri]
     lims_v_p1       = [0, 2*np.pi]
@@ -44,7 +44,7 @@ def ex_ASTE():
     
     # Pack coefficients together for instantiating hyperbola: [focus 1, focus 2, eccentricity]
     coef_h1         = [foc_1_h1, foc_2_h1, ecc_h1]
-    gridsize_h1     = [501, 301]
+    gridsize_h1     = [801, 501]
     
     lims_r_h1       = [0, R_sec]
     lims_v_h1       = [0, 2*np.pi]
@@ -58,47 +58,52 @@ def ex_ASTE():
     s = System.System()
     
     # Add parabolic reflector and hyperbolic reflector by focus, vertex and two foci and eccentricity
-    s.addParabola(name = "p1", coef=coef_p1, lims_x=lims_r_p1, lims_y=lims_v_p1, gridsize=gridsize_p1, pmode='foc', gmode='uv')
-    s.addHyperbola(name = "h1", coef=coef_h1, lims_x=lims_r_h1, lims_y=lims_v_h1, gridsize=gridsize_h1, pmode='foc', gmode='uv')
+    s.addParabola(name = "pri", coef=coef_p1, lims_x=lims_r_p1, lims_y=lims_v_p1, gridsize=gridsize_p1, pmode='foc', gmode='uv')
+    s.addHyperbola(name = "sec", coef=coef_h1, lims_x=lims_r_h1, lims_y=lims_v_h1, gridsize=gridsize_h1, pmode='foc', gmode='uv')
 
-    # Instantiate camera surface. Size does not matter, as long as z coordinate agrees
-    center_cam = foc_2_h1#foc_2_h1 # Place the camera at the z coordinate of the hyperbolic secondary focus
-    lims_x_cam = [-1000, 1000]
-    lims_y_cam = [-1000, 1000]
+    # Make far-field camera
+    center_cam = np.zeros(3)
+    
+    lim = 3 * 31
+    
+    lims_x_cam = [-lim, lim]
+    lims_y_cam = [-lim, lim]
     gridsize_cam = [201, 201]
-
+    
     # Add camera surface to optical system
-    s.addCamera(lims_x_cam, lims_y_cam, gridsize_cam, center=center_cam, name = "cam1")
-
+    s.addCamera(lims_x_cam, lims_y_cam, gridsize_cam, center=center_cam, name = "cam1", gmode='AoE', units=['as', 'mm'])
+    
     s.plotSystem(focus_1=True, focus_2=True)
     
-    s.addPointSource(area=1, pol='incoherent', n=3, amp=1e16)
+    s.addPointSource(area=1, pol=np.array([1,0,0]), n=3, amp=1)
+    s.inputBeam.calcJM(mode='PMC')
 
-    offTrans_ps = np.array([0,0,1e16])
+    offTrans_ps = foc_2_h1
     s.inputBeam.translateBeam(offTrans=offTrans_ps)
     
     s.addPlotter(save='../images/')
 
-    s.initPhysOptics(target=s.system["p1"], k=k, numThreads=11, cpp_path=cpp_path)
-    #'''
+    s.initPhysOptics(target=s.system["sec"], k=k, numThreads=11, cpp_path=cpp_path)
+    '''
     s.runPhysOptics(save=2, material_source='alu')
     
-    s.PO.plotField(s.system["p1"].grid_x, s.system["p1"].grid_y, mode='Field', polar=True)
+    s.PO.plotField(s.system["sec"].grid_x, s.system["sec"].grid_y, mode='Ex', polar=True)
     
-    s.nextPhysOptics(source=s.system["p1"], target=s.system["h1"])
+    s.nextPhysOptics(source=s.system["sec"], target=s.system["pri"])
     s.runPhysOptics(save=2, material_source='alu')
     
-    s.PO.plotField(s.system["h1"].grid_x, s.system["h1"].grid_y, mode='Field', polar=True)
+    s.PO.plotField(s.system["pri"].grid_x, s.system["pri"].grid_y, mode='Ex', polar=True)
 
-    s.nextPhysOptics(source=s.system["h1"], target=s.system["cam1"])
-    s.runPhysOptics(save=2, material_source='vac')
+    s.ffPhysOptics(source=s.system["pri"], target=s.system["cam1"])
+    s.runPhysOptics(save=2, material_source='vac', prop_mode=1)
+    '''
+    #s.PO.plotField(s.system["cam1"].grid_Az, s.system["cam1"].grid_El, mode='Ex', polar=False)
     
-    s.PO.plotField(s.system["cam1"].grid_x, s.system["cam1"].grid_y, mode='Field', polar=False)
-    #'''
-    field = s.loadField(s.system["cam1"], mode='Field')
+    field = s.loadField(s.system["cam1"], mode='Ex')
+    field2 = s.loadField(s.system["cam1"], mode='Ey')
     
-    s.plotter.plotBeam2D(s.system["cam1"], field=field, ff=f_sys, vmin=-30, interpolation='lanczos')
-    s.plotter.beamCut(s.system["cam1"], field=field)
+    s.plotter.plotBeam2D(s.system["cam1"], field=field, vmin=-30, interpolation='lanczos', units='as', save=True)
+    s.plotter.beamCut(s.system["cam1"], field=field, cross=field2, save=True)
     
 if __name__ == "__main__":
     ex_ASTE()

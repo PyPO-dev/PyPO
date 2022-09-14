@@ -27,6 +27,9 @@ class System(object):
     fileNames_ts = ['grid_t_x.txt', 'grid_t_y.txt', 'grid_t_z.txt', 'As.txt']
     fileNames_tcs = ['Ft.txt']
     
+    # Far field propagation labels
+    fileNames_t_ff = ['grid_t_ph.txt', 'grid_t_th.txt']
+    
     customBeamPath = './custom/beam/'
     customReflPath = './custom/reflector/'
     
@@ -54,7 +57,7 @@ class System(object):
         self.plotter = Plotter(save='./images/')
     
     #### ADD REFLECTOR METHODS
-    def addParabola(self, coef, lims_x, lims_y, gridsize, cRot=np.zeros(3), pmode='man', gmode='xy', name="Parabola", axis='a', trunc=False, flip=False):
+    def addParabola(self, coef, lims_x, lims_y, gridsize, cRot=np.zeros(3), pmode='man', gmode='xy', name="Parabola", axis='a', units='mm', trunc=False, flip=False):
         """
         Function for adding paraboloid reflector to system. If gmode='uv', lims_x should contain the smallest and largest radius and lims_y 
         should contain rotation.
@@ -66,7 +69,7 @@ class System(object):
             a = coef[0]
             b = coef[1]
             
-            p = Reflectors.Parabola(a, b, cRot, name)
+            p = Reflectors.Parabola(a, b, cRot, name, units)
             
             p.setGrid(lims_x, lims_y, gridsize, gmode, trunc, flip, axis)
             
@@ -91,7 +94,7 @@ class System(object):
             offRot = np.array([rx, ry, rz])
             cRot = offTrans
         
-            p = Reflectors.Parabola(a, b, cRot, name)
+            p = Reflectors.Parabola(a, b, cRot, name, units)
             
             p.focus_1 = f1
             p.focus_2 = np.ones(3) * float("NaN")
@@ -104,7 +107,7 @@ class System(object):
         self.system["{}".format(name)] = p
         self.num_ref += 1
 
-    def addHyperbola(self, coef, lims_x, lims_y, gridsize, cRot=np.zeros(3), pmode='man', gmode='xy', name="Hyperbola", axis='a', sec='upper', trunc=False, flip=False):
+    def addHyperbola(self, coef, lims_x, lims_y, gridsize, cRot=np.zeros(3), pmode='man', gmode='xy', name="Hyperbola", axis='a', units='mm', sec='upper', trunc=False, flip=False):
         if name == "Hyperbola":
             name = name + "_{}".format(self.num_ref)
         
@@ -113,7 +116,7 @@ class System(object):
             b = coef[1]
             c = coef[2]
             
-            h = Reflectors.Hyperbola(a, b, c, cRot, name, sec)
+            h = Reflectors.Hyperbola(a, b, c, cRot, name, units, sec)
 
             h.setGrid(lims_x, lims_y, gridsize, gmode, trunc, flip, axis)
         
@@ -148,7 +151,7 @@ class System(object):
             offRot = np.array([rx, ry, rz])
             cRot = offTrans
         
-            h = Reflectors.Hyperbola(a3, b3, c3, cRot, name, sec)
+            h = Reflectors.Hyperbola(a3, b3, c3, cRot, name, units, sec)
             
             h.setGrid(lims_x, lims_y, gridsize, gmode, trunc, flip, axis)
             
@@ -161,7 +164,7 @@ class System(object):
         self.system["{}".format(name)] = h
         self.num_ref += 1
         
-    def addEllipse(self, coef, lims_x, lims_y, gridsize, cRot=np.zeros(3), pmode='man', gmode='xy', name="Ellipse", axis='a', trunc=False, flip=False, ori='vertical'):
+    def addEllipse(self, coef, lims_x, lims_y, gridsize, cRot=np.zeros(3), pmode='man', gmode='xy', name="Ellipse", axis='a', units='mm', trunc=False, flip=False, ori='vertical'):
         if name == "Ellipse":
             name = name + "_{}".format(self.num_ref)
             
@@ -170,27 +173,27 @@ class System(object):
             b = coef[1]
             c = coef[2]
             
-            e = Reflectors.Ellipse(a, b, c, cRot, name, ori)
+            e = Reflectors.Ellipse(a, b, c, cRot, name, ori, units)
 
             e.setGrid(lims_x, lims_y, gridsize, gmode, trunc, flip, axis)
 
         self.system["{}".format(name)] = e
         self.num_ref += 1
     
-    def addCustomReflector(self, location, name="Custom", cRot=np.zeros(3), offTrans=np.zeros(3)):
+    def addCustomReflector(self, location, name="Custom", units='mm', cRot=np.zeros(3), offTrans=np.zeros(3)):
         if name == "Custom":
             name = name + "_{}".format(self.num_ref)
             
         path = self.customReflPath + location
-        custom = Reflectors.Custom(cRot, name, path)
+        custom = Reflectors.Custom(cRot, name, path, units)
         
         self.system["{}".format(name)] = custom
         self.num_ref += 1
     
-    def addCamera(self, lims_x, lims_y, gridsize, center=np.zeros(3), name="Camera"):
-        cam = Camera.Camera(center, name)
+    def addCamera(self, lims_x, lims_y, gridsize, center=np.zeros(3), name="Camera", gmode='xy', units='mm'):
+        cam = Camera.Camera(center, name, units)
         
-        cam.setGrid(lims_x, lims_y, gridsize)
+        cam.setGrid(lims_x, lims_y, gridsize, gmode)
         
         self.system["{}".format(name)] = cam
         self.num_cam += 1
@@ -200,7 +203,7 @@ class System(object):
         self.num_ref -= 1
     
     #### PLOTTING OPTICAL SYSTEM
-    def plotSystem(self, focus_1=False, focus_2=False, plotRaytrace=False, norm=False):
+    def plotSystem(self, focus_1=False, focus_2=False, plotRaytrace=False, norm=False, save=False):
         fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
         
         for elem in self.system.values():
@@ -222,6 +225,10 @@ class System(object):
         world_limits = ax.get_w_lims()
         ax.set_box_aspect((world_limits[1]-world_limits[0],world_limits[3]-world_limits[2],world_limits[5]-world_limits[4]))
         ax.tick_params(axis='x', which='major', pad=-3)
+        
+        if save:
+            pt.savefig(fname='system.jpg',bbox_inches='tight', dpi=300)
+        
         pt.show()
         
     def initRaytracer(self, nRays=0, nRing=0, 
@@ -306,6 +313,10 @@ class System(object):
                     else:
                         self.PO.writeInput(self.fileNames_ts[i], attr)
         
+        if target != None:
+            print("Calculating currents on {} from {}".format(target.name, self.inputBeam.name))
+        else:
+            print("Initialized PO object")
 
     def nextPhysOptics(self, source, target):
         """
@@ -352,6 +363,29 @@ class System(object):
                     pass
                 else:
                     self.PO.writeInput(self.fileNames_ts[i], attr)
+                    
+        print("Calculating currents on {} from {}".format(target.name, source.name))
+                    
+    def ffPhysOptics(self, source, target):
+        for i, attr in enumerate(source):
+            # Only write xyz and area
+            if i <= 3:
+                self.PO.writeInput(self.fileNames_s[i], attr)
+            else:
+                continue
+        
+        for i, field in enumerate(self.fileNames_tc):
+            # Copy J and M from output to input
+            self.PO.copyToInput(self.fileNames_tc[i], self.fileNames_s[i+4])
+        
+        # Write target grid
+        for i, attr in enumerate(target):
+            if i >= 2:
+                pass
+            else:
+                self.PO.writeInput(self.fileNames_t_ff[i], attr)
+                
+        print("Calculating far-field on {} from {}".format(target.name, source.name))
                 
     def folderPhysOptics(self, folder, source, target):
         """
@@ -383,6 +417,40 @@ class System(object):
                 pass
             else:
                 self.PO.writeInput(self.fileNames_t[i], attr)
+        
+        print("Calculating currents on {} from {}".format(target.name, source.name))
+        
+    def folderffPhysOptics(self, folder, source, target):
+        """
+        Perform a physical optics propagation from folder with saved input/output to target.
+        Automatically continues from last propagation by copying currents and grid to input
+        """
+        
+        # First, copy input/ to cpp_path. Do this first so that copy operations are performed
+        # in the cpp_path input/ folder. This preserves the saved data
+        self.PO.copyFromFolder(folder)
+        
+        # Now, copy J and M from local output/ to input/ in cpp_path
+        outpath = folder + 'output/'
+
+        for i, field in enumerate(self.fileNames_tc):
+            self.PO.copyToInput(self.fileNames_tc[i], self.fileNames_s[i+4], outpath=outpath)
+        
+        for i, attr in enumerate(source):
+            # Only write xyz and area
+            if i <= 3:
+                self.PO.writeInput(self.fileNames_s[i], attr)
+            else:
+                continue
+        
+        # Write target grid
+        for i, attr in enumerate(target):
+            if i >= 2:
+                pass
+            else:
+                self.PO.writeInput(self.fileNames_t_ff[i], attr)
+                
+        print("Calculating far-field on {} from {}".format(target.name, source.name))
     
     def runPhysOptics(self, save=0, material_source='vac', prop_mode=0, t_direction='forward', folder=''):
         self.PO.runPhysOptics(save, material_source, prop_mode, t_direction)

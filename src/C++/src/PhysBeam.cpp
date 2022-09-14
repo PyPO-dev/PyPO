@@ -54,19 +54,29 @@ int main(int argc, char *argv [])
     std::vector<double> source_area = handler.readArea();
     
     std::vector<std::array<double, 3>> grid_source = handler.readGrid3D(source);
-    std::vector<std::array<double, 3>> grid_target;
+    std::vector<std::array<double, 3>> grid_target3D;
+    std::vector<std::array<double, 2>> grid_target2D;
     std::vector<std::array<double, 3>> norm_target;
+    
+    int gridsize_t;
     
     if (prop_mode == 0)
     {
-        grid_target = handler.readGrid3D(target);
+        grid_target3D = handler.readGrid3D(target);
         norm_target = handler.readNormals();
+        
+        gridsize_t = grid_target3D.size();
     }
     
-    
-    
+    else if (prop_mode == 1)
+    {
+        grid_target2D = handler.readGrid2D();
+        
+        gridsize_t = grid_target2D.size();
+    }
+
     int gridsize_s = grid_source.size();
-    int gridsize_t = grid_target.size();
+    
     
     //std::cout << gridsize_t << std::endl;
     
@@ -77,10 +87,11 @@ int main(int argc, char *argv [])
     //std::cout << "jelloo" << std::endl;
     // Start timer
     
+    std::cout << "johoo" << std::endl;
+    
     begin = std::chrono::steady_clock::now();
-    std::cout << "Calculating fields on target..." << std::endl;
-    if (prop_mode == 0) {prop.parallelProp(grid_target, grid_source, norm_target, Js, Ms, source_area);}
-    //else if (prop_mode == 1) {prop.parallelFarField(grid_target, grid_source, Js, Ms, source_area);}
+    if (prop_mode == 0) {prop.parallelProp(grid_target3D, grid_source, norm_target, Js, Ms, source_area);}
+    else if (prop_mode == 1) {prop.parallelFarField(grid_target2D, grid_source, Js, Ms, source_area);}
     
     prop.joinThreads();
     

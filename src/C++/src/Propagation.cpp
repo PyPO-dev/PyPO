@@ -278,13 +278,22 @@ void Propagation::parallelProp(const std::vector<std::array<double, 3>> &grid_ta
 
 // Far-field functions to calculate E-vector in far-field
 void Propagation::calculateFarField(int start, int stop,
-                                const std::vector<std::vector<double>> &grid_ff,
-                                const std::vector<std::vector<double>> &grid_source,
-                                const std::vector<std::vector<std::complex<double>>> &Js,
-                                const std::vector<std::vector<std::complex<double>>> &Ms,
+                                const std::vector<std::array<double, 2>> &grid_ff,
+                                const std::vector<std::array<double, 3>> &grid_source,
+                                const std::vector<std::array<std::complex<double>, 3>> &Js,
+                                const std::vector<std::array<std::complex<double>, 3>> &Ms,
                                 const std::vector<double> &source_area)
 {
     // Scalars (double & complex double)
+    double theta;
+    double phi;
+    double cosEl;
+    
+    std::complex<double> e_th;
+    std::complex<double> e_ph;
+    
+    std::complex<double> e_Az;
+    std::complex<double> e_El;
 
     // Arrays of doubles
     std::array<double, 2> point_ff;            // Angular point on far-field
@@ -292,17 +301,15 @@ void Propagation::calculateFarField(int start, int stop,
 
     // Arrays of complex doubles
     std::array<std::complex<double>, 3> e;            // far-field E-field
-    
     for(int i=start; i<stop; i++)
     {
-        for(int n=0; n<2; n++)
-        {
-            point_ff[n] = grid_ff[n][i];
-        }
+        theta = grid_ff[i][0];
+        phi = grid_ff[i][1];
+        cosEl = std::sqrt(1 - sin(theta) * sin(phi) * sin(theta) * sin(phi));
         
-        r_hat[0] = sin(point_ff[0]);
-        r_hat[1] = sin(point_ff[1]);
-        r_hat[2] = sqrt(1. - r_hat[0] * r_hat[0] - r_hat[1] * r_hat[1]);
+        r_hat[0] = cos(theta) * sin(phi);
+        r_hat[1] = sin(theta) * sin(phi);
+        r_hat[2] = cos(phi);
         
         double test;
         ut.abs(r_hat, test);
@@ -310,11 +317,22 @@ void Propagation::calculateFarField(int start, int stop,
         
         // Calculate total incoming E and H field at point on target
         e = farfieldAtPoint(grid_source, Js, Ms, r_hat, source_area, start);
+        /*
+        // Convert to spherical
+        e_th = cos(theta) * (cos(phi) * e[0] + sin(phi) * e[1]) - sin(theta) * e[2];
         
-        for (int n=0; n<3; n++) 
-        {
-            this->Et_container[n][i] = e[n];
-        }
+        e_ph = -sin(phi) * e[0] + cos(phi) * e[1];
+        
+        // Convert to AoE
+        
+        e_Az = cos(phi) * e_th - cos(theta) * sin(phi) * e_ph;
+        e_El = cos(theta) * sin(phi) * e_th + cos(phi) * e_ph;
+        
+        e[0] = e_Az / cosEl;
+        e[1] = e_El / cosEl;
+        e[2] = z0;
+        */
+        this->Et_container[i] = e;
 
         if(i % 100 == 0 and start == 0 * this->step)
         {
@@ -323,9 +341,9 @@ void Propagation::calculateFarField(int start, int stop,
     }
 }
 
-std::array<std::complex<double>, 3> Propagation::farfieldAtPoint(const std::vector<std::vector<double>> &grid_source,
-                                               const std::vector<std::vector<std::complex<double>>> &Js,
-                                               const std::vector<std::vector<std::complex<double>>> &Ms,
+std::array<std::complex<double>, 3> Propagation::farfieldAtPoint(const std::vector<std::array<double, 3>> &grid_source,
+                                               const std::vector<std::array<std::complex<double>, 3>> &Js,
+                                               const std::vector<std::array<std::complex<double>, 3>> &Ms,
                                                const std::array<double, 3> &r_hat,
                                                const std::vector<double> &source_area,
                                                const int start)
@@ -365,21 +383,15 @@ std::array<std::complex<double>, 3> Propagation::farfieldAtPoint(const std::vect
     
     for(int i=0; i<gridsize_s; i++)
     {
-        for (int n=0; n<3; n++)
-        {
-            source_point[n] = grid_source[n][i]; // Kinda r_prime actually
-            _js[n] = Js[n][i];
-            _ms[n] = Ms[n][i];
-        }
         
-        ut.dot(r_hat, source_point, r_hat_in_rp);
+        ut.dot(r_hat, grid_source[i], r_hat_in_rp);
         
         std::complex<double> expo = exp(j * k * r_hat_in_rp);
         
         for (int n=0; n<3; n++)
         {
-            js[n] += _js[n] * expo * source_area[i];
-            ms[n] += _ms[n] * expo * source_area[i];
+            js[n] += Js[i][n] * expo * source_area[i];
+            ms[n] += Ms[i][n] * expo * source_area[i];
         }
     }
     ut.matVec(eye_min_rr, js, _ctemp);
@@ -396,17 +408,14 @@ std::array<std::complex<double>, 3> Propagation::farfieldAtPoint(const std::vect
     return e;
 }
 
-void Propagation::parallelFarField(const std::vector<std::vector<double>> &grid_ff,
-                               const std::vector<std::vector<double>> &grid_source,
-                               const std::vector<std::vector<std::complex<double>>> &Js,
-                               const std::vector<std::vector<std::complex<double>>> &Ms,
+void Propagation::parallelFarField(const std::vector<std::array<double, 2>> &grid_ff,
+                               const std::vector<std::array<double, 3>> &grid_source,
+                               const std::vector<std::array<std::complex<double>, 3>> &Js,
+                               const std::vector<std::array<std::complex<double>, 3>> &Ms,
                                const std::vector<double> &source_area)
 {
     int final_step; 
-    
-    //std::cout << gridsize_t << std::endl;
-    
-    
+
     for(int n=0; n<numThreads; n++)
     {
         if(n == (numThreads-1))
@@ -418,9 +427,7 @@ void Propagation::parallelFarField(const std::vector<std::vector<double>> &grid_
         {
             final_step = (n+1) * step;
         }
-        
-        //std::cout << final_step << std::endl;
-        
+
         threadPool[n] = std::thread(&Propagation::calculateFarField, 
                                     this, n * step, final_step, 
                                     grid_ff, grid_source, Js, Ms, source_area);

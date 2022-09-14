@@ -1,6 +1,6 @@
 #include "PropagationScalar.h"
 
-PropagationScalar::PropagationScalar(double k, int numThreads, int gridsize_s, int gridsize_t)
+PropagationScalar::PropagationScalar(double k, int numThreads, int gridsize_s, int gridsize_t, double eps)
 {
     this->k = k;
 
@@ -12,6 +12,8 @@ PropagationScalar::PropagationScalar(double k, int numThreads, int gridsize_s, i
     
     threadPool.resize(numThreads);
     field_container.resize(gridsize_t);
+    
+    this->n_ref = std::sqrt(eps);
 }
 
 void PropagationScalar::propagateBeam(int start, int stop,
@@ -47,7 +49,7 @@ std::complex<double> PropagationScalar::fieldAtPoint(const std::vector<std::arra
         ut.diff(point_target, grid_source[i], r_vec);
         ut.abs(r_vec, r);    
                     
-        field += beam_source[i] * exp(-j * k * r) / (4. * M_PI * r) * source_area[i];
+        field += - k * k * (n_ref*n_ref - 1) * beam_source[i] * exp(-j * k * r) / (4. * M_PI * r) * source_area[i];
         
     }
     return field;

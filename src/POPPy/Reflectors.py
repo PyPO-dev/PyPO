@@ -16,15 +16,18 @@ class Reflector(object):
     
     _counter = 0
     
-    def __init__(self, a, b, cRot, name):
+    def __init__(self, a, b, cRot, name, units):
         
-        self.a = a
-        self.b = b
+        self.units = units
+        self.conv = self.get_conv(units)
+        
+        self.a = a * self.conv
+        self.b = b * self.conv
         
         self.focus_1 = np.ones(3) * float("NaN")
         self.focus_2 = np.ones(3) * float("NaN")
         
-        self.cRot     = cRot
+        self.cRot     = cRot * self.conv
         
         Reflector._counter += 1
         self.id = Reflector._counter
@@ -33,6 +36,8 @@ class Reflector(object):
         
         # Use internal list of references to iterable attributes
         self._iterList = [0 for _ in range(7)]
+        
+        
         
     def __str__(self):#, reflectorType, reflectorId, a, b, offTrans, offRot):
         s = """\n######################### REFLECTOR INFO #########################
@@ -74,6 +79,17 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
         
     
     #### SETTERS ###
+    def get_conv(self, units):
+        
+        if units == 'mm':
+            conv = 1
+        elif units == 'cm':
+            conv = 1e2
+        elif units == 'm':
+            conv = 1e3
+            
+        return conv
+    
     def set_cRot(self, cRot):
         self.cRot = cRot
 
@@ -104,6 +120,10 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
         if gmode == 'xy':
             grid_x, grid_y = np.mgrid[lims_x[0]:lims_x[1]:gridsize[0]*1j, lims_y[0]:lims_y[1]:gridsize[1]*1j]
             
+            # Convert to mm
+            grid_x *= self.conv
+            grid_y *= self.conv
+            
             self.dx = grid_x[1,0] - grid_x[0,0]
             self.dy = grid_y[0,1] - grid_y[0,0]
             
@@ -119,8 +139,8 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
             
         elif gmode == 'uv':
             # Assume now lims_x represent smallest aperture and largest aperture radii
-            # Convert radii to u values
-            lims_x = [self.r_to_u(lims_x[0], axis=axis), self.r_to_u(lims_x[1], axis=axis)]
+            # Convert to mm and convert radii to u values
+            lims_x = [self.r_to_u(lims_x[0] * self.conv, axis=axis), self.r_to_u(lims_x[1] * self.conv, axis=axis)]
             
             v_open = (lims_y[1] - lims_y[0]) / gridsize[1]
             
@@ -174,10 +194,12 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
         self._iterList[5] = self.grid_ny
         self._iterList[6] = self.grid_nz
         
-    def translateGrid(self, offTrans):
-        self.grid_x += offTrans[0]
-        self.grid_y += offTrans[1]
-        self.grid_z += offTrans[2]
+    def translateGrid(self, offTrans, units='mm'):
+        conv = self.get_conv(units)
+        
+        self.grid_x += offTrans[0] * conv
+        self.grid_y += offTrans[1] * conv
+        self.grid_z += offTrans[2] * conv
         
         self.focus_1 += offTrans
         self.focus_2 += offTrans
@@ -325,8 +347,8 @@ class Parabola(Reflector):
     Derived class from Reflector. Creates a paraboloid mirror.
     """
     
-    def __init__(self, a, b, cRot, name):
-        Reflector.__init__(self, a, b, cRot, name)
+    def __init__(self, a, b, cRot, name, units):
+        Reflector.__init__(self, a, b, cRot, name, units)
         self.c = float("NaN")
 
         self.vertex = np.zeros(3)
@@ -406,9 +428,9 @@ class Hyperbola(Reflector):
     Derived class from Reflector. Creates a Hyperboloid mirror.
     """
     
-    def __init__(self, a, b, c, cRot, name, sec):
-        Reflector.__init__(self, a, b, cRot, name)
-        self.c = c
+    def __init__(self, a, b, c, cRot, name, units, sec):
+        Reflector.__init__(self, a, b, cRot, name, units)
+        self.c = c * self.conv
         
         self.vertex = np.array([0,0,self.c])
         
@@ -468,9 +490,9 @@ class Ellipse(Reflector):
     Derived class from Reflector. Creates an Ellipsoid mirror.
     """
     
-    def __init__(self, a, b, c, cRot, name, ori):
-        Reflector.__init__(self, a, b, cRot, name)
-        self.c = c
+    def __init__(self, a, b, c, cRot, name, ori, units):
+        Reflector.__init__(self, a, b, cRot, name, units)
+        self.c = c * self.conv
         
         self.vertex = np.array([0,0,self.c])
         
@@ -531,7 +553,7 @@ class Custom(Reflector):
     Requires a gridsize.txt to be present, which contains the gridsizes for reshaping
     """
     
-    def __init__(self, cRot, name, path):
+    def __init__(self, cRot, name, path, units):
         a = 0
         b = 0
         
@@ -547,11 +569,11 @@ class Custom(Reflector):
         gridsize = [int(gridsize[0]), int(gridsize[1])]
         self.shape = gridsize
             
-        self.grid_x = np.loadtxt(path + "x.txt").reshape(gridsize)
-        self.grid_y = np.loadtxt(path + "y.txt").reshape(gridsize)
-        self.grid_z = np.loadtxt(path + "z.txt").reshape(gridsize)
+        self.grid_x = np.loadtxt(path + "x.txt").reshape(gridsize) * self.conv
+        self.grid_y = np.loadtxt(path + "y.txt").reshape(gridsize) * self.conv
+        self.grid_z = np.loadtxt(path + "z.txt").reshape(gridsize) * self.conv
         
-        self.area = np.loadtxt(path + "A.txt").reshape(gridsize)
+        self.area = np.loadtxt(path + "A.txt").reshape(gridsize) * self.conv**2
         
         self.grid_nx = np.loadtxt(path + "nx.txt").reshape(gridsize)
         self.grid_ny = np.loadtxt(path + "ny.txt").reshape(gridsize)

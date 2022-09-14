@@ -31,7 +31,7 @@ class TestParabola(unittest.TestCase):
         
         self.gridsize = [201, 201]
         
-        self.parabola = Reflectors.Parabola(a = self.a, b = self.b, cRot = self.cRot, name = "p")
+        self.parabola = Reflectors.Parabola(a = self.a, b = self.b, cRot = self.cRot, name = "p", units='mm')
         
     def TearDown(self):
         pass
@@ -181,6 +181,15 @@ class TestParabola(unittest.TestCase):
         self.assertEqual(type(x), type(nx))
         self.assertEqual(type(x), type(ny))
         self.assertEqual(type(x), type(nz))
+        
+    def test_get_conv(self):
+        check1 = self.parabola.get_conv('mm')
+        check2 = self.parabola.get_conv('cm')
+        check3 = self.parabola.get_conv('m')
+        
+        self.assertEqual(check1, 1)
+        self.assertEqual(check2, 1e2)
+        self.assertEqual(check3, 1e3)
 
 class TestHyperbola(unittest.TestCase): 
     
@@ -202,7 +211,7 @@ class TestHyperbola(unittest.TestCase):
         self.gridsize = [201, 201]
         self.sec = 'upper'
         
-        self.hyperbola = Reflectors.Hyperbola(a = 1070, b = 1070, c = 2590, cRot = self.cRot, name = "h", sec = self.sec)
+        self.hyperbola = Reflectors.Hyperbola(a = 1070, b = 1070, c = 2590, cRot = self.cRot, name = "h", sec = self.sec, units='mm')
         
     def TearDown(self):
         pass
@@ -226,6 +235,15 @@ class TestHyperbola(unittest.TestCase):
         self.assertEqual(self.hyperbola.grid_ny.shape, (self.gridsize[0], self.gridsize[1]))
         self.assertEqual(self.hyperbola.grid_nz.shape, (self.gridsize[0], self.gridsize[1]))
         
+        # TEST: see if sec='upper' and sec='lower' are exactly mirrored
+        hyperbola_test = Reflectors.Hyperbola(a = 1070, b = 1070, c = 2590, cRot = self.cRot, name = "ht", sec = 'lower', units='mm')
+        hyperbola_test.setGrid(self.lims_x, self.lims_y, self.gridsize, gmode='xy', axis='a', trunc=False, flip=False)
+        
+        diff = self.hyperbola.grid_z + hyperbola_test.grid_z
+
+        for diff_el in diff.ravel():
+            self.assertEqual(diff_el, 0)
+        
         self.hyperbola.setGrid(self.lims_u, self.lims_v, self.gridsize, gmode='uv', axis='a', trunc=False, flip=False)
         
         self.assertEqual(self.hyperbola.grid_x.shape, (self.gridsize[0], self.gridsize[1]))
@@ -235,7 +253,7 @@ class TestHyperbola(unittest.TestCase):
         self.assertEqual(self.hyperbola.grid_nx.shape, (self.gridsize[0], self.gridsize[1]))
         self.assertEqual(self.hyperbola.grid_ny.shape, (self.gridsize[0], self.gridsize[1]))
         self.assertEqual(self.hyperbola.grid_nz.shape, (self.gridsize[0], self.gridsize[1]))
-    
+
     def test_translateGrid(self):
         offTrans = np.array([3, 1, -5])
         
@@ -350,6 +368,15 @@ class TestHyperbola(unittest.TestCase):
         self.assertEqual(type(x), type(nx))
         self.assertEqual(type(x), type(ny))
         self.assertEqual(type(x), type(nz))
+        
+    def test_get_conv(self):
+        check1 = self.parabola.get_conv('mm')
+        check2 = self.parabola.get_conv('cm')
+        check3 = self.parabola.get_conv('m')
+        
+        self.assertEqual(check1, 1)
+        self.assertEqual(check2, 1e2)
+        self.assertEqual(check3, 1e3)
     
 if __name__ == "__main__":
     unittest.main()

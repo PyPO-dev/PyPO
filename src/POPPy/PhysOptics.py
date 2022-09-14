@@ -96,14 +96,14 @@ class PhysOptics(object):
             t_dir = -1
         elif t_direction == 'backward':
             t_dir = 1
-
+        
         cwd = os.getcwd()
         os.chdir(self.cpp_path)
         if self.propType == 'coherent':
             os.system('./PhysBeam.exe {} {} {} {} {} {} {}'.format(self.numThreads, self.k, self.thres, save, epsilon, prop_mode, t_dir))
             
         elif self.propType == 'incoherent':
-            os.system('./PhysBeamScalar.exe {} {}'.format(self.numThreads, self.k))
+            os.system('./PhysBeamScalar.exe {} {} {}'.format(self.numThreads, self.k, epsilon))
         os.chdir(cwd)
         
     def loadField(self, shape, mode='Ex'):
@@ -164,13 +164,19 @@ class PhysOptics(object):
         
         if not ff:
             extent = [np.min(grid_x), np.max(grid_x), np.min(grid_y), np.max(grid_y)]
+            '''
             ax[0].set_ylabel(r"$y$ / [mm]")
             ax[0].set_xlabel(r"$x$ / [mm]")
             ax[1].set_ylabel(r"$y$ / [mm]")
             ax[1].set_xlabel(r"$x$ / [mm]")
+            '''
+            ax[0].set_ylabel(r"El / [deg]")
+            ax[0].set_xlabel(r"Az / [deg]")
+            ax[1].set_ylabel(r"El / [deg]")
+            ax[1].set_xlabel(r"Az / [deg]")
             
         else:
-            extent = [np.degrees(grid_x[0,0] / ff) * 3600, np.degrees(grid_x[-1,0] / ff) * 3600, np.degrees(grid_y[0,0] / ff) * 3600, np.degrees(grid_y[0,-1] / ff) * 3600]
+            extent = [grid_x[0,0] / ff * 3600, grid_x[-1,0] / ff * 3600, np.degrees(grid_y[0,0] / ff) * 3600, np.degrees(grid_y[0,-1] / ff) * 3600]
             ax[0].set_ylabel(r"El / [as]")
             ax[0].set_xlabel(r"Az / [as]")
             ax[1].set_ylabel(r"El / [as]")

@@ -165,30 +165,41 @@ Chief ray direction : [{:.4f}, {:.4f}, {:.4f}]
             ray["positions"].append(position)
             ray["directions"].append(direction)
     
-    def plotRays(self, quiv=True, frame=0, mode='z'):
+    def plotRays(self, quiv=True, frame=0, mode='z', save=False):
         fig, ax = pt.subplots(1,1)
         
         for i, (key, ray) in enumerate(self.rays.items()):
 
             if mode == 'z':
+                ax.set_xlabel('$x$ / [mm]')
+                ax.set_ylabel('$y$ / [mm]')
                 ax.scatter(ray["positions"][frame][0], ray["positions"][frame][1], color='black', s=10)
             
                 if quiv:
                     ax.quiver(ray["positions"][frame][0], ray["positions"][frame][1], 10 * ray["directions"][frame][0], 10 * ray["directions"][frame][1], color='black', width=0.005, scale=10)
                     
             elif mode == 'x':
+                ax.set_xlabel('$y$ / [mm]')
+                ax.set_ylabel('$z$ / [mm]')
                 ax.scatter(ray["positions"][frame][1], ray["positions"][frame][2], color='black', s=10)
             
                 if quiv:
                     ax.quiver(ray["positions"][frame][1], ray["positions"][frame][2], 10 * ray["directions"][frame][1], 10 * ray["directions"][frame][2], color='black', width=0.005, scale=10)
                     
             elif mode == 'y':
+                ax.set_xlabel('$z$ / [mm]')
+                ax.set_ylabel('$x$ / [mm]')
                 ax.scatter(ray["positions"][frame][2], ray["positions"][frame][0], color='black', s=10)
             
                 if quiv:
                     ax.quiver(ray["positions"][frame][2], ray["positions"][frame][0], 10 * ray["directions"][frame][2], 10 * ray["directions"][frame][0], color='black', width=0.005, scale=10)
-            
+                    
         ax.set_aspect(1)
+        ax.set_title('Spot diagram, frame = {}'.format(frame))
+        
+        if save:
+            pt.savefig(fname='spot_{}.jpg'.format(frame),bbox_inches='tight', dpi=300)
+
         pt.show()
         
     def plotRaysSystem(self, ax_append):

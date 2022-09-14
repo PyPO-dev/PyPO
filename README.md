@@ -13,8 +13,7 @@ The [g++](https://gcc.gnu.org/install/) compiler, capable of compiling code writ
 ```
 
 -- TESTING --\
-To run the Python unittests, first go to the main POPPy directory and from there:
+To run the Python unittests, first go to the main POPPy directory and from there run:
 ```
-    cd ./tests/Python/
     nosetests
 ```

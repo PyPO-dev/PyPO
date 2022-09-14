@@ -149,7 +149,7 @@ images/
 examples/ASTE/
 examples/images/
 tests/Python/datadir/
-
+datadir/
 buildSystem.py
 ChopperPointing.py
 Plot_spillover.py

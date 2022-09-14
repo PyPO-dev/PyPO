@@ -24,21 +24,36 @@ class Plotter(object):
         if not existSave:
             os.makedirs(self.savePath)
     
-    def plotBeam2D(self, surfaceObject, field, vmin=-30, vmax=0, ff=0, show=True, amp_only=False, save=False, interpolation=None, mode='dB'):
-        
-        titleAmp = "PNA / [dB]"
-        titlePhase = "Phase / [rad]"
-        
+    def plotBeam2D(self, surfaceObject, field, vmin=-30, vmax=0, show=True, amp_only=False, save=False, interpolation=None, mode='dB', units=''):
         comp = field[1]
         field = field[0]
         
-        if ff:
-            extent = [surfaceObject.grid_x[0,0] / ff * 3600, surfaceObject.grid_x[-1,0] / ff * 3600, surfaceObject.grid_y[0,0] / ff * 3600, surfaceObject.grid_y[0,-1] / ff * 3600]
+        titleAmp = r"${}_{}$ Amp / [dB]".format(comp[0], comp[1])
+        titlePhase = r"${}_{}$ Phase / [rad]".format(comp[0], comp[1])
+        
+        # Obtain conversion units if manually given
+        if units:
+            conv = surfaceObject.get_conv(units)
+            units = units
+        else:
+            conv = surfaceObject.conv
+            units = surfaceObject.units
+
+        if surfaceObject.elType == "Camera":
+            if surfaceObject.ff_flag:
+                grid_x1 = surfaceObject.grid_Az / conv
+                grid_x2 = surfaceObject.grid_El / conv
+                
+                ff_flag = True
             
         else:
-            extent = [surfaceObject.grid_x[0,0], surfaceObject.grid_x[-1,0], surfaceObject.grid_y[0,0], surfaceObject.grid_y[0,-1]]
-        
-        
+            grid_x1 = surfaceObject.grid_x / conv
+            grid_x2 = surfaceObject.grid_y / conv
+            
+            ff_flag = False
+
+        extent = [grid_x1[0,0], grid_x1[-1,0], grid_x2[0,0], grid_x2[0,-1]]
+    
         if not amp_only:
             fig, ax = pt.subplots(1,2, figsize=(10,5), gridspec_kw={'wspace':0.5})
         
@@ -56,17 +71,17 @@ class Plotter(object):
             
             phasefig = ax[1].imshow(np.angle(field), origin='lower', extent=extent, cmap=cmaps.parula)
             
-            if ff:
-                ax[0].set_ylabel(r"El / [as]")
-                ax[0].set_xlabel(r"Az / [as]")
-                ax[1].set_ylabel(r"El / [as]")
-                ax[1].set_xlabel(r"Az / [as]")
+            if ff_flag:
+                ax[0].set_ylabel(r"El / [{}]".format(units))
+                ax[0].set_xlabel(r"Az / [{}]".format(units))
+                ax[1].set_ylabel(r"El / [{}]".format(units))
+                ax[1].set_xlabel(r"Az / [{}]".format(units))
             
             else:
-                ax[0].set_ylabel(r"$y$ / [mm]")
-                ax[0].set_xlabel(r"$x$ / [mm]")
-                ax[1].set_ylabel(r"$y$ / [mm]")
-                ax[1].set_xlabel(r"$x$ / [mm]")
+                ax[0].set_ylabel(r"$y$ / [{}]".format(units))
+                ax[0].set_xlabel(r"$x$ / [{}]".format(units))
+                ax[1].set_ylabel(r"$y$ / [{}]".format(units))
+                ax[1].set_xlabel(r"$x$ / [{}]".format(units))
         
             ax[0].set_title(titleAmp, y=1.08)
             ax[0].set_aspect(1)
@@ -90,12 +105,12 @@ class Plotter(object):
                 ampfig = ax.imshow(20 * np.log10(np.absolute(field) / np.max(np.absolute(field))), vmin=vmin, vmax=vmax, origin='lower', extent=extent, cmap=cmaps.parula, interpolation=interpolation)
             
             if ff:
-                ax.set_ylabel(r"El / [as]")
-                ax.set_xlabel(r"Az / [as]")
+                ax.set_ylabel(r"El / [{}]".format(units))
+                ax.set_xlabel(r"Az / [{}]".format(units))
             
             else:
-                ax.set_ylabel(r"$y$ / [mm]")
-                ax.set_xlabel(r"$x$ / [mm]")
+                ax.set_ylabel(r"$y$ / [{}]".format(conv))
+                ax.set_xlabel(r"$x$ / [{}]".format(conv))
         
             ax.set_title(titleAmp, y=1.08)
             ax.set_box_aspect(1)
@@ -152,28 +167,46 @@ class Plotter(object):
         if returns:
             return ax_append
         
-    def beamCut(self, plotObject, field, vmin=-50, vmax=0, frac=1, show=True, save=True):
+    def beamCut(self, plotObject, field, cross='', units='', vmin=-50, vmax=0, frac=1, show=True, save=False):
+        if units:
+            conv = plotObject.get_conv(units)
+            units = units
+        else:
+            conv = plotObject.conv
+            units = plotObject.units
+        
         x_center = int((plotObject.shape[0] - 1) / 2)
         y_center = int((plotObject.shape[1] - 1) / 2)
-        
-        #pt.plot(plotObject.grid_x[:, y_center])
-        #pt.plot(plotObject.grid_y[:, y_center])
-        
+
         comp = field[1]
         field = field[0]
         
         field_dB = 20 * np.log10(np.absolute(field) / np.max(np.absolute(field)))
         
-        H_cut = field_dB[:,y_center]
-        E_cut = field_dB[x_center,:]
+        H_cut = field_dB[x_center,:]
+        E_cut = field_dB[:,y_center]
+        
+        # TODO: make this nicer
+        x_ax = plotObject.grid_Az[:,0] / conv
         
         fig, ax = pt.subplots(1,1, figsize=(7,5))
         
-        ax.plot(H_cut, color='blue')
-        ax.plot(E_cut, color='red', ls='--')
+        ax.plot(x_ax, H_cut, color='blue', label='H-plane')
+        ax.plot(x_ax, E_cut, color='red', ls='--', label='E-plane')
+        
+        if cross:
+            diago = np.diag(20 * np.log10(np.absolute(cross[0]) / np.max(np.absolute(field))))
+            print(diago.shape)
+            ax.plot(x_ax, diago, color='purple', ls='dashdot', label='X-pol')
+        
+        ax.set_xlabel(r'$\theta$ / [{}]'.format(units))
+        ax.set_ylabel(r'Amplitude / [dB]')
+        ax.set_title('Beam cuts')
         ax.set_box_aspect(1)
         ax.set_ylim(vmin, vmax)
-        #ax.set_xlim(-10, 10)
+        ax.set_xlim(x_ax[0], x_ax[-1])
+        ax.legend(frameon=False, prop={'size': 10},handlelength=1)
+
         if save:
             pt.savefig(fname=self.savePath + 'EH_cut_{}.jpg'.format(plotObject.name),bbox_inches='tight', dpi=300)
             

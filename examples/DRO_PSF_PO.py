@@ -37,41 +37,48 @@ def ex_DRO():
     
     # Add parabolic reflector and hyperbolic reflector by focus, vertex and two foci and eccentricity
     s.addParabola(name="p1", coef=coef_p1, lims_x=lims_r_p1, lims_y=lims_v_p1, gridsize=gridsize_p1, pmode='foc', gmode='uv')
+
+    # Make far-field camera
+    center_cam = np.zeros(3)
     
-    # Instantiate camera surface. 
-    center_cam = foc_pri
-    lims_x_cam = [-800, 800]
-    lims_y_cam = [-800, 800]
-    gridsize_cam = [401, 401]
+    lim = 3
+    
+    lims_x_cam = [-lim, lim]
+    lims_y_cam = [-lim, lim]
+    gridsize_cam = [201, 201]
     
     # Add camera surface to optical system
-    s.addCamera(lims_x_cam, lims_y_cam, gridsize_cam, center=center_cam, name = "cam1")
+    s.addCamera(lims_x_cam, lims_y_cam, gridsize_cam, center=center_cam, name = "cam1", gmode='AoE', units=['deg','mm'])
 
     s.plotSystem(focus_1=True, focus_2=True)
     
-    s.addPointSource(area=1, pol='incoherent', n=3, amp=1e16)
+    s.addPointSource(area=1, pol=np.array([1,0,0]), n=3, amp=1)
 
-    offTrans_ps = np.array([0,0,1e16])
+    #offTrans_ps = np.array([0,0,1e16])
+    offTrans_ps = foc_pri
+    s.inputBeam.calcJM(mode='PMC')
     s.inputBeam.translateBeam(offTrans=offTrans_ps)
     
     s.addPlotter(save='../images/')
 
     s.initPhysOptics(target=s.system["p1"], k=k, numThreads=11, cpp_path=cpp_path)
+    #'''
     s.runPhysOptics(save=2, material_source='alu')
     
-    s.PO.plotField(s.system["p1"].grid_x, s.system["p1"].grid_y, mode='Field', polar=True)
+    s.PO.plotField(s.system["p1"].grid_x, s.system["p1"].grid_y, mode='Ex', polar=True)
     
-    s.nextPhysOptics(source=s.system["p1"], target=s.system["cam1"])
-    s.runPhysOptics(save=2, material_source='vac')
-    
-    s.PO.plotField(s.system["cam1"].grid_x, s.system["cam1"].grid_y, mode='Field', polar=True)
+    s.ffPhysOptics(source=s.system["p1"], target=s.system["cam1"])
+    s.runPhysOptics(save=2, material_source='vac', prop_mode=1)
+    #'''
+    #s.PO.plotField(s.system["cam1"].grid_Az, s.system["cam1"].grid_El, mode='Ex', polar=False, save='DRO_ff')
     
     s.plotSystem(focus_1=False, focus_2=False)
     
-    field = s.loadField(s.system["cam1"], mode='Field')
+    field = s.loadField(s.system["cam1"], mode='Ex')
+    field2 = s.loadField(s.system["cam1"], mode='Ey')
     
-    s.plotter.plotBeam2D(s.system["cam1"], field=field, ff=foc_pri[2], vmin=-30, interpolation='lanczos')
-    s.plotter.beamCut(s.system["cam1"], field=field)
+    s.plotter.plotBeam2D(s.system["cam1"], field=field, vmin=-30, interpolation='lanczos')
+    s.plotter.beamCut(s.system["cam1"], field=field, cross=field2, save=True)
 
     
 if __name__ == "__main__":

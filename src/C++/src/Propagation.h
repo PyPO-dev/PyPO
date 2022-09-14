@@ -77,23 +77,23 @@ public:
     
     // Functions for calculating angular far-field from reflector directly - no phase term
     void calculateFarField(int start, int stop,
-                      const std::vector<std::vector<double>> &grid_ff,
-                      const std::vector<std::vector<double>> &grid_source, 
-                      const std::vector<std::vector<std::complex<double>>> &Js,
-                      const std::vector<std::vector<std::complex<double>>> &Ms,
+                      const std::vector<std::array<double, 2>> &grid_ff,
+                      const std::vector<std::array<double, 3>> &grid_source, 
+                      const std::vector<std::array<std::complex<double>, 3>> &Js,
+                      const std::vector<std::array<std::complex<double>, 3>> &Ms,
                       const std::vector<double> &source_area);
     
-    std::array<std::complex<double>, 3> farfieldAtPoint(const std::vector<std::vector<double>> &grid_source,
-                                      const std::vector<std::vector<std::complex<double>>> &Js,
-                                      const std::vector<std::vector<std::complex<double>>> &Ms,
+    std::array<std::complex<double>, 3> farfieldAtPoint(const std::vector<std::array<double, 3>> &grid_source,
+                                      const std::vector<std::array<std::complex<double>, 3>> &Js,
+                                      const std::vector<std::array<std::complex<double>, 3>> &Ms,
                                       const std::array<double, 3> &point_ff,
                                       const std::vector<double> &source_area,
                                       const int start);
     
-    void parallelFarField(const std::vector<std::vector<double>> &grid_ff,
-                      const std::vector<std::vector<double>> &grid_source, 
-                      const std::vector<std::vector<std::complex<double>>> &Js,
-                      const std::vector<std::vector<std::complex<double>>> &Ms,
+    void parallelFarField(const std::vector<std::array<double, 2>> &grid_ff,
+                      const std::vector<std::array<double, 3>> &grid_source, 
+                      const std::vector<std::array<std::complex<double>, 3>> &Js,
+                      const std::vector<std::array<std::complex<double>, 3>> &Ms,
                       const std::vector<double> &source_area);
 
     void joinThreads();

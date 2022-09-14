@@ -89,27 +89,30 @@ std::vector<std::array<double, 3>> DataHandler::readGrid3D(std::string &mode)
  *    mode = t corresponds to target grid.
  * @return grid Container of length 3 with at each element the position grid in x,y,z respectively.
  */
-std::vector<std::vector<double>> DataHandler::readGrid2D(int prop_mode) 
+std::vector<std::array<double, 2>> DataHandler::readGrid2D() 
 {
-    std::vector<std::vector<double>> grid;
+    std::vector<std::array<double, 2>> grid;
+    std::vector<std::vector<double>> _grid;
 
-    std::vector<std::string> azel = {"_x", "_y"};
-    double factor = 1.;
-    
-    if (prop_mode == 1)
-    {
-        // Convert arcseconds to radians
-        factor = M_PI / (180. * 3600.); 
-    }
-    
+    std::array<std::string, 2> azel = {"_th", "_ph"};
+
     for(int k=0; k<2; k++)
     {
         std::ifstream coord;
         coord.open("input/grid_t" + azel[k] + ".txt");
-        grid.push_back(readFile(coord, factor));
-    
+        _grid.push_back(readFile(coord));
         coord.close();
     }
+    
+    for (int i=0; i<_grid[0].size(); i++)
+        {
+            std::array<double, 2> pos;
+            
+            pos[0] = _grid[0][i];
+            pos[1] = _grid[1][i];
+            
+            grid.push_back(pos);
+        }
     
     return grid;
 }

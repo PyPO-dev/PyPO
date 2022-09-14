@@ -202,7 +202,7 @@ class PointSource(Beams):
             self.Hy = self._compList[4]
             self.Hz = self._compList[5]
             
-        if pol == 'incoherent':
+        else:
             # For incoherent source, immediately adjust _iterlist. No need for calculating J or M
             self._compList[0] = amp * np.exp(1j * phase) * field
             self.Field = self._compList[0]

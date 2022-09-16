@@ -6,15 +6,22 @@ import MPLCanvas as mplc
 
 
 class PlotScreen(qtw.QWidget):
-    def __init__(self):
+    def __init__(self, fig):
         super().__init__()
-        canvas = mplc.MplCanvas(self)
-        NavTB = NavigationToolbar(canvas, self)
+        self.canvas = mplc.MplCanvas(fig)
+        NavTB = NavigationToolbar(self.canvas, self)
 
         layout = qtw.QVBoxLayout()
         layout.addWidget(NavTB)
+        layout.addWidget(self.canvas)
 
         self.setLayout(layout)
+
+    # def setFigure(self, figure):
+    #     print("setting figure!!!!!!!!!")
+    #     self.canvas.drawInCanvas(figure)
+
+
 
 
 if __name__ == "__main__":

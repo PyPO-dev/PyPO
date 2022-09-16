@@ -12,8 +12,6 @@ class ParabolaFormLayout(qtw.QFormLayout):
     def __init__ (self, System):
         super().__init__()
 
-        self.System = System
-
         self.name = qtw.QLineEdit()
         self.name.setPlaceholderText("Parabola")
         self.addRow(qtw.QLabel("Name"),self.name)
@@ -29,7 +27,9 @@ class ParabolaFormLayout(qtw.QFormLayout):
         self.coefs = qtw.QHBoxLayout()
         self.coefs.addWidget(self.coefA)
         self.coefs.addWidget(self.coefB)
-        self.addRow("Coefficients", self.coefs)
+        self.coefsW = qtw.QWidget()
+        self.coefsW.setLayout(self.coefs)
+        self.addRow("U-limits", self.coefsW)
 
         self.vertex = qtw.QLineEdit()
         self.addRow("Vertex", self.vertex)
@@ -50,25 +50,33 @@ class ParabolaFormLayout(qtw.QFormLayout):
         self.Xlims = qtw.QHBoxLayout()
         self.Xlims.addWidget(self.limX1)
         self.Xlims.addWidget(self.limX2)
-        self.addRow("X-limits", self.Xlims)
+        self.XlimsW = qtw.QWidget()
+        self.XlimsW.setLayout(self.Xlims)
+        self.addRow("X-limits", self.XlimsW)
 
         self.limY1,self.limY2 = qtw.QLineEdit(),qtw.QLineEdit() 
         self.Ylims = qtw.QHBoxLayout()
         self.Ylims.addWidget(self.limY1)
         self.Ylims.addWidget(self.limY2)
-        self.addRow("Y-limits", self.Ylims)
+        self.YlimsW = qtw.QWidget()
+        self.YlimsW.setLayout(self.Ylims)
+        self.addRow("Y-limits", self.YlimsW)
 
         self.limU1,self.limU2 = qtw.QLineEdit(),qtw.QLineEdit() 
         self.Ulims = qtw.QHBoxLayout()
         self.Ulims.addWidget(self.limU1)
         self.Ulims.addWidget(self.limU2)
-        self.addRow("U-limits", self.Ulims)
+        self.UlimsW = qtw.QWidget()
+        self.UlimsW.setLayout(self.Ulims)
+        self.addRow("U-limits", self.UlimsW)
 
         self.limV1,self.limV2 = qtw.QLineEdit(),qtw.QLineEdit() 
         self.Vlims = qtw.QHBoxLayout()
         self.Vlims.addWidget(self.limV1)
         self.Vlims.addWidget(self.limV2)
-        self.addRow("V-limits", self.Vlims)
+        self.VlimsW = qtw.QWidget()
+        self.VlimsW.setLayout(self.Vlims)
+        self.addRow("V-limits", self.VlimsW)
 
         self.gridSizeX,self.gridSizeY = qtw.QLineEdit(),qtw.QLineEdit() 
         self.gridSizeX.setPlaceholderText("101")
@@ -76,7 +84,9 @@ class ParabolaFormLayout(qtw.QFormLayout):
         self.gridSizes = qtw.QHBoxLayout()
         self.gridSizes.addWidget(self.gridSizeX)
         self.gridSizes.addWidget(self.gridSizeY)
-        self.addRow("Grid size", self.gridSizes)
+        self.gridSizesW = qtw.QWidget()
+        self.gridSizesW.setLayout(self.gridSizes)
+        self.addRow("Grid size", self.gridSizesW)
 
         self.GModeChanged()
 
@@ -126,12 +136,14 @@ class ParabolaFormLayout(qtw.QFormLayout):
             print("dis2")
 
     def addElement(self):
-        
-        self.System.addParabola([float(self.coefA.text()), float(self.coefB.text())],
+        print(self.gridSizeX.text())
+        print(type(self.gridSizeX.text()))
+        s = system.System()
+        s.addParabola([float(self.coefA.text()), float(self.coefB.text())],
          [float(self.limX1.text()),float(self.limX2.text())], 
          [float(self.limY1.text()),float(self.limY2.text())], 
          [int(self.gridSizeX.text()), int(self.gridSizeY.text())])
-        
+        s.plotSystem(focus_1=False, focus_2=False, plotRaytrace=False)
 
     def addNot(self):
         print("canceling")

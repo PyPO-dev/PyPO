@@ -1,6 +1,6 @@
 #include "Propagation.h"
 
-Propagation::Propagation(double k, int numThreads, int gridsize_s, int gridsize_t, double thres, double epsilon, double t_direction)
+Propagation::Propagation(double k, int numThreads, int gridsize_s, int gridsize_t, double thres, double epsilon, double t_direction, int toPrint)
 {
     std::complex<double> j(0., 1.);
     std::complex<double> z0(0., 0.);
@@ -10,6 +10,8 @@ Propagation::Propagation(double k, int numThreads, int gridsize_s, int gridsize_
     this->k = k;
     
     this->EPS = epsilon * EPS_VAC; // epsilon is relative permeability
+    
+    this->toPrint = toPrint;
 
     this->numThreads = numThreads;
     this->gridsize_s = gridsize_s;
@@ -22,22 +24,35 @@ Propagation::Propagation(double k, int numThreads, int gridsize_s, int gridsize_
     this->thres = pow(10., exponent);
     
     threadPool.resize(numThreads);
-    std::array<std::complex<double>, 3> arr;
+
+    if (toPrint == 0)
+    {
+        this->Jt_container.resize(gridsize_t);
+        this->Mt_container.resize(gridsize_t);
+    }
     
-    std::vector<std::array<std::complex<double>, 3>> grid3D(gridsize_t, arr);
-    /*
-    this->Jt_container = grid3D;
-    this->Mt_container = grid3D;
+    else if (toPrint == 1)
+    {
+        this->Et_container.resize(gridsize_t);
+        this->Ht_container.resize(gridsize_t);
+    }
     
-    this->Et_container = grid3D;
-    this->Ht_container = grid3D;
-    */
-    this->Jt_container.resize(gridsize_t);
-    this->Mt_container.resize(gridsize_t);
+    else if (toPrint == 2)
+    {
+        this->Jt_container.resize(gridsize_t);
+        this->Mt_container.resize(gridsize_t);
+        
+        this->Et_container.resize(gridsize_t);
+        this->Ht_container.resize(gridsize_t);
+    }
     
-    this->Et_container.resize(gridsize_t);
-    this->Ht_container.resize(gridsize_t);
-    
+    if (toPrint == 3)
+    {
+        this->Pr_container.resize(gridsize_t);
+        this->Et_container.resize(gridsize_t);
+        this->Ht_container.resize(gridsize_t);
+    }
+
     this->t_direction = t_direction;
     
     std::array<std::array<double, 3>, 3> eye;
@@ -86,6 +101,8 @@ void Propagation::propagateBeam(int start, int stop,
     // Return containers
     std::array<std::array<std::complex<double>, 3>, 2> beam_e_h; // Container for storing fieldAtPoint return
     
+    int jc = 0; // Counter
+    
     for(int i=start; i<stop; i++)
     {
         
@@ -106,8 +123,6 @@ void Propagation::propagateBeam(int start, int stop,
             e_out_h_r[n] = temp2[n].real();                      // e_out_h_r
         }
             
-        this->Et_container[i] = beam_e_h[0];
-        this->Ht_container[i] = beam_e_h[1];
         //std::cout << this->Et_container.size() << std::endl;
         
         ut.normalize(e_out_h_r, S_i_norm);                       // S_i_norm                   
@@ -128,9 +143,7 @@ void Propagation::propagateBeam(int start, int stop,
         // Now, calculate reflected field from target
         ut.dot(beam_e_h[0], p_r_perp, e_dot_p_r_perp);      // e_dot_p_r_perp
         ut.dot(beam_e_h[0], p_r_parr, e_dot_p_r_parr);      // e_dot_p_r_parr
-        
-        
-        
+
         // Calculate reflected field from reflection matrix
         for(int n=0; n<3; n++)
         {
@@ -142,22 +155,57 @@ void Propagation::propagateBeam(int start, int stop,
         ut.ext(S_r_norm, e_r, temp1);                       // h_r_temp
         ut.s_mult(temp1, ZETA_0_INV, h_r);                  // h_r       
         
-        // Now calculate j and m
-        for(int n=0; n<3; n++)
+        if (toPrint == 0)
         {
-            temp1[n] = e_r[n] + beam_e_h[0][n]; // e_i_r
-            temp2[n] = h_r[n] + beam_e_h[1][n]; // h_i_r
-        } 
-        //std::cout << "check" << std::endl;
-        ut.ext(norms, temp2, this->Jt_container[i]);
-        ut.ext(norms, temp1, n_out_e_i_r);
+            //Calculate and store J and M only
+            for(int n=0; n<3; n++)
+            {
+                temp1[n] = e_r[n] + beam_e_h[0][n]; // e_i_r
+                temp2[n] = h_r[n] + beam_e_h[1][n]; // h_i_r
+            } 
+            
+            ut.ext(norms, temp2, this->Jt_container[i]);
+            ut.ext(norms, temp1, n_out_e_i_r);
+            ut.s_mult(n_out_e_i_r, -1., this->Mt_container[i]);
+        }
 
-        ut.s_mult(n_out_e_i_r, -1., this->Mt_container[i]);//this->Mt_container[i] = -n_out_e_i_r;
-        //std::cout << "jooo" << std::endl;
-        if(i % 100 == 0 and start == 0 * this->step)
+        else if (toPrint == 1)
         {
-            //std::cout << p_i_perp[0] << std::endl;
-            std::cout << i << " / " << this->step << std::endl;
+            // Only store E and H. WARNING! No more PO possible from this data
+            this->Et_container[i] = beam_e_h[0];
+            this->Ht_container[i] = beam_e_h[1];
+        }
+        
+        else if (toPrint == 2)
+        {
+            //Calculate and store J, M, E and H
+            for(int n=0; n<3; n++)
+            {
+                temp1[n] = e_r[n] + beam_e_h[0][n]; // e_i_r
+                temp2[n] = h_r[n] + beam_e_h[1][n]; // h_i_r
+            } 
+            
+            ut.ext(norms, temp2, this->Jt_container[i]);
+            ut.ext(norms, temp1, n_out_e_i_r);
+            ut.s_mult(n_out_e_i_r, -1., this->Mt_container[i]);
+            
+            this->Et_container[i] = beam_e_h[0];
+            this->Ht_container[i] = beam_e_h[1];
+        }
+        
+        else if (toPrint == 3)
+        {
+            // Print reflected fields and reflected Poynting vector
+            this->Pr_container[i] = S_r_norm;
+            this->Et_container[i] = e_r;
+            this->Ht_container[i] = h_r;
+        }
+
+        if((i * 100 / this->step) > jc and start == 0 * this->step)
+        {
+            std::cout << jc << " / 100" << '\r';
+            std::cout.flush();
+            jc++;
         }
     }
 }
@@ -301,6 +349,8 @@ void Propagation::calculateFarField(int start, int stop,
 
     // Arrays of complex doubles
     std::array<std::complex<double>, 3> e;            // far-field E-field
+    
+    int jc = 0;
     for(int i=start; i<stop; i++)
     {
         theta = grid_ff[i][0];
@@ -334,9 +384,11 @@ void Propagation::calculateFarField(int start, int stop,
         */
         this->Et_container[i] = e;
 
-        if(i % 100 == 0 and start == 0 * this->step)
+        if((i * 100 / this->step) > jc and start == 0 * this->step)
         {
-            std::cout << i << " / " << this->step << std::endl;
+            std::cout << jc << " / 100" << '\r';
+            std::cout.flush();
+            jc++;
         }
     }
 }

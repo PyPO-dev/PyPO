@@ -49,8 +49,8 @@ def ex_DRO():
     s.plotSystem(focus_1=True, focus_2=True)
     
     # Initialize a raytrace beam illuminating the parabolic reflector from above
-    #s.initRaytracer(nRays=20, nRing=10, a=R_pri-lam, b=R_pri-lam, originChief=foc_pri, tiltChief=np.array([0,180,0]))
-    s.initRaytracer(nRays=20, nRing=10, a=2, b=3, angx=50, angy=30, originChief=foc_pri, tiltChief=np.array([0,180,0]))
+    s.initRaytracer(nRays=20, nRing=10, a=R_pri-lam, b=R_pri-lam, angx=0, angy=0, originChief=foc_pri, tiltChief=np.array([0,180,0]))
+    #s.initRaytracer(nRays=20, nRing=10, a=2, b=3, angx=50, angy=30, originChief=foc_pri, tiltChief=np.array([0,180,0]))
     
     s.startRaytracer(target=s.system["p1"])
     s.startRaytracer(target=s.system["cam1"])

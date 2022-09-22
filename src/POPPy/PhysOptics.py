@@ -3,7 +3,7 @@ import os
 import matplotlib.pyplot as pt
 import matplotlib.cm as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-import scipy.fft as ft
+from scipy.fftpack import fft as ft
 
 import src.POPPy.Colormaps as cmaps
 
@@ -124,6 +124,17 @@ class PhysOptics(object):
         field = re + 1j * im
 
         return [field, mode]
+    
+    def loadPr(self, shape):
+        Pr = []
+        
+        for c in ['x','y','z']:
+            pr = np.loadtxt(self.outputPath + "Pr_" + c+ ".txt")
+            pr = pr.reshape(shape)
+            
+            Pr.append(pr)
+        
+        return Pr
     
     def FF_fromFocus(self, grid_x, grid_y, padding_range=(1000,1000)):
         noise_level = np.finfo(float).eps + 1j * np.finfo(float).eps

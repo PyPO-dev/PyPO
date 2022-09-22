@@ -1,14 +1,21 @@
 import math
+import sys
 from functools import partial
 import numpy as np
 import matplotlib.pyplot as pt
 import scipy.interpolate as interp
 import scipy.optimize as optimize
+from itertools import islice
+from multiprocessing import  Pool
+from functools import partial
 
 import src.POPPy.MatRotate as MatRotate
 
 class RayTrace(object):
-    def __init__(self, nRays, nRing, 
+    def __init__(self):
+        pass
+                
+    def initRaytracer(self, nRays, nRing, 
                  a, b, angx, angy,
                  originChief, tiltChief):
         
@@ -68,6 +75,29 @@ class RayTrace(object):
                 n += 1
                 alpha = 0
         
+    def POtoRaytracer(self, source, Pr):
+        x = source.grid_x.flatten()
+        y = source.grid_y.flatten()
+        z = source.grid_z.flatten()
+        
+        px = Pr[0].flatten()
+        py = Pr[1].flatten()
+        pz = Pr[2].flatten()
+        
+        self.nTot = len(x)
+        
+        self.rays = {"ray_{}".format(n) : {} for n in range(self.nTot)}
+        
+        for i, (key, ray) in enumerate(self.rays.items()):
+            ray["positions"]  = []
+            ray["directions"] = []
+            
+            pos = np.array([x[i], y[i], z[i]])
+            direction = np.array([px[i], py[i], pz[i]])
+            
+            ray["positions"].append(pos)
+            ray["directions"].append(direction)
+        
     def __len__(self):
         return len(self.rays.keys())
     
@@ -79,6 +109,37 @@ class RayTrace(object):
     
     def __setitem__(self, key, ray):
         self.rays["ray_{}".format(key)] = ray
+        
+    def sizeOf(self, units='b'):
+        """
+        Return size of self.rays.
+        """
+        
+        factor = 1
+        
+        if units == 'kb':
+            factor = 1e-3
+        
+        elif units == 'mb':
+            factor = 1e-6
+            
+        elif units == 'gb':
+            factor = 1e-9
+            
+        size = sys.getsizeof(self.rays)
+        
+        for i, (key, ray) in enumerate(self.rays.items()):
+            # Add size of reference to ray
+            size += sys.getsizeof(ray)
+            
+            for key, attr in ray.items():
+                # Add size of reference to ray
+                size += sys.getsizeof(attr)
+                
+                for coord in attr:
+                    size += sys.getsizeof(coord)
+
+        return size * factor
         
     def __str__(self):
         s = """\n######################### RAYTRACER INFO #########################
@@ -134,24 +195,60 @@ Chief ray direction : [{:.4f}, {:.4f}, {:.4f}]
         
         return np.absolute(interp_z - position[x3])
     
-    def propagateRays(self, a0, mode):
-        for i, (key, ray) in enumerate(self.rays.items()):
+    def chunkify(self, data, s):
+        it = iter(data)
+        for i in range(0, len(data), s):
+            yield {k:data[k] for k in islice(it, s)}
+        
+    
+    def propagateRays(self, a0, mode, workers):
+        
+        if mode == 'z':
+            x1 = 0
+            x2 = 1
+            x3 = 2
+                
+        elif mode == 'x':
+            x1 = 1
+            x2 = 2
+            x3 = 0
+                
+        elif mode == 'y':
+            x1 = 2
+            x2 = 0
+            x3 = 1
+        
+        self.nReduced = int(self.nTot / workers)
+        
+        # Evaluate _propagateRays partially
+        _propagateRayspar = partial(self._propagateRays, a0=a0,
+                                    x1=x1, x2=x2, x3=x3)
+        
+        PIDs = np.arange(workers)
 
-            if mode == 'z':
-                x1 = 0
-                x2 = 1
-                x3 = 2
-                
-            elif mode == 'x':
-                x1 = 1
-                x2 = 2
-                x3 = 0
-                
-            elif mode == 'y':
-                x1 = 2
-                x2 = 0
-                x3 = 1
+        # Pack rays into subdicts
+        subrays_l = []
+
+        for subrays in self.chunkify(self.rays, self.nReduced):
+            subrays_l.append(subrays)
             
+        args = zip(subrays_l, PIDs)
+        pool = Pool(workers)
+
+        toStore = pool.map(_propagateRayspar, args)
+        pool.close()
+        
+        for _toStore in toStore:
+            self.rays.update(_toStore)
+
+    def _propagateRays(self, args, a0, x1, x2, x3):
+        rays, PID = args
+        
+        toStore = rays
+        
+        j = 0 # Counter index
+            
+        for i, (key, ray) in enumerate(rays.items()):
             part_optLine = partial(self.optLine, ray=ray, x1=x1, x2=x2, x3=x3)
                 
             a_opt = optimize.fmin(part_optLine, a0, disp=0, xtol=1e-16, ftol=1e-16)
@@ -161,10 +258,36 @@ Chief ray direction : [{:.4f}, {:.4f}, {:.4f}]
             interp_n = self.interpEval_n(position[x1], position[x2])
             
             direction = ray["directions"][-1] - 2 * np.dot(ray["directions"][-1], interp_n) * interp_n
-            
-            ray["positions"].append(position)
-            ray["directions"].append(direction)
+
+            toStore[key]["positions"].append(position)
+            toStore[key]["directions"].append(direction)
+
+            if (i/self.nReduced * 100) > j and PID == 0:
+                print("{} / 100".format(j), end='\r')
+                j += 1
+                
+        return toStore
     
+    def calcPathlength(self):
+        """
+        Adds total path length as dict entry for each ray
+        """
+        for i, (key, ray) in enumerate(self.rays.items()):
+            stride = np.zeros(3)
+            L = 0
+            
+            for i, pos in enumerate(ray["positions"]):
+                if i == 0:
+                    stride = pos
+                    continue
+                
+                else:
+                    diff = pos - stride
+                    L += np.sqrt(np.dot(diff, diff))
+                    stride = pos
+                    
+            ray["length"] = L
+        
     def plotRays(self, quiv=True, frame=0, mode='z', save=False):
         fig, ax = pt.subplots(1,1)
         
@@ -209,7 +332,7 @@ Chief ray direction : [{:.4f}, {:.4f}, {:.4f}]
             y = []
             z = []
             for j in range(len(ray["positions"])):
-                
+
                 x.append(ray["positions"][j][0])
                 y.append(ray["positions"][j][1])
                 z.append(ray["positions"][j][2])

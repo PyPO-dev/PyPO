@@ -24,7 +24,7 @@ class Plotter(object):
         if not existSave:
             os.makedirs(self.savePath)
     
-    def plotBeam2D(self, surfaceObject, field, vmin=-30, vmax=0, show=True, amp_only=False, save=False, interpolation=None, mode='dB', units=''):
+    def plotBeam2D(self, surfaceObject, field, vmin=-30, vmax=0, show=True, amp_only=False, save=False, polar=False, interpolation=None, mode='dB', project='xy', units=''):
         comp = field[1]
         field = field[0]
         
@@ -45,14 +45,30 @@ class Plotter(object):
                 grid_x2 = surfaceObject.grid_El / conv
                 
                 ff_flag = True
-            
-        else:
+        
+            else:
+                ff_flag = False
+        
+        if project == 'xy':
             grid_x1 = surfaceObject.grid_x / conv
             grid_x2 = surfaceObject.grid_y / conv
-            
             ff_flag = False
+            
+            
+        elif project == 'yz':
+            grid_x1 = surfaceObject.grid_y / conv
+            grid_x2 = surfaceObject.grid_z / conv
+            ff_flag = False
+            
+        elif project == 'zx':
+            grid_x1 = surfaceObject.grid_z / conv
+            grid_x2 = surfaceObject.grid_x / conv
+            ff_flag = False
+            
+            
 
-        extent = [grid_x1[0,0], grid_x1[-1,0], grid_x2[0,0], grid_x2[0,-1]]
+        #extent = [grid_x1[0,0], grid_x1[-1,0], grid_x2[0,0], grid_x2[0,-1]]
+        extent = [np.min(grid_x1), np.max(grid_x1), np.min(grid_x2), np.max(grid_x2)]
     
         if not amp_only:
             fig, ax = pt.subplots(1,2, figsize=(10,5), gridspec_kw={'wspace':0.5})
@@ -68,6 +84,11 @@ class Plotter(object):
             
             elif mode == 'dB':
                 ampfig = ax[0].imshow(20 * np.log10(np.absolute(field) / np.max(np.absolute(field))), vmin=vmin, vmax=vmax, origin='lower', extent=extent, cmap=cmaps.parula, interpolation=interpolation)
+                
+                if polar:
+                    extent = [grid_x1[0,0], grid_x1[-1,0], grid_x2[0,0], grid_x2[0,-1]]
+                    ampfig = ax[0].pcolormesh(grid_x1, grid_x2, 20 * np.log10(np.absolute(field) / np.max(np.absolute(field))), vmin=vmin, vmax=vmax, cmap=cmaps.parula)#, origin='lower', extent=extent, cmap=cmaps.parula, vmin=vmin, vmax=vmax)
+                    phasefig = ax[1].pcolormesh(grid_x1, grid_x2, np.angle(field), cmap=cmaps.parula)#, origin='lower', extent=extent, cmap=cmaps.parula)
             
             phasefig = ax[1].imshow(np.angle(field), origin='lower', extent=extent, cmap=cmaps.parula)
             

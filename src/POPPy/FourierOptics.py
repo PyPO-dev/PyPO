@@ -3,7 +3,7 @@ import os
 import matplotlib.pyplot as pt
 import matplotlib.cm as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-import scipy.fft as ft
+from scipy.fftpack import fft as ft
 
 class FourierOptics(object):
     """

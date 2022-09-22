@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as pt
 from matplotlib import cm
 import scipy.interpolate as interp
+from src.POPPy.Copy import copyGrid
 
 # POPPy-specific modules
 import src.POPPy.MatRotate as MatRotate
@@ -33,6 +34,11 @@ class Reflector(object):
         self.id = Reflector._counter
         self.elType = "Reflector"
         self.name = name
+        
+        # Keep track of all applied translations & rotations
+        self.transCount = 0
+        self.rotCount = 0
+        self.history = []
         
         # Use internal list of references to iterable attributes
         self._iterList = [0 for _ in range(7)]
@@ -90,8 +96,10 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
             
         return conv
     
-    def set_cRot(self, cRot):
-        self.cRot = cRot
+    def set_cRot(self, cRot, units='mm'):
+        conv = self.get_conv(units)
+        
+        self.cRot = cRot * conv
 
     def setGrid(self, lims_x, lims_y, gridsize, gmode, trunc, flip, axis):
         """
@@ -194,37 +202,60 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
         self._iterList[5] = self.grid_ny
         self._iterList[6] = self.grid_nz
         
-    def translateGrid(self, offTrans, units='mm'):
+    def translateGrid(self, offTrans, units='mm', save=True):
         conv = self.get_conv(units)
-        
+
         self.grid_x += offTrans[0] * conv
         self.grid_y += offTrans[1] * conv
         self.grid_z += offTrans[2] * conv
         
-        self.focus_1 += offTrans
-        self.focus_2 += offTrans
-        self.vertex += offTrans
+        self.focus_1 += offTrans * conv
+        self.focus_2 += offTrans * conv
+        self.vertex += offTrans * conv
         
+        if save:
+            self.history.append(["t{}".format(self.transCount), offTrans, units])
+            self.transCount += 1
+
         self.updateIterlist()
         
-    def rotateGrid(self, offRot, radians=False):
-        gridRot = MatRotate.MatRotate(offRot, [self.grid_x, self.grid_y, self.grid_z], self.cRot, radians=radians)
+    def rotateGrid(self, offRot, radians=False, save=True, invert=False):
+        gridRot = MatRotate.MatRotate(offRot, [self.grid_x, self.grid_y, self.grid_z], self.cRot, radians=radians, invert=invert)
         
         self.grid_x = gridRot[0]
         self.grid_y = gridRot[1]
         self.grid_z = gridRot[2]
         
-        grid_nRot = MatRotate.MatRotate(offRot, [self.grid_nx, self.grid_ny, self.grid_nz], self.cRot, vecRot=True, radians=radians)
+        grid_nRot = MatRotate.MatRotate(offRot, [self.grid_nx, self.grid_ny, self.grid_nz], self.cRot, vecRot=True, radians=radians, invert=invert)
         
         self.grid_nx = grid_nRot[0]
         self.grid_ny = grid_nRot[1]
         self.grid_nz = grid_nRot[2]
         
-        self.focus_1 = MatRotate.MatRotate(offRot, self.focus_1, self.cRot, radians=radians)
-        self.focus_2 = MatRotate.MatRotate(offRot, self.focus_2, self.cRot, radians=radians)
-        self.vertex = MatRotate.MatRotate(offRot, self.vertex, self.cRot, radians=radians)
+        self.focus_1 = MatRotate.MatRotate(offRot, self.focus_1, self.cRot, radians=radians, invert=invert)
+        self.focus_2 = MatRotate.MatRotate(offRot, self.focus_2, self.cRot, radians=radians, invert=invert)
+        self.vertex = MatRotate.MatRotate(offRot, self.vertex, self.cRot, radians=radians, invert=invert)
+        
+        if save:
+            self.history.append(["r{}".format(self.rotCount), offRot, copyGrid(self.cRot)])
+            self.rotCount += 1
         
         self.updateIterlist()
+        
+    def homeReflector(self):
+        """
+            Home reflector back to original position. If 
+        """
+        for operation in reversed(self.history):
+            toCheck = list(operation[0])
+            # Translations
+            if toCheck[0] == 't':
+                self.translateGrid(-operation[1], operation[2], save=False)
+            
+            # Rotations
+            if toCheck[0] == 'r':
+                self.set_cRot(operation[2])
+                self.rotateGrid(operation[1], save=False, invert=True)
     '''
     def calcArea(self, grids_o):
         # Calculate surface approximations from oversized grids
@@ -432,7 +463,7 @@ class Hyperbola(Reflector):
         Reflector.__init__(self, a, b, cRot, name, units)
         self.c = c * self.conv
         
-        self.vertex = np.array([0,0,self.c])
+        self.vertex = np.array([0,0,self.c], dtype=float)
         
         self.reflectorId = self.id
         self.reflectorType = "Hyperboloid"

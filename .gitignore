@@ -156,6 +156,9 @@ Plot_spillover.py
 *.png
 *.jpg
 test_Parallel.py
+SpilloverSec.py
+TaperPri.py
+PlotConfig.py
 
 #vscode specific
 .vscode/settings.json

@@ -310,7 +310,7 @@ std::vector<std::array<double, 3>> DataHandler::readNormals()
  *      Use "Jt", "Mt", "Et" and "Ht" for consistency.
  */
 
-void DataHandler::writeOut(std::vector<std::array<std::complex<double>, 3>> &out, std::string &fileName)
+void DataHandler::writeOutC(std::vector<std::array<std::complex<double>, 3>> &out, std::string &fileName)
 {
     std::vector<std::string> xyz = {"_x", "_y", "_z"};
     
@@ -338,6 +338,31 @@ void DataHandler::writeOut(std::vector<std::array<std::complex<double>, 3>> &out
         
         out_r.close();
         out_i.close();
+    }
+}
+
+void DataHandler::writeOutR(std::vector<std::array<double, 3>> &out, std::string &fileName)
+{
+    std::vector<std::string> xyz = {"_x", "_y", "_z"};
+    
+    for (int k=0; k<3; k++)
+    {
+    
+        std::fstream out_r;
+    
+        out_r.open("output/" + fileName + xyz[k] + ".txt", std::fstream::out | std::fstream::trunc);
+        
+        out_r << std::setprecision(prec);
+
+    
+        for(int i=0; i<(out.size() - 1); i++)
+        //for(int i=(out.size() - 1); i>0; i--)
+        {
+            out_r << out[i][k] << std::endl;
+        }
+        out_r << out[out.size() - 1][k];
+        
+        out_r.close();
     }
 }
 

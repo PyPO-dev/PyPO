@@ -32,6 +32,8 @@ class Propagation
     double thres;
     double EPS;
     
+    int toPrint;
+    
     
     
     std::complex<double> j;
@@ -47,8 +49,10 @@ public:
     
     std::vector<std::array<std::complex<double>, 3>> Jt_container;
     std::vector<std::array<std::complex<double>, 3>> Mt_container;
+    
+    std::vector<std::array<double, 3>> Pr_container;
 
-    Propagation(double k, int numThreads, int gridsize_s, int gridsize_t, double thres, double epsilon, double t_direction);
+    Propagation(double k, int numThreads, int gridsize_s, int gridsize_t, double thres, double epsilon, double t_direction, int toPrint);
     
     Utils ut;
 

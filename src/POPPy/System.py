@@ -3,6 +3,9 @@ import numbers
 import numpy as np
 import matplotlib.pyplot as pt
 import time
+import psutil
+import os
+import sys
 
 # POPPy-specific modules
 import src.POPPy.Reflectors as Reflectors
@@ -13,6 +16,7 @@ import src.POPPy.PhysOptics as PO
 import src.POPPy.FourierOptics as FO
 from src.POPPy.Plotter import Plotter
 import src.POPPy.Aperture as Aperture
+from src.POPPy.Efficiencies import Efficiencies as EF
 #from src.Python.Fitting import Fitting
 
 class System(object):
@@ -37,6 +41,8 @@ class System(object):
         self.num_ref = 0
         self.num_cam = 0
         self.system = {}
+        
+        self.EF = EF()
         
     def __str__(self):
         pass
@@ -236,17 +242,36 @@ class System(object):
                  originChief=np.zeros(3), 
                  tiltChief=np.zeros(3)):
         
-        rt = RayTrace.RayTrace(nRays, nRing, a, b, angx, angy, originChief, tiltChief)
+        rt = RayTrace.RayTrace()
+        
+        rt.initRaytracer(nRays, nRing, a, b, angx, angy, originChief, tiltChief)
         
         self.Raytracer = rt
         
-    def startRaytracer(self, target, a0=100, res=1, mode='auto'):
+    def POtoRaytracer(self, source):
+        
+        # Load reflected Poynting vectors
+        Pr = self.loadPr(source)
+        
+        rt = RayTrace.RayTrace()
+        
+        rt.POtoRaytracer(source, Pr)
+
+        self.Raytracer = rt
+        
+    def startRaytracer(self, target, a0=100, workers=1, res=1, mode='auto'):
         """
         Propagate rays in RayTracer to a surface.
         Adds new frame to rays, containing point of intersection and reflected direction.
         """
                 
         print("Raytracing to {}".format(target.name))
+        print("Total amount of rays: {}".format(self.Raytracer.nTot))
+        
+        # Check if ray-trace size is OK
+        workers = self._memCheckRT(workers)
+        print(len(self.Raytracer))
+        
         start = time.time()
         
         if mode == 'auto':
@@ -262,20 +287,41 @@ class System(object):
         
         self.Raytracer.set_tcks(target.tcks)
 
-        self.Raytracer.propagateRays(a0=a0, mode=mode)
+        self.Raytracer.propagateRays(a0=a0, mode=mode, workers=workers)
         end = time.time()
         print("Elapsed time: {} s\n".format(end - start))
+        print(len(self.Raytracer))
         
-    def addBeam(self, lims_x, lims_y, gridsize, beam='pw', pol=np.array([1,0,0]), amp=1, phase=0, flip=False, name='', comp='Ex', cRot=np.zeros(3)):
+    def fieldRaytracer(self, target, field, k, a0=100, workers=1, res=1, mode='auto'):
+        print(len(self.Raytracer))
+        self.startRaytracer(target, a0, workers, res, mode)
+        
+        print(len(self.Raytracer))
+        self.Raytracer.calcPathlength()
+        print(len(self.Raytracer))
+        
+        print(len(field[0].flatten()))
+        
+        f_prop = []
+        for i, ((key, ray), f) in enumerate(zip(self.Raytracer.rays.items(), field[0].flatten())):
+            f_prop.append(f * np.exp(-1j * k * ray["length"]))
+            
+        f_prop = np.array(f_prop).reshape(field[0].shape)
+        return [f_prop, field[1]]
+        
+    def emptyRaytracer(self):
+        self.Raytracer.rays.clear()
+        
+    def addBeam(self, lims_x, lims_y, gridsize, beam='pw', pol=np.array([1,0,0]), amp=1, phase=0, flip=False, name='', comp='Ex', units='mm', cRot=np.zeros(3)):
         if beam == 'pw':
-            self.inputBeam = Beams.PlaneWave(lims_x, lims_y, gridsize, pol, amp, phase, flip, name, cRot)
+            self.inputBeam = Beams.PlaneWave(lims_x, lims_y, gridsize, pol, amp, phase, flip, name, units, cRot)
             
         elif beam == 'custom':
             pathsToFields = [self.customBeamPath + 'r' + name, self.customBeamPath + 'i' + name, self.customBeamPath]
-            self.inputBeam = Beams.CustomBeam(lims_x, lims_y, gridsize, comp, pathsToFields, flip, name, cRot)
+            self.inputBeam = Beams.CustomBeam(lims_x, lims_y, gridsize, comp, pathsToFields, flip, name, units, cRot)
 
-    def addPointSource(self, area=1, pol='incoherent', amp=1, phase=0, flip=False, name='', n=3, cRot=np.zeros(3)):
-        self.inputBeam = Beams.PointSource(area, pol, amp, phase, flip, name, n, cRot)
+    def addPointSource(self, area=1, pol='incoherent', amp=1, phase=0, flip=False, name='', units='mm', n=3, cRot=np.zeros(3)):
+        self.inputBeam = Beams.PointSource(area, pol, amp, phase, flip, name, units, n, cRot)
             
     def initPhysOptics(self, target=None, k=1, thres=-50, numThreads=1, cpp_path='./src/C++/', cont=False):
         """
@@ -459,9 +505,14 @@ class System(object):
             self.PO.copyToFolder(folder)
         
     def loadField(self, surface, mode='Ex'):
-        field = self.PO.loadField(surface.shape, mode)
+        field = self.PO.loadField(surface.grid_x.shape, mode)
         
         return field
+    
+    def loadPr(self, surface, mode='Ex'):
+        Pr = self.PO.loadPr(surface.grid_x.shape)
+        
+        return Pr
         
     def initFourierOptics(self, k):
         self.FO = FO.FourierOptics(k=k)
@@ -471,7 +522,49 @@ class System(object):
         ap.makeCircAper(r_max, r_min, gridsize)
         self.system["{}".format(name)] = ap
         
+    def calcSpillover(self, surfaceObject, field, R_aper, ret_field=False):
+        eta_s = self.EF.calcSpillover(surfaceObject, field, R_aper, ret_field)
+        return eta_s
     
+    def _countCPU(self):
+        cpu_count = os.cpu_count()
+        return cpu_count
+    
+    def _systemMem(self):
+        # Only return available memory
+        available = psutil.virtual_memory()[1] * 1e-9
+        return available
+    
+    def _memCheckRT(self, workers):
+        """
+        For determining whether a Ray-trace has enough resources.
+        To be used inside calls to startRaytracer etc.
+        If memory needs too large, manually decrease amount of workers.
+        Function will return the amount of workers appropriate for your memory.
+        """
+        
+        s_r = self.Raytracer.sizeOf(units='gb') * 2 * workers
+        s_ram = self._systemMem()
+        
+        w_init = workers
+        
+        if s_r >= s_ram:
+            print("""WARNING! You are attempting to start a ray-trace requiring {} gb of memory.
+Your system currently has {} gb of available RAM.
+Automatically reducing # of workers...""".format(s_r, s_ram))
+        
+        while s_r >= s_ram:
+            if workers == 1:
+                sys.exit("Not enough RAM for ray-trace with single worker. Exiting POPPy.")
+            
+            workers -= 1
+            s_r = self.Raytracer.sizeOf(units='gb') * 2 * workers
+        
+        if w_init != workers:
+            print("Reduced # of workers from {} to {} due to RAM constraints.".format(w_init, workers))
+            
+        return workers
+
     '''
     def addFitter(self):
         self.FI = Fitting()

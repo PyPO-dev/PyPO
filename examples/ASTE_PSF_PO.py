@@ -74,14 +74,16 @@ def ex_ASTE():
     s.addCamera(lims_x_cam, lims_y_cam, gridsize_cam, center=center_cam, name = "cam1", gmode='AoE', units=['as', 'mm'])
     
     s.plotSystem(focus_1=True, focus_2=True)
-    
-    s.addPointSource(area=1, pol=np.array([1,0,0]), n=3, amp=1)
+    s.addPlotter(save='../images/')
+    s.addPointSource(area=1, pol=np.array([1,0,0]), n=51, amp=1, units='mm')
     s.inputBeam.calcJM(mode='PMC')
-
+    
+    fieldps = [s.inputBeam.Ex, 'Ex']
+    s.plotter.plotBeam2D(s.inputBeam, field=fieldps, vmin=-30, interpolation='none', units='mm', project='xy', save=True)
     offTrans_ps = foc_2_h1
     s.inputBeam.translateBeam(offTrans=offTrans_ps)
     
-    s.addPlotter(save='../images/')
+    
 
     s.initPhysOptics(target=s.system["sec"], k=k, numThreads=11, cpp_path=cpp_path)
     '''

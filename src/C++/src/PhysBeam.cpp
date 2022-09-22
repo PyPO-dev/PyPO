@@ -83,13 +83,12 @@ int main(int argc, char *argv [])
     std::vector<std::array<std::complex<double>, 3>> Js = handler.read_Js();
     std::vector<std::array<std::complex<double>, 3>> Ms = handler.read_Ms();
     
-    Propagation prop(k, numThreads, gridsize_s, gridsize_t, thres, epsilon, t_direction);
+    Propagation prop(k, numThreads, gridsize_s, gridsize_t, thres, epsilon, t_direction, toPrint);
     //std::cout << "jelloo" << std::endl;
     // Start timer
-    
-    std::cout << "johoo" << std::endl;
-    
+
     begin = std::chrono::steady_clock::now();
+    
     if (prop_mode == 0) {prop.parallelProp(grid_target3D, grid_source, norm_target, Js, Ms, source_area);}
     else if (prop_mode == 1) {prop.parallelFarField(grid_target2D, grid_source, Js, Ms, source_area);}
     
@@ -102,8 +101,8 @@ int main(int argc, char *argv [])
     
         std::string Jt_file = "Jt";
         std::string Mt_file = "Mt";
-        handler.writeOut(Jt, Jt_file);
-        handler.writeOut(Mt, Mt_file);
+        handler.writeOutC(Jt, Jt_file);
+        handler.writeOutC(Mt, Mt_file);
     }
     
     else if (toPrint == 1)
@@ -113,8 +112,8 @@ int main(int argc, char *argv [])
     
         std::string Et_file = "Et";
         std::string Ht_file = "Ht";
-        handler.writeOut(Et, Et_file);
-        handler.writeOut(Ht, Ht_file);
+        handler.writeOutC(Et, Et_file);
+        handler.writeOutC(Ht, Ht_file);
     }
     
     else if (toPrint == 2)
@@ -124,16 +123,30 @@ int main(int argc, char *argv [])
     
         std::string Jt_file = "Jt";
         std::string Mt_file = "Mt";
-        handler.writeOut(Jt, Jt_file);
-        handler.writeOut(Mt, Mt_file);
+        handler.writeOutC(Jt, Jt_file);
+        handler.writeOutC(Mt, Mt_file);
         
         std::vector<std::array<std::complex<double>, 3>> Et = prop.Et_container;
         std::vector<std::array<std::complex<double>, 3>> Ht = prop.Ht_container;
     
         std::string Et_file = "Et";
         std::string Ht_file = "Ht";
-        handler.writeOut(Et, Et_file);
-        handler.writeOut(Ht, Ht_file);
+        handler.writeOutC(Et, Et_file);
+        handler.writeOutC(Ht, Ht_file);
+    }
+    
+    else if (toPrint == 3)
+    {
+        std::vector<std::array<double, 3>> Pr = prop.Pr_container;
+        std::vector<std::array<std::complex<double>, 3>> Et = prop.Et_container;
+        std::vector<std::array<std::complex<double>, 3>> Ht = prop.Ht_container;
+        
+        std::string Pr_file = "Pr";
+        std::string Et_file = "Et";
+        std::string Ht_file = "Ht";
+        handler.writeOutR(Pr, Pr_file);
+        handler.writeOutC(Et, Et_file);
+        handler.writeOutC(Ht, Ht_file);
     }
     
     // End timer

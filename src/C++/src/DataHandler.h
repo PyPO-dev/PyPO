@@ -26,7 +26,8 @@ public:
     std::vector<double> readArea();
     std::vector<std::array<double, 3>> readNormals();
     
-    void writeOut(std::vector<std::array<std::complex<double>, 3>> &out, std::string &fileName);
+    void writeOutC(std::vector<std::array<std::complex<double>, 3>> &out, std::string &fileName);
+    void writeOutR(std::vector<std::array<double, 3>> &out, std::string &fileName);
     void writeScalarOut(std::vector<std::complex<double>> &out, std::string &fileName);
     
 };

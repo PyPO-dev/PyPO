@@ -21,21 +21,26 @@ class Beams(object):
     
     compList_eh = ['Ex', 'Ey', 'Ez', 'Hx', 'Hy', 'Hz']
     
-    def __init__(self, x_lims, y_lims, gridsize, flip, name, cRot):
+    def __init__(self, x_lims, y_lims, gridsize, flip, name, units, cRot):
+        self.units = units
+        self.conv = self.get_conv(units)
+        
         self.cl = 299792458e3 # [mm]
         # Use internal list of references to iterable attributes
         self._iterList = [0 for _ in range(10)]
         self._compList = [0 for _ in range(6)]
         self.name = name
-        self.cRot = cRot
+        self.cRot = cRot * self.conv
+        
+        self.elType = 'Beam'
         
         # Default to coherent field as input
         self.status = 'coherent'
         
         grid_x, grid_y = np.mgrid[x_lims[0]:x_lims[1]:gridsize[0]*1j, y_lims[0]:y_lims[1]:gridsize[1]*1j]
         
-        self.grid_x = grid_x
-        self.grid_y = grid_y
+        self.grid_x = grid_x * self.conv
+        self.grid_y = grid_y * self.conv
         self.grid_z = np.zeros(grid_x.shape)
 
         dx = grid_x[1,0] - grid_x[0,0]
@@ -67,7 +72,18 @@ class Beams(object):
         
         else:
             raise StopIteration
-
+    
+    def get_conv(self, units):
+        
+        if units == 'mm':
+            conv = 1
+        elif units == 'cm':
+            conv = 1e2
+        elif units == 'm':
+            conv = 1e3
+            
+        return conv
+    
     def calcJM(self, mode='None'):
         temp = np.zeros(self.grid_x.shape, dtype=np.ndarray)
         
@@ -124,10 +140,12 @@ class Beams(object):
         self._iterList[8] = self.My
         self._iterList[9] = self.Mz
         
-    def translateBeam(self, offTrans):
-        self.grid_x += offTrans[0]
-        self.grid_y += offTrans[1]
-        self.grid_z += offTrans[2]
+    def translateBeam(self, offTrans, units='mm'):
+        conv = self.get_conv(units)
+        
+        self.grid_x += offTrans[0] * conv
+        self.grid_y += offTrans[1] * conv
+        self.grid_z += offTrans[2] * conv
         
         self.updateIterlist()
         
@@ -139,7 +157,6 @@ class Beams(object):
         self.grid_z = gridRot[2]
         
         self.norm = MatRotate.MatRotate(offRot, self.norm, self.cRot, vecRot=True, radians=radians)
-        print(self.norm)
         
         self.updateIterlist()
         
@@ -149,8 +166,8 @@ class Beams(object):
         self._iterList[2] = self.grid_z
 
 class PlaneWave(Beams):
-    def __init__(self, x_lims, y_lims, gridsize, pol, amp, phase, flip, name, cRot):
-        Beams.__init__(self, x_lims, y_lims, gridsize, flip, name, cRot)
+    def __init__(self, x_lims, y_lims, gridsize, pol, amp, phase, flip, name, units, cRot):
+        Beams.__init__(self, x_lims, y_lims, gridsize, flip, name, units, cRot)
         
         amp_B = amp / self.cl * np.cross(self.norm, pol)
         
@@ -171,13 +188,13 @@ class PlaneWave(Beams):
             self.Hz = self._compList[5]
         
 class PointSource(Beams):
-    def __init__(self, area, pol, amp, phase, flip, name, n, cRot):
+    def __init__(self, area, pol, amp, phase, flip, name, units, n, cRot):
         x_lims = [-np.sqrt(area)*1.5, np.sqrt(area)*1.5]
         y_lims = [-np.sqrt(area)*1.5, np.sqrt(area)*1.5]
         
         gridsize = [n, n]
         
-        Beams.__init__(self, x_lims, y_lims, gridsize, flip, name, cRot)
+        Beams.__init__(self, x_lims, y_lims, gridsize, flip, name, units, cRot)
         
         idx = int((n - 1) / 2)
         
@@ -194,9 +211,9 @@ class PointSource(Beams):
                 else:
                     self._compList[i] = amp_B[i-3] * np.exp(1j * phase) * field
                 
-            self.Ex = self._compList[0]
-            self.Ey = self._compList[1]
-            self.Ez = self._compList[2]
+            self.Ex = self._compList[0] + np.finfo(float).eps
+            self.Ey = self._compList[1] + np.finfo(float).eps
+            self.Ez = self._compList[2] + np.finfo(float).eps
         
             self.Hx = self._compList[3]
             self.Hy = self._compList[4]
@@ -215,10 +232,10 @@ class PointSource(Beams):
             
 
 class CustomBeam(Beams):
-    def __init__(self, x_lims, y_lims, gridsize, comp, pathsToField, flip, name, cRot):
+    def __init__(self, x_lims, y_lims, gridsize, comp, pathsToField, flip, name, units, cRot):
         idxComp = self.compList_eh.index(comp)
         
-        Beams.__init__(self, x_lims, y_lims, gridsize, flip, name, cRot)
+        Beams.__init__(self, x_lims, y_lims, gridsize, flip, name, units, cRot)
         
         rfield = np.loadtxt(pathsToField[0])
         ifield = np.loadtxt(pathsToField[1])

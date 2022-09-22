@@ -210,6 +210,7 @@ class System(object):
     
     #### PLOTTING OPTICAL SYSTEM
     def plotSystem(self, focus_1=False, focus_2=False, plotRaytrace=False, norm=False, save=False, ret=False):
+
         fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
         
         for elem in self.system.values():
@@ -237,7 +238,7 @@ class System(object):
         
         if ret:
             return fig
-        
+
         pt.show()
         
     def initRaytracer(self, nRays=0, nRing=0, 

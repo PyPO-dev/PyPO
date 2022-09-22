@@ -51,7 +51,7 @@ def ASTE_full():
     
     # Pack coefficients together for instantiating parabola: [focus, vertex]
     coef_p1         = [foc_pri, ver_pri]
-    gridsize_p1     = [351, 801] # The gridsizes along the u and v axes
+    gridsize_p1     = [3501, 1501] # The gridsizes along the u and v axes
     
     lims_r_p1       = [R_aper, R_pri]
     lims_v_p1       = [0, 2*np.pi]
@@ -84,8 +84,8 @@ def ASTE_full():
     s.addCamera(lims_x_cam, lims_y_cam, gridsize_cam, center=h_cam, name = "cam1")
     #s.system["cam1"].rotateGrid(rotcam)
     #s.system["cam1"].translateGrid(trans_cam_cf)
-    s.plotSystem(focus_1=True, focus_2=True, plotRaytrace=False)
-
+    #s.plotSystem(focus_1=True, focus_2=True, plotRaytrace=False)
+    '''
     s.initRaytracer(nRays=10, nRing=4, 
                  a=2, b=2, angx=0, angy=0,
                  originChief=np.array([0,0,0]), 
@@ -106,7 +106,7 @@ def ASTE_full():
 
     #s.plotSystem(focus_1=False, focus_2=False, plotRaytrace=False)
     
-    
+    '''
     bpath = '240GHz/'
 
     
@@ -126,14 +126,23 @@ def ASTE_full():
 
     s.addPlotter(save='../images/')
     
+    lim_ff = 3 * 31 # as
+    center_ff = np.zeros(3)
+    lims_x_ff = [-lim_ff, lim_ff]
+    lims_y_ff = [-lim_ff, lim_ff]
+    gridsize_ff = [201, 201]
+    
+    s.addCamera(lims_x_ff, lims_y_ff, gridsize_ff, center=center_ff, name = "ff", gmode='AoE', units=['as', 'mm'])
+    
     s.initPhysOptics(target=s.system["h1"], k=k, numThreads=11, cpp_path=cpp_path)
     
     
     #s.initPhysOptics(k=k, numThreads=11, cpp_path=cpp_path, cont=True)
-    #s.folderPhysOptics(folder='ASTE/sec/', source=s.system["sec"], target=s.system["pri"])
+    #s.folderffPhysOptics(folder='ASTE/pri/', source=s.system["pri"], target=s.system["ff"])
+    #s.runPhysOptics(save=2, material_source='vac', prop_mode=1)
     #s.runPhysOptics(save=2, material_source='alu')
     #s.PO.plotField(s.system["pri"].grid_y, s.system["pri"].grid_x, mode='Ex', polar=True, show=False)
-    
+    '''
     s.runPhysOptics(save=2, material_source='alu', folder='ASTE/h1/')
     s.PO.plotField(s.system["h1"].grid_y, s.system["h1"].grid_z, mode='Ez', polar=False, show=False, save="h1")
 
@@ -148,18 +157,26 @@ def ASTE_full():
     s.nextPhysOptics(source=s.system["sec"], target=s.system["pri"])
     s.runPhysOptics(save=2, material_source='alu', folder='ASTE/pri/')
     s.PO.plotField(s.system["pri"].grid_y, s.system["pri"].grid_x, mode='Ex', polar=True, show=False, save="pri")
+    
+    s.system["pri"].homeReflector()
+    
+    s.ffPhysOptics(source=s.system["pri"], target=s.system["ff"])
+    s.runPhysOptics(save=2, material_source='vac', prop_mode=1)
+    
+    #s.nextPhysOptics(source=s.system["pri"], target=s.system["cam1"])
+    
+    #s.runPhysOptics(save=2, material_source='vac', folder='ASTE/cam1/')
+    '''
+    #s.PO.plotField(s.system["cam1"].grid_y, s.system["cam1"].grid_x, mode='Ey', polar=False, show=False, save="cam1")
+    
+    
 
-    s.nextPhysOptics(source=s.system["pri"], target=s.system["cam1"])
+    field = s.loadField(s.system["ff"], mode='Ex')
+    field2 = s.loadField(s.system["ff"], mode='Ey')
     
-    s.runPhysOptics(save=2, material_source='vac', folder='ASTE/cam1/')
-    
-    s.PO.plotField(s.system["cam1"].grid_y, s.system["cam1"].grid_x, mode='Ey', polar=False, show=False, save="cam1")
-    
-    
-    '''
-    field = s.loadField(s.system["cam1"], mode='Ex')
-    s.PO.FF_fromFocus(s.system["cam1"].grid_y, s.system["cam1"].grid_x)
-    '''
+    s.plotter.plotBeam2D(s.system["ff"], field=field, vmin=-30, interpolation='none', units='as', save=True, project='')
+    s.plotter.beamCut(s.system["ff"], field=field, cross=field2, save=True)
+
 if __name__ == "__main__":
     ASTE_full()
 

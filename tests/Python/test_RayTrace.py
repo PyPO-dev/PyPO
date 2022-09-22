@@ -45,8 +45,8 @@ class TestRayTrace(unittest.TestCase):
         self.name = "cam_test"
         self.offRot = np.radians([0, 0, 0])
         
-        self.camera = Camera(center=self.centercam, name=self.name)
-        self.camera.setGrid(self.lims_x, self.lims_y, self.gridsize)
+        self.camera = Camera(center=self.centercam, name=self.name, units='mm')
+        self.camera.setGrid(self.lims_x, self.lims_y, self.gridsize, gmode='xy')
         self.camera.interpCamera(res=1, mode='z')
         self.tcks = self.camera.tcks
     
@@ -299,8 +299,8 @@ class TestRayTrace(unittest.TestCase):
         RTtest.propagateRays(a0=1, mode=mode)
         
         
-        camera2 = Camera(center=np.zeros(3), name="cam2")
-        camera2.setGrid(self.lims_x, self.lims_y, self.gridsize)
+        camera2 = Camera(center=np.zeros(3), name="cam2", units='mm')
+        camera2.setGrid(self.lims_x, self.lims_y, self.gridsize, gmode='xy')
         camera2.interpCamera(res=1, mode='z')
 
         RTtest.set_tcks(camera2.tcks)

@@ -8,10 +8,21 @@ class Camera(object):
     """
     NOTE: if prop_mode for PO == 1, it is assumed camera is in FAR-FIELD. x and y then correspond to Az-El, center only affects pointing then
     """
-    def __init__(self, center, name):
-        self.center = center
-        self.cRot = center
-        
+    def __init__(self, center, name, units):
+        if isinstance(units, list):
+            self.units = units[0]
+            self.unit_spat = units[1]
+            self.conv_spat = self.get_conv(self.unit_spat)
+            
+            self.center = center * self.conv_spat
+            self.cRot = center
+            self.conv = self.get_conv(self.units)
+            
+        else:
+            self.conv = self.get_conv(units)
+            self.center = center * self.conv
+            self.cRot = center
+
         self.elType = "Camera"
         self.name = name
         
@@ -19,6 +30,8 @@ class Camera(object):
         self._iterList = [0 for _ in range(7)]
         
         self.norm = np.array([0,0,1])
+        
+        self.ff_flag = False
         
     def __str__(self):
         s = """\n######################### CAMERA INFO #########################
@@ -40,13 +53,91 @@ Center position     : [{:.3f}, {:.3f}, {:.3f}] [mm]
         else:
             raise StopIteration
         
-    def setGrid(self, lims_x, lims_y, gridsize):
+    def get_conv(self, units):
+        
+        conv = 0
+        
+        if units == 'mm':
+            conv = 1
+        elif units == 'cm':
+            conv = 1e2
+        elif units == 'm':
+            conv = 1e3
+        
+        # Angular units - convert here to radians
+        elif units == 'deg':
+            conv = np.pi / 180
+        elif units == 'am':
+            conv = np.pi / (180 * 60)
+        elif units == 'as':
+            conv = np.pi / (180 * 3600)
+        
+        
+        return conv
+        
+    def setGrid(self, lims_x, lims_y, gridsize, gmode):
         self.shape = gridsize
         
-        grid_x, grid_y = np.mgrid[lims_x[0]:lims_x[1]:gridsize[0]*1j, lims_y[0]:lims_y[1]:gridsize[1]*1j]
+        if gmode == 'xy':
+            grid_x, grid_y = np.mgrid[lims_x[0]:lims_x[1]:gridsize[0]*1j, lims_y[0]:lims_y[1]:gridsize[1]*1j]
+            
+            grid_x *= self.conv
+            grid_y *= self.conv
         
-        dx = grid_x[1,0] - grid_x[0,0]
-        dy = grid_y[0,1] - grid_y[0,0]
+            dx = grid_x[1,0] - grid_x[0,0]
+            dy = grid_y[0,1] - grid_y[0,0]
+            
+            self.area = np.ones(grid_x.shape) * dx * dy
+            
+        elif gmode == 'uv':
+            lims_x[0] *= self.conv
+            lims_x[1] *= self.conv
+            
+            grid_u, grid_v = np.mgrid[lims_x[0]:lims_x[1]:gridsize[0]*1j, lims_y[0]:lims_y[1]:gridsize[1]*1j]
+            
+            grid_x = grid_u * np.cos(grid_v)
+            grid_y = grid_u * np.sin(grid_v)
+            
+            du = grid_u[1,0] - grid_u[0,0]
+            dv = grid_v[0,1] - grid_v[0,0]
+            
+            self.area = grid_u * du * dv
+            
+        elif gmode == 'AoE':
+            # Since only used for far-field, immediately convert to spherical coords
+            grid_Az, grid_El = np.mgrid[lims_x[0]:lims_x[1]:gridsize[0]*1j, lims_y[0]:lims_y[1]:gridsize[1]*1j]
+            
+            # Convert first to radians
+            grid_Az *= self.conv
+            grid_El *= self.conv
+            
+            # Store Az and El for plotting purps
+            self.grid_Az = grid_Az
+            self.grid_El = grid_El
+            
+            dAz = grid_Az[1,0] - grid_Az[0,0]
+            dEl = grid_El[0,1] - grid_El[0,0]
+            
+            # theta
+            grid_x = np.sqrt(grid_Az**2 + grid_El**2)
+            
+            # phi
+            grid_y = np.arctan(grid_El / grid_Az)
+
+            toFill = np.argwhere(np.isnan(grid_y))
+            
+            
+            
+            if isinstance(toFill, np.ndarray):
+                a, b = toFill[0]
+
+                grid_y[a, b] = 0
+            
+            pt.imshow(grid_y)
+            pt.show()
+            
+            self.area = dAz * dEl # whatever...
+            self.ff_flag = True
         
         self.grid_x = grid_x + self.center[0]
         self.grid_y = grid_y + self.center[1]
@@ -56,7 +147,7 @@ Center position     : [{:.3f}, {:.3f}, {:.3f}] [mm]
         self.grid_ny = np.zeros(self.grid_y.shape)
         self.grid_nz = np.ones(self.grid_z.shape)
         
-        self.area = np.ones(self.grid_x.shape) * dx * dy
+        
         
         self._iterList[0] = self.grid_x
         self._iterList[1] = self.grid_y
@@ -79,13 +170,15 @@ Center position     : [{:.3f}, {:.3f}, {:.3f}] [mm]
         self._iterList[5] = self.grid_ny
         self._iterList[6] = self.grid_nz
        
-    def set_cRot(self, cRot):
-        self.cRot = cRot   
+    def set_cRot(self, cRot, units='mm'):
+        conv = self.get_conv(units)
+        self.cRot = cRot * conv
     
-    def translateGrid(self, offTrans):
-        self.grid_x += offTrans[0]
-        self.grid_y += offTrans[1]
-        self.grid_z += offTrans[2]
+    def translateGrid(self, offTrans, units='mm'):
+        conv = self.get_conv(units)
+        self.grid_x += offTrans[0] * conv
+        self.grid_y += offTrans[1] * conv
+        self.grid_z += offTrans[2] * conv
         
         self.center += offTrans
         

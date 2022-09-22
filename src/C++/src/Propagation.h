@@ -32,6 +32,8 @@ class Propagation
     double thres;
     double EPS;
     
+    int toPrint;
+    
     
     
     std::complex<double> j;
@@ -47,8 +49,10 @@ public:
     
     std::vector<std::array<std::complex<double>, 3>> Jt_container;
     std::vector<std::array<std::complex<double>, 3>> Mt_container;
+    
+    std::vector<std::array<double, 3>> Pr_container;
 
-    Propagation(double k, int numThreads, int gridsize_s, int gridsize_t, double thres, double epsilon, double t_direction);
+    Propagation(double k, int numThreads, int gridsize_s, int gridsize_t, double thres, double epsilon, double t_direction, int toPrint);
     
     Utils ut;
 
@@ -77,23 +81,23 @@ public:
     
     // Functions for calculating angular far-field from reflector directly - no phase term
     void calculateFarField(int start, int stop,
-                      const std::vector<std::vector<double>> &grid_ff,
-                      const std::vector<std::vector<double>> &grid_source, 
-                      const std::vector<std::vector<std::complex<double>>> &Js,
-                      const std::vector<std::vector<std::complex<double>>> &Ms,
+                      const std::vector<std::array<double, 2>> &grid_ff,
+                      const std::vector<std::array<double, 3>> &grid_source, 
+                      const std::vector<std::array<std::complex<double>, 3>> &Js,
+                      const std::vector<std::array<std::complex<double>, 3>> &Ms,
                       const std::vector<double> &source_area);
     
-    std::array<std::complex<double>, 3> farfieldAtPoint(const std::vector<std::vector<double>> &grid_source,
-                                      const std::vector<std::vector<std::complex<double>>> &Js,
-                                      const std::vector<std::vector<std::complex<double>>> &Ms,
+    std::array<std::complex<double>, 3> farfieldAtPoint(const std::vector<std::array<double, 3>> &grid_source,
+                                      const std::vector<std::array<std::complex<double>, 3>> &Js,
+                                      const std::vector<std::array<std::complex<double>, 3>> &Ms,
                                       const std::array<double, 3> &point_ff,
                                       const std::vector<double> &source_area,
                                       const int start);
     
-    void parallelFarField(const std::vector<std::vector<double>> &grid_ff,
-                      const std::vector<std::vector<double>> &grid_source, 
-                      const std::vector<std::vector<std::complex<double>>> &Js,
-                      const std::vector<std::vector<std::complex<double>>> &Ms,
+    void parallelFarField(const std::vector<std::array<double, 2>> &grid_ff,
+                      const std::vector<std::array<double, 3>> &grid_source, 
+                      const std::vector<std::array<std::complex<double>, 3>> &Js,
+                      const std::vector<std::array<std::complex<double>, 3>> &Ms,
                       const std::vector<double> &source_area);
 
     void joinThreads();

@@ -31,11 +31,11 @@ class TestParabola(unittest.TestCase):
         
         self.gridsize = [201, 201]
         
-        self.parabola = Reflectors.Parabola(a = self.a, b = self.b, cRot = self.cRot, name = "p")
+        self.parabola = Reflectors.Parabola(a = self.a, b = self.b, cRot = self.cRot, name = "p", units='mm')
         
     def TearDown(self):
         pass
-    
+
     def test_set_cRot(self):
         cRot_test = np.array([345, 129, 2343])
         
@@ -84,7 +84,7 @@ class TestParabola(unittest.TestCase):
             self.assertEqual(xx0 + offTrans[0], xx)
             self.assertEqual(yy0 + offTrans[1], yy)
             self.assertEqual(zz0 + offTrans[2], zz)
-            
+
     def test_rotateGrid(self):
         offRot = np.array([34, 21, 178])
         
@@ -119,7 +119,7 @@ class TestParabola(unittest.TestCase):
             self.assertEqual(norm_t[0], nxx)
             self.assertEqual(norm_t[1], nyy)
             self.assertEqual(norm_t[2], nzz)
-            
+
     def test_interpReflector(self):
         self.parabola.setGrid(self.lims_x, self.lims_y, self.gridsize, gmode='xy', axis='a', trunc=False, flip=False)
         
@@ -181,6 +181,67 @@ class TestParabola(unittest.TestCase):
         self.assertEqual(type(x), type(nx))
         self.assertEqual(type(x), type(ny))
         self.assertEqual(type(x), type(nz))
+        
+    def test_get_conv(self):
+        check1 = self.parabola.get_conv('mm')
+        check2 = self.parabola.get_conv('cm')
+        check3 = self.parabola.get_conv('m')
+        
+        self.assertEqual(check1, 1)
+        self.assertEqual(check2, 1e2)
+        self.assertEqual(check3, 1e3)
+    
+
+    def test_homeReflector(self):
+        # Apply three random rotations and translations and see if homing works
+        self.parabola.setGrid(self.lims_x, self.lims_y, self.gridsize, gmode='xy', axis='a', trunc=False, flip=False)
+        
+        trans1 = np.random.rand(3)
+        trans2 = np.random.rand(3)
+        trans3 = np.random.rand(3)
+        
+        rot1 = np.random.rand(3) * 100
+        rot2 = np.random.rand(3) * 100
+        rot3 = np.random.rand(3) * 100
+        
+        cRot1 = np.random.rand(3)
+        cRot2 = np.random.rand(3)
+        cRot3 = np.random.rand(3)
+        
+        # Store otiginal grids
+        x = Copy.copyGrid(self.parabola.grid_x)
+        y = Copy.copyGrid(self.parabola.grid_y)
+        z = Copy.copyGrid(self.parabola.grid_z)
+        
+        nx = Copy.copyGrid(self.parabola.grid_nx)
+        ny = Copy.copyGrid(self.parabola.grid_ny)
+        nz = Copy.copyGrid(self.parabola.grid_nz)
+        
+        self.parabola.translateGrid(trans1, units='m')
+        self.parabola.set_cRot(cRot1, units='m')
+        self.parabola.rotateGrid(rot1)
+        self.parabola.translateGrid(trans2, units='m')
+        self.parabola.set_cRot(cRot2, units='m')
+        self.parabola.rotateGrid(rot2)
+        self.parabola.translateGrid(trans3, units='m')
+        self.parabola.set_cRot(cRot3, units='m')
+        self.parabola.rotateGrid(rot3)
+
+        self.parabola.homeReflector()
+
+        for xp, xh, yp, yh, zp, zh, nxp, nxh, nyp, nyh, nzp, nzh in zip(x.ravel(), self.parabola.grid_x.ravel(),
+                                                                        y.ravel(), self.parabola.grid_y.ravel(),
+                                                                        z.ravel(), self.parabola.grid_z.ravel(),
+                                                                        nx.ravel(), self.parabola.grid_nx.ravel(),
+                                                                        ny.ravel(), self.parabola.grid_ny.ravel(),
+                                                                        nz.ravel(), self.parabola.grid_nz.ravel()):
+            self.assertAlmostEqual(xp, xh)
+            self.assertAlmostEqual(yp, yh)
+            self.assertAlmostEqual(zp, zh)
+            
+            self.assertAlmostEqual(nxp, nxh)
+            self.assertAlmostEqual(nyp, nyh)
+            self.assertAlmostEqual(nzp, nzh)
 
 class TestHyperbola(unittest.TestCase): 
     
@@ -202,11 +263,11 @@ class TestHyperbola(unittest.TestCase):
         self.gridsize = [201, 201]
         self.sec = 'upper'
         
-        self.hyperbola = Reflectors.Hyperbola(a = 1070, b = 1070, c = 2590, cRot = self.cRot, name = "h", sec = self.sec)
+        self.hyperbola = Reflectors.Hyperbola(a = 1070, b = 1070, c = 2590, cRot = self.cRot, name = "h", sec = self.sec, units='mm')
         
     def TearDown(self):
         pass
-    
+
     def test_set_cRot(self):
         cRot_test = np.array([345, 129, 2343])
         
@@ -226,6 +287,15 @@ class TestHyperbola(unittest.TestCase):
         self.assertEqual(self.hyperbola.grid_ny.shape, (self.gridsize[0], self.gridsize[1]))
         self.assertEqual(self.hyperbola.grid_nz.shape, (self.gridsize[0], self.gridsize[1]))
         
+        # TEST: see if sec='upper' and sec='lower' are exactly mirrored
+        hyperbola_test = Reflectors.Hyperbola(a = 1070, b = 1070, c = 2590, cRot = self.cRot, name = "ht", sec = 'lower', units='mm')
+        hyperbola_test.setGrid(self.lims_x, self.lims_y, self.gridsize, gmode='xy', axis='a', trunc=False, flip=False)
+        
+        diff = self.hyperbola.grid_z + hyperbola_test.grid_z
+
+        for diff_el in diff.ravel():
+            self.assertEqual(diff_el, 0)
+        
         self.hyperbola.setGrid(self.lims_u, self.lims_v, self.gridsize, gmode='uv', axis='a', trunc=False, flip=False)
         
         self.assertEqual(self.hyperbola.grid_x.shape, (self.gridsize[0], self.gridsize[1]))
@@ -235,7 +305,7 @@ class TestHyperbola(unittest.TestCase):
         self.assertEqual(self.hyperbola.grid_nx.shape, (self.gridsize[0], self.gridsize[1]))
         self.assertEqual(self.hyperbola.grid_ny.shape, (self.gridsize[0], self.gridsize[1]))
         self.assertEqual(self.hyperbola.grid_nz.shape, (self.gridsize[0], self.gridsize[1]))
-    
+
     def test_translateGrid(self):
         offTrans = np.array([3, 1, -5])
         
@@ -350,7 +420,67 @@ class TestHyperbola(unittest.TestCase):
         self.assertEqual(type(x), type(nx))
         self.assertEqual(type(x), type(ny))
         self.assertEqual(type(x), type(nz))
-    
+        
+    def test_get_conv(self):
+        check1 = self.hyperbola.get_conv('mm')
+        check2 = self.hyperbola.get_conv('cm')
+        check3 = self.hyperbola.get_conv('m')
+        
+        self.assertEqual(check1, 1)
+        self.assertEqual(check2, 1e2)
+        self.assertEqual(check3, 1e3)
+
+    def test_homeReflector(self):
+        # Apply three random rotations and translations and see if homing works
+        self.hyperbola.setGrid(self.lims_x, self.lims_y, self.gridsize, gmode='xy', axis='a', trunc=False, flip=False)
+        
+        trans1 = np.random.rand(3)
+        trans2 = np.random.rand(3)
+        trans3 = np.random.rand(3)
+        
+        rot1 = np.random.rand(3) * 100
+        rot2 = np.random.rand(3) * 100
+        rot3 = np.random.rand(3) * 100
+        
+        cRot1 = np.random.rand(3)
+        cRot2 = np.random.rand(3)
+        cRot3 = np.random.rand(3)
+        
+        # Store original grids
+        x = Copy.copyGrid(self.hyperbola.grid_x)
+        y = Copy.copyGrid(self.hyperbola.grid_y)
+        z = Copy.copyGrid(self.hyperbola.grid_z)
+        
+        nx = Copy.copyGrid(self.hyperbola.grid_nx)
+        ny = Copy.copyGrid(self.hyperbola.grid_ny)
+        nz = Copy.copyGrid(self.hyperbola.grid_nz)
+        
+        self.hyperbola.translateGrid(trans1, units='m')
+        self.hyperbola.set_cRot(cRot1, units='m')
+        self.hyperbola.rotateGrid(rot1)
+        self.hyperbola.translateGrid(trans2, units='m')
+        self.hyperbola.set_cRot(cRot2, units='m')
+        self.hyperbola.rotateGrid(rot2)
+        self.hyperbola.translateGrid(trans3, units='m')
+        self.hyperbola.set_cRot(cRot3, units='m')
+        self.hyperbola.rotateGrid(rot3)
+
+        self.hyperbola.homeReflector()
+
+        for xp, xh, yp, yh, zp, zh, nxp, nxh, nyp, nyh, nzp, nzh in zip(x.ravel(), self.hyperbola.grid_x.ravel(),
+                                                                        y.ravel(), self.hyperbola.grid_y.ravel(),
+                                                                        z.ravel(), self.hyperbola.grid_z.ravel(),
+                                                                        nx.ravel(), self.hyperbola.grid_nx.ravel(),
+                                                                        ny.ravel(), self.hyperbola.grid_ny.ravel(),
+                                                                        nz.ravel(), self.hyperbola.grid_nz.ravel()):
+            self.assertAlmostEqual(xp, xh)
+            self.assertAlmostEqual(yp, yh)
+            self.assertAlmostEqual(zp, zh)
+            
+            self.assertAlmostEqual(nxp, nxh)
+            self.assertAlmostEqual(nyp, nyh)
+            self.assertAlmostEqual(nzp, nzh)
+
 if __name__ == "__main__":
     unittest.main()
         

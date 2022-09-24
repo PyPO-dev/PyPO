@@ -20,6 +20,7 @@ class PropagationScalar
     int gridsize_s;             // Flattened gridsize of source grids
     int gridsize_t;             // Flattened gridsize of target grids
     int step;                   // Number of points calculated by n-1 threads.
+    double n_ref;
     
     Utils ut;
     
@@ -27,7 +28,7 @@ public:
     std::vector<std::thread> threadPool;
     std::vector<std::complex<double>> field_container;
 
-    PropagationScalar(double k, int numThreads, int gridsize_s, int gridsize_t);
+    PropagationScalar(double k, int numThreads, int gridsize_s, int gridsize_t, double eps);
 
     void propagateBeam(int start, int stop,
                        const std::vector<std::array<double, 3>> &grid_target,

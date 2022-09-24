@@ -30,6 +30,7 @@ int main(int argc, char *argv [])
 {
     int numThreads  = atoi(argv[1]); // Number of CPU threads to use
     double k        = atof(argv[2]); // Wavenumber of field to be propagated
+    double eps      = atof(argv[3]); // Relative permittivity of source medium
     
     // Initialize timer to assess performance
     std::chrono::steady_clock::time_point begin;
@@ -51,7 +52,7 @@ int main(int argc, char *argv [])
 
     std::vector<std::complex<double>> field_s = handler.readScalarField();
     
-    PropagationScalar prop(k, numThreads, gridsize_s, gridsize_t);
+    PropagationScalar prop(k, numThreads, gridsize_s, gridsize_t, eps);
     // Start timer
     
     begin = std::chrono::steady_clock::now();

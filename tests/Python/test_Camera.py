@@ -28,10 +28,10 @@ class TestCamera(unittest.TestCase):
         
         self.offRot = np.radians([0, 0, 0])
         
-        self.camera = Camera.Camera(center=self.center, name=self.name)
+        self.camera = Camera.Camera(center=self.center, name=self.name, units='mm')
         
     def test_setGrid(self):
-        self.camera.setGrid(self.lims_x, self.lims_y, self.gridsize)
+        self.camera.setGrid(self.lims_x, self.lims_y, self.gridsize, gmode='xy')
         
         self.assertEqual(self.camera.grid_x.shape, (self.gridsize[0], self.gridsize[1]))
         self.assertEqual(self.camera.grid_y.shape, (self.gridsize[0], self.gridsize[1]))
@@ -44,7 +44,7 @@ class TestCamera(unittest.TestCase):
     def test_translateGrid(self):
         offTrans = np.array([3, 1, -5])
         
-        self.camera.setGrid(self.lims_x, self.lims_y, self.gridsize)
+        self.camera.setGrid(self.lims_x, self.lims_y, self.gridsize, gmode='xy')
         
         x0 = Copy.copyGrid(self.camera.grid_x.ravel())
         y0 = Copy.copyGrid(self.camera.grid_y.ravel())
@@ -69,7 +69,7 @@ class TestCamera(unittest.TestCase):
     def test_rotateGrid(self):
         offRot = np.array([34, 21, 178])
         
-        self.camera.setGrid(self.lims_x, self.lims_y, self.gridsize)
+        self.camera.setGrid(self.lims_x, self.lims_y, self.gridsize, gmode='xy')
         
         x0 = Copy.copyGrid(self.camera.grid_x.ravel())
         y0 = Copy.copyGrid(self.camera.grid_y.ravel())
@@ -109,7 +109,7 @@ class TestCamera(unittest.TestCase):
             self.assertEqual(cc0, cc)
         
     def test_interpCamera(self):
-        self.camera.setGrid(self.lims_x, self.lims_y, self.gridsize)
+        self.camera.setGrid(self.lims_x, self.lims_y, self.gridsize, gmode='xy')
         
         self.camera.interpCamera(res=1, mode='z')
         
@@ -139,6 +139,23 @@ class TestCamera(unittest.TestCase):
             self.assertAlmostEqual(nx.ravel()[i], interp_nx.ravel()[i], places=7)
             self.assertAlmostEqual(ny.ravel()[i], interp_ny.ravel()[i], places=7)
             self.assertAlmostEqual(nz.ravel()[i], interp_nz.ravel()[i], places=7)
+            
+    def test_get_conv(self):
+        check1 = self.camera.get_conv('mm')
+        check2 = self.camera.get_conv('cm')
+        check3 = self.camera.get_conv('m')
+        
+        check4 = self.camera.get_conv('deg')
+        check5 = self.camera.get_conv('am')
+        check6 = self.camera.get_conv('as')
+        
+        self.assertEqual(check1, 1)
+        self.assertEqual(check2, 1e2)
+        self.assertEqual(check3, 1e3)
+        
+        self.assertEqual(check4, np.pi / 180)
+        self.assertEqual(check5, np.pi / (180 * 60))
+        self.assertEqual(check6, np.pi / (180 * 3600))
         
 if __name__ == "__main__":
     unittest.main()

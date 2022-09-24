@@ -2,7 +2,7 @@ from PyQt5 import QtWidgets as qtw
 import sys
 sys.path.append('../')
 sys.path.append('../../')
-import POPPy.System as system
+import POPPy.System as st
 
 
 
@@ -122,7 +122,7 @@ class ParabolaFormLayout(qtw.QFormLayout):
             self.limU2.setEnabled(False)
             self.limV1.setEnabled(False)
             self.limV2.setEnabled(False)
-            print("dis1")
+            # print("dis1")
             
         else:
             self.limX1.setEnabled(False)
@@ -136,9 +136,9 @@ class ParabolaFormLayout(qtw.QFormLayout):
             print("dis2")
 
     def addElement(self):
-        print(self.gridSizeX.text())
-        print(type(self.gridSizeX.text()))
-        s = system.System()
+        # print(self.gridSizeX.text())
+        # print(type(self.gridSizeX.text()))
+        s = st.System()
         s.addParabola([float(self.coefA.text()), float(self.coefB.text())],
          [float(self.limX1.text()),float(self.limX2.text())], 
          [float(self.limY1.text()),float(self.limY2.text())], 
@@ -146,7 +146,7 @@ class ParabolaFormLayout(qtw.QFormLayout):
         s.plotSystem(focus_1=False, focus_2=False, plotRaytrace=False)
 
     def addNot(self):
-        print("canceling")
+        # print("canceling")
         for i in reversed(range(self.count())): 
             print(self.itemAt(i)) #.widget().setParent(None)
         # print(self.getLayoutPosition())

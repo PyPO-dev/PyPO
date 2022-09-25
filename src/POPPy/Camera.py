@@ -6,20 +6,25 @@ import src.POPPy.MatRotate as MatRotate
 
 class Camera(object):
     """
-    NOTE: if prop_mode for PO == 1, it is assumed camera is in FAR-FIELD. x and y then correspond to Az-El, center only affects pointing then
+    Class for instantiating a camera object. If a planar reflector is created, actually a camera object is instantiated.
+    NOTE: if prop_mode for PO == 1, it is assumed camera is in FAR-FIELD. x and y then correspond to Az-El.
+    Center only affects pointing then!
     """
+    
+    #### DUNDER METHODS ###
+    
     def __init__(self, center, name, units):
         if isinstance(units, list):
             self.units = units[0]
             self.unit_spat = units[1]
-            self.conv_spat = self.get_conv(self.unit_spat)
+            self.conv_spat = self._get_conv(self.unit_spat)
             
             self.center = center * self.conv_spat
             self.cRot = center
-            self.conv = self.get_conv(self.units)
+            self.conv = self._get_conv(self.units)
             
         else:
-            self.conv = self.get_conv(units)
+            self.conv = self._get_conv(units)
             self.center = center * self.conv
             self.cRot = center
 
@@ -53,29 +58,20 @@ Center position     : [{:.3f}, {:.3f}, {:.3f}] [mm]
         else:
             raise StopIteration
         
-    def get_conv(self, units):
-        
-        conv = 0
-        
-        if units == 'mm':
-            conv = 1
-        elif units == 'cm':
-            conv = 1e2
-        elif units == 'm':
-            conv = 1e3
-        
-        # Angular units - convert here to radians
-        elif units == 'deg':
-            conv = np.pi / 180
-        elif units == 'am':
-            conv = np.pi / (180 * 60)
-        elif units == 'as':
-            conv = np.pi / (180 * 3600)
-        
-        
-        return conv
+    #### PUBLIC METHODS ###
         
     def setGrid(self, lims_x, lims_y, gridsize, gmode):
+        """
+        (PUBLIC)
+        Set the xyz, area and normal vector grids to camera surface.
+        
+        @param  ->
+            lims_x      :   Lower and upper limits on x (u) values
+            lims_y      :   Lower and upper limits on y (v) values
+            gridsize    :   Number of cells along the xy (uv) axes
+            gmode       :   Use direct xy function evaluation, a uv parametrization or Az over El co-ordinates
+        """
+        
         self.shape = gridsize
         
         if gmode == 'xy':
@@ -158,33 +154,48 @@ Center position     : [{:.3f}, {:.3f}, {:.3f}] [mm]
         self._iterList[4] = self.grid_nx
         self._iterList[5] = self.grid_ny
         self._iterList[6] = self.grid_nz
-        
-    def updateIterlist(self):
-        self._iterList[0] = self.grid_x
-        self._iterList[1] = self.grid_y
-        self._iterList[2] = self.grid_z
-        
-        self._iterList[3] = self.area
-        
-        self._iterList[4] = self.grid_nx
-        self._iterList[5] = self.grid_ny
-        self._iterList[6] = self.grid_nz
        
     def set_cRot(self, cRot, units='mm'):
+        """
+        (PUBLIC)
+        Set center of rotation for camera.
+        
+        @param  ->
+            cRot        :   Array containg co-ordinates of center of rotation
+            units       :   Units of co-ordinate
+        """
         conv = self.get_conv(units)
         self.cRot = cRot * conv
     
     def translateGrid(self, offTrans, units='mm'):
-        conv = self.get_conv(units)
+        """
+        (PUBLIC)
+        Translate camera along xyz axes.
+        
+        @param  ->
+            offTrans    :   Translation in xyz   
+            units       :   Units of the supplied translation
+        """
+        
+        conv = self._get_conv(units)
         self.grid_x += offTrans[0] * conv
         self.grid_y += offTrans[1] * conv
         self.grid_z += offTrans[2] * conv
         
         self.center += offTrans
         
-        self.updateIterlist()
+        self._updateIterlist()
         
     def rotateGrid(self, offRot, radians=False):
+        """
+        (PUBLIC)
+        Rotate camera around xyz axes.
+        
+        @param  ->
+            offRot      :   Rotation around xyz axes, in degrees
+            radians     :   Whether offRot is in degrees or radians
+        """
+        
         gridRot = MatRotate.MatRotate(offRot, [self.grid_x, self.grid_y, self.grid_z], self.cRot, radians=radians)
         
         self.grid_x = gridRot[0]
@@ -200,9 +211,19 @@ Center position     : [{:.3f}, {:.3f}, {:.3f}] [mm]
         self.center = MatRotate.MatRotate(offRot, self.center, self.cRot, radians=radians)
         self.norm = MatRotate.MatRotate(offRot, self.norm, self.cRot, vecRot=True, radians=radians)
         
-        self.updateIterlist()
+        self._updateIterlist()
     
     def interpCamera(self, res, mode):
+        """
+        (PUBLIC)
+        Obtain tcks parameters for interpolation on camera.
+        
+        @param  ->
+            res         :   Space between points on surface to use for interpolation.
+                        :   If too low, overflow error might occur.
+            mode        :   Dependent axis for interpolation
+        """
+        
         skip = slice(None,None,res)
 
         if mode == 'z':
@@ -254,3 +275,54 @@ Center position     : [{:.3f}, {:.3f}, {:.3f}] [mm]
             
         else:
             return ax_append
+        
+    #### PRIVATE METHODS ###
+        
+    def _get_conv(self, units):
+        """
+        (PRIVATE)
+        Get conversion factor given the units supplied.
+        
+        @param  ->
+            units       :   Units of the supplied translation
+            
+        @return ->
+            conv        :   Conversion factor for unit to mm conversion
+        """
+        
+        conv = 0
+        
+        if units == 'mm':
+            conv = 1
+        elif units == 'cm':
+            conv = 1e2
+        elif units == 'm':
+            conv = 1e3
+        
+        # Angular units - convert here to radians
+        elif units == 'deg':
+            conv = np.pi / 180
+        elif units == 'am':
+            conv = np.pi / (180 * 60)
+        elif units == 'as':
+            conv = np.pi / (180 * 3600)
+        
+        
+        return conv
+    
+    def _updateIterlist(self):
+        """
+        (PRIVATE)
+        Update internal iteration container.
+        Called after translation and rotation.
+        """
+        
+        self._iterList[0] = self.grid_x
+        self._iterList[1] = self.grid_y
+        self._iterList[2] = self.grid_z
+        
+        self._iterList[3] = self.area
+        
+        self._iterList[4] = self.grid_nx
+        self._iterList[5] = self.grid_ny
+        self._iterList[6] = self.grid_nz

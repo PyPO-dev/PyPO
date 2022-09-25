@@ -274,7 +274,6 @@ class System(object):
         
         # Check if ray-trace size is OK
         workers = self._memCheckRT(workers)
-        print(len(self.Raytracer))
         
         start = time.time()
         
@@ -293,18 +292,13 @@ class System(object):
 
         self.Raytracer.propagateRays(a0=a0, mode=mode, workers=workers)
         end = time.time()
-        print("Elapsed time: {} s\n".format(end - start))
+        print("Elapsed time: {:.2f} [s]\n".format(end - start))
         print(len(self.Raytracer))
         
     def fieldRaytracer(self, target, field, k, a0=100, workers=1, res=1, mode='auto'):
-        print(len(self.Raytracer))
         self.startRaytracer(target, a0, workers, res, mode)
         
-        print(len(self.Raytracer))
         self.Raytracer.calcPathlength()
-        print(len(self.Raytracer))
-        
-        print(len(field[0].flatten()))
         
         f_prop = []
         for i, ((key, ray), f) in enumerate(zip(self.Raytracer.rays.items(), field[0].flatten())):
@@ -539,7 +533,7 @@ class System(object):
         available = psutil.virtual_memory()[1] * 1e-9
         return available
     
-    def _memCheckRT(self, workers):
+    def _memCheckRT(self, workers, buff=2):
         """
         For determining whether a Ray-trace has enough resources.
         To be used inside calls to startRaytracer etc.
@@ -552,14 +546,14 @@ class System(object):
         
         w_init = workers
         
-        if s_r >= s_ram:
-            print("""WARNING! You are attempting to start a ray-trace requiring {} gb of memory.
-Your system currently has {} gb of available RAM.
+        if s_r >= (s_ram - buff):
+            print("""WARNING! You are attempting to start a ray-trace requiring {:.2f} gb of memory.
+Your system currently has {:.2f} gb of available RAM.
 Automatically reducing # of workers...""".format(s_r, s_ram))
         
         while s_r >= s_ram:
             if workers == 1:
-                sys.exit("Not enough RAM for ray-trace with single worker. Exiting POPPy.")
+                sys.exit("Insufficient RAM for ray-trace with single worker. Exiting POPPy.")
             
             workers -= 1
             s_r = self.Raytracer.sizeOf(units='gb') * 2 * workers

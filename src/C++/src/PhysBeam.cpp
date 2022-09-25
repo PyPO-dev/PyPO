@@ -152,7 +152,7 @@ int main(int argc, char *argv [])
     // End timer
     end = std::chrono::steady_clock::now();
     
-    std::cout << "Calculation time = " 
+    std::cout << "Elapsed time: " 
         << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() 
         << " [s]\n" << std::endl;
 

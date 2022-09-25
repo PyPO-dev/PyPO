@@ -14,15 +14,46 @@ import src.POPPy.MatRotate as MatRotate
 class RayTrace(object):
     def __init__(self):
         pass
-                
+
+    def __len__(self):
+        return len(self.rays.keys())
+    
+    def __iter__(self):
+        yield from self.rays.items()
+        
+    def __getitem__(self, key):
+        return self.rays["ray_{}".format(key)]
+    
+    def __setitem__(self, key, ray):
+        self.rays["ray_{}".format(key)] = ray
+        
+    def __str__(self):
+        s = """\n######################### RAYTRACER INFO #########################
+Chief ray origin    : [{:.3f}, {:.3f}, {:.3f}] [mm]
+Chief ray direction : [{:.4f}, {:.4f}, {:.4f}] 
+######################### RAYTRACER INFO #########################\n""".format(self.originChief[0], self.originChief[1], self.originChief[2],
+                                                                               self.directionChief[0], self.directionChief[1], self.directionChief[2])
+        return s
+              
+    #### PUBLIC METHODS ###
+        
     def initRaytracer(self, nRays, nRing, 
                  a, b, angx, angy,
                  originChief, tiltChief):
+        """
+        (PUBLIC)
+        Initialize a ray-trace from beam parameters.
         
-        # This is the main ray container
-        # ray_0 : chief ray
-        # ray_1 - ray_(4*NraysCirc) : rays distributed in circle around chief ray (multiples of four)
-        # ray_(4*NraysCirc+1) - ray_(4*NraysCirc + 4*NraysCross) : rays distributed in cross around chief ray (multiples of four)
+        @param  ->
+            nRays           :   Number of rays in a concentric ring
+            nRing           :   Number of concentric ray-trace rings
+            a               :   Semi major axis of ring, in mm
+            b               :   Semi minor axis of ring, in mm
+            angx            :   Opening angle of beam along x-axis, degrees
+            angy            :   Opening angle of beam along y-axis, degrees
+            originChief     :   Array containg co-ordinates of chief ray origin
+            tiltChief       :   Tilt of chief ray w.r.t. normal vector along z axis
+        """
         
         nomChief = np.array([0,0,1]) # Always initialize raytrace beam along z-axis
         
@@ -76,6 +107,15 @@ class RayTrace(object):
                 alpha = 0
         
     def POtoRaytracer(self, source, Pr):
+        """
+        (PUBLIC)
+        Initialize a ray-trace from PO calculation.
+        
+        @param  ->
+            source          :   Object on which Pr is calculated
+            Pr              :   List containing components of Pr
+        """
+        
         x = source.grid_x.flatten()
         y = source.grid_y.flatten()
         z = source.grid_z.flatten()
@@ -98,21 +138,17 @@ class RayTrace(object):
             ray["positions"].append(pos)
             ray["directions"].append(direction)
         
-    def __len__(self):
-        return len(self.rays.keys())
-    
-    def __iter__(self):
-        yield from self.rays.items()
-        
-    def __getitem__(self, key):
-        return self.rays["ray_{}".format(key)]
-    
-    def __setitem__(self, key, ray):
-        self.rays["ray_{}".format(key)] = ray
-        
     def sizeOf(self, units='b'):
         """
-        Return size of self.rays.
+        (PUBLIC)
+        Return memory size of self.rays.
+        
+        @param  ->
+            units           :   Units of memory size for return.
+                            :   Options are bytes 'b', megabytes 'mb' and gigabytes 'gb'
+                            
+        @return ->
+            size            :   Memory size of self.rays object
         """
         
         factor = 1
@@ -140,24 +176,21 @@ class RayTrace(object):
                     size += sys.getsizeof(coord)
 
         return size * factor
-        
-    def __str__(self):
-        s = """\n######################### RAYTRACER INFO #########################
-Chief ray origin    : [{:.3f}, {:.3f}, {:.3f}] [mm]
-Chief ray direction : [{:.4f}, {:.4f}, {:.4f}] 
-######################### RAYTRACER INFO #########################\n""".format(self.originChief[0], self.originChief[1], self.originChief[2],
-                                                                               self.directionChief[0], self.directionChief[1], self.directionChief[2])
-        return s
     
     def set_tcks(self, tcks):
+        """
+        (PUBLIC)
+        Set interpolation tcks parameters for a ray-trace.
+        
+        @param  ->
+            tcks            :   Array containing tcks parameters of target surface
+        """
         self.tcks = tcks
         
     def getMode(self):
         """
-        Obtain axis for ray trace interpolation. 
-        Takes dominant components of chief ray as propagation axis.
-        
-        @return mode The dominant ray axis used for interpolation
+        (PUBLIC)
+        Obtain most efficient axis for dependent interpolation variable.
         """
         
         axes = ['x', 'y', 'z']
@@ -165,43 +198,17 @@ Chief ray direction : [{:.4f}, {:.4f}, {:.4f}]
         
         mode = axes[axis]
         return mode
-        
-    def interpEval(self, x1, x2):
-        x3 = interp.bisplev(x1, x2, self.tcks[0])
-        return x3
-        
-    def interpEval_n(self, x1, x2):
-        interp_nx = interp.bisplev(x1, x2, self.tcks[1])
-        interp_ny = interp.bisplev(x1, x2, self.tcks[2])
-        interp_nz = interp.bisplev(x1, x2, self.tcks[3])
-        
-        norm = np.sqrt(interp_nz**2 + interp_ny**2 + interp_nx**2)
-        
-        interp_nx /= norm
-        interp_ny /= norm
-        interp_nz /= norm
-        
-        return np.array([interp_nx, interp_ny, interp_nz])
-    
-    def optLine(self, a, ray, x1, x2, x3):
+
+    def propagateRays(self, a0, mode, workers=1):
         """
-        This function calculates the difference between a line xyz-coordinate and the 
-        interpolated mirror xyz-coordinate. Should be used inside optimize.fmin functions
+        (PUBLIC)
+        Propagate beam of rays from last point in self.rays to target.
+        
+        @param  ->
+            a0              :   Initial value for optimizing ray to target surface
+            mode            :   Dependent variable of interpolation
+            workers         :   Number of workers to spawn on CPU
         """
-        
-        position = a * ray["directions"][-1] + ray["positions"][-1]
-        
-        interp_z = self.interpEval(position[x1], position[x2])
-        
-        return np.absolute(interp_z - position[x3])
-    
-    def chunkify(self, data, s):
-        it = iter(data)
-        for i in range(0, len(data), s):
-            yield {k:data[k] for k in islice(it, s)}
-        
-    
-    def propagateRays(self, a0, mode, workers):
         
         if mode == 'z':
             x1 = 0
@@ -229,7 +236,7 @@ Chief ray direction : [{:.4f}, {:.4f}, {:.4f}]
         # Pack rays into subdicts
         subrays_l = []
 
-        for subrays in self.chunkify(self.rays, self.nReduced):
+        for subrays in self._chunkify(self.rays, self.nReduced):
             subrays_l.append(subrays)
             
         args = zip(subrays_l, PIDs)
@@ -240,38 +247,13 @@ Chief ray direction : [{:.4f}, {:.4f}, {:.4f}]
         
         for _toStore in toStore:
             self.rays.update(_toStore)
-
-    def _propagateRays(self, args, a0, x1, x2, x3):
-        rays, PID = args
-        
-        toStore = rays
-        
-        j = 0 # Counter index
-            
-        for i, (key, ray) in enumerate(rays.items()):
-            part_optLine = partial(self.optLine, ray=ray, x1=x1, x2=x2, x3=x3)
-                
-            a_opt = optimize.fmin(part_optLine, a0, disp=0, xtol=1e-16, ftol=1e-16)
-            
-            position = a_opt*ray["directions"][-1] + ray["positions"][-1]
-            
-            interp_n = self.interpEval_n(position[x1], position[x2])
-            
-            direction = ray["directions"][-1] - 2 * np.dot(ray["directions"][-1], interp_n) * interp_n
-
-            toStore[key]["positions"].append(position)
-            toStore[key]["directions"].append(direction)
-
-            if (i/self.nReduced * 100) > j and PID == 0:
-                print("{} / 100".format(j), end='\r')
-                j += 1
-                
-        return toStore
     
     def calcPathlength(self):
         """
-        Adds total path length as dict entry for each ray
+        (PUBLIC)
+        Adds total path length as dict entry for each ray.
         """
+        
         for i, (key, ray) in enumerate(self.rays.items()):
             stride = np.zeros(3)
             L = 0
@@ -287,6 +269,13 @@ Chief ray direction : [{:.4f}, {:.4f}, {:.4f}]
                     stride = pos
                     
             ray["length"] = L
+            
+    def clearRays(self):
+        """
+        (PUBLIC)
+        Clear current self.rays object
+        """
+        self.rays.clear()
         
     def plotRays(self, quiv=True, frame=0, mode='z', save=False):
         fig, ax = pt.subplots(1,1)
@@ -340,11 +329,134 @@ Chief ray direction : [{:.4f}, {:.4f}, {:.4f}]
             ax_append.plot(x, y, z, color='grey')
             
         return ax_append
+    
+    #### PRIVATE METHODS ###
+    
+    def _propagateRays(self, args, a0, x1, x2, x3):
+        """
+        (PRIVATE)
+        Calculate position and reflected normal vector of ray on target surface.
+        
+        @param  ->
+            args            :   Tuple containing rays and process IDs for this worker
+            a0              :   Initial value for ray-tracer
+            x1              :   Independent variable 1
+            x2              :   Independent variable 2
+            x3              :   Dependent variable
+            
+        @return ->
+            toStore         :   Dict containing new ray positions and direction vectors
+        """
+        
+        rays, PID = args
+        
+        toStore = rays
+        
+        j = 0 # Counter index
+            
+        for i, (key, ray) in enumerate(rays.items()):
+            part_optLine = partial(self._optLine, ray=ray, x1=x1, x2=x2, x3=x3)
+                
+            a_opt = optimize.fmin(part_optLine, a0, disp=0, xtol=1e-16, ftol=1e-16)
+            
+            position = a_opt*ray["directions"][-1] + ray["positions"][-1]
+            
+            interp_n = self._interpEval_n(position[x1], position[x2])
+            
+            direction = ray["directions"][-1] - 2 * np.dot(ray["directions"][-1], interp_n) * interp_n
+
+            toStore[key]["positions"].append(position)
+            toStore[key]["directions"].append(direction)
+
+            if (i/self.nReduced * 100) > j and PID == 0:
+                print("{} / 100".format(j), end='\r')
+                j += 1
+                
+        return toStore
+    
+    def _interpEval(self, x1, x2):
+        """
+        (PRIVATE)
+        Evaluate interpolation of xyz grids.
+        @param  ->
+            x1              :   Independent variable 1
+            x2              :   Independent variable 2
+        
+        @return ->
+            x3              :   Interpolated dependent variable
+        """
+        
+        x3 = interp.bisplev(x1, x2, self.tcks[0])
+        return x3
+        
+    def _interpEval_n(self, x1, x2):
+        """
+        (PRIVATE)
+        Evaluate interpolation of xyz components of normal vector grids.
+        @param  ->
+            x1              :   Independent variable 1
+            x2              :   Independent variable 2
+        
+        @return ->  (array)
+            interp_nx       :   Interpolated x-components
+            interp_ny       :   Interpolated y-components
+            interp_nz       :   Interpolated z-components
+        """
+        
+        interp_nx = interp.bisplev(x1, x2, self.tcks[1])
+        interp_ny = interp.bisplev(x1, x2, self.tcks[2])
+        interp_nz = interp.bisplev(x1, x2, self.tcks[3])
+        
+        norm = np.sqrt(interp_nz**2 + interp_ny**2 + interp_nx**2)
+        
+        interp_nx /= norm
+        interp_ny /= norm
+        interp_nz /= norm
+        
+        return np.array([interp_nx, interp_ny, interp_nz])
+    
+    def _optLine(self, a, ray, x1, x2, x3):
+        """
+        (PRIVATE)
+        Calculate difference between interpolated point on surface and point on ray.
+        
+        @param  ->
+            a               :   Multiplier of ray
+            ray             :   Ray to be propagated
+            x1              :   Index of independent variable 1
+            x2              :   Index of independent variable 2
+            x3              :   Index of Dependent variable
+            
+        @return ->
+            diff            :   Absolute difference between point on surface and point on ray
+                            :   in dependent variable
+        """
+        
+        position = a * ray["directions"][-1] + ray["positions"][-1]
+        
+        interp = self._interpEval(position[x1], position[x2])
+        diff = np.absolute(interp - position[x3])
+        
+        return diff
+    
+    def _chunkify(self, data, s):
+        """
+        (PRIVATE)
+        Subdivide self.rays object into smaller chunks for multiprocessing.
+        
+        @param  ->
+            data            :   Data to be chunkified
+            s               :   Size of a chunk (approx)
+            
+        @return ->  (generator)
+            chunk           :   Generator over chunk, derived from self.rays
+        """
+        
+        it = iter(data)
+        for i in range(0, len(data), s):
+            yield {k:data[k] for k in islice(it, s)}
+        
+    
 
 if __name__ == "__main__":
-    tiltChief=np.array([0,1,-2.5])
-    tiltChief=np.array([0,0,0])
-    
-    rt = RayTrace(NraysCirc=10, rCirc=1, tiltChief=tiltChief, NraysCross=0)
-    print(rt)
-    rt.plotInitialBeam()
+    print("Raytracer class.")

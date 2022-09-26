@@ -12,6 +12,11 @@ The [g++](https://gcc.gnu.org/install/) compiler, capable of compiling code writ
     $ sudo apt-get install gcc build-essential
 ```
 
+-- SYSTEM REQS --\
+CPU: One core/thread (minimal). As many cores as possible (recommended).\
+RAM: 4 Gigabytes (minimal). As much as possible (recommended).\
+OS: Any Unix-like operating system.\
+
 -- TESTING --\
 To run the Python unittests, first go to the main POPPy directory and from there run:
 ```

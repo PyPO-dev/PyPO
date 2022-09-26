@@ -15,7 +15,6 @@ import src.POPPy.Beams as Beams
 import src.POPPy.PhysOptics as PO
 import src.POPPy.FourierOptics as FO
 from src.POPPy.Plotter import Plotter
-import src.POPPy.Aperture as Aperture
 from src.POPPy.Efficiencies import Efficiencies as EF
 #from src.Python.Fitting import Fitting
 
@@ -513,12 +512,7 @@ class System(object):
         
     def initFourierOptics(self, k):
         self.FO = FO.FourierOptics(k=k)
-        
-    def addCircAper(self, r_max, gridsize, r_min=1e-3, cRot=np.zeros(3), name=''):
-        ap = Aperture.Aperture(cRot, name)
-        ap.makeCircAper(r_max, r_min, gridsize)
-        self.system["{}".format(name)] = ap
-        
+
     def calcSpillover(self, surfaceObject, field, R_aper, ret_field=False):
         eta_s = self.EF.calcSpillover(surfaceObject, field, R_aper, ret_field)
         return eta_s

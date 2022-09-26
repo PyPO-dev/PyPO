@@ -183,9 +183,9 @@ class TestParabola(unittest.TestCase):
         self.assertEqual(type(x), type(nz))
         
     def test_get_conv(self):
-        check1 = self.parabola.get_conv('mm')
-        check2 = self.parabola.get_conv('cm')
-        check3 = self.parabola.get_conv('m')
+        check1 = self.parabola._get_conv('mm')
+        check2 = self.parabola._get_conv('cm')
+        check3 = self.parabola._get_conv('m')
         
         self.assertEqual(check1, 1)
         self.assertEqual(check2, 1e2)
@@ -422,9 +422,9 @@ class TestHyperbola(unittest.TestCase):
         self.assertEqual(type(x), type(nz))
         
     def test_get_conv(self):
-        check1 = self.hyperbola.get_conv('mm')
-        check2 = self.hyperbola.get_conv('cm')
-        check3 = self.hyperbola.get_conv('m')
+        check1 = self.hyperbola._get_conv('mm')
+        check2 = self.hyperbola._get_conv('cm')
+        check3 = self.hyperbola._get_conv('m')
         
         self.assertEqual(check1, 1)
         self.assertEqual(check2, 1e2)

@@ -389,6 +389,3 @@ void DataHandler::writeScalarOut(std::vector<std::complex<double>> &out, std::st
     out_r.close();
     out_i.close();
 }
-
-
-

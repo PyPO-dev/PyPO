@@ -17,10 +17,12 @@ class Reflector(object):
     
     _counter = 0
     
+    #### DUNDER METHODS ###
+    
     def __init__(self, a, b, cRot, name, units):
         
         self.units = units
-        self.conv = self.get_conv(units)
+        self.conv = self._get_conv(units)
         
         self.a = a * self.conv
         self.b = b * self.conv
@@ -83,39 +85,34 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
         else:
             raise StopIteration
         
-    
-    #### SETTERS ###
-    def get_conv(self, units):
-        
-        if units == 'mm':
-            conv = 1
-        elif units == 'cm':
-            conv = 1e2
-        elif units == 'm':
-            conv = 1e3
-            
-        return conv
+    #### PUBLIC METHODS ###
     
     def set_cRot(self, cRot, units='mm'):
+        """
+        (PUBLIC)
+        Set center of rotation for camera.
+        
+        @param  ->
+            cRot        :   Array containg co-ordinates of center of rotation
+            units       :   Units of co-ordinate
+        """
+        
         conv = self.get_conv(units)
         
         self.cRot = cRot * conv
 
     def setGrid(self, lims_x, lims_y, gridsize, gmode, trunc, flip, axis):
         """
-        Takes limits in x and y directions, gridsize in x and y. 
-        Per default, truncates the grid.
+        (PUBLIC)
+        Set the xyz, area and normal vector grids to reflector surface.
         
-        @param lims_x The negative and positive extents of the reflector in the x-direction: list, arr
-        @param lims_y The negative and positive extents of the reflector in the y-direction: list, arr
-        @param gridsize Gridding resolutions along x and y axes: list, arr
-        @param trunc Whether to truncate grid by elliptic aperture: bool
-            TODO: make elliptic from circular truncation
-        @param flip Whether normal vectors of reflectors point inside or outside: True/False
-            'inside' (default) refers to the normal vectors pointing upward.
-            'outside' refers to downward pointing normal vectors.
-            TODO: fix normal vectors of Hyperbola
-            TODO: test Ellipsoid normal vectors
+        @param  ->
+            lims_x      :   Lower and upper limits on x (u) values
+            lims_y      :   Lower and upper limits on y (v) values
+            gridsize    :   Number of cells along the xy (uv) axes
+            gmode       :   Use direct xy function evaluation or a uv parametrization
+            trunc       :   Truncate xy parameterized reflector with circle
+            flip        :   Flip normal vector direction
         """
         
         if flip:
@@ -191,19 +188,18 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
         self._iterList[5] = self.grid_ny
         self._iterList[6] = self.grid_nz
         
-    def updateIterlist(self):
-        self._iterList[0] = self.grid_x
-        self._iterList[1] = self.grid_y
-        self._iterList[2] = self.grid_z
-        
-        self._iterList[3] = self.area
-        
-        self._iterList[4] = self.grid_nx
-        self._iterList[5] = self.grid_ny
-        self._iterList[6] = self.grid_nz
-        
     def translateGrid(self, offTrans, units='mm', save=True):
-        conv = self.get_conv(units)
+        """
+        (PUBLIC)
+        Translate reflector along xyz axes.
+        
+        @param  ->
+            offTrans    :   Translation in xyz   
+            units       :   Units of the supplied translation
+            save        :   Save applied translation to history
+        """
+        
+        conv = self._get_conv(units)
 
         self.grid_x += offTrans[0] * conv
         self.grid_y += offTrans[1] * conv
@@ -217,9 +213,20 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
             self.history.append(["t{}".format(self.transCount), offTrans, units])
             self.transCount += 1
 
-        self.updateIterlist()
+        self._updateIterlist()
         
     def rotateGrid(self, offRot, radians=False, save=True, invert=False):
+        """
+        (PUBLIC)
+        Rotate reflector around xyz axes.
+        
+        @param  ->
+            offRot      :   Rotation around xyz axes, in degrees
+            radians     :   Whether offRot is in degrees or radians
+            save        :   Save applied rotation to history
+            invert      :   Apply inverse rotation
+        """
+        
         gridRot = MatRotate.MatRotate(offRot, [self.grid_x, self.grid_y, self.grid_z], self.cRot, radians=radians, invert=invert)
         
         self.grid_x = gridRot[0]
@@ -240,12 +247,14 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
             self.history.append(["r{}".format(self.rotCount), offRot, copyGrid(self.cRot)])
             self.rotCount += 1
         
-        self.updateIterlist()
+        self._updateIterlist()
         
     def homeReflector(self):
         """
-            Home reflector back to original position. If 
+        (PUBLIC)
+        Home reflector back to original position.
         """
+        
         for operation in reversed(self.history):
             toCheck = list(operation[0])
             # Translations
@@ -256,40 +265,13 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
             if toCheck[0] == 'r':
                 self.set_cRot(operation[2])
                 self.rotateGrid(operation[1], save=False, invert=True)
-    '''
-    def calcArea(self, grids_o):
-        # Calculate surface approximations from oversized grids
-        # Only for xy mode
-        # Do this before grid truncation!
-        x = grids_o[0]
-        y = grids_o[1]
-        z = grids_o[2]
-        
-        A = np.zeros((x.shape[0]-1, x.shape[1]-1))
-
-        for i in range(A.shape[0]):
-            for j in range(A.shape[1]):
-                v1 = np.zeros(3)
-                v2 = np.zeros(3)
-            
-                v1[0] = x[i,j] - x[i+1,j+1]
-                v1[1] = y[i,j] - y[i+1,j+1]
-                v1[2] = z[i,j] - z[i+1,j+1]
-                
-                v2[0] = x[i,j+1] - x[i+1,j]
-                v2[1] = y[i,j+1] - y[i+1,j]
-                v2[2] = z[i,j+1] - z[i+1,j]
-                
-                outer = np.cross(v1, v2)
-                
-                A[i,j] = np.sqrt(np.dot(outer, outer))
-        
-        # Flatten array containing area elements now for easier analysis
-        self.area = A
-    '''
-    # Function to truncate with an ellipse in xy plane
-    # TODO: plane with any orientation wrt xy plane
+    
     def truncateGrid(self):
+        """
+        (PUBLIC)
+        Truncate a rectangular grid by ellipsoid bordered by x limits and y limits.
+        """
+        
         lim_x_neg = np.amin(self.grid_x)
         lim_x_pos = np.amax(self.grid_x)
         
@@ -311,6 +293,16 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
         self.area = self.area[idx_in_ellipse]
         
     def interpReflector(self, res, mode):
+        """
+        (PUBLIC)
+        Obtain tcks parameters for interpolation on reflector.
+        
+        @param  ->
+            res         :   Space between points on surface to use for interpolation.
+                        :   If too low, overflow error might occur.
+            mode        :   Dependent axis for interpolation
+        """
+        
         skip = slice(None,None,res)
         
         if mode == 'z':
@@ -372,6 +364,46 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
             
         else:
             return ax_append
+        
+    #### PRIVATE METHODS ###
+    
+    def _get_conv(self, units):
+        """
+        (PRIVATE)
+        Get conversion factor given the units supplied.
+        
+        @param  ->
+            units       :   Units of the supplied translation
+            
+        @return ->
+            conv        :   Conversion factor for unit to mm conversion
+        """
+        
+        if units == 'mm':
+            conv = 1
+        elif units == 'cm':
+            conv = 1e2
+        elif units == 'm':
+            conv = 1e3
+            
+        return conv
+    
+    def _updateIterlist(self):
+        """
+        (PRIVATE)
+        Update internal iteration container.
+        Called after translation and rotation.
+        """
+        
+        self._iterList[0] = self.grid_x
+        self._iterList[1] = self.grid_y
+        self._iterList[2] = self.grid_z
+        
+        self._iterList[3] = self.area
+        
+        self._iterList[4] = self.grid_nx
+        self._iterList[5] = self.grid_ny
+        self._iterList[6] = self.grid_nz
 
 class Parabola(Reflector):
     """
@@ -389,12 +421,19 @@ class Parabola(Reflector):
         
     def uvGrid(self, u, v, du, dv):
         """
+        (PUBLIC)
         Create paraboloid from uv points.
-        @param u Height parameter (number/array).
-        @param v Angular parameter (number/array).
         
-        @return x, y, z Parabola points (number/array)
-        @return nx, ny, nz Parabola normal vector components (number/array)
+        @param  ->
+            u           :   Height parameter
+            v           :   Angular parameter
+            du          :   Increment size along u axis
+            dv          :   Increment size along v axis
+        
+        @return ->
+            x, y, z     :   Parabola points
+            nx, ny, nz  :   Parabola normal vector components
+            area        :   Area element corresponding to u and v
         """
         
         x = self.a * u * np.cos(v)
@@ -413,12 +452,16 @@ class Parabola(Reflector):
     
     def xyGrid(self, x, y):
         """
-        Create paraboloid from xy points.
-        @param x X coordinate(s) (number/array).
-        @param y Y coordinate(s) (number/array).
+        (PUBLIC)
+        Create paraboloid from uv points.
         
-        @return x, y, z Parabola points (number/array)
-        @return nx, ny, nz Parabola normal vector components (number/array)
+        @param  ->
+            x           :   x co-ordinate
+            y           :   y co-ordinate
+        
+        @return ->
+            x, y, z     :   Parabola points
+            nx, ny, nz  :   Parabola normal vector components
         """
         
         z = x**2 / self.a**2 + y**2 / self.b**2
@@ -431,19 +474,21 @@ class Parabola(Reflector):
             
         else:
             nz = -1
-            
-        #self.area = np.sqrt(1 + 4/self.a**4 * x**2 + 4/self.b**4 * y**2) * self.dx * self.dy
-        
+
         return x, y, z, nx, ny, nz
     
     def r_to_u(self, r, axis='a'):
         """
+        (PUBLIC)
         Convert aperture radius to u parameter.
-        @param r Radius of aperture in mm
-        @param axis Axis along which to set the radius. Default is 'a', semi major axis.
+        @param  ->
+            r           :   Radius of aperture in mm
+            axis        :   Axis along which to set the radius. Default is 'a', semi major axis.
         
-        @return u Value of u corresponding to r
+        @return ->
+            u           :   Value of u corresponding to r
         """
+        
         if r == 0:
             r = np.finfo(float).eps
         
@@ -473,6 +518,21 @@ class Hyperbola(Reflector):
             self.section = -1
     
     def uvGrid(self, u, v, du, dv):
+        """
+        (PUBLIC)
+        Create hyperboloid from uv points.
+        
+        @param  ->
+            u           :   Height parameter
+            v           :   Angular parameter
+            du          :   Increment size along u axis
+            dv          :   Increment size along v axis
+        
+        @return ->
+            x, y, z     :   hyperboloid points
+            nx, ny, nz  :   hyperboloid normal vector components
+            area        :   Area element corresponding to u and v
+        """
         
         x = self.section * self.a * np.sqrt(u**2 - 1) * np.cos(v)
         y = self.section * self.b * np.sqrt(u**2 - 1) * np.sin(v)
@@ -490,6 +550,19 @@ class Hyperbola(Reflector):
         
     
     def xyGrid(self, x, y):
+        """
+        (PUBLIC)
+        Create hyperboloid from uv points.
+        
+        @param  ->
+            x           :   x co-ordinate
+            y           :   y co-ordinate
+        
+        @return ->
+            x, y, z     :   hyperboloid points
+            nx, ny, nz  :   hyperboloid normal vector components
+        """
+        
         z = self.section * self.c * np.sqrt(x ** 2 / self.a ** 2 + y ** 2 / self.b ** 2 + 1)
         
         nx = self.section * 2 * x / self.a**2
@@ -506,8 +579,19 @@ class Hyperbola(Reflector):
         return x, y, z, nx, ny, nz
     
     def r_to_u(self, r, axis='a'):
+        """
+        (PUBLIC)
+        Convert aperture radius to u parameter.
+        @param  ->
+            r           :   Radius of aperture in mm
+            axis        :   Axis along which to set the radius. Default is 'a', semi major axis.
+        
+        @return ->
+            u           :   Value of u corresponding to r
+        """
+        
         if r == 0:
-            r = 0.0001#np.finfo(float).eps
+            r = np.finfo(float).eps
             
         if axis == 'a':
             u = np.sqrt((r / self.a)**2 + 1)
@@ -537,23 +621,51 @@ class Ellipse(Reflector):
             self.section = 1
     
     def uvGrid(self, u, v, du, dv):
+        """
+        (PUBLIC)
+        Create ellipsoid from uv points.
         
-        x = self.a * np.sqrt(u**2 - 1) * np.cos(v)
-        y = self.b * np.sqrt(u**2 - 1) * np.sin(v)
-        z = self.c * u
+        @param  ->
+            u           :   Height parameter
+            v           :   Angular parameter
+            du          :   Increment size along u axis
+            dv          :   Increment size along v axis
         
-        prefac = 1 / np.sqrt(self.b**2 * self.c**2 * (u**2 - 1) * np.cos(v)**2 + self.a**2 * self.c**2 * (u**2 - 1) * np.sin(v)**2 + self.a**2 * self.b**2 * u**2)
+        @return ->
+            x, y, z     :   ellipsoid points
+            nx, ny, nz  :   ellipsoid normal vector components
+            area        :   Area element corresponding to u and v
+        """
         
-        nx = -self.b * self.c * np.sqrt(u**2 - 1) * np.cos(v) * prefac
-        ny = -self.a * self.c * np.sqrt(u**2 - 1) * np.sin(v) * prefac
-        nz = self.a * self.b * u * prefac
+        x = self.a * np.sin(u) * np.cos(v)
+        y = self.b * np.sin(u) * np.sin(v)
+        z = self.c * np.cos(u)
         
-        area = np.sqrt(self.b**2 * self.c**2 * (u**2 - 1) * np.cos(v)**2 + self.a**2 * self.c**2 * (u**2 - 1) * np.sin(v)**2 + self.a**2 * self.b**2 * u**2) * du * dv
+        prefac = 1 / np.sqrt(self.b**2 * self.c**2 * np.sin(u)**2 * np.cos(v)**2 + self.a**2 * self.c**2 * np.sin(u) * np.sin(v)**2 + self.a**2 * self.b**2 * np.cos(u)**2)
+        
+        nx = self.b * self.c * np.sin(u) * np.cos(v) * prefac
+        ny = self.a * self.c * np.sin(u) * np.sin(v) * prefac
+        nz = self.a * self.b * np.cos(u) * prefac
+        
+        area = np.sin(u) * np.sqrt(self.b**2 * self.c**2 * np.sin(u)**2 * np.cos(v)**2 + self.a**2 * self.c**2 * np.sin(u)**2 * np.sin(v)**2 + self.a**2 * self.b**2 * np.cos(u)**2) * du * dv
         
         return x, y, z, nx, ny, nz, area
         
     
     def xyGrid(self, x, y):
+        """
+        (PUBLIC)
+        Create ellipsoid from uv points.
+        
+        @param  ->
+            x           :   x co-ordinate
+            y           :   y co-ordinate
+        
+        @return ->
+            x, y, z     :   ellipsoid points
+            nx, ny, nz  :   ellipsoid normal vector components
+        """
+        
         z = self.section * self.c * np.sqrt(1 - x ** 2 / self.a ** 2 - y ** 2 / self.b ** 2)
         
         nx = self.section * 2 * x / self.a**2
@@ -569,6 +681,7 @@ class Ellipse(Reflector):
         
         return x, y, z, nx, ny, nz
     
+    # TODO
     def r_to_u(self, r, axis='a'):
         if axis == 'a':
             u = np.sqrt((r / self.a)**2 + 1)

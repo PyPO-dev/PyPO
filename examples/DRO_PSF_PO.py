@@ -62,16 +62,11 @@ def ex_DRO():
     s.addPlotter(save='../images/')
 
     s.initPhysOptics(target=s.system["p1"], k=k, numThreads=11, cpp_path=cpp_path)
-    #'''
     s.runPhysOptics(save=2, material_source='alu')
-    
-    s.PO.plotField(s.system["p1"].grid_x, s.system["p1"].grid_y, mode='Ex', polar=True)
-    
+
     s.ffPhysOptics(source=s.system["p1"], target=s.system["cam1"])
     s.runPhysOptics(save=2, material_source='vac', prop_mode=1)
-    #'''
-    #s.PO.plotField(s.system["cam1"].grid_Az, s.system["cam1"].grid_El, mode='Ex', polar=False, save='DRO_ff')
-    
+
     s.plotSystem(focus_1=False, focus_2=False)
     
     field = s.loadField(s.system["cam1"], mode='Ex')

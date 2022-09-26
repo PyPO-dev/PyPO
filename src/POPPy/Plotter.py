@@ -33,7 +33,7 @@ class Plotter(object):
         
         # Obtain conversion units if manually given
         if units:
-            conv = surfaceObject.get_conv(units)
+            conv = surfaceObject._get_conv(units)
             units = units
         else:
             conv = surfaceObject.conv
@@ -64,10 +64,7 @@ class Plotter(object):
             grid_x1 = surfaceObject.grid_z / conv
             grid_x2 = surfaceObject.grid_x / conv
             ff_flag = False
-            
-            
 
-        #extent = [grid_x1[0,0], grid_x1[-1,0], grid_x2[0,0], grid_x2[0,-1]]
         extent = [np.min(grid_x1), np.max(grid_x1), np.min(grid_x2), np.max(grid_x2)]
     
         if not amp_only:
@@ -81,16 +78,18 @@ class Plotter(object):
         
             if mode == 'linear':
                 ampfig = ax[0].imshow(np.absolute(field), origin='lower', extent=extent, cmap=cmaps.parula, interpolation=interpolation)
+                phasefig = ax[1].imshow(np.angle(field), origin='lower', extent=extent, cmap=cmaps.parula)
             
             elif mode == 'dB':
-                ampfig = ax[0].imshow(20 * np.log10(np.absolute(field) / np.max(np.absolute(field))), vmin=vmin, vmax=vmax, origin='lower', extent=extent, cmap=cmaps.parula, interpolation=interpolation)
-                
                 if polar:
                     extent = [grid_x1[0,0], grid_x1[-1,0], grid_x2[0,0], grid_x2[0,-1]]
-                    ampfig = ax[0].pcolormesh(grid_x1, grid_x2, 20 * np.log10(np.absolute(field) / np.max(np.absolute(field))), vmin=vmin, vmax=vmax, cmap=cmaps.parula)#, origin='lower', extent=extent, cmap=cmaps.parula, vmin=vmin, vmax=vmax)
-                    phasefig = ax[1].pcolormesh(grid_x1, grid_x2, np.angle(field), cmap=cmaps.parula)#, origin='lower', extent=extent, cmap=cmaps.parula)
+                    ampfig = ax[0].pcolormesh(grid_x1, grid_x2, 20 * np.log10(np.absolute(field) / np.max(np.absolute(field))), vmin=vmin, vmax=vmax, cmap=cmaps.parula, shading='auto')
+                    phasefig = ax[1].pcolormesh(grid_x1, grid_x2, np.angle(field), cmap=cmaps.parula, shading='auto')
+                    
+                else:
+                    phasefig = ax[1].imshow(np.angle(field), origin='lower', extent=extent, cmap=cmaps.parula)
+                    ampfig = ax[0].imshow(20 * np.log10(np.absolute(field) / np.max(np.absolute(field))), vmin=vmin, vmax=vmax, origin='lower', extent=extent, cmap=cmaps.parula, interpolation=interpolation)
             
-            phasefig = ax[1].imshow(np.angle(field), origin='lower', extent=extent, cmap=cmaps.parula)
             
             if ff_flag:
                 ax[0].set_ylabel(r"El / [{}]".format(units))

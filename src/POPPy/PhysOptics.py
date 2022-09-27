@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import math
 import matplotlib.pyplot as pt
 import matplotlib.cm as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -65,10 +66,15 @@ class PhysOptics(object):
         if prec == 'float':
             if self.propType == 'coherent':
                 if device == 'cpu':
-                    os.system('./PhysBeamf.exe {} {} {} {} {} {} {}'.format(self.numThreads, self.k, self.thres, save, epsilon, prop_mode, t_dir))
+                    os.system('./PhysBeamf.exe {} {} {} {} {} {} {}'.format(self.numThreads, self.k, self.thres, 
+                                                                            save, epsilon, prop_mode, t_dir))
                     
                 elif device == 'gpu':
-                    pass
+                    nThread = 256
+                    nBlock = math.ceil(self.gt / 256)
+                    os.system('./GPhysBeamf.exe {} {} {} {} {} {} {} {} {}'.format(nThread, nBlock, self.k, 
+                                                                                   save, epsilon, prop_mode, 
+                                                                                   t_dir, self.gs, self.gt))
             
             elif self.propType == 'incoherent':
                 os.system('./PhysBeamScalarf.exe {} {} {}'.format(self.numThreads, self.k, epsilon))
@@ -76,10 +82,15 @@ class PhysOptics(object):
         elif prec == 'double':
             if self.propType == 'coherent':
                 if device == 'cpu':
-                    os.system('./PhysBeam.exe {} {} {} {} {} {} {}'.format(self.numThreads, self.k, self.thres, save, epsilon, prop_mode, t_dir))
+                    os.system('./PhysBeam.exe {} {} {} {} {} {} {}'.format(self.numThreads, self.k, self.thres, 
+                                                                           save, epsilon, prop_mode, t_dir))
                     
                 elif device == 'gpu':
-                    pass
+                    nThread = 256
+                    nBlock = math.ceil(self.gt / 256)
+                    os.system('./GPhysBeam.exe {} {} {} {} {} {} {} {} {}'.format(nThread, nBlock, self.k, 
+                                                                                   save, epsilon, prop_mode, 
+                                                                                   t_dir, self.gs, self.gt))
             
             elif self.propType == 'incoherent':
                 os.system('./PhysBeamScalar.exe {} {} {}'.format(self.numThreads, self.k, epsilon))
@@ -211,3 +222,9 @@ class PhysOptics(object):
         """
         
         os.system('cp -R {} {}'.format(folder + 'input/', self.cpp_path))
+        
+    def set_gs(self, gs):
+        self.gs = gs[0] * gs[1]
+        
+    def set_gt(self, gt):
+        self.gt = gt[0] * gt[1]

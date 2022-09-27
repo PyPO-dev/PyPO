@@ -328,6 +328,7 @@ class System(object):
         
         self.PO = PO.PhysOptics(k, numThreads, thres, cpp_path)
         self.PO.propType = self.inputBeam.status
+        self.PO.set_gs(self.inputBeam.shape)
         
         if self.PO.propType == 'coherent':
             if not cont:
@@ -356,6 +357,7 @@ class System(object):
                         self.PO.writeInput(self.fileNames_ts[i], attr)
         
         if target != None:
+            self.PO.set_gt(target.shape)
             print("Calculating currents on {} from {}".format(target.name, self.inputBeam.name))
         else:
             print("Initialized PO object")
@@ -365,6 +367,9 @@ class System(object):
         Perform a physical optics propagation from source to target.
         Automatically continues from last propagation by copying currents and gird to input
         """
+        
+        self.PO.set_gs(source.shape)
+        self.PO.set_gt(target.shape)
         
         if self.PO.propType == 'coherent':
             for i, attr in enumerate(source):
@@ -409,6 +414,9 @@ class System(object):
         print("Calculating currents on {} from {}".format(target.name, source.name))
                     
     def ffPhysOptics(self, source, target):
+        self.PO.set_gs(source.shape)
+        self.PO.set_gt(target.shape)
+        
         for i, attr in enumerate(source):
             # Only write xyz and area
             if i <= 3:
@@ -434,7 +442,8 @@ class System(object):
         Perform a physical optics propagation from folder with saved input/output to target.
         Automatically continues from last propagation by copying currents and grid to input
         """
-        
+        self.PO.set_gs(source.shape)
+        self.PO.set_gt(target.shape)
         # First, copy input/ to cpp_path. Do this first so that copy operations are performed
         # in the cpp_path input/ folder. This preserves the saved data
         self.PO.copyFromFolder(folder)
@@ -467,7 +476,8 @@ class System(object):
         Perform a physical optics propagation from folder with saved input/output to target.
         Automatically continues from last propagation by copying currents and grid to input
         """
-        
+        self.PO.set_gs(source.shape)
+        self.PO.set_gt(target.shape)
         # First, copy input/ to cpp_path. Do this first so that copy operations are performed
         # in the cpp_path input/ folder. This preserves the saved data
         self.PO.copyFromFolder(folder)

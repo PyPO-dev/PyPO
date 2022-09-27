@@ -24,6 +24,7 @@ class Beams(object):
     #### DUNDER METHODS ###
     
     def __init__(self, x_lims, y_lims, gridsize, flip, name, units, cRot):
+        self.shape = gridsize
         self.units = units
         self.conv = self._get_conv(units)
         

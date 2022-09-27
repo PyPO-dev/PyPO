@@ -200,12 +200,17 @@ void Propagation::propagateBeam(int start, int stop,
             this->Et_container[i] = e_r;
             this->Ht_container[i] = h_r;
         }
-
+        /*
         if((i * 100 / this->step) > jc and start == 0 * this->step)
         {
             std::cout << jc << " / 100" << '\r';
             std::cout.flush();
             jc++;
+        }
+        */
+        if (i == 1000)
+        {
+            printf("%.16f\n",this->Mt_container[i][1].real());
         }
     }
 }
@@ -273,6 +278,8 @@ std::array<std::array<std::complex<double>, 3>, 2> Propagation::fieldAtPoint(con
         
         ut.ext(k_arr, Js[i], k_out_js);
         
+        //printf("%.16g\n", r);
+        
         Green = exp(this->t_direction * j * k * r) / (4 * M_PI * r) * source_area[i] * j;
         
         for( int n=0; n<3; n++)
@@ -280,6 +287,7 @@ std::array<std::array<std::complex<double>, 3>, 2> Propagation::fieldAtPoint(con
             e_field[n] += (-omega * MU_0 * e_vec_thing[n] + k_out_ms[n]) * Green;
             h_field[n] += (-omega * EPS * h_vec_thing[n] - k_out_js[n]) * Green;
         }  
+        //printf("%.16g, %.16g\n", Green.real(), Green.imag()); // %s is format specifier
     }
     
     // Pack e and h together in single container 

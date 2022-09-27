@@ -143,8 +143,6 @@ Center position     : [{:.3f}, {:.3f}, {:.3f}] [mm]
         self.grid_ny = np.zeros(self.grid_y.shape)
         self.grid_nz = np.ones(self.grid_z.shape)
         
-        
-        
         self._iterList[0] = self.grid_x
         self._iterList[1] = self.grid_y
         self._iterList[2] = self.grid_z

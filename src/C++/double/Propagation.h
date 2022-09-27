@@ -9,7 +9,7 @@
 
 #include "Utils.h"
 
-# define M_PI           3.14159265358979323846  /* pi */
+#define M_PI            3.14159265358979323846  /* pi */
 #define C_L             2.99792458e11 // mm s^-1
 #define MU_0            1.2566370614e-3 // kg mm s^-2 A^-2
 #define EPS_VAC         1 / (MU_0 * C_L*C_L)

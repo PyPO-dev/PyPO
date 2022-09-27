@@ -10,9 +10,9 @@ std::array<double*, 3> GDataHandler::cppToCUDA_3DGrid(std::string &mode)
     
     int m = data.size();
     
-    double outx[m];
-    double outy[m];
-    double outz[m];
+    double *outx = new double[m];
+    double *outy = new double[m];
+    double *outz = new double[m];
     
     for (int i=0; i<m; i++)
     {
@@ -25,6 +25,8 @@ std::array<double*, 3> GDataHandler::cppToCUDA_3DGrid(std::string &mode)
     out[1] = outy;
     out[2] = outz;
     
+    
+    
     return out;
 } 
 
@@ -36,8 +38,8 @@ std::array<double*, 2> GDataHandler::cppToCUDA_2DGrid()
     
     int m = data.size();
     
-    double outx[m];
-    double outy[m];
+    double *outx = new double[m];
+    double *outy = new double[m];
     
     for (int i=0; i<m; i++)
     {
@@ -59,15 +61,15 @@ std::array<cuDoubleComplex*, 3> GDataHandler::cppToCUDA_Js()
     
     int m = data.size();
     
-    cuDoubleComplex outx[m];
-    cuDoubleComplex outy[m];
-    cuDoubleComplex outz[m];
+    cuDoubleComplex *outx = new cuDoubleComplex[m];
+    cuDoubleComplex *outy = new cuDoubleComplex[m];
+    cuDoubleComplex *outz = new cuDoubleComplex[m];
     
     for (int i=0; i<m; i++)
     {
         outx[i] = make_cuDoubleComplex(data[i][0].real(), data[i][0].imag());
-        outx[i] = make_cuDoubleComplex(data[i][1].real(), data[i][1].imag());
-        outx[i] = make_cuDoubleComplex(data[i][2].real(), data[i][2].imag());
+        outy[i] = make_cuDoubleComplex(data[i][1].real(), data[i][1].imag());
+        outz[i] = make_cuDoubleComplex(data[i][2].real(), data[i][2].imag());
     }
     
     out[0] = outx;
@@ -85,15 +87,15 @@ std::array<cuDoubleComplex*, 3> GDataHandler::cppToCUDA_Ms()
     
     int m = data.size();
     
-    cuDoubleComplex outx[m];
-    cuDoubleComplex outy[m];
-    cuDoubleComplex outz[m];
+    cuDoubleComplex *outx = new cuDoubleComplex[m];
+    cuDoubleComplex *outy = new cuDoubleComplex[m];
+    cuDoubleComplex *outz = new cuDoubleComplex[m];
     
     for (int i=0; i<m; i++)
     {
         outx[i] = make_cuDoubleComplex(data[i][0].real(), data[i][0].imag());
-        outx[i] = make_cuDoubleComplex(data[i][1].real(), data[i][1].imag());
-        outx[i] = make_cuDoubleComplex(data[i][2].real(), data[i][2].imag());
+        outy[i] = make_cuDoubleComplex(data[i][1].real(), data[i][1].imag());
+        outz[i] = make_cuDoubleComplex(data[i][2].real(), data[i][2].imag());
     }
     
     out[0] = outx;
@@ -123,9 +125,9 @@ std::array<double*, 3> GDataHandler::cppToCUDA_3Dnormals()
     
     int m = data.size();
     
-    double outx[m];
-    double outy[m];
-    double outz[m];
+    double *outx = new double[m];
+    double *outy = new double[m];
+    double *outz = new double[m];
     
     for (int i=0; i<m; i++)
     {

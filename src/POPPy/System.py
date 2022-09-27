@@ -495,8 +495,8 @@ class System(object):
                 
         print("Calculating far-field on {} from {}".format(target.name, source.name))
     
-    def runPhysOptics(self, save=0, material_source='vac', prop_mode=0, t_direction='forward', folder=''):
-        self.PO.runPhysOptics(save, material_source, prop_mode, t_direction)
+    def runPhysOptics(self, save=0, material_source='vac', prop_mode=0, t_direction='forward', folder='', prec='float', device='cpu'):
+        self.PO.runPhysOptics(save, material_source, prop_mode, t_direction, prec, device)
         
         if folder != '':
             self.PO.copyToFolder(folder)

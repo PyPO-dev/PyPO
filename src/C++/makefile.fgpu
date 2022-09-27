@@ -1,0 +1,22 @@
+######################################################################################
+DIRSRC = ./float/
+######################################################################################
+COMP = nvcc
+CFLAGS = -O3
+CC  = $(COMP) $(CFLAGS) -c
+CO  = $(COMP) $(CFLAGS) -o
+######################################################################################
+EXE = GPhysBeamf.exe
+all: $(EXE)
+######################################################################################
+GPhysBeamf.exe: GPhysBeamf.o GDataHandlerf.o DataHandlerf.o
+	$(CO) GPhysBeamf.exe GPhysBeamf.o GDataHandlerf.o DataHandlerf.o
+######################################################################################
+GPhysBeamf.o: $(DIRSRC)GPhysBeamf.cu GDataHandlerf.o DataHandlerf.o
+	$(CC) $(DIRSRC)GPhysBeamf.cu -I$(DIRSRC)
+GDataHandlerf.o: $(DIRSRC)GDataHandlerf.h $(DIRSRC)GDataHandlerf.cu DataHandlerf.o
+	$(CC) $(DIRSRC)GDataHandlerf.cu -I$(DIRSRC)
+DataHandlerf.o: $(DIRSRC)DataHandlerf.h $(DIRSRC)DataHandlerf.cpp
+	$(CC) $(DIRSRC)DataHandlerf.cpp -I$(DIRSRC)
+######################################################################################
+ 

@@ -1,32 +1,23 @@
-######################################################################################
-DIRSRC = ./src/
-######################################################################################
-COMP = g++
-CFLAGS = -O3 -std=c++11 -pthread
-CC  = $(COMP) $(CFLAGS) -c
-CO  = $(COMP) $(CFLAGS) -o
-######################################################################################
-EXE = PhysBeam.exe
-EXE_S = PhysBeamScalar.exe
-all: $(EXE) $(EXE_S)
-######################################################################################
-PhysBeam.exe: PhysBeam.o Propagation.o DataHandler.o
-	$(CO) PhysBeam.exe PhysBeam.o Propagation.o DataHandler.o
-######################################################################################
-PhysBeamScalar.exe: PhysBeamScalar.o PropagationScalar.o DataHandler.o
-	$(CO) PhysBeamScalar.exe PhysBeamScalar.o PropagationScalar.o DataHandler.o
-######################################################################################
-PhysBeam.o: $(DIRSRC)PhysBeam.cpp Propagation.o DataHandler.o
-	$(CC) $(DIRSRC)PhysBeam.cpp -I$(DIRSRC)
-PhysBeamScalar.o: $(DIRSRC)PhysBeamScalar.cpp PropagationScalar.o DataHandler.o
-	$(CC) $(DIRSRC)PhysBeamScalar.cpp -I$(DIRSRC)
-Propagation.o: $(DIRSRC)Propagation.h $(DIRSRC)Propagation.cpp 
-	$(CC) $(DIRSRC)Propagation.cpp -I$(DIRSRC)
-PropagationScalar.o: $(DIRSRC)PropagationScalar.h $(DIRSRC)PropagationScalar.cpp 
-	$(CC) $(DIRSRC)PropagationScalar.cpp -I$(DIRSRC)
-DataHandler.o: $(DIRSRC)DataHandler.h $(DIRSRC)DataHandler.cpp
-	$(CC) $(DIRSRC)DataHandler.cpp -I$(DIRSRC)
-######################################################################################
+# Global makefile. Contains rules for creating different .exe files
+
+dcpu:
+	make -f makefile.dcpu 
+	
+fcpu:
+	make -f makefile.fcpu 
+	
+dgpu:
+	make -f makefile.dgpu
+	
+fgpu:
+	make -f makefile.fgpu
+	
+all:
+	make -f makefile.dcpu 
+	make -f makefile.fcpu 
+	make -f makefile.dgpu 
+	make -f makefile.fgpu
+	
 clean:
 	rm -f *~
 	rm -f *.o
@@ -34,5 +25,5 @@ clean:
 	rm -f -r ccache
 	rm -f .fuse*
 	rm -f *.out
-	rm -f $(DIRSRC)*.h.gch
-######################################################################################
+	rm -f *.h.gch
+	rm -f *.ptx

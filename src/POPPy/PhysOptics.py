@@ -37,7 +37,7 @@ class PhysOptics(object):
         
     #### PUBLIC METHODS ###
         
-    def runPhysOptics(self, save, material_source, prop_mode, t_direction):
+    def runPhysOptics(self, save, material_source, prop_mode, t_direction, prec, device):
         """
         (PUBLIC)
         Call PhysBeam.exe and perform PO calculation.
@@ -61,11 +61,29 @@ class PhysOptics(object):
         
         cwd = os.getcwd()
         os.chdir(self.cpp_path)
-        if self.propType == 'coherent':
-            os.system('./PhysBeam.exe {} {} {} {} {} {} {}'.format(self.numThreads, self.k, self.thres, save, epsilon, prop_mode, t_dir))
+        
+        if prec == 'float':
+            if self.propType == 'coherent':
+                if device == 'cpu':
+                    os.system('./PhysBeamf.exe {} {} {} {} {} {} {}'.format(self.numThreads, self.k, self.thres, save, epsilon, prop_mode, t_dir))
+                    
+                elif device == 'gpu':
+                    pass
             
-        elif self.propType == 'incoherent':
-            os.system('./PhysBeamScalar.exe {} {} {}'.format(self.numThreads, self.k, epsilon))
+            elif self.propType == 'incoherent':
+                os.system('./PhysBeamScalarf.exe {} {} {}'.format(self.numThreads, self.k, epsilon))
+                
+        elif prec == 'double':
+            if self.propType == 'coherent':
+                if device == 'cpu':
+                    os.system('./PhysBeam.exe {} {} {} {} {} {} {}'.format(self.numThreads, self.k, self.thres, save, epsilon, prop_mode, t_dir))
+                    
+                elif device == 'gpu':
+                    pass
+            
+            elif self.propType == 'incoherent':
+                os.system('./PhysBeamScalar.exe {} {} {}'.format(self.numThreads, self.k, epsilon))
+                
         os.chdir(cwd)
         
     def loadField(self, shape, mode='Ex'):

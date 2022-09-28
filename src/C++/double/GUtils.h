@@ -5,7 +5,7 @@
 // The Utils file contains mostly linear algebra functions as CUDA device functions
 
 // Real dot-product
-__device__ void dot(double (&v1)[3], double (&v2)[3], double &out)
+__device__ __inline__ void dot(double (&v1)[3], double (&v2)[3], double &out)
 {
     out = 0;
     
@@ -17,7 +17,7 @@ __device__ void dot(double (&v1)[3], double (&v2)[3], double &out)
 
 
 // Complex hermitian conjugate inner-product
-__device__ void dot(cuDoubleComplex (&cv1)[3], cuDoubleComplex (&cv2)[3], cuDoubleComplex &out)
+__device__ __inline__ void dot(cuDoubleComplex (&cv1)[3], cuDoubleComplex (&cv2)[3], cuDoubleComplex &out)
 {
     out = make_cuDoubleComplex(0, 0);
     
@@ -28,7 +28,7 @@ __device__ void dot(cuDoubleComplex (&cv1)[3], cuDoubleComplex (&cv2)[3], cuDoub
 }
 
 // Complex vector - real vector dot-product
-__device__ void dot(cuDoubleComplex (&cv1)[3], double (&v2)[3], cuDoubleComplex &out)
+__device__ __inline__ void dot(cuDoubleComplex (&cv1)[3], double (&v2)[3], cuDoubleComplex &out)
 {
     out = make_cuDoubleComplex(0, 0);
     
@@ -39,7 +39,7 @@ __device__ void dot(cuDoubleComplex (&cv1)[3], double (&v2)[3], cuDoubleComplex 
 }
 
 // Real vector - complex vector dot-product
-__device__ void dot(double (&v1)[3], cuDoubleComplex (&cv2)[3], cuDoubleComplex &out)
+__device__ __inline__ void dot(double (&v1)[3], cuDoubleComplex (&cv2)[3], cuDoubleComplex &out)
 {
     out = make_cuDoubleComplex(0, 0);
     
@@ -50,7 +50,7 @@ __device__ void dot(double (&v1)[3], cuDoubleComplex (&cv2)[3], cuDoubleComplex 
 }
 
 // Real cross-product
-__device__ void ext(double (&v1)[3], double (&v2)[3], double (&out)[3])
+__device__ __inline__ void ext(double (&v1)[3], double (&v2)[3], double (&out)[3])
 {
     out[0] = v1[1]*v2[2] - v1[2]*v2[1];
     out[1] = v1[2]*v2[0] - v1[0]*v2[2];
@@ -59,7 +59,7 @@ __device__ void ext(double (&v1)[3], double (&v2)[3], double (&out)[3])
 
 
 // Complex conjugate of cross product
-__device__ void ext(cuDoubleComplex (&cv1)[3], cuDoubleComplex (&cv2)[3], cuDoubleComplex (&out)[3])
+__device__ __inline__ void ext(cuDoubleComplex (&cv1)[3], cuDoubleComplex (&cv2)[3], cuDoubleComplex (&out)[3])
 {
     out[0] = cuCsub(cuCmul(cv1[1], cv2[2]), cuCmul(cv1[2], cv2[1]));
     out[1] = cuCsub(cuCmul(cv1[2], cv2[0]), cuCmul(cv1[0], cv2[2]));
@@ -67,7 +67,7 @@ __device__ void ext(cuDoubleComplex (&cv1)[3], cuDoubleComplex (&cv2)[3], cuDoub
 }
 
 // Cross product between an complex and a real vector
-__device__ void ext(cuDoubleComplex (&cv1)[3], double (&v2)[3], cuDoubleComplex (&out)[3])
+__device__ __inline__ void ext(cuDoubleComplex (&cv1)[3], double (&v2)[3], cuDoubleComplex (&out)[3])
 {
     out[0] = cuCsub(cuCmul(cv1[1], make_cuDoubleComplex(v2[2],0)), cuCmul(cv1[2], make_cuDoubleComplex(v2[1],0)));
     out[1] = cuCsub(cuCmul(cv1[2], make_cuDoubleComplex(v2[0],0)), cuCmul(cv1[0], make_cuDoubleComplex(v2[2],0)));
@@ -75,7 +75,7 @@ __device__ void ext(cuDoubleComplex (&cv1)[3], double (&v2)[3], cuDoubleComplex 
 }
 
 // Cross product between a real vector and a complex vector
-__device__ void ext(double (&v1)[3], cuDoubleComplex (&cv2)[3], cuDoubleComplex (&out)[3])
+__device__ __inline__ void ext(double (&v1)[3], cuDoubleComplex (&cv2)[3], cuDoubleComplex (&out)[3])
 {
     out[0] = cuCsub(cuCmul(make_cuDoubleComplex(v1[1],0), cv2[2]), cuCmul(make_cuDoubleComplex(v1[2],0), cv2[1]));
     out[1] = cuCsub(cuCmul(make_cuDoubleComplex(v1[2],0), cv2[0]), cuCmul(make_cuDoubleComplex(v1[0],0), cv2[2]));
@@ -83,7 +83,7 @@ __device__ void ext(double (&v1)[3], cuDoubleComplex (&cv2)[3], cuDoubleComplex 
 }
 
 // Difference between two real vectors
-__device__ void diff(double (&v1)[3], double (&v2)[3], double (&out)[3])
+__device__ __inline__ void diff(double (&v1)[3], double (&v2)[3], double (&out)[3])
 {
     for(int n=0; n<3; n++)
     {
@@ -92,7 +92,7 @@ __device__ void diff(double (&v1)[3], double (&v2)[3], double (&out)[3])
 }
 
 // Difference between two complex valued vectors
-__device__ void diff(cuDoubleComplex (&cv1)[3], cuDoubleComplex (&cv2)[3], cuDoubleComplex (&out)[3])
+__device__ __inline__ void diff(cuDoubleComplex (&cv1)[3], cuDoubleComplex (&cv2)[3], cuDoubleComplex (&out)[3])
 {
     for(int n=0; n<3; n++)
     {
@@ -101,13 +101,13 @@ __device__ void diff(cuDoubleComplex (&cv1)[3], cuDoubleComplex (&cv2)[3], cuDou
 }
 
 // Absolute value of real vector
-__device__ void abs(double (&v)[3], double &out)
+__device__ __inline__ void abs(double (&v)[3], double &out)
 {
     dot(v, v, out);
     out = sqrt(out);
 }
 // Return complex conjugate of complex vector
-__device__ void conja(cuDoubleComplex (&cv)[3], cuDoubleComplex (&out)[3])
+__device__ __inline__ void conja(cuDoubleComplex (&cv)[3], cuDoubleComplex (&out)[3])
 {
     for(int n=0; n<3; n++)
     {
@@ -115,7 +115,7 @@ __device__ void conja(cuDoubleComplex (&cv)[3], cuDoubleComplex (&out)[3])
     }
 }
 // Absolute value of a complex vector. Still returns a complex number!
-__device__ void abs(cuDoubleComplex (&cv)[3], cuDoubleComplex &out)
+__device__ __inline__ void abs(cuDoubleComplex (&cv)[3], cuDoubleComplex &out)
 {
     cuDoubleComplex cv_conj[3];
     conja(cv, cv_conj);
@@ -124,7 +124,7 @@ __device__ void abs(cuDoubleComplex (&cv)[3], cuDoubleComplex &out)
 }
 
 // Return normalized real vector from vector
-__device__ void normalize(double (&v)[3], double (&out)[3])
+__device__ __inline__ void normalize(double (&v)[3], double (&out)[3])
 {
     double norm;
     abs(v, norm);
@@ -136,7 +136,7 @@ __device__ void normalize(double (&v)[3], double (&out)[3])
 }
 
 // Normalize complex vector
-__device__ void normalize(cuDoubleComplex (&cv)[3], cuDoubleComplex (&out)[3])
+__device__ __inline__ void normalize(cuDoubleComplex (&cv)[3], cuDoubleComplex (&out)[3])
 {
     cuDoubleComplex cnorm;
     abs(cv, cnorm);
@@ -148,7 +148,7 @@ __device__ void normalize(cuDoubleComplex (&cv)[3], cuDoubleComplex (&out)[3])
 }
 
 // Apply standard real s-multiplication on a real vector
-__device__ void s_mult(double (&v)[3], double &s, double (&out)[3])
+__device__ __inline__ void s_mult(double (&v)[3], double &s, double (&out)[3])
 {
     for(int n=0; n<3; n++)
     {
@@ -158,7 +158,7 @@ __device__ void s_mult(double (&v)[3], double &s, double (&out)[3])
 
 
 // Multiply complex vector by complex scalar
-__device__ void s_mult(cuDoubleComplex (&cv)[3], cuDoubleComplex &cs, cuDoubleComplex (&out)[3])
+__device__ __inline__ void s_mult(cuDoubleComplex (&cv)[3], cuDoubleComplex &cs, cuDoubleComplex (&out)[3])
 {
     for(int n=0; n<3; n++)
     {
@@ -167,7 +167,7 @@ __device__ void s_mult(cuDoubleComplex (&cv)[3], cuDoubleComplex &cs, cuDoubleCo
 }
 
 // Multiply real vector by complex scalar
-__device__ void s_mult(double (&v)[3], cuDoubleComplex &cs, cuDoubleComplex (&out)[3])
+__device__ __inline__ void s_mult(double (&v)[3], cuDoubleComplex &cs, cuDoubleComplex (&out)[3])
 {
     for(int n=0; n<3; n++)
     {
@@ -176,7 +176,7 @@ __device__ void s_mult(double (&v)[3], cuDoubleComplex &cs, cuDoubleComplex (&ou
 }
 
 // Multiply complex vector by real scalar
-__device__ void s_mult(cuDoubleComplex (&cv)[3], const double &s, cuDoubleComplex (&out)[3])
+__device__ __inline__ void s_mult(cuDoubleComplex (&cv)[3], const double &s, cuDoubleComplex (&out)[3])
 {
     for(int n=0; n<3; n++)
     {
@@ -185,7 +185,7 @@ __device__ void s_mult(cuDoubleComplex (&cv)[3], const double &s, cuDoubleComple
 }
 
 // Calculate refected vector from surface using complex incoming vector and real normal vector to surface
-__device__ void snell(cuDoubleComplex (&cvin)[3], double (&normal)[3], cuDoubleComplex (&out)[3])
+__device__ __inline__ void snell(cuDoubleComplex (&cvin)[3], double (&normal)[3], cuDoubleComplex (&out)[3])
 {
     cuDoubleComplex cfactor;
     dot(cvin, normal, cfactor);
@@ -199,7 +199,7 @@ __device__ void snell(cuDoubleComplex (&cvin)[3], double (&normal)[3], cuDoubleC
 }
 
 // Calculate refected vector from surface using complex incoming vector and real normal vector to surface
-__device__ void snell(double (&vin)[3], double (&normal)[3], double (&out)[3])
+__device__ __inline__ void snell(double (&vin)[3], double (&normal)[3], double (&out)[3])
 {
     double factor;
     dot(vin, normal, factor);
@@ -214,7 +214,7 @@ __device__ void snell(double (&vin)[3], double (&normal)[3], double (&out)[3])
 
 // Calculate Dyadic product between two real vectors
 // Returns array of length 3, containing 3 arrays representing ROWS in the resulting matrix
-__device__ void dyad(double (&v1)[3], double (&v2)[3], double (&out)[3][3])
+__device__ __inline__ void dyad(double (&v1)[3], double (&v2)[3], double (&out)[3][3])
 {
     for(int n=0; n<3; n++)
     {
@@ -225,7 +225,7 @@ __device__ void dyad(double (&v1)[3], double (&v2)[3], double (&out)[3][3])
 }
 
 // Subtract matrix from another matrix element-wise
-__device__ void matDiff(double (&m1)[3][3], double (&m2)[3][3], double (&out)[3][3])
+__device__ __inline__ void matDiff(double (&m1)[3][3], double (&m2)[3][3], double (&out)[3][3])
 {
     for(int n=0; n<3; n++)
     {
@@ -236,7 +236,7 @@ __device__ void matDiff(double (&m1)[3][3], double (&m2)[3][3], double (&out)[3]
 }
 
 // Multiply matrix with vector to return vector
-__device__ void matVec(double (&m1)[3][3], double (&v1)[3], double (&out)[3])
+__device__ __inline__ void matVec(double (&m1)[3][3], double (&v1)[3], double (&out)[3])
 {
     for(int n=0; n<3; n++)
     {
@@ -244,7 +244,7 @@ __device__ void matVec(double (&m1)[3][3], double (&v1)[3], double (&out)[3])
     }
 }
 
-__device__ void matVec(double (&m1)[3][3], cuDoubleComplex (&cv1)[3], cuDoubleComplex (&out)[3])
+__device__ __inline__ void matVec(double (&m1)[3][3], cuDoubleComplex (&cv1)[3], cuDoubleComplex (&out)[3])
 {
     for(int n=0; n<3; n++)
     {

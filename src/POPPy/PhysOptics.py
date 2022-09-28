@@ -48,6 +48,8 @@ class PhysOptics(object):
             m_t         :   Material of target surface
             prop_mode   :   Propagate to surface (0) or to far-field (1)
             t_direction :   Reverse time by changing sign in Greens function
+            prec        :   Run simulation in single or double precision
+            device      :   Run on either CPU or GPU. For GPU, needs CUDA
         """
         
         if material_source == 'vac':
@@ -63,7 +65,7 @@ class PhysOptics(object):
         cwd = os.getcwd()
         os.chdir(self.cpp_path)
         
-        if prec == 'float':
+        if prec == 'single':
             if self.propType == 'coherent':
                 if device == 'cpu':
                     os.system('./PhysBeamf.exe {} {} {} {} {} {} {}'.format(self.numThreads, self.k, self.thres, 

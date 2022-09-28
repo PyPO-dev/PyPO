@@ -10,9 +10,9 @@ std::array<float*, 3> GDataHandlerf::cppToCUDA_3DGrid(std::string &mode)
     
     int m = data.size();
     
-    float outx[m];
-    float outy[m];
-    float outz[m];
+    float *outx = new float[m];
+    float *outy = new float[m];
+    float *outz = new float[m];
     
     for (int i=0; i<m; i++)
     {
@@ -25,6 +25,8 @@ std::array<float*, 3> GDataHandlerf::cppToCUDA_3DGrid(std::string &mode)
     out[1] = outy;
     out[2] = outz;
     
+    
+    
     return out;
 } 
 
@@ -36,8 +38,8 @@ std::array<float*, 2> GDataHandlerf::cppToCUDA_2DGrid()
     
     int m = data.size();
     
-    float outx[m];
-    float outy[m];
+    float *outx = new float[m];
+    float *outy = new float[m];
     
     for (int i=0; i<m; i++)
     {
@@ -59,15 +61,15 @@ std::array<cuFloatComplex*, 3> GDataHandlerf::cppToCUDA_Js()
     
     int m = data.size();
     
-    cuFloatComplex outx[m];
-    cuFloatComplex outy[m];
-    cuFloatComplex outz[m];
+    cuFloatComplex *outx = new cuFloatComplex[m];
+    cuFloatComplex *outy = new cuFloatComplex[m];
+    cuFloatComplex *outz = new cuFloatComplex[m];
     
     for (int i=0; i<m; i++)
     {
         outx[i] = make_cuFloatComplex(data[i][0].real(), data[i][0].imag());
-        outx[i] = make_cuFloatComplex(data[i][1].real(), data[i][1].imag());
-        outx[i] = make_cuFloatComplex(data[i][2].real(), data[i][2].imag());
+        outy[i] = make_cuFloatComplex(data[i][1].real(), data[i][1].imag());
+        outz[i] = make_cuFloatComplex(data[i][2].real(), data[i][2].imag());
     }
     
     out[0] = outx;
@@ -85,15 +87,15 @@ std::array<cuFloatComplex*, 3> GDataHandlerf::cppToCUDA_Ms()
     
     int m = data.size();
     
-    cuFloatComplex outx[m];
-    cuFloatComplex outy[m];
-    cuFloatComplex outz[m];
+    cuFloatComplex *outx = new cuFloatComplex[m];
+    cuFloatComplex *outy = new cuFloatComplex[m];
+    cuFloatComplex *outz = new cuFloatComplex[m];
     
     for (int i=0; i<m; i++)
     {
         outx[i] = make_cuFloatComplex(data[i][0].real(), data[i][0].imag());
-        outx[i] = make_cuFloatComplex(data[i][1].real(), data[i][1].imag());
-        outx[i] = make_cuFloatComplex(data[i][2].real(), data[i][2].imag());
+        outy[i] = make_cuFloatComplex(data[i][1].real(), data[i][1].imag());
+        outz[i] = make_cuFloatComplex(data[i][2].real(), data[i][2].imag());
     }
     
     out[0] = outx;
@@ -123,9 +125,9 @@ std::array<float*, 3> GDataHandlerf::cppToCUDA_3Dnormals()
     
     int m = data.size();
     
-    float outx[m];
-    float outy[m];
-    float outz[m];
+    float *outx = new float[m];
+    float *outy = new float[m];
+    float *outz = new float[m];
     
     for (int i=0; i<m; i++)
     {
@@ -142,19 +144,18 @@ std::array<float*, 3> GDataHandlerf::cppToCUDA_3Dnormals()
 } 
 
 // Convert complex CUDA grid to complex cpp grid
-std::vector<std::array<std::complex<float>, 3>> GDataHandlerf::CUDAToCpp_C(std::array<cuFloatComplex*, 3> CUDA_C)
+std::vector<std::array<std::complex<float>, 3>> GDataHandlerf::CUDAToCpp_C(std::array<cuFloatComplex*, 3> CUDA_C, int size)
 {
     std::vector<std::array<std::complex<float>, 3>> out;
-    int n = sizeof(CUDA_C[0])/sizeof(CUDA_C[0][0]);
-    
-    for (int i=0; i<n; i++)
+
+    for (int i=0; i<size; i++)
     {
         std::array<std::complex<float>, 3> arr;
 
         std::complex<float> x(cuCrealf(CUDA_C[0][i]), cuCimagf(CUDA_C[0][i]));
         std::complex<float> y(cuCrealf(CUDA_C[1][i]), cuCimagf(CUDA_C[1][i]));
         std::complex<float> z(cuCrealf(CUDA_C[2][i]), cuCimagf(CUDA_C[2][i]));
-        
+
         arr[0] = x;
         arr[1] = y;
         arr[2] = z;
@@ -165,12 +166,11 @@ std::vector<std::array<std::complex<float>, 3>> GDataHandlerf::CUDAToCpp_C(std::
 }
 
 // Convert real CUDA grid to real cpp grid
-std::vector<std::array<float, 3>> GDataHandlerf::CUDAToCpp_R(std::array<float*, 3> CUDA_R)
+std::vector<std::array<float, 3>> GDataHandlerf::CUDAToCpp_R(std::array<float*, 3> CUDA_R, int size)
 {
     std::vector<std::array<float, 3>> out;
-    int n = sizeof(CUDA_R[0])/sizeof(CUDA_R[0][0]);
     
-    for (int i=0; i<n; i++)
+    for (int i=0; i<size; i++)
     {
         std::array<float, 3> arr;
         

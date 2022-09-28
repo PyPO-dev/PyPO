@@ -29,8 +29,8 @@ public:
     std::array<cuDoubleComplex*, 3> cppToCUDA_Ms();
     void cppToCUDA_area(double *out);
     std::array<double*, 3> cppToCUDA_3Dnormals();
-    std::vector<std::array<std::complex<double>, 3>> CUDAToCpp_C(std::array<cuDoubleComplex*, 3> CUDA_C);
-    std::vector<std::array<double, 3>> CUDAToCpp_R(std::array<double*, 3> CUDA_R);
+    std::vector<std::array<std::complex<double>, 3>> CUDAToCpp_C(std::array<cuDoubleComplex*, 3> CUDA_C, int size);
+    std::vector<std::array<double, 3>> CUDAToCpp_R(std::array<double*, 3> CUDA_R, int size);
 };
 #endif 
  

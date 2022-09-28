@@ -48,6 +48,30 @@ __constant__ double eye[3][3];      // Identity matrix
 __constant__ int g_s;               // Gridsize on source
 __constant__ int g_t;               // Gridsize on target
 
+/**
+ * Wrapper for finding errors in CUDA API calls.
+ * 
+ * @param code The errorcode returned from failed API call.
+ * @param file The file in which failure occured.
+ * @param line The line in file in which error occured.
+ * @param abort Exit code upon error.
+ */
+#define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
+__host__ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
+{
+   if (code != cudaSuccess) 
+   {
+      fprintf(stderr,"GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
+      if (abort) exit(code);
+   }
+}
+
+/**
+ * Function to calculate complex exponential with
+ * CUDA type cuDoubleComplex.
+ * 
+ * @param z Complex number.
+ */
 __device__ __inline__ cuDoubleComplex my_cexp(cuDoubleComplex z)
 {
     cuDoubleComplex res;
@@ -58,7 +82,23 @@ __device__ __inline__ cuDoubleComplex my_cexp(cuDoubleComplex z)
     return res;
 }
 
-// Calculate field at target point
+/**
+ * Calculate total field at point on target.
+ * 
+ * @param d_xs C-style array containing source points x-coordinate.
+ * @param d_ys C-style array containing source points y-coordinate.
+ * @param d_zs C-style array containing source points z-coordinate.
+ * @param d_Jx C-style array containing source J x-component.
+ * @param d_Jy C-style array containing source J y-component.
+ * @param d_Jz C-style array containing source J z-component.
+ * @param d_Mx C-style array containing source M x-component.
+ * @param d_My C-style array containing source M y-component.
+ * @param d_Mz C-style array containing source M z-component.
+ * @param point C-style array of length 3 containing xyz coordinates of target point.
+ * @param d_A C-style array containing area elements.
+ * @param d_ei C-style array of length 3 to be filled with E-field at point.
+ * @param d_hi C-style array of length 3 to be filled with H-field at point.
+ */ 
 __device__ void fieldAtPoint(double *d_xs, double *d_ys, double*d_zs, 
                     cuDoubleComplex *d_Jx, cuDoubleComplex *d_Jy, cuDoubleComplex *d_Jz, 
                     cuDoubleComplex *d_Mx, cuDoubleComplex *d_My, cuDoubleComplex *d_Mz, 
@@ -135,15 +175,12 @@ __device__ void fieldAtPoint(double *d_xs, double *d_ys, double*d_zs,
         cuDoubleComplex d_Ac = make_cuDoubleComplex(d_A[i], 0.);
         
         Green = cuCmul(cuCdiv(my_cexp(cuCmul(con[6], cuCmul(con[7], cuCmul(con[0], rc)))), (cuCmul(con[9], cuCmul(con[4], rc)))), cuCmul(d_Ac, con[7]));
-        
-        //printf("%.16f, %.16f\n", rc.x, r);
-        
+
         for( int n=0; n<3; n++)
         {
             e_field[n] = cuCsub(e_field[n], cuCmul(cuCsub(cuCmul(omega, cuCmul(con[2], e_vec_thing[n])), k_out_ms[n]), Green));
             h_field[n] = cuCsub(h_field[n], cuCmul(cuCadd(cuCmul(omega, cuCmul(con[1], h_vec_thing[n])), k_out_js[n]), Green));
         }  
-        //printf("%.16g, %.16g\n", cuCreal(Green), cuCimag(Green)); // %s is format specifier
     }
 
     d_ei[0] = e_field[0];
@@ -157,9 +194,33 @@ __device__ void fieldAtPoint(double *d_xs, double *d_ys, double*d_zs,
     
 }
 
-// Propagate to next surface.
-// Kernel for toPrint == 0
-__global__ void GpropagateBeam(double *d_xs, double *d_ys, double *d_zs,
+/**
+ * Kernel for toPrint == 0: save J and M.
+ * 
+ * @param d_xs C-style array containing source points x-coordinate.
+ * @param d_ys C-style array containing source points y-coordinate.
+ * @param d_zs C-style array containing source points z-coordinate.
+ * @param d_A C-style array containing area elements.
+ * @param d_xt C-style array containing target points x-coordinate.
+ * @param d_yt C-style array containing target points y-coordinate.
+ * @param d_zt C-style array containing target points z-coordinate.
+ * @param d_nxt C-style array containing target norms x-component.
+ * @param d_nyt C-style array containing target norms y-component.
+ * @param d_nzt C-style array containing target norms z-component.
+ * @param d_Jx C-style array containing source J x-component.
+ * @param d_Jy C-style array containing source J y-component.
+ * @param d_Jz C-style array containing source J z-component.
+ * @param d_Mx C-style array containing source M x-component.
+ * @param d_My C-style array containing source M y-component.
+ * @param d_Mz C-style array containing source M z-component.
+ * @param d_Jxt C-style array to be filled with target J x-component.
+ * @param d_Jyt C-style array to be filled with target J y-component.
+ * @param d_Jzt C-style array to be filled with target J z-component.
+ * @param d_Mxt C-style array to be filled with target M x-component.
+ * @param d_Myt C-style array to be filled with target M y-component.
+ * @param d_Mzt C-style array to be filled with target M z-component.
+ */ 
+__global__ void GpropagateBeam_0(double *d_xs, double *d_ys, double *d_zs,
                                 double *d_A, double *d_xt, double *d_yt, double *d_zt,
                                 double *d_nxt, double *d_nyt, double *d_nzt,
                                 cuDoubleComplex *d_Jx, cuDoubleComplex *d_Jy, cuDoubleComplex *d_Jz,
@@ -196,34 +257,23 @@ __global__ void GpropagateBeam(double *d_xs, double *d_ys, double *d_zs,
     cuDoubleComplex d_ei[3];
     cuDoubleComplex d_hi[3];
 
-    int jc = 0; // Counter
-    
-    //for(int i=start; i<stop; i++)
     int idx = blockDim.x*blockIdx.x + threadIdx.x;
     if (idx < g_t)
     {
-        
-        
         point[0] = d_xt[idx];
         point[1] = d_yt[idx];
         point[2] = d_zt[idx];
-        
-        //printf("%.16f, %.16f, %.16f\n", point[0], point[1], point[2]);
-        
+
         norms[0] = d_nxt[idx];
         norms[1] = d_nyt[idx];
         norms[2] = d_nzt[idx];
-        
-        
-        
+
         // Calculate total incoming E and H field at point on target
         fieldAtPoint(d_xs, d_ys, d_zs, 
                     d_Jx, d_Jy, d_Jz, 
                     d_Mx, d_My, d_Mz, 
                     point, d_A, d_ei, d_hi);
-        
-        
-        
+
         // Calculate normalised incoming poynting vector.
         conja(d_ei, temp1);                        // h_conj
         ext(d_hi, temp1, temp2);                  // e_out_h
@@ -232,9 +282,7 @@ __global__ void GpropagateBeam(double *d_xs, double *d_ys, double *d_zs,
         {
             e_out_h_r[n] = cuCreal(temp2[n]);                      // e_out_h_r
         }
-            
-        //std::cout << this->Et_container.size() << std::endl;
-        
+
         normalize(e_out_h_r, S_i_norm);                       // S_i_norm                   
         
         // Calculate incoming polarization vectors
@@ -254,14 +302,10 @@ __global__ void GpropagateBeam(double *d_xs, double *d_ys, double *d_zs,
         dot(d_ei, p_r_perp, e_dot_p_r_perp);      // e_dot_p_r_perp
         dot(d_ei, p_r_parr, e_dot_p_r_parr);      // e_dot_p_r_parr
 
-        
-        
         // Calculate reflected field from reflection matrix
         for(int n=0; n<3; n++)
         {
             e_r[n] = cuCsub(cuCmul(e_dot_p_r_perp, make_cuDoubleComplex(-p_i_perp[n], 0.)), cuCmul(e_dot_p_r_parr, make_cuDoubleComplex(p_i_parr[n], 0.)));
-            
-            //this->Et_container[k][i] = e_r[k];
         }
 
         ext(S_r_norm, e_r, temp1);                       // h_r_temp
@@ -286,25 +330,363 @@ __global__ void GpropagateBeam(double *d_xs, double *d_ys, double *d_zs,
         d_Mxt[idx] = temp3[0];
         d_Myt[idx] = temp3[1];
         d_Mzt[idx] = temp3[2];
-        /*
-        if((i * 100 / this->step) > jc and start == 0 * this->step)
+    }
+}
+
+/**
+ * Kernel for toPrint == 1: save Ei and Hi.
+ * 
+ * @param d_xs C-style array containing source points x-coordinate.
+ * @param d_ys C-style array containing source points y-coordinate.
+ * @param d_zs C-style array containing source points z-coordinate.
+ * @param d_A C-style array containing area elements.
+ * @param d_xt C-style array containing target points x-coordinate.
+ * @param d_yt C-style array containing target points y-coordinate.
+ * @param d_zt C-style array containing target points z-coordinate.
+ * @param d_Jx C-style array containing source J x-component.
+ * @param d_Jy C-style array containing source J y-component.
+ * @param d_Jz C-style array containing source J z-component.
+ * @param d_Mx C-style array containing source M x-component.
+ * @param d_My C-style array containing source M y-component.
+ * @param d_Mz C-style array containing source M z-component.
+ * @param d_Ext C-style array to be filled with target Ei x-component.
+ * @param d_Eyt C-style array to be filled with target Ei y-component.
+ * @param d_Ezt C-style array to be filled with target Ei z-component.
+ * @param d_Hxt C-style array to be filled with target Hi x-component.
+ * @param d_Hyt C-style array to be filled with target Hi y-component.
+ * @param d_Hzt C-style array to be filled with target Hi z-component.
+ */ 
+__global__ void GpropagateBeam_1(double *d_xs, double *d_ys, double *d_zs,
+                                double *d_A, double *d_xt, double *d_yt, double *d_zt,
+                                cuDoubleComplex *d_Jx, cuDoubleComplex *d_Jy, cuDoubleComplex *d_Jz,
+                                cuDoubleComplex *d_Mx, cuDoubleComplex *d_My, cuDoubleComplex *d_Mz,
+                                cuDoubleComplex *d_Ext, cuDoubleComplex *d_Eyt, cuDoubleComplex *d_Ezt,
+                                cuDoubleComplex *d_Hxt, cuDoubleComplex *d_Hyt, cuDoubleComplex *d_Hzt)
+{
+    // Arrays of doubles
+    double point[3];            // Point on target
+    
+    // Return containers for call to fieldAtPoint
+    cuDoubleComplex d_ei[3];
+    cuDoubleComplex d_hi[3];
+
+    int idx = blockDim.x*blockIdx.x + threadIdx.x;
+    if (idx < g_t)
+    {
+        point[0] = d_xt[idx];
+        point[1] = d_yt[idx];
+        point[2] = d_zt[idx];
+
+        // Calculate total incoming E and H field at point on target
+        fieldAtPoint(d_xs, d_ys, d_zs, 
+                    d_Jx, d_Jy, d_Jz, 
+                    d_Mx, d_My, d_Mz, 
+                    point, d_A, d_ei, d_hi);
+        
+        d_Ext[idx] = d_ei[0];
+        d_Eyt[idx] = d_ei[1];
+        d_Ezt[idx] = d_ei[2];
+
+        d_Hxt[idx] = d_hi[0];
+        d_Hyt[idx] = d_hi[1];
+        d_Hzt[idx] = d_hi[2];
+    }
+}
+
+/**
+ * Kernel for toPrint == 2: save J, M, Ei and Hi.
+ * 
+ * @param d_xs C-style array containing source points x-coordinate.
+ * @param d_ys C-style array containing source points y-coordinate.
+ * @param d_zs C-style array containing source points z-coordinate.
+ * @param d_A C-style array containing area elements.
+ * @param d_xt C-style array containing target points x-coordinate.
+ * @param d_yt C-style array containing target points y-coordinate.
+ * @param d_zt C-style array containing target points z-coordinate.
+ * @param d_nxt C-style array containing target norms x-component.
+ * @param d_nyt C-style array containing target norms y-component.
+ * @param d_nzt C-style array containing target norms z-component.
+ * @param d_Jx C-style array containing source J x-component.
+ * @param d_Jy C-style array containing source J y-component.
+ * @param d_Jz C-style array containing source J z-component.
+ * @param d_Mx C-style array containing source M x-component.
+ * @param d_My C-style array containing source M y-component.
+ * @param d_Mz C-style array containing source M z-component.
+ * @param d_Jxt C-style array to be filled with target J x-component.
+ * @param d_Jyt C-style array to be filled with target J y-component.
+ * @param d_Jzt C-style array to be filled with target J z-component.
+ * @param d_Mxt C-style array to be filled with target M x-component.
+ * @param d_Myt C-style array to be filled with target M y-component.
+ * @param d_Mzt C-style array to be filled with target M z-component.
+ * @param d_Ext C-style array to be filled with target Ei x-component.
+ * @param d_Eyt C-style array to be filled with target Ei y-component.
+ * @param d_Ezt C-style array to be filled with target Ei z-component.
+ * @param d_Hxt C-style array to be filled with target Hi x-component.
+ * @param d_Hyt C-style array to be filled with target Hi y-component.
+ * @param d_Hzt C-style array to be filled with target Hi z-component.
+ */ 
+__global__ void GpropagateBeam_2(double *d_xs, double *d_ys, double *d_zs,
+                                double *d_A, double *d_xt, double *d_yt, double *d_zt,
+                                double *d_nxt, double *d_nyt, double *d_nzt,
+                                cuDoubleComplex *d_Jx, cuDoubleComplex *d_Jy, cuDoubleComplex *d_Jz,
+                                cuDoubleComplex *d_Mx, cuDoubleComplex *d_My, cuDoubleComplex *d_Mz,
+                                cuDoubleComplex *d_Jxt, cuDoubleComplex *d_Jyt, cuDoubleComplex *d_Jzt,
+                                cuDoubleComplex *d_Mxt, cuDoubleComplex *d_Myt, cuDoubleComplex *d_Mzt,
+                                cuDoubleComplex *d_Ext, cuDoubleComplex *d_Eyt, cuDoubleComplex *d_Ezt,
+                                cuDoubleComplex *d_Hxt, cuDoubleComplex *d_Hyt, cuDoubleComplex *d_Hzt)
+{
+    
+    // Scalars (double & complex double)
+    cuDoubleComplex e_dot_p_r_perp;    // E-field - perpendicular reflected POI polarization vector dot product
+    cuDoubleComplex e_dot_p_r_parr;    // E-field - parallel reflected POI polarization vector dot product
+    
+    // Arrays of doubles
+    double S_i_norm[3];         // Normalized incoming Poynting vector
+    double p_i_perp[3];         // Perpendicular incoming POI polarization vector 
+    double p_i_parr[3];         // Parallel incoming POI polarization vector 
+    double S_r_norm[3];         // Normalized reflected Poynting vector
+    double p_r_perp[3];         // Perpendicular reflected POI polarization vector 
+    double p_r_parr[3];         // Parallel reflected POI polarization vector 
+    double S_out_n[3];          // Container for Poynting-normal ext products
+    double point[3];            // Point on target
+    double norms[3];            // Normal vector at point
+    double e_out_h_r[3];        // Real part of E-field - H-field ext product
+
+    // Arrays of complex doubles
+    cuDoubleComplex e_r[3];            // Reflected E-field
+    cuDoubleComplex h_r[3];            // Reflected H-field
+    cuDoubleComplex n_out_e_i_r[3];    // Electric current
+    cuDoubleComplex temp1[3];          // Temporary container 1 for intermediate irrelevant values
+    cuDoubleComplex temp2[3];          // Temporary container 2
+    cuDoubleComplex temp3[3];          // Temporary container 3
+    
+    // Return containers
+    cuDoubleComplex d_ei[3];
+    cuDoubleComplex d_hi[3];
+
+    int idx = blockDim.x*blockIdx.x + threadIdx.x;
+    if (idx < g_t)
+    {
+        point[0] = d_xt[idx];
+        point[1] = d_yt[idx];
+        point[2] = d_zt[idx];
+
+        norms[0] = d_nxt[idx];
+        norms[1] = d_nyt[idx];
+        norms[2] = d_nzt[idx];
+
+        // Calculate total incoming E and H field at point on target
+        fieldAtPoint(d_xs, d_ys, d_zs, 
+                    d_Jx, d_Jy, d_Jz, 
+                    d_Mx, d_My, d_Mz, 
+                    point, d_A, d_ei, d_hi);
+        
+        d_Ext[idx] = d_ei[0];
+        d_Eyt[idx] = d_ei[1];
+        d_Ezt[idx] = d_ei[2];
+
+        d_Hxt[idx] = d_hi[0];
+        d_Hyt[idx] = d_hi[1];
+        d_Hzt[idx] = d_hi[2];
+
+        // Calculate normalised incoming poynting vector.
+        conja(d_ei, temp1);                        // h_conj
+        ext(d_hi, temp1, temp2);                  // e_out_h
+        
+        for (int n=0; n<3; n++) 
         {
-            std::cout << jc << " / 100" << '\r';
-            std::cout.flush();
-            jc++;
+            e_out_h_r[n] = cuCreal(temp2[n]);                      // e_out_h_r
         }
-        */
-        if (idx == 1000)
+
+        normalize(e_out_h_r, S_i_norm);                       // S_i_norm                   
+        
+        // Calculate incoming polarization vectors
+        ext(S_i_norm, norms, S_out_n);                      // S_i_out_n
+        normalize(S_out_n, p_i_perp);                       // p_i_perp                   
+        ext(p_i_perp, S_i_norm, p_i_parr);               // p_i_parr                     
+        
+        // Now calculate reflected poynting vector.
+        snell(S_i_norm, norms, S_r_norm);                // S_r_norm     
+
+        // Calculate normalised reflected polarization vectors
+        ext(S_r_norm, norms, S_out_n);                      // S_r_out_n
+        normalize(S_out_n, p_r_perp);                       // p_r_perp                   
+        ext(S_r_norm, p_r_perp, p_r_parr);               // p_r_parr                     
+        
+        // Now, calculate reflected field from target
+        dot(d_ei, p_r_perp, e_dot_p_r_perp);      // e_dot_p_r_perp
+        dot(d_ei, p_r_parr, e_dot_p_r_parr);      // e_dot_p_r_parr
+
+        // Calculate reflected field from reflection matrix
+        for(int n=0; n<3; n++)
         {
-            printf("%.16f", d_Myt[idx].x);
+            e_r[n] = cuCsub(cuCmul(e_dot_p_r_perp, make_cuDoubleComplex(-p_i_perp[n], 0.)), cuCmul(e_dot_p_r_parr, make_cuDoubleComplex(p_i_parr[n], 0.)));
         }
+
+        ext(S_r_norm, e_r, temp1);                       // h_r_temp
+        s_mult(temp1, con[3], h_r);                     // ZETA_0_INV, h_r   
+
+        //Calculate and store J and M only
+        for(int n=0; n<3; n++)
+        {
+            temp1[n] = cuCadd(e_r[n], d_ei[n]); // e_i_r
+            temp2[n] = cuCadd(h_r[n], d_hi[n]); // h_i_r
+        } 
+            
+        ext(norms, temp2, temp3);
+        
+        d_Jxt[idx] = temp3[0];
+        d_Jyt[idx] = temp3[1];
+        d_Jzt[idx] = temp3[2];
+        
+        ext(norms, temp1, n_out_e_i_r);
+        s_mult(n_out_e_i_r, -1., temp3);
+        
+        d_Mxt[idx] = temp3[0];
+        d_Myt[idx] = temp3[1];
+        d_Mzt[idx] = temp3[2];
+    }
+}
+
+/**
+ * Kernel for toPrint == 3: save Pr, Er and Hr.
+ * 
+ * @param d_xs C-style array containing source points x-coordinate.
+ * @param d_ys C-style array containing source points y-coordinate.
+ * @param d_zs C-style array containing source points z-coordinate.
+ * @param d_A C-style array containing area elements.
+ * @param d_xt C-style array containing target points x-coordinate.
+ * @param d_yt C-style array containing target points y-coordinate.
+ * @param d_zt C-style array containing target points z-coordinate.
+ * @param d_nxt C-style array containing target norms x-component.
+ * @param d_nyt C-style array containing target norms y-component.
+ * @param d_nzt C-style array containing target norms z-component.
+ * @param d_Jx C-style array containing source J x-component.
+ * @param d_Jy C-style array containing source J y-component.
+ * @param d_Jz C-style array containing source J z-component.
+ * @param d_Mx C-style array containing source M x-component.
+ * @param d_My C-style array containing source M y-component.
+ * @param d_Mz C-style array containing source M z-component.
+ * @param d_Prxt C-style array to be filled with Pr x-component.
+ * @param d_Pryt C-style array to be filled with Pr y-component.
+ * @param d_Przt C-style array to be filled with Pr z-component.
+ * @param d_Ext C-style array to be filled with target Er x-component.
+ * @param d_Eyt C-style array to be filled with target Er y-component.
+ * @param d_Ezt C-style array to be filled with target Er z-component.
+ * @param d_Hxt C-style array to be filled with target Hr x-component.
+ * @param d_Hyt C-style array to be filled with target Hr y-component.
+ * @param d_Hzt C-style array to be filled with target Hr z-component.
+ */ 
+__global__ void GpropagateBeam_3(double *d_xs, double *d_ys, double *d_zs,
+                                double *d_A, double *d_xt, double *d_yt, double *d_zt,
+                                double *d_nxt, double *d_nyt, double *d_nzt,
+                                cuDoubleComplex *d_Jx, cuDoubleComplex *d_Jy, cuDoubleComplex *d_Jz,
+                                cuDoubleComplex *d_Mx, cuDoubleComplex *d_My, cuDoubleComplex *d_Mz,
+                                double *d_Prxt, double *d_Pryt, double *d_Przt,
+                                cuDoubleComplex *d_Ext, cuDoubleComplex *d_Eyt, cuDoubleComplex *d_Ezt,
+                                cuDoubleComplex *d_Hxt, cuDoubleComplex *d_Hyt, cuDoubleComplex *d_Hzt)
+{
+    
+    // Scalars (double & complex double)
+    cuDoubleComplex e_dot_p_r_perp;    // E-field - perpendicular reflected POI polarization vector dot product
+    cuDoubleComplex e_dot_p_r_parr;    // E-field - parallel reflected POI polarization vector dot product
+    
+    // Arrays of doubles
+    double S_i_norm[3];         // Normalized incoming Poynting vector
+    double p_i_perp[3];         // Perpendicular incoming POI polarization vector 
+    double p_i_parr[3];         // Parallel incoming POI polarization vector 
+    double S_r_norm[3];         // Normalized reflected Poynting vector
+    double p_r_perp[3];         // Perpendicular reflected POI polarization vector 
+    double p_r_parr[3];         // Parallel reflected POI polarization vector 
+    double S_out_n[3];          // Container for Poynting-normal ext products
+    double point[3];            // Point on target
+    double norms[3];            // Normal vector at point
+    double e_out_h_r[3];        // Real part of E-field - H-field ext product
+
+    // Arrays of complex doubles
+    cuDoubleComplex e_r[3];            // Reflected E-field
+    cuDoubleComplex h_r[3];            // Reflected H-field
+    cuDoubleComplex temp1[3];          // Temporary container 1 for intermediate irrelevant values
+    cuDoubleComplex temp2[3];          // Temporary container 2
+    
+    // Return containers
+    cuDoubleComplex d_ei[3];
+    cuDoubleComplex d_hi[3];
+
+    int idx = blockDim.x*blockIdx.x + threadIdx.x;
+    if (idx < g_t)
+    {
+        point[0] = d_xt[idx];
+        point[1] = d_yt[idx];
+        point[2] = d_zt[idx];
+
+        norms[0] = d_nxt[idx];
+        norms[1] = d_nyt[idx];
+        norms[2] = d_nzt[idx];
+
+        // Calculate total incoming E and H field at point on target
+        fieldAtPoint(d_xs, d_ys, d_zs, 
+                    d_Jx, d_Jy, d_Jz, 
+                    d_Mx, d_My, d_Mz, 
+                    point, d_A, d_ei, d_hi);
+
+        // Calculate normalised incoming poynting vector.
+        conja(d_ei, temp1);                        // h_conj
+        ext(d_hi, temp1, temp2);                  // e_out_h
+        
+        for (int n=0; n<3; n++) 
+        {
+            e_out_h_r[n] = cuCreal(temp2[n]);                      // e_out_h_r
+        }
+
+        normalize(e_out_h_r, S_i_norm);                       // S_i_norm                   
+        
+        // Calculate incoming polarization vectors
+        ext(S_i_norm, norms, S_out_n);                      // S_i_out_n
+        normalize(S_out_n, p_i_perp);                       // p_i_perp                   
+        ext(p_i_perp, S_i_norm, p_i_parr);               // p_i_parr                     
+        
+        // Now calculate reflected poynting vector.
+        snell(S_i_norm, norms, S_r_norm);                // S_r_norm   
+        
+        // Store REFLECTED Pynting vectors
+        d_Prxt[idx] = S_r_norm[0];
+        d_Pryt[idx] = S_r_norm[1];
+        d_Przt[idx] = S_r_norm[2];
+
+        // Calculate normalised reflected polarization vectors
+        ext(S_r_norm, norms, S_out_n);                      // S_r_out_n
+        normalize(S_out_n, p_r_perp);                       // p_r_perp                   
+        ext(S_r_norm, p_r_perp, p_r_parr);               // p_r_parr                     
+        
+        // Now, calculate reflected field from target
+        dot(d_ei, p_r_perp, e_dot_p_r_perp);      // e_dot_p_r_perp
+        dot(d_ei, p_r_parr, e_dot_p_r_parr);      // e_dot_p_r_parr
+
+        // Calculate reflected field from reflection matrix
+        for(int n=0; n<3; n++)
+        {
+            e_r[n] = cuCsub(cuCmul(e_dot_p_r_perp, make_cuDoubleComplex(-p_i_perp[n], 0.)), cuCmul(e_dot_p_r_parr, make_cuDoubleComplex(p_i_parr[n], 0.)));
+        }
+
+        ext(S_r_norm, e_r, temp1);                       // h_r_temp
+        s_mult(temp1, con[3], h_r);                     // ZETA_0_INV, h_r   
+        
+        // Store REFLECTED fields
+        d_Ext[idx] = e_r[0];
+        d_Eyt[idx] = e_r[1];
+        d_Ezt[idx] = e_r[2];
+
+        d_Hxt[idx] = h_r[0];
+        d_Hyt[idx] = h_r[1];
+        d_Hzt[idx] = h_r[2];
     }
 }
 
 int main(int argc, char *argv [])
 {
     int numThreads  = atoi(argv[1]); // Number of GPU threads per block
-    int numBlocks   = atoi(argv[2]); // Threshold in dB for propagation performance
+    int numBlocks   = atoi(argv[2]); // Number of execution blocks
     double k        = atof(argv[3]); // Wavenumber of field to be propagated
     int toPrint     = atoi(argv[4]); // 0 for printing J and M, 1 for E and H and 2 for all fields
     
@@ -321,7 +703,7 @@ int main(int argc, char *argv [])
     // Calculate permittivity of target
     double EPS = EPS_VAC * epsilon;
     
-    // Fill ID
+    // Fill ID matrix
     double _eye[3][3];
     _eye[0][0] = 1.;
     _eye[1][1] = 1.;
@@ -334,7 +716,7 @@ int main(int argc, char *argv [])
     _eye[2][0] = 0.;
     _eye[2][1] = 0.;
     
-    // Allocate constant memory on Device
+    // Pack constant array
     cuDoubleComplex _con[CSIZE] = {make_cuDoubleComplex(k, 0.), 
                                     make_cuDoubleComplex(EPS, 0.), 
                                     make_cuDoubleComplex(MU_0, 0.), 
@@ -346,16 +728,12 @@ int main(int argc, char *argv [])
                                     make_cuDoubleComplex(0., 0.),
                                     make_cuDoubleComplex(4., 0.)};
 
-    // Copy to constant memory
+    // Copy constant array to Device constant memory
     cudaMemcpyToSymbol(con, &_con, CSIZE * sizeof(cuDoubleComplex));
     cudaMemcpyToSymbol(eye, &_eye, sizeof(_eye));
     cudaMemcpyToSymbol(g_s, &gridsize_s, sizeof(int));
     cudaMemcpyToSymbol(g_t, &gridsize_t, sizeof(int));
 
-    // Initialize timer to assess performance
-    std::chrono::steady_clock::time_point begin;
-    std::chrono::steady_clock::time_point end; 
-    
     std::string source = "s"; 
     std::string target = "t"; 
     
@@ -363,6 +741,7 @@ int main(int argc, char *argv [])
     
     double source_area[gridsize_s];
     
+    // Obtain source area elements
     ghandler.cppToCUDA_area(source_area);
     
     std::array<double*, 3> grid_source = ghandler.cppToCUDA_3DGrid(source);
@@ -370,29 +749,28 @@ int main(int argc, char *argv [])
     std::array<double*, 2> grid_target2D;
     std::array<double*, 3> norm_target;
     
-    // Allocate source grid and area on GPU
+    // Allocate source grid and area on Device
     double *d_xs; cudaMalloc( (void**)&d_xs, gridsize_s * sizeof(double) );
     double *d_ys; cudaMalloc( (void**)&d_ys, gridsize_s * sizeof(double) );
     double *d_zs; cudaMalloc( (void**)&d_zs, gridsize_s * sizeof(double) );
     double *d_A; cudaMalloc( (void**)&d_A, gridsize_s * sizeof(double) );
     
-    // Copy data to Device
+    // Copy data from Host to Device
     cudaMemcpy(d_xs, grid_source[0], gridsize_s * sizeof(double), cudaMemcpyHostToDevice);
     cudaMemcpy(d_ys, grid_source[1], gridsize_s * sizeof(double), cudaMemcpyHostToDevice);
     cudaMemcpy(d_zs, grid_source[2], gridsize_s * sizeof(double), cudaMemcpyHostToDevice);
     cudaMemcpy(d_A, source_area, gridsize_s * sizeof(double), cudaMemcpyHostToDevice);
     
-    
-    
-    
+    // Declare pointers to Device arrays. No return for kernel calls
     double *d_xt; double *d_yt; double *d_zt; double *d_nxt; double *d_nyt; double *d_nzt;
     
     if (prop_mode == 0)
     {
+        // Convert .txt files to CUDA arrays
         grid_target3D = ghandler.cppToCUDA_3DGrid(target);
         norm_target = ghandler.cppToCUDA_3Dnormals();
         
-        // Allocate memory for grids
+        // Allocate memory on Device for 3D grids and normals
         cudaMalloc( (void**)&d_xt, gridsize_t * sizeof(double) );
         cudaMalloc( (void**)&d_yt, gridsize_t * sizeof(double) );
         cudaMalloc( (void**)&d_zt, gridsize_t * sizeof(double) );
@@ -401,7 +779,7 @@ int main(int argc, char *argv [])
         cudaMalloc( (void**)&d_nyt, gridsize_t * sizeof(double) );
         cudaMalloc( (void**)&d_nzt, gridsize_t * sizeof(double) );
         
-        // Copy to GPU from Host
+        // Copy grids and normals from Host to Device
         cudaMemcpy(d_xt, grid_target3D[0], gridsize_t * sizeof(double), cudaMemcpyHostToDevice);
         cudaMemcpy(d_yt, grid_target3D[1], gridsize_t * sizeof(double), cudaMemcpyHostToDevice);
         cudaMemcpy(d_zt, grid_target3D[2], gridsize_t * sizeof(double), cudaMemcpyHostToDevice);
@@ -413,25 +791,23 @@ int main(int argc, char *argv [])
     
     else if (prop_mode == 1)
     {
+        // Convert .txt files to CUDA arrays
         grid_target2D = ghandler.cppToCUDA_2DGrid();
         
-        // Allocate memory for grids
+        // Allocate memory on Device for 2D grids
         cudaMalloc( (void**)&d_xt, gridsize_t * sizeof(double) );
         cudaMalloc( (void**)&d_yt, gridsize_t * sizeof(double) );
         
         // Copy to GPU from Host
-        cudaMemcpy(d_xt, grid_target3D[0], gridsize_t * sizeof(double), cudaMemcpyHostToDevice);
-        cudaMemcpy(d_yt, grid_target3D[1], gridsize_t * sizeof(double), cudaMemcpyHostToDevice);
+        cudaMemcpy(d_xt, grid_target2D[0], gridsize_t * sizeof(double), cudaMemcpyHostToDevice);
+        cudaMemcpy(d_yt, grid_target2D[1], gridsize_t * sizeof(double), cudaMemcpyHostToDevice);
     }
-
+    
+    // Read source currents from .txt and convert to CUDA array
     std::array<cuDoubleComplex*, 3> Js = ghandler.cppToCUDA_Js();
     std::array<cuDoubleComplex*, 3> Ms = ghandler.cppToCUDA_Ms();
-    
 
-    std::cout << Ms[1][0].x << std::endl;
-
-    
-    // Allocate memory on GPU for currents
+    // Allocate memory on Device for source currents
     cuDoubleComplex *d_Jx; cudaMalloc( (void**)&d_Jx, gridsize_s * sizeof(cuDoubleComplex) );
     cuDoubleComplex *d_Jy; cudaMalloc( (void**)&d_Jy, gridsize_s * sizeof(cuDoubleComplex) );
     cuDoubleComplex *d_Jz; cudaMalloc( (void**)&d_Jz, gridsize_s * sizeof(cuDoubleComplex) );
@@ -440,7 +816,7 @@ int main(int argc, char *argv [])
     cuDoubleComplex *d_My; cudaMalloc( (void**)&d_My, gridsize_s * sizeof(cuDoubleComplex) );
     cuDoubleComplex *d_Mz; cudaMalloc( (void**)&d_Mz, gridsize_s * sizeof(cuDoubleComplex) );
     
-    // Copy currents from Host to GPU
+    // Copy source currents from Host to Device
     cudaMemcpy(d_Jx, Js[0], gridsize_s * sizeof(cuDoubleComplex), cudaMemcpyHostToDevice);
     cudaMemcpy(d_Jy, Js[1], gridsize_s * sizeof(cuDoubleComplex), cudaMemcpyHostToDevice);
     cudaMemcpy(d_Jz, Js[2], gridsize_s * sizeof(cuDoubleComplex), cudaMemcpyHostToDevice);
@@ -450,10 +826,11 @@ int main(int argc, char *argv [])
     cudaMemcpy(d_Mz, Ms[2], gridsize_s * sizeof(cuDoubleComplex), cudaMemcpyHostToDevice);
     
     
-    // Create Device arrays for storing the data.
+    // Create Device arrays for storing the data and call the kernel
     // Which kernel is called is determined by toPrint
     if (toPrint == 0)
     {
+        // Allocate memory for J and M arrays on Device
         cuDoubleComplex *d_Jxt; cudaMalloc( (void**)&d_Jxt, gridsize_t * sizeof(cuDoubleComplex) );
         cuDoubleComplex *d_Jyt; cudaMalloc( (void**)&d_Jyt, gridsize_t * sizeof(cuDoubleComplex) );
         cuDoubleComplex *d_Jzt; cudaMalloc( (void**)&d_Jzt, gridsize_t * sizeof(cuDoubleComplex) );
@@ -462,10 +839,8 @@ int main(int argc, char *argv [])
         cuDoubleComplex *d_Myt; cudaMalloc( (void**)&d_Myt, gridsize_t * sizeof(cuDoubleComplex) );
         cuDoubleComplex *d_Mzt; cudaMalloc( (void**)&d_Mzt, gridsize_t * sizeof(cuDoubleComplex) );
 
-        std::cout << numBlocks << std::endl;
-
-        // Call to KERNEL 1
-        GpropagateBeam<<<nrb, nrt>>>(d_xs, d_ys, d_zs, 
+        // Call to KERNEL 0
+        GpropagateBeam_0<<<nrb, nrt>>>(d_xs, d_ys, d_zs, 
                                    d_A, d_xt, d_yt, d_zt,
                                    d_nxt, d_nyt, d_nzt,
                                    d_Jx, d_Jy, d_Jz,
@@ -473,23 +848,17 @@ int main(int argc, char *argv [])
                                    d_Jxt, d_Jyt, d_Jzt,
                                    d_Mxt, d_Myt, d_Mzt);
         cudaDeviceSynchronize();
-        cudaDeviceReset();
         
+        // Allocate, on stackframe, Host arrays for J and M
+        cuDoubleComplex h_Jxt[gridsize_t];
+        cuDoubleComplex h_Jyt[gridsize_t];
+        cuDoubleComplex h_Jzt[gridsize_t];
         
-        // Pack CUDA arrays into cpp array for processing
-        std::array<cuDoubleComplex*, 3> CJ;
-        std::array<cuDoubleComplex*, 3> CM;
+        cuDoubleComplex h_Mxt[gridsize_t];
+        cuDoubleComplex h_Myt[gridsize_t];
+        cuDoubleComplex h_Mzt[gridsize_t];
         
-        cuDoubleComplex *h_Jxt = new cuDoubleComplex[gridsize_t];
-        cuDoubleComplex *h_Jyt = new cuDoubleComplex[gridsize_t];
-        cuDoubleComplex *h_Jzt = new cuDoubleComplex[gridsize_t];
-        
-        cuDoubleComplex *h_Mxt = new cuDoubleComplex[gridsize_t];
-        cuDoubleComplex *h_Myt = new cuDoubleComplex[gridsize_t];
-        cuDoubleComplex *h_Mzt = new cuDoubleComplex[gridsize_t];
-        
-        
-        
+        // Copy content of Device J,M arrays into Host J,M arrays
         cudaMemcpy(h_Jxt, d_Jxt, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
         cudaMemcpy(h_Jyt, d_Jyt, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
         cudaMemcpy(h_Jzt, d_Jzt, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
@@ -498,8 +867,14 @@ int main(int argc, char *argv [])
         cudaMemcpy(h_Myt, d_Myt, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
         cudaMemcpy(h_Mzt, d_Mzt, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
         
-        int size_arr = sizeof(h_Jxt);
+        // Free Device memory
+        cudaDeviceReset();
         
+        // Pack CUDA arrays into cpp array for processing
+        std::array<cuDoubleComplex*, 3> CJ;
+        std::array<cuDoubleComplex*, 3> CM;
+        
+        // Fill the C++ std::array with C-style arrays
         CJ[0] = h_Jxt;
         CJ[1] = h_Jyt;
         CJ[2] = h_Jzt;
@@ -508,74 +883,284 @@ int main(int argc, char *argv [])
         CM[1] = h_Myt;
         CM[2] = h_Mzt;
         
-        
-        std::cout << h_Myt[0].x << std::endl;
-        
-        
+        // Convert the CUDA style arrays to format compatible with CPU functions
+        std::vector<std::array<std::complex<double>, 3>> Jt = ghandler.CUDAToCpp_C(CJ, gridsize_t);
+        std::vector<std::array<std::complex<double>, 3>> Mt = ghandler.CUDAToCpp_C(CM, gridsize_t);
 
-        std::vector<std::array<std::complex<double>, 3>> Jt = ghandler.CUDAToCpp_C(CJ);
-        std::vector<std::array<std::complex<double>, 3>> Mt = ghandler.CUDAToCpp_C(CM);
-    
         std::string Jt_file = "Jt";
         std::string Mt_file = "Mt";
         
+        // Write using standard CPU DataHandler object
         ghandler.dh.writeOutC(Jt, Jt_file);
         ghandler.dh.writeOutC(Mt, Mt_file);
-        
-        
     }
-    /*
+
     else if (toPrint == 1)
     {
-        std::vector<std::array<std::complex<double>, 3>> Et = prop.Et_container;
-        std::vector<std::array<std::complex<double>, 3>> Ht = prop.Ht_container;
-    
+        // Allocate memory for E and H arrays on Device
+        cuDoubleComplex *d_Ext; cudaMalloc( (void**)&d_Ext, gridsize_t * sizeof(cuDoubleComplex) );
+        cuDoubleComplex *d_Eyt; cudaMalloc( (void**)&d_Eyt, gridsize_t * sizeof(cuDoubleComplex) );
+        cuDoubleComplex *d_Ezt; cudaMalloc( (void**)&d_Ezt, gridsize_t * sizeof(cuDoubleComplex) );
+        
+        cuDoubleComplex *d_Hxt; cudaMalloc( (void**)&d_Hxt, gridsize_t * sizeof(cuDoubleComplex) );
+        cuDoubleComplex *d_Hyt; cudaMalloc( (void**)&d_Hyt, gridsize_t * sizeof(cuDoubleComplex) );
+        cuDoubleComplex *d_Hzt; cudaMalloc( (void**)&d_Hzt, gridsize_t * sizeof(cuDoubleComplex) );
+        
+        // Call to KERNEL 1
+        GpropagateBeam_1<<<nrb, nrt>>>(d_xs, d_ys, d_zs, 
+                                   d_A, d_xt, d_yt, d_zt,
+                                   d_Jx, d_Jy, d_Jz,
+                                   d_Mx, d_My, d_Mz,
+                                   d_Ext, d_Eyt, d_Ezt,
+                                   d_Hxt, d_Hyt, d_Hzt);
+        cudaDeviceSynchronize();
+        
+        // Allocate, on stackframe, Host arrays for E and H
+        cuDoubleComplex h_Ext[gridsize_t];
+        cuDoubleComplex h_Eyt[gridsize_t];
+        cuDoubleComplex h_Ezt[gridsize_t];
+        
+        cuDoubleComplex h_Hxt[gridsize_t];
+        cuDoubleComplex h_Hyt[gridsize_t];
+        cuDoubleComplex h_Hzt[gridsize_t];
+        
+        // Copy content of Device E,H arrays into Host E,H arrays
+        cudaMemcpy(h_Ext, d_Ext, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
+        cudaMemcpy(h_Eyt, d_Eyt, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
+        cudaMemcpy(h_Ezt, d_Ezt, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
+        
+        cudaMemcpy(h_Hxt, d_Hxt, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
+        cudaMemcpy(h_Hyt, d_Hyt, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
+        cudaMemcpy(h_Hzt, d_Hzt, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
+        
+        // Free Device memory
+        cudaDeviceReset();
+        
+        // Pack CUDA arrays into cpp array for processing
+        std::array<cuDoubleComplex*, 3> CE;
+        std::array<cuDoubleComplex*, 3> CH;
+        
+        // Fill the C++ std::array with C-style arrays
+        CE[0] = h_Ext;
+        CE[1] = h_Eyt;
+        CE[2] = h_Ezt;
+        
+        CH[0] = h_Hxt;
+        CH[1] = h_Hyt;
+        CH[2] = h_Hzt;
+        
+        // Convert the CUDA style arrays to format compatible with CPU functions
+        std::vector<std::array<std::complex<double>, 3>> Et = ghandler.CUDAToCpp_C(CE, gridsize_t);
+        std::vector<std::array<std::complex<double>, 3>> Ht = ghandler.CUDAToCpp_C(CH, gridsize_t);
+
         std::string Et_file = "Et";
         std::string Ht_file = "Ht";
-        handler.writeOutC(Et, Et_file);
-        handler.writeOutC(Ht, Ht_file);
+        
+        // Write using standard CPU DataHandler object
+        ghandler.dh.writeOutC(Et, Et_file);
+        ghandler.dh.writeOutC(Ht, Ht_file);
     }
     
     else if (toPrint == 2)
     {
-        std::vector<std::array<std::complex<double>, 3>> Jt = prop.Jt_container;
-        std::vector<std::array<std::complex<double>, 3>> Mt = prop.Mt_container;
-    
+        // Allocate memory for J, M, E and H arrays on Device
+        cuDoubleComplex *d_Jxt; cudaMalloc( (void**)&d_Jxt, gridsize_t * sizeof(cuDoubleComplex) );
+        cuDoubleComplex *d_Jyt; cudaMalloc( (void**)&d_Jyt, gridsize_t * sizeof(cuDoubleComplex) );
+        cuDoubleComplex *d_Jzt; cudaMalloc( (void**)&d_Jzt, gridsize_t * sizeof(cuDoubleComplex) );
+        
+        cuDoubleComplex *d_Mxt; cudaMalloc( (void**)&d_Mxt, gridsize_t * sizeof(cuDoubleComplex) );
+        cuDoubleComplex *d_Myt; cudaMalloc( (void**)&d_Myt, gridsize_t * sizeof(cuDoubleComplex) );
+        cuDoubleComplex *d_Mzt; cudaMalloc( (void**)&d_Mzt, gridsize_t * sizeof(cuDoubleComplex) );
+        
+        cuDoubleComplex *d_Ext; cudaMalloc( (void**)&d_Ext, gridsize_t * sizeof(cuDoubleComplex) );
+        cuDoubleComplex *d_Eyt; cudaMalloc( (void**)&d_Eyt, gridsize_t * sizeof(cuDoubleComplex) );
+        cuDoubleComplex *d_Ezt; cudaMalloc( (void**)&d_Ezt, gridsize_t * sizeof(cuDoubleComplex) );
+        
+        cuDoubleComplex *d_Hxt; cudaMalloc( (void**)&d_Hxt, gridsize_t * sizeof(cuDoubleComplex) );
+        cuDoubleComplex *d_Hyt; cudaMalloc( (void**)&d_Hyt, gridsize_t * sizeof(cuDoubleComplex) );
+        cuDoubleComplex *d_Hzt; cudaMalloc( (void**)&d_Hzt, gridsize_t * sizeof(cuDoubleComplex) );
+        
+        // Call to KERNEL 2
+        GpropagateBeam_2<<<nrb, nrt>>>(d_xs, d_ys, d_zs, 
+                                   d_A, d_xt, d_yt, d_zt,
+                                   d_nxt, d_nyt, d_nzt,
+                                   d_Jx, d_Jy, d_Jz,
+                                   d_Mx, d_My, d_Mz,
+                                   d_Jxt, d_Jyt, d_Jzt,
+                                   d_Mxt, d_Myt, d_Mzt,
+                                   d_Ext, d_Eyt, d_Ezt,
+                                   d_Hxt, d_Hyt, d_Hzt);
+        cudaDeviceSynchronize();
+        
+        // Allocate, on stackframe, Host arrays for J, M, E and H
+        cuDoubleComplex h_Jxt[gridsize_t];
+        cuDoubleComplex h_Jyt[gridsize_t];
+        cuDoubleComplex h_Jzt[gridsize_t];
+        
+        cuDoubleComplex h_Mxt[gridsize_t];
+        cuDoubleComplex h_Myt[gridsize_t];
+        cuDoubleComplex h_Mzt[gridsize_t];
+        
+        cuDoubleComplex h_Ext[gridsize_t];
+        cuDoubleComplex h_Eyt[gridsize_t];
+        cuDoubleComplex h_Ezt[gridsize_t];
+        
+        cuDoubleComplex h_Hxt[gridsize_t];
+        cuDoubleComplex h_Hyt[gridsize_t];
+        cuDoubleComplex h_Hzt[gridsize_t];
+        
+        // Copy content of Device J,M,E,H arrays into Host J,M,E,H arrays
+        cudaMemcpy(h_Jxt, d_Jxt, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
+        cudaMemcpy(h_Jyt, d_Jyt, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
+        cudaMemcpy(h_Jzt, d_Jzt, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
+        
+        cudaMemcpy(h_Mxt, d_Mxt, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
+        cudaMemcpy(h_Myt, d_Myt, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
+        cudaMemcpy(h_Mzt, d_Mzt, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
+        
+        cudaMemcpy(h_Ext, d_Ext, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
+        cudaMemcpy(h_Eyt, d_Eyt, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
+        cudaMemcpy(h_Ezt, d_Ezt, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
+        
+        cudaMemcpy(h_Hxt, d_Hxt, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
+        cudaMemcpy(h_Hyt, d_Hyt, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
+        cudaMemcpy(h_Hzt, d_Hzt, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
+        
+        // Free Device memory
+        cudaDeviceReset();
+        
+        // Pack CUDA arrays into cpp array for processing
+        std::array<cuDoubleComplex*, 3> CJ;
+        std::array<cuDoubleComplex*, 3> CM;
+        
+        std::array<cuDoubleComplex*, 3> CE;
+        std::array<cuDoubleComplex*, 3> CH;
+        
+        // Fill the C++ std::array with C-style arrays
+        CJ[0] = h_Jxt;
+        CJ[1] = h_Jyt;
+        CJ[2] = h_Jzt;
+        
+        CM[0] = h_Mxt;
+        CM[1] = h_Myt;
+        CM[2] = h_Mzt;
+        
+        CE[0] = h_Ext;
+        CE[1] = h_Eyt;
+        CE[2] = h_Ezt;
+        
+        CH[0] = h_Hxt;
+        CH[1] = h_Hyt;
+        CH[2] = h_Hzt;
+        
+        // Convert the CUDA style arrays to format compatible with CPU functions
+        std::vector<std::array<std::complex<double>, 3>> Jt = ghandler.CUDAToCpp_C(CJ, gridsize_t);
+        std::vector<std::array<std::complex<double>, 3>> Mt = ghandler.CUDAToCpp_C(CM, gridsize_t);
+        
+        std::vector<std::array<std::complex<double>, 3>> Et = ghandler.CUDAToCpp_C(CE, gridsize_t);
+        std::vector<std::array<std::complex<double>, 3>> Ht = ghandler.CUDAToCpp_C(CH, gridsize_t);
+
         std::string Jt_file = "Jt";
         std::string Mt_file = "Mt";
-        handler.writeOutC(Jt, Jt_file);
-        handler.writeOutC(Mt, Mt_file);
         
-        std::vector<std::array<std::complex<double>, 3>> Et = prop.Et_container;
-        std::vector<std::array<std::complex<double>, 3>> Ht = prop.Ht_container;
-    
         std::string Et_file = "Et";
         std::string Ht_file = "Ht";
-        handler.writeOutC(Et, Et_file);
-        handler.writeOutC(Ht, Ht_file);
+        
+        // Write using standard CPU DataHandler object
+        ghandler.dh.writeOutC(Jt, Jt_file);
+        ghandler.dh.writeOutC(Mt, Mt_file);
+        
+        ghandler.dh.writeOutC(Et, Et_file);
+        ghandler.dh.writeOutC(Ht, Ht_file);
     }
     
     else if (toPrint == 3)
     {
-        std::vector<std::array<double, 3>> Pr = prop.Pr_container;
-        std::vector<std::array<std::complex<double>, 3>> Et = prop.Et_container;
-        std::vector<std::array<std::complex<double>, 3>> Ht = prop.Ht_container;
+        // Allocate memory for Pr, Er and Hr arrays on Device
+        double *d_Prxt; cudaMalloc( (void**)&d_Prxt, gridsize_t * sizeof(double) );
+        double *d_Pryt; cudaMalloc( (void**)&d_Pryt, gridsize_t * sizeof(double) );
+        double *d_Przt; cudaMalloc( (void**)&d_Przt, gridsize_t * sizeof(double) );
+        
+        cuDoubleComplex *d_Ext; cudaMalloc( (void**)&d_Ext, gridsize_t * sizeof(cuDoubleComplex) );
+        cuDoubleComplex *d_Eyt; cudaMalloc( (void**)&d_Eyt, gridsize_t * sizeof(cuDoubleComplex) );
+        cuDoubleComplex *d_Ezt; cudaMalloc( (void**)&d_Ezt, gridsize_t * sizeof(cuDoubleComplex) );
+        
+        cuDoubleComplex *d_Hxt; cudaMalloc( (void**)&d_Hxt, gridsize_t * sizeof(cuDoubleComplex) );
+        cuDoubleComplex *d_Hyt; cudaMalloc( (void**)&d_Hyt, gridsize_t * sizeof(cuDoubleComplex) );
+        cuDoubleComplex *d_Hzt; cudaMalloc( (void**)&d_Hzt, gridsize_t * sizeof(cuDoubleComplex) );
+        
+        // Call to KERNEL 3
+        GpropagateBeam_3<<<nrb, nrt>>>(d_xs, d_ys, d_zs, 
+                                   d_A, d_xt, d_yt, d_zt,
+                                   d_nxt, d_nyt, d_nzt,
+                                   d_Jx, d_Jy, d_Jz,
+                                   d_Mx, d_My, d_Mz,
+                                   d_Prxt, d_Pryt, d_Przt,
+                                   d_Ext, d_Eyt, d_Ezt,
+                                   d_Hxt, d_Hyt, d_Hzt);
+        cudaDeviceSynchronize();
+        
+        // Allocate, on stackframe, Host arrays for Pr, Er and Hr
+        double h_Prxt[gridsize_t];
+        double h_Pryt[gridsize_t];
+        double h_Przt[gridsize_t];
+        
+        cuDoubleComplex h_Ext[gridsize_t];
+        cuDoubleComplex h_Eyt[gridsize_t];
+        cuDoubleComplex h_Ezt[gridsize_t];
+        
+        cuDoubleComplex h_Hxt[gridsize_t];
+        cuDoubleComplex h_Hyt[gridsize_t];
+        cuDoubleComplex h_Hzt[gridsize_t];
+        
+        // Copy content of Device Pr,Er,Hr arrays into Host Pr,Er,Hr arrays
+        cudaMemcpy(h_Prxt, d_Prxt, gridsize_t * sizeof(double), cudaMemcpyDeviceToHost);
+        cudaMemcpy(h_Pryt, d_Pryt, gridsize_t * sizeof(double), cudaMemcpyDeviceToHost);
+        cudaMemcpy(h_Przt, d_Przt, gridsize_t * sizeof(double), cudaMemcpyDeviceToHost);
+        
+        cudaMemcpy(h_Ext, d_Ext, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
+        cudaMemcpy(h_Eyt, d_Eyt, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
+        cudaMemcpy(h_Ezt, d_Ezt, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
+        
+        cudaMemcpy(h_Hxt, d_Hxt, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
+        cudaMemcpy(h_Hyt, d_Hyt, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
+        cudaMemcpy(h_Hzt, d_Hzt, gridsize_t * sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
+        
+        // Free Device memory
+        cudaDeviceReset();
+        
+        // Pack CUDA arrays into cpp array for processing
+        std::array<double*, 3> CP;
+        std::array<cuDoubleComplex*, 3> CE;
+        std::array<cuDoubleComplex*, 3> CH;
+        
+        // Fill the C++ std::array with C-style arrays
+        CP[0] = h_Prxt;
+        CP[1] = h_Pryt;
+        CP[2] = h_Przt;
+        
+        CE[0] = h_Ext;
+        CE[1] = h_Eyt;
+        CE[2] = h_Ezt;
+        
+        CH[0] = h_Hxt;
+        CH[1] = h_Hyt;
+        CH[2] = h_Hzt;
+        
+        // Convert the CUDA style arrays to format compatible with CPU functions
+        std::vector<std::array<double, 3>> Pr = ghandler.CUDAToCpp_R(CP, gridsize_t);
+        std::vector<std::array<std::complex<double>, 3>> Et = ghandler.CUDAToCpp_C(CE, gridsize_t);
+        std::vector<std::array<std::complex<double>, 3>> Ht = ghandler.CUDAToCpp_C(CH, gridsize_t);
         
         std::string Pr_file = "Pr";
         std::string Et_file = "Et";
         std::string Ht_file = "Ht";
-        handler.writeOutR(Pr, Pr_file);
-        handler.writeOutC(Et, Et_file);
-        handler.writeOutC(Ht, Ht_file);
+        
+        // Write using standard CPU DataHandler object
+        ghandler.dh.writeOutR(Pr, Pr_file);
+        ghandler.dh.writeOutC(Et, Et_file);
+        ghandler.dh.writeOutC(Ht, Ht_file);
     }
-    */
-    // End timer
-    end = std::chrono::steady_clock::now();
-    
-    std::cout << "Elapsed time: " 
-        << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() 
-        << " [s]\n" << std::endl;
-    
     return 0;
 }
  

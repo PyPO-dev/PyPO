@@ -144,19 +144,18 @@ std::array<double*, 3> GDataHandler::cppToCUDA_3Dnormals()
 } 
 
 // Convert complex CUDA grid to complex cpp grid
-std::vector<std::array<std::complex<double>, 3>> GDataHandler::CUDAToCpp_C(std::array<cuDoubleComplex*, 3> CUDA_C)
+std::vector<std::array<std::complex<double>, 3>> GDataHandler::CUDAToCpp_C(std::array<cuDoubleComplex*, 3> CUDA_C, int size)
 {
     std::vector<std::array<std::complex<double>, 3>> out;
-    int n = sizeof(CUDA_C[0])/sizeof(CUDA_C[0][0]);
-    
-    for (int i=0; i<n; i++)
+
+    for (int i=0; i<size; i++)
     {
         std::array<std::complex<double>, 3> arr;
 
         std::complex<double> x(cuCreal(CUDA_C[0][i]), cuCimag(CUDA_C[0][i]));
         std::complex<double> y(cuCreal(CUDA_C[1][i]), cuCimag(CUDA_C[1][i]));
         std::complex<double> z(cuCreal(CUDA_C[2][i]), cuCimag(CUDA_C[2][i]));
-        
+
         arr[0] = x;
         arr[1] = y;
         arr[2] = z;
@@ -167,12 +166,11 @@ std::vector<std::array<std::complex<double>, 3>> GDataHandler::CUDAToCpp_C(std::
 }
 
 // Convert real CUDA grid to real cpp grid
-std::vector<std::array<double, 3>> GDataHandler::CUDAToCpp_R(std::array<double*, 3> CUDA_R)
+std::vector<std::array<double, 3>> GDataHandler::CUDAToCpp_R(std::array<double*, 3> CUDA_R, int size)
 {
     std::vector<std::array<double, 3>> out;
-    int n = sizeof(CUDA_R[0])/sizeof(CUDA_R[0][0]);
     
-    for (int i=0; i<n; i++)
+    for (int i=0; i<size; i++)
     {
         std::array<double, 3> arr;
         

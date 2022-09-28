@@ -292,7 +292,6 @@ class System(object):
         self.Raytracer.propagateRays(a0=a0, mode=mode, workers=workers)
         end = time.time()
         print("Elapsed time: {:.2f} [s]\n".format(end - start))
-        print(len(self.Raytracer))
         
     def fieldRaytracer(self, target, field, k, a0=100, workers=1, res=1, mode='auto'):
         self.startRaytracer(target, a0, workers, res, mode)
@@ -505,8 +504,13 @@ class System(object):
                 
         print("Calculating far-field on {} from {}".format(target.name, source.name))
     
-    def runPhysOptics(self, save=0, material_source='vac', prop_mode=0, t_direction='forward', folder='', prec='float', device='cpu'):
+    def runPhysOptics(self, save=0, material_source='vac', prop_mode=0, t_direction='forward', folder='', prec='single', device='cpu'):
+        start = time.time()
+        
         self.PO.runPhysOptics(save, material_source, prop_mode, t_direction, prec, device)
+        
+        end = time.time()
+        print("Elapsed time: {:.2f} [s]\n".format(end - start))
         
         if folder != '':
             self.PO.copyToFolder(folder)

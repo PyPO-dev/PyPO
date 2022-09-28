@@ -40,12 +40,7 @@ int main(int argc, char *argv [])
     float epsilon  = atof(argv[5]); // Relative electric permeability
     int prop_mode   = atoi(argv[6]); // Whether to propagate to surface or to far-field
     float t_direction = atof(argv[7]); // Whether to propagate forward or back in time
-    
-    // Initialize timer to assess performance
-    std::chrono::steady_clock::time_point begin;
-    std::chrono::steady_clock::time_point end; 
-    
-    
+
     std::string source = "s"; 
     std::string target = "t"; 
     
@@ -76,19 +71,12 @@ int main(int argc, char *argv [])
     }
 
     int gridsize_s = grid_source.size();
-    
-    
-    //std::cout << gridsize_t << std::endl;
-    
+
     std::vector<std::array<std::complex<float>, 3>> Js = handler.read_Js();
     std::vector<std::array<std::complex<float>, 3>> Ms = handler.read_Ms();
     
     Propagationf prop(k, numThreads, gridsize_s, gridsize_t, thres, epsilon, t_direction, toPrint);
-    //std::cout << "jelloo" << std::endl;
-    // Start timer
 
-    begin = std::chrono::steady_clock::now();
-    
     if (prop_mode == 0) {prop.parallelProp(grid_target3D, grid_source, norm_target, Js, Ms, source_area);}
     else if (prop_mode == 1) {prop.parallelFarField(grid_target2D, grid_source, Js, Ms, source_area);}
     
@@ -148,13 +136,5 @@ int main(int argc, char *argv [])
         handler.writeOutC(Et, Et_file);
         handler.writeOutC(Ht, Ht_file);
     }
-    
-    // End timer
-    end = std::chrono::steady_clock::now();
-    
-    std::cout << "Elapsed time: " 
-        << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() 
-        << " [s]\n" << std::endl;
-
     return 0;
 }

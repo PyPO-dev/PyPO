@@ -170,3 +170,4 @@ PlotConfig.py
 .idea/inspectionProfiles/profiles_settings.xml
 fromDesigner.py
 src/GUI/fromDesigner.ui
+src/GUI/Tests

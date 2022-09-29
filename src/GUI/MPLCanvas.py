@@ -2,7 +2,7 @@ import sys
 import matplotlib
 matplotlib.use('Qt5Agg')
 sys.path.append('../../')
-from examples.DRO_PSF_RT import ex_DRO
+# from examples.DRO_PSF_RT import ex_DRO
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 

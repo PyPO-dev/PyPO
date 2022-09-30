@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QLabel, QApplication, QWidget, QHBoxLayout, QMainWin
 from PyQt5.QtGui import QFont, QIcon, QCursor 
 from PyQt5.QtCore import QMargins, Qt
 from ElementOptionsLayout import ElementOptionsLayout
+from selfClosingDialog import selfClosingDialog
 import sys
 sys.path.append('../')
 sys.path.append('../../')
@@ -17,7 +18,6 @@ class ElementWidget(QWidget):
         super().__init__(p)
         layout = QHBoxLayout()
         label = QLabel(element)
-        self.optionsOpen = False
 
         # label.setFont(QFont('Times New Roman', 18))
         label.setStyleSheet("border-top-left-radius :15px;"
@@ -53,23 +53,16 @@ class ElementWidget(QWidget):
         #                     background: #ffffff;")     
 
     def _openOptionsMenu(self):
-        if self.optionsOpen:
-            self.closeOptionsMenu()
-            return
+        self.dlg = selfClosingDialog(self.closeOptionsMenu, parent = self)
         
-        self.optionsOpen = True
-        self.dlg = QDialog(self)
-        self.dlg.setX = QCursor.pos().x
-        self.dlg.y = QCursor.pos().y
         self.dlg.setLayout(ElementOptionsLayout(self.closeOptionsMenu))
         self.dlg.setWindowFlag(Qt.FramelessWindowHint)
         
-        self.dlg.setGeometry(QCursor.pos().x(), QCursor.pos().y() ,50,50)
+        self.dlg.setGeometry(QCursor.pos().x(), QCursor.pos().y() ,100,100)
         self.dlg.show()
         
 
     def closeOptionsMenu(self):
-        self.optionsOpen = False
         self.dlg.close()
         
 

@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, 
 from PyQt5.QtGui import QFont, QIcon
 from ElementsColumn import ElementsWindow
 from PlotScreen import PlotScreen
+from ParameterForms.BaseForm import FormWidget
 
 sys.path.append('../')
 sys.path.append('../../')
@@ -23,6 +24,10 @@ class MainWidget(QWidget):
         self.GPButtons =        [2, 0, 1, 1]
         self.GPParameterForm =  [0, 1, 3, 1]
         self.GPPlotScreen =     [0, 2, 3, 1]
+
+
+        ### ElementConfigurations
+        
 
         # init System
         self.STM = st.System()
@@ -58,7 +63,7 @@ class MainWidget(QWidget):
         if hasattr(self, "ParameterWid"):
             self.ParameterWid.setParent(None)
 
-        self.ParameterWid = QWidget()
+        self.ParameterWid = FormWidget()
         self.ParameterWid.setMaximumWidth(400)
         self.ParameterWid.setMinimumWidth(400)
         # self.ParameterWid.setProperty('class', 'parameterForm')
@@ -76,15 +81,12 @@ class MainWidget(QWidget):
         self.grid.addWidget(widget, param[0], param[1], param[2], param[3])
 
 
-
     def _createMenuBar(self):
         menuBar = QMenuBar(self)
         self.setMenuBar(menuBar)
 
         ElementsMenu = QMenu("Elements", self)
         menuBar.addMenu(ElementsMenu)
-
-        # ElementsMenu.addAction(self.AddElementAction)
 
     def _mkButtons(self):
         btn = QPushButton("addParabola")

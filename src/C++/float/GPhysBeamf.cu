@@ -220,7 +220,8 @@ __global__ void GpropagateBeam_0(float *d_xs, float *d_ys, float *d_zs,
                                 cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
                                 cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz,
                                 cuFloatComplex *d_Jxt, cuFloatComplex *d_Jyt, cuFloatComplex *d_Jzt,
-                                cuFloatComplex *d_Mxt, cuFloatComplex *d_Myt, cuFloatComplex *d_Mzt)
+                                cuFloatComplex *d_Mxt, cuFloatComplex *d_Myt, cuFloatComplex *d_Mzt,
+                                bool *d_stop, int *d_counter, int *d_prog)
 {
     
     // Scalars (float & complex float)
@@ -252,6 +253,16 @@ __global__ void GpropagateBeam_0(float *d_xs, float *d_ys, float *d_zs,
     cuFloatComplex d_hi[3];
 
     int idx = blockDim.x*blockIdx.x + threadIdx.x;
+    /*
+    d_counter[0]++;
+    
+    if ((d_counter[0] / g_t * 100) > d_prog[0])
+    {
+        d_prog[0]++;
+        printf("%d\n", d_prog[0]);
+    }
+    */
+    
     if (idx < g_t)
     {
         point[0] = d_xt[idx];
@@ -325,6 +336,11 @@ __global__ void GpropagateBeam_0(float *d_xs, float *d_ys, float *d_zs,
         d_Myt[idx] = temp3[1];
         d_Mzt[idx] = temp3[2];
     }
+    
+    if (d_prog[0] == g_t)
+    {
+        d_stop[0] = true;
+    }
 }
 
 /**
@@ -355,7 +371,8 @@ __global__ void GpropagateBeam_1(float *d_xs, float *d_ys, float *d_zs,
                                 cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
                                 cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz,
                                 cuFloatComplex *d_Ext, cuFloatComplex *d_Eyt, cuFloatComplex *d_Ezt,
-                                cuFloatComplex *d_Hxt, cuFloatComplex *d_Hyt, cuFloatComplex *d_Hzt)
+                                cuFloatComplex *d_Hxt, cuFloatComplex *d_Hyt, cuFloatComplex *d_Hzt,
+                                bool *d_stop, int *d_counter, int *d_prog)
 {
     // Arrays of floats
     float point[3];            // Point on target
@@ -427,7 +444,8 @@ __global__ void GpropagateBeam_2(float *d_xs, float *d_ys, float *d_zs,
                                 cuFloatComplex *d_Jxt, cuFloatComplex *d_Jyt, cuFloatComplex *d_Jzt,
                                 cuFloatComplex *d_Mxt, cuFloatComplex *d_Myt, cuFloatComplex *d_Mzt,
                                 cuFloatComplex *d_Ext, cuFloatComplex *d_Eyt, cuFloatComplex *d_Ezt,
-                                cuFloatComplex *d_Hxt, cuFloatComplex *d_Hyt, cuFloatComplex *d_Hzt)
+                                cuFloatComplex *d_Hxt, cuFloatComplex *d_Hyt, cuFloatComplex *d_Hzt,
+                                bool *d_stop, int *d_counter, int *d_prog)
 {
     
     // Scalars (float & complex float)
@@ -578,7 +596,8 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
                                 cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz,
                                 float *d_Prxt, float *d_Pryt, float *d_Przt,
                                 cuFloatComplex *d_Ext, cuFloatComplex *d_Eyt, cuFloatComplex *d_Ezt,
-                                cuFloatComplex *d_Hxt, cuFloatComplex *d_Hyt, cuFloatComplex *d_Hzt)
+                                cuFloatComplex *d_Hxt, cuFloatComplex *d_Hyt, cuFloatComplex *d_Hzt,
+                                bool *d_stop, int *d_counter, int *d_prog)
 {
     
     // Scalars (float & complex float)
@@ -700,6 +719,8 @@ int main(int argc, char *argv [])
     // Calculate nr of blocks per grid and nr of threads per block
     dim3 nrb(numBlocks); dim3 nrt(numThreads);
     
+    std::cout << nrb.x << " " << nrb.y << std::endl;
+    
     // Calculate permittivity of target
     float EPS = EPS_VAC * epsilon;
     
@@ -729,10 +750,10 @@ int main(int argc, char *argv [])
                                     make_cuFloatComplex(4., 0.)};
 
     // Copy constant array to Device constant memory
-    cudaMemcpyToSymbol(con, &_con, CSIZE * sizeof(cuFloatComplex));
-    cudaMemcpyToSymbol(eye, &_eye, sizeof(_eye));
-    cudaMemcpyToSymbol(g_s, &gridsize_s, sizeof(int));
-    cudaMemcpyToSymbol(g_t, &gridsize_t, sizeof(int));
+    gpuErrchk( cudaMemcpyToSymbol(con, &_con, CSIZE * sizeof(cuFloatComplex)) );
+    gpuErrchk( cudaMemcpyToSymbol(eye, &_eye, sizeof(_eye)) );
+    gpuErrchk( cudaMemcpyToSymbol(g_s, &gridsize_s, sizeof(int)) );
+    gpuErrchk( cudaMemcpyToSymbol(g_t, &gridsize_t, sizeof(int)) );
 
     std::string source = "s"; 
     std::string target = "t"; 
@@ -750,16 +771,16 @@ int main(int argc, char *argv [])
     std::array<float*, 3> norm_target;
     
     // Allocate source grid and area on Device
-    float *d_xs; cudaMalloc( (void**)&d_xs, gridsize_s * sizeof(float) );
-    float *d_ys; cudaMalloc( (void**)&d_ys, gridsize_s * sizeof(float) );
-    float *d_zs; cudaMalloc( (void**)&d_zs, gridsize_s * sizeof(float) );
-    float *d_A; cudaMalloc( (void**)&d_A, gridsize_s * sizeof(float) );
+    float *d_xs; gpuErrchk( cudaMalloc((void**)&d_xs, gridsize_s * sizeof(float)) );
+    float *d_ys; gpuErrchk( cudaMalloc((void**)&d_ys, gridsize_s * sizeof(float)) );
+    float *d_zs; gpuErrchk( cudaMalloc((void**)&d_zs, gridsize_s * sizeof(float)) );
+    float *d_A; gpuErrchk( cudaMalloc((void**)&d_A, gridsize_s * sizeof(float)) );
     
     // Copy data from Host to Device
-    cudaMemcpy(d_xs, grid_source[0], gridsize_s * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_ys, grid_source[1], gridsize_s * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_zs, grid_source[2], gridsize_s * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_A, source_area, gridsize_s * sizeof(float), cudaMemcpyHostToDevice);
+    gpuErrchk( cudaMemcpy(d_xs, grid_source[0], gridsize_s * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_ys, grid_source[1], gridsize_s * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_zs, grid_source[2], gridsize_s * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_A, source_area, gridsize_s * sizeof(float), cudaMemcpyHostToDevice) );
     
     // Declare pointers to Device arrays. No return for kernel calls
     float *d_xt; float *d_yt; float *d_zt; float *d_nxt; float *d_nyt; float *d_nzt;
@@ -771,22 +792,22 @@ int main(int argc, char *argv [])
         norm_target = ghandler.cppToCUDA_3Dnormals();
         
         // Allocate memory on Device for 3D grids and normals
-        cudaMalloc( (void**)&d_xt, gridsize_t * sizeof(float) );
-        cudaMalloc( (void**)&d_yt, gridsize_t * sizeof(float) );
-        cudaMalloc( (void**)&d_zt, gridsize_t * sizeof(float) );
+        gpuErrchk( cudaMalloc((void**)&d_xt, gridsize_t * sizeof(float)) );
+        gpuErrchk( cudaMalloc((void**)&d_yt, gridsize_t * sizeof(float)) );
+        gpuErrchk( cudaMalloc((void**)&d_zt, gridsize_t * sizeof(float)) );
         
-        cudaMalloc( (void**)&d_nxt, gridsize_t * sizeof(float) );
-        cudaMalloc( (void**)&d_nyt, gridsize_t * sizeof(float) );
-        cudaMalloc( (void**)&d_nzt, gridsize_t * sizeof(float) );
+        gpuErrchk( cudaMalloc((void**)&d_nxt, gridsize_t * sizeof(float)) );
+        gpuErrchk( cudaMalloc((void**)&d_nyt, gridsize_t * sizeof(float)) );
+        gpuErrchk( cudaMalloc((void**)&d_nzt, gridsize_t * sizeof(float)) );
         
         // Copy grids and normals from Host to Device
-        cudaMemcpy(d_xt, grid_target3D[0], gridsize_t * sizeof(float), cudaMemcpyHostToDevice);
-        cudaMemcpy(d_yt, grid_target3D[1], gridsize_t * sizeof(float), cudaMemcpyHostToDevice);
-        cudaMemcpy(d_zt, grid_target3D[2], gridsize_t * sizeof(float), cudaMemcpyHostToDevice);
+        gpuErrchk( cudaMemcpy(d_xt, grid_target3D[0], gridsize_t * sizeof(float), cudaMemcpyHostToDevice) );
+        gpuErrchk( cudaMemcpy(d_yt, grid_target3D[1], gridsize_t * sizeof(float), cudaMemcpyHostToDevice) );
+        gpuErrchk( cudaMemcpy(d_zt, grid_target3D[2], gridsize_t * sizeof(float), cudaMemcpyHostToDevice) );
         
-        cudaMemcpy(d_nxt, norm_target[0], gridsize_t * sizeof(float), cudaMemcpyHostToDevice);
-        cudaMemcpy(d_nyt, norm_target[1], gridsize_t * sizeof(float), cudaMemcpyHostToDevice);
-        cudaMemcpy(d_nzt, norm_target[2], gridsize_t * sizeof(float), cudaMemcpyHostToDevice);
+        gpuErrchk( cudaMemcpy(d_nxt, norm_target[0], gridsize_t * sizeof(float), cudaMemcpyHostToDevice) );
+        gpuErrchk( cudaMemcpy(d_nyt, norm_target[1], gridsize_t * sizeof(float), cudaMemcpyHostToDevice) );
+        gpuErrchk( cudaMemcpy(d_nzt, norm_target[2], gridsize_t * sizeof(float), cudaMemcpyHostToDevice) );
     }
     
     else if (prop_mode == 1)
@@ -795,12 +816,12 @@ int main(int argc, char *argv [])
         grid_target2D = ghandler.cppToCUDA_2DGrid();
         
         // Allocate memory on Device for 2D grids
-        cudaMalloc( (void**)&d_xt, gridsize_t * sizeof(float) );
-        cudaMalloc( (void**)&d_yt, gridsize_t * sizeof(float) );
+        gpuErrchk( cudaMalloc((void**)&d_xt, gridsize_t * sizeof(float)) );
+        gpuErrchk( cudaMalloc((void**)&d_yt, gridsize_t * sizeof(float)) );
         
         // Copy to GPU from Host
-        cudaMemcpy(d_xt, grid_target2D[0], gridsize_t * sizeof(float), cudaMemcpyHostToDevice);
-        cudaMemcpy(d_yt, grid_target2D[1], gridsize_t * sizeof(float), cudaMemcpyHostToDevice);
+        gpuErrchk( cudaMemcpy(d_xt, grid_target2D[0], gridsize_t * sizeof(float), cudaMemcpyHostToDevice) );
+        gpuErrchk( cudaMemcpy(d_yt, grid_target2D[1], gridsize_t * sizeof(float), cudaMemcpyHostToDevice) );
     }
     
     // Read source currents from .txt and convert to CUDA array
@@ -808,37 +829,66 @@ int main(int argc, char *argv [])
     std::array<cuFloatComplex*, 3> Ms = ghandler.cppToCUDA_Ms();
 
     // Allocate memory on Device for source currents
-    cuFloatComplex *d_Jx; cudaMalloc( (void**)&d_Jx, gridsize_s * sizeof(cuFloatComplex) );
-    cuFloatComplex *d_Jy; cudaMalloc( (void**)&d_Jy, gridsize_s * sizeof(cuFloatComplex) );
-    cuFloatComplex *d_Jz; cudaMalloc( (void**)&d_Jz, gridsize_s * sizeof(cuFloatComplex) );
+    cuFloatComplex *d_Jx; gpuErrchk( cudaMalloc((void**)&d_Jx, gridsize_s * sizeof(cuFloatComplex)) );
+    cuFloatComplex *d_Jy; gpuErrchk( cudaMalloc((void**)&d_Jy, gridsize_s * sizeof(cuFloatComplex)) );
+    cuFloatComplex *d_Jz; gpuErrchk( cudaMalloc((void**)&d_Jz, gridsize_s * sizeof(cuFloatComplex)) );
     
-    cuFloatComplex *d_Mx; cudaMalloc( (void**)&d_Mx, gridsize_s * sizeof(cuFloatComplex) );
-    cuFloatComplex *d_My; cudaMalloc( (void**)&d_My, gridsize_s * sizeof(cuFloatComplex) );
-    cuFloatComplex *d_Mz; cudaMalloc( (void**)&d_Mz, gridsize_s * sizeof(cuFloatComplex) );
+    cuFloatComplex *d_Mx; gpuErrchk( cudaMalloc((void**)&d_Mx, gridsize_s * sizeof(cuFloatComplex)) );
+    cuFloatComplex *d_My; gpuErrchk( cudaMalloc((void**)&d_My, gridsize_s * sizeof(cuFloatComplex)) );
+    cuFloatComplex *d_Mz; gpuErrchk( cudaMalloc((void**)&d_Mz, gridsize_s * sizeof(cuFloatComplex)) );
     
     // Copy source currents from Host to Device
-    cudaMemcpy(d_Jx, Js[0], gridsize_s * sizeof(cuFloatComplex), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_Jy, Js[1], gridsize_s * sizeof(cuFloatComplex), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_Jz, Js[2], gridsize_s * sizeof(cuFloatComplex), cudaMemcpyHostToDevice);
+    gpuErrchk( cudaMemcpy(d_Jx, Js[0], gridsize_s * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_Jy, Js[1], gridsize_s * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_Jz, Js[2], gridsize_s * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
         
-    cudaMemcpy(d_Mx, Ms[0], gridsize_s * sizeof(cuFloatComplex), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_My, Ms[1], gridsize_s * sizeof(cuFloatComplex), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_Mz, Ms[2], gridsize_s * sizeof(cuFloatComplex), cudaMemcpyHostToDevice);
+    gpuErrchk( cudaMemcpy(d_Mx, Ms[0], gridsize_s * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_My, Ms[1], gridsize_s * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_Mz, Ms[2], gridsize_s * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
     
+        
+    // Construct stream for progress monitoring
+    cudaStream_t stream_prog, stream_stop;
+    int *h_counter, *h_prog, *d_counter, *d_prog;
+    bool *h_stop, *d_stop;
+    
+    volatile bool *v_stop;
+    volatile int *v_counter, *v_prog;
+    
+    gpuErrchk( cudaStreamCreate(&stream_prog) );
+    gpuErrchk( cudaStreamCreate(&stream_stop) );
+    gpuErrchk( cudaMalloc(&d_counter, sizeof(int)) );
+    gpuErrchk( cudaMalloc(&d_stop, sizeof(bool)) );
+    gpuErrchk( cudaMalloc(&d_prog, sizeof(int)) );
+    gpuErrchk( cudaMallocHost(&h_stop, sizeof(bool)) );
+    gpuErrchk( cudaMallocHost(&h_counter, sizeof(int)) );
+    gpuErrchk( cudaMallocHost(&h_prog, sizeof(int)) );
+    
+    h_stop[0] = false;
+    h_counter[0] = 0;
+    h_prog[0] = 0;
+    
+    gpuErrchk( cudaMemcpy(d_stop, h_stop, sizeof(bool), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_counter, h_counter, sizeof(int), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_prog, h_prog, sizeof(int), cudaMemcpyHostToDevice) );
+    
+    v_stop = h_stop;
+    v_counter = h_counter;
+    v_prog = h_prog;
     
     // Create Device arrays for storing the data and call the kernel
     // Which kernel is called is determined by toPrint
     if (toPrint == 0)
     {
         // Allocate memory for J and M arrays on Device
-        cuFloatComplex *d_Jxt; cudaMalloc( (void**)&d_Jxt, gridsize_t * sizeof(cuFloatComplex) );
-        cuFloatComplex *d_Jyt; cudaMalloc( (void**)&d_Jyt, gridsize_t * sizeof(cuFloatComplex) );
-        cuFloatComplex *d_Jzt; cudaMalloc( (void**)&d_Jzt, gridsize_t * sizeof(cuFloatComplex) );
+        cuFloatComplex *d_Jxt; gpuErrchk( cudaMalloc((void**)&d_Jxt, gridsize_t * sizeof(cuFloatComplex)) );
+        cuFloatComplex *d_Jyt; gpuErrchk( cudaMalloc((void**)&d_Jyt, gridsize_t * sizeof(cuFloatComplex)) );
+        cuFloatComplex *d_Jzt; gpuErrchk( cudaMalloc((void**)&d_Jzt, gridsize_t * sizeof(cuFloatComplex)) );
         
-        cuFloatComplex *d_Mxt; cudaMalloc( (void**)&d_Mxt, gridsize_t * sizeof(cuFloatComplex) );
-        cuFloatComplex *d_Myt; cudaMalloc( (void**)&d_Myt, gridsize_t * sizeof(cuFloatComplex) );
-        cuFloatComplex *d_Mzt; cudaMalloc( (void**)&d_Mzt, gridsize_t * sizeof(cuFloatComplex) );
-
+        cuFloatComplex *d_Mxt; gpuErrchk( cudaMalloc((void**)&d_Mxt, gridsize_t * sizeof(cuFloatComplex)) );
+        cuFloatComplex *d_Myt; gpuErrchk( cudaMalloc((void**)&d_Myt, gridsize_t * sizeof(cuFloatComplex)) );
+        cuFloatComplex *d_Mzt; gpuErrchk( cudaMalloc((void**)&d_Mzt, gridsize_t * sizeof(cuFloatComplex)) );
+        
         // Call to KERNEL 0
         GpropagateBeam_0<<<nrb, nrt>>>(d_xs, d_ys, d_zs, 
                                    d_A, d_xt, d_yt, d_zt,
@@ -846,8 +896,26 @@ int main(int argc, char *argv [])
                                    d_Jx, d_Jy, d_Jz,
                                    d_Mx, d_My, d_Mz,
                                    d_Jxt, d_Jyt, d_Jzt,
-                                   d_Mxt, d_Myt, d_Mzt);
-        cudaDeviceSynchronize();
+                                   d_Mxt, d_Myt, d_Mzt,
+                                   d_stop, d_counter, d_prog);
+        /*
+        // Poll value of d_prog
+        while (v_stop[0] == false)
+        {
+            gpuErrchk( cudaMemcpyAsync(h_stop, d_stop, sizeof(bool), cudaMemcpyDeviceToHost, stream_stop) );
+            gpuErrchk( cudaMemcpyAsync(h_prog, d_prog, sizeof(int), cudaMemcpyDeviceToHost, stream_prog) );
+            std::cout << h_prog[0] << " / 100\r" << std::flush;
+            v_stop = h_stop;
+            
+            if (h_prog[0] > v_prog[0])
+            {
+                std::cout << v_counter[0] << " / 100\r" << std::flush;
+                v_counter = h_counter;
+            }
+        }
+        */
+        
+        gpuErrchk( cudaDeviceSynchronize() );
         
         // Allocate, on stackframe, Host arrays for J and M
         cuFloatComplex h_Jxt[gridsize_t];
@@ -859,16 +927,16 @@ int main(int argc, char *argv [])
         cuFloatComplex h_Mzt[gridsize_t];
         
         // Copy content of Device J,M arrays into Host J,M arrays
-        cudaMemcpy(h_Jxt, d_Jxt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
-        cudaMemcpy(h_Jyt, d_Jyt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
-        cudaMemcpy(h_Jzt, d_Jzt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
+        gpuErrchk( cudaMemcpy(h_Jxt, d_Jxt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+        gpuErrchk( cudaMemcpy(h_Jyt, d_Jyt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+        gpuErrchk( cudaMemcpy(h_Jzt, d_Jzt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
         
-        cudaMemcpy(h_Mxt, d_Mxt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
-        cudaMemcpy(h_Myt, d_Myt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
-        cudaMemcpy(h_Mzt, d_Mzt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
+        gpuErrchk( cudaMemcpy(h_Mxt, d_Mxt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+        gpuErrchk( cudaMemcpy(h_Myt, d_Myt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+        gpuErrchk( cudaMemcpy(h_Mzt, d_Mzt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
         
         // Free Device memory
-        cudaDeviceReset();
+        gpuErrchk( cudaDeviceReset() );
         
         // Pack CUDA arrays into cpp array for processing
         std::array<cuFloatComplex*, 3> CJ;
@@ -898,13 +966,13 @@ int main(int argc, char *argv [])
     else if (toPrint == 1)
     {
         // Allocate memory for E and H arrays on Device
-        cuFloatComplex *d_Ext; cudaMalloc( (void**)&d_Ext, gridsize_t * sizeof(cuFloatComplex) );
-        cuFloatComplex *d_Eyt; cudaMalloc( (void**)&d_Eyt, gridsize_t * sizeof(cuFloatComplex) );
-        cuFloatComplex *d_Ezt; cudaMalloc( (void**)&d_Ezt, gridsize_t * sizeof(cuFloatComplex) );
+        cuFloatComplex *d_Ext; gpuErrchk( cudaMalloc((void**)&d_Ext, gridsize_t * sizeof(cuFloatComplex)) );
+        cuFloatComplex *d_Eyt; gpuErrchk( cudaMalloc((void**)&d_Eyt, gridsize_t * sizeof(cuFloatComplex)) );
+        cuFloatComplex *d_Ezt; gpuErrchk( cudaMalloc((void**)&d_Ezt, gridsize_t * sizeof(cuFloatComplex)) );
         
-        cuFloatComplex *d_Hxt; cudaMalloc( (void**)&d_Hxt, gridsize_t * sizeof(cuFloatComplex) );
-        cuFloatComplex *d_Hyt; cudaMalloc( (void**)&d_Hyt, gridsize_t * sizeof(cuFloatComplex) );
-        cuFloatComplex *d_Hzt; cudaMalloc( (void**)&d_Hzt, gridsize_t * sizeof(cuFloatComplex) );
+        cuFloatComplex *d_Hxt; gpuErrchk( cudaMalloc((void**)&d_Hxt, gridsize_t * sizeof(cuFloatComplex)) );
+        cuFloatComplex *d_Hyt; gpuErrchk( cudaMalloc((void**)&d_Hyt, gridsize_t * sizeof(cuFloatComplex)) );
+        cuFloatComplex *d_Hzt; gpuErrchk( cudaMalloc((void**)&d_Hzt, gridsize_t * sizeof(cuFloatComplex)) );
         
         // Call to KERNEL 1
         GpropagateBeam_1<<<nrb, nrt>>>(d_xs, d_ys, d_zs, 
@@ -912,8 +980,9 @@ int main(int argc, char *argv [])
                                    d_Jx, d_Jy, d_Jz,
                                    d_Mx, d_My, d_Mz,
                                    d_Ext, d_Eyt, d_Ezt,
-                                   d_Hxt, d_Hyt, d_Hzt);
-        cudaDeviceSynchronize();
+                                   d_Hxt, d_Hyt, d_Hzt,
+                                   d_stop, d_counter, d_prog);
+        gpuErrchk( cudaDeviceSynchronize() );
         
         // Allocate, on stackframe, Host arrays for E and H
         cuFloatComplex h_Ext[gridsize_t];
@@ -925,16 +994,16 @@ int main(int argc, char *argv [])
         cuFloatComplex h_Hzt[gridsize_t];
         
         // Copy content of Device E,H arrays into Host E,H arrays
-        cudaMemcpy(h_Ext, d_Ext, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
-        cudaMemcpy(h_Eyt, d_Eyt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
-        cudaMemcpy(h_Ezt, d_Ezt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
+        gpuErrchk( cudaMemcpy(h_Ext, d_Ext, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+        gpuErrchk( cudaMemcpy(h_Eyt, d_Eyt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+        gpuErrchk( cudaMemcpy(h_Ezt, d_Ezt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
         
-        cudaMemcpy(h_Hxt, d_Hxt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
-        cudaMemcpy(h_Hyt, d_Hyt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
-        cudaMemcpy(h_Hzt, d_Hzt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
+        gpuErrchk( cudaMemcpy(h_Hxt, d_Hxt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+        gpuErrchk( cudaMemcpy(h_Hyt, d_Hyt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+        gpuErrchk( cudaMemcpy(h_Hzt, d_Hzt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
         
         // Free Device memory
-        cudaDeviceReset();
+        gpuErrchk( cudaDeviceReset() );
         
         // Pack CUDA arrays into cpp array for processing
         std::array<cuFloatComplex*, 3> CE;
@@ -964,21 +1033,21 @@ int main(int argc, char *argv [])
     else if (toPrint == 2)
     {
         // Allocate memory for J, M, E and H arrays on Device
-        cuFloatComplex *d_Jxt; cudaMalloc( (void**)&d_Jxt, gridsize_t * sizeof(cuFloatComplex) );
-        cuFloatComplex *d_Jyt; cudaMalloc( (void**)&d_Jyt, gridsize_t * sizeof(cuFloatComplex) );
-        cuFloatComplex *d_Jzt; cudaMalloc( (void**)&d_Jzt, gridsize_t * sizeof(cuFloatComplex) );
+        cuFloatComplex *d_Jxt; gpuErrchk( cudaMalloc((void**)&d_Jxt, gridsize_t * sizeof(cuFloatComplex)) );
+        cuFloatComplex *d_Jyt; gpuErrchk( cudaMalloc((void**)&d_Jyt, gridsize_t * sizeof(cuFloatComplex)) );
+        cuFloatComplex *d_Jzt; gpuErrchk( cudaMalloc((void**)&d_Jzt, gridsize_t * sizeof(cuFloatComplex)) );
         
-        cuFloatComplex *d_Mxt; cudaMalloc( (void**)&d_Mxt, gridsize_t * sizeof(cuFloatComplex) );
-        cuFloatComplex *d_Myt; cudaMalloc( (void**)&d_Myt, gridsize_t * sizeof(cuFloatComplex) );
-        cuFloatComplex *d_Mzt; cudaMalloc( (void**)&d_Mzt, gridsize_t * sizeof(cuFloatComplex) );
+        cuFloatComplex *d_Mxt; gpuErrchk( cudaMalloc((void**)&d_Mxt, gridsize_t * sizeof(cuFloatComplex)) );
+        cuFloatComplex *d_Myt; gpuErrchk( cudaMalloc((void**)&d_Myt, gridsize_t * sizeof(cuFloatComplex)) );
+        cuFloatComplex *d_Mzt; gpuErrchk( cudaMalloc((void**)&d_Mzt, gridsize_t * sizeof(cuFloatComplex)) );
         
-        cuFloatComplex *d_Ext; cudaMalloc( (void**)&d_Ext, gridsize_t * sizeof(cuFloatComplex) );
-        cuFloatComplex *d_Eyt; cudaMalloc( (void**)&d_Eyt, gridsize_t * sizeof(cuFloatComplex) );
-        cuFloatComplex *d_Ezt; cudaMalloc( (void**)&d_Ezt, gridsize_t * sizeof(cuFloatComplex) );
+        cuFloatComplex *d_Ext; gpuErrchk( cudaMalloc((void**)&d_Ext, gridsize_t * sizeof(cuFloatComplex)) );
+        cuFloatComplex *d_Eyt; gpuErrchk( cudaMalloc((void**)&d_Eyt, gridsize_t * sizeof(cuFloatComplex)) );
+        cuFloatComplex *d_Ezt; gpuErrchk( cudaMalloc((void**)&d_Ezt, gridsize_t * sizeof(cuFloatComplex)) );
         
-        cuFloatComplex *d_Hxt; cudaMalloc( (void**)&d_Hxt, gridsize_t * sizeof(cuFloatComplex) );
-        cuFloatComplex *d_Hyt; cudaMalloc( (void**)&d_Hyt, gridsize_t * sizeof(cuFloatComplex) );
-        cuFloatComplex *d_Hzt; cudaMalloc( (void**)&d_Hzt, gridsize_t * sizeof(cuFloatComplex) );
+        cuFloatComplex *d_Hxt; gpuErrchk( cudaMalloc((void**)&d_Hxt, gridsize_t * sizeof(cuFloatComplex)) );
+        cuFloatComplex *d_Hyt; gpuErrchk( cudaMalloc((void**)&d_Hyt, gridsize_t * sizeof(cuFloatComplex)) );
+        cuFloatComplex *d_Hzt; gpuErrchk( cudaMalloc((void**)&d_Hzt, gridsize_t * sizeof(cuFloatComplex)) );
         
         // Call to KERNEL 2
         GpropagateBeam_2<<<nrb, nrt>>>(d_xs, d_ys, d_zs, 
@@ -989,8 +1058,9 @@ int main(int argc, char *argv [])
                                    d_Jxt, d_Jyt, d_Jzt,
                                    d_Mxt, d_Myt, d_Mzt,
                                    d_Ext, d_Eyt, d_Ezt,
-                                   d_Hxt, d_Hyt, d_Hzt);
-        cudaDeviceSynchronize();
+                                   d_Hxt, d_Hyt, d_Hzt,
+                                   d_stop, d_counter, d_prog);
+        gpuErrchk( cudaDeviceSynchronize() );
         
         // Allocate, on stackframe, Host arrays for J, M, E and H
         cuFloatComplex h_Jxt[gridsize_t];
@@ -1010,24 +1080,24 @@ int main(int argc, char *argv [])
         cuFloatComplex h_Hzt[gridsize_t];
         
         // Copy content of Device J,M,E,H arrays into Host J,M,E,H arrays
-        cudaMemcpy(h_Jxt, d_Jxt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
-        cudaMemcpy(h_Jyt, d_Jyt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
-        cudaMemcpy(h_Jzt, d_Jzt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
+        gpuErrchk( cudaMemcpy(h_Jxt, d_Jxt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+        gpuErrchk( cudaMemcpy(h_Jyt, d_Jyt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+        gpuErrchk( cudaMemcpy(h_Jzt, d_Jzt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
         
-        cudaMemcpy(h_Mxt, d_Mxt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
-        cudaMemcpy(h_Myt, d_Myt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
-        cudaMemcpy(h_Mzt, d_Mzt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
+        gpuErrchk( cudaMemcpy(h_Mxt, d_Mxt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+        gpuErrchk( cudaMemcpy(h_Myt, d_Myt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+        gpuErrchk( cudaMemcpy(h_Mzt, d_Mzt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
         
-        cudaMemcpy(h_Ext, d_Ext, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
-        cudaMemcpy(h_Eyt, d_Eyt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
-        cudaMemcpy(h_Ezt, d_Ezt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
+        gpuErrchk( cudaMemcpy(h_Ext, d_Ext, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+        gpuErrchk( cudaMemcpy(h_Eyt, d_Eyt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+        gpuErrchk( cudaMemcpy(h_Ezt, d_Ezt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
         
-        cudaMemcpy(h_Hxt, d_Hxt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
-        cudaMemcpy(h_Hyt, d_Hyt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
-        cudaMemcpy(h_Hzt, d_Hzt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
+        gpuErrchk( cudaMemcpy(h_Hxt, d_Hxt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+        gpuErrchk( cudaMemcpy(h_Hyt, d_Hyt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+        gpuErrchk( cudaMemcpy(h_Hzt, d_Hzt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
         
         // Free Device memory
-        cudaDeviceReset();
+        gpuErrchk( cudaDeviceReset() );
         
         // Pack CUDA arrays into cpp array for processing
         std::array<cuFloatComplex*, 3> CJ;
@@ -1077,17 +1147,17 @@ int main(int argc, char *argv [])
     else if (toPrint == 3)
     {
         // Allocate memory for Pr, Er and Hr arrays on Device
-        float *d_Prxt; cudaMalloc( (void**)&d_Prxt, gridsize_t * sizeof(float) );
-        float *d_Pryt; cudaMalloc( (void**)&d_Pryt, gridsize_t * sizeof(float) );
-        float *d_Przt; cudaMalloc( (void**)&d_Przt, gridsize_t * sizeof(float) );
+        float *d_Prxt; gpuErrchk( cudaMalloc((void**)&d_Prxt, gridsize_t * sizeof(float)) );
+        float *d_Pryt; gpuErrchk( cudaMalloc((void**)&d_Pryt, gridsize_t * sizeof(float)) );
+        float *d_Przt; gpuErrchk( cudaMalloc((void**)&d_Przt, gridsize_t * sizeof(float)) );
         
-        cuFloatComplex *d_Ext; cudaMalloc( (void**)&d_Ext, gridsize_t * sizeof(cuFloatComplex) );
-        cuFloatComplex *d_Eyt; cudaMalloc( (void**)&d_Eyt, gridsize_t * sizeof(cuFloatComplex) );
-        cuFloatComplex *d_Ezt; cudaMalloc( (void**)&d_Ezt, gridsize_t * sizeof(cuFloatComplex) );
+        cuFloatComplex *d_Ext; gpuErrchk( cudaMalloc((void**)&d_Ext, gridsize_t * sizeof(cuFloatComplex)) );
+        cuFloatComplex *d_Eyt; gpuErrchk( cudaMalloc((void**)&d_Eyt, gridsize_t * sizeof(cuFloatComplex)) );
+        cuFloatComplex *d_Ezt; gpuErrchk( cudaMalloc((void**)&d_Ezt, gridsize_t * sizeof(cuFloatComplex)) );
         
-        cuFloatComplex *d_Hxt; cudaMalloc( (void**)&d_Hxt, gridsize_t * sizeof(cuFloatComplex) );
-        cuFloatComplex *d_Hyt; cudaMalloc( (void**)&d_Hyt, gridsize_t * sizeof(cuFloatComplex) );
-        cuFloatComplex *d_Hzt; cudaMalloc( (void**)&d_Hzt, gridsize_t * sizeof(cuFloatComplex) );
+        cuFloatComplex *d_Hxt; gpuErrchk( cudaMalloc((void**)&d_Hxt, gridsize_t * sizeof(cuFloatComplex)) );
+        cuFloatComplex *d_Hyt; gpuErrchk( cudaMalloc((void**)&d_Hyt, gridsize_t * sizeof(cuFloatComplex)) );
+        cuFloatComplex *d_Hzt; gpuErrchk( cudaMalloc((void**)&d_Hzt, gridsize_t * sizeof(cuFloatComplex)) );
         
         // Call to KERNEL 3
         GpropagateBeam_3<<<nrb, nrt>>>(d_xs, d_ys, d_zs, 
@@ -1097,8 +1167,9 @@ int main(int argc, char *argv [])
                                    d_Mx, d_My, d_Mz,
                                    d_Prxt, d_Pryt, d_Przt,
                                    d_Ext, d_Eyt, d_Ezt,
-                                   d_Hxt, d_Hyt, d_Hzt);
-        cudaDeviceSynchronize();
+                                   d_Hxt, d_Hyt, d_Hzt,
+                                   d_stop, d_counter, d_prog);
+        gpuErrchk( cudaDeviceSynchronize() );
         
         // Allocate, on stackframe, Host arrays for Pr, Er and Hr
         float h_Prxt[gridsize_t];
@@ -1114,20 +1185,20 @@ int main(int argc, char *argv [])
         cuFloatComplex h_Hzt[gridsize_t];
         
         // Copy content of Device Pr,Er,Hr arrays into Host Pr,Er,Hr arrays
-        cudaMemcpy(h_Prxt, d_Prxt, gridsize_t * sizeof(float), cudaMemcpyDeviceToHost);
-        cudaMemcpy(h_Pryt, d_Pryt, gridsize_t * sizeof(float), cudaMemcpyDeviceToHost);
-        cudaMemcpy(h_Przt, d_Przt, gridsize_t * sizeof(float), cudaMemcpyDeviceToHost);
+        gpuErrchk( cudaMemcpy(h_Prxt, d_Prxt, gridsize_t * sizeof(float), cudaMemcpyDeviceToHost) );
+        gpuErrchk( cudaMemcpy(h_Pryt, d_Pryt, gridsize_t * sizeof(float), cudaMemcpyDeviceToHost) );
+        gpuErrchk( cudaMemcpy(h_Przt, d_Przt, gridsize_t * sizeof(float), cudaMemcpyDeviceToHost) );
         
-        cudaMemcpy(h_Ext, d_Ext, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
-        cudaMemcpy(h_Eyt, d_Eyt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
-        cudaMemcpy(h_Ezt, d_Ezt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
+        gpuErrchk( cudaMemcpy(h_Ext, d_Ext, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+        gpuErrchk( cudaMemcpy(h_Eyt, d_Eyt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+        gpuErrchk( cudaMemcpy(h_Ezt, d_Ezt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
         
-        cudaMemcpy(h_Hxt, d_Hxt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
-        cudaMemcpy(h_Hyt, d_Hyt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
-        cudaMemcpy(h_Hzt, d_Hzt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost);
+        gpuErrchk( cudaMemcpy(h_Hxt, d_Hxt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+        gpuErrchk( cudaMemcpy(h_Hyt, d_Hyt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+        gpuErrchk( cudaMemcpy(h_Hzt, d_Hzt, gridsize_t * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
         
         // Free Device memory
-        cudaDeviceReset();
+        gpuErrchk( cudaDeviceReset() );
         
         // Pack CUDA arrays into cpp array for processing
         std::array<float*, 3> CP;
@@ -1163,4 +1234,3 @@ int main(int argc, char *argv [])
     }
     return 0;
 }
- 

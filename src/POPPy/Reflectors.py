@@ -87,6 +87,36 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
         
     #### PUBLIC METHODS ###
     
+    def paramTojson(self):
+        """
+        (PUBLIC)
+        Convert parameters to json file.
+        """
+        
+        # Convert history to list of lists
+        h_l = []
+        for ll in self.history:
+            h_l.append([x.tolist() if isinstance(x, np.ndarray) else x for x in ll])
+        
+        paramdict = {"name"     : self.name,
+                 "type"     : self.reflectorType,
+                 "a"        : self.a,
+                 "b"        : self.b,
+                 "c"        : self.c,
+                 "lims_x"   : self.lims_x,
+                 "lims_y"   : self.lims_y,
+                 "gridsize" : self.shape,
+                 "gmode"    : self.gmode,
+                 "uvaxis"   : self.uvaxis,
+                 "units"    : self.units,
+                 "cRot"     : self.cRot.tolist(),
+                 "flip"     : self.flip,
+                 "sec"      : self.sec,
+                 "history"  : h_l}
+        
+        return paramdict
+
+    
     def set_cRot(self, cRot, units='mm'):
         """
         (PUBLIC)
@@ -97,7 +127,7 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
             units       :   Units of co-ordinate
         """
         
-        conv = self.get_conv(units)
+        conv = self._get_conv(units)
         
         self.cRot = cRot * conv
 
@@ -115,10 +145,17 @@ COR [x, y, z]       : [{:.3f}, {:.3f}, {:.3f}] [mm]
             flip        :   Flip normal vector direction
         """
         
+        self.lims_x = lims_x
+        self.lims_y = lims_y
+        self.gmode = gmode
+        self.uvaxis = axis
+        
         if flip:
             mult = -1
         else:
             mult = 1
+            
+        self.flip = flip
 
         self.shape = gridsize
         
@@ -419,6 +456,8 @@ class Parabola(Reflector):
         self.reflectorId = self.id
         self.reflectorType = "Paraboloid"
         
+        self.sec = 'upper'
+        
     def uvGrid(self, u, v, du, dv):
         """
         (PUBLIC)
@@ -512,6 +551,8 @@ class Hyperbola(Reflector):
         
         self.reflectorId = self.id
         self.reflectorType = "Hyperboloid"
+        self.sec = sec
+        
         if sec == 'upper':
             self.section = 1
         elif sec == 'lower':

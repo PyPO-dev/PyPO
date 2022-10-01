@@ -43,13 +43,13 @@ class PhysOptics(object):
         (PUBLIC)
         Call PhysBeam.exe and perform PO calculation.
         @param  ->
-            save        :   Which fields to save to disk after PO calculation.
-                        :   Options: 0 (J,M), 1 (E,H), 2 (J,M,E,H), 3 (E,H,Pr)
-            m_t         :   Material of target surface
-            prop_mode   :   Propagate to surface (0) or to far-field (1)
-            t_direction :   Reverse time by changing sign in Greens function
-            prec        :   Run simulation in single or double precision
-            device      :   Run on either CPU or GPU. For GPU, needs CUDA
+            save            :   Which fields to save to disk after PO calculation.
+                            :   Options: 0 (J,M), 1 (E,H), 2 (J,M,E,H), 3 (E,H,Pr)
+            material_source :   Material of source surface
+            prop_mode       :   Propagate to surface (0) or to far-field (1)
+            t_direction     :   Reverse time by changing sign in Greens function
+            prec            :   Run simulation in single or double precision
+            device          :   Run on either CPU or GPU. For GPU, needs CUDA
         """
         
         if material_source == 'vac':
@@ -72,8 +72,8 @@ class PhysOptics(object):
                                                                             save, epsilon, prop_mode, t_dir))
                     
                 elif device == 'gpu':
-                    nThread = 256
-                    nBlock = math.ceil(self.gt / 256)
+                    nThread = 16
+                    nBlock = math.ceil(self.gt / nThread)
                     os.system('./GPhysBeamf.exe {} {} {} {} {} {} {} {} {}'.format(nThread, nBlock, self.k, 
                                                                                    save, epsilon, prop_mode, 
                                                                                    t_dir, self.gs, self.gt))
@@ -89,7 +89,7 @@ class PhysOptics(object):
                     
                 elif device == 'gpu':
                     nThread = 256
-                    nBlock = math.ceil(self.gt / 256)
+                    nBlock = math.ceil(self.gt / nThread)
                     os.system('./GPhysBeam.exe {} {} {} {} {} {} {} {} {}'.format(nThread, nBlock, self.k, 
                                                                                    save, epsilon, prop_mode, 
                                                                                    t_dir, self.gs, self.gt))

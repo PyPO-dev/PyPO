@@ -6,6 +6,7 @@ import time
 import psutil
 import os
 import sys
+import json
 
 # POPPy-specific modules
 import src.POPPy.Reflectors as Reflectors
@@ -35,6 +36,8 @@ class System(object):
     
     customBeamPath = './custom/beam/'
     customReflPath = './custom/reflector/'
+    
+    savePathElem = './save/elements/'
     
     def __init__(self):
         self.num_ref = 0
@@ -202,6 +205,78 @@ class System(object):
         
         self.system["{}".format(name)] = cam
         self.num_cam += 1
+        
+    def saveElement(self, element):
+        saveExist = os.path.isdir(self.savePathElem)
+        
+        if not saveExist:
+            os.makedirs(self.savePathElem)
+        
+        paramdict = element.paramTojson()
+        
+        with open('./{}{}.json'.format(self.savePathElem, element.name), 'w') as f:
+            json.dump(paramdict, f)
+            
+    def loadElement(self, name):
+        """
+        (PUBLIC)
+        Load an element from save.
+        
+        @param  ->
+            name            :   Name of reflector to load
+        """
+        
+        with open('./{}{}.json'.format(self.savePathElem, name), 'r') as f:
+            paramdict = json.loads(f.read())
+            
+        name = paramdict["name"]
+            
+        coef = [paramdict["a"], paramdict["b"], paramdict["c"]]
+        
+        lims_x = paramdict["lims_x"]
+        lims_y = paramdict["lims_y"]
+        gridsize = paramdict["gridsize"]
+        
+        gmode = paramdict["gmode"]
+        units = paramdict["units"]
+        
+        flip = paramdict["flip"]
+        
+        cRot = np.array(paramdict["cRot"])
+        uvaxis = paramdict["uvaxis"]
+        
+        sec = paramdict["sec"]
+            
+        if paramdict["type"] == "Paraboloid":
+
+            self.addParabola(coef=coef, lims_x=lims_x, lims_y=lims_y, 
+                             gridsize=gridsize, cRot=cRot, 
+                             pmode='man', gmode=gmode, name=name, axis=uvaxis, 
+                             units=units, trunc=False, flip=flip)
+        
+        elif paramdict["type"] == "Hyperboloid":
+
+            self.addHyperbola(coef=coef, lims_x=lims_x, lims_y=lims_y, 
+                             gridsize=gridsize, cRot=cRot, 
+                             pmode='man', gmode=gmode, name=name, axis=uvaxis, 
+                             units=units, sec=sec, trunc=False, flip=flip)
+        
+        history = []    
+        for ll in paramdict["history"]:
+            history.append([np.array(x) if isinstance(x, list) else x for x in ll])
+            
+        self.system[name].history = history
+        
+        for action in history:
+            a_t = list(action[0])
+            
+            if a_t[0] == "r":
+                self.system[name].cRot = action[2]
+                self.system[name].rotateGrid(action[1], save=False)
+                
+            elif a_t[0] == "t":
+                self.system[name].translateGrid(action[1], units, save=False)
+        
         
     def removeElement(self, name):
         del self.system[name]

@@ -41,11 +41,6 @@ int main(int argc, char *argv [])
     int prop_mode   = atoi(argv[6]); // Whether to propagate to surface or to far-field
     double t_direction = atof(argv[7]); // Whether to propagate forward or back in time
     
-    // Initialize timer to assess performance
-    std::chrono::steady_clock::time_point begin;
-    std::chrono::steady_clock::time_point end; 
-    
-    
     std::string source = "s"; 
     std::string target = "t"; 
     
@@ -84,11 +79,7 @@ int main(int argc, char *argv [])
     std::vector<std::array<std::complex<double>, 3>> Ms = handler.read_Ms();
     
     Propagation prop(k, numThreads, gridsize_s, gridsize_t, thres, epsilon, t_direction, toPrint);
-    //std::cout << "jelloo" << std::endl;
-    // Start timer
 
-    begin = std::chrono::steady_clock::now();
-    
     if (prop_mode == 0) {prop.parallelProp(grid_target3D, grid_source, norm_target, Js, Ms, source_area);}
     else if (prop_mode == 1) {prop.parallelFarField(grid_target2D, grid_source, Js, Ms, source_area);}
     
@@ -148,13 +139,5 @@ int main(int argc, char *argv [])
         handler.writeOutC(Et, Et_file);
         handler.writeOutC(Ht, Ht_file);
     }
-    
-    // End timer
-    end = std::chrono::steady_clock::now();
-    
-    std::cout << "Calculation time = " 
-        << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() 
-        << " [s]\n" << std::endl;
-
     return 0;
 }

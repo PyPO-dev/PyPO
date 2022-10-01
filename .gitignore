@@ -135,9 +135,9 @@ dmypy.json
 # User-specific folders
 src/C++/input/
 src/C++/output/
-src/C++/src/backup/
+src/C++/double/backup/
 images/
-
+save/
 
 # Personal projects/files
 personal/

@@ -6,6 +6,7 @@ import time
 import psutil
 import os
 import sys
+import json
 
 # POPPy-specific modules
 import src.POPPy.Reflectors as Reflectors
@@ -15,7 +16,6 @@ import src.POPPy.Beams as Beams
 import src.POPPy.PhysOptics as PO
 import src.POPPy.FourierOptics as FO
 from src.POPPy.Plotter import Plotter
-import src.POPPy.Aperture as Aperture
 from src.POPPy.Efficiencies import Efficiencies as EF
 #from src.Python.Fitting import Fitting
 
@@ -36,6 +36,8 @@ class System(object):
     
     customBeamPath = './custom/beam/'
     customReflPath = './custom/reflector/'
+    
+    savePathElem = './save/elements/'
     
     def __init__(self):
         self.num_ref = 0
@@ -204,6 +206,78 @@ class System(object):
         self.system["{}".format(name)] = cam
         self.num_cam += 1
         
+    def saveElement(self, element):
+        saveExist = os.path.isdir(self.savePathElem)
+        
+        if not saveExist:
+            os.makedirs(self.savePathElem)
+        
+        paramdict = element.paramTojson()
+        
+        with open('./{}{}.json'.format(self.savePathElem, element.name), 'w') as f:
+            json.dump(paramdict, f)
+            
+    def loadElement(self, name):
+        """
+        (PUBLIC)
+        Load an element from save.
+        
+        @param  ->
+            name            :   Name of reflector to load
+        """
+        
+        with open('./{}{}.json'.format(self.savePathElem, name), 'r') as f:
+            paramdict = json.loads(f.read())
+            
+        name = paramdict["name"]
+            
+        coef = [paramdict["a"], paramdict["b"], paramdict["c"]]
+        
+        lims_x = paramdict["lims_x"]
+        lims_y = paramdict["lims_y"]
+        gridsize = paramdict["gridsize"]
+        
+        gmode = paramdict["gmode"]
+        units = paramdict["units"]
+        
+        flip = paramdict["flip"]
+        
+        cRot = np.array(paramdict["cRot"])
+        uvaxis = paramdict["uvaxis"]
+        
+        sec = paramdict["sec"]
+            
+        if paramdict["type"] == "Paraboloid":
+
+            self.addParabola(coef=coef, lims_x=lims_x, lims_y=lims_y, 
+                             gridsize=gridsize, cRot=cRot, 
+                             pmode='man', gmode=gmode, name=name, axis=uvaxis, 
+                             units=units, trunc=False, flip=flip)
+        
+        elif paramdict["type"] == "Hyperboloid":
+
+            self.addHyperbola(coef=coef, lims_x=lims_x, lims_y=lims_y, 
+                             gridsize=gridsize, cRot=cRot, 
+                             pmode='man', gmode=gmode, name=name, axis=uvaxis, 
+                             units=units, sec=sec, trunc=False, flip=flip)
+        
+        history = []    
+        for ll in paramdict["history"]:
+            history.append([np.array(x) if isinstance(x, list) else x for x in ll])
+            
+        self.system[name].history = history
+        
+        for action in history:
+            a_t = list(action[0])
+            
+            if a_t[0] == "r":
+                self.system[name].cRot = action[2]
+                self.system[name].rotateGrid(action[1], save=False)
+                
+            elif a_t[0] == "t":
+                self.system[name].translateGrid(action[1], units, save=False)
+        
+        
     def removeElement(self, name):
         del self.system[name]
         self.num_ref -= 1
@@ -274,7 +348,6 @@ class System(object):
         
         # Check if ray-trace size is OK
         workers = self._memCheckRT(workers)
-        print(len(self.Raytracer))
         
         start = time.time()
         
@@ -293,18 +366,12 @@ class System(object):
 
         self.Raytracer.propagateRays(a0=a0, mode=mode, workers=workers)
         end = time.time()
-        print("Elapsed time: {} s\n".format(end - start))
-        print(len(self.Raytracer))
+        print("Elapsed time: {:.2f} [s]\n".format(end - start))
         
     def fieldRaytracer(self, target, field, k, a0=100, workers=1, res=1, mode='auto'):
-        print(len(self.Raytracer))
         self.startRaytracer(target, a0, workers, res, mode)
         
-        print(len(self.Raytracer))
         self.Raytracer.calcPathlength()
-        print(len(self.Raytracer))
-        
-        print(len(field[0].flatten()))
         
         f_prop = []
         for i, ((key, ray), f) in enumerate(zip(self.Raytracer.rays.items(), field[0].flatten())):
@@ -336,6 +403,7 @@ class System(object):
         
         self.PO = PO.PhysOptics(k, numThreads, thres, cpp_path)
         self.PO.propType = self.inputBeam.status
+        self.PO.set_gs(self.inputBeam.shape)
         
         if self.PO.propType == 'coherent':
             if not cont:
@@ -364,6 +432,7 @@ class System(object):
                         self.PO.writeInput(self.fileNames_ts[i], attr)
         
         if target != None:
+            self.PO.set_gt(target.shape)
             print("Calculating currents on {} from {}".format(target.name, self.inputBeam.name))
         else:
             print("Initialized PO object")
@@ -373,6 +442,9 @@ class System(object):
         Perform a physical optics propagation from source to target.
         Automatically continues from last propagation by copying currents and gird to input
         """
+        
+        self.PO.set_gs(source.shape)
+        self.PO.set_gt(target.shape)
         
         if self.PO.propType == 'coherent':
             for i, attr in enumerate(source):
@@ -417,6 +489,9 @@ class System(object):
         print("Calculating currents on {} from {}".format(target.name, source.name))
                     
     def ffPhysOptics(self, source, target):
+        self.PO.set_gs(source.shape)
+        self.PO.set_gt(target.shape)
+        
         for i, attr in enumerate(source):
             # Only write xyz and area
             if i <= 3:
@@ -442,7 +517,8 @@ class System(object):
         Perform a physical optics propagation from folder with saved input/output to target.
         Automatically continues from last propagation by copying currents and grid to input
         """
-        
+        self.PO.set_gs(source.shape)
+        self.PO.set_gt(target.shape)
         # First, copy input/ to cpp_path. Do this first so that copy operations are performed
         # in the cpp_path input/ folder. This preserves the saved data
         self.PO.copyFromFolder(folder)
@@ -475,7 +551,8 @@ class System(object):
         Perform a physical optics propagation from folder with saved input/output to target.
         Automatically continues from last propagation by copying currents and grid to input
         """
-        
+        self.PO.set_gs(source.shape)
+        self.PO.set_gt(target.shape)
         # First, copy input/ to cpp_path. Do this first so that copy operations are performed
         # in the cpp_path input/ folder. This preserves the saved data
         self.PO.copyFromFolder(folder)
@@ -502,8 +579,13 @@ class System(object):
                 
         print("Calculating far-field on {} from {}".format(target.name, source.name))
     
-    def runPhysOptics(self, save=0, material_source='vac', prop_mode=0, t_direction='forward', folder=''):
-        self.PO.runPhysOptics(save, material_source, prop_mode, t_direction)
+    def runPhysOptics(self, save=0, material_source='vac', prop_mode=0, t_direction='forward', folder='', prec='single', device='cpu'):
+        start = time.time()
+        
+        self.PO.runPhysOptics(save, material_source, prop_mode, t_direction, prec, device)
+        
+        end = time.time()
+        print("Elapsed time: {:.2f} [s]\n".format(end - start))
         
         if folder != '':
             self.PO.copyToFolder(folder)
@@ -520,12 +602,7 @@ class System(object):
         
     def initFourierOptics(self, k):
         self.FO = FO.FourierOptics(k=k)
-        
-    def addCircAper(self, r_max, gridsize, r_min=1e-3, cRot=np.zeros(3), name=''):
-        ap = Aperture.Aperture(cRot, name)
-        ap.makeCircAper(r_max, r_min, gridsize)
-        self.system["{}".format(name)] = ap
-        
+
     def calcSpillover(self, surfaceObject, field, R_aper, ret_field=False):
         eta_s = self.EF.calcSpillover(surfaceObject, field, R_aper, ret_field)
         return eta_s
@@ -539,7 +616,7 @@ class System(object):
         available = psutil.virtual_memory()[1] * 1e-9
         return available
     
-    def _memCheckRT(self, workers):
+    def _memCheckRT(self, workers, buff=2):
         """
         For determining whether a Ray-trace has enough resources.
         To be used inside calls to startRaytracer etc.
@@ -552,14 +629,14 @@ class System(object):
         
         w_init = workers
         
-        if s_r >= s_ram:
-            print("""WARNING! You are attempting to start a ray-trace requiring {} gb of memory.
-Your system currently has {} gb of available RAM.
+        if s_r >= (s_ram - buff):
+            print("""WARNING! You are attempting to start a ray-trace requiring {:.2f} gb of memory.
+Your system currently has {:.2f} gb of available RAM.
 Automatically reducing # of workers...""".format(s_r, s_ram))
         
         while s_r >= s_ram:
             if workers == 1:
-                sys.exit("Not enough RAM for ray-trace with single worker. Exiting POPPy.")
+                sys.exit("Insufficient RAM for ray-trace with single worker. Exiting POPPy.")
             
             workers -= 1
             s_r = self.Raytracer.sizeOf(units='gb') * 2 * workers

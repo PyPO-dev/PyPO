@@ -141,13 +141,13 @@ class TestCamera(unittest.TestCase):
             self.assertAlmostEqual(nz.ravel()[i], interp_nz.ravel()[i], places=7)
             
     def test_get_conv(self):
-        check1 = self.camera.get_conv('mm')
-        check2 = self.camera.get_conv('cm')
-        check3 = self.camera.get_conv('m')
+        check1 = self.camera._get_conv('mm')
+        check2 = self.camera._get_conv('cm')
+        check3 = self.camera._get_conv('m')
         
-        check4 = self.camera.get_conv('deg')
-        check5 = self.camera.get_conv('am')
-        check6 = self.camera.get_conv('as')
+        check4 = self.camera._get_conv('deg')
+        check5 = self.camera._get_conv('am')
+        check6 = self.camera._get_conv('as')
         
         self.assertEqual(check1, 1)
         self.assertEqual(check2, 1e2)

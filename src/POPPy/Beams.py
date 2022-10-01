@@ -12,18 +12,21 @@ import src.POPPy.MatRotate as MatRotate
 class Beams(object):
     """
     Class that contains templates for commonly used beam patterns.
-    Currently supports plane waves and Gaussian beams.
+    Currently supports plane waves, point sources and custom distributions.
     
     Beams are always defined on rectangular grids, oriented in the xy plane and centered at (0,0,0).
-    In order to translate and rotate beams, the positions of the grid are rotated. 
+    In order to translate and rotate beams, the positions of the grid are to be rotated and translated. 
     The beam values are unchanged.
     """
     
     compList_eh = ['Ex', 'Ey', 'Ez', 'Hx', 'Hy', 'Hz']
     
+    #### DUNDER METHODS ###
+    
     def __init__(self, x_lims, y_lims, gridsize, flip, name, units, cRot):
+        self.shape = gridsize
         self.units = units
-        self.conv = self.get_conv(units)
+        self.conv = self._get_conv(units)
         
         self.cl = 299792458e3 # [mm]
         # Use internal list of references to iterable attributes
@@ -73,18 +76,18 @@ class Beams(object):
         else:
             raise StopIteration
     
-    def get_conv(self, units):
-        
-        if units == 'mm':
-            conv = 1
-        elif units == 'cm':
-            conv = 1e2
-        elif units == 'm':
-            conv = 1e3
-            
-        return conv
+    #### PUBLIC METHODS ###
     
     def calcJM(self, mode='None'):
+        """
+        (PUBLIC)
+        Calculate J and M current distribution from EM field.
+        
+        @param  ->
+            mode        :   Apply image theorem to calculate J and M
+                        :   Options: 'PEC', 'PMC', 'None'
+        """
+        
         temp = np.zeros(self.grid_x.shape, dtype=np.ndarray)
         
         norm_arr = temp.fill(self.norm)
@@ -141,15 +144,33 @@ class Beams(object):
         self._iterList[9] = self.Mz
         
     def translateBeam(self, offTrans, units='mm'):
-        conv = self.get_conv(units)
+        """
+        (PUBLIC)
+        Translate beam grid along xyz axes.
+        
+        @param  ->
+            offTrans    :   Translation in xyz   
+            units       :   Units of the supplied translation
+        """
+        
+        conv = self._get_conv(units)
         
         self.grid_x += offTrans[0] * conv
         self.grid_y += offTrans[1] * conv
         self.grid_z += offTrans[2] * conv
         
-        self.updateIterlist()
+        self._updateIterlist()
         
     def rotateBeam(self, offRot, radians=False):
+        """
+        (PUBLIC)
+        Rotate beam grid around xyz axes.
+        
+        @param  ->
+            offRot      :   Rotation around xyz axes, in degrees
+            radians     :   Whether offRot is in degrees or radians
+        """
+        
         gridRot = MatRotate.MatRotate(offRot, [self.grid_x, self.grid_y, self.grid_z], self.cRot, radians=radians)
         
         self.grid_x = gridRot[0]
@@ -158,12 +179,42 @@ class Beams(object):
         
         self.norm = MatRotate.MatRotate(offRot, self.norm, self.cRot, vecRot=True, radians=radians)
         
-        self.updateIterlist()
+        self._updateIterlist()
+    
+    #### PRIVATE METHODS ###
+    
+    def _updateIterlist(self):
+        """
+        (PRIVATE)
+        Update internal iteration container.
+        Called after translation and rotation
+        """
         
-    def updateIterlist(self):
         self._iterList[0] = self.grid_x
         self._iterList[1] = self.grid_y
         self._iterList[2] = self.grid_z
+        
+    def _get_conv(self, units):
+        """
+        (PRIVATE)
+        Get conversion factor given the units supplied.
+        
+        @param  ->
+            units       :   Units of the supplied translation
+            
+        @return ->
+            conv        :   Conversion factor for unit to mm conversion
+        """
+        
+        if units == 'mm':
+            conv = 1
+        elif units == 'cm':
+            conv = 1e2
+        elif units == 'm':
+            conv = 1e3
+            
+        return conv
+    
 
 class PlaneWave(Beams):
     def __init__(self, x_lims, y_lims, gridsize, pol, amp, phase, flip, name, units, cRot):

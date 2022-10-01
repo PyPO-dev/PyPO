@@ -82,25 +82,16 @@ def ex_ASTE():
     s.plotter.plotBeam2D(s.inputBeam, field=fieldps, vmin=-30, interpolation='none', units='mm', project='xy', save=True)
     offTrans_ps = foc_2_h1
     s.inputBeam.translateBeam(offTrans=offTrans_ps)
-    
-    
 
     s.initPhysOptics(target=s.system["sec"], k=k, numThreads=11, cpp_path=cpp_path)
-    '''
     s.runPhysOptics(save=2, material_source='alu')
-    
-    s.PO.plotField(s.system["sec"].grid_x, s.system["sec"].grid_y, mode='Ex', polar=True)
-    
+
     s.nextPhysOptics(source=s.system["sec"], target=s.system["pri"])
     s.runPhysOptics(save=2, material_source='alu')
-    
-    s.PO.plotField(s.system["pri"].grid_x, s.system["pri"].grid_y, mode='Ex', polar=True)
 
     s.ffPhysOptics(source=s.system["pri"], target=s.system["cam1"])
     s.runPhysOptics(save=2, material_source='vac', prop_mode=1)
-    '''
-    #s.PO.plotField(s.system["cam1"].grid_Az, s.system["cam1"].grid_El, mode='Ex', polar=False)
-    
+
     field = s.loadField(s.system["cam1"], mode='Ex')
     field2 = s.loadField(s.system["cam1"], mode='Ey')
     

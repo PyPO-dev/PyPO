@@ -28,7 +28,9 @@ class TestRayTrace(unittest.TestCase):
         self.originChief = np.zeros(3)
         self.tiltChief = np.zeros(3)
         
-        self.RT = RayTrace(self.nRays,
+        self.RT = RayTrace()
+        
+        self.RT.initRaytracer(self.nRays,
                             self.nRing,
                             self.a,
                             self.b,
@@ -65,7 +67,9 @@ class TestRayTrace(unittest.TestCase):
         tiltx = np.array([44,0,0])
         tilty = np.array([0,44,0])
         
-        RTtest = RayTrace(self.nRays,
+        RTtest = RayTrace()
+        
+        RTtest.initRaytracer(self.nRays,
                     self.nRing,
                     self.a,
                     self.b,
@@ -76,7 +80,9 @@ class TestRayTrace(unittest.TestCase):
         
         self.assertEqual('z', RTtest.getMode())
         
-        RTtest = RayTrace(self.nRays,
+        RTtest.clearRays()
+        
+        RTtest.initRaytracer(self.nRays,
                     self.nRing,
                     self.a,
                     self.b,
@@ -87,11 +93,13 @@ class TestRayTrace(unittest.TestCase):
         
         self.assertEqual('z', RTtest.getMode())
         
+        RTtest.clearRays()
+        
         # Now tilt 46 degrees along x and y
         tiltx = np.array([46,0,0])
         tilty = np.array([0,46,0])
         
-        RTtest = RayTrace(self.nRays,
+        RTtest.initRaytracer(self.nRays,
                     self.nRing,
                     self.a,
                     self.b,
@@ -102,7 +110,9 @@ class TestRayTrace(unittest.TestCase):
         
         self.assertEqual('y', RTtest.getMode())
         
-        RTtest = RayTrace(self.nRays,
+        RTtest.clearRays()
+        
+        RTtest.initRaytracer(self.nRays,
                     self.nRing,
                     self.a,
                     self.b,
@@ -113,11 +123,13 @@ class TestRayTrace(unittest.TestCase):
         
         self.assertEqual('x', RTtest.getMode())
         
+        RTtest.clearRays()
+        
         # Now tilt 45 degrees along x and y. Should resolve to x and y.
         tiltx = np.array([45,0,0])
         tilty = np.array([0,45,0])
         
-        RTtest = RayTrace(self.nRays,
+        RTtest.initRaytracer(self.nRays,
                     self.nRing,
                     self.a,
                     self.b,
@@ -128,7 +140,9 @@ class TestRayTrace(unittest.TestCase):
         
         self.assertEqual('z', RTtest.getMode())
         
-        RTtest = RayTrace(self.nRays,
+        RTtest.clearRays()
+        
+        RTtest.initRaytracer(self.nRays,
                     self.nRing,
                     self.a,
                     self.b,
@@ -138,6 +152,8 @@ class TestRayTrace(unittest.TestCase):
                     tiltChief=tilty)
         
         self.assertEqual('z', RTtest.getMode())
+        
+        RTtest.clearRays()
 
     def test_interpEval(self):
         self.RT.set_tcks(self.tcks)
@@ -146,7 +162,7 @@ class TestRayTrace(unittest.TestCase):
         x2 = np.linspace(-100, 100)
         
         for xx1, xx2 in zip(x1, x2):
-            self.assertEqual(self.RT.interpEval(xx1, xx2), 0)
+            self.assertEqual(self.RT._interpEval(xx1, xx2), 0)
             
     def test_interpEval_n(self):
         self.RT.set_tcks(self.tcks)
@@ -155,7 +171,7 @@ class TestRayTrace(unittest.TestCase):
         x2 = np.linspace(-100, 100)
         
         for xx1, xx2 in zip(x1, x2):
-            interp_n = self.RT.interpEval_n(xx1, xx2)
+            interp_n = self.RT._interpEval_n(xx1, xx2)
             self.assertEqual(interp_n[0], 0)
             self.assertEqual(interp_n[1], 0)
             self.assertEqual(interp_n[2], 1)
@@ -173,7 +189,7 @@ class TestRayTrace(unittest.TestCase):
         self.camera.interpCamera(res=1, mode='z')
         self.RT.set_tcks(self.camera.tcks)
         
-        diff = self.RT.optLine(a_test, ray_test, x1, x2, x3)
+        diff = self.RT._optLine(a_test, ray_test, x1, x2, x3)
         
         self.assertAlmostEqual(a_test, diff)
         
@@ -184,8 +200,10 @@ class TestRayTrace(unittest.TestCase):
         tiltx = np.array([25,0,0])
         dy = -np.tan(np.radians(tiltx[0])) * off_z
         
+        RTtest = RayTrace()
+        
         # TEST 1
-        RTtest = RayTrace(self.nRays,
+        RTtest.initRaytracer(self.nRays,
                     self.nRing,
                     self.a,
                     self.b,
@@ -204,8 +222,10 @@ class TestRayTrace(unittest.TestCase):
         
         self.assertAlmostEqual(RTtest.rays["ray_0"]["positions"][0][1] + dy, RTtest.rays["ray_0"]["positions"][1][1])
         
+        RTtest.clearRays()
+        
         # TEST 2
-        RTtest = RayTrace(nRays=4,
+        RTtest.initRaytracer(nRays=4,
                     nRing=0,
                     a=0,
                     b=0,
@@ -231,8 +251,10 @@ class TestRayTrace(unittest.TestCase):
             else:
                 self.assertAlmostEqual(diff, dr)
         
+        RTtest.clearRays()
+        
         # TEST 3
-        RTtest = RayTrace(nRays=4,
+        RTtest.initRaytracer(nRays=4,
                     nRing=0,
                     a=5,
                     b=5,
@@ -257,9 +279,11 @@ class TestRayTrace(unittest.TestCase):
                 
             else:
                 self.assertAlmostEqual(diff, dr+5)
-                
+        
+        RTtest.clearRays()
+        
         # TEST 4
-        RTtest = RayTrace(nRays=4,
+        RTtest.initRaytracer(nRays=4,
                     nRing=0,
                     a=0,
                     b=0,
@@ -284,9 +308,11 @@ class TestRayTrace(unittest.TestCase):
                 
             else:
                 self.assertAlmostEqual(diff, dr)
-                
+        
+        RTtest.clearRays()
+        
         # TEST 5
-        RTtest = RayTrace(nRays=4,
+        RTtest.initRaytracer(nRays=4,
                     nRing=4,
                     a=5,
                     b=5,

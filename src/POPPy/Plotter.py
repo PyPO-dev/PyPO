@@ -2,6 +2,7 @@ import numpy as np
 import os
 import matplotlib.pyplot as pt
 import matplotlib.cm as cm
+import matplotlib as mpl
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import src.POPPy.Colormaps as cmaps
@@ -24,7 +25,7 @@ class Plotter(object):
         if not existSave:
             os.makedirs(self.savePath)
     
-    def plotBeam2D(self, surfaceObject, field, vmin=-30, vmax=0, show=True, amp_only=False, save=False, polar=False, interpolation=None, mode='dB', project='xy', units=''):
+    def plotBeam2D(self, surfaceObject, field, vmin=-30, vmax=0, show=True, amp_only=False, save=False, polar=False, interpolation=None, plot_aper={"plot":False}, mode='dB', project='xy', units='', name=''):
         comp = field[1]
         field = field[0]
         
@@ -33,7 +34,7 @@ class Plotter(object):
         
         # Obtain conversion units if manually given
         if units:
-            conv = surfaceObject.get_conv(units)
+            conv = surfaceObject._get_conv(units)
             units = units
         else:
             conv = surfaceObject.conv
@@ -64,10 +65,7 @@ class Plotter(object):
             grid_x1 = surfaceObject.grid_z / conv
             grid_x2 = surfaceObject.grid_x / conv
             ff_flag = False
-            
-            
 
-        #extent = [grid_x1[0,0], grid_x1[-1,0], grid_x2[0,0], grid_x2[0,-1]]
         extent = [np.min(grid_x1), np.max(grid_x1), np.min(grid_x2), np.max(grid_x2)]
     
         if not amp_only:
@@ -81,16 +79,18 @@ class Plotter(object):
         
             if mode == 'linear':
                 ampfig = ax[0].imshow(np.absolute(field), origin='lower', extent=extent, cmap=cmaps.parula, interpolation=interpolation)
+                phasefig = ax[1].imshow(np.angle(field), origin='lower', extent=extent, cmap=cmaps.parula)
             
             elif mode == 'dB':
-                ampfig = ax[0].imshow(20 * np.log10(np.absolute(field) / np.max(np.absolute(field))), vmin=vmin, vmax=vmax, origin='lower', extent=extent, cmap=cmaps.parula, interpolation=interpolation)
-                
                 if polar:
                     extent = [grid_x1[0,0], grid_x1[-1,0], grid_x2[0,0], grid_x2[0,-1]]
-                    ampfig = ax[0].pcolormesh(grid_x1, grid_x2, 20 * np.log10(np.absolute(field) / np.max(np.absolute(field))), vmin=vmin, vmax=vmax, cmap=cmaps.parula)#, origin='lower', extent=extent, cmap=cmaps.parula, vmin=vmin, vmax=vmax)
-                    phasefig = ax[1].pcolormesh(grid_x1, grid_x2, np.angle(field), cmap=cmaps.parula)#, origin='lower', extent=extent, cmap=cmaps.parula)
+                    ampfig = ax[0].pcolormesh(grid_x1, grid_x2, 20 * np.log10(np.absolute(field) / np.max(np.absolute(field))), vmin=vmin, vmax=vmax, cmap=cmaps.parula, shading='auto')
+                    phasefig = ax[1].pcolormesh(grid_x1, grid_x2, np.angle(field), cmap=cmaps.parula, shading='auto')
+                    
+                else:
+                    phasefig = ax[1].imshow(np.angle(np.flip(field)), origin='lower', extent=extent, cmap=cmaps.parula)
+                    ampfig = ax[0].imshow(20 * np.log10(np.absolute(np.flip(field)) / np.max(np.absolute(field))), vmin=vmin, vmax=vmax, origin='lower', extent=extent, cmap=cmaps.parula, interpolation=interpolation)
             
-            phasefig = ax[1].imshow(np.angle(field), origin='lower', extent=extent, cmap=cmaps.parula)
             
             if ff_flag:
                 ax[0].set_ylabel(r"El / [{}]".format(units))
@@ -105,12 +105,22 @@ class Plotter(object):
                 ax[1].set_xlabel(r"$x$ / [{}]".format(units))
         
             ax[0].set_title(titleAmp, y=1.08)
-            ax[0].set_aspect(1)
+            #ax[0].set_box_aspect(1)
             ax[1].set_title(titlePhase, y=1.08)
-            ax[1].set_aspect(1)
+            #ax[1].set_box_aspect(1)
         
             c1 = fig.colorbar(ampfig, cax=cax1, orientation='vertical')
             c2 = fig.colorbar(phasefig, cax=cax2, orientation='vertical')
+            
+            if plot_aper["plot"]:
+                xc = plot_aper["center"][0]
+                yc = plot_aper["center"][1]
+                R = plot_aper["radius"]
+            
+                circle=mpl.patches.Circle((xc,yc),R, color='black', fill=False)
+
+                ax[0].add_patch(circle)
+                ax[0].scatter(xc, yc, color='black', marker='x')
             
         else:
             fig, ax = pt.subplots(1,1, figsize=(5,5))
@@ -137,9 +147,20 @@ class Plotter(object):
             ax.set_box_aspect(1)
         
             c = fig.colorbar(ampfig, cax=cax, orientation='vertical')
+            
+            if plot_aper["plot"]:
+                xc = plot_aper["center"][0]
+                yc = plot_aper["center"][1]
+                R = plot_aper["radius"]
+            
+                circle=mpl.patches.Circle((xc,yc),R, color='black', fill=False)
+
+                ax.add_patch(circle)
+                ax.scatter(xc, yc, color='black', marker='x')
+        
         
         if save:
-            pt.savefig(fname=self.savePath + '{}_{}.jpg'.format(surfaceObject.name, comp),bbox_inches='tight', dpi=300)
+            pt.savefig(fname=self.savePath + '{}_{}_{}.jpg'.format(surfaceObject.name, comp, name),bbox_inches='tight', dpi=300)
         
         if show:
             pt.show()

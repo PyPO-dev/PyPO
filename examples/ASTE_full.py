@@ -116,7 +116,7 @@ def ASTE_full():
     
     s.addBeam(lims_x=lims_x, lims_y=lims_y, gridsize=gridsize_beam, name='240.txt', beam='custom', comp='Ez')
     
-    beam_rot = np.array([0, 90, 0])
+    beam_rot = np.array([0, 95, 5])
     d_cryo = np.array([158.124, 0, 0])
     
     s.inputBeam.rotateBeam(beam_rot)
@@ -135,12 +135,13 @@ def ASTE_full():
     s.addCamera(lims_x_ff, lims_y_ff, gridsize_ff, center=center_ff, name = "ff", gmode='AoE', units=['as', 'mm'])
     
     s.initPhysOptics(target=s.system["h1"], k=k, numThreads=11, cpp_path=cpp_path)
-    
-    
+
     #s.initPhysOptics(k=k, numThreads=11, cpp_path=cpp_path, cont=True)
     #s.folderffPhysOptics(folder='ASTE/pri/', source=s.system["pri"], target=s.system["ff"])
-    #s.runPhysOptics(save=2, material_source='vac', prop_mode=1)
-    #s.runPhysOptics(save=2, material_source='alu')
+    #s.runPhysOptics(save=1, material_source='vac', prop_mode=1)
+    s.runPhysOptics(save=1, material_source='alu', prec='single', device='gpu')
+    field = s.loadField(s.system["h1"], mode='Ez')
+    s.plotter.plotBeam2D(s.system["h1"], field=field, polar=False, vmin=-30, interpolation='none', project='yz', units='mm')
     #s.PO.plotField(s.system["pri"].grid_y, s.system["pri"].grid_x, mode='Ex', polar=True, show=False)
     '''
     s.runPhysOptics(save=2, material_source='alu', folder='ASTE/h1/')

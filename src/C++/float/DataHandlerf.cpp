@@ -1,21 +1,21 @@
-#include "DataHandler.h"
+#include "DataHandlerf.h"
 
 /**
  * Read from .txt file.
  * 
  * @param file An ifstream object to the .txt file to be read.
- * @return data Container of doubles containing the contents of .txt file.
+ * @return data Container of floats containing the contents of .txt file.
  */
-std::vector<double> DataHandler::readFile(std::ifstream &file, double factor = 1.)
+std::vector<float> DataHandlerf::readFile(std::ifstream &file, float factor = 1.)
 {
     std::string value;
-    std::vector<double> data;
+    std::vector<float> data;
     
     if (file)
     {
         while (file >> value)
         {
-            double val = factor * atof(value.c_str());
+            float val = factor * atof(value.c_str());
             data.push_back(val);
         }
     }
@@ -23,19 +23,19 @@ std::vector<double> DataHandler::readFile(std::ifstream &file, double factor = 1
     return data;
 }
 
-std::vector<double> DataHandler::readPars()
+std::vector<float> DataHandlerf::readPars()
 {
     std::ifstream pars_stream;
     pars_stream.open("input/pars.txt");
     
     std::string value;
-    std::vector<double> pars;
+    std::vector<float> pars;
     
     if (pars_stream)
     {
         while (pars_stream >> value)
         {
-            double val = atof(value.c_str());
+            float val = atof(value.c_str());
             pars.push_back(val);
         }
     }
@@ -50,11 +50,11 @@ std::vector<double> DataHandler::readPars()
  *    mode = t corresponds to target grid.
  * @return grid Container of length grid with at each element a 3D array containing x,y,z respectively.
  */
-std::vector<std::array<double, 3>> DataHandler::readGrid3D(std::string &mode) 
+std::vector<std::array<float, 3>> DataHandlerf::readGrid3D(std::string &mode) 
 {
-    std::vector<std::array<double, 3>> grid;
+    std::vector<std::array<float, 3>> grid;
     
-    std::vector<std::vector<double>> _grid;
+    std::vector<std::vector<float>> _grid;
     
     std::vector<std::string> xyz = {"_x", "_y", "_z"};
     
@@ -69,7 +69,7 @@ std::vector<std::array<double, 3>> DataHandler::readGrid3D(std::string &mode)
     
     for (int i=0; i<_grid[0].size(); i++)
         {
-            std::array<double, 3> pos;
+            std::array<float, 3> pos;
             
             pos[0] = _grid[0][i];
             pos[1] = _grid[1][i];
@@ -89,10 +89,10 @@ std::vector<std::array<double, 3>> DataHandler::readGrid3D(std::string &mode)
  *    mode = t corresponds to target grid.
  * @return grid Container of length 3 with at each element the position grid in x,y,z respectively.
  */
-std::vector<std::array<double, 2>> DataHandler::readGrid2D() 
+std::vector<std::array<float, 2>> DataHandlerf::readGrid2D() 
 {
-    std::vector<std::array<double, 2>> grid;
-    std::vector<std::vector<double>> _grid;
+    std::vector<std::array<float, 2>> grid;
+    std::vector<std::vector<float>> _grid;
 
     std::array<std::string, 2> azel = {"_th", "_ph"};
 
@@ -106,7 +106,7 @@ std::vector<std::array<double, 2>> DataHandler::readGrid2D()
     
     for (int i=0; i<_grid[0].size(); i++)
         {
-            std::array<double, 2> pos;
+            std::array<float, 2> pos;
             
             pos[0] = _grid[0][i];
             pos[1] = _grid[1][i];
@@ -122,18 +122,18 @@ std::vector<std::array<double, 2>> DataHandler::readGrid2D()
  * 
  * @return Js_xyz Container the complex xyz components of Js.
  */
-std::vector<std::array<std::complex<double>, 3>> DataHandler::read_Js()
+std::vector<std::array<std::complex<float>, 3>> DataHandlerf::read_Js()
 {   
     
-    std::vector<std::array<std::complex<double>, 3>> Js_grid;
+    std::vector<std::array<std::complex<float>, 3>> Js_grid;
     
-    std::vector<std::vector<std::complex<double>>> _Js_grid;
+    std::vector<std::vector<std::complex<float>>> _Js_grid;
     
     std::vector<std::string> xyz = {"_x", "_y", "_z"};
     
     for (int k=0; k<3; k++)
     {
-        std::vector<std::complex<double>> Js;
+        std::vector<std::complex<float>> Js;
         
         std::ifstream rJs_stream;
         std::ifstream iJs_stream;
@@ -141,15 +141,15 @@ std::vector<std::array<std::complex<double>, 3>> DataHandler::read_Js()
         rJs_stream.open("input/rJs" + xyz[k] + ".txt");
         iJs_stream.open("input/iJs" + xyz[k] + ".txt");
     
-        std::vector<double> rJs = readFile(rJs_stream);
-        std::vector<double> iJs = readFile(iJs_stream);
+        std::vector<float> rJs = readFile(rJs_stream);
+        std::vector<float> iJs = readFile(iJs_stream);
         
         rJs_stream.close();
         iJs_stream.close();
     
         for (int i=0; i<rJs.size(); i++)
         {
-            std::complex<double> z(rJs[i], iJs[i]);
+            std::complex<float> z(rJs[i], iJs[i]);
             Js.push_back(z);
         }
         _Js_grid.push_back(Js);
@@ -157,7 +157,7 @@ std::vector<std::array<std::complex<double>, 3>> DataHandler::read_Js()
     
     for (int i=0; i<_Js_grid[0].size(); i++)
         {
-            std::array<std::complex<double>, 3> arr;
+            std::array<std::complex<float>, 3> arr;
             
             arr[0] = _Js_grid[0][i];
             arr[1] = _Js_grid[1][i];
@@ -174,17 +174,17 @@ std::vector<std::array<std::complex<double>, 3>> DataHandler::read_Js()
  * 
  * @return Ms_xyz Container the complex xyz components of Ms.
  */
-std::vector<std::array<std::complex<double>, 3>> DataHandler::read_Ms()
+std::vector<std::array<std::complex<float>, 3>> DataHandlerf::read_Ms()
 {   
     
-    std::vector<std::array<std::complex<double>, 3>> Ms_grid;
-    std::vector<std::vector<std::complex<double>>> _Ms_grid;
+    std::vector<std::array<std::complex<float>, 3>> Ms_grid;
+    std::vector<std::vector<std::complex<float>>> _Ms_grid;
     
     std::vector<std::string> xyz = {"_x", "_y", "_z"};
     
     for (int k=0; k<3; k++)
     {
-        std::vector<std::complex<double>> Ms;
+        std::vector<std::complex<float>> Ms;
         
         std::ifstream rMs_stream;
         std::ifstream iMs_stream;
@@ -192,15 +192,15 @@ std::vector<std::array<std::complex<double>, 3>> DataHandler::read_Ms()
         rMs_stream.open("input/rMs" + xyz[k] + ".txt");
         iMs_stream.open("input/iMs" + xyz[k] + ".txt");
     
-        std::vector<double> rMs = readFile(rMs_stream);
-        std::vector<double> iMs = readFile(iMs_stream);
+        std::vector<float> rMs = readFile(rMs_stream);
+        std::vector<float> iMs = readFile(iMs_stream);
         
         rMs_stream.close();
         iMs_stream.close();
     
         for (int i=0; i<rMs.size(); i++)
         {
-            std::complex<double> z(rMs[i], iMs[i]);
+            std::complex<float> z(rMs[i], iMs[i]);
             Ms.push_back(z);
         }
         _Ms_grid.push_back(Ms);
@@ -208,7 +208,7 @@ std::vector<std::array<std::complex<double>, 3>> DataHandler::read_Ms()
 
     for (int i=0; i<_Ms_grid[0].size(); i++)
         {
-            std::array<std::complex<double>, 3> arr;
+            std::array<std::complex<float>, 3> arr;
             
             arr[0] = _Ms_grid[0][i];
             arr[1] = _Ms_grid[1][i];
@@ -225,9 +225,9 @@ std::vector<std::array<std::complex<double>, 3>> DataHandler::read_Ms()
  * 
  * @return field_s Source field illuminating target.
  */
-std::vector<std::complex<double>> DataHandler::readScalarField()
+std::vector<std::complex<float>> DataHandlerf::readScalarField()
 {
-    std::vector<std::complex<double>> Fs;
+    std::vector<std::complex<float>> Fs;
     
     std::ifstream rFs_stream;
     std::ifstream iFs_stream;
@@ -235,12 +235,12 @@ std::vector<std::complex<double>> DataHandler::readScalarField()
     rFs_stream.open("input/rFs.txt");
     iFs_stream.open("input/iFs.txt");
     
-    std::vector<double> rFs = readFile(rFs_stream);
-    std::vector<double> iFs = readFile(iFs_stream);
+    std::vector<float> rFs = readFile(rFs_stream);
+    std::vector<float> iFs = readFile(iFs_stream);
     
     for (int i=0; i<rFs.size(); i++)
     {
-        std::complex<double> z(rFs[i], iFs[i]);
+        std::complex<float> z(rFs[i], iFs[i]);
         Fs.push_back(z);
     }
     
@@ -253,12 +253,12 @@ std::vector<std::complex<double>> DataHandler::readScalarField()
  * @param fileName Name of file containing grid of areas.
  * @return are Container with areas corresponding to spatial grid.
  */
-std::vector<double> DataHandler::readArea()
+std::vector<float> DataHandlerf::readArea()
 {
     std::ifstream a_stream;
     
     a_stream.open("input/As.txt");
-    std::vector<double> area = readFile(a_stream);
+    std::vector<float> area = readFile(a_stream);
     
     return area;
 }
@@ -272,10 +272,10 @@ std::vector<double> DataHandler::readArea()
  *    mode = N corresponds to the terminating surface.
  * @return grid Container of length 3 with at each element the components nx,ny,nz respectively.
  */
-std::vector<std::array<double, 3>> DataHandler::readNormals()
+std::vector<std::array<float, 3>> DataHandlerf::readNormals()
 {
-    std::vector<std::array<double, 3>> grid;
-    std::vector<std::vector<double>> _grid;
+    std::vector<std::array<float, 3>> grid;
+    std::vector<std::vector<float>> _grid;
 
     std::vector<std::string> nxyz = {"_nx", "_ny", "_nz"};
     
@@ -290,7 +290,7 @@ std::vector<std::array<double, 3>> DataHandler::readNormals()
     
     for (int i=0; i<_grid[0].size(); i++)
         {
-            std::array<double, 3> arr;
+            std::array<float, 3> arr;
             
             arr[0] = _grid[0][i];
             arr[1] = _grid[1][i];
@@ -310,7 +310,7 @@ std::vector<std::array<double, 3>> DataHandler::readNormals()
  *      Use "Jt", "Mt", "Et" and "Ht" for consistency.
  */
 
-void DataHandler::writeOutC(std::vector<std::array<std::complex<double>, 3>> &out, std::string &fileName)
+void DataHandlerf::writeOutC(std::vector<std::array<std::complex<float>, 3>> &out, std::string &fileName)
 {
     std::vector<std::string> xyz = {"_x", "_y", "_z"};
     
@@ -341,7 +341,7 @@ void DataHandler::writeOutC(std::vector<std::array<std::complex<double>, 3>> &ou
     }
 }
 
-void DataHandler::writeOutR(std::vector<std::array<double, 3>> &out, std::string &fileName)
+void DataHandlerf::writeOutR(std::vector<std::array<float, 3>> &out, std::string &fileName)
 {
     std::vector<std::string> xyz = {"_x", "_y", "_z"};
     
@@ -366,7 +366,7 @@ void DataHandler::writeOutR(std::vector<std::array<double, 3>> &out, std::string
     }
 }
 
-void DataHandler::writeScalarOut(std::vector<std::complex<double>> &out, std::string &fileName)
+void DataHandlerf::writeScalarOut(std::vector<std::complex<float>> &out, std::string &fileName)
 {
     std::fstream out_r;
     std::fstream out_i;
@@ -389,6 +389,3 @@ void DataHandler::writeScalarOut(std::vector<std::complex<double>> &out, std::st
     out_r.close();
     out_i.close();
 }
-
-
-

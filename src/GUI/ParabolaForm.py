@@ -19,7 +19,6 @@ class ParabolaFormLayout(qtw.QFormLayout):
         
 
         
-        # self.setStyleSheet("background: #D9D9D9;")
 
     def PModeChanged(self):
         if self.pmode.currentIndex() == 0:

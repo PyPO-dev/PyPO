@@ -3,38 +3,31 @@ from PyQt5.QtWidgets import QLabel, QApplication, QWidget, QHBoxLayout, QMainWin
                                     QAction
                                         
 from PyQt5.QtGui import QFont, QIcon, QCursor 
-from PyQt5.QtCore import QMargins, Qt
+from PyQt5.QtCore import Qt
 from ElementOptionsLayout import ElementOptionsLayout
 from selfClosingDialog import selfClosingDialog
+from selfClosingDialog_HoverableBtn import HoverOpenBtn
 import sys
 sys.path.append('../')
 sys.path.append('../../')
-import time
 
 
 
 class ElementWidget(QWidget):
-    def __init__ (self, p, element):
+    def __init__ (self, element, p=None ):
         super().__init__(p)
+        
         layout = QHBoxLayout()
         label = QLabel(element)
 
-        # label.setFont(QFont('Times New Roman', 18))
-        label.setStyleSheet("border-top-left-radius :15px;"
-                            " border-top-right-radius : 0px; "
-                            "border-bottom-left-radius : 15px; "
-                            "border-bottom-right-radius : 0px")
         label.setFixedSize(200,39)
 
+        # self.btn = HoverOpenBtn("btn",self._openOptionsMenu, self._closeOptionsMenu)
         self.btn = QPushButton("btn")
         self.btn.clicked.connect(self._openOptionsMenu)
         self.btn.setIcon(QIcon("src/GUI/Images/dots.png"))
         self.btn.setFixedSize(50,39)
         
-        self.btn.setStyleSheet("border-top-left-radius :0px;"
-                            " border-top-right-radius : 15px; "
-                            "border-bottom-left-radius : 0px; "
-                            "border-bottom-right-radius : 15px")
 
         layout.setSpacing(0)
         layout.addWidget(label)
@@ -43,35 +36,32 @@ class ElementWidget(QWidget):
         self.setLayout(layout)
         self.setFixedSize(250,60)
   
-        self.setStyleSheet("*{background:#6715a5;}"
-                            "*:hover{background:#a51554; }")
-
-            
-
-        ### debug style
-        # self.setStyleSheet("border: 2px dotted #ff6550;\
-        #                     background: #ffffff;")     
+         
 
     def _openOptionsMenu(self):
-        self.dlg = selfClosingDialog(self.closeOptionsMenu, parent = self)
+        self.dlg = selfClosingDialog(self._closeOptionsMenu, parent = self)
         
-        self.dlg.setLayout(ElementOptionsLayout(self.closeOptionsMenu))
+        self.dlg.setLayout(ElementOptionsLayout(self._closeOptionsMenu))
         self.dlg.setWindowFlag(Qt.FramelessWindowHint)
-        
-        self.dlg.setGeometry(QCursor.pos().x(), QCursor.pos().y() ,100,100)
+        posi = self.mapToGlobal(self.btn.pos())
+        self.dlg.setGeometry(posi.x(), posi.y() ,100,100)
         self.dlg.show()
         
 
-    def closeOptionsMenu(self):
+    def _closeOptionsMenu(self):
         self.dlg.close()
+
+   
+
+    
         
 
 
 if __name__ == "__main__":
     app = QApplication([])
     window = QMainWindow()
-    window.resize(500,800)
-    wid = ElementWidget(window,"Parabola_0")
+    window.resize(500,400)
+    wid = ElementWidget("Parabola_0", window)
     
     window.show()
     app.exec_()

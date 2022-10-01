@@ -1,0 +1,21 @@
+ElementWidget QPushButton{
+    background:#6715a5;
+    border-top-left-radius :0px;
+    border-top-right-radius : 15px; 
+    border-bottom-left-radius : 0px; 
+    border-bottom-right-radius : 15px
+}
+QPushButton:hover{
+    background:#a51554;
+}
+
+ElementWidget QLabel{
+    background: #6715a5;
+    border-top-left-radius :15px;
+    border-top-right-radius : 0px; 
+    border-bottom-left-radius : 15px; 
+    border-bottom-right-radius : 0px
+}
+QWidget[class="parameterForm"]{
+    background: #6715a5;
+}

@@ -9,10 +9,10 @@ class ElementsWindow(qtw.QWidget):
     def __init__ (self, elements):
         super().__init__()
 
-        ColLayout = qtw.QVBoxLayout()
+        # ColLayout = qtw.QVBoxLayout()
         pushDown = 0
         for elem in elements:
-            label = ElementWidget(self, elem)
+            label = ElementWidget(elem, self)
             label.move(0,pushDown)
             pushDown += 40
             # ColLayout.addWidget(label)
@@ -20,12 +20,8 @@ class ElementsWindow(qtw.QWidget):
         # verticalSpacer = qtw.QSpacerItem(20, 40, qtw.QSizePolicy.Maximum, qtw.QSizePolicy.Expanding)         
         # ColLayout.addItem(verticalSpacer)
 
-
-        # self.setStyleSheet("background: #5A0168; color:white")
-        # self.setLayout(ColLayout)
         self.setMaximumHeight(500)
    
-
         
 if __name__ == '__main__':
 

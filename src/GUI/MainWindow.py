@@ -61,7 +61,7 @@ class MainWidget(QWidget):
         self.ParameterWid = QWidget()
         self.ParameterWid.setMaximumWidth(400)
         self.ParameterWid.setMinimumWidth(400)
-        self.ParameterWid.setStyleSheet("background: #5A0168")
+        # self.ParameterWid.setProperty('class', 'parameterForm')
         self.addToWindowGrid(self.ParameterWid,self.GPParameterForm)
 
     def plotSystem(self):
@@ -124,5 +124,10 @@ if __name__ == "__main__":
     win = QMainWindow(parent=None)
     win.showMaximized()
     win.setCentralWidget(MainWidget())
+
+    with open('style.css') as f:
+        css = f.read()
+    win.setStyleSheet(css)
+
     win.show()
     app.exec_()

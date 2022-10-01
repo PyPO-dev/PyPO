@@ -95,7 +95,6 @@ class SystemTab(QWidget):
         self.Parameterform.setMaximumWidth(400)
         self.Parameterform.setMinimumWidth(400)
 
-        # self.Parameterform.setStyleSheet("background: #D9D9D9")
         self.Layout.addWidget(self.Parameterform, 0, 1, 2, 1)
 
         # TransformationWidget

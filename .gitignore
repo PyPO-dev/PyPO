@@ -135,7 +135,9 @@ dmypy.json
 # User-specific folders
 src/C++/input/
 src/C++/output/
-src/C++/double/backup/
+src/C++/src/bak/
+src/C++/src/bak2/
+src/C++/src/bleeding_edge/
 images/
 save/
 

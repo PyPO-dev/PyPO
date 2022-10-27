@@ -18,50 +18,53 @@ def loadCPUlib():
     return lib
 
 # WRAPPER FUNCTIONS DOUBLE PREC
-def calcJM_CPUd(source, target, currents, k, numThreads, epsilon, t_direction):
+def calcJM_CPUd(source, target, currents, k, epsilon, t_direction, nThreads):
     lib = loadCPUlib()
 
-    target_shape = (target.shape[0], target.shape[1])
+    # Create structs with pointers for source and target
+    csp = reflparamsf()
+    ctp = reflparamsf()
+
+    cs = reflcontainerf()
+    ct = reflcontainerf()
+
+    gs = source["gridsize"][0] * source["gridsize"][1]
+    gt = target["gridsize"][0] * target["gridsize"][1]
+
+    allfill_reflparams(csp, source, ctypes.c_double)
+    allfill_reflparams(ctp, target, ctypes.c_double)
+
+    allocate_reflcontainer(cs, gs, ctypes.c_double)
+    allocate_reflcontainer(ct, gt, ctypes.c_double)
+
+    # Create structure for input currents c2Bundle
+    c_currents = c2Bundlef()
+
+    # Copy content of currents into c_currents
+    currentConv(currents, c_currents, gs, ctypes.c_double)
+
+    target_shape = (target["gridsize"][0], target["gridsize"][1])
 
     # Define arg and return types
-    lib.propagateToGrid_JM.argtypes = [ctypes.POINTER(c2Bundle),
-                                       ctypes.POINTER(ctypes.c_double), ctypes.POINTER(ctypes.c_double),
-                                       ctypes.POINTER(ctypes.c_double), ctypes.POINTER(ctypes.c_double),
-                                       ctypes.POINTER(ctypes.c_double), ctypes.POINTER(ctypes.c_double),
-                                       ctypes.POINTER(ctypes.c_double), ctypes.POINTER(ctypes.c_double),
-                                       ctypes.POINTER(ctypes.c_double), ctypes.POINTER(ctypes.c_double),
-                                       ctypes.POINTER(ctypes.c_double), ctypes.POINTER(ctypes.c_double),
-                                       ctypes.POINTER(ctypes.c_double), ctypes.POINTER(ctypes.c_double),
-                                       ctypes.POINTER(ctypes.c_double), ctypes.POINTER(ctypes.c_double),
-                                       ctypes.POINTER(ctypes.c_double), ctypes.POINTER(ctypes.c_double),
-                                       ctypes.POINTER(ctypes.c_double), ctypes.POINTER(ctypes.c_double),
-                                       ctypes.POINTER(ctypes.c_double), ctypes.POINTER(ctypes.c_double),
-                                       ctypes.c_int, ctypes.c_int, ctypes.c_double, ctypes.c_int,
-                                       ctypes.c_double, ctypes.c_double]
+    lib.propagateToGrid_JM.argtypes = [ctypes.POINTER(c2Bundle), reflparamsf, reflparamsf,
+                                        ctypes.POINTER(reflcontainerf), ctypes.POINTER(reflcontainerf),
+                                        ctypes.POINTER(c2Bundlef),ctypes.c_double, ctypes.c_int,
+                                        ctypes.c_double, ctypes.c_double]
 
     lib.propagateToGrid_JM.restype = None
 
-    xyzs, xyzt, nxyzt, area, rJs, iJs, rMs, iMs = extractor(source, target, currents, ctypes.c_double)
-
-    gs          = ctypes.c_int(source.shape[0] * source.shape[1])
-    gt          = ctypes.c_int(target.shape[0] * target.shape[1])
     k           = ctypes.c_double(k)
-    numThreads  = ctypes.c_int(numThreads)
+    nThreads    = ctypes.c_int(nThreads)
     epsilon     = ctypes.c_double(epsilon)
     t_direction = ctypes.c_double(t_direction)
 
     # We pass reference to struct to c-function.
     res = c2Bundle()
+    allocate_c2Bundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_double)
 
-    lib.propagateToGrid_JM(ctypes.byref(res),
-                            xyzt[0], xyzt[1], xyzt[2],
-                            xyzs[0], xyzs[1], xyzs[2],
-                            nxyzt[0], nxyzt[1], nxyzt[2],
-                            rJs[0], rJs[1], rJs[2],
-                            iJs[0], iJs[1], iJs[2],
-                            rMs[0], rMs[1], rMs[2],
-                            iMs[0], iMs[1], iMs[2],
-                            area, gt, gs, k, numThreads,
+    lib.propagateToGrid_JM(ctypes.byref(res), csp, ctp,
+                            ctypes.byref(cs), ctypes.byref(ct),
+                            ctypes.byref(c_currents), k, nThreads,
                             epsilon, t_direction)
 
     # Unpack filled struct

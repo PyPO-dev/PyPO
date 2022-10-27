@@ -156,6 +156,12 @@ class System(object):
 
         self.num_ref += 1
 
+    def rotateGrids(self, name, rotation, cRot=np.zeros(3)):
+        self.system[name]["transf"] = MatRotate(rotation, self.system[name]["transf"], cRot)
+
+    def translateGrids(self, name, translation):
+        self.system[name]["transf"] = MatTranslate(offTrans, self.system[name]["transf"])
+
     def readCustomBeam(self, name, comp, shape, convert_to_current=True, mode="PMC", ret="currents"):
         rfield = np.loadtxt(self.customBeamPath + "r" + name + ".txt")
         ifield = np.loadtxt(self.customBeamPath + "i" + name + ".txt")

@@ -16,47 +16,25 @@
 
 // DOUBLE PRECISION INTERFACE
 
-extern "C" void propagateToGrid_JM(c2Bundle *res, double *xt, double *yt, double *zt,
-                                double *xs, double *ys, double *zs,
-                                double *nxt, double *nyt, double *nzt,
-                                double *rJxs, double *rJys, double *rJzs,
-                                double *iJxs, double *iJys, double *iJzs,
-                                double *rMxs, double *rMys, double *rMzs,
-                                double *iMxs, double *iMys, double *iMzs,
-                                double *area, int gt, int gs,
+extern "C" void propagateToGrid_JM(c2Bundle *res, reflparams source, reflparams target,
+                                reflcontainer *cs, reflcontainer *ct,
+                                c2Bundle *currents,
                                 double k, int numThreads, double epsilon,
                                 double t_direction)
 {
-    // Since res contains null pointers to arrays of doubles, assign new pointers to dynamic arrays
-    res->r1x = (double*)calloc(gt, sizeof(double));
-    res->r1y = (double*)calloc(gt, sizeof(double));
-    res->r1z = (double*)calloc(gt, sizeof(double));
-    res->i1x = (double*)calloc(gt, sizeof(double));
-    res->i1y = (double*)calloc(gt, sizeof(double));
-    res->i1z = (double*)calloc(gt, sizeof(double));
+    Propagation<double, c2Bundle> prop(k, numThreads, cs->size, ct->size, epsilon, t_direction);
 
-    res->r2x = (double*)calloc(gt, sizeof(double));
-    res->r2y = (double*)calloc(gt, sizeof(double));
-    res->r2z = (double*)calloc(gt, sizeof(double));
-    res->i2x = (double*)calloc(gt, sizeof(double));
-    res->i2y = (double*)calloc(gt, sizeof(double));
-    res->i2z = (double*)calloc(gt, sizeof(double));
-
-    Propagation<double, c2Bundle> prop(k, numThreads, gs, gt, epsilon, t_direction);
+    // Generate source and target grids
+    generateGridf(source, cs);
+    generateGridf(target, ct);
 
     std::chrono::steady_clock::time_point begin;
     std::chrono::steady_clock::time_point end;
 
     printf("Starting mode 0...\n");
     begin = std::chrono::steady_clock::now();
-    prop.parallelProp_JM(xt, yt, zt,
-                        xs, ys, zs,
-                        nxt, nyt, nzt,
-                        rJxs, rJys, rJzs,
-                        iJxs, iJys, iJzs,
-                        rMxs, rMys, rMzs,
-                        iMxs, iMys, iMzs,
-                        area, res);
+
+    prop.parallelProp_JM(cs, ct, currents, res);
 
     end = std::chrono::steady_clock::now();
 

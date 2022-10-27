@@ -34,6 +34,7 @@ def generateGrid(reflparams_py):
     lib.generateGrid.argtypes = [reflparams, ctypes.POINTER(reflcontainer)]
     lib.generateGrid.restype = None
 
+    print(reflparams_py["transf"])
 
     lib.generateGrid(inp, ctypes.byref(res))
     grids = creflToObj(res, reflparams_py["gridsize"], np.float64)

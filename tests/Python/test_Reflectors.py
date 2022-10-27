@@ -242,6 +242,69 @@ class TestParabola(unittest.TestCase):
             self.assertAlmostEqual(nxp, nxh)
             self.assertAlmostEqual(nyp, nyh)
             self.assertAlmostEqual(nzp, nzh)
+            
+    def test_paramTojson(self):
+        self.parabola.setGrid(self.lims_x, self.lims_y, self.gridsize, gmode='xy', axis='a', trunc=False, flip=False)
+        param_dict = self.parabola.paramTojson()
+
+        self.assertEqual(param_dict["name"], self.parabola.name)
+        self.assertEqual(param_dict["type"], self.parabola.reflectorType)
+        self.assertEqual(param_dict["a"], self.parabola.a)
+        self.assertEqual(param_dict["b"], self.parabola.b)
+        self.assertTrue(np.isnan(param_dict["c"]))
+        self.assertEqual(param_dict["lims_x"][0], self.parabola.lims_x[0])
+        self.assertEqual(param_dict["lims_y"][0], self.parabola.lims_y[0])
+        self.assertEqual(param_dict["lims_x"][1], self.parabola.lims_x[1])
+        self.assertEqual(param_dict["lims_y"][1], self.parabola.lims_y[1])
+        self.assertEqual(param_dict["gridsize"][0], self.parabola.shape[0])
+        self.assertEqual(param_dict["gridsize"][1], self.parabola.shape[1])
+        self.assertEqual(param_dict["gmode"], self.parabola.gmode)
+        self.assertEqual(param_dict["uvaxis"], self.parabola.uvaxis)
+        self.assertEqual(param_dict["units"], self.parabola.units)
+        self.assertEqual(param_dict["cRot"][0], self.parabola.cRot[0])
+        self.assertEqual(param_dict["cRot"][1], self.parabola.cRot[1])
+        self.assertEqual(param_dict["cRot"][2], self.parabola.cRot[2])
+        self.assertEqual(param_dict["flip"], self.parabola.flip)
+        self.assertEqual(param_dict["sec"], self.parabola.sec)
+        
+        for lp, ld in zip(self.parabola.history, param_dict["history"]):
+            for llp, lld in zip(lp, ld):
+                if isinstance(lld, list):
+                    for lllp, llld in zip(llp, lld):
+                        self.assertEqual(lllp, llld)
+                                         
+                else:
+                    self.assertEqual(llp, lld)
+                    
+    def test_updateIterlist(self):
+        self.parabola.setGrid(self.lims_x, self.lims_y, self.gridsize, gmode='xy', axis='a', trunc=False, flip=False)
+        trans = np.array([1,2,3])
+        rot = np.array([0,180,0])
+        
+        iterList0 = Copy.copyGrid(self.parabola._iterList)
+        self.parabola.translateGrid(trans)
+        
+        for i, (attr0, attr) in enumerate(zip(iterList0, self.parabola._iterList)):
+            for x0, x1 in zip(attr0.ravel(), attr.ravel()):
+                if i < 3:
+                    self.assertEqual(x0, x1 - trans[i])
+                
+                else:
+                    self.assertEqual(x0, x1)
+        
+        self.parabola.homeReflector()
+        
+        iterList1 = Copy.copyGrid(self.parabola._iterList)
+        self.parabola.rotateGrid(rot)
+        
+        for i, (attr0, attr) in enumerate(zip(iterList1, self.parabola._iterList)):
+            for x0, x1 in zip(attr0.ravel(), attr.ravel()):
+                if i == 0 or i == 2 or i == 4 or i == 6:
+                    self.assertAlmostEqual(x0, -1*x1)
+                
+                else:
+                    self.assertAlmostEqual(x0, x1)
+  
 
 class TestHyperbola(unittest.TestCase): 
     
@@ -480,7 +543,68 @@ class TestHyperbola(unittest.TestCase):
             self.assertAlmostEqual(nxp, nxh)
             self.assertAlmostEqual(nyp, nyh)
             self.assertAlmostEqual(nzp, nzh)
+            
+    def test_paramTojson(self):
+        self.hyperbola.setGrid(self.lims_x, self.lims_y, self.gridsize, gmode='xy', axis='a', trunc=False, flip=False)
+        param_dict = self.hyperbola.paramTojson()
 
+        self.assertEqual(param_dict["name"], self.hyperbola.name)
+        self.assertEqual(param_dict["type"], self.hyperbola.reflectorType)
+        self.assertEqual(param_dict["a"], self.hyperbola.a)
+        self.assertEqual(param_dict["b"], self.hyperbola.b)
+        self.assertEqual(param_dict["c"], self.hyperbola.c)
+        self.assertEqual(param_dict["lims_x"][0], self.hyperbola.lims_x[0])
+        self.assertEqual(param_dict["lims_y"][0], self.hyperbola.lims_y[0])
+        self.assertEqual(param_dict["lims_x"][1], self.hyperbola.lims_x[1])
+        self.assertEqual(param_dict["lims_y"][1], self.hyperbola.lims_y[1])
+        self.assertEqual(param_dict["gridsize"][0], self.hyperbola.shape[0])
+        self.assertEqual(param_dict["gridsize"][1], self.hyperbola.shape[1])
+        self.assertEqual(param_dict["gmode"], self.hyperbola.gmode)
+        self.assertEqual(param_dict["uvaxis"], self.hyperbola.uvaxis)
+        self.assertEqual(param_dict["units"], self.hyperbola.units)
+        self.assertEqual(param_dict["cRot"][0], self.hyperbola.cRot[0])
+        self.assertEqual(param_dict["cRot"][1], self.hyperbola.cRot[1])
+        self.assertEqual(param_dict["cRot"][2], self.hyperbola.cRot[2])
+        self.assertEqual(param_dict["flip"], self.hyperbola.flip)
+        self.assertEqual(param_dict["sec"], self.hyperbola.sec)
+        
+        for lp, ld in zip(self.hyperbola.history, param_dict["history"]):
+            for llp, lld in zip(lp, ld):
+                if isinstance(lld, list):
+                    for lllp, llld in zip(llp, lld):
+                        self.assertEqual(lllp, llld)
+                                         
+                else:
+                    self.assertEqual(llp, lld)
+
+    def test_updateIterlist(self):
+        self.hyperbola.setGrid(self.lims_x, self.lims_y, self.gridsize, gmode='xy', axis='a', trunc=False, flip=False)
+        trans = np.array([1,2,3])
+        rot = np.array([0,180,0])
+        
+        iterList0 = Copy.copyGrid(self.hyperbola._iterList)
+        self.hyperbola.translateGrid(trans)
+        
+        for i, (attr0, attr) in enumerate(zip(iterList0, self.hyperbola._iterList)):
+            for x0, x1 in zip(attr0.ravel(), attr.ravel()):
+                if i < 3:
+                    self.assertEqual(x0, x1 - trans[i])
+                
+                else:
+                    self.assertEqual(x0, x1)
+        
+        self.hyperbola.homeReflector()
+        
+        iterList1 = Copy.copyGrid(self.hyperbola._iterList)
+        self.hyperbola.rotateGrid(rot)
+        
+        for i, (attr0, attr) in enumerate(zip(iterList1, self.hyperbola._iterList)):
+            for x0, x1 in zip(attr0.ravel(), attr.ravel()):
+                if i == 0 or i == 2 or i == 4 or i == 6:
+                    self.assertAlmostEqual(x0, -1*x1)
+                
+                else:
+                    self.assertAlmostEqual(x0, x1)
 if __name__ == "__main__":
     unittest.main()
         

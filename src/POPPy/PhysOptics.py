@@ -1,10 +1,12 @@
 import numpy as np
 import os
+import json
 import math
 import matplotlib.pyplot as pt
 import matplotlib.cm as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from scipy.fftpack import fft as ft
+from scipy.interpolate import bisplev
 
 import src.POPPy.Colormaps as cmaps
 
@@ -36,6 +38,24 @@ class PhysOptics(object):
         
         self.propType = 'coherent'
         
+        # Detect if GPU benchmark exists
+        '''
+        files = os.listdir('./save/benchmark/')
+
+        if files:
+            self.GPUbar = True
+            for file in files:
+                file = file.replace(".json", "")
+                self.bm_file = file
+                print("Found GPU benchmark file for device {}. Enabling GPU progressbar.\n".format(file.replace("_", " ").replace(" GPU", "")))
+        
+        else:
+        '''
+        self.GPUbar = False
+        self.bm_file = ''
+        #print("No GPU benchmark file found. Disabling GPU progressbar.\n")
+
+        
     #### PUBLIC METHODS ###
         
     def runPhysOptics(self, save, material_source, prop_mode, t_direction, prec, device):
@@ -63,38 +83,58 @@ class PhysOptics(object):
             t_dir = 1
         
         cwd = os.getcwd()
-        os.chdir(self.cpp_path)
         
         if prec == 'single':
             if self.propType == 'coherent':
                 if device == 'cpu':
+                    os.chdir(self.cpp_path)
                     os.system('./PhysBeamf.exe {} {} {} {} {} {} {}'.format(self.numThreads, self.k, self.thres, 
                                                                             save, epsilon, prop_mode, t_dir))
                     
                 elif device == 'gpu':
-                    nThread = 16
+                    if self.GPUbar:
+                        time = self._get_GPUtime()
+                        wsleep = math.ceil(time * 1e4)
+                        print("Estd. time : {:.2f} s".format(time))
+                        
+                    else:
+                        wsleep = 0.
+                        
+                    nThread = 256
                     nBlock = math.ceil(self.gt / nThread)
-                    os.system('./GPhysBeamf.exe {} {} {} {} {} {} {} {} {}'.format(nThread, nBlock, self.k, 
+                    os.chdir(self.cpp_path)
+                    os.system('./GPhysBeamf.exe {} {} {} {} {} {} {} {} {} {}'.format(nThread, nBlock, self.k, 
                                                                                    save, epsilon, prop_mode, 
-                                                                                   t_dir, self.gs, self.gt))
+                                                                                   t_dir, self.gs, self.gt, wsleep))
             
             elif self.propType == 'incoherent':
+                os.chdir(self.cpp_path)
                 os.system('./PhysBeamScalarf.exe {} {} {}'.format(self.numThreads, self.k, epsilon))
                 
         elif prec == 'double':
             if self.propType == 'coherent':
                 if device == 'cpu':
+                    os.chdir(self.cpp_path)
                     os.system('./PhysBeam.exe {} {} {} {} {} {} {}'.format(self.numThreads, self.k, self.thres, 
                                                                            save, epsilon, prop_mode, t_dir))
                     
                 elif device == 'gpu':
+                    if self.GPUbar:
+                        time = self._get_GPUtime()
+                        print("Estd. time : {} s".format(time))
+                        
+                    else:
+                        time = 0.
+                        
                     nThread = 256
                     nBlock = math.ceil(self.gt / nThread)
+                    os.chdir(self.cpp_path)
                     os.system('./GPhysBeam.exe {} {} {} {} {} {} {} {} {}'.format(nThread, nBlock, self.k, 
                                                                                    save, epsilon, prop_mode, 
                                                                                    t_dir, self.gs, self.gt))
             
             elif self.propType == 'incoherent':
+                os.chdir(self.cpp_path)
                 os.system('./PhysBeamScalar.exe {} {} {}'.format(self.numThreads, self.k, epsilon))
                 
         os.chdir(cwd)
@@ -230,3 +270,34 @@ class PhysOptics(object):
         
     def set_gt(self, gt):
         self.gt = gt[0] * gt[1]
+        
+    def _get_GPUtime(self):
+        """
+        (PRIVATE)
+        Obtain estimated GPU time from previous benchmark.
+        
+        @param  ->
+            ns              :   Total number of cells on source grid.
+            nt              :   Total number of cells on target grid.
+            name            :   Name of .json file containing GPU benchmark.
+            
+        @return ->
+            time            :   Estimated GPU time for calculation.
+        """
+
+        with open('save/benchmark/{}.json'.format(self.bm_file), 'r') as f:
+            gpu_dict = json.loads(f.read())
+            
+        '''
+        tcks_arr = []
+        for ll in gpu_dict["tcks"]:
+            if isinstance(ll, list):
+                ll = np.array(ll)
+            
+            tcks_arr.append(ll)
+        '''
+        coeff = gpu_dict["coeff"]
+        #time = bisplev(self.gs, self.gt, tcks_arr)
+        time = coeff[0] + coeff[1] * self.gs + (coeff[2] + coeff[3] * self.gs) * self.gt
+        
+        return time

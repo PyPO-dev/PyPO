@@ -30,7 +30,7 @@ def ex_DRO():
     lims_r_p1       = [R_aper, R_pri]
     lims_v_p1       = [0, 2*np.pi]
 
-    gridsize_p1     = [801, 501] # The gridsizes along the x and y axes
+    gridsize_p1     = [1501, 1501] # The gridsizes along the x and y axes
 
     # Initialize system
     s = System()
@@ -39,16 +39,16 @@ def ex_DRO():
     s.addParabola(name="p1", coef=coef_p1, lims_x=lims_r_p1, lims_y=lims_v_p1, gridsize=gridsize_p1, pmode='foc', gmode='uv')
 
     # Make far-field camera
-    center_cam = np.zeros(3)
+    center_cam = foc_pri#np.zeros(3)
     
-    lim = 3
+    lim = 12.5e3#3
     
     lims_x_cam = [-lim, lim]
     lims_y_cam = [-lim, lim]
-    gridsize_cam = [201, 201]
+    gridsize_cam = [901, 901]
     
     # Add camera surface to optical system
-    s.addCamera(lims_x_cam, lims_y_cam, gridsize_cam, center=center_cam, name = "cam1", gmode='AoE', units=['deg','mm'])
+    s.addCamera(lims_x_cam, lims_y_cam, gridsize_cam, center=center_cam, name = "cam1", units='mm')#, gmode='AoE', units=['deg','mm'])
 
     s.plotSystem(focus_1=True, focus_2=True)
     
@@ -62,18 +62,21 @@ def ex_DRO():
     s.addPlotter(save='../images/')
 
     s.initPhysOptics(target=s.system["p1"], k=k, numThreads=11, cpp_path=cpp_path)
-    s.runPhysOptics(save=2, material_source='alu')
+    s.runPhysOptics(save=0, material_source='alu', prec='single', device='gpu')
 
-    s.ffPhysOptics(source=s.system["p1"], target=s.system["cam1"])
-    s.runPhysOptics(save=2, material_source='vac', prop_mode=1)
+    #s.ffPhysOptics(source=s.system["p1"], target=s.system["cam1"])
+    s.nextPhysOptics(source=s.system["p1"], target=s.system["cam1"])
+    #s.runPhysOptics(save=2, material_source='vac', prop_mode=1)
+    s.runPhysOptics(save=1, material_source='vac', prec='single', device='gpu')
 
-    s.plotSystem(focus_1=False, focus_2=False)
-    
     field = s.loadField(s.system["cam1"], mode='Ex')
     field2 = s.loadField(s.system["cam1"], mode='Ey')
     
     s.plotter.plotBeam2D(s.system["cam1"], field=field, vmin=-30, interpolation='lanczos')
-    s.plotter.beamCut(s.system["cam1"], field=field, cross=field2, save=True)
+    #s.plotter.beamCut(s.system["cam1"], field=field, cross=field2, save=True)
+    
+    eta_t = s.calcSpillover(s.system["cam1"], field, R_aper)
+    print(eta_t)
 
     
 if __name__ == "__main__":

@@ -10,40 +10,98 @@ from multiprocessing import  Pool
 from functools import partial
 
 import src.POPPy.MatRotate as MatRotate
+import src.POPPy.Copy as Copy
 
-class RayTrace(object):
-    def __init__(self):
-        pass
+class Frame(object):
+    def __init__(self, length):
+        self.x = np.zeros(length)
+        self.y = np.zeros(length)
+        self.z = np.zeros(length)
 
-    def __len__(self):
-        return len(self.rays.keys())
-    
-    def __iter__(self):
-        yield from self.rays.items()
-        
-    def __getitem__(self, key):
-        return self.rays["ray_{}".format(key)]
-    
-    def __setitem__(self, key, ray):
-        self.rays["ray_{}".format(key)] = ray
-        
-    def __str__(self):
-        s = """\n######################### RAYTRACER INFO #########################
-Chief ray origin    : [{:.3f}, {:.3f}, {:.3f}] [mm]
-Chief ray direction : [{:.4f}, {:.4f}, {:.4f}] 
-######################### RAYTRACER INFO #########################\n""".format(self.originChief[0], self.originChief[1], self.originChief[2],
-                                                                               self.directionChief[0], self.directionChief[1], self.directionChief[2])
-        return s
-              
-    #### PUBLIC METHODS ###
-        
-    def initRaytracer(self, nRays, nRing, 
-                 a, b, angx, angy,
-                 originChief, tiltChief):
+        self.dx = np.zeros(length)
+        self.dy = np.zeros(length)
+        self.dz = np.zeros(length)
+
+        self.length = length
+
+    def assignValues(self, x, y, z, dx, dy, dz):
+        self.x = x
+        self.y = y
+        self.z = z
+
+        self.dx = dx
+        self.dy = dy
+        self.dz = dz
+
+    # Convert self.x, self.y, etc... into lists of arrays.
+    # Because this is only applied to _frame objects, can
+    # modify itself.
+    def chunkify(self, nReduced):
+        xl = []
+        yl = []
+        zl = []
+
+        dxl = []
+        dyl = []
+        dzl = []
+
+        start = 0
+
+        while start <= self.length:
+            stop = start + nReduced
+
+            if stop > self.length:
+                stop = self.length
+
+            xl.append(self.x[start:stop])
+            yl.append(self.y[start:stop])
+            zl.append(self.z[start:stop])
+
+            dxl.append(self.dx[start:stop])
+            dyl.append(self.dy[start:stop])
+            dzl.append(self.dz[start:stop])
+
+            start += nReduced
+
+        self.x = xl
+        self.y = yl
+        self.z = zl
+
+        self.dx = dxl
+        self.dy = dyl
+        self.dz = dzl
+
+    def writoToFrame(self, idx, xyz, dxyz):
+        self.x[idx] = xyz[0]
+        self.y[idx] = xyz[1]
+        self.z[idx] = xyz[2]
+
+        self.dx[idx] = dxyz[0]
+        self.dy[idx] = dxyz[1]
+        self.dz[idx] = dxyz[2]
+
+class Beam(object):
+    def __init__(self, frame, nTot, frameCounter):
+        self.frameDict = {"frame0" : frame}
+
+        self.nTot = nTot
+        self.frameCounter = frameCounter
+
+    @classmethod
+    def initFromInp(cls, nRays, nRing,
+                     a, b, angx, angy,
+                     originChief, tiltChief):
+
         """
         (PUBLIC)
         Initialize a ray-trace from beam parameters.
-        
+        We initialize a beam object by appending frames. A frame consists of 6 lists of
+        length nRays * nRing * 4 + 1. Each ray trace, a new frame is calculated.
+        One can choose to save previous frames, or keep only the new one.
+        The frames are stored in frameDict. When one chooses to remove a frame, the frameDict
+        will be emptied to store memory. The entry is deleted. Frame numbering continues though,
+        so the keys stay the same.
+
         @param  ->
             nRays           :   Number of rays in a concentric ring
             nRing           :   Number of concentric ray-trace rings
@@ -54,409 +112,386 @@ Chief ray direction : [{:.4f}, {:.4f}, {:.4f}]
             originChief     :   Array containg co-ordinates of chief ray origin
             tiltChief       :   Tilt of chief ray w.r.t. normal vector along z axis
         """
-        
+
         nomChief = np.array([0,0,1]) # Always initialize raytrace beam along z-axis
-        
-        self.originChief = originChief
-        self.directionChief = MatRotate.MatRotate(tiltChief, nomChief, vecRot=True)
-        
-        self.nTot = 1 + nRing * 4 * nRays
-        
-        self.rays = {"ray_{}".format(n) : {} for n in range(self.nTot)}
+
+        originChief = originChief
+        directionChief = MatRotate.MatRotate(tiltChief, nomChief, vecRot=True)
+
+        nTot = 1 + nRing * 4 * nRays
+        frameCounter = 0
+
+        frame0 = Frame(nTot)
 
         alpha = 0.0                             # Set first circle ray in the right of beam
         if nRays > 0:
-            
             d_alpha = 2 * np.pi / (4 * nRays)   # Set spacing in clockwise angle
-            
         else:
             d_alpha = 0
-        
-        # Ray initialization:
-        # every ray gets two lists: one for position, one for direction
-        # For each element encountered, a new entry will be made in each list:
-        # we append a 3D array of the point to the position list and a 3D array to direction list
-        
+
         n = 1
-        
-        for i, (key, ray) in enumerate(self.rays.items()):
-            ray["positions"]  = []
-            ray["directions"] = []
+        for i in range(nTot):
 
             if i == 0: # Chief ray
-                ray["positions"].append(self.originChief)
-                ray["directions"].append(self.directionChief)
-
+                frame0.writoToFrame(i, originChief, directionChief)
                 continue
-            
+
             pos_ray = np.array([a * np.cos(alpha), b * np.sin(alpha), 0]) / nRing * n
             rotation = np.array([np.radians(angy) * np.sin(alpha) / nRing * n, np.radians(angx) * np.cos(alpha) / nRing * n, 2*alpha])
 
             direction = MatRotate.MatRotate(rotation, nomChief, vecRot=True, radians=True)
             direction = MatRotate.MatRotate(tiltChief, direction, vecRot=True)
-    
-            pos_r = MatRotate.MatRotate(tiltChief, self.originChief + pos_ray, origin=self.originChief)
-    
-            ray["positions"].append(pos_r)
-            ray["directions"].append(direction)
 
+            pos_r = MatRotate.MatRotate(tiltChief, originChief + pos_ray, origin=originChief)
+
+            frame0.writoToFrame(i, pos_r, direction)
             alpha += d_alpha
-            
-            if i == int(self.nTot / nRing) * n:
+
+            if i == int(nTot / nRing) * n:
                 n += 1
                 alpha = 0
-        
+
+        return cls(frame0, nTot, frameCounter)
+
+    @classmethod
+    def initFromPO(cls, source, Pr):
+        """
+        (PUBLIC)
+        Initialize a ray-trace from PO calculation.
+        @param  ->
+        source          :   Object on which Pr is calculated
+        Pr              :   List containing components of Pr
+        """
+
+        x = source.grid_x.flatten()
+        y = source.grid_y.flatten()
+        z = source.grid_z.flaten()
+
+        dx = Pr[0].flatten()
+        dy = Pr[1].flatten()
+        dz = Pr[2].flatten()
+
+        nTot = len(x)
+        frameCounter = 0
+        frame0 = Frame(nTot)
+
+        frame0.assignValues(x, y, z, dx, dy, dz)
+
+        return cls(frame0, nTot, frameCounter)
+
+    # Iterate over frames in beam
+    def __iter__(self):
+        yield from self.frameDict.items()
+
+    def appendFrame(self, frame):
+        self.frameDict["frame{}".format(self.frameCounter)] = frame
+
+    def _convertToArr(self, frame, idx):
+        xyz = np.zeros(3)
+        dxyz = np.zeros(3)
+
+        xyz[0] = frame.x[idx]
+        xyz[1] = frame.y[idx]
+        xyz[2] = frame.z[idx]
+
+        dxyz[0] = frame.dx[idx]
+        dxyz[1] = frame.dy[idx]
+        dxyz[2] = frame.dz[idx]
+
+        return xyz, dxyz
+
+
+
+class RayTrace(object):
+    def initRaytracer(self, nRays, nRing,
+                 a, b, angx, angy,
+                 originChief, tiltChief):
+        """
+        (PUBLIC)
+        Initialize a ray-trace from beam parameters.
+        See Beam class for explanation of arguments.
+        """
+        self.beam = Beam.initFromInp(nRays, nRing,
+                     a, b, angx, angy,
+                     originChief, tiltChief)
+
     def POtoRaytracer(self, source, Pr):
         """
         (PUBLIC)
         Initialize a ray-trace from PO calculation.
-        
+
         @param  ->
             source          :   Object on which Pr is calculated
             Pr              :   List containing components of Pr
         """
-        
-        x = source.grid_x.flatten()
-        y = source.grid_y.flatten()
-        z = source.grid_z.flatten()
-        
-        px = Pr[0].flatten()
-        py = Pr[1].flatten()
-        pz = Pr[2].flatten()
-        
-        self.nTot = len(x)
-        
-        self.rays = {"ray_{}".format(n) : {} for n in range(self.nTot)}
-        
-        for i, (key, ray) in enumerate(self.rays.items()):
-            ray["positions"]  = []
-            ray["directions"] = []
-            
-            pos = np.array([x[i], y[i], z[i]])
-            direction = np.array([px[i], py[i], pz[i]])
-            
-            ray["positions"].append(pos)
-            ray["directions"].append(direction)
-        
+        self.beam = Beam.initFromPO(source, Pr)
+
     def sizeOf(self, units='b'):
         """
         (PUBLIC)
-        Return memory size of self.rays.
-        
+        Return memory size of self.beam.
+
         @param  ->
             units           :   Units of memory size for return.
                             :   Options are bytes 'b', megabytes 'mb' and gigabytes 'gb'
-                            
+
         @return ->
             size            :   Memory size of self.rays object
         """
-        
+
         factor = 1
-        
+
         if units == 'kb':
             factor = 1e-3
-        
+
         elif units == 'mb':
             factor = 1e-6
-            
+
         elif units == 'gb':
             factor = 1e-9
-            
-        size = sys.getsizeof(self.rays)
-        
-        for i, (key, ray) in enumerate(self.rays.items()):
-            # Add size of reference to ray
-            size += sys.getsizeof(ray)
-            
-            for key, attr in ray.items():
-                # Add size of reference to ray
-                size += sys.getsizeof(attr)
-                
-                for coord in attr:
-                    size += sys.getsizeof(coord)
+
+        # Size of references to frames is beam
+        size = sys.getsizeof(self.beam)
+
+        for key, frame in self.beam:
+            # Add size of reference to frame
+            size += sys.getsizeof(frame)
+
+            size += sys.getsizeof(frame.x)
+            size += sys.getsizeof(frame.y)
+            size += sys.getsizeof(frame.z)
+
+            size += sys.getsizeof(frame.dx)
+            size += sys.getsizeof(frame.dy)
+            size += sys.getsizeof(frame.dz)
 
         return size * factor
-    
-    def set_tcks(self, tcks):
-        """
-        (PUBLIC)
-        Set interpolation tcks parameters for a ray-trace.
-        
-        @param  ->
-            tcks            :   Array containing tcks parameters of target surface
-        """
-        self.tcks = tcks
-        
-    def getMode(self):
-        """
-        (PUBLIC)
-        Obtain most efficient axis for dependent interpolation variable.
-        """
-        
-        axes = ['x', 'y', 'z']
-        axis = np.argmax(np.absolute(self.rays["ray_0"]["directions"][-1]))
-        
-        mode = axes[axis]
-        return mode
 
-    def propagateRays(self, a0, mode, workers=1):
+    def propagateRays(self, target, a0, mode, workers=1):
         """
         (PUBLIC)
-        Propagate beam of rays from last point in self.rays to target.
-        
+        Propagate beam of rays from last frame to new frame on target.
+
         @param  ->
+            target          :   Target surface for propagation
             a0              :   Initial value for optimizing ray to target surface
             mode            :   Dependent variable of interpolation
             workers         :   Number of workers to spawn on CPU
         """
-        
-        if mode == 'z':
-            x1 = 0
-            x2 = 1
-            x3 = 2
-                
-        elif mode == 'x':
-            x1 = 1
-            x2 = 2
-            x3 = 0
-                
-        elif mode == 'y':
-            x1 = 2
-            x2 = 0
-            x3 = 1
-        
-        self.nReduced = int(self.nTot / workers)
-        
+
+        _frame = Frame(self.beam.nTot)
+        _frame_out = Frame(self.beam.nTot)
+
+        self.nReduced = math.ceil(self.beam.nTot / workers)
+
+        mat, mat_v = target.getFullTransform()
+        inv_mat, inv_mat_v = target.getFullTransform(fwd=False)
+
+        self._transformRays(self.beam.frameDict["frame{}".format(self.beam.frameCounter)], _frame, inv_mat, inv_mat_v)
+        #_frame = self.beam.frameDict["frame{}".format(self.beam.frameCounter)]
         # Evaluate _propagateRays partially
-        _propagateRayspar = partial(self._propagateRays, a0=a0,
-                                    x1=x1, x2=x2, x3=x3)
-        
+        #self.beam.frameDict["frame0"] = Copy.copyGrid(_frame)
+
+        _propagateRayspar = partial(self._propagateRays, target=target, a0=a0)
+
         PIDs = np.arange(workers)
 
-        # Pack rays into subdicts
-        subrays_l = []
+        # Pack _frame into chunks of rays
+        _frame.chunkify(self.nReduced)
 
-        for subrays in self._chunkify(self.rays, self.nReduced):
-            subrays_l.append(subrays)
-            
-        args = zip(subrays_l, PIDs)
+        args = zip(_frame.x, _frame.y, _frame.z,
+                    _frame.dx, _frame.dy, _frame.dz, PIDs)
+
         pool = Pool(workers)
 
-        toStore = pool.map(_propagateRayspar, args)
+        out = pool.map(_propagateRayspar, args)
         pool.close()
-        
-        for _toStore in toStore:
-            self.rays.update(_toStore)
-    
-    def calcPathlength(self):
-        """
-        (PUBLIC)
-        Adds total path length as dict entry for each ray.
-        """
-        
-        for i, (key, ray) in enumerate(self.rays.items()):
-            stride = np.zeros(3)
-            L = 0
-            
-            for i, pos in enumerate(ray["positions"]):
-                if i == 0:
-                    stride = pos
-                    continue
-                
-                else:
-                    diff = pos - stride
-                    L += np.sqrt(np.dot(diff, diff))
-                    stride = pos
-                    
-            ray["length"] = L
-            
-    def clearRays(self):
+
+
+        _frame_out = self._reconstructToFrame(out)
+        __frame = Frame(self.beam.nTot)
+
+        # Delete chunkified frame, create new empty one
+        del _frame
+
+        self.beam.frameCounter += 1
+        self._transformRays(_frame_out, __frame, mat, mat_v)
+        #__frame = _frame_out
+
+        pt.plot(__frame.z)
+        pt.show()
+
+
+        self.beam.appendFrame(__frame)
+
+        del _frame_out
+
+    def clearBeam(self):
         """
         (PUBLIC)
         Clear current self.rays object
         """
-        self.rays.clear()
-        
+        self.beam.clear()
+
+    def clearFrame(self, idx):
+        del self.beam.frameDict["frame{}".format(idx)]
+
     def plotRays(self, quiv=True, frame=0, mode='z', save=False):
         fig, ax = pt.subplots(1,1)
-        
-        for i, (key, ray) in enumerate(self.rays.items()):
 
-            if mode == 'z':
-                ax.set_xlabel('$x$ / [mm]')
-                ax.set_ylabel('$y$ / [mm]')
-                ax.scatter(ray["positions"][frame][0], ray["positions"][frame][1], color='black', s=10)
-            
-                if quiv:
-                    ax.quiver(ray["positions"][frame][0], ray["positions"][frame][1], 10 * ray["directions"][frame][0], 10 * ray["directions"][frame][1], color='black', width=0.005, scale=10)
-                    
-            elif mode == 'x':
-                ax.set_xlabel('$y$ / [mm]')
-                ax.set_ylabel('$z$ / [mm]')
-                ax.scatter(ray["positions"][frame][1], ray["positions"][frame][2], color='black', s=10)
-            
-                if quiv:
-                    ax.quiver(ray["positions"][frame][1], ray["positions"][frame][2], 10 * ray["directions"][frame][1], 10 * ray["directions"][frame][2], color='black', width=0.005, scale=10)
-                    
-            elif mode == 'y':
-                ax.set_xlabel('$z$ / [mm]')
-                ax.set_ylabel('$x$ / [mm]')
-                ax.scatter(ray["positions"][frame][2], ray["positions"][frame][0], color='black', s=10)
-            
-                if quiv:
-                    ax.quiver(ray["positions"][frame][2], ray["positions"][frame][0], 10 * ray["directions"][frame][2], 10 * ray["directions"][frame][0], color='black', width=0.005, scale=10)
-                    
+        toPlot = self.beam.frameDict["frame{}".format(frame)]
+
+        #print(self.beam.frameDict["frame{}".format(frame)].x)
+
+        if mode == 'z':
+            ax.set_xlabel('$x$ / [mm]')
+            ax.set_ylabel('$y$ / [mm]')
+            ax.scatter(toPlot.x, toPlot.y, color='black', s=10)
+
+            if quiv:
+                ax.quiver(ray["positions"][frame][0], ray["positions"][frame][1], 10 * ray["directions"][frame][0], 10 * ray["directions"][frame][1], color='black', width=0.005, scale=10)
+
+        elif mode == 'x':
+            ax.set_xlabel('$y$ / [mm]')
+            ax.set_ylabel('$z$ / [mm]')
+            ax.scatter(toPlot.y, toPlot.z, color='black', s=10)
+
+            if quiv:
+                ax.quiver(ray["positions"][frame][1], ray["positions"][frame][2], 10 * ray["directions"][frame][1], 10 * ray["directions"][frame][2], color='black', width=0.005, scale=10)
+
+        elif mode == 'y':
+            ax.set_xlabel('$z$ / [mm]')
+            ax.set_ylabel('$x$ / [mm]')
+            ax.scatter(toPlot.z, toPlot.x, color='black', s=10)
+
+            if quiv:
+                ax.quiver(ray["positions"][frame][2], ray["positions"][frame][0], 10 * ray["directions"][frame][2], 10 * ray["directions"][frame][0], color='black', width=0.005, scale=10)
+
         ax.set_aspect(1)
         ax.set_title('Spot diagram, frame = {}'.format(frame))
-        
+
         if save:
             pt.savefig(fname='spot_{}.jpg'.format(frame),bbox_inches='tight', dpi=300)
 
         pt.show()
-        
+
     def plotRaysSystem(self, ax_append):
-        
-        for i, (key, ray) in enumerate(self.rays.items()):
+
+        for i in range(self.beam.nTot):
             x = []
             y = []
             z = []
-            for j in range(len(ray["positions"])):
+            for key, frame in self.beam:
 
-                x.append(ray["positions"][j][0])
-                y.append(ray["positions"][j][1])
-                z.append(ray["positions"][j][2])
-                
+                x.append(frame.x[i])
+                y.append(frame.y[i])
+                z.append(frame.z[i])
+
             ax_append.plot(x, y, z, color='grey')
-            
+
         return ax_append
-    
+
     #### PRIVATE METHODS ###
-    
-    def _propagateRays(self, args, a0, x1, x2, x3):
+
+    def _propagateRays(self, args, target, a0):
         """
         (PRIVATE)
         Calculate position and reflected normal vector of ray on target surface.
-        
+
         @param  ->
             args            :   Tuple containing rays and process IDs for this worker
             a0              :   Initial value for ray-tracer
-            x1              :   Independent variable 1
-            x2              :   Independent variable 2
-            x3              :   Dependent variable
-            
-        @return ->
-            toStore         :   Dict containing new ray positions and direction vectors
         """
-        
-        rays, PID = args
-        
-        toStore = rays
-        
-        j = 0 # Counter index
-            
-        for i, (key, ray) in enumerate(rays.items()):
-            part_optLine = partial(self._optLine, ray=ray, x1=x1, x2=x2, x3=x3)
-                
-            a_opt = optimize.fmin(part_optLine, a0, disp=0, xtol=1e-16, ftol=1e-16)
-            
-            position = a_opt*ray["directions"][-1] + ray["positions"][-1]
-            
-            interp_n = self._interpEval_n(position[x1], position[x2])
-            
-            direction = ray["directions"][-1] - 2 * np.dot(ray["directions"][-1], interp_n) * interp_n
 
-            toStore[key]["positions"].append(position)
-            toStore[key]["directions"].append(direction)
+        x, y, z, dx, dy, dz, PID = args
+
+        j = 0 # Counter index
+
+        for i in range(len(x)):
+            #print(dy[i])
+            getxyz = lambda a : target.xyGrid(a*dx[i] + x[i], a*dy[i] + y[i])
+            #diff = lambda a : np.sqrt((getxyz(a)[0] - a*dx[i] - x[i])**2 + (getxyz(a)[1] - a*dy[i] - y[i])**2 + (getxyz(a)[2] - a*dz[i] + z[i])**2)
+            diff = lambda a : np.absolute(getxyz(a)[2] - a*dz[i] + z[i])
+            #print(diff(z[i]))
+
+            a_opt = optimize.fmin(diff, a0, disp=0, xtol=1e-16, ftol=1e-16)[0]
+
+            xo, yo, zo, nx, ny, nz = target.xyGrid(a_opt*dx[i] + x[i], a_opt*dy[i] + y[i])
+
+            norm = np.sqrt(nx**2 + ny**2 + nz**2)
+
+            nx /= norm
+            ny /= norm
+            nz /= norm
+
+            x[i] = xo
+            y[i] = yo
+            z[i] = zo
+
+            dinn = dx[i]*nx + dy[i]*ny + dz[i]*nz
+
+            dx[i] = dx[i] - 2 * dinn * nx
+            dy[i] = dy[i] - 2 * dinn * ny
+            dz[i] = dz[i] - 2 * dinn * nz
+
+            #print(a_opt)
 
             if (i/self.nReduced * 100) > j and PID == 0:
                 print("{} / 100".format(j), end='\r')
                 j += 1
-                
-        return toStore
-    
-    def _interpEval(self, x1, x2):
-        """
-        (PRIVATE)
-        Evaluate interpolation of xyz grids.
-        @param  ->
-            x1              :   Independent variable 1
-            x2              :   Independent variable 2
-        
-        @return ->
-            x3              :   Interpolated dependent variable
-        """
-        
-        x3 = interp.bisplev(x1, x2, self.tcks[0])
-        return x3
-        
-    def _interpEval_n(self, x1, x2):
-        """
-        (PRIVATE)
-        Evaluate interpolation of xyz components of normal vector grids.
-        @param  ->
-            x1              :   Independent variable 1
-            x2              :   Independent variable 2
-        
-        @return ->  (array)
-            interp_nx       :   Interpolated x-components
-            interp_ny       :   Interpolated y-components
-            interp_nz       :   Interpolated z-components
-        """
-        
-        interp_nx = interp.bisplev(x1, x2, self.tcks[1])
-        interp_ny = interp.bisplev(x1, x2, self.tcks[2])
-        interp_nz = interp.bisplev(x1, x2, self.tcks[3])
-        
-        norm = np.sqrt(interp_nz**2 + interp_ny**2 + interp_nx**2)
-        
-        interp_nx /= norm
-        interp_ny /= norm
-        interp_nz /= norm
-        
-        return np.array([interp_nx, interp_ny, interp_nz])
-    
-    def _optLine(self, a, ray, x1, x2, x3):
-        """
-        (PRIVATE)
-        Calculate difference between interpolated point on surface and point on ray.
-        
-        @param  ->
-            a               :   Multiplier of ray
-            ray             :   Ray to be propagated
-            x1              :   Index of independent variable 1
-            x2              :   Index of independent variable 2
-            x3              :   Index of Dependent variable
-            
-        @return ->
-            diff            :   Absolute difference between point on surface and point on ray
-                            :   in dependent variable
-        """
-        
-        position = a * ray["directions"][-1] + ray["positions"][-1]
-        
-        interp = self._interpEval(position[x1], position[x2])
-        diff = np.absolute(interp - position[x3])
-        
-        return diff
-    
-    def _chunkify(self, data, s):
-        """
-        (PRIVATE)
-        Subdivide self.rays object into smaller chunks for multiprocessing.
-        
-        @param  ->
-            data            :   Data to be chunkified
-            s               :   Size of a chunk (approx)
-            
-        @return ->  (generator)
-            chunk           :   Generator over chunk, derived from self.rays
-        """
-        
-        it = iter(data)
-        for i in range(0, len(data), s):
-            yield {k:data[k] for k in islice(it, s)}
-        
-    
+
+        return [x, y, z, dx, dy, dz]
+
+    def _transformRays(self, frame, frame_out, mat, mat_v):
+        _vec = np.zeros(4)
+
+        print(mat)
+        print(mat_v)
+
+        for i in range(self.beam.nTot):
+            _vec[0] = frame.x[i]
+            _vec[1] = frame.y[i]
+            _vec[2] = frame.z[i]
+            _vec[3] = 1
+
+            _vec_out = np.matmul(mat, _vec)
+
+            frame_out.x[i] = _vec_out[0]
+            frame_out.y[i] = _vec_out[1]
+            frame_out.z[i] = _vec_out[2]
+
+            _vec[0] = frame.dx[i]
+            _vec[1] = frame.dy[i]
+            _vec[2] = frame.dz[i]
+            _vec[3] = 1
+
+            _vec_out = np.matmul(mat_v, _vec)
+
+            frame_out.dx[i] = _vec_out[0]
+            frame_out.dy[i] = _vec_out[1]
+            frame_out.dz[i] = _vec_out[2]
+
+    def _reconstructToFrame(self, out):
+        frame_out = Frame(self.beam.nTot)
+
+        offset = 0
+        for subl in out:
+            lensubl = len(subl[0]) + offset
+
+            start = offset
+
+            frame_out.x[start:lensubl] = subl[0]
+            frame_out.y[start:lensubl] = subl[1]
+            frame_out.z[start:lensubl] = subl[2]
+
+            frame_out.dx[start:lensubl] = subl[3]
+            frame_out.dy[start:lensubl] = subl[4]
+            frame_out.dz[start:lensubl] = subl[5]
+
+            offset = lensubl
+
+        return frame_out
+
 
 if __name__ == "__main__":
     print("Raytracer class.")

@@ -1,0 +1,23 @@
+
+#nvcc GDataHandler.cu GPhysBeam.cu DataHandler.cpp -o test  -Xcompiler
+###########################################################################################
+DIRSRC = ./src/
+###########################################################################################
+GCOMP = nvcc
+CFLAGS = -O3
+CC  = $(GCOMP) $(CFLAGS) -c -Xcompiler -fPIC -lineinfo --ptxas-options=-v -w
+#CC  = $(GCOMP) $(CFLAGS) -c -w
+CO  = $(GCOMP) $(CFLAGS) -o
+###########################################################################################
+LIB = libpoppygpu.so
+all: $(LIB)
+###########################################################################################
+libpoppygpu.so: Kernels.o Kernelsf.o
+	$(CO) libpoppygpu.so -Xcompiler -fPIC --shared Kernels.o Kernelsf.o -L./ -lpoppyrefl
+###########################################################################################
+Kernelsf.o: $(DIRSRC)Kernelsf.cu
+	$(CC) $(DIRSRC)Kernelsf.cu -I$(DIRSRC)
+###########################################################################################
+Kernels.o: $(DIRSRC)Kernels.cu
+	$(CC) $(DIRSRC)Kernels.cu -I$(DIRSRC)
+###########################################################################################

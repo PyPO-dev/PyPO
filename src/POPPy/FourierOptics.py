@@ -3,7 +3,7 @@ import os
 import matplotlib.pyplot as pt
 import matplotlib.cm as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from scipy.fftpack import fft as ft
+import scipy.fftpack as ft
 
 class FourierOptics(object):
     """
@@ -22,37 +22,67 @@ class FourierOptics(object):
         
         self.k = k
         
-    def padGrids(self, grid_x, grid_y, field, pad_range=(1000,1000), noise=1e-12):
+    def padGrids(self, x1, x2, field, pad_range, noise, project, pad_coord):
         noise_level = noise + 1j * noise
         
-        field_pad = np.pad(field, pad_range, 'constant', constant_values=(noise_level, noise_level))
+        field_pad = np.pad(field[0], pad_range, 'constant', constant_values=(noise_level, noise_level))
         
-        grid_x_pad = np.pad(grid_x, pad_range, 'reflect', reflect_type='odd')
-        grid_y_pad = np.pad(grid_y, pad_range, 'reflect', reflect_type='odd')
+        if pad_coord:
+            grid_x_pad = np.pad(x1, pad_range, 'reflect', reflect_type='odd')
+            grid_y_pad = np.pad(x2, pad_range, 'reflect', reflect_type='odd')
         
-        return grid_x_pad, grid_y_pad, field_pad
+        return [field_pad, field[1]], grid_x_pad, grid_y_pad
         
-    def ft2(self, grid_x, grid_y, field):
-        ft2_field = ft.fftshift(ft.fft2(ft.ifftshift(field)))
-        
+    def ft2(self, surfaceObject, field, pad_range=(1000,1000), noise=1e-12, ret_t='freq', project='xy', pad_coord=True):
+        if project == 'xy':
+            x1 = surfaceObject.grid_x
+            x2 = surfaceObject.grid_y
+            
+        elif project == 'yz':
+            x1 = surfaceObject.grid_y
+            x2 = surfaceObject.grid_z
+            
+        elif project == 'zx':
+            x1 = surfaceObject.grid_z
+            x2 = surfaceObject.grid_x
+            
+        #field_pad, x_pad, y_pad = padGrids(surfaceObject, field, pad_range, noise, update, pad_coord)
+
+        ft2_field = ft.fftshift(ft.fft2(ft.ifftshift(field[0])))
+
         # Calculate Fourier space axes
-        dx = grid_x[1,0] - grid_x[0,0]
-        dy = grid_y[0,1] - grid_y[0,0]
+        dx = x1[1,0] - x1[0,0]
+        dy = x2[0,1] - x2[0,0]
         
-        Lx = np.max(grid_x[:,0]) - np.min(grid_x[:,0])
-        Ly = np.max(grid_y[0,:]) - np.min(grid_y[0,:])
+        Lx = np.max(x1[:,0]) - np.min(x1[:,0])
+        Ly = np.max(x2[0,:]) - np.min(x2[0,:])
         
         fx_min = -1 / (2*dx)
         fx_max = 1 / (2*dx) - 1 / Lx
-        dfx = grid_x.shape[0]
+        dfx = x1.shape[0]
         
         fy_min = -1 / (2*dy)
         fy_max = 1 / (2*dy) - 1 / Ly
-        dfy = grid_y.shape[1]
+        dfy = x2.shape[1]
         
         fx, fy = np.mgrid[fx_min:fx_max:dfx*1j, fy_min:fy_max:dfy*1j]
         
-        return ft2_field, fx, fy
+        if ret_t == 'wavevec':
+            fx = 2 * np.pi * fx
+            fy = 2 * np.pi * fy
+            
+        elif ret_t == 'angular':
+            kx = 2 * np.pi * fx
+            ky = 2 * np.pi * fy
+            
+            fx = np.degrees(np.arctan(kx / self.k))
+            fy = np.degrees(np.arctan(ky / self.k))
+            
+        surfaceObject.grid_fox = fx
+        surfaceObject.grid_foy = fy
+        surfaceObject.fo_flag = True
+        
+        return [ft2_field, field[1]], fx, fy
     
     def ift2(self, field):
         ift2_field = ft.fftshift(ft.ifft2(ft.ifftshift(field)))

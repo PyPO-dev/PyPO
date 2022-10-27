@@ -228,7 +228,7 @@ class Plotter(object):
 
     def plotSystem(self, systemDict, fine=2, cmap=cm.cool,
                 ax_append=False, norm=False,
-                show=True, foc1=False, foc2=False, save=True):
+                show=True, foc1=False, foc2=False, save=True, ret=False):
 
         fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
 
@@ -250,6 +250,9 @@ class Plotter(object):
 
         if show:
             pt.show()
+
+        if ret:
+            return fig, ax
 
         pt.close()
 

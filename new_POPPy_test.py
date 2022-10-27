@@ -16,7 +16,7 @@ def plotSystem_test():
     parabola["lims_y"] = [-1000,1000]
     parabola["lims_u"] = [200,5e3]
     parabola["lims_v"] = [0,2*np.pi]
-    parabola["gridsize"] = [1403,1401]
+    parabola["gridsize"] = [403,401]
 
     hyperbola = {}
     hyperbola["name"] = "h1"
@@ -31,13 +31,16 @@ def plotSystem_test():
     hyperbola["lims_y"] = [-310,310]
     hyperbola["lims_u"] = [0,310]
     hyperbola["lims_v"] = [0,2*np.pi]
-    hyperbola["gridsize"] = [1501,1801]
+    hyperbola["gridsize"] = [501,501]
 
     s = System()
     s.addPlotter()
     s.addHyperbola(hyperbola)
     s.addParabola(parabola)
 
+    rotation=np.array([90, 0, 0])
+
+    s.rotateGrids("p1", rotation)
 
     s.plotter.plotSystem(s.system, fine=2, norm=False)
 

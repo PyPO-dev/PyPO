@@ -52,9 +52,9 @@ def MatRotate(theta, matAppend, origin=np.zeros(3), radians=False):
 
 def MatTranslate(trans, matAppend):
     xt, yt, zt = trans
-    trans = np.array([[1, 0, 0, -xt],
-                    [0, 1, 0, -yt],
-                    [0, 0, 1, -zt],
+    trans = np.array([[1, 0, 0, xt],
+                    [0, 1, 0, yt],
+                    [0, 0, 1, zt],
                     [0, 0, 0, 1]])
 
     return np.matmul(trans, matAppend)

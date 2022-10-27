@@ -22,21 +22,19 @@ class ElementWidget(QWidget):
 
         label.setFixedSize(200,39)
 
+        # self.setContentsMargins(1,0,0,0)
         # self.btn = HoverOpenBtn("btn",self._openOptionsMenu, self._closeOptionsMenu)
         self.btn = QPushButton("btn")
         self.btn.clicked.connect(self._openOptionsMenu)
         self.btn.setIcon(QIcon("src/GUI/Images/dots.png"))
         self.btn.setFixedSize(50,39)
         
-
-        layout.setSpacing(0)
         layout.addWidget(label)
         layout.addWidget(self.btn)
+        layout.setSpacing(40)
 
         self.setLayout(layout)
         self.setFixedSize(250,60)
-  
-         
 
     def _openOptionsMenu(self):
         self.dlg = selfClosingDialog(self._closeOptionsMenu, parent = self)
@@ -47,7 +45,6 @@ class ElementWidget(QWidget):
         self.dlg.setGeometry(posi.x(), posi.y() ,100,100)
         self.dlg.show()
         
-
     def _closeOptionsMenu(self):
         self.dlg.close()
 

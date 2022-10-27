@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QApplication, QComboBox, QVBoxLayout, QGridLayout, QLabel,QSpacerItem, QSizePolicy
+from PyQt5.QtWidgets import QWidget, QApplication, QComboBox, QFormLayout, QVBoxLayout, QGridLayout, QLabel,QSpacerItem, QSizePolicy
 from PyQt5.QtCore import Qt
 
 class FormWidget(QWidget):
@@ -6,18 +6,19 @@ class FormWidget(QWidget):
         super().__init__()
 
         ### Setup Ui ###
-        self.grid = QGridLayout()
-        self.grid.addWidget(self.ElementSelector(), 0,0,1,2)
-        verticalSpacer = QSpacerItem(20, 40,QSizePolicy.Maximum, QSizePolicy.Expanding)         
-        self.grid.addItem(verticalSpacer, 10,0,2,1)
-        self.grid.setAlignment(Qt.AlignTop)
-        self.setLayout(self.grid)
+        self.form = QFormLayout()
+        self.form.addRow(QLabel("Element Type"), self.ElementSelector())
+        
+        # self.form.setAlignment(Qt.AlignTop)
+        self.setLayout(self.form)
 
     def ElementSelector(self):
         self.ElementSelector = QComboBox()
         self.ElementSelector.addItems([
             "--select Element type--"
             , "Reflector"
+            , "Camera"
+            , "RayTracer"
             ])
         self.ElementSelector.currentIndexChanged.connect(self.ElementSelected)
         return self.ElementSelector
@@ -26,7 +27,7 @@ class FormWidget(QWidget):
         if self.ElementSelector.currentIndex() == 1:
             if hasattr(self, "ReflectorSelector"):
                 self.ReflectorSelector.setParent(None)
-            self.grid.addWidget(self._makeReflectorSelector(),1,0,1,2)
+            self.form.addWidget(self._makeReflectorSelector(),1,0,1,2)
 
     def _makeReflectorSelector(self):
 
@@ -42,11 +43,11 @@ class FormWidget(QWidget):
 
     def ReflectorSelected(self):
         if self.ReflectorSelector.currentIndex() == 1:
-            self.grid.addWidget(QLabel("ParabolaForm"),2,0,1,2)
+            self.form.addWidget(QLabel("ParabolaForm"),2,0,1,2)
         if self.ReflectorSelector.currentIndex() == 2:
-            self.grid.addWidget(QLabel("HeyperbolaForm"),2,0,1,2)
+            self.form.addWidget(QLabel("HeyperbolaForm"),2,0,1,2)
         if self.ReflectorSelector.currentIndex() == 3:
-            self.grid.addWidget(QLabel("EllipseForm"),2,0,1,2)
+            self.form.addWidget(QLabel("EllipseForm"),2,0,1,2)
 
     
         

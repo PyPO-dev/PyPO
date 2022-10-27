@@ -16,7 +16,7 @@ def plotSystem_test():
     parabola["lims_y"] = [-1000,1000]
     parabola["lims_u"] = [200,5e3]
     parabola["lims_v"] = [0,2*np.pi]
-    parabola["gridsize"] = [13403,13401]
+    parabola["gridsize"] = [1403,1401]
 
     hyperbola = {}
     hyperbola["name"] = "h1"

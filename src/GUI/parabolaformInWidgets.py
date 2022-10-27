@@ -2,7 +2,7 @@ from PyQt5 import QtWidgets as qtw
 import sys
 sys.path.append('../')
 sys.path.append('../../')
-import POPPy.System as st
+# import POPPy.System as st
 
 
 
@@ -121,7 +121,6 @@ class ParabolaFormLayout(qtw.QFormLayout):
             self.limU2.setEnabled(False)
             self.limV1.setEnabled(False)
             self.limV2.setEnabled(False)
-            # print("dis1")
             
         else:
             self.limX1.setEnabled(False)

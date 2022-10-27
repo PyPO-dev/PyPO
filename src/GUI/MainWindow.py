@@ -29,16 +29,16 @@ class MainWidget(QWidget):
 
 
         ### ElementConfigurations
-        
+        self.elementConfigs = []
 
         # init System
         self.STM = st.System()
+        self.STM.addPlotter()
         # self.STM.addParabola([1,1], [-1,1], [-1,1], [101,101]) ##TODO: remove 
 
 
 
         # init layout
-        # self._createMenuBar()
         self.grid = QGridLayout()
 
         self._mkElementsColumn()
@@ -48,17 +48,6 @@ class MainWidget(QWidget):
 
 
         self.setLayout(self.grid)
-        
-
-
-
-        
-    # def _mkMenuBar(self):
-    #     ### Bar 
-    #     menuBar = menuBar()
-    #     ### Menus
-    #     ElementsMenu = menuBar.addMenu('Elements')
-    #     ElementsMenu.addAction(AddTestElement)
     
     def _mkElementsColumn(self):
         if hasattr(self, "ElementsColumn"):
@@ -70,22 +59,12 @@ class MainWidget(QWidget):
         self.ElementsColumn.setMaximumWidth(300)
         self.ElementsColumn.setMinimumWidth(300)
         self.addToWindowGrid(self.ElementsColumn, self.GPElementsColumn)
-        
-    def _mkParameterWidget(self):
-        if hasattr(self, "ParameterWid"):
-            self.ParameterWid.setParent(None)
-
-        self.ParameterWid = FormWidget()
-        self.ParameterWid.setMaximumWidth(400)
-        self.ParameterWid.setMinimumWidth(400)
-        # self.ParameterWid.setProperty('class', 'parameterForm')
-        self.addToWindowGrid(self.ParameterWid,self.GPParameterForm)
 
     def plotSystem(self):
         if hasattr(self, "PlotScreen"):
             self.PlotScreen.setParent(None)
 
-        figure = self.STM.plotSystem(ret = True)
+        figure = self.STM.plotter.plotSystem(ret = True, show=False)
         self.PlotScreen= PlotScreen(figure)
         self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
 
@@ -93,15 +72,15 @@ class MainWidget(QWidget):
         self.grid.addWidget(widget, param[0], param[1], param[2], param[3])
 
 
-    def _mkButtons(self):
-        btn = QPushButton("addParabola")
-        btn.clicked.connect(self.btnAction)
+    # def _mkButtons(self):
+    #     btn = QPushButton("addParabola")
+    #     btn.clicked.connect(self.btnAction)
 
-        btnWidget = QWidget()
-        btnLayout = QVBoxLayout()
-        btnLayout.addWidget(btn)
-        btnWidget.setLayout(btnLayout)
-        self.addToWindowGrid(btnWidget,self.GPButtons)
+    #     btnWidget = QWidget()
+    #     btnLayout = QVBoxLayout()
+    #     btnLayout.addWidget(btn)
+    #     btnWidget.setLayout(btnLayout)
+    #     self.addToWindowGrid(btnWidget,self.GPButtons)
 
     def btnAction(self):
         self.STM.addParabola([1,1], [-1,1], [-1,1], [101,101]) 
@@ -109,14 +88,16 @@ class MainWidget(QWidget):
         self.plotSystem()
         self._mkElementsColumn()
 
-    def AddElementAction(self):
-        pass
+    def addElementAction(self, elementDict):
+        self.elementConfigs.append(elementDict)
+        self.STM.addParabola(elementDict) 
+        print(self.elementConfigs[-1])
 
     def setParabolaForm(self):
         if hasattr(self, "ParameterWid"):
             self.ParameterWid.setParent(None)
 
-        self.ParameterWid = ParabolaForm.Form()
+        self.ParameterWid = ParabolaForm.Form(self.addElementAction)
         self.ParameterWid.setMaximumWidth(400)
         self.ParameterWid.setMinimumWidth(400)
         self.addToWindowGrid(self.ParameterWid,self.GPParameterForm)
@@ -125,7 +106,7 @@ class MainWidget(QWidget):
         if hasattr(self, "ParameterWid"):
             self.ParameterWid.setParent(None)
 
-        self.ParameterWid = HyperbolaForm.Form()
+        self.ParameterWid = HyperbolaForm.Form(self.addElementAction)
         self.ParameterWid.setMaximumWidth(400)
         self.ParameterWid.setMinimumWidth(400)
         self.addToWindowGrid(self.ParameterWid,self.GPParameterForm)

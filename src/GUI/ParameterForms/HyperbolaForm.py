@@ -9,8 +9,10 @@ import src.POPPy.System as system
 
 
 class Form(QWidget):
-    def __init__ (self):
+    def __init__ (self, addElement):
         super().__init__()
+
+        self.addElementAction = addElement
         self.form = QFormLayout()
 
         self.fillForm()       
@@ -113,7 +115,6 @@ class Form(QWidget):
             self.limU2.setEnabled(False)
             self.limV1.setEnabled(False)
             self.limV2.setEnabled(False)
-            print("dis1")
             
         else:
             self.limX1.setEnabled(False)
@@ -167,8 +168,13 @@ class Form(QWidget):
                 del paramdict["lims_x"]
             if "lims_y" in paramdict:
                 del paramdict["lims_y"]
-        for k in paramdict:
-            print(k, (15 - len(k))*" ",paramdict[k], (20 - len(str(paramdict[k])))*" ",type(paramdict[k]))
+
+
+        # for k in paramdict:
+        #     print(k, (15 - len(k))*" ",paramdict[k], (20 - len(str(paramdict[k])))*" ",type(paramdict[k]))
+
+        self.addElementAction(paramdict)
+
         
     def addNot(self):
         print("canceling")

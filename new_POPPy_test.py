@@ -7,13 +7,13 @@ def plotSystem_test():
     parabola["name"] = "p1"
     #parabola["pmode"] = "manual"
     parabola["pmode"] = "focus"
-    parabola["gmode"] = "uv"
+    parabola["gmode"] = "xy"
     parabola["flip"] = False
     parabola["coeffs"] = [1, 1, -1]
     parabola["vertex"] = np.zeros(3)
     parabola["focus_1"] = np.array([0,0,3.5e3])
-    parabola["lims_x"] = [-1,1]
-    parabola["lims_y"] = [-1,1]
+    parabola["lims_x"] = [-100,100]
+    parabola["lims_y"] = [-100,100]
     parabola["lims_u"] = [200,5e3]
     parabola["lims_v"] = [0,2*np.pi]
     parabola["gridsize"] = [403,401]
@@ -25,7 +25,7 @@ def plotSystem_test():
     hyperbola["gmode"] = "xy"
     hyperbola["flip"] = False
     hyperbola["focus_1"] = np.array([0,0,3.5e3])
-    hyperbola["focus_2"] = np.array([0,0,3.5e3 - 5606])
+    hyperbola["focus_2"] = np.array([0,0,3.5e3-1000])
     hyperbola["ecc"] = 1.08208248
     hyperbola["lims_x"] = [-310,310]
     hyperbola["lims_y"] = [-310,310]
@@ -38,9 +38,10 @@ def plotSystem_test():
     s.addHyperbola(hyperbola)
     s.addParabola(parabola)
 
-    rotation=np.array([90, 0, 0])
+    rotation=np.array([2, 2, 0])
 
-    #s.rotateGrids("p1", rotation)
+    s.rotateGrids("p1", rotation)
+    s.rotateGrids("h1", rotation)
 
     s.plotter.plotSystem(s.system, fine=2, norm=False)
 
@@ -52,13 +53,13 @@ def plotSystem_test():
     pt.imshow(np.absolute(EH.Ex))
     pt.show()
 
-    EH1 = s.propagatePO_GPU(s.system["p1"], s.system["h1"], JM, k=4.9,
-                    epsilon=1, t_direction=-1, nThreads=256,
+    EH1 = s.propagatePO_GPU(s.system["p1"], s.system["h1"], JM, k=111.9,
+                    epsilon=1, t_direction=1, nThreads=256,
                     mode="EH", precision="single")
 
-    EH1 = s.propagatePO_CPU(s.system["p1"], s.system["h1"], JM, k=4.9,
-                    epsilon=1, t_direction=-1, nThreads=11,
-                    mode="EH", precision="double")
+    #EH1 = s.propagatePO_CPU(s.system["p1"], s.system["h1"], JM, k=4.9,
+    #                epsilon=1, t_direction=-1, nThreads=11,
+    #                mode="EH", precision="double")
 
     pt.imshow(np.absolute(EH1.Ex))
     pt.show()

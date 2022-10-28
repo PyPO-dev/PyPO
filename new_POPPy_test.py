@@ -7,13 +7,13 @@ def plotSystem_test():
     parabola["name"] = "p1"
     #parabola["pmode"] = "manual"
     parabola["pmode"] = "focus"
-    parabola["gmode"] = "xy"
+    parabola["gmode"] = "uv"
     parabola["flip"] = False
     parabola["coeffs"] = [1, 1, -1]
     parabola["vertex"] = np.zeros(3)
     parabola["focus_1"] = np.array([0,0,3.5e3])
-    parabola["lims_x"] = [-1000,1000]
-    parabola["lims_y"] = [-1000,1000]
+    parabola["lims_x"] = [-1,1]
+    parabola["lims_y"] = [-1,1]
     parabola["lims_u"] = [200,5e3]
     parabola["lims_v"] = [0,2*np.pi]
     parabola["gridsize"] = [403,401]
@@ -40,7 +40,7 @@ def plotSystem_test():
 
     rotation=np.array([90, 0, 0])
 
-    s.rotateGrids("p1", rotation)
+    #s.rotateGrids("p1", rotation)
 
     s.plotter.plotSystem(s.system, fine=2, norm=False)
 
@@ -56,6 +56,9 @@ def plotSystem_test():
                     epsilon=1, t_direction=-1, nThreads=256,
                     mode="EH", precision="single")
 
+    EH1 = s.propagatePO_CPU(s.system["p1"], s.system["h1"], JM, k=4.9,
+                    epsilon=1, t_direction=-1, nThreads=11,
+                    mode="EH", precision="double")
 
     pt.imshow(np.absolute(EH1.Ex))
     pt.show()

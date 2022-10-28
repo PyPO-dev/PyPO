@@ -23,6 +23,10 @@ def currentConv(currents, c_currents, size, ct_t):
     c_currents.i2y = (ct_t * size)(*np.imag(currents.My).ravel().tolist())
     c_currents.i2z = (ct_t * size)(*np.imag(currents.Mz).ravel().tolist())
 
+def fieldConv(field, c_field, size, ct_t):
+    c_currents.rx = (ct_t * size)(*np.real(field.x).ravel().tolist())
+    c_currents.ix = (ct_t * size)(*np.imag(field.x).ravel().tolist())
+
 def extractorScalar(source, target, field, ct_t):
     """
     (PUBLIC)
@@ -119,6 +123,10 @@ def c2rBundleToObj(res, shape):
     out2 = rfield(x3, y3, z3)
 
     return out1, out2
+
+def allocate_arrC1(res, size, ct_t):
+    res.rx = (ct_t * size)()
+    res.ix = (ct_t * size)()
 
 def allocate_c2Bundle(res, size, ct_t):
     res.r1x = (ct_t * size)()

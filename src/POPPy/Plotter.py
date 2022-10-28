@@ -221,10 +221,13 @@ class Plotter(object):
         if show:
             pt.show()
 
+        del grids
+        
         if returns:
             return ax_append
 
         pt.close()
+
 
     def plotSystem(self, systemDict, fine=2, cmap=cm.cool,
                 ax_append=False, norm=False,

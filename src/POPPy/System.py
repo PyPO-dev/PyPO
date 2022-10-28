@@ -11,6 +11,7 @@ import json
 # POPPy-specific modules
 from src.POPPy.BindRefl import *
 from src.POPPy.BindGPU import *
+from src.POPPy.BindCPU import *
 from src.POPPy.Copy import copyGrid
 from src.POPPy.MatTransform import *
 from src.POPPy.Plotter import Plotter
@@ -227,7 +228,22 @@ class System(object):
                     epsilon=1, t_direction=-1, nThreads=1,
                     mode="JM", precision="single"):
 
-        pass
+        if precision == "double":
+            if mode == "JM":
+                out = calcJM_CPUd(source, target, s_currents, k, epsilon, t_direction, nThreads)
+
+            elif mode == "EH":
+                out = calcEH_CPUd(source, target, s_currents, k, epsilon, t_direction, nThreads)
+
+            elif mode == "JMEH":
+                out1, out2 = calcJMEH_CPUd(source, target, s_currents, k, epsilon, t_direction, nThreads)
+                out = [out1, out2]
+
+            elif mode == "EHP":
+                out1, out2 = calcEHP_CPUd(source, target, s_currents, k, epsilon, t_direction, nThreads)
+                out = [out1, out2]
+
+        return out
 
     def propagatePO_GPU(self, source, target, s_currents, k,
                     epsilon=1, t_direction=-1, nThreads=256,

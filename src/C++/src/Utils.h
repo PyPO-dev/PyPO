@@ -21,55 +21,55 @@ public:
     void dot(const std::array<std::complex<T>, 3> &cv1, const std::array<std::complex<T>, 3> &cv2, std::complex<T> &out);
     void dot(const std::array<std::complex<T>, 3> &cv1, const std::array<T, 3> &v2, std::complex<T> &out);
     void dot(const std::array<T, 3> &v1, const std::array<std::complex<T>, 3> &cv2, std::complex<T> &out);
-    
+
     // Overloaded cross products
     void ext(const std::array<T, 3> &v1, const std::array<T, 3> &v2, std::array<T, 3> &out);
     void ext(const std::array<std::complex<T>, 3> &cv1, const std::array<std::complex<T>, 3> &cv2, std::array<std::complex<T>, 3> &out);
     void ext(const std::array<std::complex<T>, 3> &cv1, const std::array<T, 3> &v2, std::array<std::complex<T>, 3> &out);
     void ext(const std::array<T, 3> &v1, const std::array<std::complex<T>, 3> &cv2, std::array<std::complex<T>, 3> &out);
-    
+
     // Overloaded absolute value
     void abs(const std::array<T, 3> &v, T &out);
     void abs(const std::array<std::complex<T>, 3> &cv, std::complex<T> &out);
-    
+
     // Difference vectors
     void diff(const std::array<T, 3> &v1, const std::array<T, 3> &v2, std::array<T, 3> &out);
     void diff(const std::array<std::complex<T>, 3> &cv1, const std::array<std::complex<T>, 3> &cv2, std::array<std::complex<T>, 3> &out);
-    
+
     // Normalization
     void normalize(const std::array<T, 3> &v, std::array<T, 3> &out);
     void normalize(const std::array<std::complex<T>, 3> &cv, std::array<std::complex<T>, 3> &out);
-    
+
     // Scalar multiplication
     void s_mult(const std::array<T, 3> &v, const T &s, std::array<T, 3> &out);
     void s_mult(const std::array<std::complex<T>, 3> &cv, const std::complex<T> &cs, std::array<std::complex<T>, 3> &out);
     void s_mult(const std::array<T, 3> &v, const std::complex<T> &cs, std::array<std::complex<T>, 3> &out);
     void s_mult(const std::array<std::complex<T>, 3> &cv, const T &s, std::array<std::complex<T>, 3> &out);
-    
+
     // Conjugation of complex vector
     void conj(const std::array<std::complex<T>, 3> &cv, std::array<std::complex<T>, 3> &out);
-    
+
     // Snell's function
     void snell(const std::array<std::complex<T>, 3> &cvin, const std::array<T, 3> &normal, std::array<std::complex<T>, 3> &out);
     void snell(const std::array<T, 3> &vin, const std::array<T, 3> &normal, std::array<T, 3> &out);
-    
+
     // Dyadic products
     void dyad(const std::array<T, 3> &v1, const std::array<T, 3> &v2, std::array<std::array<T, 3>, 3> &out);
-    
+
     // Real valued matrix-matrix subtraction
     void matDiff(const std::array<std::array<T, 3>, 3> &m1, const std::array<std::array<T, 3>, 3> &m2, std::array<std::array<T, 3>, 3> &out);
-    
+
     // Matrix-vector multiplication
     void matVec(const std::array<std::array<T, 3>, 3> &m1, const std::array<T, 3> &v1, std::array<T, 3> &out);
     void matVec(const std::array<std::array<T, 3>, 3> &m1, const std::array<std::complex<T>, 3> &cv1, std::array<std::complex<T>, 3> &out);
-    
+
 };
 
 // Real dot-product
 template <typename T> inline void Utils<T>::dot(const std::array<T, 3> &v1, const std::array<T, 3> &v2, T &out)
 {
     out = 0;
-    
+
     for(int n=0; n<3; n++)
     {
         out += v1[n] * v2[n];
@@ -81,7 +81,7 @@ template <typename T> inline void Utils<T>::dot(const std::array<T, 3> &v1, cons
 template <typename T> inline void Utils<T>::dot(const std::array<std::complex<T>, 3> &cv1, const std::array<std::complex<T>, 3> &cv2, std::complex<T> &out)
 {
     out = (0, 0);
-    
+
     for(int n=0; n<3; n++)
     {
         out += std::conj(cv1[n]) * cv2[n];
@@ -92,7 +92,7 @@ template <typename T> inline void Utils<T>::dot(const std::array<std::complex<T>
 template <typename T> inline void Utils<T>::dot(const std::array<std::complex<T>, 3> &cv1, const std::array<T, 3> &v2, std::complex<T> &out)
 {
     out = (0, 0);
-    
+
     for(int n=0; n<3; n++)
     {
         out += std::conj(cv1[n]) * v2[n];
@@ -103,7 +103,7 @@ template <typename T> inline void Utils<T>::dot(const std::array<std::complex<T>
 template <typename T> inline void Utils<T>::dot(const std::array<T, 3> &v1, const std::array<std::complex<T>, 3> &cv2, std::complex<T> &out)
 {
     out = (0, 0);
-    
+
     for(int n=0; n<3; n++)
     {
         out += v1[n] * cv2[n];
@@ -182,12 +182,12 @@ template <typename T> inline void Utils<T>::normalize(const std::array<T, 3> &v,
 {
     T norm;
     abs(v, norm);
-    
+
     if (norm == 0)
     {
         norm = 1;
     }
-    
+
     for( int n=0; n<3; n++)
     {
         out[n] = v[n] / norm;
@@ -199,9 +199,7 @@ template <typename T> inline void Utils<T>::normalize(const std::array<std::comp
 {
     std::complex<T> cnorm;
     abs(cv, cnorm);
-    printf("never\n");
 
-    
     for( int n=0; n<3; n++)
     {
         out[n] = cv[n] / cnorm;
@@ -261,12 +259,12 @@ template <typename T> inline void Utils<T>::snell(const std::array<std::complex<
 {
     std::complex<T> cfactor;
     dot(cvin, normal, cfactor);
-    
+
     cfactor = 2. * cfactor;
-    
+
     std::array<std::complex<T>, 3> rhs;
     s_mult(normal, cfactor, rhs);
-    
+
     diff(cvin, rhs, out);
 }
 
@@ -275,12 +273,12 @@ template <typename T> inline void Utils<T>::snell(const std::array<T, 3> &vin, c
 {
     T factor;
     dot(vin, normal, factor);
-    
+
     factor = 2. * factor;
-    
+
     std::array<T, 3> rhs;
     s_mult(normal, factor, rhs);
-    
+
     diff(vin, rhs, out);
 }
 
@@ -324,4 +322,4 @@ template <typename T> inline void Utils<T>::matVec(const std::array<std::array<T
     }
 }
 
-#endif 
+#endif

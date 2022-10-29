@@ -211,18 +211,22 @@ def allfill_reflparams(inp, reflparams_py, ct_t):
     inp.n_cells = (ctypes.c_int * 2)()
 
     for i in range(2):
-        if reflparams_py["gmode"]:
+        if reflparams_py["gmode"] == 0:
             inp.lxu[i] = ct_t(reflparams_py["lims_x"][i])
             inp.lyv[i] = ct_t(reflparams_py["lims_y"][i])
 
-        else:
+        elif reflparams_py["gmode"] == 1:
             inp.lxu[i] = ct_t(reflparams_py["lims_u"][i])
             inp.lyv[i] = ct_t(reflparams_py["lims_v"][i])
+
+        elif reflparams_py["gmode"] == 2:
+            inp.lxu[i] = ct_t(reflparams_py["lims_Az"][i])
+            inp.lyv[i] = ct_t(reflparams_py["lims_El"][i])
 
         inp.n_cells[i] = ctypes.c_int(reflparams_py["gridsize"][i])
 
     inp.flip = ctypes.c_bool(reflparams_py["flip"])
-    inp.gmode = ctypes.c_bool(reflparams_py["gmode"])
+    inp.gmode = ctypes.c_int(reflparams_py["gmode"])
 
     inp.transf = (ct_t * 16)()
     for i in range(16):

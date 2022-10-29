@@ -93,10 +93,14 @@ class System(object):
             self.system[reflDict["name"]]["coeffs"][1] = b
             self.system[reflDict["name"]]["coeffs"][2] = -1
 
-        if reflDict["gmode"] == "uv":
+        if reflDict["gmode"] == "xy":
             self.system[reflDict["name"]]["gmode"] = 0
 
-        elif reflDict["gmode"] == "xy":
+        elif reflDict["gmode"] == "uv":
+            # Convert v in degrees to radians
+            self.system[reflDict["name"]]["lims_v"] = [np.radians(self.system[reflDict["name"]]["lims_v"][0]),
+                                                        np.radians(self.system[reflDict["name"]]["lims_v"][1])]
+
             self.system[reflDict["name"]]["gmode"] = 1
 
         self.num_ref += 1
@@ -149,11 +153,71 @@ class System(object):
             self.system[reflDict["name"]]["coeffs"][1] = b3
             self.system[reflDict["name"]]["coeffs"][2] = c3
 
-        if reflDict["gmode"] == "uv":
+        if reflDict["gmode"] == "xy":
             self.system[reflDict["name"]]["gmode"] = 0
 
-        elif reflDict["gmode"] == "xy":
+        elif reflDict["gmode"] == "uv":
+            self.system[reflDict["name"]]["lims_v"] = [np.radians(self.system[reflDict["name"]]["lims_v"][0]),
+                                                        np.radians(self.system[reflDict["name"]]["lims_v"][1])]
+
             self.system[reflDict["name"]]["gmode"] = 1
+
+        self.num_ref += 1
+
+    def addEllipse(self, reflDict):
+        if reflDict["name"] == "Ellipse":
+            reflDict["name"] = reflDict["name"] + "_{}".format(self.num_ref)
+
+        reflDict["type"] = 2
+        reflDict["transf"] = np.eye(4)
+
+        self.system[reflDict["name"]] = copyGrid(reflDict)
+
+        if reflDict["pmode"] == "focus":
+            pass
+
+        if reflDict["gmode"] == "xy":
+            self.system[reflDict["name"]]["gmode"] = 0
+
+        elif reflDict["gmode"] == "uv":
+            self.system[reflDict["name"]]["lims_v"] = [np.radians(self.system[reflDict["name"]]["lims_v"][0]),
+                                                        np.radians(self.system[reflDict["name"]]["lims_v"][1])]
+
+            self.system[reflDict["name"]]["gmode"] = 1
+
+        self.num_ref += 1
+
+    def addPlane(self, reflDict):
+        if reflDict["name"] == "Plane":
+            reflDict["name"] = reflDict["name"] + "_{}".format(self.num_ref)
+
+        reflDict["type"] = 3
+        reflDict["transf"] = np.eye(4)
+
+        self.system[reflDict["name"]] = copyGrid(reflDict)
+        self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
+
+        self.system[reflDict["name"]]["coeffs"][0] = -1
+        self.system[reflDict["name"]]["coeffs"][1] = -1
+        self.system[reflDict["name"]]["coeffs"][2] = -1
+
+        if reflDict["gmode"] == "xy":
+            self.system[reflDict["name"]]["gmode"] = 0
+
+        elif reflDict["gmode"] == "uv":
+            self.system[reflDict["name"]]["gmode"] = 1
+
+        elif reflDict["gmode"] == "AoE":
+            # Assume is given in degrees
+            # Convert Az and El to radians
+
+            self.system[reflDict["name"]]["lims_Az"] = [np.radians(self.system[reflDict["name"]]["lims_Az"][0]),
+                                                        np.radians(self.system[reflDict["name"]]["lims_Az"][1])]
+
+            self.system[reflDict["name"]]["lims_El"] = [np.radians(self.system[reflDict["name"]]["lims_El"][0]),
+                                                        np.radians(self.system[reflDict["name"]]["lims_El"][1])]
+
+            self.system[reflDict["name"]]["gmode"] = 2
 
         self.num_ref += 1
 
@@ -161,7 +225,7 @@ class System(object):
         self.system[name]["transf"] = MatRotate(rotation, self.system[name]["transf"], cRot)
 
     def translateGrids(self, name, translation):
-        self.system[name]["transf"] = MatTranslate(offTrans, self.system[name]["transf"])
+        self.system[name]["transf"] = MatTranslate(translation, self.system[name]["transf"])
 
     def readCustomBeam(self, name, comp, shape, convert_to_current=True, mode="PMC", ret="currents"):
         rfield = np.loadtxt(self.customBeamPath + "r" + name + ".txt")
@@ -224,9 +288,12 @@ class System(object):
         elif ret == "both":
             return currents_c, fields_c
 
-    def propagatePO_CPU(self, source, target, s_currents, k,
+    def propagatePO_CPU(self, source_name, target_name, s_currents, k,
                     epsilon=1, t_direction=-1, nThreads=1,
                     mode="JM", precision="single"):
+
+        source = self.system[source_name]
+        target = self.system[target_name]
 
         if precision == "double":
             if mode == "JM":
@@ -243,11 +310,17 @@ class System(object):
                 out1, out2 = calcEHP_CPUd(source, target, s_currents, k, epsilon, t_direction, nThreads)
                 out = [out1, out2]
 
+            elif mode == "FF":
+                out = calcFF_CPUd(source, target, s_currents, k, epsilon, t_direction, nThreads)
+
         return out
 
-    def propagatePO_GPU(self, source, target, s_currents, k,
+    def propagatePO_GPU(self, source_name, target_name, s_currents, k,
                     epsilon=1, t_direction=-1, nThreads=256,
                     mode="JM", precision="single"):
+
+        source = self.system[source_name]
+        target = self.system[target_name]
 
         if precision == "single":
             if mode == "JM":

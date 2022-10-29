@@ -143,14 +143,13 @@ Propagation<T, U, V, W>::Propagation(T k, int numThreads, int gs, int gt, T epsi
 
     this->t_direction = t_direction;
 
-    std::array<std::array<T, 3>, 3> eye;
-    eye[0].fill(0.);
-    eye[1].fill(0.);
-    eye[2].fill(0.);
+    this->eye[0].fill(0);
+    this->eye[1].fill(0);
+    this->eye[2].fill(0);
 
-    eye[0][0] = 1.;
-    eye[1][1] = 1.;
-    eye[2][2] = 1.;
+    this->eye[0][0] = 1;
+    this->eye[1][1] = 1;
+    this->eye[2][2] = 1;
 }
 
 // This function calculates the propagation between source and target, calculates currents
@@ -916,10 +915,13 @@ void Propagation<T, U, V, W>::propagateToFarField(int start, int stop,
         r_hat[1] = sin(theta) * sin(phi);
         r_hat[2] = cos(phi);
 
+        //_debugArray(r_hat);
+
         // Calculate total incoming E and H field at point on target
         e = farfieldAtPoint(cs, currents, r_hat);
 
         res->r1x[i] = e[0].real();
+
         res->r1y[i] = e[1].real();
         res->r1z[i] = e[2].real();
 
@@ -954,8 +956,8 @@ std::array<std::complex<T>, 3> Propagation<T, U, V, W>::farfieldAtPoint(V *cs,
     T omega_mu;                       // Angular frequency of field times mu
     T r_hat_in_rp;                 // r_hat dot product r_prime
     std::complex<T> r_in_s;        // Container for inner products between wavevctor and currents
-    T exp;
-    T area;                         // Copy area to here, reduce calls to memory
+    std::complex<T> expo;
+    T area;
 
     // Arrays of Ts
     std::array<T, 3> source_point; // Container for xyz co-ordinates
@@ -993,29 +995,49 @@ std::array<std::complex<T>, 3> Propagation<T, U, V, W>::farfieldAtPoint(V *cs,
 
         ut.dot(r_hat, source_point, r_hat_in_rp);
 
-        exp = k * r_hat_in_rp;
+        expo = exp(j * k * r_hat_in_rp);
         area = cs->area[i];
 
-        js[0] += (T)(currents->r1x[i]*cos(exp) - currents->i1x[i]*sin(exp))*area +
-                  j*(T)(currents->r1x[i]*sin(exp) + currents->i1x[i]*cos(exp))*area;
+        //cexp = cos(k * r_hat_in_rp)*cs->area[i];
+        //sexp = sin(k * r_hat_in_rp)*cs->area[i];
 
-        js[1] += (T)(currents->r1y[i]*cos(exp) - currents->i1y[i]*sin(exp))*area +
-                  j*(T)(currents->r1y[i]*sin(exp) + currents->i1y[i]*cos(exp))*area;
+        _js[0] = {currents->r1x[i], currents->i1x[i]};
+        _js[1] = {currents->r1y[i], currents->i1y[i]};
+        _js[2] = {currents->r1z[i], currents->i1z[i]};
 
-        js[2] += (T)(currents->r1z[i]*cos(exp) - currents->i1z[i]*sin(exp))*area +
-                  j*(T)(currents->r1z[i]*sin(exp) + currents->i1z[i]*cos(exp))*area;
+        _ms[0] = {currents->r2x[i], currents->i2x[i]};
+        _ms[1] = {currents->r2y[i], currents->i2y[i]};
+        _ms[2] = {currents->r2z[i], currents->i2z[i]};
 
-        ms[0] += (T)(currents->r2x[i]*cos(exp) - currents->i2x[i]*sin(exp))*area +
-                  j*(T)(currents->r2x[i]*sin(exp) + currents->i2x[i]*cos(exp))*area;
+        for (int n=0; n<3; n++)
+        {
+            js[n] += _js[n] * expo * area;
+            ms[n] += _ms[n] * expo * area;
+        }
+        /*
+        js[0] += (T)(currents->r1x[i]*cexp - currents->i1x[i]*sexp) +
+                  j*(T)(currents->r1x[i]*sexp + currents->i1x[i]*cexp);
 
-        ms[1] += (T)(currents->r2y[i]*cos(exp) - currents->i2y[i]*sin(exp))*area +
-                  j*(T)(currents->r2y[i]*sin(exp) + currents->i2y[i]*cos(exp))*area;
+        js[1] += (T)(currents->r1y[i]*cexp - currents->i1y[i]*sexp) +
+                  j*(T)(currents->r1y[i]*sexp + currents->i1y[i]*cexp);
 
-        ms[2] += (T)(currents->r2z[i]*cos(exp) - currents->i2z[i]*sin(exp))*area +
-                  j*(T)(currents->r2z[i]*sin(exp) + currents->i2z[i]*cos(exp))*area;
+        js[2] += (T)(currents->r1z[i]*cexp - currents->i1z[i]*sexp) +
+                  j*(T)(currents->r1z[i]*sexp + currents->i1z[i]*cexp);
+
+        ms[0] += (T)(currents->r2x[i]*cexp - currents->i2x[i]*sexp) +
+                  j*(T)(currents->r2x[i]*sexp + currents->i2x[i]*cexp);
+
+        ms[1] += (T)(currents->r2y[i]*cexp - currents->i2y[i]*sexp) +
+                  j*(T)(currents->r2y[i]*sexp + currents->i2y[i]*cexp);
+
+        ms[2] += (T)(currents->r2z[i]*cexp - currents->i2z[i]*sexp) +
+                  j*(T)(currents->r2z[i]*sexp + currents->i2z[i]*cexp);
+                  */
+
     }
 
     ut.matVec(eye_min_rr, js, _ctemp);
+
     ut.s_mult(_ctemp, omega_mu, js_tot_factor);
 
     ut.ext(r_hat, ms, _ctemp);
@@ -1076,24 +1098,15 @@ void Propagation<T, U, V, W>::_debugArray(T *arr, int idx)
 template <class T, class U, class V, class W>
 void Propagation<T, U, V, W>::_debugArray(std::array<T, 3> arr)
 {
-    std::cout << "Value of length-3 real array, element 0, is : " << arr[0] << std::endl;
-    std::cout << "Value of length-3 real array, element 1, is : " << arr[1] << std::endl;
-    std::cout << "Value of length-3 real array, element 2, is : " << arr[2] << std::endl;
+    std::cout << arr[0] << ", " << arr[1] << ", " << arr[2] << std::endl;
 }
 
 template <class T, class U, class V, class W>
 void Propagation<T, U, V, W>::_debugArray(std::array<std::complex<T>, 3> arr)
 {
-    std::cout << "Value of length 3 complex array, element 0, is : "
-                << arr[0].real() << " + " << arr[0].imag() << "j"
-                <<  std::endl;
-
-    std::cout << "Value of length 3 complex array, element 1, is : "
-                << arr[1].real() << " + " << arr[1].imag() << "j"
-                <<  std::endl;
-
-    std::cout << "Value of length 3 complex array, element 2, is : "
-                << arr[2].real() << " + " << arr[2].imag() << "j"
+    std::cout << arr[0].real() << " + " << arr[0].imag() << "j"
+                <<  ", " << arr[1].real() << " + " << arr[1].imag() << "j"
+                <<  ", " << arr[2].real() << " + " << arr[2].imag() << "j"
                 <<  std::endl;
 }
 

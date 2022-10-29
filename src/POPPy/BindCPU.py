@@ -304,6 +304,7 @@ def calcFF_CPUd(source, target, currents, k, epsilon, t_direction, nThreads):
     allfill_reflparams(csp, source, ctypes.c_double)
     allfill_reflparams(ctp, target, ctypes.c_double)
 
+    print(gt)
     allocate_reflcontainer(cs, gs, ctypes.c_double)
     allocate_reflcontainer(ct, gt, ctypes.c_double)
 
@@ -330,6 +331,7 @@ def calcFF_CPUd(source, target, currents, k, epsilon, t_direction, nThreads):
 
     # We pass reference to struct to c-function.
     res = c2Bundle()
+    allocate_c2Bundle(res, gt, ctypes.c_double)
 
     lib.propagateToFarField(ctypes.byref(res), csp, ctp,
                             ctypes.byref(cs), ctypes.byref(ct),

@@ -4,9 +4,10 @@
 
 #include "InterfaceReflector.h"
 
-template<typename T, typename U> void Parabola_xy(T *parabola, U xu_lo, U xu_up, U yv_lo,
-                                                U yv_up, U a, U b, int ncx, int ncy, int nfac,
-                                                U mat[16])
+template<typename T, typename U>
+void Parabola_xy(T *parabola, U xu_lo, U xu_up, U yv_lo,
+                U yv_up, U a, U b, int ncx, int ncy, int nfac,
+                U mat[16])
 {
     U _dx = (xu_up - xu_lo) / ncx;
     U _dy = (yv_up - yv_lo) / ncy;
@@ -74,9 +75,10 @@ template<typename T, typename U> void Parabola_xy(T *parabola, U xu_lo, U xu_up,
     }
 }
 
-template<typename T, typename U> void Parabola_uv(T *parabola, U xu_lo, U xu_up, U yv_lo,
-                                                U yv_up, U a, U b, int ncx, int ncy, int nfac,
-                                                U mat[16])
+template<typename T, typename U>
+void Parabola_uv(T *parabola, U xu_lo, U xu_up, U yv_lo,
+                U yv_up, U a, U b, int ncx, int ncy, int nfac,
+                U mat[16])
 {
     U _du = (xu_up/a - xu_lo/a) / ncx; // Divide by a to convert aperture radius to u param
     U _dv = (yv_up - yv_lo) / ncy;
@@ -139,9 +141,10 @@ template<typename T, typename U> void Parabola_uv(T *parabola, U xu_lo, U xu_up,
     }
 }
 
-template<typename T, typename U> void Hyperbola_xy(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
-                                                U yv_up, U a, U b, U c, int ncx, int ncy, int nfac,
-                                                U mat[16])
+template<typename T, typename U>
+void Hyperbola_xy(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
+                  U yv_up, U a, U b, U c, int ncx, int ncy, int nfac,
+                  U mat[16])
 {
     U _dx = (xu_up - xu_lo) / ncx;
     U _dy = (yv_up - yv_lo) / ncy;
@@ -209,9 +212,10 @@ template<typename T, typename U> void Hyperbola_xy(T *hyperbola, U xu_lo, U xu_u
     }
 }
 
-template<typename T, typename U> void Hyperbola_uv(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
-                                                U yv_up, U a, U b, U c, int ncx, int ncy, int nfac,
-                                                U mat[16])
+template<typename T, typename U>
+void Hyperbola_uv(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
+                  U yv_up, U a, U b, U c, int ncx, int ncy, int nfac,
+                  U mat[16])
 {
     U _du = (sqrt(xu_up*xu_up/(a*a) + 1) - sqrt(xu_lo*xu_lo/(a*a) + 1)) / ncx;
     U _dv = (yv_up - yv_lo) / ncy;
@@ -276,9 +280,10 @@ template<typename T, typename U> void Hyperbola_uv(T *hyperbola, U xu_lo, U xu_u
     }
 }
 
-template<typename T, typename U> void Ellipse_xy(T *ellipse, U xu_lo, U xu_up, U yv_lo,
-                                                U yv_up, U a, U b, U c, int ncx, int ncy, int nfac,
-                                                U mat[16])
+template<typename T, typename U>
+void Ellipse_xy(T *ellipse, U xu_lo, U xu_up, U yv_lo,
+                U yv_up, U a, U b, U c, int ncx, int ncy, int nfac,
+                U mat[16])
 {
     U _dx = (xu_up - xu_lo) / ncx;
     U _dy = (yv_up - yv_lo) / ncy;
@@ -346,9 +351,10 @@ template<typename T, typename U> void Ellipse_xy(T *ellipse, U xu_lo, U xu_up, U
     }
 }
 
-template<typename T, typename U> void Ellipse_uv(T *ellipse, U xu_lo, U xu_up, U yv_lo,
-                                                U yv_up, U a, U b, U c, int ncx, int ncy, int nfac,
-                                                U mat[16])
+template<typename T, typename U>
+void Ellipse_uv(T *ellipse, U xu_lo, U xu_up, U yv_lo,
+                U yv_up, U a, U b, U c, int ncx, int ncy, int nfac,
+                U mat[16])
 {
     U _du = (asin(xu_up/a) - asin(xu_lo/a)) / ncx;
     U _dv = (yv_up - yv_lo) / ncy;
@@ -412,6 +418,196 @@ template<typename T, typename U> void Ellipse_uv(T *ellipse, U xu_lo, U xu_up, U
     }
 }
 
+template<typename T, typename U>
+void Plane_xy(T *plane, U xu_lo, U xu_up, U yv_lo,
+              U yv_up, int ncx, int ncy, int nfac,
+              U mat[16])
+{
+    U _dx = (xu_up - xu_lo) / ncx;
+    U _dy = (yv_up - yv_lo) / ncy;
+
+    U dx = (xu_up + _dx - xu_lo) / ncx;
+    U dy = (yv_up + _dy - yv_lo) / ncy;
+
+    // Generate using xy parametrisation
+    U x;
+    U y;
+    U prefac;
+
+    U norm;
+
+    for (int i=0; i < ncx; i++)
+    {
+        x = i * dx + xu_lo;
+        for (int j=0; j < ncy; j++)
+        {
+            y = j * dy + yv_lo;
+
+            plane->x[i*ncy + j] = x;
+            plane->y[i*ncy  + j] = y;
+            plane->z[i*ncy  + j] = 0;
+
+            plane->nx[i*ncy  + j] = 0;
+            plane->ny[i*ncy  + j] = 0;
+            plane->nz[i*ncy  + j] = nfac * 1;
+
+            plane->area[i*ncy  + j] = dx * dy;
+
+            U xr, yr, zr, nxr, nyr, nzr;
+
+            xr = mat[0]*plane->x[i*ncy + j] + mat[1]*plane->y[i*ncy + j] +
+                  mat[2]*plane->z[i*ncy + j] + mat[3];
+            yr = mat[4]*plane->x[i*ncy + j] + mat[5]*plane->y[i*ncy + j] +
+                  mat[6]*plane->z[i*ncy + j] + mat[7];
+            zr = mat[8]*plane->x[i*ncy + j] + mat[9]*plane->y[i*ncy + j] +
+                  mat[10]*plane->z[i*ncy + j] + mat[11];
+
+            nxr = mat[0]*plane->nx[i*ncy + j] + mat[1]*plane->ny[i*ncy + j] +
+                  mat[2]*plane->nz[i*ncy + j];
+            nyr = mat[4]*plane->nx[i*ncy + j] + mat[5]*plane->ny[i*ncy + j] +
+                  mat[6]*plane->nz[i*ncy + j];
+            nzr = mat[8]*plane->nx[i*ncy + j] + mat[9]*plane->ny[i*ncy + j] +
+                  mat[10]*plane->nz[i*ncy + j];
+
+            plane->x[i*ncy + j] = xr;
+            plane->y[i*ncy  + j] = yr;
+            plane->z[i*ncy  + j] = zr;
+
+            plane->nx[i*ncy  + j] = nxr;
+            plane->ny[i*ncy  + j] = nyr;
+            plane->nz[i*ncy  + j] = nzr;
+        }
+    }
+}
+
+template<typename T, typename U>
+void Plane_uv(T *plane, U xu_lo, U xu_up, U yv_lo,
+              U yv_up, int ncx, int ncy, int nfac,
+              U mat[16])
+{
+    U _du = (xu_up - xu_lo) / ncx;
+    U _dv = (yv_up - yv_lo) / ncy;
+
+    U du = (xu_up + _du - xu_lo) / ncx;
+    U dv = (yv_up + _dv - yv_lo) / ncy;
+
+    // Generate using xy parametrisation
+    U u;
+    U v;
+
+    U norm;
+
+    for (int i=0; i < ncx; i++)
+    {
+        u = i * du + xu_lo;
+
+        for (int j=0; j < ncy; j++)
+        {
+            v = j * dv + yv_lo;
+
+            plane->x[i*ncy + j] = u * cos(v);
+            plane->y[i*ncy  + j] = u * sin(v);
+            plane->z[i*ncy  + j] = 0;
+
+            plane->nx[i*ncy  + j] = 0;
+            plane->ny[i*ncy  + j] = 0;
+            plane->nz[i*ncy  + j] = nfac * 1;
+
+            plane->area[i*ncy  + j] = u * du * dv;
+
+            U xr, yr, zr, nxr, nyr, nzr;
+
+            xr = mat[0]*plane->x[i*ncy + j] + mat[1]*plane->y[i*ncy + j] +
+                  mat[2]*plane->z[i*ncy + j] + mat[3];
+            yr = mat[4]*plane->x[i*ncy + j] + mat[5]*plane->y[i*ncy + j] +
+                  mat[6]*plane->z[i*ncy + j] + mat[7];
+            zr = mat[8]*plane->x[i*ncy + j] + mat[9]*plane->y[i*ncy + j] +
+                  mat[10]*plane->z[i*ncy + j] + mat[11];
+
+            nxr = mat[0]*plane->nx[i*ncy + j] + mat[1]*plane->ny[i*ncy + j] +
+                  mat[2]*plane->nz[i*ncy + j];
+            nyr = mat[4]*plane->nx[i*ncy + j] + mat[5]*plane->ny[i*ncy + j] +
+                  mat[6]*plane->nz[i*ncy + j];
+            nzr = mat[8]*plane->nx[i*ncy + j] + mat[9]*plane->ny[i*ncy + j] +
+                  mat[10]*plane->nz[i*ncy + j];
+
+            plane->x[i*ncy + j] = xr;
+            plane->y[i*ncy  + j] = yr;
+            plane->z[i*ncy  + j] = zr;
+
+            plane->nx[i*ncy  + j] = nxr;
+            plane->ny[i*ncy  + j] = nyr;
+            plane->nz[i*ncy  + j] = nzr;
+        }
+    }
+}
+
+template<typename T, typename U>
+void Plane_AoE(T *plane, U xu_lo, U xu_up, U yv_lo,
+              U yv_up, int ncx, int ncy,
+              U mat[16])
+{
+    U _dA = (xu_up - xu_lo) / ncx;
+    U _dE = (yv_up - yv_lo) / ncy;
+
+    U dA = (xu_up + _dA - xu_lo) / ncx;
+    U dE = (yv_up + _dE - yv_lo) / ncy;
+
+    // Generate using xy parametrisation
+    U Az;
+    U El;
+
+    for (int i=0; i < ncx; i++)
+    {
+        Az = i * dA + xu_lo;
+
+        for (int j=0; j < ncy; j++)
+        {
+            El = j * dE + yv_lo;
+
+            plane->x[i*ncy + j] = sqrt(Az*Az + El*El);
+            plane->y[i*ncy  + j] = atan(El / Az);
+
+            if (plane->y[i*ncy  + j] != plane->y[i*ncy  + j])
+            {
+                plane->y[i*ncy  + j] = 0;
+            }
+
+            plane->z[i*ncy  + j] = 0;
+
+            plane->nx[i*ncy  + j] = 0;
+            plane->ny[i*ncy  + j] = 0;
+            plane->nz[i*ncy  + j] = 1;
+
+            plane->area[i*ncy  + j] = 1;
+
+            U xr, yr, zr, nxr, nyr, nzr;
+
+            xr = mat[0]*plane->x[i*ncy + j] + mat[1]*plane->y[i*ncy + j] +
+                  mat[2]*plane->z[i*ncy + j] + mat[3];
+            yr = mat[4]*plane->x[i*ncy + j] + mat[5]*plane->y[i*ncy + j] +
+                  mat[6]*plane->z[i*ncy + j] + mat[7];
+            zr = mat[8]*plane->x[i*ncy + j] + mat[9]*plane->y[i*ncy + j] +
+                  mat[10]*plane->z[i*ncy + j] + mat[11];
+
+            nxr = mat[0]*plane->nx[i*ncy + j] + mat[1]*plane->ny[i*ncy + j] +
+                  mat[2]*plane->nz[i*ncy + j];
+            nyr = mat[4]*plane->nx[i*ncy + j] + mat[5]*plane->ny[i*ncy + j] +
+                  mat[6]*plane->nz[i*ncy + j];
+            nzr = mat[8]*plane->nx[i*ncy + j] + mat[9]*plane->ny[i*ncy + j] +
+                  mat[10]*plane->nz[i*ncy + j];
+
+            plane->x[i*ncy + j] = xr;
+            plane->y[i*ncy  + j] = yr;
+            plane->z[i*ncy  + j] = zr;
+
+            plane->nx[i*ncy  + j] = nxr;
+            plane->ny[i*ncy  + j] = nyr;
+            plane->nz[i*ncy  + j] = nzr;
+        }
+    }
+}
+
 extern "C" void generateGrid(reflparams refl, reflcontainer *container)
 {
     // For readability, assign new temporary placeholders
@@ -434,7 +630,7 @@ extern "C" void generateGrid(reflparams refl, reflcontainer *container)
         nfac = -1;
     }
 
-    if (refl.gmode)
+    if (refl.gmode == 0)
     {
         if (refl.type == 0)
         {
@@ -453,9 +649,15 @@ extern "C" void generateGrid(reflparams refl, reflcontainer *container)
             Ellipse_xy<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
                                             yv_up, a, b, c, ncx, ncy, nfac, refl.transf);
         }
+
+        else if (refl.type == 3)
+        {
+            Plane_xy<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
+                                            yv_up, ncx, ncy, nfac, refl.transf);
+        }
     }
 
-    else
+    else if (refl.gmode == 1)
     {
         if (refl.type == 0)
         {
@@ -475,6 +677,18 @@ extern "C" void generateGrid(reflparams refl, reflcontainer *container)
             Ellipse_uv<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
                                             yv_up, a, b, c, ncx, ncy, nfac, refl.transf);
         }
+
+        else if (refl.type == 3)
+        {
+            Plane_uv<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
+                                            yv_up, ncx, ncy, nfac, refl.transf);
+        }
+    }
+
+    if (refl.gmode == 2)
+    {
+        Plane_AoE<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
+                                        yv_up, ncx, ncy, refl.transf);
     }
 }
 
@@ -500,7 +714,7 @@ extern "C" void generateGridf(reflparamsf refl, reflcontainerf *container)
         nfac = -1;
     }
 
-    if (refl.gmode)
+    if (refl.gmode == 0)
     {
         if (refl.type == 0)
         {
@@ -519,9 +733,15 @@ extern "C" void generateGridf(reflparamsf refl, reflcontainerf *container)
             Ellipse_xy<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
                                             yv_up, a, b, c, ncx, ncy, nfac, refl.transf);
         }
+
+        else if (refl.type == 3)
+        {
+            Plane_xy<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
+                                            yv_up, ncx, ncy, nfac, refl.transf);
+        }
     }
 
-    else
+    else if (refl.gmode == 1)
     {
         if (refl.type == 0)
         {
@@ -541,5 +761,17 @@ extern "C" void generateGridf(reflparamsf refl, reflcontainerf *container)
             Ellipse_uv<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
                                             yv_up, a, b, c, ncx, ncy, nfac, refl.transf);
         }
+
+        else if (refl.type == 3)
+        {
+            Plane_uv<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
+                                            yv_up, ncx, ncy, nfac, refl.transf);
+        }
+    }
+
+    else if (refl.gmode == 2)
+    {
+        Plane_AoE<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
+                                        yv_up, ncx, ncy, refl.transf);
     }
 }

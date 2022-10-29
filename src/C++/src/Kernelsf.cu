@@ -422,7 +422,7 @@ __global__ void GpropagateBeam_0(float *d_xs, float *d_ys, float *d_zs,
 
         for (int n=0; n<3; n++)
         {
-            e_out_h_r[n] = cuCrealf(temp2[n]);                      // e_out_h_r
+            e_out_h_r[n] = temp2[n].x;                      // e_out_h_r
         }
 
         normalize(e_out_h_r, S_i_norm);                       // S_i_norm
@@ -639,7 +639,7 @@ __global__ void GpropagateBeam_2(float *d_xs, float *d_ys, float *d_zs,
 
         for (int n=0; n<3; n++)
         {
-            e_out_h_r[n] = cuCrealf(temp2[n]);                      // e_out_h_r
+            e_out_h_r[n] = temp2[n].x;                      // e_out_h_r
         }
 
         normalize(e_out_h_r, S_i_norm);                       // S_i_norm
@@ -780,7 +780,7 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
 
         for (int n=0; n<3; n++)
         {
-            e_out_h_r[n] = cuCrealf(temp2[n]);                      // e_out_h_r
+            e_out_h_r[n] = temp2[n].x;                      // e_out_h_r
         }
 
         normalize(e_out_h_r, S_i_norm);                       // S_i_norm
@@ -1031,8 +1031,8 @@ __host__ void _arrCUDACToC(cuFloatComplex* carr, float *rarr, float *iarr, int s
 {
     for (int i=0; i<size; i++)
     {
-        rarr[i] = cuCrealf(carr[i]);
-        iarr[i] = cuCimagf(carr[i]);
+        rarr[i] = carr[i].x;
+        iarr[i] = carr[i].x;
     }
 }
 
@@ -1043,14 +1043,14 @@ __host__ void _arrCUDACToC3(cuFloatComplex* c1arr, cuFloatComplex* c2arr, cuFloa
 {
     for (int i=0; i<size; i++)
     {
-        r1arr[i] = cuCrealf(c1arr[i]);
-        i1arr[i] = cuCimagf(c1arr[i]);
+        r1arr[i] = c1arr[i].x;
+        i1arr[i] = c1arr[i].y;
 
-        r2arr[i] = cuCrealf(c2arr[i]);
-        i2arr[i] = cuCimagf(c2arr[i]);
+        r2arr[i] = c2arr[i].x;
+        i2arr[i] = c2arr[i].y;
 
-        r3arr[i] = cuCrealf(c3arr[i]);
-        i3arr[i] = cuCimagf(c3arr[i]);
+        r3arr[i] = c3arr[i].x;
+        i3arr[i] = c3arr[i].y;
     }
 }
 
@@ -1535,7 +1535,7 @@ extern "C" void callKernelf_JMEH(c4Bundlef *res, reflparamsf source, reflparamsf
     std::chrono::steady_clock::time_point end;
 
     // Call to KERNEL 2
-    printf("Calculating J, H, E and H...\n");
+    printf("Calculating J, M, E and H...\n");
     begin = std::chrono::steady_clock::now();
     GpropagateBeam_2<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs,
                                    d_A, d_xt, d_yt, d_zt,

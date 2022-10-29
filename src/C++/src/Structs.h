@@ -64,7 +64,7 @@ typedef struct reflparams {
     int *n_cells;
 
     bool flip;
-    bool gmode;
+    int gmode;
     int type;
 
     double *transf;
@@ -146,7 +146,7 @@ typedef struct reflparamsf {
     int *n_cells;
 
     bool flip;
-    bool gmode;
+    int gmode;
     int type;
 
     float *transf;

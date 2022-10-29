@@ -76,7 +76,7 @@ class reflparams(ctypes.Structure):
                 ("lyv", ctypes.POINTER(ctypes.c_double)),
                 ("n_cells", ctypes.POINTER(ctypes.c_int)),
                 ("flip", ctypes.c_bool),
-                ("gmode", ctypes.c_bool),
+                ("gmode", ctypes.c_int),
                 ("type", ctypes.c_int),
                 ("transf", ctypes.POINTER(ctypes.c_double))]
 
@@ -164,7 +164,7 @@ class reflparamsf(ctypes.Structure):
                 ("lyv", ctypes.POINTER(ctypes.c_float)),
                 ("n_cells", ctypes.POINTER(ctypes.c_int)),
                 ("flip", ctypes.c_bool),
-                ("gmode", ctypes.c_bool),
+                ("gmode", ctypes.c_int),
                 ("type", ctypes.c_int),
                 ("transf", ctypes.POINTER(ctypes.c_float))]
 

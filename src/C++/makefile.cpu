@@ -1,0 +1,22 @@
+# This makefile creates the cpu version of POPPy.
+# To build, type: 'make cpu' in terminal
+
+###########################################################################################
+DIRSRC = ./src/
+###########################################################################################
+COMP = g++
+CFLAGS = -O3 -std=c++11 -pthread
+LDFLAGS= -Wl,-rpath,./src/C++/
+
+CC  = $(COMP) $(CFLAGS) -fpic -c
+CO  = $(COMP) $(CFLAGS) $(LDFLAGS) -o
+###########################################################################################
+LIB = libpoppycpu.so
+all: $(LIB)
+###########################################################################################
+libpoppycpu.so: Interface_CPU.o
+	$(CO) libpoppycpu.so -fpic -shared Interface_CPU.o -L. -lpoppyrefl
+###########################################################################################
+Interface_CPU.o: $(DIRSRC)Interface_CPU.cpp
+	$(CC) $(DIRSRC)Interface_CPU.cpp -I$(DIRSRC) -L. -lpoppyrefl
+###########################################################################################

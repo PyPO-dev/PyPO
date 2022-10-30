@@ -46,7 +46,7 @@ def MakeWO():
     
     # Add parabolic reflector and hyperbolic reflector by focus, vertex and two foci and eccentricity
     h_coeff = [_B_HYPERBO, _B_HYPERBO, _A_HYPERBO]
-    h_gridsize = [501, 501]
+    h_gridsize = [601, 401]
     
     # Define ellipse coefficients. Note that _X_LIM_ELL is in frame where ellipse vertex is at origin
     # In our definition, ellipse is centered at origin. Semi-major axis is along x-axis

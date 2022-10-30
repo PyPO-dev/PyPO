@@ -918,10 +918,7 @@ void Propagation<T, U, V, W>::propagateToFarField(int start, int stop,
         // Calculate total incoming E and H field at point on target
         e = farfieldAtPoint(cs, currents, r_hat, start);
 
-        if(i==100 || i ==1000) {_debugArray(e);}
-
         res->r1x[i] = e[0].real();
-
         res->r1y[i] = e[1].real();
         res->r1z[i] = e[2].real();
 
@@ -994,8 +991,6 @@ std::array<std::complex<T>, 3> Propagation<T, U, V, W>::farfieldAtPoint(V *cs,
         source_point[2] = cs->z[i];
 
         ut.dot(r_hat, source_point, r_hat_in_rp);
-
-        //if (i==100 && start==0){printf("%f\n", r_hat_in_rp);}
 
         expo = exp(j * k * r_hat_in_rp);
         area = cs->area[i];

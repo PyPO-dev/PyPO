@@ -66,6 +66,17 @@ __host__ inline void gpuAssert(cudaError_t code, const char *file, int line, boo
    }
 }
 
+
+__host__ __device__ void _debugArray(cuFloatComplex arr[3])
+{
+    printf("%f + %fj, %f + %fj, %f + %fj\n", arr[0].x, arr[0].y, arr[1].x, arr[1].y, arr[2].x, arr[2].y);
+}
+
+__host__ __device__ void _debugArray(float arr[3])
+{
+    printf("%f, %f, %f\n", arr[0], arr[1], arr[2]);
+}
+
 __device__ __inline__ cuFloatComplex expCo(cuFloatComplex z)
 {
     cuFloatComplex res;
@@ -269,72 +280,6 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
 
 }
 
-__device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
-                                cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
-                                cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz,
-                                float (&r_hat)[3], float *d_A, cuFloatComplex (&e)[3])
-{
-    // Scalars (float & complex float)
-    float omega_mu;                       // Angular frequency of field times mu
-    float r_hat_in_rp;                 // r_hat dot product r_prime
-
-    // Arrays of floats
-    float source_point[3]; // Container for xyz co-ordinates
-
-    // Arrays of complex floats
-    cuFloatComplex js[3];      // Build radiation integral
-    cuFloatComplex ms[3];      // Build radiation integral
-
-    cuFloatComplex _ctemp[3];
-    cuFloatComplex js_tot_factor[3];
-    cuFloatComplex ms_tot_factor[3];
-
-    // Matrices
-    float rr_dyad[3][3];       // Dyadic product between r_hat - r_hat
-    float eye_min_rr[3][3];    // I - rr
-
-    //omega_mu = C_L * k * MU_0;
-    omega_mu = con[5].x * con[0].x * con[2].x;
-    dyad(r_hat, r_hat, rr_dyad);
-    matDiff(eye, rr_dyad, eye_min_rr);
-
-    e[0] = con[8];
-    e[1] = con[8];
-    e[2] = con[8];
-
-    for(int i=0; i<g_s; i++)
-    {
-        source_point[0] = d_xs[i];
-        source_point[1] = d_ys[i];
-        source_point[2] = d_zs[i];
-
-        dot(r_hat, source_point, r_hat_in_rp);
-
-        cuFloatComplex cfact = cuCmulf(con[7], make_cuFloatComplex((con[0].x * r_hat_in_rp), 0.));
-        cuFloatComplex expo = expCo(cfact);
-        cfact = cuCmulf(expo, make_cuFloatComplex(d_A[i], 0.));
-
-        js[0] = cuCaddf(js[0], cuCmulf(d_Jx[i], cfact));
-        js[1] = cuCaddf(js[1], cuCmulf(d_Jy[i], cfact));
-        js[2] = cuCaddf(js[2], cuCmulf(d_Jz[i], cfact));
-
-        ms[0] = cuCaddf(ms[0], cuCmulf(d_Mx[i], cfact));
-        ms[1] = cuCaddf(ms[1], cuCmulf(d_My[i], cfact));
-        ms[2] = cuCaddf(ms[2], cuCmulf(d_Mz[i], cfact));
-
-    }
-    matVec(eye_min_rr, js, _ctemp);
-    s_mult(_ctemp, omega_mu, js_tot_factor);
-
-    ext(r_hat, ms, _ctemp);
-    s_mult(_ctemp, con[0].x, ms_tot_factor);
-
-    for (int n=0; n<3; n++)
-    {
-        e[n] = cuCsubf(ms_tot_factor[n], js_tot_factor[n]);
-    }
-}
-
 /**
  * Kernel for toPrint == 0: save J and M.
  *
@@ -399,7 +344,6 @@ __global__ void GpropagateBeam_0(float *d_xs, float *d_ys, float *d_zs,
     cuFloatComplex d_hi[3];
 
     int idx = blockDim.x*blockIdx.x + threadIdx.x;
-    //printf("%d\n", idx);
     if (idx < g_t)
     {
         point[0] = d_xt[idx];
@@ -826,6 +770,76 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
         d_Hzt[idx] = h_r[2];
     }
 }
+
+__device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
+                                cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
+                                cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz,
+                                float (&r_hat)[3], float *d_A, cuFloatComplex (&e)[3])
+{
+    // Scalars (float & complex float)
+    float omega_mu;                       // Angular frequency of field times mu
+    float r_hat_in_rp;                 // r_hat dot product r_prime
+
+    // Arrays of floats
+    float source_point[3]; // Container for xyz co-ordinates
+
+    // Arrays of complex floats
+    cuFloatComplex js[3] = {con[8], con[8], con[8]};      // Build radiation integral
+    cuFloatComplex ms[3] = {con[8], con[8], con[8]};      // Build radiation integral
+
+    cuFloatComplex _ctemp[3];
+    cuFloatComplex js_tot_factor[3];
+    cuFloatComplex ms_tot_factor[3];
+    cuFloatComplex expo;
+    cuFloatComplex cfact;
+
+    // Matrices
+    float rr_dyad[3][3];       // Dyadic product between r_hat - r_hat
+    float eye_min_rr[3][3];    // I - rr
+
+    omega_mu = con[5].x * con[0].x * con[2].x;
+    dyad(r_hat, r_hat, rr_dyad);
+    matDiff(eye, rr_dyad, eye_min_rr);
+
+    e[0] = con[8];
+    e[1] = con[8];
+    e[2] = con[8];
+
+    for(int i=0; i<g_s; i++)
+    {
+        source_point[0] = d_xs[i];
+        source_point[1] = d_ys[i];
+        source_point[2] = d_zs[i];
+
+        dot(r_hat, source_point, r_hat_in_rp);
+
+        expo = expCo(cuCmulf(con[7], make_cuFloatComplex((con[0].x * r_hat_in_rp), 0.)));
+
+        //if (i==100){printf("%f\n", expo.x);}
+        cfact = cuCmulf(expo, make_cuFloatComplex(d_A[i], 0.));
+
+        js[0] = cuCaddf(js[0], cuCmulf(d_Jx[i], cfact));
+        js[1] = cuCaddf(js[1], cuCmulf(d_Jy[i], cfact));
+        js[2] = cuCaddf(js[2], cuCmulf(d_Jz[i], cfact));
+
+        ms[0] = cuCaddf(ms[0], cuCmulf(d_Mx[i], cfact));
+        ms[1] = cuCaddf(ms[1], cuCmulf(d_My[i], cfact));
+        ms[2] = cuCaddf(ms[2], cuCmulf(d_Mz[i], cfact));
+
+    }
+    matVec(eye_min_rr, js, _ctemp);
+    s_mult(_ctemp, omega_mu, js_tot_factor);
+
+    ext(r_hat, ms, _ctemp);
+    s_mult(_ctemp, con[0].x, ms_tot_factor);
+
+    for (int n=0; n<3; n++)
+    {
+        e[n] = cuCsubf(ms_tot_factor[n], js_tot_factor[n]);
+    }
+}
+
+
 /*
  * Kernel 4, propagation to far field
  * */
@@ -833,7 +847,8 @@ void __global__ GpropagateBeam_4(float *d_xs, float *d_ys, float *d_zs,
                                 float *d_A, float *d_xt, float *d_yt,
                                 cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
                                 cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz,
-                                cuFloatComplex *d_Ext, cuFloatComplex *d_Eyt, cuFloatComplex *d_Ezt)
+                                cuFloatComplex *d_Ext, cuFloatComplex *d_Eyt, cuFloatComplex *d_Ezt,
+                                cuFloatComplex *d_Hxt, cuFloatComplex *d_Hyt, cuFloatComplex *d_Hzt)
 {
     // Scalars (float & complex float)
     float theta;
@@ -856,11 +871,18 @@ void __global__ GpropagateBeam_4(float *d_xs, float *d_ys, float *d_zs,
         r_hat[2] = cos(phi);
 
         // Calculate total incoming E field at point on far-field
-        farfieldAtPoint(d_xs, d_ys, d_zs, d_Jx, d_Jy, d_Jz, d_Mx, d_My, d_Mz, r_hat, d_A, e);
+        farfieldAtPoint(d_xs, d_ys, d_zs,
+                      d_Jx, d_Jy, d_Jz,
+                      d_Mx, d_My, d_Mz,
+                      r_hat, d_A, e);
 
         d_Ext[idx] = e[0];
         d_Eyt[idx] = e[1];
         d_Ezt[idx] = e[2];
+
+        d_Hxt[idx] = e[0];
+        d_Hyt[idx] = e[1];
+        d_Hzt[idx] = e[2];
     }
 }
 
@@ -1852,14 +1874,12 @@ extern "C" void callKernelf_FF(c2Bundlef *res, reflparamsf source, reflparamsf t
     gpuErrchk( cudaMemcpy(d_A, cs->area, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
 
     // Create pointers to target grid
-    float *d_xt, *d_yt, *d_zt;
+    float *d_xt, *d_yt;
     gpuErrchk( cudaMalloc((void**)&d_xt, ct->size * sizeof(float)) );
     gpuErrchk( cudaMalloc((void**)&d_yt, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_zt, ct->size * sizeof(float)) );
 
     gpuErrchk( cudaMemcpy(d_xt, ct->x, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
     gpuErrchk( cudaMemcpy(d_yt, ct->y, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_zt, ct->z, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
 
     cuFloatComplex *h_Jx = new cuFloatComplex[cs->size];
     cuFloatComplex *h_Jy = new cuFloatComplex[cs->size];
@@ -1931,7 +1951,8 @@ extern "C" void callKernelf_FF(c2Bundlef *res, reflparamsf source, reflparamsf t
                                 d_A, d_xt, d_yt,
                                 d_Jx, d_Jy, d_Jz,
                                 d_Mx, d_My, d_Mz,
-                                d_Ext, d_Eyt, d_Ezt);
+                                d_Ext, d_Eyt, d_Ezt,
+                                d_Hxt, d_Hyt, d_Hzt);
 
     gpuErrchk( cudaDeviceSynchronize() );
 

@@ -98,8 +98,8 @@ class System(object):
 
         elif reflDict["gmode"] == "uv":
             # Convert v in degrees to radians
-            self.system[reflDict["name"]]["lims_v"] = [np.radians(self.system[reflDict["name"]]["lims_v"][0]),
-                                                        np.radians(self.system[reflDict["name"]]["lims_v"][1])]
+            self.system[reflDict["name"]]["lims_v"] = [self.system[reflDict["name"]]["lims_v"][0],
+                                                        self.system[reflDict["name"]]["lims_v"][1]]
 
             self.system[reflDict["name"]]["gmode"] = 1
 
@@ -157,8 +157,8 @@ class System(object):
             self.system[reflDict["name"]]["gmode"] = 0
 
         elif reflDict["gmode"] == "uv":
-            self.system[reflDict["name"]]["lims_v"] = [np.radians(self.system[reflDict["name"]]["lims_v"][0]),
-                                                        np.radians(self.system[reflDict["name"]]["lims_v"][1])]
+            self.system[reflDict["name"]]["lims_v"] = [self.system[reflDict["name"]]["lims_v"][0],
+                                                        self.system[reflDict["name"]]["lims_v"][1]]
 
             self.system[reflDict["name"]]["gmode"] = 1
 
@@ -180,8 +180,8 @@ class System(object):
             self.system[reflDict["name"]]["gmode"] = 0
 
         elif reflDict["gmode"] == "uv":
-            self.system[reflDict["name"]]["lims_v"] = [np.radians(self.system[reflDict["name"]]["lims_v"][0]),
-                                                        np.radians(self.system[reflDict["name"]]["lims_v"][1])]
+            self.system[reflDict["name"]]["lims_v"] = [self.system[reflDict["name"]]["lims_v"][0],
+                                                        self.system[reflDict["name"]]["lims_v"][1]]
 
             self.system[reflDict["name"]]["gmode"] = 1
 
@@ -211,11 +211,11 @@ class System(object):
             # Assume is given in degrees
             # Convert Az and El to radians
 
-            self.system[reflDict["name"]]["lims_Az"] = [np.radians(self.system[reflDict["name"]]["lims_Az"][0]),
-                                                        np.radians(self.system[reflDict["name"]]["lims_Az"][1])]
+            self.system[reflDict["name"]]["lims_Az"] = [self.system[reflDict["name"]]["lims_Az"][0],
+                                                        self.system[reflDict["name"]]["lims_Az"][1]]
 
-            self.system[reflDict["name"]]["lims_El"] = [np.radians(self.system[reflDict["name"]]["lims_El"][0]),
-                                                        np.radians(self.system[reflDict["name"]]["lims_El"][1])]
+            self.system[reflDict["name"]]["lims_El"] = [self.system[reflDict["name"]]["lims_El"][0],
+                                                        self.system[reflDict["name"]]["lims_El"][1]]
 
             self.system[reflDict["name"]]["gmode"] = 2
 
@@ -226,6 +226,10 @@ class System(object):
 
     def translateGrids(self, name, translation):
         self.system[name]["transf"] = MatTranslate(translation, self.system[name]["transf"])
+
+    def generateGrids(self, name):
+        grids = generateGrid(self.system[name])
+        return grids
 
     def readCustomBeam(self, name, comp, shape, convert_to_current=True, mode="PMC", ret="currents"):
         rfield = np.loadtxt(self.customBeamPath + "r" + name + ".txt")
@@ -336,6 +340,9 @@ class System(object):
             elif mode == "EHP":
                 out1, out2 = calcEHP_GPUf(source, target, s_currents, k, epsilon, t_direction, nThreads)
                 out = [out1, out2]
+
+            elif mode == "FF":
+                out = calcFF_GPUf(source, target, s_currents, k, epsilon, t_direction, nThreads)
 
         return out
 

@@ -848,8 +848,8 @@ void __global__ GpropagateBeam_4(float *d_xs, float *d_ys, float *d_zs,
     int idx = blockDim.x*blockIdx.x + threadIdx.x;
     if (idx < g_t)
     {
-        theta   = d_xt[idx];
-        phi     = d_yt[idx];
+        phi     = d_xt[idx];
+        theta   = d_yt[idx];
 
         r_hat[0] = cos(theta) * sin(phi);
         r_hat[1] = sin(theta) * sin(phi);
@@ -1824,53 +1824,109 @@ extern "C" void callKernelf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf
  * @param h_z Pointer for z array on host.
  * @param size Number of elements of h_x/d_x.
  */
-/*
-extern "C" void callKernelf_FF(arrC3f *res, float *xt, float *yt,
-                                float *xs, float *ys, float *zs,
-                                float *rJxs, float *rJys, float *rJzs,
-                                float *iJxs, float *iJys, float *iJzs,
-                                float *rMxs, float *rMys, float *rMzs,
-                                float *iMxs, float *iMys, float *iMzs,
-                                float *area, float k, float epsilon, int ct->size, int cs->size,
+extern "C" void callKernelf_FF(c2Bundlef *res, reflparamsf source, reflparamsf target,
+                                reflcontainerf *cs, reflcontainerf *ct,
+                                c2Bundlef *currents,
+                                float k, float epsilon,
                                 float t_direction, int nBlocks, int nThreads)
 {
+    // Generate source and target grids
+    generateGridf(source, cs);
+    generateGridf(target, ct);
+
     // Initialize and copy constant memory to device
     std::array<dim3, 2> BT;
     BT = _initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
-
+    //alsd
     // Create pointers to device arrays and allocate/copy source grid and area.
     float *d_xs, *d_ys, *d_zs, *d_A;
-    _allocateGridR3ToGPU(d_xs, d_ys, d_zs, xs, ys, zs, cs->size);
-    _allocateGridR1ToGPU(d_A, area, cs->size);
 
-    // Create pointers to target grid and normal vectors
-    float *d_xt, *d_yt;
-    _allocateGridR2ToGPU(d_xt, d_yt, xt, yt, ct->size);
+    gpuErrchk( cudaMalloc((void**)&d_xs, cs->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_ys, cs->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_zs, cs->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_A, cs->size * sizeof(float)) );
 
-    cuFloatComplex *h_Jx, *h_Jy, *h_Jz;
-    cuFloatComplex *h_Mx, *h_My, *h_Mz;
+    gpuErrchk( cudaMemcpy(d_xs, cs->x, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_ys, cs->y, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_zs, cs->z, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_A, cs->area, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+
+    // Create pointers to target grid
+    float *d_xt, *d_yt, *d_zt;
+    gpuErrchk( cudaMalloc((void**)&d_xt, ct->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_yt, ct->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_zt, ct->size * sizeof(float)) );
+
+    gpuErrchk( cudaMemcpy(d_xt, ct->x, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_yt, ct->y, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_zt, ct->z, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
+
+    cuFloatComplex *h_Jx = new cuFloatComplex[cs->size];
+    cuFloatComplex *h_Jy = new cuFloatComplex[cs->size];
+    cuFloatComplex *h_Jz = new cuFloatComplex[cs->size];
+
+    cuFloatComplex *h_Mx = new cuFloatComplex[cs->size];
+    cuFloatComplex *h_My = new cuFloatComplex[cs->size];
+    cuFloatComplex *h_Mz = new cuFloatComplex[cs->size];
+
+    _arrC3ToCUDAC(currents->r1x, currents->r1y, currents->r1z,
+                  currents->i1x, currents->i1y, currents->i1z,
+                  h_Jx, h_Jy, h_Jz, cs->size);
+
+    _arrC3ToCUDAC(currents->r2x, currents->r2y, currents->r2z,
+                  currents->i2x, currents->i2y, currents->i2z,
+                  h_Mx, h_My, h_Mz, cs->size);
 
     cuFloatComplex *d_Jx, *d_Jy, *d_Jz;
     cuFloatComplex *d_Mx, *d_My, *d_Mz;
 
-    _arrC3ToCUDAC(rJxs, rJys, rJzs, iJxs, iJys, iJzs,
-                    h_Jx, h_Jy, h_Jz, cs->size);
+    // Allocate and copy J and M currents
+    gpuErrchk( cudaMalloc((void**)&d_Jx, cs->size * sizeof(cuFloatComplex)) );
+    gpuErrchk( cudaMalloc((void**)&d_Jy, cs->size * sizeof(cuFloatComplex)) );
+    gpuErrchk( cudaMalloc((void**)&d_Jz, cs->size * sizeof(cuFloatComplex)) );
 
-    _arrC3ToCUDAC(rMxs, rMys, rMzs, iMxs, iMys, iMzs,
-                    h_Mx, h_My, h_Mz, cs->size);
+    gpuErrchk( cudaMemcpy(d_Jx, h_Jx, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_Jy, h_Jy, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_Jz, h_Jz, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
 
-    _allocateGridC3ToGPU(d_Jx, d_Jy, d_Jz, h_Jx, h_Jy, h_Jz, cs->size);
-    _allocateGridC3ToGPU(d_Mx, d_My, d_Mz, h_Mx, h_My, h_Mz, cs->size);
+    gpuErrchk( cudaMalloc((void**)&d_Mx, cs->size * sizeof(cuFloatComplex)) );
+    gpuErrchk( cudaMalloc((void**)&d_My, cs->size * sizeof(cuFloatComplex)) );
+    gpuErrchk( cudaMalloc((void**)&d_Mz, cs->size * sizeof(cuFloatComplex)) );
+
+    gpuErrchk( cudaMemcpy(d_Mx, h_Mx, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_My, h_My, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_Mz, h_Mz, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
+
+    // Delete host arrays for source currents - not needed anymore
+    delete h_Jx;
+    delete h_Jy;
+    delete h_Jz;
+
+    delete h_Mx;
+    delete h_My;
+    delete h_Mz;
 
     cuFloatComplex *d_Ext, *d_Eyt, *d_Ezt;
+    cuFloatComplex *d_Hxt, *d_Hyt, *d_Hzt;
 
-    _allocateGridC3(d_Ext, d_Eyt, d_Ezt, cs->size);
+    gpuErrchk( cudaMalloc((void**)&d_Ext, ct->size * sizeof(cuFloatComplex)) );
+    gpuErrchk( cudaMalloc((void**)&d_Eyt, ct->size * sizeof(cuFloatComplex)) );
+    gpuErrchk( cudaMalloc((void**)&d_Ezt, ct->size * sizeof(cuFloatComplex)) );
+
+    gpuErrchk( cudaMalloc((void**)&d_Hxt, ct->size * sizeof(cuFloatComplex)) );
+    gpuErrchk( cudaMalloc((void**)&d_Hyt, ct->size * sizeof(cuFloatComplex)) );
+    gpuErrchk( cudaMalloc((void**)&d_Hzt, ct->size * sizeof(cuFloatComplex)) );
 
     // Create stopping event for kernel
     cudaEvent_t event;
     gpuErrchk( cudaEventCreateWithFlags(&event, cudaEventDisableTiming) );
 
-    // Call to KERNEL 4
+    std::chrono::steady_clock::time_point begin;
+    std::chrono::steady_clock::time_point end;
+
+    // Call to KERNEL 1
+    printf("Calculating E and H, far-field...\n");
+    begin = std::chrono::steady_clock::now();
     GpropagateBeam_4<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs,
                                 d_A, d_xt, d_yt,
                                 d_Jx, d_Jy, d_Jz,
@@ -1879,25 +1935,42 @@ extern "C" void callKernelf_FF(arrC3f *res, float *xt, float *yt,
 
     gpuErrchk( cudaDeviceSynchronize() );
 
-    // Allocate, on stackframe, Host arrays for E and H
-    cuFloatComplex h_Ext[ct->size], h_Eyt[ct->size], h_Ezt[ct->size];
+    end = std::chrono::steady_clock::now();
+
+    std::cout << "Elapsed time : "
+            << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
+            << " [s]" << std::endl;
+
+    // Allocate Host arrays for E and H
+    cuFloatComplex *h_Ext = new cuFloatComplex[ct->size];
+    cuFloatComplex *h_Eyt = new cuFloatComplex[ct->size];
+    cuFloatComplex *h_Ezt = new cuFloatComplex[ct->size];
+
+    cuFloatComplex *h_Hxt = new cuFloatComplex[ct->size];
+    cuFloatComplex *h_Hyt = new cuFloatComplex[ct->size];
+    cuFloatComplex *h_Hzt = new cuFloatComplex[ct->size];
 
     // Copy data back from Device to Host
-    _allocateGridGPUToC3(h_Ext, h_Eyt, h_Ezt, d_Ext, d_Eyt, d_Ezt, ct->size);
+    gpuErrchk( cudaMemcpy(h_Ext, d_Ext, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+    gpuErrchk( cudaMemcpy(h_Eyt, d_Eyt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+    gpuErrchk( cudaMemcpy(h_Ezt, d_Ezt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+
+    gpuErrchk( cudaMemcpy(h_Hxt, d_Hxt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+    gpuErrchk( cudaMemcpy(h_Hyt, d_Hyt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+    gpuErrchk( cudaMemcpy(h_Hzt, d_Hzt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
 
     // Free Device memory
     gpuErrchk( cudaDeviceReset() );
 
-    // Create arrays of floats, for transferring back output
-    float *rExt, *rEyt, *rEzt, *iExt, *iEyt, *iEzt;
+    _arrCUDACToC3(h_Ext, h_Eyt, h_Ezt, res->r1x, res->r1y, res->r1z, res->i1x, res->i1y, res->i1z, ct->size);
+    _arrCUDACToC3(h_Hxt, h_Hyt, h_Hzt, res->r2x, res->r2y, res->r2z, res->i2x, res->i2y, res->i2z, ct->size);
 
-    _arrCUDACToC3(h_Ext, h_Eyt, h_Ezt, rExt, rEyt, rEzt, iExt, iEyt, iEzt, ct->size);
+    // Delete host arrays for target fields
+    delete h_Ext;
+    delete h_Eyt;
+    delete h_Ezt;
 
-    arrC3 *out = new arrC3;
-    if (out == NULL) exit (1); //EXIT_FAILURE
-
-    fill_arrC3(out, rExt, rEyt, rEzt, iExt, iEyt, iEzt);
-
-    return out;
+    delete h_Hxt;
+    delete h_Hyt;
+    delete h_Hzt;
 }
-*/

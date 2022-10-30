@@ -91,7 +91,7 @@ public:
                               W *currents, U *res);
 
     std::array<std::complex<T>, 3> farfieldAtPoint(V *cs, W *currents,
-                                              const std::array<T, 3> &point_target);
+                                              const std::array<T, 3> &point_target, int start);
 
     void parallelFarField(V *cs, V *ct,
                         W *currents, U *res);
@@ -907,18 +907,18 @@ void Propagation<T, U, V, W>::propagateToFarField(int start, int stop,
     int jc = 0;
     for(int i=start; i<stop; i++)
     {
-        theta   = ct->x[i];
-        phi     = ct->y[i];
+        phi     = ct->x[i];
+        theta   = ct->y[i];
         cosEl   = std::sqrt(1 - sin(theta) * sin(phi) * sin(theta) * sin(phi));
 
         r_hat[0] = cos(theta) * sin(phi);
         r_hat[1] = sin(theta) * sin(phi);
         r_hat[2] = cos(phi);
 
-        //_debugArray(r_hat);
-
         // Calculate total incoming E and H field at point on target
-        e = farfieldAtPoint(cs, currents, r_hat);
+        e = farfieldAtPoint(cs, currents, r_hat, start);
+
+        if(i==100 || i ==1000) {_debugArray(e);}
 
         res->r1x[i] = e[0].real();
 
@@ -950,7 +950,7 @@ void Propagation<T, U, V, W>::propagateToFarField(int start, int stop,
 template <class T, class U, class V, class W>
 std::array<std::complex<T>, 3> Propagation<T, U, V, W>::farfieldAtPoint(V *cs,
                                                 W *currents,
-                                                const std::array<T, 3> &r_hat)
+                                                const std::array<T, 3> &r_hat, int start)
 {
     // Scalars (T & complex T)
     T omega_mu;                       // Angular frequency of field times mu
@@ -995,11 +995,10 @@ std::array<std::complex<T>, 3> Propagation<T, U, V, W>::farfieldAtPoint(V *cs,
 
         ut.dot(r_hat, source_point, r_hat_in_rp);
 
+        //if (i==100 && start==0){printf("%f\n", r_hat_in_rp);}
+
         expo = exp(j * k * r_hat_in_rp);
         area = cs->area[i];
-
-        //cexp = cos(k * r_hat_in_rp)*cs->area[i];
-        //sexp = sin(k * r_hat_in_rp)*cs->area[i];
 
         _js[0] = {currents->r1x[i], currents->i1x[i]};
         _js[1] = {currents->r1y[i], currents->i1y[i]};
@@ -1014,26 +1013,6 @@ std::array<std::complex<T>, 3> Propagation<T, U, V, W>::farfieldAtPoint(V *cs,
             js[n] += _js[n] * expo * area;
             ms[n] += _ms[n] * expo * area;
         }
-        /*
-        js[0] += (T)(currents->r1x[i]*cexp - currents->i1x[i]*sexp) +
-                  j*(T)(currents->r1x[i]*sexp + currents->i1x[i]*cexp);
-
-        js[1] += (T)(currents->r1y[i]*cexp - currents->i1y[i]*sexp) +
-                  j*(T)(currents->r1y[i]*sexp + currents->i1y[i]*cexp);
-
-        js[2] += (T)(currents->r1z[i]*cexp - currents->i1z[i]*sexp) +
-                  j*(T)(currents->r1z[i]*sexp + currents->i1z[i]*cexp);
-
-        ms[0] += (T)(currents->r2x[i]*cexp - currents->i2x[i]*sexp) +
-                  j*(T)(currents->r2x[i]*sexp + currents->i2x[i]*cexp);
-
-        ms[1] += (T)(currents->r2y[i]*cexp - currents->i2y[i]*sexp) +
-                  j*(T)(currents->r2y[i]*sexp + currents->i2y[i]*cexp);
-
-        ms[2] += (T)(currents->r2z[i]*cexp - currents->i2z[i]*sexp) +
-                  j*(T)(currents->r2z[i]*sexp + currents->i2z[i]*cexp);
-                  */
-
     }
 
     ut.matVec(eye_min_rr, js, _ctemp);

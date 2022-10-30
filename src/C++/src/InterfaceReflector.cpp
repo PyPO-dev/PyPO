@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#define _USE_MATH_DEFINES
 #include <cmath>
 
 #include "InterfaceReflector.h"
@@ -9,11 +10,8 @@ void Parabola_xy(T *parabola, U xu_lo, U xu_up, U yv_lo,
                 U yv_up, U a, U b, int ncx, int ncy, int nfac,
                 U mat[16])
 {
-    U _dx = (xu_up - xu_lo) / ncx;
-    U _dy = (yv_up - yv_lo) / ncy;
-
-    U dx = (xu_up + _dx - xu_lo) / ncx;
-    U dy = (yv_up + _dy - yv_lo) / ncy;
+    U dx = (xu_up - xu_lo) / (ncx - 1);
+    U dy = (yv_up - yv_lo) / (ncy - 1);
 
     // Generate using xy parametrisation
     U x;
@@ -80,11 +78,8 @@ void Parabola_uv(T *parabola, U xu_lo, U xu_up, U yv_lo,
                 U yv_up, U a, U b, int ncx, int ncy, int nfac,
                 U mat[16])
 {
-    U _du = (xu_up/a - xu_lo/a) / ncx; // Divide by a to convert aperture radius to u param
-    U _dv = (yv_up - yv_lo) / ncy;
-
-    U du = (xu_up/a + _du - xu_lo/a) / ncx;
-    U dv = (yv_up + _dv - yv_lo) / ncy;
+    U du = (xu_up/a - xu_lo/a) / (ncx - 1);
+    U dv = (yv_up- yv_lo) / (ncy - 1);
 
     // Generate using uv parametrisation
     U u;
@@ -96,7 +91,7 @@ void Parabola_uv(T *parabola, U xu_lo, U xu_up, U yv_lo,
         u = i * du + xu_lo/a;
         for (int j=0; j < ncy; j++)
         {
-            v = j * dv + yv_lo;
+            v = (j * dv + yv_lo) * M_PI/180;
 
             parabola->x[i*ncy + j] = a * u * cos(v);
             parabola->y[i*ncy + j] = b * u * sin(v);
@@ -146,11 +141,8 @@ void Hyperbola_xy(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
                   U yv_up, U a, U b, U c, int ncx, int ncy, int nfac,
                   U mat[16])
 {
-    U _dx = (xu_up - xu_lo) / ncx;
-    U _dy = (yv_up - yv_lo) / ncy;
-
-    U dx = (xu_up + _dx - xu_lo) / ncx;
-    U dy = (yv_up + _dy - yv_lo) / ncy;
+    U dx = (xu_up - xu_lo) / (ncx - 1);
+    U dy = (yv_up - yv_lo) / (ncy - 1);
 
     // Generate using xy parametrisation
     U x;
@@ -217,11 +209,8 @@ void Hyperbola_uv(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
                   U yv_up, U a, U b, U c, int ncx, int ncy, int nfac,
                   U mat[16])
 {
-    U _du = (sqrt(xu_up*xu_up/(a*a) + 1) - sqrt(xu_lo*xu_lo/(a*a) + 1)) / ncx;
-    U _dv = (yv_up - yv_lo) / ncy;
-
-    U du = (sqrt(xu_up*xu_up/(a*a) + 1) + _du - sqrt(xu_lo*xu_lo/(a*a) + 1)) / ncx;
-    U dv = (yv_up + _dv - yv_lo) / ncy;
+    U du = (sqrt(xu_up*xu_up/(a*a) + 1) - sqrt(xu_lo*xu_lo/(a*a) + 1)) / (ncx - 1);
+    U dv = (yv_up - yv_lo) / (ncy - 1);
 
     // Generate using xy parametrisation
     U u;
@@ -235,7 +224,7 @@ void Hyperbola_uv(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
         u = i * du + sqrt(xu_lo*xu_lo/(a*a) + 1);
         for (int j=0; j < ncy; j++)
         {
-            v = j * dv + yv_lo;
+            v = (j * dv + yv_lo) * M_PI/180;
 
             hyperbola->x[i*ncy + j] = a * sqrt(u*u - 1) * cos(v);
             hyperbola->y[i*ncy + j] = b * sqrt(u*u - 1) * sin(v);
@@ -285,11 +274,8 @@ void Ellipse_xy(T *ellipse, U xu_lo, U xu_up, U yv_lo,
                 U yv_up, U a, U b, U c, int ncx, int ncy, int nfac,
                 U mat[16])
 {
-    U _dx = (xu_up - xu_lo) / ncx;
-    U _dy = (yv_up - yv_lo) / ncy;
-
-    U dx = (xu_up + _dx - xu_lo) / ncx;
-    U dy = (yv_up + _dy - yv_lo) / ncy;
+    U dx = (xu_up - xu_lo) / (ncx - 1);
+    U dy = (yv_up - yv_lo) / (ncy - 1);
 
     // Generate using xy parametrisation
     U x;
@@ -356,11 +342,8 @@ void Ellipse_uv(T *ellipse, U xu_lo, U xu_up, U yv_lo,
                 U yv_up, U a, U b, U c, int ncx, int ncy, int nfac,
                 U mat[16])
 {
-    U _du = (asin(xu_up/a) - asin(xu_lo/a)) / ncx;
-    U _dv = (yv_up - yv_lo) / ncy;
-
-    U du = (asin(xu_up/a) + _du - asin(xu_lo/a)) / ncx;
-    U dv = (yv_up + _dv - yv_lo) / ncy;
+    U du = (asin(xu_up/a) - asin(xu_lo/a)) / (ncx - 1);
+    U dv = (yv_up - yv_lo) / (ncy - 1);
 
     // Generate using xy parametrisation
     U u;
@@ -374,7 +357,7 @@ void Ellipse_uv(T *ellipse, U xu_lo, U xu_up, U yv_lo,
         u = i * du + asin(xu_lo/a);
         for (int j=0; j < ncy; j++)
         {
-            v = j * dv + yv_lo;
+            v = (j * dv + yv_lo) * M_PI/180;
 
             ellipse->x[i*ncy + j] = a * sin(u) * cos(v);
             ellipse->y[i*ncy + j] = b * sin(u) * sin(v);
@@ -423,11 +406,8 @@ void Plane_xy(T *plane, U xu_lo, U xu_up, U yv_lo,
               U yv_up, int ncx, int ncy, int nfac,
               U mat[16])
 {
-    U _dx = (xu_up - xu_lo) / ncx;
-    U _dy = (yv_up - yv_lo) / ncy;
-
-    U dx = (xu_up + _dx - xu_lo) / ncx;
-    U dy = (yv_up + _dy - yv_lo) / ncy;
+    U dx = (xu_up - xu_lo) / (ncx - 1);
+    U dy = (yv_up - yv_lo) / (ncy - 1);
 
     // Generate using xy parametrisation
     U x;
@@ -485,11 +465,8 @@ void Plane_uv(T *plane, U xu_lo, U xu_up, U yv_lo,
               U yv_up, int ncx, int ncy, int nfac,
               U mat[16])
 {
-    U _du = (xu_up - xu_lo) / ncx;
-    U _dv = (yv_up - yv_lo) / ncy;
-
-    U du = (xu_up + _du - xu_lo) / ncx;
-    U dv = (yv_up + _dv - yv_lo) / ncy;
+    U du = (xu_up - xu_lo) / (ncx - 1);
+    U dv = (yv_up - yv_lo) / (ncy - 1);
 
     // Generate using xy parametrisation
     U u;
@@ -503,7 +480,7 @@ void Plane_uv(T *plane, U xu_lo, U xu_up, U yv_lo,
 
         for (int j=0; j < ncy; j++)
         {
-            v = j * dv + yv_lo;
+            v = (j * dv + yv_lo) * M_PI/180;
 
             plane->x[i*ncy + j] = u * cos(v);
             plane->y[i*ncy  + j] = u * sin(v);
@@ -547,11 +524,8 @@ void Plane_AoE(T *plane, U xu_lo, U xu_up, U yv_lo,
               U yv_up, int ncx, int ncy,
               U mat[16])
 {
-    U _dA = (xu_up - xu_lo) / ncx;
-    U _dE = (yv_up - yv_lo) / ncy;
-
-    U dA = (xu_up + _dA - xu_lo) / ncx;
-    U dE = (yv_up + _dE - yv_lo) / ncy;
+    U dA = (xu_up - xu_lo) / (ncx - 1);
+    U dE = (yv_up - yv_lo) / (ncy - 1);
 
     // Generate using xy parametrisation
     U Az;
@@ -565,7 +539,7 @@ void Plane_AoE(T *plane, U xu_lo, U xu_up, U yv_lo,
         {
             El = j * dE + yv_lo;
 
-            plane->x[i*ncy + j] = sqrt(Az*Az + El*El);
+            plane->x[i*ncy + j] = sqrt(Az*Az + El*El) * M_PI/180;
             plane->y[i*ncy  + j] = atan(El / Az);
 
             if (plane->y[i*ncy  + j] != plane->y[i*ncy  + j])

@@ -11,12 +11,12 @@ def plotSystem_test():
     parabola["flip"] = False
     parabola["coeffs"] = [1, 1, -1]
     parabola["vertex"] = np.zeros(3)
-    parabola["focus_1"] = np.array([0,0,3.5e3])
+    parabola["focus_1"] = np.array([0,0,12e3])
     parabola["lims_x"] = [-5000,5000]
     parabola["lims_y"] = [-5000,5000]
-    parabola["lims_u"] = [200,5e3]
+    parabola["lims_u"] = [200,12.5e3]
     parabola["lims_v"] = [0,360]
-    parabola["gridsize"] = [1501,1501]
+    parabola["gridsize"] = [801,501]
 
     hyperbola = {}
     hyperbola["name"] = "h1"
@@ -37,9 +37,17 @@ def plotSystem_test():
     plane["name"] = "plane1"
     plane["gmode"] = "xy"
     plane["flip"] = False
-    plane["lims_x"] = [-1,1]
-    plane["lims_y"] = [-1,1]
+    plane["lims_x"] = [-0.1,0.1]
+    plane["lims_y"] = [-0.1,0.1]
     plane["gridsize"] = [3, 3]
+
+    plane2 = {}
+    plane2["name"] = "plane2"
+    plane2["gmode"] = "xy"
+    plane2["flip"] = False
+    plane2["lims_x"] = [-1000,1000]
+    plane2["lims_y"] = [-1000,1000]
+    plane2["gridsize"] = [1501, 1501]
 
     planeff = {}
     planeff["name"] = "planeff"
@@ -47,13 +55,14 @@ def plotSystem_test():
     planeff["flip"] = False
     planeff["lims_Az"] = [-3,3]
     planeff["lims_El"] = [-3,3]
-    planeff["gridsize"] = [101, 101]
+    planeff["gridsize"] = [201, 201]
 
     s = System()
     s.addPlotter()
     #s.addHyperbola(hyperbola)
     s.addParabola(parabola)
     s.addPlane(plane)
+    s.addPlane(planeff)
 
 
     rotation=np.array([42, 42, 0])
@@ -68,11 +77,14 @@ def plotSystem_test():
 
     s.plotter.plotSystem(s.system, fine=2, norm=False)
 
-    s.addPlane(planeff)
 
     #s.setCustomBeamPath(path="240GHz/", append=True)
 
     #cBeam = "240"
+
+    grd_ff = s.generateGrids("planeff")
+    print(grd_ff.x)
+    print(grd_ff.y)
 
 
     s.setCustomBeamPath(path="ps/", append=True)
@@ -85,22 +97,18 @@ def plotSystem_test():
     pt.imshow(np.absolute(EH.Ex))
     pt.show()
 
-    JM1, EH1 = s.propagatePO_GPU("plane1", "p1", JM, k=4.9,
-                    epsilon=10, t_direction=1, nThreads=256,
+    JM1, EH1 = s.propagatePO_GPU("plane1", "p1", JM, k=0.02991993003,
+                    epsilon=10, t_direction=-1, nThreads=256,
                     mode="JMEH", precision="single")
 
-    pt.imshow(np.absolute(JM1.My))
+    pt.imshow(20*np.log10(np.absolute(JM1.My) / np.max(np.absolute(JM1.My))), vmin=-30, vmax=0)
     pt.show()
 
-    #EH1 = s.propagatePO_CPU(s.system["p1"], s.system["h1"], JM, k=4.9,
-    #                epsilon=1, t_direction=-1, nThreads=11,
-    #                mode="EH", precision="double")
-
-    EH1 = s.propagatePO_CPU("p1", "planeff", JM1, k=4.9,
+    EH2 = s.propagatePO_CPU("p1", "planeff", JM1, k=0.02991993003,
                     epsilon=10, t_direction=-1, nThreads=11,
                     mode="FF", precision="double")
 
-    pt.imshow(np.absolute(EH1.Ex))
+    pt.imshow(20*np.log10(np.absolute(EH2.Ex) / np.max(np.absolute(EH2.Ex))), vmin=-30, vmax=0)
     pt.show()
 
 

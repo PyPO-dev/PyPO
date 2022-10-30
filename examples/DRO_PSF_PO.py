@@ -1,84 +1,74 @@
 import numpy as np
 import sys
-sys.path.append('../')
+#sys.path.append('../')
 
 import matplotlib.pyplot as pt
 
 #import src.Python.System as System
 from src.POPPy.System import System
 
-def ex_DRO():
+def ex_DRO_PO():
     """
     In this example script we will build the Dwingeloo Radio Observatory (DRO).
     The setup consists of a parabolic reflector and feed.
     """
-    
-    cpp_path = '../src/C++/'
-    
+
     lam = 210 # [mm]
     k = 2 * np.pi / lam
-    
-    # Primary parameters
-    R_pri           = 12.5e3 # Radius in [mm]
-    R_aper          = 300 # Vertex hole radius in [mm]
-    foc_pri         = np.array([0,0,12e3]) # Coordinates of focal point in [mm]
-    ver_pri         = np.zeros(3) # Coordinates of vertex point in [mm]
-    
-    # Pack coefficients together for instantiating parabola: [focus, vertex]
-    coef_p1 = [foc_pri, ver_pri]
 
-    lims_r_p1       = [R_aper, R_pri]
-    lims_v_p1       = [0, 2*np.pi]
+    parabola = {}
+    parabola["name"] = "p1"
+    parabola["pmode"] = "focus"
+    parabola["gmode"] = "uv"
+    parabola["flip"] = False
+    parabola["vertex"] = np.zeros(3)
+    parabola["focus_1"] = np.array([0,0,12e3])
+    parabola["lims_u"] = [200,12.5e3]
+    parabola["lims_v"] = [0,360]
+    parabola["gridsize"] = [1501,1501]
 
-    gridsize_p1     = [1501, 1501] # The gridsizes along the x and y axes
+    plane = {}
+    plane["name"] = "plane1"
+    plane["gmode"] = "xy"
+    plane["flip"] = False
+    plane["lims_x"] = [-0.1,0.1]
+    plane["lims_y"] = [-0.1,0.1]
+    plane["gridsize"] = [3, 3]
 
-    # Initialize system
+    planeff = {}
+    planeff["name"] = "planeff"
+    planeff["gmode"] = "AoE"
+    planeff["flip"] = False
+    planeff["lims_Az"] = [-3,3]
+    planeff["lims_El"] = [-3,3]
+    planeff["gridsize"] = [201, 201]
+
     s = System()
-    
-    # Add parabolic reflector and hyperbolic reflector by focus, vertex and two foci and eccentricity
-    s.addParabola(name="p1", coef=coef_p1, lims_x=lims_r_p1, lims_y=lims_v_p1, gridsize=gridsize_p1, pmode='foc', gmode='uv')
+    s.addPlotter()
+    s.addParabola(parabola)
+    s.addPlane(plane)
+    s.addPlane(planeff)
 
-    # Make far-field camera
-    center_cam = foc_pri#np.zeros(3)
-    
-    lim = 12.5e3#3
-    
-    lims_x_cam = [-lim, lim]
-    lims_y_cam = [-lim, lim]
-    gridsize_cam = [901, 901]
-    
-    # Add camera surface to optical system
-    s.addCamera(lims_x_cam, lims_y_cam, gridsize_cam, center=center_cam, name = "cam1", units='mm')#, gmode='AoE', units=['deg','mm'])
+    s.setCustomBeamPath(path="ps/", append=True)
 
-    s.plotSystem(focus_1=True, focus_2=True)
-    
-    s.addPointSource(area=1, pol=np.array([1,0,0]), n=3, amp=1)
+    cBeam = "ps"
+    JM = s.readCustomBeam(name=cBeam, comp="Ex", shape=[3,3], convert_to_current=True, mode="PMC")
 
-    #offTrans_ps = np.array([0,0,1e16])
-    offTrans_ps = foc_pri
-    s.inputBeam.calcJM(mode='PMC')
-    s.inputBeam.translateBeam(offTrans=offTrans_ps)
-    
-    s.addPlotter(save='../images/')
+    translation = np.array([0, 0, 12e3])
+    rotation_plane = np.array([180, 0, 0])
+    s.rotateGrids("plane1", rotation_plane)
+    s.translateGrids("plane1", translation)
 
-    s.initPhysOptics(target=s.system["p1"], k=k, numThreads=11, cpp_path=cpp_path)
-    s.runPhysOptics(save=0, material_source='alu', prec='single', device='gpu')
+    JM1 = s.propagatePO_GPU("plane1", "p1", JM, k=k,
+                    epsilon=10, t_direction=-1, nThreads=256,
+                    mode="JM", precision="single")
 
-    #s.ffPhysOptics(source=s.system["p1"], target=s.system["cam1"])
-    s.nextPhysOptics(source=s.system["p1"], target=s.system["cam1"])
-    #s.runPhysOptics(save=2, material_source='vac', prop_mode=1)
-    s.runPhysOptics(save=1, material_source='vac', prec='single', device='gpu')
+    EH = s.propagatePO_GPU("p1", "planeff", JM1, k=k,
+                    epsilon=10, t_direction=-1, nThreads=256,
+                    mode="FF", precision="single")
 
-    field = s.loadField(s.system["cam1"], mode='Ex')
-    field2 = s.loadField(s.system["cam1"], mode='Ey')
-    
-    s.plotter.plotBeam2D(s.system["cam1"], field=field, vmin=-30, interpolation='lanczos')
-    #s.plotter.beamCut(s.system["cam1"], field=field, cross=field2, save=True)
-    
-    eta_t = s.calcSpillover(s.system["cam1"], field, R_aper)
-    print(eta_t)
+    pt.imshow(20*np.log10(np.absolute(EH.Ex) / np.max(np.absolute(EH.Ex))), vmin=-30, vmax=0)
+    pt.show()
 
-    
 if __name__ == "__main__":
     ex_DRO()
-

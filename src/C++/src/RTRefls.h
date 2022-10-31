@@ -73,7 +73,7 @@ inline T RTRefls<T>::ge(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr)
 template<class T>
 inline T RTRefls<T>::gpl(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr)
 {
-    return t - (zr + t*dzr) / dzr;
+    return t - (zr + t*dzr - 11e3) / dzr;
 }
 
 template<class T>

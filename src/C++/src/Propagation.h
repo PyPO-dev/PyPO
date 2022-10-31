@@ -151,6 +151,15 @@ Propagation<T, U, V, W>::Propagation(T k, int numThreads, int gs, int gt, T epsi
     this->eye[0][0] = 1;
     this->eye[1][1] = 1;
     this->eye[2][2] = 1;
+
+    printf("***--------- PO info ---------***\n");
+    printf("--- Source         :   %d cells\n", gs);
+    printf("--- Target         :   %d cells\n", gt);
+    printf("--- Wavenumber     :   %.3f / mm\n", k);
+    printf("--- Threads        :   %d\n", numThreads);
+    printf("--- Device         :   CPU\n");
+    printf("***--------- PO info ---------***\n");
+    printf("\n");
 }
 
 // This function calculates the propagation between source and target, calculates currents

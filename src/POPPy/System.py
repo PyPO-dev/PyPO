@@ -336,7 +336,7 @@ class System(object):
 
         return out
 
-    def initRayTracer(self, nThreads, mode, argDict):
+    def createFrame(self, mode, argDict):
         if mode == "manual":
             # If manual, argDict should contain the parameters
             nomChief = np.array([0,0,1,1]) # Always initialize raytrace beam along z-axis
@@ -420,7 +420,7 @@ class System(object):
 
         return frame_in
 
-    def runRayTracer(self, fr_in, name_target, epsilon=1e-6, nThreads=1):
+    def runRayTracer(self, fr_in, name_target, epsilon=1e-10, nThreads=1):
         fr_out = RT_CPUd(self.system[name_target], fr_in, nThreads, epsilon)
         return fr_out
 

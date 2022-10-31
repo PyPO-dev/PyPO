@@ -17,12 +17,12 @@ Refl = {
 
 # Manual raytracer
 Refl = {
-        "nRays"     :       "p1",
-        "nRing"     :       "manual",
-        "angx"      :       "focus",
-        "angy"      :       "uv",
-        "a"         :       False,
-        "b"         :       [1, 1, -1],
+        "nRays"     :       10,
+        "nRing"     :       10,
+        "angx"      :       6,
+        "angy"      :       6,
+        "a"         :       0,
+        "b"         :       0,
         "tChief"    :       np.zeros(3),
-        "oChief"    :       np.array([0,0,3.5e3])
+        "oChief"    :       np.zeros(3)
         }

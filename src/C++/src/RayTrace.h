@@ -52,6 +52,13 @@ RayTracer<T, U, V>::RayTracer(int numThreads, int nTot, V epsilon)
     this->nTot = nTot;
     this->threadPool.resize(numThreads);
     this->epsilon = epsilon;
+
+    printf("<<<--------- RT info --------->>>\n");
+    printf("--- Rays          :   %d\n", nTot);
+    printf("--- Threads       :   %d\n", numThreads);
+    printf("--- Device        :   CPU\n");
+    printf("<<<--------- RT info --------->>>\n");
+    printf("\n");
 }
 
 template<class T, class U, class V>
@@ -73,6 +80,8 @@ void RayTracer<T, U, V>::propagateRaysToP(int start, int stop,
     V check = fabs(t1 - t0);
     std::array<V, 3> norms;
 
+    int jc = 0; // Counter
+
     for (int i=start; i<stop; i++)
     {
         V x = fr_in->x[i];
@@ -85,8 +94,7 @@ void RayTracer<T, U, V>::propagateRaysToP(int start, int stop,
 
         while (check > epsilon)
         {
-            t1 = refls.gp(t0, x, y, z,
-                      dx, dy, dz);
+            t1 = refls.gp(t0, x, y, z, dx, dy, dz);
 
             check = fabs(t1 - t0);
 
@@ -103,6 +111,13 @@ void RayTracer<T, U, V>::propagateRaysToP(int start, int stop,
         fr_out->dx[i] = dx - 2*check*norms[0];
         fr_out->dy[i] = dy - 2*check*norms[1];
         fr_out->dz[i] = dz - 2*check*norms[2];
+
+        if((i * 100 / this->step) > jc and start == 0 * this->step)
+        {
+            std::cout << jc << " / 100" << '\r';
+            std::cout.flush();
+            jc++;
+        }
     }
 }
 
@@ -300,6 +315,7 @@ void RayTracer<T, U, V>::parallelRays(T ctp, U *fr_in, U *fr_out)
 
         else if (ctp.type == 3)
         {
+          printf("fuck uu\n");
             threadPool[n] = std::thread(&RayTracer::propagateRaysToPl,
                                         this, n * step, final_step,
                                         ctp, fr_in, fr_out);

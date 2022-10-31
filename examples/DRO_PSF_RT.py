@@ -32,30 +32,45 @@ def ex_DRO_RT():
     plane["gridsize"] = [3, 3]
 
     RTpar = {
-            "nRays"     :       10,
-            "nRing"     :       10,
-            "angx"      :       6,
-            "angy"      :       6,
-            "a"         :       10,
-            "b"         :       10,
-            "tChief"    :       np.zeros(3),
+            "nRays"     :       50,
+            "nRing"     :       100,
+            "angx"      :       0,
+            "angy"      :       0,
+            "a"         :       10000,
+            "b"         :       10000,
+            "tChief"    :       np.array([180,0,0]),
             "oChief"    :       np.array([0,0,12e3])
             }
 
     s = System()
+    s.addPlotter()
     s.addParabola(parabola)
     s.addPlane(plane)
+    s.translateGrids("plane1", np.array([0,0,12e3]))
 
-    frame_in = s.initRayTracer(nThreads=11, mode="manual", argDict=RTpar)
-    frame_out = s.runRayTracer(frame_in, "p1", nThreads=11)
+    #s.plotter.plotSystem()
 
-    print(frame_out.size)
+    frame_in = s.createFrame(mode="manual", argDict=RTpar)
 
-    frame_out2 = s.runRayTracer(frame_out, "plane1", nThreads=11)
+    pt.scatter(frame_in.x, frame_in.y)
+    pt.show()
 
+    frame_out = s.runRayTracer(frame_in, "p1", nThreads=5)
 
+    fig, ax = pt.subplots(1,1)
+    ax.scatter(frame_out.x, frame_out.y)
+    ax.set_box_aspect(1)
+    pt.show()
+    #print(frame_in.size)
+    print(frame_out.dz)
 
-    pt.scatter(frame_out2.x, frame_out2.y)
+    frame_out2 = s.runRayTracer(frame_out, "plane1", nThreads=5)
+
+    #print(frame_out2.x)
+
+    fig, ax = pt.subplots(1,1)
+    ax.scatter(frame_out2.x, frame_out2.y)
+    ax.set_box_aspect(1)
     pt.show()
 
 

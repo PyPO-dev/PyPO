@@ -19,23 +19,7 @@
 #define CSIZE 10
 #define MILLISECOND 1000
 
-/* This program calculates the PO propagation between a source and a target plane.
- * NOTE: This file contains the CUDA version of PhysBeam
- *
- * In order to run, the presence of the following .txt files in the POPPy/src/C++/input/ is required:
- * - s_Jr_(x,y,z).txt the real x,y,z components of the source electric current distribution
- * - s_Ji_(x,y,z).txt the imaginary x,y,z components of the source electric current distribution
- * - s_Mr_(x,y,z).txt the real x,y,z components of the source magnetic current distribution
- * - s_Mi_(x,y,z).txt the imaginary x,y,z components of the source magnetic current distribution
- *
- * - s_(x,y,z).txt the source x,y,z grids
- * - s_n(x,y,z).txt the source nx,ny,nz normal grids
- * - A_s the source area elements corresponding to points x,y,z
- *
- * - t_(x,y,z).txt the target x,y,z grids
- * - t_n(x,y,z).txt the target nx,ny,nz normal grids
- *
- *
+/* Kernels for single precision PO.
  * Author: Arend Moerman
  * For questions, contact: arendmoerman@gmail.com
  */

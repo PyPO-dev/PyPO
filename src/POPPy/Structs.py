@@ -90,6 +90,15 @@ class reflcontainer(ctypes.Structure):
                 ("nz", ctypes.POINTER(ctypes.c_double)),
                 ("area", ctypes.POINTER(ctypes.c_double))]
 
+class cframe(ctypes.Structure):
+    _fields_ = [("size", ctypes.c_int),
+                ("x", ctypes.POINTER(ctypes.c_double)),
+                ("y", ctypes.POINTER(ctypes.c_double)),
+                ("z", ctypes.POINTER(ctypes.c_double)),
+                ("dx", ctypes.POINTER(ctypes.c_double)),
+                ("dy", ctypes.POINTER(ctypes.c_double)),
+                ("dz", ctypes.POINTER(ctypes.c_double))]
+
 # FLOATS
 class arrC1f(ctypes.Structure):
     _fields_ = [("x", ctypes.POINTER(ctypes.c_float)),
@@ -177,3 +186,12 @@ class reflcontainerf(ctypes.Structure):
                 ("ny", ctypes.POINTER(ctypes.c_float)),
                 ("nz", ctypes.POINTER(ctypes.c_float)),
                 ("area", ctypes.POINTER(ctypes.c_float))]
+
+class cframef(ctypes.Structure):
+    _fields_ = [("size", ctypes.c_int),
+                ("x", ctypes.POINTER(ctypes.c_float)),
+                ("y", ctypes.POINTER(ctypes.c_float)),
+                ("z", ctypes.POINTER(ctypes.c_float)),
+                ("dx", ctypes.POINTER(ctypes.c_float)),
+                ("dy", ctypes.POINTER(ctypes.c_float)),
+                ("dz", ctypes.POINTER(ctypes.c_float))]

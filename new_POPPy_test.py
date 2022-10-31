@@ -2,6 +2,8 @@ from src.POPPy.System import System
 import numpy as np
 import matplotlib.pyplot as pt
 
+import src.POPPy.Colormaps as cmaps
+
 def plotSystem_test():
     parabola = {}
     parabola["name"] = "p1"
@@ -16,7 +18,7 @@ def plotSystem_test():
     parabola["lims_y"] = [-5000,5000]
     parabola["lims_u"] = [200,5e3]
     parabola["lims_v"] = [0,360]
-    parabola["gridsize"] = [1501,1501]
+    parabola["gridsize"] = [501,501]
 
     hyperbola = {}
     hyperbola["name"] = "h1"
@@ -98,9 +100,9 @@ def plotSystem_test():
 
     #JM, EH = s.readCustomBeam(name=cBeam, comp="Ex", shape=[3,3], convert_to_current=True, mode="PMC", ret="both")
 
-    JM1, EH1 = s.propagatePO_GPU("plane1", "p1", JM, k=5,
+    JM1 = s.propagatePO_GPU("plane1", "p1", JM, k=5,
                     epsilon=10, t_direction=-1, nThreads=256,
-                    mode="JMEH", precision="single")
+                    mode="JM", precision="single")
 
     #EH2 = s.propagatePO_CPU("p1", "planeff", JM1, k=0.02991993003,
     #                epsilon=10, t_direction=-1, nThreads=11,
@@ -110,7 +112,7 @@ def plotSystem_test():
                     epsilon=10, t_direction=-1, nThreads=256,
                     mode="FF", precision="single")
 
-    pt.imshow(20*np.log10(np.absolute(EH2.Ex) / np.max(np.absolute(EH2.Ex))), vmin=-30, vmax=0)
+    pt.imshow(20*np.log10(np.absolute(EH2.Ex) / np.max(np.absolute(EH2.Ex))), vmin=-30, vmax=0, cmap=cmaps.plasma)
     pt.show()
 
 

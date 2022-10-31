@@ -5,8 +5,6 @@ from src.POPPy.BindUtils import *
 from src.POPPy.Structs import *
 from src.POPPy.POPPyTypes import *
 
-import sys
-
 #############################################################################
 #                                                                           #
 #              List of bindings for the CPU interface of POPPy.             #
@@ -57,6 +55,11 @@ def loadCPUlib():
                                         ctypes.c_double, ctypes.c_double]
 
     lib.propagateToFarField.restype = None
+
+    lib.propagateRays.argtypes = [reflparams, ctypes.POINTER(cframe),
+                                ctypes.POINTER(cframe), ctypes.c_int, ctypes.c_double]
+
+    lib.propagateRays.restype = None
 
     return lib
 
@@ -178,6 +181,30 @@ def POPPy_CPUd(source, target, currents, k, epsilon, t_direction, nThreads, mode
         EH = c2BundleToObj(res, shape=target_shape, obj_t='fields')
 
         return EH
+
+def RT_CPUd(target, fr_in, nThreads, epsilon):
+    lib = loadCPUlib()
+
+    inp = cframe()
+    res = cframe()
+
+    allocate_cframe(res, fr_in.size, ctypes.c_double)
+    allfill_cframe(inp, fr_in, fr_in.size, ctypes.c_double)
+
+    ctp = reflparams()
+    allfill_reflparams(ctp, target, ctypes.c_double)
+
+    nThreads    = ctypes.c_int(nThreads)
+    epsilon     = ctypes.c_double(epsilon)
+
+    lib.propagateRays(ctp, ctypes.byref(inp), ctypes.byref(res),
+                        nThreads, epsilon)
+    shape = (fr_in.size,)
+    fr_out = frameToObj(res, np_t=np.float64, shape=shape)
+
+    return fr_out
+
+
 
 if __name__ == "__main__":
     rint("Bindings for POPPy CPU.")

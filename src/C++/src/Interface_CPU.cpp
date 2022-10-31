@@ -9,6 +9,7 @@
 #include "stdlib.h"
 
 #include "Propagation.h"
+#include "RayTrace.h"
 
 #ifdef __cplusplus
     extern "C"
@@ -167,6 +168,25 @@ extern "C" void propagateToFarField(c2Bundle *res, reflparams source, reflparams
     begin = std::chrono::steady_clock::now();
 
     prop.parallelFarField(cs, ct, currents, res);
+
+    end = std::chrono::steady_clock::now();
+    std::cout << "Elapsed time : "
+              << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
+              << " [s]" << std::endl;
+}
+
+extern "C" void propagateRays(reflparams ctp, cframe *fr_in, cframe *fr_out,
+                              int numThreads, double epsilon)
+{
+    int nTot = fr_in->size;
+    RayTracer<reflparams, cframe, double> RT(numThreads, nTot, epsilon);
+
+    std::chrono::steady_clock::time_point begin;
+    std::chrono::steady_clock::time_point end;
+
+    printf("Calculating ray-trace...\n");
+    begin = std::chrono::steady_clock::now();
+    RT.parallelRays(ctp, fr_in, fr_out);
 
     end = std::chrono::steady_clock::now();
     std::cout << "Elapsed time : "

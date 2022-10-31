@@ -7,7 +7,7 @@ import matplotlib.pyplot as pt
 #import src.Python.System as System
 from src.POPPy.System import System
 
-def ex_DRO_PO():
+def ex_DRO_PO(device):
     """
     In this example script we will build the Dwingeloo Radio Observatory (DRO).
     The setup consists of a parabolic reflector and feed.
@@ -49,6 +49,8 @@ def ex_DRO_PO():
     s.addPlane(plane)
     s.addPlane(planeff)
 
+    s.saveElement("p1")
+
     s.setCustomBeamPath(path="ps/", append=True)
 
     cBeam = "ps"
@@ -59,21 +61,25 @@ def ex_DRO_PO():
     s.rotateGrids("plane1", rotation_plane)
     s.translateGrids("plane1", translation)
 
-    JM1 = s.propagatePO_CPU("plane1", "p1", JM, k=k,
-                    epsilon=10, t_direction=-1, nThreads=11,
-                    mode="JM", precision="double")
+    if device == "CPU":
 
-    #EH = s.propagatePO_CPU("p1", "planeff", JM1, k=k,
-    #                epsilon=10, t_direction=-1, nThreads=11,
-    #                mode="FF", precision="double")
+        JM1 = s.propagatePO_CPU("plane1", "p1", JM, k=k,
+                        epsilon=10, t_direction=-1, nThreads=11,
+                        mode="JM", precision="double")
 
-    #JM1 = s.propagatePO_GPU("plane1", "p1", JM, k=k,
-    #                epsilon=10, t_direction=-1, nThreads=256,
-    #                mode="JM", precision="single")
+        EH = s.propagatePO_CPU("p1", "planeff", JM1, k=k,
+                        epsilon=10, t_direction=-1, nThreads=11,
+                        mode="FF", precision="double")
 
-    EH = s.propagatePO_GPU("p1", "planeff", JM1, k=k,
-                    epsilon=10, t_direction=-1, nThreads=256,
-                    mode="FF", precision="single")
+    elif device == "GPU":
+
+        JM1 = s.propagatePO_GPU("plane1", "p1", JM, k=k,
+                        epsilon=10, t_direction=-1, nThreads=256,
+                        mode="JM", precision="single")
+
+        EH = s.propagatePO_GPU("p1", "planeff", JM1, k=k,
+                        epsilon=10, t_direction=-1, nThreads=256,
+                        mode="FF", precision="single")
 
     pt.imshow(20*np.log10(np.absolute(EH.Ex) / np.max(np.absolute(EH.Ex))), vmin=-30, vmax=0)
     pt.show()

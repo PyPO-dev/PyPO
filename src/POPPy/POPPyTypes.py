@@ -69,3 +69,14 @@ class reflGrids(object):
         self.nz = nz
 
         self.area = area
+
+class frame(object):
+    def __init__(self, size, x, y, z, dx, dy, dz):
+        self.size = size
+        self.x = x
+        self.y = y
+        self.z = z
+
+        self.dx = dx
+        self.dy = dy
+        self.dz = dz

@@ -245,6 +245,28 @@ def allocate_reflcontainer(res, size, ct_t):
 
     res.area = (ct_t * size)()
 
+def allocate_cframe(res, size, ct_t):
+    res.size = size
+
+    res.x = (ct_t * size)()
+    res.y = (ct_t * size)()
+    res.z = (ct_t * size)()
+
+    res.dx = (ct_t * size)()
+    res.dy = (ct_t * size)()
+    res.dz = (ct_t * size)()
+
+def allfill_cframe(res, frame_py, size, ct_t):
+    res.size = size
+
+    res.x = (ct_t * size)(*frame_py.x.tolist())
+    res.y = (ct_t * size)(*frame_py.y.tolist())
+    res.z = (ct_t * size)(*frame_py.z.tolist())
+
+    res.dx = (ct_t * size)(*frame_py.dx.tolist())
+    res.dy = (ct_t * size)(*frame_py.dy.tolist())
+    res.dz = (ct_t * size)(*frame_py.dz.tolist())
+
 def creflToObj(res, shape, np_t):
 
     x = np.ctypeslib.as_array(res.x, shape=shape).astype(np_t)
@@ -258,3 +280,14 @@ def creflToObj(res, shape, np_t):
     area = np.ctypeslib.as_array(res.area, shape=shape).astype(np_t)
 
     return reflGrids(x, y, z, nx, ny, nz, area)
+
+def frameToObj(res, np_t, shape):
+    x = np.ctypeslib.as_array(res.x, shape=shape).astype(np_t)
+    y = np.ctypeslib.as_array(res.y, shape=shape).astype(np_t)
+    z = np.ctypeslib.as_array(res.z, shape=shape).astype(np_t)
+
+    dx = np.ctypeslib.as_array(res.dx, shape=shape).astype(np_t)
+    dy = np.ctypeslib.as_array(res.dy, shape=shape).astype(np_t)
+    dz = np.ctypeslib.as_array(res.dz, shape=shape).astype(np_t)
+
+    return frame(shape[0], x, y, z, dx, dy, dz)

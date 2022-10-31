@@ -1,7 +1,6 @@
 import ctypes
 import math
 import numpy as np
-import sys
 
 from src.POPPy.BindUtils import *
 from src.POPPy.Structs import *

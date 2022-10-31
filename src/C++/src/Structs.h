@@ -85,6 +85,18 @@ typedef struct reflcontainer {
     double *area;
 } reflcontainer;
 
+typedef struct cframe {
+    int size;
+
+    double *x;
+    double *y;
+    double *z;
+
+    double *dx;
+    double *dy;
+    double *dz;
+} cframe;
+
 // Have to write explicit types for float and float: ctypes doesnt support templates
 struct arrC1f;
 struct arrR3f;
@@ -166,5 +178,17 @@ typedef struct reflcontainerf {
 
     float *area;
 } reflcontainerf;
+
+typedef struct cframef {
+    int size;
+
+    float *x;
+    float *y;
+    float *z;
+
+    float *dx;
+    float *dy;
+    float *dz;
+} cframef;
 
 #endif

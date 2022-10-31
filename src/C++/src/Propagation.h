@@ -16,7 +16,8 @@
 #define __Propagation_h
 
 // T is either double or float, U is return struct (double or float as well)
-template <class T, class U, class V, class W> class Propagation
+template <class T, class U, class V, class W>
+class Propagation
 {
     T k;                   // Wavenumber
     int numThreads;             // Number of CPU threads used
@@ -254,7 +255,7 @@ void Propagation<T,U, V, W>::propagateBeam_JM(int start, int stop,
         ut.ext(norms, temp1, n_out_e_i_r);
         ut.s_mult(n_out_e_i_r, -1., mt);
 
-        res->r1x[i] = beam_e_h[0][0].real();//jt[0].real();
+        res->r1x[i] = jt[0].real();
         res->r1y[i] = jt[1].real();
         res->r1z[i] = jt[2].real();
 

@@ -1,14 +1,9 @@
 import ctypes
-import math
 import numpy as np
 
 from src.POPPy.BindUtils import allfill_reflparams, allocate_reflcontainer, creflToObj
 from src.POPPy.Structs import *
 from src.POPPy.POPPyTypes import *
-
-import sys
-
-import matplotlib.pyplot as pt
 
 #############################################################################
 #                                                                           #

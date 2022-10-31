@@ -59,9 +59,17 @@ def ex_DRO_PO():
     s.rotateGrids("plane1", rotation_plane)
     s.translateGrids("plane1", translation)
 
-    JM1 = s.propagatePO_GPU("plane1", "p1", JM, k=k,
-                    epsilon=10, t_direction=-1, nThreads=256,
-                    mode="JM", precision="single")
+    JM1 = s.propagatePO_CPU("plane1", "p1", JM, k=k,
+                    epsilon=10, t_direction=-1, nThreads=11,
+                    mode="JM", precision="double")
+
+    #EH = s.propagatePO_CPU("p1", "planeff", JM1, k=k,
+    #                epsilon=10, t_direction=-1, nThreads=11,
+    #                mode="FF", precision="double")
+
+    #JM1 = s.propagatePO_GPU("plane1", "p1", JM, k=k,
+    #                epsilon=10, t_direction=-1, nThreads=256,
+    #                mode="JM", precision="single")
 
     EH = s.propagatePO_GPU("p1", "planeff", JM1, k=k,
                     epsilon=10, t_direction=-1, nThreads=256,

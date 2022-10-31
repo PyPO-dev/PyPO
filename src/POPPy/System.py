@@ -294,28 +294,13 @@ class System(object):
 
     def propagatePO_CPU(self, source_name, target_name, s_currents, k,
                     epsilon=1, t_direction=-1, nThreads=1,
-                    mode="JM", precision="single"):
+                    mode="JM", precision="double"):
 
         source = self.system[source_name]
         target = self.system[target_name]
 
         if precision == "double":
-            if mode == "JM":
-                out = calcJM_CPUd(source, target, s_currents, k, epsilon, t_direction, nThreads)
-
-            elif mode == "EH":
-                out = calcEH_CPUd(source, target, s_currents, k, epsilon, t_direction, nThreads)
-
-            elif mode == "JMEH":
-                out1, out2 = calcJMEH_CPUd(source, target, s_currents, k, epsilon, t_direction, nThreads)
-                out = [out1, out2]
-
-            elif mode == "EHP":
-                out1, out2 = calcEHP_CPUd(source, target, s_currents, k, epsilon, t_direction, nThreads)
-                out = [out1, out2]
-
-            elif mode == "FF":
-                out = calcFF_CPUd(source, target, s_currents, k, epsilon, t_direction, nThreads)
+            out = POPPy_CPUd(source, target, s_currents, k, epsilon, t_direction, nThreads, mode)
 
         return out
 
@@ -327,22 +312,7 @@ class System(object):
         target = self.system[target_name]
 
         if precision == "single":
-            if mode == "JM":
-                out = calcJM_GPUf(source, target, s_currents, k, epsilon, t_direction, nThreads)
-
-            elif mode == "EH":
-                out = calcEH_GPUf(source, target, s_currents, k, epsilon, t_direction, nThreads)
-
-            elif mode == "JMEH":
-                out1, out2 = calcJMEH_GPUf(source, target, s_currents, k, epsilon, t_direction, nThreads)
-                out = [out1, out2]
-
-            elif mode == "EHP":
-                out1, out2 = calcEHP_GPUf(source, target, s_currents, k, epsilon, t_direction, nThreads)
-                out = [out1, out2]
-
-            elif mode == "FF":
-                out = calcFF_GPUf(source, target, s_currents, k, epsilon, t_direction, nThreads)
+            out = POPPy_GPUf(source, target, s_currents, k, epsilon, t_direction, nThreads, mode)
 
         return out
 
@@ -365,4 +335,4 @@ class System(object):
         return field_c
 
 if __name__ == "__main__":
-    print("Please run System.py from the SystemInterface.py, located in the POPPy directory.")
+    print("System interface for POPPy.")

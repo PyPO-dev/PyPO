@@ -222,7 +222,7 @@ class Plotter(object):
             pt.show()
 
         del grids
-        
+
         if returns:
             return ax_append
 
@@ -231,7 +231,7 @@ class Plotter(object):
 
     def plotSystem(self, systemDict, fine=2, cmap=cm.cool,
                 ax_append=False, norm=False,
-                show=True, foc1=False, foc2=False, save=True, ret=False):
+                show=True, foc1=False, foc2=False, save=True, ret=False, RTframes=[]):
 
         fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
 
@@ -247,6 +247,19 @@ class Plotter(object):
         world_limits = ax.get_w_lims()
         ax.set_box_aspect((world_limits[1]-world_limits[0],world_limits[3]-world_limits[2],world_limits[5]-world_limits[4]))
         ax.tick_params(axis='x', which='major', pad=-3)
+
+        if RTframes:
+            for i in range(RTframes[0].size):
+                x = []
+                y = []
+                z = []
+
+                for frame in RTframes:
+                    x.append(frame.x[i])
+                    y.append(frame.y[i])
+                    z.append(frame.z[i])
+
+                pt.plot(x, y, z, color='grey')
 
         if save:
             pt.savefig(fname=self.savePath + 'system.jpg',bbox_inches='tight', dpi=300)
@@ -323,3 +336,24 @@ class Plotter(object):
 
         if ret:
             return field[:,y_center], field[:,y_center]
+
+    def plotRTframe(self, frame, project="xy"):
+        fig, ax = pt.subplots(1,1)
+
+        if project == "xy":
+            ax.scatter(frame.x, frame.y, color="black")
+            ax.set_xlabel(r"$x$ / mm")
+            ax.set_ylabel(r"$y$ / mm")
+
+        elif project == "yz":
+            ax.scatter(frame.y, frame.z, color="black")
+            ax.set_xlabel(r"$y$ / mm")
+            ax.set_ylabel(r"$z$ / mm")
+
+        elif project == "zx":
+            ax.scatter(frame.z, frame.x, color="black")
+            ax.set_xlabel(r"$z$ / mm")
+            ax.set_ylabel(r"$x$ / mm")
+
+        ax.set_box_aspect(1)
+        pt.show()

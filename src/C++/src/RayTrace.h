@@ -26,9 +26,12 @@ class RayTracer
     V epsilon;
 
 public:
+    Utils<V> ut;
     std::vector<std::thread> threadPool;
 
     RayTracer(int numThreads, int nTot, V epsilon);
+
+    void transfRays(T ctp, U *fr, bool inv = false);
 
     void propagateRaysToP(int start, int stop,
                       T ctp, U *fr_in, U *fr_out);
@@ -59,6 +62,39 @@ RayTracer<T, U, V>::RayTracer(int numThreads, int nTot, V epsilon)
     printf("--- Device        :   CPU\n");
     printf("<<<--------- RT info --------->>>\n");
     printf("\n");
+}
+/*
+ * Transform ray-trace frame into target surface restframe.
+ */
+template<class T, class U, class V>
+void RayTracer<T, U, V>::transfRays(T ctp, U *fr, bool inv)
+{
+    bool vec = true;
+    std::array<V, 3> inp, out;
+    for (int i=0; i<fr->size; i++)
+    {
+        inp[0] = fr->x[i];
+        inp[1] = fr->y[i];
+        inp[2] = fr->z[i];
+
+        if (inv) {ut.invmatVec4(ctp.transf, inp, out);}
+        else {ut.matVec4(ctp.transf, inp, out);}
+
+        fr->x[i] = out[0];
+        fr->y[i] = out[1];
+        fr->z[i] = out[2];
+
+        inp[0] = fr->dx[i];
+        inp[1] = fr->dy[i];
+        inp[2] = fr->dz[i];
+
+        if (inv) {ut.invmatVec4(ctp.transf, inp, out, vec);}
+        else {ut.matVec4(ctp.transf, inp, out, vec);}
+
+        fr->dx[i] = out[0];
+        fr->dy[i] = out[1];
+        fr->dz[i] = out[2];
+    }
 }
 
 template<class T, class U, class V>
@@ -96,7 +132,6 @@ void RayTracer<T, U, V>::propagateRaysToP(int start, int stop,
         while (check > epsilon)
         {
             t1 = refls.gp(t0, x, y, z, dx, dy, dz);
-
 
             check = fabs(t1 - t0);
 
@@ -284,6 +319,10 @@ void RayTracer<T, U, V>::parallelRays(T ctp, U *fr_in, U *fr_out)
 {
     int final_step;
 
+    // Transform to reflector rest frame
+    bool inv = true;
+    transfRays(ctp, fr_in, inv);
+
     for(int n=0; n<numThreads; n++)
     {
         if(n == (numThreads-1))
@@ -325,6 +364,9 @@ void RayTracer<T, U, V>::parallelRays(T ctp, U *fr_in, U *fr_out)
         }
     }
     joinThreads();
+
+    // Transform back to real frame
+    transfRays(ctp, fr_out);
 }
 
 template <class T, class U, class V>

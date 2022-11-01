@@ -122,8 +122,8 @@ void Parabola_uv(T *parabola, U xu_lo, U xu_up, U yv_lo,
             inp[2] = parabola->z[i*ncy + j];
 
             ut.matVec4(mat, inp, out);
-            inp = out;
-            ut.invmatVec4(mat, inp, out);
+            //inp = out;
+            //ut.invmatVec4(mat, inp, out);
 
             parabola->x[i*ncy + j] = out[0];
             parabola->y[i*ncy  + j] = out[1];
@@ -135,8 +135,8 @@ void Parabola_uv(T *parabola, U xu_lo, U xu_up, U yv_lo,
 
             ut.matVec4(mat, inp, out, vec);
 
-            inp = out;
-            ut.invmatVec4(mat, inp, out, vec);
+            //inp = out;
+            //ut.invmatVec4(mat, inp, out, vec);
 
             parabola->nx[i*ncy  + j] = out[0];
             parabola->ny[i*ncy  + j] = out[1];

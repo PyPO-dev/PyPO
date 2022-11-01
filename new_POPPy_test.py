@@ -73,9 +73,10 @@ def plotSystem_test():
     s.addParabola(parabola)
     #s.addPlane(plane)
     #s.addPlane(planeff)
-
+    s.plotter.plotSystem(s.system, fine=2, norm=True)
 
     rotation=np.array([42, 42, 0])
+    rotation2=np.array([3.876, -72, 35])
 
     s.rotateGrids("p1", rotation)
 
@@ -88,6 +89,7 @@ def plotSystem_test():
     #s.rotateGrids("plane1", rotation)
 
     s.translateGrids("p1", translation)
+    s.rotateGrids("p1", rotation2)
 
     s.plotter.plotSystem(s.system, fine=2, norm=True)
 

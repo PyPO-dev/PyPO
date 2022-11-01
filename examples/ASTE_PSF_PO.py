@@ -7,7 +7,7 @@ import matplotlib.pyplot as pt
 #import src.Python.System as System
 from src.POPPy.System import System
 
-def ex_ASTE_PO():
+def ex_ASTE_PO(device):
     """
     In this example script we will build the Dwingeloo Radio Observatory (DRO).
     The setup consists of a parabolic reflector and feed.
@@ -52,8 +52,8 @@ def ex_ASTE_PO():
     planeff["name"] = "planeff"
     planeff["gmode"] = "AoE"
     planeff["flip"] = False
-    planeff["lims_Az"] = [-0.3,0.3]
-    planeff["lims_El"] = [-0.3,0.3]
+    planeff["lims_Az"] = [-0.03,0.03]
+    planeff["lims_El"] = [-0.03,0.03]
     planeff["gridsize"] = [201, 201]
 
     s = System()
@@ -71,17 +71,31 @@ def ex_ASTE_PO():
     translation = np.array([0,0,3.5e3 - d_foc_h])
     s.translateGrids("plane1", translation)
 
-    JM1 = s.propagatePO_GPU("plane1", "h1", JM, k=k,
-                    epsilon=10, t_direction=-1, nThreads=256,
-                    mode="JM", precision="single")
+    if device == "GPU":
+        JM1 = s.propagatePO_GPU("plane1", "h1", JM, k=k,
+                        epsilon=10, t_direction=-1, nThreads=256,
+                        mode="JM", precision="single")
 
-    JM2 = s.propagatePO_GPU("h1", "p1", JM1, k=k,
-                    epsilon=10, t_direction=-1, nThreads=256,
-                    mode="JM", precision="single")
+        JM2 = s.propagatePO_GPU("h1", "p1", JM1, k=k,
+                        epsilon=10, t_direction=-1, nThreads=256,
+                        mode="JM", precision="single")
 
-    EH = s.propagatePO_GPU("p1", "planeff", JM1, k=k,
-                    epsilon=10, t_direction=-1, nThreads=256,
-                    mode="FF", precision="single")
+        EH = s.propagatePO_GPU("p1", "planeff", JM2, k=k,
+                        epsilon=10, t_direction=-1, nThreads=256,
+                        mode="FF", precision="single")
+
+    elif device == "CPU":
+        JM1 = s.propagatePO_CPU("plane1", "h1", JM, k=k,
+                        epsilon=10, t_direction=-1, nThreads=11,
+                        mode="JM", precision="double")
+
+        JM2 = s.propagatePO_CPU("h1", "p1", JM1, k=k,
+                        epsilon=10, t_direction=-1, nThreads=11,
+                        mode="JM", precision="double")
+
+        EH = s.propagatePO_CPU("p1", "planeff", JM2, k=k,
+                        epsilon=10, t_direction=-1, nThreads=11,
+                        mode="FF", precision="double")
 
     pt.imshow(20*np.log10(np.absolute(EH.Ex) / np.max(np.absolute(EH.Ex))), vmin=-30, vmax=0)
     pt.show()

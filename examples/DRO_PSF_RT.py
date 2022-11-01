@@ -27,13 +27,13 @@ def ex_DRO_RT():
     plane["name"] = "plane1"
     plane["gmode"] = "xy"
     plane["flip"] = False
-    plane["lims_x"] = [-0.1,0.1]
-    plane["lims_y"] = [-0.1,0.1]
+    plane["lims_x"] = [-100,100]
+    plane["lims_y"] = [-100,100]
     plane["gridsize"] = [3, 3]
 
     RTpar = {
-            "nRays"     :       100,
-            "nRing"     :       100,
+            "nRays"     :       10,
+            "nRing"     :       10,
             "angx"      :       0,
             "angy"      :       0,
             "a"         :       10000,
@@ -41,7 +41,6 @@ def ex_DRO_RT():
             "tChief"    :       np.array([180,0,0]),
             "oChief"    :       np.array([0,0,12e3])
             }
-
     s = System()
     s.addPlotter()
     s.addParabola(parabola)
@@ -56,10 +55,8 @@ def ex_DRO_RT():
 
     frame_out2 = s.runRayTracer(frame_out, "plane1", nThreads=1)
 
-    fig, ax = pt.subplots(1,1)
-    ax.scatter(frame_out2.x, frame_out2.y)
-    ax.set_box_aspect(1)
-    pt.show()
+    s.plotter.plotRTframe(frame_out2)
+    s.plotter.plotSystem(s.system, RTframes=[frame_in, frame_out, frame_out2])
 
 
 

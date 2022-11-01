@@ -12,6 +12,7 @@ import json
 from src.POPPy.BindRefl import *
 from src.POPPy.BindGPU import *
 from src.POPPy.BindCPU import *
+from src.POPPy.BindBeam import *
 from src.POPPy.Copy import copyGrid
 from src.POPPy.MatTransform import *
 from src.POPPy.Plotter import Plotter
@@ -338,77 +339,7 @@ class System(object):
 
     def createFrame(self, mode, argDict):
         if mode == "manual":
-            # If manual, argDict should contain the parameters
-            nomChief = np.array([0,0,1,1]) # Always initialize raytrace beam along z-axis
-            tChief = argDict["tChief"]
-            oChief = argDict["oChief"]
-            a = argDict["a"]
-            b = argDict["b"]
-            angx = argDict["angx"]
-            angy = argDict["angy"]
-            nRays = argDict["nRays"]
-            nRing = argDict["nRing"]
-
-            nTot = 1 + nRing * 4 * nRays
-            mat_i = np.eye(4)
-
-            x = []
-            y = []
-            z = []
-
-            dx = []
-            dy = []
-            dz = []
-
-            alpha = 0.0 # Set first circle ray in the right of beam
-            d_alpha = 0
-
-            if nRays > 0:
-                d_alpha = 2 * np.pi / (4 * nRays) # Set spacing in clockwise angle
-
-            n = 1
-
-            for i in range(nTot):
-                if i == 0: # Chief ray
-                    x.append(oChief[0])
-                    y.append(oChief[1])
-                    z.append(oChief[2])
-
-                    dChief = np.matmul(MatRotate(tChief, mat_i), nomChief)
-
-                    dx.append(dChief[0])
-                    dy.append(dChief[1])
-                    dz.append(dChief[2])
-                    continue
-
-                pos_ray = np.array([a * np.cos(alpha), b * np.sin(alpha), 0]) / nRing * n + oChief
-                rotation = np.array([np.radians(angy) * np.sin(alpha) / nRing * n,
-                                    np.radians(angx) * np.cos(alpha) / nRing * n,
-                                    2*alpha])
-
-                direction = np.matmul(MatRotate(rotation, mat_i, radians=True), nomChief)
-                direction = np.matmul(MatRotate(tChief, mat_i), direction)
-
-                to_rotate = np.array([pos_ray[0], pos_ray[1], pos_ray[2], 1])
-
-                pos_r = np.matmul(MatRotate(tChief, mat_i, origin=oChief), to_rotate)
-
-                x.append(to_rotate[0])
-                y.append(to_rotate[1])
-                z.append(to_rotate[2])
-
-                dx.append(direction[0])
-                dy.append(direction[1])
-                dz.append(direction[2])
-
-                alpha += d_alpha
-
-                if i == int(nTot / nRing) * n:
-                    n += 1
-                    alpha = 0
-
-            frame_in = frame(nTot, np.array(x), np.array(y), np.array(z),
-                            np.array(dx), np.array(dy), np.array(dz))
+            frame_in = makeRTframe(argDict)
 
         elif mode == "poynting":
             # Now, assume argDict is an rfield and grids object

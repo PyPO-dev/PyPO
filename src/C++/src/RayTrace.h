@@ -325,15 +325,8 @@ void RayTracer<T, U, V>::parallelRays(T ctp, U *fr_in, U *fr_out)
 
     for(int n=0; n<numThreads; n++)
     {
-        if(n == (numThreads-1))
-        {
-            final_step = nTot;
-        }
-
-        else
-        {
-            final_step = (n+1) * step;
-        }
+        if(n == (numThreads-1)) {final_step = nTot;}
+        else {final_step = (n+1) * step;}
 
         if (ctp.type == 0)
         {
@@ -372,12 +365,6 @@ void RayTracer<T, U, V>::parallelRays(T ctp, U *fr_in, U *fr_out)
 template <class T, class U, class V>
 void RayTracer<T, U, V>::joinThreads()
 {
-    for (std::thread &t : threadPool)
-    {
-        if (t.joinable())
-        {
-            t.join();
-        }
-    }
+    for (std::thread &t : threadPool) {if (t.joinable()) {t.join();}}
 }
 #endif

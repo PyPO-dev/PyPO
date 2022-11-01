@@ -74,16 +74,17 @@ void RayTracer<T, U, V>::propagateRaysToP(int start, int stop,
         flip = -1;
     }
 
-    V t0 = 100;
-    V t1 = 1e99;
-
-    V check = fabs(t1 - t0);
     std::array<V, 3> norms;
 
     int jc = 0; // Counter
 
     for (int i=start; i<stop; i++)
     {
+        V t0 = 100;
+        V t1 = 1e99;
+
+        V check = fabs(t1 - t0);
+
         V x = fr_in->x[i];
         V y = fr_in->y[i];
         V z = fr_in->z[i];
@@ -95,6 +96,7 @@ void RayTracer<T, U, V>::propagateRaysToP(int start, int stop,
         while (check > epsilon)
         {
             t1 = refls.gp(t0, x, y, z, dx, dy, dz);
+
 
             check = fabs(t1 - t0);
 
@@ -134,14 +136,15 @@ void RayTracer<T, U, V>::propagateRaysToH(int start, int stop,
         flip = -1;
     }
 
-    V t0 = 100;
-    V t1 = 1e99;
-
-    V check = fabs(t1 - t0);
     std::array<V, 3> norms;
 
     for (int i=start; i<stop; i++)
     {
+        V t0 = 100;
+        V t1 = 1e99;
+
+        V check = fabs(t1 - t0);
+
         V x = fr_in->x[i];
         V y = fr_in->y[i];
         V z = fr_in->z[i];
@@ -185,14 +188,15 @@ void RayTracer<T, U, V>::propagateRaysToE(int start, int stop,
         flip = -1;
     }
 
-    V t0 = 100;
-    V t1 = 1e99;
-
-    V check = fabs(t1 - t0);
     std::array<V, 3> norms;
 
     for (int i=start; i<stop; i++)
     {
+        V t0 = 100;
+        V t1 = 1e99;
+
+        V check = fabs(t1 - t0);
+
         V x = fr_in->x[i];
         V y = fr_in->y[i];
         V z = fr_in->z[i];
@@ -236,14 +240,14 @@ void RayTracer<T, U, V>::propagateRaysToPl(int start, int stop,
         flip = -1;
     }
 
-    V t0 = 100;
-    V t1 = 1e99;
-
-    V check = fabs(t1 - t0);
-    std::array<V, 3> norms;
-
     for (int i=start; i<stop; i++)
     {
+        V t0 = 100;
+        V t1 = 1e99;
+
+        V check = fabs(t1 - t0);
+        std::array<V, 3> norms;
+
         V x = fr_in->x[i];
         V y = fr_in->y[i];
         V z = fr_in->z[i];
@@ -315,7 +319,6 @@ void RayTracer<T, U, V>::parallelRays(T ctp, U *fr_in, U *fr_out)
 
         else if (ctp.type == 3)
         {
-          printf("fuck uu\n");
             threadPool[n] = std::thread(&RayTracer::propagateRaysToPl,
                                         this, n * step, final_step,
                                         ctp, fr_in, fr_out);

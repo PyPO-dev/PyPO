@@ -6,6 +6,7 @@
 #include <thread>
 #include <iomanip>
 
+#define _USE_MATH_DEFINES
 #ifndef __Utils_h
 #define __Utils_h
 
@@ -67,7 +68,7 @@ public:
     void matVec4(const T *m1, const std::array<T, 3> &v1, std::array<T, 3> &out, bool vec=false);
 
     void invmatVec4(const T *m1, const std::array<T, 3> &v1, std::array<T, 3> &out, bool vec=false);
-
+    void matRot(const std::array<T, 3> &rot, const std::array<T, 3> &v1, const std::array<T, 3> &cRot, std::array<T, 3> &out);
 };
 
 // Real dot-product
@@ -392,6 +393,31 @@ void Utils<T>::invmatVec4(const T *m1, const std::array<T, 3> &cv1, std::array<T
             out[n] = m1[n] * cv1[0] + m1[n+4] * cv1[1] + m1[n+8] * cv1[2] + temp;
         }
     }
+}
+
+template <typename T> inline
+void Utils<T>::matRot(const std::array<T, 3> &rot, const std::array<T, 3> &v1, const std::array<T, 3> &cRot, std::array<T, 3> &out)
+{
+    T cosx = cos(rot[0]);
+    T cosy = cos(rot[1]);
+    T cosz = cos(rot[2]);
+
+    T sinx = sin(rot[0]);
+    T siny = sin(rot[1]);
+    T sinz = sin(rot[2]);
+
+    T mu = cosz * siny;
+    T rho = sinz * siny;
+
+    std::array<T, 3> to_rot;
+
+    for(int n=0; n<3; n++) {to_rot[n] = v1[n] - cRot[n];}
+
+    out[0] = cosz*cosy * to_rot[0] + (mu*sinx - sinz*cosx) * to_rot[1] + (mu*cosx + sinz*sinx) * to_rot[2];
+    out[1] = sinz*cosy * to_rot[0] + (rho*sinx + cosz*cosx) * to_rot[1] + (rho*cosx - cosz*sinx) * to_rot[2];
+    out[2] = -siny * to_rot[0] + cosy*sinx * to_rot[1] + cosy*cosx * to_rot[2];
+
+    for(int n=0; n<3; n++) {out[n] = out[n] + cRot[n];}
 }
 
 #endif

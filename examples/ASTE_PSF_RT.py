@@ -46,9 +46,12 @@ def ex_ASTE_RT(device):
             "angy"      :       0,
             "a"         :       4000,
             "b"         :       4000,
-            "tChief"    :       np.array([180,0,0]),
+            "tChief"    :       np.array([0,0,0]),
             "oChief"    :       np.array([0,0,3.5e3])
             }
+
+    rotation = np.array([0, 0, 0])
+
     s = System()
     s.addPlotter()
     s.addParabola(parabola)
@@ -56,7 +59,9 @@ def ex_ASTE_RT(device):
     s.addPlane(plane)
     s.translateGrids("plane1", np.array([0,0,3.5e3 - d_foc_h]))
 
-    s.plotter.plotSystem(s.system)
+    s.rotateGrids("p1", rotation)
+    s.rotateGrids("h1", rotation)
+    s.rotateGrids("plane1", rotation)
 
     frame_in = s.createFrame(mode="manual", argDict=RTpar)
 
@@ -65,7 +70,7 @@ def ex_ASTE_RT(device):
 
     frame_out2 = s.runRayTracer(frame_out1, "plane1", nThreads=1)
 
-    s.plotter.plotRTframe(frame_out2)
+    s.plotter.plotRTframe(frame_out2, project="xy")
     s.plotter.plotSystem(s.system, RTframes=[frame_in, frame_out, frame_out1, frame_out2])
 
 if __name__ == "__main__":

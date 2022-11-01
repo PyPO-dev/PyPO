@@ -267,6 +267,19 @@ def allfill_cframe(res, frame_py, size, ct_t):
     res.dy = (ct_t * size)(*frame_py.dy.tolist())
     res.dz = (ct_t * size)(*frame_py.dz.tolist())
 
+def allfill_RTDict(res, rdict_py, ct_t):
+    res.nRays = ctypes.c_int(rdict_py["nRays"])
+    res.nRing = ctypes.c_int(rdict_py["nRing"])
+
+    res.angx = ct_t(np.radians(rdict_py["angx"]))
+    res.angy = ct_t(np.radians(rdict_py["angy"]))
+    res.a = ct_t(rdict_py["a"])
+    res.b = ct_t(rdict_py["b"])
+
+    res.tChief = (ct_t * 3)(*np.radians(rdict_py["tChief"]).tolist())
+    res.oChief = (ct_t * 3)(*rdict_py["oChief"].tolist())
+
+
 def creflToObj(res, shape, np_t):
 
     x = np.ctypeslib.as_array(res.x, shape=shape).astype(np_t)

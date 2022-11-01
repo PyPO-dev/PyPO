@@ -1,0 +1,21 @@
+# This makefile creates the cpu version of POPPy.
+# To build, type: 'make beam' in terminal
+
+###########################################################################################
+DIRSRC = ./src/
+###########################################################################################
+COMP = g++
+CFLAGS = -O3 -std=c++11 -pthread
+
+CC  = $(COMP) $(CFLAGS) -fpic -c
+CO  = $(COMP) $(CFLAGS) -o
+###########################################################################################
+LIB = libpoppybeam.so
+all: $(LIB)
+###########################################################################################
+libpoppybeam.so: InterfaceBeam.o
+	$(CO) libpoppybeam.so -fpic -shared InterfaceBeam.o
+###########################################################################################
+InterfaceBeam.o: $(DIRSRC)InterfaceBeam.cpp
+	$(CC) $(DIRSRC)InterfaceBeam.cpp -I$(DIRSRC)
+###########################################################################################

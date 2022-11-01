@@ -16,7 +16,7 @@ Refl = {
         }
 
 # Manual raytracer
-Refl = {
+RTDict = {
         "nRays"     :       10,
         "nRing"     :       10,
         "angx"      :       6,

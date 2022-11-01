@@ -32,8 +32,8 @@ def ex_DRO_RT():
     plane["gridsize"] = [3, 3]
 
     RTpar = {
-            "nRays"     :       10,
-            "nRing"     :       10,
+            "nRays"     :       100,
+            "nRing"     :       100,
             "angx"      :       0,
             "angy"      :       0,
             "a"         :       10000,
@@ -51,9 +51,12 @@ def ex_DRO_RT():
 
     frame_in = s.createFrame(mode="manual", argDict=RTpar)
 
-    frame_out = s.runRayTracer(frame_in, "p1", nThreads=1)
+    s.plotter.plotRTframe(frame_in)
 
-    frame_out2 = s.runRayTracer(frame_out, "plane1", nThreads=1)
+    frame_out = s.runRayTracer(frame_in, "p1", nThreads=11)
+    s.plotter.plotRTframe(frame_out)
+
+    frame_out2 = s.runRayTracer(frame_out, "plane1", nThreads=11)
 
     s.plotter.plotRTframe(frame_out2)
     s.plotter.plotSystem(s.system, RTframes=[frame_in, frame_out, frame_out2])

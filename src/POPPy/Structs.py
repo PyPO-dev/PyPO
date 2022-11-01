@@ -99,6 +99,16 @@ class cframe(ctypes.Structure):
                 ("dy", ctypes.POINTER(ctypes.c_double)),
                 ("dz", ctypes.POINTER(ctypes.c_double))]
 
+class RTDict(ctypes.Structure):
+    _fields_ = [("nRays", ctypes.c_int),
+                ("nRing", ctypes.c_int),
+                ("angx", ctypes.c_double),
+                ("angy", ctypes.c_double),
+                ("a", ctypes.c_double),
+                ("b", ctypes.c_double),
+                ("tChief", ctypes.POINTER(ctypes.c_double)),
+                ("oChief", ctypes.POINTER(ctypes.c_double))]
+
 # FLOATS
 class arrC1f(ctypes.Structure):
     _fields_ = [("x", ctypes.POINTER(ctypes.c_float)),
@@ -195,3 +205,13 @@ class cframef(ctypes.Structure):
                 ("dx", ctypes.POINTER(ctypes.c_float)),
                 ("dy", ctypes.POINTER(ctypes.c_float)),
                 ("dz", ctypes.POINTER(ctypes.c_float))]
+
+class RTDictf(ctypes.Structure):
+    _fields_ = [("nRays", ctypes.c_int),
+                ("nRing", ctypes.c_int),
+                ("angx", ctypes.c_float),
+                ("angy", ctypes.c_float),
+                ("a", ctypes.c_float),
+                ("b", ctypes.c_float),
+                ("tChief", ctypes.POINTER(ctypes.c_float)),
+                ("oChief", ctypes.POINTER(ctypes.c_float))]

@@ -97,6 +97,17 @@ typedef struct cframe {
     double *dz;
 } cframe;
 
+typedef struct RTDict {
+    int nRays;
+    int nRing;
+    double angx;
+    double angy;
+    double a;
+    double b;
+    double *tChief;
+    double *oChief;
+} RTDict;
+
 // Have to write explicit types for float and float: ctypes doesnt support templates
 struct arrC1f;
 struct arrR3f;
@@ -190,5 +201,16 @@ typedef struct cframef {
     float *dy;
     float *dz;
 } cframef;
+
+typedef struct RTDictf {
+    int nRays;
+    int nRing;
+    float angx;
+    float angy;
+    float a;
+    float b;
+    float *tChief;
+    float *oChief;
+} RTDictf;
 
 #endif

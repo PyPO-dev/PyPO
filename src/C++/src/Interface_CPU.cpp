@@ -190,8 +190,8 @@ extern "C" void propagateRays(reflparams ctp, cframe *fr_in, cframe *fr_out,
 
     end = std::chrono::steady_clock::now();
     std::cout << "Elapsed time : "
-              << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-              << " [s]" << std::endl;
+              << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()
+              << " [us]" << std::endl;
 }
 
 // SINGLE PRECISION INTERFACE

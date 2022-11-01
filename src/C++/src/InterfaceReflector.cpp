@@ -1,8 +1,10 @@
 #include <iostream>
 #include <vector>
+#include <array>
 #define _USE_MATH_DEFINES
 #include <cmath>
 
+#include "Utils.h"
 #include "InterfaceReflector.h"
 
 template<typename T, typename U>
@@ -19,6 +21,11 @@ void Parabola_xy(T *parabola, U xu_lo, U xu_up, U yv_lo,
     U prefac;
 
     U norm;
+
+    Utils<U> ut;
+    bool vec = true;
+
+    std::array<U, 3> inp, out;
 
     for (int i=0; i < ncx; i++)
     {
@@ -46,29 +53,25 @@ void Parabola_xy(T *parabola, U xu_lo, U xu_up, U yv_lo,
 
             parabola->area[i*ncy  + j] = norm * dx * dy;
 
-            U xr, yr, zr, nxr, nyr, nzr;
+            inp[0] = parabola->x[i*ncy + j];
+            inp[1] = parabola->y[i*ncy + j];
+            inp[2] = parabola->z[i*ncy + j];
 
-            xr = mat[0]*parabola->x[i*ncy + j] + mat[1]*parabola->y[i*ncy + j] +
-                  mat[2]*parabola->z[i*ncy + j] + mat[3];
-            yr = mat[4]*parabola->x[i*ncy + j] + mat[5]*parabola->y[i*ncy + j] +
-                  mat[6]*parabola->z[i*ncy + j] + mat[7];
-            zr = mat[8]*parabola->x[i*ncy + j] + mat[9]*parabola->y[i*ncy + j] +
-                  mat[10]*parabola->z[i*ncy + j] + mat[11];
+            ut.matVec4(mat, inp, out);
 
-            nxr = mat[0]*parabola->nx[i*ncy + j] + mat[1]*parabola->ny[i*ncy + j] +
-                  mat[2]*parabola->nz[i*ncy + j];
-            nyr = mat[4]*parabola->nx[i*ncy + j] + mat[5]*parabola->ny[i*ncy + j] +
-                  mat[6]*parabola->nz[i*ncy + j];
-            nzr = mat[8]*parabola->nx[i*ncy + j] + mat[9]*parabola->ny[i*ncy + j] +
-                  mat[10]*parabola->nz[i*ncy + j];
+            parabola->x[i*ncy + j] = out[0];
+            parabola->y[i*ncy  + j] = out[1];
+            parabola->z[i*ncy  + j] = out[2];
 
-            parabola->x[i*ncy + j] = xr;
-            parabola->y[i*ncy  + j] = yr;
-            parabola->z[i*ncy  + j] = zr;
+            inp[0] = parabola->nx[i*ncy + j];
+            inp[1] = parabola->ny[i*ncy + j];
+            inp[2] = parabola->nz[i*ncy + j];
 
-            parabola->nx[i*ncy  + j] = nxr;
-            parabola->ny[i*ncy  + j] = nyr;
-            parabola->nz[i*ncy  + j] = nzr;
+            ut.matVec4(mat, inp, out, vec);
+
+            parabola->nx[i*ncy  + j] = out[0];
+            parabola->ny[i*ncy  + j] = out[1];
+            parabola->nz[i*ncy  + j] = out[2];
         }
     }
 }
@@ -85,6 +88,11 @@ void Parabola_uv(T *parabola, U xu_lo, U xu_up, U yv_lo,
     U u;
     U v;
     U prefac;
+
+    Utils<U> ut;
+    bool vec = true;
+
+    std::array<U, 3> inp, out;
 
     for (int i=0; i < ncx; i++)
     {
@@ -109,29 +117,30 @@ void Parabola_uv(T *parabola, U xu_lo, U xu_up, U yv_lo,
                                     4 * a*a * u*u * sin(v)*sin(v) +
                                     a*a * b*b) * du * dv;
 
-            U xr, yr, zr, nxr, nyr, nzr;
+            inp[0] = parabola->x[i*ncy + j];
+            inp[1] = parabola->y[i*ncy + j];
+            inp[2] = parabola->z[i*ncy + j];
 
-            xr = mat[0]*parabola->x[i*ncy + j] + mat[1]*parabola->y[i*ncy + j] +
-                  mat[2]*parabola->z[i*ncy + j] + mat[3];
-            yr = mat[4]*parabola->x[i*ncy + j] + mat[5]*parabola->y[i*ncy + j] +
-                  mat[6]*parabola->z[i*ncy + j] + mat[7];
-            zr = mat[8]*parabola->x[i*ncy + j] + mat[9]*parabola->y[i*ncy + j] +
-                  mat[10]*parabola->z[i*ncy + j] + mat[11];
+            ut.matVec4(mat, inp, out);
+            inp = out;
+            ut.invmatVec4(mat, inp, out);
 
-            nxr = mat[0]*parabola->nx[i*ncy + j] + mat[1]*parabola->ny[i*ncy + j] +
-                  mat[2]*parabola->nz[i*ncy + j];
-            nyr = mat[4]*parabola->nx[i*ncy + j] + mat[5]*parabola->ny[i*ncy + j] +
-                  mat[6]*parabola->nz[i*ncy + j];
-            nzr = mat[8]*parabola->nx[i*ncy + j] + mat[9]*parabola->ny[i*ncy + j] +
-                  mat[10]*parabola->nz[i*ncy + j];
+            parabola->x[i*ncy + j] = out[0];
+            parabola->y[i*ncy  + j] = out[1];
+            parabola->z[i*ncy  + j] = out[2];
 
-            parabola->x[i*ncy + j] = xr;
-            parabola->y[i*ncy  + j] = yr;
-            parabola->z[i*ncy  + j] = zr;
+            inp[0] = parabola->nx[i*ncy + j];
+            inp[1] = parabola->ny[i*ncy + j];
+            inp[2] = parabola->nz[i*ncy + j];
 
-            parabola->nx[i*ncy  + j] = nxr;
-            parabola->ny[i*ncy  + j] = nyr;
-            parabola->nz[i*ncy  + j] = nzr;
+            ut.matVec4(mat, inp, out, vec);
+
+            inp = out;
+            ut.invmatVec4(mat, inp, out, vec);
+
+            parabola->nx[i*ncy  + j] = out[0];
+            parabola->ny[i*ncy  + j] = out[1];
+            parabola->nz[i*ncy  + j] = out[2];
         }
     }
 }
@@ -150,6 +159,11 @@ void Hyperbola_xy(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
     U prefac;
 
     U norm;
+
+    Utils<U> ut;
+    bool vec = true;
+
+    std::array<U, 3> inp, out;
 
     for (int i=0; i < ncx; i++)
     {
@@ -177,29 +191,25 @@ void Hyperbola_xy(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
 
             hyperbola->area[i*ncy  + j] = norm * dx * dy;
 
-            U xr, yr, zr, nxr, nyr, nzr;
+            inp[0] = hyperbola->x[i*ncy + j];
+            inp[1] = hyperbola->y[i*ncy + j];
+            inp[2] = hyperbola->z[i*ncy + j];
 
-            xr = mat[0]*hyperbola->x[i*ncy + j] + mat[1]*hyperbola->y[i*ncy + j] +
-                  mat[2]*hyperbola->z[i*ncy + j] + mat[3];
-            yr = mat[4]*hyperbola->x[i*ncy + j] + mat[5]*hyperbola->y[i*ncy + j] +
-                  mat[6]*hyperbola->z[i*ncy + j] + mat[7];
-            zr = mat[8]*hyperbola->x[i*ncy + j] + mat[9]*hyperbola->y[i*ncy + j] +
-                  mat[10]*hyperbola->z[i*ncy + j] + mat[11];
+            ut.matVec4(mat, inp, out);
 
-            nxr = mat[0]*hyperbola->nx[i*ncy + j] + mat[1]*hyperbola->ny[i*ncy + j] +
-                  mat[2]*hyperbola->nz[i*ncy + j];
-            nyr = mat[4]*hyperbola->nx[i*ncy + j] + mat[5]*hyperbola->ny[i*ncy + j] +
-                  mat[6]*hyperbola->nz[i*ncy + j];
-            nzr = mat[8]*hyperbola->nx[i*ncy + j] + mat[9]*hyperbola->ny[i*ncy + j] +
-                  mat[10]*hyperbola->nz[i*ncy + j];
+            hyperbola->x[i*ncy + j] = out[0];
+            hyperbola->y[i*ncy  + j] = out[1];
+            hyperbola->z[i*ncy  + j] = out[2];
 
-            hyperbola->x[i*ncy + j] = xr;
-            hyperbola->y[i*ncy  + j] = yr;
-            hyperbola->z[i*ncy  + j] = zr;
+            inp[0] = hyperbola->nx[i*ncy + j];
+            inp[1] = hyperbola->ny[i*ncy + j];
+            inp[2] = hyperbola->nz[i*ncy + j];
 
-            hyperbola->nx[i*ncy  + j] = nxr;
-            hyperbola->ny[i*ncy  + j] = nyr;
-            hyperbola->nz[i*ncy  + j] = nzr;
+            ut.matVec4(mat, inp, out, vec);
+
+            hyperbola->nx[i*ncy  + j] = out[0];
+            hyperbola->ny[i*ncy  + j] = out[1];
+            hyperbola->nz[i*ncy  + j] = out[2];
         }
     }
 }
@@ -219,6 +229,11 @@ void Hyperbola_uv(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
 
     U norm;
 
+    Utils<U> ut;
+    bool vec = true;
+
+    std::array<U, 3> inp, out;
+
     for (int i=0; i < ncx; i++)
     {
         u = i * du + sqrt(xu_lo*xu_lo/(a*a) + 1);
@@ -233,8 +248,6 @@ void Hyperbola_uv(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
             prefac = nfac / sqrt(b*b * c*c * (u*u - 1) * cos(v)*cos(v) +
                       a*a * c*c * (u*u - 1) * sin(v)*sin(v) + a*a * b*b * u*u);
 
-            if(i == 0 && j == 0){printf("%f\n", c);}
-
             hyperbola->nx[i*ncy + j] = -b * c * sqrt(u*u - 1) * cos(v) * prefac;
             hyperbola->ny[i*ncy + j] = -a * c * sqrt(u*u - 1) * sin(v) * prefac;
             hyperbola->nz[i*ncy + j] = b * a * u * prefac;
@@ -242,29 +255,25 @@ void Hyperbola_uv(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
             hyperbola->area[i*ncy + j] = sqrt(b*b * c*c * (u*u - 1) * cos(v)*cos(v) +
                                         a*a * c*c * (u*u - 1) * sin(v)*sin(v) + a*a * b*b * u*u) * du * dv;
 
-                                        U xr, yr, zr, nxr, nyr, nzr;
+            inp[0] = hyperbola->x[i*ncy + j];
+            inp[1] = hyperbola->y[i*ncy + j];
+            inp[2] = hyperbola->z[i*ncy + j];
 
-            xr = mat[0]*hyperbola->x[i*ncy + j] + mat[1]*hyperbola->y[i*ncy + j] +
-                  mat[2]*hyperbola->z[i*ncy + j] + mat[3];
-            yr = mat[4]*hyperbola->x[i*ncy + j] + mat[5]*hyperbola->y[i*ncy + j] +
-                  mat[6]*hyperbola->z[i*ncy + j] + mat[7];
-            zr = mat[8]*hyperbola->x[i*ncy + j] + mat[9]*hyperbola->y[i*ncy + j] +
-                  mat[10]*hyperbola->z[i*ncy + j] + mat[11];
+            ut.matVec4(mat, inp, out);
 
-            nxr = mat[0]*hyperbola->nx[i*ncy + j] + mat[1]*hyperbola->ny[i*ncy + j] +
-                  mat[2]*hyperbola->nz[i*ncy + j];
-            nyr = mat[4]*hyperbola->nx[i*ncy + j] + mat[5]*hyperbola->ny[i*ncy + j] +
-                  mat[6]*hyperbola->nz[i*ncy + j];
-            nzr = mat[8]*hyperbola->nx[i*ncy + j] + mat[9]*hyperbola->ny[i*ncy + j] +
-                  mat[10]*hyperbola->nz[i*ncy + j];
+            hyperbola->x[i*ncy + j] = out[0];
+            hyperbola->y[i*ncy  + j] = out[1];
+            hyperbola->z[i*ncy  + j] = out[2];
 
-            hyperbola->x[i*ncy + j] = xr;
-            hyperbola->y[i*ncy  + j] = yr;
-            hyperbola->z[i*ncy  + j] = zr;
+            inp[0] = hyperbola->nx[i*ncy + j];
+            inp[1] = hyperbola->ny[i*ncy + j];
+            inp[2] = hyperbola->nz[i*ncy + j];
 
-            hyperbola->nx[i*ncy  + j] = nxr;
-            hyperbola->ny[i*ncy  + j] = nyr;
-            hyperbola->nz[i*ncy  + j] = nzr;
+            ut.matVec4(mat, inp, out, vec);
+
+            hyperbola->nx[i*ncy  + j] = out[0];
+            hyperbola->ny[i*ncy  + j] = out[1];
+            hyperbola->nz[i*ncy  + j] = out[2];
         }
     }
 }
@@ -283,6 +292,11 @@ void Ellipse_xy(T *ellipse, U xu_lo, U xu_up, U yv_lo,
     U prefac;
 
     U norm;
+
+    Utils<U> ut;
+    bool vec = true;
+
+    std::array<U, 3> inp, out;
 
     for (int i=0; i < ncx; i++)
     {
@@ -310,29 +324,25 @@ void Ellipse_xy(T *ellipse, U xu_lo, U xu_up, U yv_lo,
 
             ellipse->area[i*ncy  + j] = norm * dx * dy;
 
-            U xr, yr, zr, nxr, nyr, nzr;
+            inp[0] = ellipse->x[i*ncy + j];
+            inp[1] = ellipse->y[i*ncy + j];
+            inp[2] = ellipse->z[i*ncy + j];
 
-            xr = mat[0]*ellipse->x[i*ncy + j] + mat[1]*ellipse->y[i*ncy + j] +
-                  mat[2]*ellipse->z[i*ncy + j] + mat[3];
-            yr = mat[4]*ellipse->x[i*ncy + j] + mat[5]*ellipse->y[i*ncy + j] +
-                  mat[6]*ellipse->z[i*ncy + j] + mat[7];
-            zr = mat[8]*ellipse->x[i*ncy + j] + mat[9]*ellipse->y[i*ncy + j] +
-                  mat[10]*ellipse->z[i*ncy + j] + mat[11];
+            ut.matVec4(mat, inp, out);
 
-            nxr = mat[0]*ellipse->nx[i*ncy + j] + mat[1]*ellipse->ny[i*ncy + j] +
-                  mat[2]*ellipse->nz[i*ncy + j];
-            nyr = mat[4]*ellipse->nx[i*ncy + j] + mat[5]*ellipse->ny[i*ncy + j] +
-                  mat[6]*ellipse->nz[i*ncy + j];
-            nzr = mat[8]*ellipse->nx[i*ncy + j] + mat[9]*ellipse->ny[i*ncy + j] +
-                  mat[10]*ellipse->nz[i*ncy + j];
+            ellipse->x[i*ncy + j] = out[0];
+            ellipse->y[i*ncy  + j] = out[1];
+            ellipse->z[i*ncy  + j] = out[2];
 
-            ellipse->x[i*ncy + j] = xr;
-            ellipse->y[i*ncy  + j] = yr;
-            ellipse->z[i*ncy  + j] = zr;
+            inp[0] = ellipse->nx[i*ncy + j];
+            inp[1] = ellipse->ny[i*ncy + j];
+            inp[2] = ellipse->nz[i*ncy + j];
 
-            ellipse->nx[i*ncy  + j] = nxr;
-            ellipse->ny[i*ncy  + j] = nyr;
-            ellipse->nz[i*ncy  + j] = nzr;
+            ut.matVec4(mat, inp, out, vec);
+
+            ellipse->nx[i*ncy  + j] = out[0];
+            ellipse->ny[i*ncy  + j] = out[1];
+            ellipse->nz[i*ncy  + j] = out[2];
         }
     }
 }
@@ -351,6 +361,11 @@ void Ellipse_uv(T *ellipse, U xu_lo, U xu_up, U yv_lo,
     U prefac;
 
     U norm;
+
+    Utils<U> ut;
+    bool vec = true;
+
+    std::array<U, 3> inp, out;
 
     for (int i=0; i < ncx; i++)
     {
@@ -374,29 +389,25 @@ void Ellipse_uv(T *ellipse, U xu_lo, U xu_up, U yv_lo,
                                         a*a * c*c * sin(u)*sin(u) * sin(v)*sin(v) +
                                         a*a * b*b * cos(u)*cos(u)) * du * dv;
 
-            U xr, yr, zr, nxr, nyr, nzr;
+            inp[0] = ellipse->x[i*ncy + j];
+            inp[1] = ellipse->y[i*ncy + j];
+            inp[2] = ellipse->z[i*ncy + j];
 
-            xr = mat[0]*ellipse->x[i*ncy + j] + mat[1]*ellipse->y[i*ncy + j] +
-                  mat[2]*ellipse->z[i*ncy + j] + mat[3];
-            yr = mat[4]*ellipse->x[i*ncy + j] + mat[5]*ellipse->y[i*ncy + j] +
-                  mat[6]*ellipse->z[i*ncy + j] + mat[7];
-            zr = mat[8]*ellipse->x[i*ncy + j] + mat[9]*ellipse->y[i*ncy + j] +
-                  mat[10]*ellipse->z[i*ncy + j] + mat[11];
+            ut.matVec4(mat, inp, out);
 
-            nxr = mat[0]*ellipse->nx[i*ncy + j] + mat[1]*ellipse->ny[i*ncy + j] +
-                  mat[2]*ellipse->nz[i*ncy + j];
-            nyr = mat[4]*ellipse->nx[i*ncy + j] + mat[5]*ellipse->ny[i*ncy + j] +
-                  mat[6]*ellipse->nz[i*ncy + j];
-            nzr = mat[8]*ellipse->nx[i*ncy + j] + mat[9]*ellipse->ny[i*ncy + j] +
-                  mat[10]*ellipse->nz[i*ncy + j];
+            ellipse->x[i*ncy + j] = out[0];
+            ellipse->y[i*ncy  + j] = out[1];
+            ellipse->z[i*ncy  + j] = out[2];
 
-            ellipse->x[i*ncy + j] = xr;
-            ellipse->y[i*ncy  + j] = yr;
-            ellipse->z[i*ncy  + j] = zr;
+            inp[0] = ellipse->nx[i*ncy + j];
+            inp[1] = ellipse->ny[i*ncy + j];
+            inp[2] = ellipse->nz[i*ncy + j];
 
-            ellipse->nx[i*ncy  + j] = nxr;
-            ellipse->ny[i*ncy  + j] = nyr;
-            ellipse->nz[i*ncy  + j] = nzr;
+            ut.matVec4(mat, inp, out, vec);
+
+            ellipse->nx[i*ncy  + j] = out[0];
+            ellipse->ny[i*ncy  + j] = out[1];
+            ellipse->nz[i*ncy  + j] = out[2];
         }
     }
 }
@@ -416,6 +427,11 @@ void Plane_xy(T *plane, U xu_lo, U xu_up, U yv_lo,
 
     U norm;
 
+    Utils<U> ut;
+    bool vec = true;
+
+    std::array<U, 3> inp, out;
+
     for (int i=0; i < ncx; i++)
     {
         x = i * dx + xu_lo;
@@ -433,29 +449,25 @@ void Plane_xy(T *plane, U xu_lo, U xu_up, U yv_lo,
 
             plane->area[i*ncy  + j] = dx * dy;
 
-            U xr, yr, zr, nxr, nyr, nzr;
+            inp[0] = plane->x[i*ncy + j];
+            inp[1] = plane->y[i*ncy + j];
+            inp[2] = plane->z[i*ncy + j];
 
-            xr = mat[0]*plane->x[i*ncy + j] + mat[1]*plane->y[i*ncy + j] +
-                  mat[2]*plane->z[i*ncy + j] + mat[3];
-            yr = mat[4]*plane->x[i*ncy + j] + mat[5]*plane->y[i*ncy + j] +
-                  mat[6]*plane->z[i*ncy + j] + mat[7];
-            zr = mat[8]*plane->x[i*ncy + j] + mat[9]*plane->y[i*ncy + j] +
-                  mat[10]*plane->z[i*ncy + j] + mat[11];
+            ut.matVec4(mat, inp, out);
 
-            nxr = mat[0]*plane->nx[i*ncy + j] + mat[1]*plane->ny[i*ncy + j] +
-                  mat[2]*plane->nz[i*ncy + j];
-            nyr = mat[4]*plane->nx[i*ncy + j] + mat[5]*plane->ny[i*ncy + j] +
-                  mat[6]*plane->nz[i*ncy + j];
-            nzr = mat[8]*plane->nx[i*ncy + j] + mat[9]*plane->ny[i*ncy + j] +
-                  mat[10]*plane->nz[i*ncy + j];
+            plane->x[i*ncy + j] = out[0];
+            plane->y[i*ncy  + j] = out[1];
+            plane->z[i*ncy  + j] = out[2];
 
-            plane->x[i*ncy + j] = xr;
-            plane->y[i*ncy  + j] = yr;
-            plane->z[i*ncy  + j] = zr;
+            inp[0] = plane->nx[i*ncy + j];
+            inp[1] = plane->ny[i*ncy + j];
+            inp[2] = plane->nz[i*ncy + j];
 
-            plane->nx[i*ncy  + j] = nxr;
-            plane->ny[i*ncy  + j] = nyr;
-            plane->nz[i*ncy  + j] = nzr;
+            ut.matVec4(mat, inp, out, vec);
+
+            plane->nx[i*ncy  + j] = out[0];
+            plane->ny[i*ncy  + j] = out[1];
+            plane->nz[i*ncy  + j] = out[2];
         }
     }
 }
@@ -473,6 +485,11 @@ void Plane_uv(T *plane, U xu_lo, U xu_up, U yv_lo,
     U v;
 
     U norm;
+
+    Utils<U> ut;
+    bool vec = true;
+
+    std::array<U, 3> inp, out;
 
     for (int i=0; i < ncx; i++)
     {
@@ -492,29 +509,25 @@ void Plane_uv(T *plane, U xu_lo, U xu_up, U yv_lo,
 
             plane->area[i*ncy  + j] = u * du * dv;
 
-            U xr, yr, zr, nxr, nyr, nzr;
+            inp[0] = plane->x[i*ncy + j];
+            inp[1] = plane->y[i*ncy + j];
+            inp[2] = plane->z[i*ncy + j];
 
-            xr = mat[0]*plane->x[i*ncy + j] + mat[1]*plane->y[i*ncy + j] +
-                  mat[2]*plane->z[i*ncy + j] + mat[3];
-            yr = mat[4]*plane->x[i*ncy + j] + mat[5]*plane->y[i*ncy + j] +
-                  mat[6]*plane->z[i*ncy + j] + mat[7];
-            zr = mat[8]*plane->x[i*ncy + j] + mat[9]*plane->y[i*ncy + j] +
-                  mat[10]*plane->z[i*ncy + j] + mat[11];
+            ut.matVec4(mat, inp, out);
 
-            nxr = mat[0]*plane->nx[i*ncy + j] + mat[1]*plane->ny[i*ncy + j] +
-                  mat[2]*plane->nz[i*ncy + j];
-            nyr = mat[4]*plane->nx[i*ncy + j] + mat[5]*plane->ny[i*ncy + j] +
-                  mat[6]*plane->nz[i*ncy + j];
-            nzr = mat[8]*plane->nx[i*ncy + j] + mat[9]*plane->ny[i*ncy + j] +
-                  mat[10]*plane->nz[i*ncy + j];
+            plane->x[i*ncy + j] = out[0];
+            plane->y[i*ncy  + j] = out[1];
+            plane->z[i*ncy  + j] = out[2];
 
-            plane->x[i*ncy + j] = xr;
-            plane->y[i*ncy  + j] = yr;
-            plane->z[i*ncy  + j] = zr;
+            inp[0] = plane->nx[i*ncy + j];
+            inp[1] = plane->ny[i*ncy + j];
+            inp[2] = plane->nz[i*ncy + j];
 
-            plane->nx[i*ncy  + j] = nxr;
-            plane->ny[i*ncy  + j] = nyr;
-            plane->nz[i*ncy  + j] = nzr;
+            ut.matVec4(mat, inp, out, vec);
+
+            plane->nx[i*ncy  + j] = out[0];
+            plane->ny[i*ncy  + j] = out[1];
+            plane->nz[i*ncy  + j] = out[2];
         }
     }
 }
@@ -530,6 +543,11 @@ void Plane_AoE(T *plane, U xu_lo, U xu_up, U yv_lo,
     // Generate using xy parametrisation
     U Az;
     U El;
+
+    Utils<U> ut;
+    bool vec = true;
+
+    std::array<U, 3> inp, out;
 
     for (int i=0; i < ncx; i++)
     {
@@ -555,29 +573,25 @@ void Plane_AoE(T *plane, U xu_lo, U xu_up, U yv_lo,
 
             plane->area[i*ncy  + j] = 1;
 
-            U xr, yr, zr, nxr, nyr, nzr;
+            inp[0] = plane->x[i*ncy + j];
+            inp[1] = plane->y[i*ncy + j];
+            inp[2] = plane->z[i*ncy + j];
 
-            xr = mat[0]*plane->x[i*ncy + j] + mat[1]*plane->y[i*ncy + j] +
-                  mat[2]*plane->z[i*ncy + j] + mat[3];
-            yr = mat[4]*plane->x[i*ncy + j] + mat[5]*plane->y[i*ncy + j] +
-                  mat[6]*plane->z[i*ncy + j] + mat[7];
-            zr = mat[8]*plane->x[i*ncy + j] + mat[9]*plane->y[i*ncy + j] +
-                  mat[10]*plane->z[i*ncy + j] + mat[11];
+            ut.matVec4(mat, inp, out);
 
-            nxr = mat[0]*plane->nx[i*ncy + j] + mat[1]*plane->ny[i*ncy + j] +
-                  mat[2]*plane->nz[i*ncy + j];
-            nyr = mat[4]*plane->nx[i*ncy + j] + mat[5]*plane->ny[i*ncy + j] +
-                  mat[6]*plane->nz[i*ncy + j];
-            nzr = mat[8]*plane->nx[i*ncy + j] + mat[9]*plane->ny[i*ncy + j] +
-                  mat[10]*plane->nz[i*ncy + j];
+            plane->x[i*ncy + j] = out[0];
+            plane->y[i*ncy  + j] = out[1];
+            plane->z[i*ncy  + j] = out[2];
 
-            plane->x[i*ncy + j] = xr;
-            plane->y[i*ncy  + j] = yr;
-            plane->z[i*ncy  + j] = zr;
+            inp[0] = plane->nx[i*ncy + j];
+            inp[1] = plane->ny[i*ncy + j];
+            inp[2] = plane->nz[i*ncy + j];
 
-            plane->nx[i*ncy  + j] = nxr;
-            plane->ny[i*ncy  + j] = nyr;
-            plane->nz[i*ncy  + j] = nzr;
+            ut.matVec4(mat, inp, out, vec);
+
+            plane->nx[i*ncy  + j] = out[0];
+            plane->ny[i*ncy  + j] = out[1];
+            plane->nz[i*ncy  + j] = out[2];
         }
     }
 }

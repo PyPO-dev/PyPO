@@ -4,6 +4,8 @@
 #include <cmath>
 #define FLEPS 1.0E-8
 
+#include "Utils.h"
+
 #ifndef __RTRefls_h
 #define __RTRefls_h
 
@@ -14,6 +16,8 @@ class RTRefls
 
 public:
     RTRefls(T a, T b, T c);
+
+    Utils<T> ut;
 
     T common1(T t, T xr, T yr, T dxr, T dyr);
     T common2(T t, T xr, T yr, T dxr, T dyr);
@@ -73,7 +77,7 @@ inline T RTRefls<T>::ge(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr)
 template<class T>
 inline T RTRefls<T>::gpl(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr)
 {
-    return t - (zr + t*dzr - 12e3) / dzr;
+    return t - (zr + t*dzr) / dzr;
 }
 
 template<class T>

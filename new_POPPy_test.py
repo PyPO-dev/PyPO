@@ -71,21 +71,25 @@ def plotSystem_test():
     s.addPlotter()
     #s.addHyperbola(hyperbola)
     s.addParabola(parabola)
-    s.addPlane(plane)
-    s.addPlane(planeff)
+    #s.addPlane(plane)
+    #s.addPlane(planeff)
 
 
     rotation=np.array([42, 42, 0])
 
-    #s.rotateGrids("p1", rotation)
+    s.rotateGrids("p1", rotation)
+
     #s.rotateGrids("h1", rotation)
 
     translation = np.array([0, 0, 3.5e3-150])
     rotation_plane = np.array([180, 0, 0])
-    s.rotateGrids("plane1", rotation_plane)
-    s.translateGrids("plane1", translation)
+    #s.rotateGrids("plane1", rotation_plane)
+    #s.translateGrids("plane1", translation)
+    #s.rotateGrids("plane1", rotation)
 
-    s.plotter.plotSystem(s.system, fine=2, norm=False)
+    s.translateGrids("p1", translation)
+
+    s.plotter.plotSystem(s.system, fine=2, norm=True)
 
 
     s.setCustomBeamPath(path="240GHz/", append=True)

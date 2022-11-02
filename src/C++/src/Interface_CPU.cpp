@@ -176,7 +176,7 @@ extern "C" void propagateToFarField(c2Bundle *res, reflparams source, reflparams
 }
 
 extern "C" void propagateRays(reflparams ctp, cframe *fr_in, cframe *fr_out,
-                              int numThreads, double epsilon)
+                              int numThreads, double epsilon, double t0)
 {
     int nTot = fr_in->size;
     RayTracer<reflparams, cframe, double> RT(numThreads, nTot, epsilon);
@@ -186,7 +186,7 @@ extern "C" void propagateRays(reflparams ctp, cframe *fr_in, cframe *fr_out,
 
     printf("Calculating ray-trace...\n");
     begin = std::chrono::steady_clock::now();
-    RT.parallelRays(ctp, fr_in, fr_out);
+    RT.parallelRays(ctp, fr_in, fr_out, t0);
 
     end = std::chrono::steady_clock::now();
     std::cout << "Elapsed time : "

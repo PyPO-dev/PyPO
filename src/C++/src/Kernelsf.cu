@@ -688,6 +688,7 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
     int idx = blockDim.x*blockIdx.x + threadIdx.x;
     if (idx < g_t)
     {
+
         point[0] = d_xt[idx];
         point[1] = d_yt[idx];
         point[2] = d_zt[idx];
@@ -702,6 +703,7 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
                     d_Mx, d_My, d_Mz,
                     point, d_A, d_ei, d_hi);
 
+        d_Ext[idx] = d_ei[0];
         // Calculate normalised incoming poynting vector.
         conja(d_hi, temp1);                        // h_conj
         ext(d_ei, temp1, temp2);                  // e_out_h
@@ -720,6 +722,8 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
 
         // Now calculate reflected poynting vector.
         snell(S_i_norm, norms, S_r_norm);                // S_r_norm
+
+
 
         // Store REFLECTED Pynting vectors
         d_Prxt[idx] = S_r_norm[0];
@@ -745,7 +749,7 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
         s_mult(temp1, con[3], h_r);                     // ZETA_0_INV, h_r
 
         // Store REFLECTED fields
-        d_Ext[idx] = e_r[0];
+        //d_Ext[idx] = e_r[0];
         d_Eyt[idx] = e_r[1];
         d_Ezt[idx] = e_r[2];
 
@@ -1034,6 +1038,15 @@ __host__ void _arrC3ToCUDAC(float *r1arr, float *r2arr, float *r3arr,
  * @param size Size of arrays.
  */
 __host__ void _arrCUDACToC(cuFloatComplex* carr, float *rarr, float *iarr, int size)
+{
+    for (int i=0; i<size; i++)
+    {
+        rarr[i] = carr[i].x;
+        iarr[i] = carr[i].x;
+    }
+}
+
+__host__ void _arrCUDACToR3(cuFloatComplex* carr, float *rarr, float *iarr, int size)
 {
     for (int i=0; i<size; i++)
     {
@@ -1653,10 +1666,10 @@ extern "C" void callKernelf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf
     // Create pointers to device arrays and allocate/copy source grid and area.
     float *d_xs, *d_ys, *d_zs, *d_A;
 
-    gpuErrchk( cudaMalloc((void**)&d_xs, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_ys, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_zs, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_A, ct->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_xs, cs->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_ys, cs->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_zs, cs->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_A, cs->size * sizeof(float)) );
 
     gpuErrchk( cudaMemcpy(d_xs, cs->x, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
     gpuErrchk( cudaMemcpy(d_ys, cs->y, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
@@ -1669,17 +1682,17 @@ extern "C" void callKernelf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf
     gpuErrchk( cudaMalloc((void**)&d_yt, ct->size * sizeof(float)) );
     gpuErrchk( cudaMalloc((void**)&d_zt, ct->size * sizeof(float)) );
 
-    gpuErrchk( cudaMemcpy(d_xt, ct->x, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_yt, ct->y, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_zt, ct->z, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_xt, ct->x, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_yt, ct->y, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_zt, ct->z, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
 
     gpuErrchk( cudaMalloc((void**)&d_nxt, ct->size * sizeof(float)) );
     gpuErrchk( cudaMalloc((void**)&d_nyt, ct->size * sizeof(float)) );
     gpuErrchk( cudaMalloc((void**)&d_nzt, ct->size * sizeof(float)) );
 
-    gpuErrchk( cudaMemcpy(d_nxt, ct->nx, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_nyt, ct->ny, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_nzt, ct->nz, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_nxt, ct->nx, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_nyt, ct->ny, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_nzt, ct->nz, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
 
     cuFloatComplex *h_Jx = new cuFloatComplex[cs->size];
     cuFloatComplex *h_Jy = new cuFloatComplex[cs->size];
@@ -1790,9 +1803,9 @@ extern "C" void callKernelf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf
     gpuErrchk( cudaMemcpy(h_Hyt, d_Hyt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
     gpuErrchk( cudaMemcpy(h_Hzt, d_Hzt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
 
-    gpuErrchk( cudaMemcpy(h_Prxt, d_Prxt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Pryt, d_Pryt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Przt, d_Przt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+    gpuErrchk( cudaMemcpy(h_Prxt, d_Prxt, ct->size * sizeof(float), cudaMemcpyDeviceToHost) );
+    gpuErrchk( cudaMemcpy(h_Pryt, d_Pryt, ct->size * sizeof(float), cudaMemcpyDeviceToHost) );
+    gpuErrchk( cudaMemcpy(h_Przt, d_Przt, ct->size * sizeof(float), cudaMemcpyDeviceToHost) );
 
     // Free Device memory
     gpuErrchk( cudaDeviceReset() );
@@ -1800,9 +1813,12 @@ extern "C" void callKernelf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf
     _arrCUDACToC3(h_Ext, h_Eyt, h_Ezt, res->r1x, res->r1y, res->r1z, res->i1x, res->i1y, res->i1z, ct->size);
     _arrCUDACToC3(h_Hxt, h_Hyt, h_Hzt, res->r2x, res->r2y, res->r2z, res->i2x, res->i2y, res->i2z, ct->size);
 
-    res->r3x = h_Prxt;
-    res->r3y = h_Pryt;
-    res->r3z = h_Przt;
+    for (int i=0; i<ct->size; i++)
+    {
+        res->r3x[i] = h_Prxt[i];
+        res->r3y[i] = h_Pryt[i];
+        res->r3z[i] = h_Przt[i];
+    }
 
     // Delete host arrays for target fields
     delete h_Ext;

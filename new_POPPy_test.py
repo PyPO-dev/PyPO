@@ -69,30 +69,14 @@ def plotSystem_test():
 
     s = System()
     s.addPlotter()
-    #s.addHyperbola(hyperbola)
+    s.addHyperbola(hyperbola)
     s.addParabola(parabola)
-    #s.addPlane(plane)
-    #s.addPlane(planeff)
-    s.plotter.plotSystem(s.system, fine=2, norm=True)
-
-    rotation=np.array([42, 42, 0])
-    rotation2=np.array([3.876, -72, 35])
-
-    s.rotateGrids("p1", rotation)
-
-    #s.rotateGrids("h1", rotation)
+    s.addPlane(plane)
+    s.addPlane(planeff)
+    s.plotter.plotSystem(s.system, fine=2)
 
     translation = np.array([0, 0, 3.5e3-150])
     rotation_plane = np.array([180, 0, 0])
-    #s.rotateGrids("plane1", rotation_plane)
-    #s.translateGrids("plane1", translation)
-    #s.rotateGrids("plane1", rotation)
-
-    s.translateGrids("p1", translation)
-    s.rotateGrids("p1", rotation2)
-
-    s.plotter.plotSystem(s.system, fine=2, norm=True)
-
 
     s.setCustomBeamPath(path="240GHz/", append=True)
 
@@ -102,7 +86,10 @@ def plotSystem_test():
     #s.setCustomBeamPath(path="ps/", append=True)
 
     #cBeam = "ps"
-    JM, EH = s.readCustomBeam(name="240", comp="Ex", shape=[403,401], convert_to_current=True, mode="PMC", ret="both")
+    JM, EH = s.readCustomBeam(name_beam="240", name_source="plane1", comp="Ex", shape=[403,401], convert_to_current=True, mode="PMC")
+
+    pt.imshow(20*np.log10(np.absolute(JM.My) / np.max(np.absolute(JM.My))), vmin=-30, vmax=0, cmap=cmaps.parula)
+    pt.show()
 
     #JM, EH = s.readCustomBeam(name=cBeam, comp="Ex", shape=[3,3], convert_to_current=True, mode="PMC", ret="both")
 

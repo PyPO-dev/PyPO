@@ -57,7 +57,7 @@ def loadCPUlib():
     lib.propagateToFarField.restype = None
 
     lib.propagateRays.argtypes = [reflparams, ctypes.POINTER(cframe),
-                                ctypes.POINTER(cframe), ctypes.c_int, ctypes.c_double]
+                                ctypes.POINTER(cframe), ctypes.c_int, ctypes.c_double, ctypes.c_double]
 
     lib.propagateRays.restype = None
 
@@ -108,7 +108,7 @@ def POPPy_CPUd(source, target, currents, k, epsilon, t_direction, nThreads, mode
                                 epsilon, t_direction)
 
         # Unpack filled struct
-        JM = c2BundleToObj(res, shape=target_shape, obj_t='currents')
+        JM = c2BundleToObj(res, shape=target_shape, obj_t='currents', np_t=np.float64)
 
         return JM
 
@@ -122,7 +122,7 @@ def POPPy_CPUd(source, target, currents, k, epsilon, t_direction, nThreads, mode
                                 epsilon, t_direction)
 
         # Unpack filled struct
-        EH = c2BundleToObj(res, shape=target_shape, obj_t='fields')
+        EH = c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
 
         return EH
 
@@ -136,7 +136,7 @@ def POPPy_CPUd(source, target, currents, k, epsilon, t_direction, nThreads, mode
                                 epsilon, t_direction)
 
         # Unpack filled struct
-        JM, EH = c4BundleToObj(res, shape=target_shape)
+        JM, EH = c4BundleToObj(res, shape=target_shape, np_t=np.float64)
 
         return [JM, EH]
 
@@ -150,7 +150,7 @@ def POPPy_CPUd(source, target, currents, k, epsilon, t_direction, nThreads, mode
                                 epsilon, t_direction)
 
         # Unpack filled struct
-        EH, Pr = c2rBundleToObj(res, shape=target_shape)
+        EH, Pr = c2rBundleToObj(res, shape=target_shape, np_t=np.float64)
 
         return [EH, Pr]
 
@@ -178,11 +178,11 @@ def POPPy_CPUd(source, target, currents, k, epsilon, t_direction, nThreads, mode
                                 epsilon, t_direction)
 
         # Unpack filled struct
-        EH = c2BundleToObj(res, shape=target_shape, obj_t='fields')
+        EH = c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
 
         return EH
 
-def RT_CPUd(target, fr_in, nThreads, epsilon):
+def RT_CPUd(target, fr_in, nThreads, epsilon, t0):
     lib = loadCPUlib()
 
     inp = cframe()
@@ -196,9 +196,10 @@ def RT_CPUd(target, fr_in, nThreads, epsilon):
 
     nThreads    = ctypes.c_int(nThreads)
     epsilon     = ctypes.c_double(epsilon)
+    t0          = ctypes.c_double(t0)
 
     lib.propagateRays(ctp, ctypes.byref(inp), ctypes.byref(res),
-                        nThreads, epsilon)
+                        nThreads, epsilon, t0)
     shape = (fr_in.size,)
     fr_out = frameToObj(res, np_t=np.float64, shape=shape)
 

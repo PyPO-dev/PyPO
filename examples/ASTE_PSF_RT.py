@@ -61,14 +61,14 @@ def ex_ASTE_RT(device):
 
     s.rotateGrids("p1", rotation)
     s.rotateGrids("h1", rotation)
-    s.rotateGrids("plane1", rotation)
+    #s.rotateGrids("plane1", rotation)
 
-    frame_in = s.createFrame(mode="manual", argDict=RTpar)
+    frame_in = s.createFrame(argDict=RTpar)
 
-    frame_out = s.runRayTracer(frame_in, "p1", nThreads=1)
-    frame_out1 = s.runRayTracer(frame_out, "h1", nThreads=1)
+    frame_out = s.runRayTracer(frame_in, "p1", nThreads=11)
+    frame_out1 = s.runRayTracer(frame_out, "h1", nThreads=11)
 
-    frame_out2 = s.runRayTracer(frame_out1, "plane1", nThreads=1)
+    frame_out2 = s.runRayTracer(frame_out1, "plane1", nThreads=11)
 
     s.plotter.plotRTframe(frame_out2, project="xy")
     s.plotter.plotSystem(s.system, RTframes=[frame_in, frame_out, frame_out1, frame_out2])

@@ -108,6 +108,15 @@ typedef struct RTDict {
     double *oChief;
 } RTDict;
 
+typedef struct GDict {
+    double lam;
+    double w0;
+    double n;
+    double E0;
+    double z;
+    double *pol;
+} GDict;
+
 // Have to write explicit types for float and float: ctypes doesnt support templates
 struct arrC1f;
 struct arrR3f;
@@ -212,5 +221,14 @@ typedef struct RTDictf {
     float *tChief;
     float *oChief;
 } RTDictf;
+
+typedef struct GDictf {
+    float lam;
+    float w0;
+    float n;
+    float E0;
+    float z;
+    float *pol;
+} GDictf;
 
 #endif

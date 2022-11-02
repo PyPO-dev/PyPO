@@ -101,7 +101,7 @@ def POPPy_GPUf(source, target, currents, k, epsilon, t_direction, nThreads, mode
                                 t_direction, nBlocks, nThreads)
 
         # Unpack filled struct
-        JM = c2BundleToObj(res, shape=target_shape, obj_t='currents')
+        JM = c2BundleToObj(res, shape=target_shape, obj_t='currents', np_t=np.float64)
 
         return JM
 
@@ -115,7 +115,7 @@ def POPPy_GPUf(source, target, currents, k, epsilon, t_direction, nThreads, mode
                                 t_direction, nBlocks, nThreads)
 
         # Unpack filled struct
-        EH = c2BundleToObj(res, shape=target_shape, obj_t='fields')
+        EH = c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
 
         return EH
 
@@ -129,11 +129,12 @@ def POPPy_GPUf(source, target, currents, k, epsilon, t_direction, nThreads, mode
                                 t_direction, nBlocks, nThreads)
 
         # Unpack filled struct
-        JM, EH = c4BundleToObj(res, shape=target_shape)
+        JM, EH = c4BundleToObj(res, shape=target_shape, np_t=np.float64)
 
         return [JM, EH]
 
     elif mode == "EHP":
+
         res = c2rBundlef()
         allocate_c2rBundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
 
@@ -143,7 +144,7 @@ def POPPy_GPUf(source, target, currents, k, epsilon, t_direction, nThreads, mode
                                 t_direction, nBlocks, nThreads)
 
         # Unpack filled struct
-        EH, Pr = c2rBundleToObj(res, shape=target_shape)
+        EH, Pr = c2rBundleToObj(res, shape=target_shape, np_t=np.float64)
 
         return [EH, Pr]
 
@@ -157,7 +158,7 @@ def POPPy_GPUf(source, target, currents, k, epsilon, t_direction, nThreads, mode
                                 t_direction, nBlocks, nThreads)
 
         # Unpack filled struct
-        EH = c2BundleToObj(res, shape=target_shape, obj_t='fields')
+        EH = c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
 
         return EH
 

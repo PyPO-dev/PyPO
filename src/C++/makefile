@@ -13,22 +13,22 @@
 #								      #
 # Author of src: Arend Moerman (A.Moerman-1@tudelft.nl)		      #
 refl:
-	make -f makefile.beam
 	make -f makefile.refl
+	make -f makefile.beam
 #######################################################################
 cpu:
-	make -f makefile.beam
 	make -f makefile.refl
+	make -f makefile.beam
 	make -f makefile.cpu
 #######################################################################
 gpu:
-	make -f makefile.beam
 	make -f makefile.refl
+	make -f makefile.beam
 	make -f makefile.gpu
 #######################################################################
 all:
-	make -f makefile.beam
 	make -f makefile.refl
+	make -f makefile.beam
 	make -f makefile.cpu
 	make -f makefile.gpu
 #######################################################################

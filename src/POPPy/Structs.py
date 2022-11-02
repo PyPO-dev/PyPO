@@ -109,6 +109,14 @@ class RTDict(ctypes.Structure):
                 ("tChief", ctypes.POINTER(ctypes.c_double)),
                 ("oChief", ctypes.POINTER(ctypes.c_double))]
 
+class GDict(ctypes.Structure):
+    _fields_ = [("lam", ctypes.c_double),
+                ("w0", ctypes.c_double),
+                ("n", ctypes.c_double),
+                ("E0", ctypes.c_double),
+                ("z", ctypes.c_double),
+                ("pol", ctypes.POINTER(ctypes.c_double))]
+
 # FLOATS
 class arrC1f(ctypes.Structure):
     _fields_ = [("x", ctypes.POINTER(ctypes.c_float)),
@@ -215,3 +223,11 @@ class RTDictf(ctypes.Structure):
                 ("b", ctypes.c_float),
                 ("tChief", ctypes.POINTER(ctypes.c_float)),
                 ("oChief", ctypes.POINTER(ctypes.c_float))]
+
+class GDictf(ctypes.Structure):
+    _fields_ = [("lam", ctypes.c_float),
+                ("w0", ctypes.c_float),
+                ("n", ctypes.c_float),
+                ("E0", ctypes.c_float),
+                ("z", ctypes.c_float),
+                ("pol", ctypes.POINTER(ctypes.c_float))]

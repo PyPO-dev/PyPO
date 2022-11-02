@@ -34,15 +34,15 @@ public:
     void transfRays(T ctp, U *fr, bool inv = false);
 
     void propagateRaysToP(int start, int stop,
-                      T ctp, U *fr_in, U *fr_out);
+                      T ctp, U *fr_in, U *fr_out, V t0);
     void propagateRaysToH(int start, int stop,
-                      T ctp, U *fr_in, U *fr_out);
+                      T ctp, U *fr_in, U *fr_out, V t0);
     void propagateRaysToE(int start, int stop,
-                      T ctp, U *fr_in, U *fr_out);
+                      T ctp, U *fr_in, U *fr_out, V t0);
     void propagateRaysToPl(int start, int stop,
-                      T ctp, U *fr_in, U *fr_out);
+                      T ctp, U *fr_in, U *fr_out, V t0);
 
-    void parallelRays(T ctp, U *fr_in, U *fr_out);
+    void parallelRays(T ctp, U *fr_in, U *fr_out, V t0);
 
     void joinThreads();
 };
@@ -99,7 +99,7 @@ void RayTracer<T, U, V>::transfRays(T ctp, U *fr, bool inv)
 
 template<class T, class U, class V>
 void RayTracer<T, U, V>::propagateRaysToP(int start, int stop,
-                  T ctp, U *fr_in, U *fr_out)
+                  T ctp, U *fr_in, U *fr_out, V t0)
 {
     RTRefls<V> refls(ctp.coeffs[0], ctp.coeffs[1], ctp.coeffs[2]);
 
@@ -113,13 +113,12 @@ void RayTracer<T, U, V>::propagateRaysToP(int start, int stop,
     std::array<V, 3> norms;
 
     int jc = 0; // Counter
-
     for (int i=start; i<stop; i++)
     {
-        V t0 = 100;
+        V _t = t0;
         V t1 = 1e99;
 
-        V check = fabs(t1 - t0);
+        V check = fabs(t1 - _t);
 
         V x = fr_in->x[i];
         V y = fr_in->y[i];
@@ -128,19 +127,19 @@ void RayTracer<T, U, V>::propagateRaysToP(int start, int stop,
         V dx = fr_in->dx[i];
         V dy = fr_in->dy[i];
         V dz = fr_in->dz[i];
+        //printf("%d\n", i);
 
         while (check > epsilon)
         {
-            t1 = refls.gp(t0, x, y, z, dx, dy, dz);
+            t1 = refls.gp(_t, x, y, z, dx, dy, dz);
 
-            check = fabs(t1 - t0);
+            check = fabs(t1 - _t);
 
-            t0 = t1;
+            _t = t1;
         }
-
-        fr_out->x[i] = x + t0*dx;
-        fr_out->y[i] = y + t0*dy;
-        fr_out->z[i] = z + t0*dz;
+        fr_out->x[i] = x + _t*dx;
+        fr_out->y[i] = y + _t*dy;
+        fr_out->z[i] = z + _t*dz;
 
         norms = refls.np(fr_out->x[i], fr_out->y[i], fr_out->z[i], flip);
         check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
@@ -155,12 +154,13 @@ void RayTracer<T, U, V>::propagateRaysToP(int start, int stop,
             std::cout.flush();
             jc++;
         }
+
     }
 }
 
 template<class T, class U, class V>
 void RayTracer<T, U, V>::propagateRaysToH(int start, int stop,
-                  T ctp, U *fr_in, U *fr_out)
+                  T ctp, U *fr_in, U *fr_out, V t0)
 {
     RTRefls<V> refls(ctp.coeffs[0], ctp.coeffs[1], ctp.coeffs[2]);
 
@@ -175,10 +175,10 @@ void RayTracer<T, U, V>::propagateRaysToH(int start, int stop,
 
     for (int i=start; i<stop; i++)
     {
-        V t0 = 100;
+        V _t = t0;
         V t1 = 1e99;
 
-        V check = fabs(t1 - t0);
+        V check = fabs(t1 - _t);
 
         V x = fr_in->x[i];
         V y = fr_in->y[i];
@@ -189,17 +189,17 @@ void RayTracer<T, U, V>::propagateRaysToH(int start, int stop,
         V dz = fr_in->dz[i];
         while (check > epsilon)
         {
-            t1 = refls.gh(t0, fr_in->x[i], fr_in->y[i], fr_in->z[i],
+            t1 = refls.gh(_t, fr_in->x[i], fr_in->y[i], fr_in->z[i],
                       fr_in->dx[i], fr_in->dy[i], fr_in->dz[i]);
 
-            check = fabs(t1 - t0);
+            check = fabs(t1 - _t);
 
-            t0 = t1;
+            _t = t1;
         }
 
-        fr_out->x[i] = x + t0*dx;
-        fr_out->y[i] = y + t0*dy;
-        fr_out->z[i] = z + t0*dz;
+        fr_out->x[i] = x + _t*dx;
+        fr_out->y[i] = y + _t*dy;
+        fr_out->z[i] = z + _t*dz;
 
         norms = refls.nhe(fr_out->x[i], fr_out->y[i], fr_out->z[i], flip);
         check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
@@ -212,7 +212,7 @@ void RayTracer<T, U, V>::propagateRaysToH(int start, int stop,
 
 template<class T, class U, class V>
 void RayTracer<T, U, V>::propagateRaysToE(int start, int stop,
-                  T ctp, U *fr_in, U *fr_out)
+                  T ctp, U *fr_in, U *fr_out, V t0)
 {
     RTRefls<V> refls(ctp.coeffs[0], ctp.coeffs[1], ctp.coeffs[2]);
 
@@ -227,10 +227,10 @@ void RayTracer<T, U, V>::propagateRaysToE(int start, int stop,
 
     for (int i=start; i<stop; i++)
     {
-        V t0 = 100;
+        V _t = t0;
         V t1 = 1e99;
 
-        V check = fabs(t1 - t0);
+        V check = fabs(t1 - _t);
 
         V x = fr_in->x[i];
         V y = fr_in->y[i];
@@ -241,17 +241,17 @@ void RayTracer<T, U, V>::propagateRaysToE(int start, int stop,
         V dz = fr_in->dz[i];
         while (check > epsilon)
         {
-            t1 = refls.ge(t0, fr_in->x[i], fr_in->y[i], fr_in->z[i],
+            t1 = refls.ge(_t, fr_in->x[i], fr_in->y[i], fr_in->z[i],
                       fr_in->dx[i], fr_in->dy[i], fr_in->dz[i]);
 
-            check = fabs(t1 - t0);
+            check = fabs(t1 - _t);
 
-            t0 = t1;
+            _t = t1;
         }
 
-        fr_out->x[i] = x + t0*dx;
-        fr_out->y[i] = y + t0*dy;
-        fr_out->z[i] = z + t0*dz;
+        fr_out->x[i] = x + _t*dx;
+        fr_out->y[i] = y + _t*dy;
+        fr_out->z[i] = z + _t*dz;
 
         norms = refls.nhe(fr_out->x[i], fr_out->y[i], fr_out->z[i], flip);
         check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
@@ -264,7 +264,7 @@ void RayTracer<T, U, V>::propagateRaysToE(int start, int stop,
 
 template<class T, class U, class V>
 void RayTracer<T, U, V>::propagateRaysToPl(int start, int stop,
-                  T ctp, U *fr_in, U *fr_out)
+                  T ctp, U *fr_in, U *fr_out, V t0)
 {
     RTRefls<V> refls(ctp.coeffs[0], ctp.coeffs[1], ctp.coeffs[2]);
 
@@ -277,10 +277,10 @@ void RayTracer<T, U, V>::propagateRaysToPl(int start, int stop,
 
     for (int i=start; i<stop; i++)
     {
-        V t0 = 100;
+        V _t = t0;
         V t1 = 1e99;
 
-        V check = fabs(t1 - t0);
+        V check = fabs(t1 - _t);
         std::array<V, 3> norms;
 
         V x = fr_in->x[i];
@@ -292,17 +292,17 @@ void RayTracer<T, U, V>::propagateRaysToPl(int start, int stop,
         V dz = fr_in->dz[i];
         while (check > epsilon)
         {
-            t1 = refls.gpl(t0, fr_in->x[i], fr_in->y[i], fr_in->z[i],
+            t1 = refls.gpl(_t, fr_in->x[i], fr_in->y[i], fr_in->z[i],
                       fr_in->dx[i], fr_in->dy[i], fr_in->dz[i]);
 
-            check = fabs(t1 - t0);
+            check = fabs(t1 - _t);
 
-            t0 = t1;
+            _t = t1;
         }
 
-        fr_out->x[i] = x + t0*dx;
-        fr_out->y[i] = y + t0*dy;
-        fr_out->z[i] = z + t0*dz;
+        fr_out->x[i] = x + _t*dx;
+        fr_out->y[i] = y + _t*dy;
+        fr_out->z[i] = z + _t*dz;
 
         norms = refls.npl(fr_out->x[i], fr_out->y[i], fr_out->z[i], flip);
         check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
@@ -315,7 +315,7 @@ void RayTracer<T, U, V>::propagateRaysToPl(int start, int stop,
 
 
 template <class T, class U, class V>
-void RayTracer<T, U, V>::parallelRays(T ctp, U *fr_in, U *fr_out)
+void RayTracer<T, U, V>::parallelRays(T ctp, U *fr_in, U *fr_out, V t0)
 {
     int final_step;
 
@@ -332,33 +332,34 @@ void RayTracer<T, U, V>::parallelRays(T ctp, U *fr_in, U *fr_out)
         {
             threadPool[n] = std::thread(&RayTracer::propagateRaysToP,
                                         this, n * step, final_step,
-                                        ctp, fr_in, fr_out);
+                                        ctp, fr_in, fr_out, t0);
         }
 
         else if (ctp.type == 1)
         {
             threadPool[n] = std::thread(&RayTracer::propagateRaysToH,
                                         this, n * step, final_step,
-                                        ctp, fr_in, fr_out);
+                                        ctp, fr_in, fr_out, t0);
         }
 
         else if (ctp.type == 2)
         {
             threadPool[n] = std::thread(&RayTracer::propagateRaysToE,
                                         this, n * step, final_step,
-                                        ctp, fr_in, fr_out);
+                                        ctp, fr_in, fr_out, t0);
         }
 
         else if (ctp.type == 3)
         {
             threadPool[n] = std::thread(&RayTracer::propagateRaysToPl,
                                         this, n * step, final_step,
-                                        ctp, fr_in, fr_out);
+                                        ctp, fr_in, fr_out, t0);
         }
     }
     joinThreads();
 
     // Transform back to real frame
+    transfRays(ctp, fr_in);
     transfRays(ctp, fr_out);
 }
 

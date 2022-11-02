@@ -252,66 +252,16 @@ class System(object):
         with open('./{}{}.json'.format(self.savePathElem, name), 'w') as f:
             json.dump(jsonDict, f)
 
-    def readCustomBeam(self, name, comp, shape, convert_to_current=True, mode="PMC", ret="currents"):
-        rfield = np.loadtxt(self.customBeamPath + "r" + name + ".txt")
-        ifield = np.loadtxt(self.customBeamPath + "i" + name + ".txt")
+    def readCustomBeam(self, name_beam, name_source, comp, shape, convert_to_current=True, mode="PMC"):
+        rfield = np.loadtxt(self.customBeamPath + "r" + name_beam + ".txt")
+        ifield = np.loadtxt(self.customBeamPath + "i" + name_beam + ".txt")
 
         field = rfield.reshape(shape) + 1j*ifield.reshape(shape)
 
         fields_c = self._compToFields(comp, field)
+        currents_c = calcCurrents(fields_c, self.system[name_source], mode)
 
-        if convert_to_current:
-
-            comps_M = np.zeros((shape[0], shape[1], 3), dtype=complex)
-            np.stack((fields_c.Ex, fields_c.Ey, fields_c.Ez), axis=2, out=comps_M)
-
-            comps_J = np.zeros((shape[0], shape[1], 3), dtype=complex)
-            np.stack((fields_c.Hx, fields_c.Hy, fields_c.Hz), axis=2, out=comps_J)
-
-            null = np.zeros(field.shape, dtype=complex)
-
-            # Because we initialize in xy plane, take norm as z
-            norm = np.array([0,0,1])
-            if mode == 'None':
-                M = -np.cross(norm, comps_M, axisb=2)
-                J = np.cross(norm, comps_J, axisb=2)
-
-                Mx = M[:,:,0]
-                My = M[:,:,1]
-                Mz = M[:,:,2]
-
-                Jx = J[:,:,0]
-                Jy = J[:,:,1]
-                Jz = J[:,:,2]
-
-                currents_c = currents(Jx, Jy, Jz, Mx, My, Mz)
-
-            elif mode == 'PMC':
-                M = -2 * np.cross(norm, comps_M, axisb=2)
-
-                Mx = M[:,:,0]
-                My = M[:,:,1]
-                Mz = M[:,:,2]
-
-                currents_c = currents(null, null, null, Mx, My, Mz)
-
-            elif mode == 'PEC':
-                J = 2 * np.cross(norm, comps_J, axisb=2)
-
-                Jx = J[:,:,0]
-                Jy = J[:,:,1]
-                Jz = J[:,:,2]
-
-                currents_c = currents(Jx, Jy, Jz, null, null, null)
-
-        if ret == "currents":
-            return currents_c
-
-        elif ret == "fields":
-            return fields_c
-
-        elif ret == "both":
-            return currents_c, fields_c
+        return currents_c, fields_c
 
     def propagatePO_CPU(self, source_name, target_name, s_currents, k,
                     epsilon=1, t_direction=-1, nThreads=1,
@@ -337,22 +287,46 @@ class System(object):
 
         return out
 
-    def createFrame(self, mode, argDict):
-        if mode == "manual":
-            frame_in = makeRTframe(argDict)
+    def createFrame(self, argDict):
+        frame_in = makeRTframe(argDict)
+        return frame_in
 
-        elif mode == "poynting":
-            # Now, assume argDict is an rfield and grids object
-            grids = argDict["grids"]
-            dxyz = argDict["poynting"]
-            nTot = len(dxyz.Prx)
-            frame_in = frame(nTot, grids.x, grids.y, grids.z,
-                            dxyz.Prx, dxyz.Pry, dxyz.Prz)
+    def loadFramePoynt(self, Poynting, name_source):
+        grids = generateGrid(self.system[name_source])
+
+        nTot = Poynting.x.shape[0] * Poynting.x.shape[1]
+        frame_in = frame(nTot, grids.x.ravel(), grids.y.ravel(), grids.z.ravel(),
+                        Poynting.x.ravel(), Poynting.y.ravel(), Poynting.z.ravel())
 
         return frame_in
 
-    def runRayTracer(self, fr_in, name_target, epsilon=1e-10, nThreads=1):
-        fr_out = RT_CPUd(self.system[name_target], fr_in, nThreads, epsilon)
+    def calcRayLen(self, *args):
+        frame0 = args[0]
+
+        out = []
+        sumd = np.zeros(len(frame0.x))
+
+        for i in range(len(args) - 1):
+            diffx = args[i+1].x - frame0.x
+            diffy = args[i+1].y - frame0.y
+            diffz = args[i+1].z - frame0.z
+
+            lens = np.sqrt(diffx**2 + diffy**2 + diffz**2)
+            out.append(lens)
+
+            frame0 = args[i+1]
+            sumd += lens
+
+        out.append(sumd)
+
+        return out
+
+    def createGauss(self, gaussDict, name_source):
+        gauss_in = makeGauss(gaussDict, self.system[name_source])
+        return gauss_in
+
+    def runRayTracer(self, fr_in, name_target, epsilon=1e-10, nThreads=1, t0=100):
+        fr_out = RT_CPUd(self.system[name_target], fr_in, nThreads, epsilon, t0)
         return fr_out
 
 

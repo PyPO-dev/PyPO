@@ -23,7 +23,24 @@ def currentConv(currents, c_currents, size, ct_t):
     c_currents.i2y = (ct_t * size)(*np.imag(currents.My).ravel().tolist())
     c_currents.i2z = (ct_t * size)(*np.imag(currents.Mz).ravel().tolist())
 
-def fieldConv(field, c_field, size, ct_t):
+def fieldConv(field, c_fields, size, ct_t):
+    c_fields.r1x = (ct_t * size)(*np.real(field.Ex).ravel().tolist())
+    c_fields.r1y = (ct_t * size)(*np.real(field.Ey).ravel().tolist())
+    c_fields.r1z = (ct_t * size)(*np.real(field.Ez).ravel().tolist())
+
+    c_fields.i1x = (ct_t * size)(*np.imag(field.Ex).ravel().tolist())
+    c_fields.i1y = (ct_t * size)(*np.imag(field.Ey).ravel().tolist())
+    c_fields.i1z = (ct_t * size)(*np.imag(field.Ez).ravel().tolist())
+
+    c_fields.r2x = (ct_t * size)(*np.real(field.Hx).ravel().tolist())
+    c_fields.r2y = (ct_t * size)(*np.real(field.Hy).ravel().tolist())
+    c_fields.r2z = (ct_t * size)(*np.real(field.Hz).ravel().tolist())
+
+    c_fields.i2x = (ct_t * size)(*np.imag(field.Hx).ravel().tolist())
+    c_fields.i2y = (ct_t * size)(*np.imag(field.Hy).ravel().tolist())
+    c_fields.i2z = (ct_t * size)(*np.imag(field.Hz).ravel().tolist())
+
+def sfieldConv(field, c_field, size, ct_t):
     c_currents.rx = (ct_t * size)(*np.real(field.x).ravel().tolist())
     c_currents.ix = (ct_t * size)(*np.imag(field.x).ravel().tolist())
 
@@ -67,14 +84,14 @@ def arrC1ToObj(res, shape):
     x1 = np.ctypeslib.as_array(res.x, shape=shape) + 1j * np.ctypeslib.as_array(res.y, shape=shape)
     return x1
 
-def c2BundleToObj(res, shape, obj_t):
-    x1 = np.ctypeslib.as_array(res.r1x, shape=shape) + 1j * np.ctypeslib.as_array(res.i1x, shape=shape)
-    y1 = np.ctypeslib.as_array(res.r1y, shape=shape) + 1j * np.ctypeslib.as_array(res.i1y, shape=shape)
-    z1 = np.ctypeslib.as_array(res.r1z, shape=shape) + 1j * np.ctypeslib.as_array(res.i1z, shape=shape)
+def c2BundleToObj(res, shape, obj_t, np_t):
+    x1 = np.ctypeslib.as_array(res.r1x, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i1x, shape=shape).astype(np_t)
+    y1 = np.ctypeslib.as_array(res.r1y, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i1y, shape=shape).astype(np_t)
+    z1 = np.ctypeslib.as_array(res.r1z, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i1z, shape=shape).astype(np_t)
 
-    x2 = np.ctypeslib.as_array(res.r2x, shape=shape) + 1j * np.ctypeslib.as_array(res.i2x, shape=shape)
-    y2 = np.ctypeslib.as_array(res.r2y, shape=shape) + 1j * np.ctypeslib.as_array(res.i2y, shape=shape)
-    z2 = np.ctypeslib.as_array(res.r2z, shape=shape) + 1j * np.ctypeslib.as_array(res.i2z, shape=shape)
+    x2 = np.ctypeslib.as_array(res.r2x, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i2x, shape=shape).astype(np_t)
+    y2 = np.ctypeslib.as_array(res.r2y, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i2y, shape=shape).astype(np_t)
+    z2 = np.ctypeslib.as_array(res.r2z, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i2z, shape=shape).astype(np_t)
 
     if obj_t == 'currents':
         out = currents(x1, y1, z1, x2, y2, z2)
@@ -84,40 +101,40 @@ def c2BundleToObj(res, shape, obj_t):
 
     return out
 
-def c4BundleToObj(res, shape):
-    x1 = np.ctypeslib.as_array(res.r1x, shape=shape) + 1j * np.ctypeslib.as_array(res.i1x, shape=shape)
-    y1 = np.ctypeslib.as_array(res.r1y, shape=shape) + 1j * np.ctypeslib.as_array(res.i1y, shape=shape)
-    z1 = np.ctypeslib.as_array(res.r1z, shape=shape) + 1j * np.ctypeslib.as_array(res.i1z, shape=shape)
+def c4BundleToObj(res, shape, np_t):
+    x1 = np.ctypeslib.as_array(res.r1x, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i1x, shape=shape).astype(np_t)
+    y1 = np.ctypeslib.as_array(res.r1y, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i1y, shape=shape).astype(np_t)
+    z1 = np.ctypeslib.as_array(res.r1z, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i1z, shape=shape).astype(np_t)
 
-    x2 = np.ctypeslib.as_array(res.r2x, shape=shape) + 1j * np.ctypeslib.as_array(res.i2x, shape=shape)
-    y2 = np.ctypeslib.as_array(res.r2y, shape=shape) + 1j * np.ctypeslib.as_array(res.i2y, shape=shape)
-    z2 = np.ctypeslib.as_array(res.r2z, shape=shape) + 1j * np.ctypeslib.as_array(res.i2z, shape=shape)
+    x2 = np.ctypeslib.as_array(res.r2x, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i2x, shape=shape).astype(np_t)
+    y2 = np.ctypeslib.as_array(res.r2y, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i2y, shape=shape).astype(np_t)
+    z2 = np.ctypeslib.as_array(res.r2z, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i2z, shape=shape).astype(np_t)
 
-    x3 = np.ctypeslib.as_array(res.r3x, shape=shape) + 1j * np.ctypeslib.as_array(res.i3x, shape=shape)
-    y3 = np.ctypeslib.as_array(res.r3y, shape=shape) + 1j * np.ctypeslib.as_array(res.i3y, shape=shape)
-    z3 = np.ctypeslib.as_array(res.r3z, shape=shape) + 1j * np.ctypeslib.as_array(res.i3z, shape=shape)
+    x3 = np.ctypeslib.as_array(res.r3x, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i3x, shape=shape).astype(np_t)
+    y3 = np.ctypeslib.as_array(res.r3y, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i3y, shape=shape).astype(np_t)
+    z3 = np.ctypeslib.as_array(res.r3z, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i3z, shape=shape).astype(np_t)
 
-    x4 = np.ctypeslib.as_array(res.r4x, shape=shape) + 1j * np.ctypeslib.as_array(res.i4x, shape=shape)
-    y4 = np.ctypeslib.as_array(res.r4y, shape=shape) + 1j * np.ctypeslib.as_array(res.i4y, shape=shape)
-    z4 = np.ctypeslib.as_array(res.r4z, shape=shape) + 1j * np.ctypeslib.as_array(res.i4z, shape=shape)
+    x4 = np.ctypeslib.as_array(res.r4x, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i4x, shape=shape).astype(np_t)
+    y4 = np.ctypeslib.as_array(res.r4y, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i4y, shape=shape).astype(np_t)
+    z4 = np.ctypeslib.as_array(res.r4z, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i4z, shape=shape).astype(np_t)
 
     out1 = currents(x1, y1, z1, x2, y2, z2)
     out2 = fields(x3, y3, z3, x4, y4, z4)
 
     return out1, out2
 
-def c2rBundleToObj(res, shape):
-    x1 = np.ctypeslib.as_array(res.r1x, shape=shape) + 1j * np.ctypeslib.as_array(res.i1x, shape=shape)
-    y1 = np.ctypeslib.as_array(res.r1y, shape=shape) + 1j * np.ctypeslib.as_array(res.i1y, shape=shape)
-    z1 = np.ctypeslib.as_array(res.r1z, shape=shape) + 1j * np.ctypeslib.as_array(res.i1z, shape=shape)
+def c2rBundleToObj(res, shape, np_t):
+    x1 = np.ctypeslib.as_array(res.r1x, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i1x, shape=shape).astype(np_t)
+    y1 = np.ctypeslib.as_array(res.r1y, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i1y, shape=shape).astype(np_t)
+    z1 = np.ctypeslib.as_array(res.r1z, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i1z, shape=shape).astype(np_t)
 
-    x2 = np.ctypeslib.as_array(res.r2x, shape=shape) + 1j * np.ctypeslib.as_array(res.i2x, shape=shape)
-    y2 = np.ctypeslib.as_array(res.r2y, shape=shape) + 1j * np.ctypeslib.as_array(res.i2y, shape=shape)
-    z2 = np.ctypeslib.as_array(res.r2z, shape=shape) + 1j * np.ctypeslib.as_array(res.i2z, shape=shape)
+    x2 = np.ctypeslib.as_array(res.r2x, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i2x, shape=shape).astype(np_t)
+    y2 = np.ctypeslib.as_array(res.r2y, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i2y, shape=shape).astype(np_t)
+    z2 = np.ctypeslib.as_array(res.r2z, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i2z, shape=shape).astype(np_t)
 
-    x3 = np.ctypeslib.as_array(res.r3x, shape=shape)
-    y3 = np.ctypeslib.as_array(res.r3y, shape=shape)
-    z3 = np.ctypeslib.as_array(res.r3z, shape=shape)
+    x3 = np.ctypeslib.as_array(res.r3x, shape=shape).astype(np_t)
+    y3 = np.ctypeslib.as_array(res.r3y, shape=shape).astype(np_t)
+    z3 = np.ctypeslib.as_array(res.r3z, shape=shape).astype(np_t)
 
     out1 = fields(x1, y1, z1, x2, y2, z2)
     out2 = rfield(x3, y3, z3)
@@ -259,13 +276,13 @@ def allocate_cframe(res, size, ct_t):
 def allfill_cframe(res, frame_py, size, ct_t):
     res.size = size
 
-    res.x = (ct_t * size)(*frame_py.x.tolist())
-    res.y = (ct_t * size)(*frame_py.y.tolist())
-    res.z = (ct_t * size)(*frame_py.z.tolist())
+    res.x = (ct_t * size)(*(frame_py.x.tolist()))
+    res.y = (ct_t * size)(*(frame_py.y.tolist()))
+    res.z = (ct_t * size)(*(frame_py.z.tolist()))
 
-    res.dx = (ct_t * size)(*frame_py.dx.tolist())
-    res.dy = (ct_t * size)(*frame_py.dy.tolist())
-    res.dz = (ct_t * size)(*frame_py.dz.tolist())
+    res.dx = (ct_t * size)(*(frame_py.dx.tolist()))
+    res.dy = (ct_t * size)(*(frame_py.dy.tolist()))
+    res.dz = (ct_t * size)(*(frame_py.dz.tolist()))
 
 def allfill_RTDict(res, rdict_py, ct_t):
     res.nRays = ctypes.c_int(rdict_py["nRays"])
@@ -279,6 +296,13 @@ def allfill_RTDict(res, rdict_py, ct_t):
     res.tChief = (ct_t * 3)(*np.radians(rdict_py["tChief"]).tolist())
     res.oChief = (ct_t * 3)(*rdict_py["oChief"].tolist())
 
+def allfill_GDict(res, gdict_py, ct_t):
+    res.lam = ct_t(gdict_py["lam"])
+    res.w0 = ct_t(gdict_py["w0"])
+    res.n = ct_t(gdict_py["n"])
+    res.E0 = ct_t(gdict_py["E0"])
+    res.z = ct_t(gdict_py["z"])
+    res.pol = (ct_t * 3)(*gdict_py["pol"].tolist())
 
 def creflToObj(res, shape, np_t):
 

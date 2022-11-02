@@ -26,3 +26,12 @@ RTDict = {
         "tChief"    :       np.zeros(3),
         "oChief"    :       np.zeros(3)
         }
+
+GDict = {
+        "lam"       :       1,
+        "w0"        :       4,
+        "n"         :       1,
+        "E0"        :       1,
+        "z"         :       0,
+        "pol"       :       np.array([1, 0, 0])
+        }

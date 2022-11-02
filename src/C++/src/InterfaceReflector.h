@@ -5,7 +5,7 @@
 
 extern "C"
 {
-    void generateGrid(reflparams refl, reflcontainer *container);
-    void generateGridf(reflparamsf refl, reflcontainerf *container);
+    void generateGrid(reflparams refl, reflcontainer *container, bool transform=true);
+    void generateGridf(reflparamsf refl, reflcontainerf *container, bool transform=true);
 }
 #endif

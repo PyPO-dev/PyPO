@@ -1,8 +1,8 @@
 from PyQt5.QtWidgets import QWidget, QFormLayout, QLineEdit, QLabel, QPushButton, QComboBox, QHBoxLayout, QApplication
 import sys
+import numpy as np
 sys.path.append('../')
 sys.path.append('../../')
-import src.POPPy.System as system
 
 
 
@@ -32,10 +32,10 @@ class Form(QWidget):
         self.form.addRow("Parameter mode", self.pmode)
 
         self.coefA,self.coefB = QLineEdit(),QLineEdit() 
-        coefs = QHBoxLayout()
-        coefs.addWidget(self.coefA)
-        coefs.addWidget(self.coefB)
-        self.form.addRow("Coefficients", coefs)
+        coeffs = QHBoxLayout()
+        coeffs.addWidget(self.coefA)
+        coeffs.addWidget(self.coefB)
+        self.form.addRow("Coefficients", coeffs)
 
         self.vertex = [QLineEdit(),QLineEdit(),QLineEdit()]
         vertexLayout = QHBoxLayout()
@@ -43,11 +43,11 @@ class Form(QWidget):
             vertexLayout.addWidget(e)
         self.form.addRow("Vertex", vertexLayout)
 
-        self.focus = [QLineEdit(),QLineEdit(),QLineEdit()]
-        focusLayout = QHBoxLayout()
-        for e in self.focus:
-            focusLayout.addWidget(e)
-        self.form.addRow("Focus", focusLayout)
+        self.focus_1 = [QLineEdit(),QLineEdit(),QLineEdit()]
+        focus_1Layout = QHBoxLayout()
+        for e in self.focus_1:
+            focus_1Layout.addWidget(e)
+        self.form.addRow("focus_1", focus_1Layout)
         self.PModeChanged()
 
         self.form.addRow(QLabel("Grid Parameters"))
@@ -103,13 +103,13 @@ class Form(QWidget):
             self.coefB.setEnabled(True)
             for i in range(3):
                 self.vertex[i].setEnabled(False)
-                self.focus[i].setEnabled(False)
+                self.focus_1[i].setEnabled(False)
         else:
             self.coefA.setEnabled(False)
             self.coefB.setEnabled(False)
             for i in range(3):
                 self.vertex[i].setEnabled(True)
-                self.focus[i].setEnabled(True)
+                self.focus_1[i].setEnabled(True)
             
 
     def GModeChanged(self):
@@ -136,31 +136,31 @@ class Form(QWidget):
 
     def GetDict(self):
         paramdict = {"name"     : None if self.name.text()=="" else self.name.text(),
-                 "type"     : "Hyperbola",
+                 "type"     : "Parabola",
                  "gridsize" : [int(self.gridSizeX.text()),int(self.gridSizeY.text())],
                 #  "uvaxis"   : self.uvaxis,
                 #  "units"    : self.units,
                 #  "cRot"     : self.cRot.tolist(),
-                #  "flip"     : self.flip,
+                 "flip"     : False,
                 #  "sec"      : self.sec,
                 #  "history"  : h_l
                  }
         if self.pmode.currentIndex() == 0:
-            paramdict ["pmode"] = False
-            paramdict ["coefs"] = [float(self.coefA.text()),float(self.coefB.text()),float(0)]
+            paramdict ["pmode"] = "manual"
+            paramdict ["coeffs"] = np.array([float(self.coefA.text()),float(self.coefB.text()),float(0)])
             if "vertex" in paramdict:
                 del paramdict["vertex"]
-            if "focus" in paramdict:
-                del paramdict["focus"]
+            if "focus_1" in paramdict:
+                del paramdict["focus_1"]
         else:
-            paramdict ["pmode"] = True
-            paramdict ["vertex"] = [float(self.vertex[0].text()),float(self.vertex[1].text()),float(self.vertex[2].text())]
-            paramdict ["focus"] = [float(self.focus[0].text()),float(self.focus[1].text()),float(self.focus[2].text())]
-            if "coefs" in paramdict:
-                del paramdict["coefs"]
+            paramdict ["pmode"] = "focus"
+            paramdict ["vertex"] = np.array([float(self.vertex[0].text()),float(self.vertex[1].text()),float(self.vertex[2].text())])
+            paramdict ["focus_1"] = np.array([float(self.focus_1[0].text()),float(self.focus_1[1].text()),float(self.focus_1[2].text())])
+            if "coeffs" in paramdict:
+                del paramdict["coeffs"]
 
         if self.gmode.currentIndex() == 0:
-            paramdict ["gmode"] = False
+            paramdict ["gmode"] = "xy"
             paramdict["lims_x"] = [float(self.limX1.text()), float(self.limX2.text())]
             paramdict["lims_y"] = [float(self.limY1.text()), float(self.limY2.text())]
             if "lims_u" in paramdict:
@@ -168,7 +168,7 @@ class Form(QWidget):
             if "lims_v" in paramdict:
                 del paramdict["lims_v"]
         else:
-            paramdict ["gmode"] = True
+            paramdict ["gmode"] = "uv"
             paramdict["lims_u"] = [float(self.limU1.text()), float(self.limU2.text())]
             paramdict["lims_v"] = [float(self.limV1.text()), float(self.limV2.text())]
             if "lims_x" in paramdict:

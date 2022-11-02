@@ -19,23 +19,23 @@ class ParabolaFormLayout(qtw.QFormLayout):
         self.addRow(qtw.QLabel("Element Parameters"))
 
         self.pmode = qtw.QComboBox()
-        self.pmode.addItems(["Manual", "Focus"])
+        self.pmode.addItems(["Manual", "focus_1"])
         self.pmode.activated.connect(self.PModeChanged)
         self.addRow("Parameter mode", self.pmode)
 
         self.coefA,self.coefB = qtw.QLineEdit(),qtw.QLineEdit() 
-        self.coefs = qtw.QHBoxLayout()
-        self.coefs.addWidget(self.coefA)
-        self.coefs.addWidget(self.coefB)
-        self.coefsW = qtw.QWidget()
-        self.coefsW.setLayout(self.coefs)
-        self.addRow("U-limits", self.coefsW)
+        self.coeffs = qtw.QHBoxLayout()
+        self.coeffs.addWidget(self.coefA)
+        self.coeffs.addWidget(self.coefB)
+        self.coeffsW = qtw.QWidget()
+        self.coeffsW.setLayout(self.coeffs)
+        self.addRow("U-limits", self.coeffsW)
 
         self.vertex = qtw.QLineEdit()
         self.addRow("Vertex", self.vertex)
 
-        self.focus = qtw.QLineEdit()
-        self.addRow("Focus", self.focus)
+        self.focus_1 = qtw.QLineEdit()
+        self.addRow("focus_1", self.focus_1)
         self.PModeChanged()
 
 
@@ -103,12 +103,12 @@ class ParabolaFormLayout(qtw.QFormLayout):
             self.coefA.setEnabled(True)
             self.coefB.setEnabled(True)
             self.vertex.setEnabled(False)
-            self.focus.setEnabled(False)
+            self.focus_1.setEnabled(False)
         else:
             self.coefA.setEnabled(False)
             self.coefB.setEnabled(False)
             self.vertex.setEnabled(True)
-            self.focus.setEnabled(True)
+            self.focus_1.setEnabled(True)
             
 
     def GModeChanged(self):
@@ -141,7 +141,7 @@ class ParabolaFormLayout(qtw.QFormLayout):
          [float(self.limX1.text()),float(self.limX2.text())], 
          [float(self.limY1.text()),float(self.limY2.text())], 
          [int(self.gridSizeX.text()), int(self.gridSizeY.text())])
-        s.plotSystem(focus_1=False, focus_2=False, plotRaytrace=False)
+        s.plotSystem(focus_1_1=False, focus_1_2=False, plotRaytrace=False)
 
     def addNot(self):
         # print("canceling")

@@ -5,6 +5,13 @@ ElementWidget QPushButton{
     border-bottom-left-radius : 0px; 
     border-bottom-right-radius : 15px
 }
+SystemsWidget QPushButton{
+    background:#a5a515;
+    border-top-left-radius :0px;
+    border-top-right-radius : 15px; 
+    border-bottom-left-radius : 0px; 
+    border-bottom-right-radius : 15px
+}
 QPushButton:hover{
     background:#a51554;
 }
@@ -16,6 +23,13 @@ ElementWidget QLabel{
     border-bottom-left-radius : 15px; 
     border-bottom-right-radius : 0px
 }
-QWidget[class="parameterForm"]{
-    background: #6715a5;
+SystemWidget QLabel{
+    background: #a5a515;
+    border-top-left-radius :15px;
+    border-top-right-radius : 0px; 
+    border-bottom-left-radius : 15px; 
+    border-bottom-right-radius : 0px
 }
+/* QWidget[class="parameterForm"]{
+    background: #6715a5;
+} */

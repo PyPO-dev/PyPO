@@ -3,23 +3,18 @@ from PyQt5 import QtCore
 from PyQt5.QtGui import QFont, QIcon
 
 
-from ElementWidget import ElementWidget
+from src.GUI.ElementWidget import ElementWidget
 
 class ElementsWindow(qtw.QWidget):
     def __init__ (self, elements):
         super().__init__()
 
-        # ColLayout = qtw.QVBoxLayout()
         pushDown = 0
         for elem in elements:
             label = ElementWidget(elem, self)
             label.move(0,pushDown)
             pushDown += 40
-            # ColLayout.addWidget(label)
-
-        # verticalSpacer = qtw.QSpacerItem(20, 40, qtw.QSizePolicy.Maximum, qtw.QSizePolicy.Expanding)         
-        # ColLayout.addItem(verticalSpacer)
-
+           
         self.setMaximumHeight(500)
    
         

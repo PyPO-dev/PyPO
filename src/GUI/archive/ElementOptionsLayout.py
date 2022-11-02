@@ -6,9 +6,11 @@ class ElementOptionsLayout(QVBoxLayout):
         self.setSpacing(0)
         self.setContentsMargins(0,0,0,0)
 
-        btn1 = QPushButton("Option1")
-        btn2 = QPushButton("Option2")
-        btn3 = QPushButton("Option3")
+        self.close = cls
+
+        btn1 = QPushButton("Transform")
+        btn2 = QPushButton("Edit")
+        btn3 = QPushButton("Plot")
 
         btn1.clicked.connect(cls)
         btn2.clicked.connect(cls)

@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets as qtw
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
-import MPLCanvas as mplc
+import src.GUI.MPLCanvas as mplc
 
 
 

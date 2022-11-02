@@ -2,15 +2,15 @@ import sys
 
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSpacerItem, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction
 from PyQt5.QtGui import QFont, QIcon
-from ElementsColumn import ElementsWindow
-from GUI.ParameterForms import ParabolaForm, HyperbolaForm
-from POPPy.Reflectors import Parabola
-from PlotScreen import PlotScreen
-from ParameterForms.BaseForm import FormWidget
+from src.GUI.ElementsColumn import ElementsWindow
+from src.GUI.SystemsColumn import SystemsWindow
+from src.GUI.ParameterForms import ParabolaForm, HyperbolaForm
+from src.GUI.PlotScreen import PlotScreen
+import numpy as np
 
 sys.path.append('../')
 sys.path.append('../../')
-import POPPy.System as st
+import src.POPPy.System as st
 
 class MainWidget(QWidget):
     """Main Window."""
@@ -22,19 +22,18 @@ class MainWidget(QWidget):
 
         # GridParameters
         self.GPElementsColumn = [0, 0, 2, 1]
-        # self.GPSystemsColumn  = [1, 0, 1, 1]
+        self.GPSystemsColumn  = [2, 0, 2, 1]
         self.GPButtons        = [2, 0, 1, 1]
-        self.GPParameterForm  = [0, 1, 3, 1]
-        self.GPPlotScreen     = [0, 2, 3, 1]
+        self.GPParameterForm  = [0, 1, 4, 1]
+        self.GPPlotScreen     = [0, 2, 4, 1]
 
 
         ### ElementConfigurations
         self.elementConfigs = []
 
         # init System
-        self.STM = st.System()
-        self.STM.addPlotter()
-        # self.STM.addParabola([1,1], [-1,1], [-1,1], [101,101]) ##TODO: remove 
+        self.SystemsList = {}
+        
 
 
 
@@ -42,6 +41,7 @@ class MainWidget(QWidget):
         self.grid = QGridLayout()
 
         self._mkElementsColumn()
+        self._mkSystemsColumn()
         # self._mkButtons()
         # self.grid.addItem(QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum),3,3)
         self.plotSystem()
@@ -53,18 +53,33 @@ class MainWidget(QWidget):
         if hasattr(self, "ElementsColumn"):
             self.ElementsColumn.setParent(None)
         StmElements = []
-        for key, element in self.STM.system.items():
-            StmElements.append(key)
+        for c in self.elementConfigs:
+            StmElements.append(c["name"])
         self.ElementsColumn = ElementsWindow(StmElements)
         self.ElementsColumn.setMaximumWidth(300)
         self.ElementsColumn.setMinimumWidth(300)
         self.addToWindowGrid(self.ElementsColumn, self.GPElementsColumn)
 
+    
+    def _mkSystemsColumn(self):
+        if hasattr(self, "SystemsColumn"):
+            self.SystemsColumn.setParent(None)
+        listofstr = []
+        for k,_ in self.SystemsList.items():
+            listofstr.append(k)
+        self.SystemsColumn = SystemsWindow(listofstr)
+        self.SystemsColumn.setMaximumWidth(300)
+        self.SystemsColumn.setMinimumWidth(300)
+        self.addToWindowGrid(self.SystemsColumn, self.GPSystemsColumn)
+
     def plotSystem(self):
         if hasattr(self, "PlotScreen"):
             self.PlotScreen.setParent(None)
 
-        figure = self.STM.plotter.plotSystem(ret = True, show=False)
+        if self.SystemsList:
+            figure, _ = self.SystemsList["System 1"].plotter.plotSystem(self.SystemsList["System 1"].system , ret = True, show=False, save=False)
+        else :
+            figure = None
         self.PlotScreen= PlotScreen(figure)
         self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
 
@@ -82,16 +97,34 @@ class MainWidget(QWidget):
     #     btnWidget.setLayout(btnLayout)
     #     self.addToWindowGrid(btnWidget,self.GPButtons)
 
-    def btnAction(self):
-        self.STM.addParabola([1,1], [-1,1], [-1,1], [101,101]) 
-        print("Parabola added!!!")
-        self.plotSystem()
-        self._mkElementsColumn()
+    def addExampleParabola(self):
+        d = {'name': 'parabol', 'type': 'Parabola', 'gridsize': [101, 101], 'flip': False, 'pmode': 'manual', 'coeffs':    np.array[1., 1., 0.], 'gmode': 'xy', 'lims_x': [-1.0, 1.0], 'lims_y': [-1.0, 1.0]}
+        self.addElementAction(d)
+
+    def addExampleHyperbola(self):
+        d = {'name': 'Hyper', 'type': 'Hyperbola', 'gridsize': [201, 201], 'flip': False, 'pmode': 'manual', 'coeffs': np.array([3., 3., 2.]), 'gmode': 'xy', 'lims_x': [-1.5, 1.5], 'lims_y': [0.5, 0.5]}
+        self.addElementAction(d)
 
     def addElementAction(self, elementDict):
         self.elementConfigs.append(elementDict)
-        self.STM.addParabola(elementDict) 
+        
         print(self.elementConfigs[-1])
+        self._mkElementsColumn()
+
+    def addSystemAction(self):
+        stm = st.System()
+        stm.addPlotter()
+
+        for elementDict in self.elementConfigs:
+            if elementDict["type"] == "Parabola":
+                stm.addParabola(elementDict) 
+            elif elementDict["type"] == "Hyperbola":
+                stm.addHyperbola(elementDict) 
+
+        self.SystemsList["System 1"] = stm
+        
+        # self.plotSystem()
+        self._mkSystemsColumn()
 
     def setParabolaForm(self):
         if hasattr(self, "ParameterWid"):
@@ -121,7 +154,7 @@ class PoppyMainWindow(QMainWindow):
         self._createMenuBar()
         self.setCentralWidget(self.mainWid)
         self.showMaximized()
-        with open('style.css') as f:
+        with open('src/GUI/style.css') as f:
             style = f.read()
         self.setStyleSheet(style)
 
@@ -133,11 +166,18 @@ class PoppyMainWindow(QMainWindow):
         SystemsMenu = menuBar.addMenu("Systems")
 
         ### Generate test parabola
-        AddTestElement = QAction('Add Test Parabola', self)
-        AddTestElement.setShortcut('Ctrl+A')
-        AddTestElement.setStatusTip('Generates a Parabolic reflector and plots it')
-        AddTestElement.triggered.connect(self.mainWid.btnAction)
-        ElementsMenu.addAction(AddTestElement)
+        AddTestParabola = QAction('Add Test Parabola', self)
+        AddTestParabola.setShortcut('Ctrl+Shift+P')
+        AddTestParabola.setStatusTip('Generates a Parabolic reflector and plots it')
+        AddTestParabola.triggered.connect(self.mainWid.addExampleParabola)
+        ElementsMenu.addAction(AddTestParabola)
+
+        ### Generate test hyperbola
+        AddTestHyperbola = QAction('Add Test Hyperbola', self)
+        AddTestHyperbola.setShortcut('Ctrl+Shift+H')
+        AddTestHyperbola.setStatusTip('Generates a Parabolic reflector and plots it')
+        AddTestHyperbola.triggered.connect(self.mainWid.addExampleHyperbola)
+        ElementsMenu.addAction(AddTestHyperbola)
 
         ### Add Element
         newElementMenu = ElementsMenu.addMenu("New Element")
@@ -159,7 +199,7 @@ class PoppyMainWindow(QMainWindow):
 
     ### System actions
         newSystem = QAction('Add System', self)
-        # newSystem.triggered.connect(self.mainWid...)
+        newSystem.triggered.connect(self.mainWid.addSystemAction)
         SystemsMenu.addAction(newSystem)
 
 if __name__ == "__main__":

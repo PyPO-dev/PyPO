@@ -3,7 +3,7 @@ from ElementsColumn import ElementsWindow
 from PyQt5 import QtCore
 from GUI.ParameterForms.ParabolaForm import ParabolaFormLayout
 import PlotScreen as PS
-from TransformationWidget import TransformationWidget
+from GUI.archive.TransformationWidget import TransformationWidget
 import sys
 import numpy as np
 from matplotlib.figure import Figure

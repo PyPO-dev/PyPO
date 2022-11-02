@@ -1,6 +1,6 @@
 from xml.etree.ElementTree import tostring
 from PyQt5 import QtWidgets as qtw
-from SystemTab import SystemTab
+from GUI.archive.SystemTab import SystemTab
 from PyQt5 import QtCore
 from PyQt5 import QtGui
 

@@ -1,12 +1,11 @@
 from PyQt5.QtWidgets import QLabel, QApplication, QWidget, QHBoxLayout, QMainWindow, \
                                     QPushButton, QSpacerItem, QSizePolicy, QDialog, \
-                                    QAction
+                                    QAction,QVBoxLayout
                                         
 from PyQt5.QtGui import QFont, QIcon, QCursor 
 from PyQt5.QtCore import Qt
-from ElementOptionsLayout import ElementOptionsLayout
-from selfClosingDialog import selfClosingDialog
-from selfClosingDialog_HoverableBtn import HoverOpenBtn
+from src.GUI.selfClosingDialog import selfClosingDialog
+from src.GUI.selfClosingDialog_HoverableBtn import HoverOpenBtn
 import sys
 sys.path.append('../')
 sys.path.append('../../')
@@ -15,7 +14,7 @@ sys.path.append('../../')
 
 class ElementWidget(QWidget):
     def __init__ (self, element, p=None ):
-        super().__init__(p)
+        super().__init__(parent=p)
         
         layout = QHBoxLayout()
         label = QLabel(element)
@@ -38,8 +37,22 @@ class ElementWidget(QWidget):
 
     def _openOptionsMenu(self):
         self.dlg = selfClosingDialog(self._closeOptionsMenu, parent = self)
-        
-        self.dlg.setLayout(ElementOptionsLayout(self._closeOptionsMenu))
+
+        dlgLayout = QVBoxLayout()
+
+        btn1 = QPushButton("Transform")
+        btn2 = QPushButton("Edit")
+        btn3 = QPushButton("Plot")
+
+        btn1.clicked.connect(self._closeOptionsMenu)
+        btn2.clicked.connect(self._closeOptionsMenu)
+        btn3.clicked.connect(self._closeOptionsMenu)
+
+        dlgLayout.addWidget(btn1)
+        dlgLayout.addWidget(btn2)
+        dlgLayout.addWidget(btn3)
+
+        self.dlg.setLayout(dlgLayout)
         self.dlg.setWindowFlag(Qt.FramelessWindowHint)
         posi = self.mapToGlobal(self.btn.pos())
         self.dlg.setGeometry(posi.x(), posi.y() ,100,100)

@@ -2,6 +2,7 @@
 import numbers
 import numpy as np
 import matplotlib.pyplot as pt
+import matplotlib.cm as cm
 import time
 import psutil
 import os
@@ -17,8 +18,10 @@ from src.POPPy.BindCPU import *
 from src.POPPy.BindBeam import *
 from src.POPPy.Copy import copyGrid
 from src.POPPy.MatTransform import *
-from src.POPPy.Plotter import Plotter
 from src.POPPy.POPPyTypes import *
+
+import src.POPPy.Plotter as plt
+import src.POPPy.Efficiencies as effs
 
 class System(object):
     customBeamPath = './custom/beam/'
@@ -38,6 +41,13 @@ class System(object):
         if not saveExist:
             os.makedirs(self.savePathElem)
 
+        self.savePath = './images/'
+
+        existSave = os.path.isdir(self.savePath)
+
+        if not existSave:
+            os.makedirs(self.savePath)
+
     def __str__(self):
         pass
 
@@ -52,9 +62,6 @@ class System(object):
             self.customReflPath += path
         else:
             self.customReflPath = path
-
-    def addPlotter(self, save='./images/'):
-        self.plotter = Plotter(save='./images/')
 
     #### ADD REFLECTOR METHODS
     # Parabola takes as input the reflectordict from now on.
@@ -360,7 +367,7 @@ class System(object):
         fr_out = RT_CPUd(self.system[name_target], fr_in, nThreads, epsilon, t0)
         return fr_out
 
-    def interpFrame(self, fr_in, field, name_target):
+    def interpFrame(self, fr_in, field, name_target, method="nearest"):
         grids = generateGrid(self.system[name_target])
 
         points = (fr_in.x, fr_in.y, fr_in.z)
@@ -370,12 +377,51 @@ class System(object):
 
         grid_interp = (grids.x, grids.y, grids.z)
 
-        rout = griddata(points, rfield, grid_interp, method='nearest')
-        iout = griddata(points, ifield, grid_interp, method='nearest')
+        rout = griddata(points, rfield, grid_interp, method=method)
+        iout = griddata(points, ifield, grid_interp, method=method)
 
-        out = rout + 1j * iout
+        out = rout.reshape(self.system[name_target]["gridsize"]) + 1j * iout.reshape(self.system[name_target]["gridsize"])
 
         return out
+
+    def calcSpillover(self, field, name_target, aperDict):
+        surfaceObj = self.system[name_target]
+        return effs.calcSpillover(field, surfaceObj, aperDict)
+
+    def calcTaper(self, field, name_target, aperDict):
+        surfaceObj = self.system[name_target]
+        return effs.calcTaper(field, surfaceObj, aperDict)
+
+    def plotBeam2D(self, plotObject, field,
+                    vmin=-30, vmax=0, show=True, amp_only=False,
+                    save=False, polar=False, interpolation=None,
+                    aperDict={"plot":False}, mode='dB', project='xy',
+                    units='', name='', titleA="Amp", titleP="Phase"):
+
+        plt.plotBeam2D(self, plotObject, field,
+                        vmin, vmax, show, amp_only,
+                        save, polar, interpolation,
+                        aperDict, mode, project,
+                        units, name, titleA, titleP, self.savePath)
+
+    def plot3D(self, plotObject, fine=2, cmap=cm.cool,
+                returns=False, ax_append=False, norm=False,
+                show=True, foc1=False, foc2=False, save=True):
+
+        plt.plot3D(self, plotObject, fine, cmap,
+                    returns, ax_append, norm,
+                    show, foc1, foc2, save, self.savePath)
+
+    def plotSystem(self, systemDict, fine=2, cmap=cm.cool,
+                ax_append=False, norm=False,
+                show=True, foc1=False, foc2=False, save=True, ret=False, RTframes=[]):
+
+        plt.plotSystem(self, systemDict, fine, cmap,
+                    ax_append, norm,
+                    show, foc1, foc2, save, ret, RTframes, self.savePath)
+
+    def plotRTframe(self, frame, project="xy"):
+        plt.plotRTframe(self, frame, project, self.savePath)
 
     def _compToFields(self, comp, field):
         null = np.zeros(field.shape, dtype=complex)

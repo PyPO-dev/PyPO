@@ -29,7 +29,7 @@ public:
     Utils<V> ut;
     std::vector<std::thread> threadPool;
 
-    RayTracer(int numThreads, int nTot, V epsilon);
+    RayTracer(int numThreads, int nTot, V epsilon, bool verbose = false);
 
     void transfRays(T ctp, U *fr, bool inv = false);
 
@@ -48,7 +48,7 @@ public:
 };
 
 template<class T, class U, class V>
-RayTracer<T, U, V>::RayTracer(int numThreads, int nTot, V epsilon)
+RayTracer<T, U, V>::RayTracer(int numThreads, int nTot, V epsilon, bool verbose)
 {
     this->numThreads = numThreads;
     this->step = ceil(nTot / numThreads);
@@ -56,13 +56,17 @@ RayTracer<T, U, V>::RayTracer(int numThreads, int nTot, V epsilon)
     this->threadPool.resize(numThreads);
     this->epsilon = epsilon;
 
-    printf("<<<--------- RT info --------->>>\n");
-    printf("--- Rays          :   %d\n", nTot);
-    printf("--- Threads       :   %d\n", numThreads);
-    printf("--- Device        :   CPU\n");
-    printf("<<<--------- RT info --------->>>\n");
-    printf("\n");
+    if (verbose)
+    {
+        printf("<<<--------- RT info --------->>>\n");
+        printf("--- Rays          :   %d\n", nTot);
+        printf("--- Threads       :   %d\n", numThreads);
+        printf("--- Device        :   CPU\n");
+        printf("<<<--------- RT info --------->>>\n");
+        printf("\n");
+    }
 }
+
 /*
  * Transform ray-trace frame into target surface restframe.
  */

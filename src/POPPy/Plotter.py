@@ -246,6 +246,7 @@ def plotSystem(self, systemDict, fine=2, cmap=cm.cool,
         return fig, ax
 
     pt.close()
+    return 0
     """
 def beamCut(self, plotObject, field, cross='', units='', vmin=-50, vmax=0, frac=1, show=True, save=False, ret=False):
 

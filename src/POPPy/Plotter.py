@@ -26,69 +26,39 @@ class Plotter(object):
         if not existSave:
             os.makedirs(self.savePath)
 
-    def plotBeam2D(self, surfaceObject, field, vmin=-30, vmax=0, show=True, amp_only=False, save=False, polar=False, interpolation=None, plot_aper={"plot":False}, mode='dB', project='xy', units='', name=''):
-        comp = field[1]
-        field = field[0]
+    def plotBeam2D(self, plotObject, field,
+                    vmin=-30, vmax=0, show=True, amp_only=False,
+                    save=False, polar=False, interpolation=None,
+                    plot_aper={"plot":False}, mode='dB', project='xy',
+                    units='', name='', titleA="Amp", titleP="Phase"):
 
-        titleAmp = r"${}_{}$ Amp / [dB]".format(comp[0], comp[1])
-        titlePhase = r"${}_{}$ Phase / [rad]".format(comp[0], comp[1])
+        # With far-field, generate grid without converting to spherical
 
-        # Obtain conversion units if manually given
-        if units:
-            conv = surfaceObject._get_conv(units)
-            units = units
-        else:
-            conv = surfaceObject.conv
-            units = surfaceObject.units
-
-        if surfaceObject.elType == "Camera":
-            if surfaceObject.ff_flag:
-                grid_x1 = surfaceObject.grid_Az / conv
-                grid_x2 = surfaceObject.grid_El / conv
-
-                ff_flag = True
-
-            else:
-                ff_flag = False
-
+        max_field = np.max(np.absolute(field))
+        grids = generateGrid(plotObject, spheric=False)
         if project == 'xy':
-            grid_x1 = surfaceObject.grid_x / conv
-            grid_x2 = surfaceObject.grid_y / conv
-
-            cx1 = 'x'
-            cx2 = 'y'
-
+            grid_x1 = grids.x
+            grid_x2 = grids.y
             ff_flag = False
 
 
         elif project == 'yz':
-            grid_x1 = surfaceObject.grid_y / conv
-            grid_x2 = surfaceObject.grid_z / conv
-
-            cx1 = 'y'
-            cx2 = 'z'
-
+            grid_x1 = grids.y
+            grid_x2 = grids.z
             ff_flag = False
 
         elif project == 'zx':
-            grid_x1 = surfaceObject.grid_z / conv
-            grid_x2 = surfaceObject.grid_x / conv
-
-            cx1 = 'z'
-            cx2 = 'x'
-
+            grid_x1 = grids.z
+            grid_x2 = grids.x
             ff_flag = False
+
+        if plotObject["gmode"] == 2:
+            ff_flag = True
 
         extent = [np.min(grid_x1), np.max(grid_x1), np.min(grid_x2), np.max(grid_x2)]
 
         if not amp_only:
             fig, ax = pt.subplots(1,2, figsize=(10,5), gridspec_kw={'wspace':0.5})
-
-            divider1 = make_axes_locatable(ax[0])
-            divider2 = make_axes_locatable(ax[1])
-
-            cax1 = divider1.append_axes('right', size='5%', pad=0.05)
-            cax2 = divider2.append_axes('right', size='5%', pad=0.05)
 
             if mode == 'linear':
                 ampfig = ax[0].imshow(np.absolute(field), origin='lower', extent=extent, cmap=cmaps.parula, interpolation=interpolation)
@@ -96,34 +66,45 @@ class Plotter(object):
 
             elif mode == 'dB':
                 if polar:
-                    extent = [grid_x1[0,0], grid_x1[-1,0], grid_x2[0,0], grid_x2[0,-1]]
-                    ampfig = ax[0].pcolormesh(grid_x1, grid_x2, 20 * np.log10(np.absolute(field) / np.max(np.absolute(field))), vmin=vmin, vmax=vmax, cmap=cmaps.parula, shading='auto')
+                    ampfig = ax[0].pcolormesh(grid_x1, grid_x2, 20 * np.log10(np.absolute(field) / max_field),
+                                            vmin=vmin, vmax=vmax, cmap=cmaps.parula, shading='auto')
                     phasefig = ax[1].pcolormesh(grid_x1, grid_x2, np.angle(field), cmap=cmaps.parula, shading='auto')
 
                 else:
+                    ampfig = ax[0].imshow(20 * np.log10(np.absolute(np.flip(field)) / max_field),
+                                        vmin=vmin, vmax=vmax, origin='lower', extent=extent,
+                                        cmap=cmaps.parula, interpolation=interpolation)
                     phasefig = ax[1].imshow(np.angle(np.flip(field)), origin='lower', extent=extent, cmap=cmaps.parula)
-                    ampfig = ax[0].imshow(20 * np.log10(np.absolute(np.flip(field)) / np.max(np.absolute(field))), vmin=vmin, vmax=vmax, origin='lower', extent=extent, cmap=cmaps.parula, interpolation=interpolation)
 
+            divider1 = make_axes_locatable(ax[0])
+            divider2 = make_axes_locatable(ax[1])
+
+            cax1 = divider1.append_axes('right', size='5%', pad=0.05)
+            cax2 = divider2.append_axes('right', size='5%', pad=0.05)
+
+            c1 = fig.colorbar(ampfig, cax=cax1, orientation='vertical')
+            c2 = fig.colorbar(phasefig, cax=cax2, orientation='vertical')
 
             if ff_flag:
                 ax[0].set_ylabel(r"El / [{}]".format(units))
                 ax[0].set_xlabel(r"Az / [{}]".format(units))
                 ax[1].set_ylabel(r"El / [{}]".format(units))
                 ax[1].set_xlabel(r"Az / [{}]".format(units))
+                ax[0].set_box_aspect(1)
+                ax[1].set_box_aspect(1)
 
             else:
-                ax[0].set_ylabel(r"${}$ / [{}]".format(cx2, units))
-                ax[0].set_xlabel(r"${}$ / [{}]".format(cx1, units))
-                ax[1].set_ylabel(r"${}$ / [{}]".format(cx2, units))
-                ax[1].set_xlabel(r"${}$ / [{}]".format(cx1, units))
+                ax[0].set_ylabel(r"$y$ / [{}]".format(units))
+                ax[0].set_xlabel(r"$x$ / [{}]".format(units))
+                ax[1].set_ylabel(r"$y$ / [{}]".format(units))
+                ax[1].set_xlabel(r"$x$ / [{}]".format(units))
 
-            ax[0].set_title(titleAmp, y=1.08)
+            ax[0].set_title(titleA, y=1.08)
             ax[0].set_aspect(1)
-            ax[1].set_title(titlePhase, y=1.08)
+            ax[1].set_title(titleP, y=1.08)
             ax[1].set_aspect(1)
 
-            c1 = fig.colorbar(ampfig, cax=cax1, orientation='vertical')
-            c2 = fig.colorbar(phasefig, cax=cax2, orientation='vertical')
+
 
             if plot_aper["plot"]:
                 xc = plot_aper["center"][0]
@@ -153,10 +134,10 @@ class Plotter(object):
                 ax.set_xlabel(r"Az / [{}]".format(units))
 
             else:
-                ax.set_ylabel(r"${}$ / [{}]".format(cx2, units))
-                ax.set_xlabel(r"${}$ / [{}]".format(cx1, units))
+                ax.set_ylabel(r"$y$ / [{}]".format(conv))
+                ax.set_xlabel(r"$x$ / [{}]".format(conv))
 
-            ax.set_title(titleAmp, y=1.08)
+            ax.set_title(titleA, y=1.08)
             ax.set_box_aspect(1)
 
             c = fig.colorbar(ampfig, cax=cax, orientation='vertical')
@@ -173,7 +154,8 @@ class Plotter(object):
 
 
         if save:
-            pt.savefig(fname=self.savePath + '{}_{}_{}.jpg'.format(surfaceObject.name, comp, name),bbox_inches='tight', dpi=300)
+            pt.savefig(fname=self.savePath + '{}_.jpg'.format(surfaceObject["name"]),
+                        bbox_inches='tight', dpi=300)
 
         if show:
             pt.show()
@@ -271,17 +253,13 @@ class Plotter(object):
             return fig, ax
 
         pt.close()
-
+    """
     def beamCut(self, plotObject, field, cross='', units='', vmin=-50, vmax=0, frac=1, show=True, save=False, ret=False):
-        if units:
-            conv = plotObject.get_conv(units)
-            units = units
-        else:
-            conv = plotObject.conv
-            units = plotObject.units
 
-        x_center = int((plotObject.shape[0] - 1) / 2)
-        y_center = int((plotObject.shape[1] - 1) / 2)
+        x_center = int((plotObject["gridsize"][0] - 1) / 2)
+        y_center = int((plotObject["gridsize"][1] - 1) / 2)
+
+        grids = generateGrid(plotObject, spheric=False)
 
         comp = field[1]
         field = field[0]
@@ -336,7 +314,7 @@ class Plotter(object):
 
         if ret:
             return field[:,y_center], field[:,y_center]
-
+    """
     def plotRTframe(self, frame, project="xy"):
         fig, ax = pt.subplots(1,1)
 

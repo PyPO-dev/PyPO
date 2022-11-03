@@ -16,7 +16,7 @@ def loadRefllib():
     return lib
 
 #### DOUBLE PRECISION
-def generateGrid(reflparams_py):
+def generateGrid(reflparams_py, transform=True, spheric=True):
     lib = loadRefllib()
     size = reflparams_py["gridsize"][0] * reflparams_py["gridsize"][1]
 
@@ -26,16 +26,17 @@ def generateGrid(reflparams_py):
     allfill_reflparams(inp, reflparams_py, ctypes.c_double)
     allocate_reflcontainer(res, size, ctypes.c_double)
 
-    lib.generateGrid.argtypes = [reflparams, ctypes.POINTER(reflcontainer)]
+    lib.generateGrid.argtypes = [reflparams, ctypes.POINTER(reflcontainer),
+                                ctypes.c_bool, ctypes.c_bool]
     lib.generateGrid.restype = None
 
-    lib.generateGrid(inp, ctypes.byref(res))
+    lib.generateGrid(inp, ctypes.byref(res), transform, spheric)
     grids = creflToObj(res, reflparams_py["gridsize"], np.float64)
 
     return grids
 
 #### SINGLE PRECISION
-def generateGridf(reflparams_py):
+def generateGridf(reflparams_py, transform=True, spheric=True):
     lib = loadRefllib()
     size = reflparams_py["gridsize"][0] * reflparams_py["gridsize"][1]
 
@@ -45,10 +46,11 @@ def generateGridf(reflparams_py):
     allfill_reflparams(inp, reflparams_py, ctypes.c_float)
     allocate_reflcontainer(res, size, ctypes.c_float)
 
-    lib.generateGridf.argtypes = [reflparamsf, ctypes.POINTER(reflcontainerf)]
+    lib.generateGridf.argtypes = [reflparamsf, ctypes.POINTER(reflcontainerf),
+                                ctypes.c_bool, ctypes.c_bool]
     lib.generateGridf.restype = None
 
-    lib.generateGridf(inp, ctypes.byref(res))
+    lib.generateGridf(inp, ctypes.byref(res), transform, spheric)
 
     grids = creflToObj(res, reflparams_py["gridsize"], np.float32)
 

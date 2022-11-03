@@ -19,23 +19,7 @@
 #define CSIZE 10
 #define MILLISECOND 1000
 
-/* This program calculates the PO propagation between a source and a target plane.
- * NOTE: This file contains the CUDA version of PhysBeam
- *
- * In order to run, the presence of the following .txt files in the POPPy/src/C++/input/ is required:
- * - s_Jr_(x,y,z).txt the real x,y,z components of the source electric current distribution
- * - s_Ji_(x,y,z).txt the imaginary x,y,z components of the source electric current distribution
- * - s_Mr_(x,y,z).txt the real x,y,z components of the source magnetic current distribution
- * - s_Mi_(x,y,z).txt the imaginary x,y,z components of the source magnetic current distribution
- *
- * - s_(x,y,z).txt the source x,y,z grids
- * - s_n(x,y,z).txt the source nx,ny,nz normal grids
- * - A_s the source area elements corresponding to points x,y,z
- *
- * - t_(x,y,z).txt the target x,y,z grids
- * - t_n(x,y,z).txt the target nx,ny,nz normal grids
- *
- *
+/* Kernels for single precision PO.
  * Author: Arend Moerman
  * For questions, contact: arendmoerman@gmail.com
  */
@@ -64,6 +48,17 @@ __host__ inline void gpuAssert(cudaError_t code, const char *file, int line, boo
       fprintf(stderr,"GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
       if (abort) exit(code);
    }
+}
+
+
+__host__ __device__ void _debugArray(cuFloatComplex arr[3])
+{
+    printf("%f + %fj, %f + %fj, %f + %fj\n", arr[0].x, arr[0].y, arr[1].x, arr[1].y, arr[2].x, arr[2].y);
+}
+
+__host__ __device__ void _debugArray(float arr[3])
+{
+    printf("%f, %f, %f\n", arr[0], arr[1], arr[2]);
 }
 
 __device__ __inline__ cuFloatComplex expCo(cuFloatComplex z)
@@ -269,72 +264,6 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
 
 }
 
-__device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
-                                cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
-                                cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz,
-                                float (&r_hat)[3], float *d_A, cuFloatComplex (&e)[3])
-{
-    // Scalars (float & complex float)
-    float omega_mu;                       // Angular frequency of field times mu
-    float r_hat_in_rp;                 // r_hat dot product r_prime
-
-    // Arrays of floats
-    float source_point[3]; // Container for xyz co-ordinates
-
-    // Arrays of complex floats
-    cuFloatComplex js[3];      // Build radiation integral
-    cuFloatComplex ms[3];      // Build radiation integral
-
-    cuFloatComplex _ctemp[3];
-    cuFloatComplex js_tot_factor[3];
-    cuFloatComplex ms_tot_factor[3];
-
-    // Matrices
-    float rr_dyad[3][3];       // Dyadic product between r_hat - r_hat
-    float eye_min_rr[3][3];    // I - rr
-
-    //omega_mu = C_L * k * MU_0;
-    omega_mu = con[5].x * con[0].x * con[2].x;
-    dyad(r_hat, r_hat, rr_dyad);
-    matDiff(eye, rr_dyad, eye_min_rr);
-
-    e[0] = con[8];
-    e[1] = con[8];
-    e[2] = con[8];
-
-    for(int i=0; i<g_s; i++)
-    {
-        source_point[0] = d_xs[i];
-        source_point[1] = d_ys[i];
-        source_point[2] = d_zs[i];
-
-        dot(r_hat, source_point, r_hat_in_rp);
-
-        cuFloatComplex cfact = cuCmulf(con[7], make_cuFloatComplex((con[0].x * r_hat_in_rp), 0.));
-        cuFloatComplex expo = expCo(cfact);
-        cfact = cuCmulf(expo, make_cuFloatComplex(d_A[i], 0.));
-
-        js[0] = cuCaddf(js[0], cuCmulf(d_Jx[i], cfact));
-        js[1] = cuCaddf(js[1], cuCmulf(d_Jy[i], cfact));
-        js[2] = cuCaddf(js[2], cuCmulf(d_Jz[i], cfact));
-
-        ms[0] = cuCaddf(ms[0], cuCmulf(d_Mx[i], cfact));
-        ms[1] = cuCaddf(ms[1], cuCmulf(d_My[i], cfact));
-        ms[2] = cuCaddf(ms[2], cuCmulf(d_Mz[i], cfact));
-
-    }
-    matVec(eye_min_rr, js, _ctemp);
-    s_mult(_ctemp, omega_mu, js_tot_factor);
-
-    ext(r_hat, ms, _ctemp);
-    s_mult(_ctemp, con[0].x, ms_tot_factor);
-
-    for (int n=0; n<3; n++)
-    {
-        e[n] = cuCsubf(ms_tot_factor[n], js_tot_factor[n]);
-    }
-}
-
 /**
  * Kernel for toPrint == 0: save J and M.
  *
@@ -399,7 +328,6 @@ __global__ void GpropagateBeam_0(float *d_xs, float *d_ys, float *d_zs,
     cuFloatComplex d_hi[3];
 
     int idx = blockDim.x*blockIdx.x + threadIdx.x;
-    //printf("%d\n", idx);
     if (idx < g_t)
     {
         point[0] = d_xt[idx];
@@ -422,7 +350,7 @@ __global__ void GpropagateBeam_0(float *d_xs, float *d_ys, float *d_zs,
 
         for (int n=0; n<3; n++)
         {
-            e_out_h_r[n] = cuCrealf(temp2[n]);                      // e_out_h_r
+            e_out_h_r[n] = temp2[n].x;                      // e_out_h_r
         }
 
         normalize(e_out_h_r, S_i_norm);                       // S_i_norm
@@ -639,7 +567,7 @@ __global__ void GpropagateBeam_2(float *d_xs, float *d_ys, float *d_zs,
 
         for (int n=0; n<3; n++)
         {
-            e_out_h_r[n] = cuCrealf(temp2[n]);                      // e_out_h_r
+            e_out_h_r[n] = temp2[n].x;                      // e_out_h_r
         }
 
         normalize(e_out_h_r, S_i_norm);                       // S_i_norm
@@ -760,6 +688,7 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
     int idx = blockDim.x*blockIdx.x + threadIdx.x;
     if (idx < g_t)
     {
+
         point[0] = d_xt[idx];
         point[1] = d_yt[idx];
         point[2] = d_zt[idx];
@@ -774,13 +703,14 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
                     d_Mx, d_My, d_Mz,
                     point, d_A, d_ei, d_hi);
 
+        d_Ext[idx] = d_ei[0];
         // Calculate normalised incoming poynting vector.
         conja(d_hi, temp1);                        // h_conj
         ext(d_ei, temp1, temp2);                  // e_out_h
 
         for (int n=0; n<3; n++)
         {
-            e_out_h_r[n] = cuCrealf(temp2[n]);                      // e_out_h_r
+            e_out_h_r[n] = temp2[n].x;                      // e_out_h_r
         }
 
         normalize(e_out_h_r, S_i_norm);                       // S_i_norm
@@ -792,6 +722,8 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
 
         // Now calculate reflected poynting vector.
         snell(S_i_norm, norms, S_r_norm);                // S_r_norm
+
+
 
         // Store REFLECTED Pynting vectors
         d_Prxt[idx] = S_r_norm[0];
@@ -817,7 +749,7 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
         s_mult(temp1, con[3], h_r);                     // ZETA_0_INV, h_r
 
         // Store REFLECTED fields
-        d_Ext[idx] = e_r[0];
+        //d_Ext[idx] = e_r[0];
         d_Eyt[idx] = e_r[1];
         d_Ezt[idx] = e_r[2];
 
@@ -826,6 +758,76 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
         d_Hzt[idx] = h_r[2];
     }
 }
+
+__device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
+                                cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
+                                cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz,
+                                float (&r_hat)[3], float *d_A, cuFloatComplex (&e)[3])
+{
+    // Scalars (float & complex float)
+    float omega_mu;                       // Angular frequency of field times mu
+    float r_hat_in_rp;                 // r_hat dot product r_prime
+
+    // Arrays of floats
+    float source_point[3]; // Container for xyz co-ordinates
+
+    // Arrays of complex floats
+    cuFloatComplex js[3] = {con[8], con[8], con[8]};      // Build radiation integral
+    cuFloatComplex ms[3] = {con[8], con[8], con[8]};      // Build radiation integral
+
+    cuFloatComplex _ctemp[3];
+    cuFloatComplex js_tot_factor[3];
+    cuFloatComplex ms_tot_factor[3];
+    cuFloatComplex expo;
+    cuFloatComplex cfact;
+
+    // Matrices
+    float rr_dyad[3][3];       // Dyadic product between r_hat - r_hat
+    float eye_min_rr[3][3];    // I - rr
+
+    omega_mu = con[5].x * con[0].x * con[2].x;
+    dyad(r_hat, r_hat, rr_dyad);
+    matDiff(eye, rr_dyad, eye_min_rr);
+
+    e[0] = con[8];
+    e[1] = con[8];
+    e[2] = con[8];
+
+    for(int i=0; i<g_s; i++)
+    {
+        source_point[0] = d_xs[i];
+        source_point[1] = d_ys[i];
+        source_point[2] = d_zs[i];
+
+        dot(r_hat, source_point, r_hat_in_rp);
+
+        expo = expCo(cuCmulf(con[7], make_cuFloatComplex((con[0].x * r_hat_in_rp), 0.)));
+
+        //if (i==100){printf("%f\n", expo.x);}
+        cfact = cuCmulf(expo, make_cuFloatComplex(d_A[i], 0.));
+
+        js[0] = cuCaddf(js[0], cuCmulf(d_Jx[i], cfact));
+        js[1] = cuCaddf(js[1], cuCmulf(d_Jy[i], cfact));
+        js[2] = cuCaddf(js[2], cuCmulf(d_Jz[i], cfact));
+
+        ms[0] = cuCaddf(ms[0], cuCmulf(d_Mx[i], cfact));
+        ms[1] = cuCaddf(ms[1], cuCmulf(d_My[i], cfact));
+        ms[2] = cuCaddf(ms[2], cuCmulf(d_Mz[i], cfact));
+
+    }
+    matVec(eye_min_rr, js, _ctemp);
+    s_mult(_ctemp, omega_mu, js_tot_factor);
+
+    ext(r_hat, ms, _ctemp);
+    s_mult(_ctemp, con[0].x, ms_tot_factor);
+
+    for (int n=0; n<3; n++)
+    {
+        e[n] = cuCsubf(ms_tot_factor[n], js_tot_factor[n]);
+    }
+}
+
+
 /*
  * Kernel 4, propagation to far field
  * */
@@ -833,7 +835,8 @@ void __global__ GpropagateBeam_4(float *d_xs, float *d_ys, float *d_zs,
                                 float *d_A, float *d_xt, float *d_yt,
                                 cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
                                 cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz,
-                                cuFloatComplex *d_Ext, cuFloatComplex *d_Eyt, cuFloatComplex *d_Ezt)
+                                cuFloatComplex *d_Ext, cuFloatComplex *d_Eyt, cuFloatComplex *d_Ezt,
+                                cuFloatComplex *d_Hxt, cuFloatComplex *d_Hyt, cuFloatComplex *d_Hzt)
 {
     // Scalars (float & complex float)
     float theta;
@@ -848,19 +851,26 @@ void __global__ GpropagateBeam_4(float *d_xs, float *d_ys, float *d_zs,
     int idx = blockDim.x*blockIdx.x + threadIdx.x;
     if (idx < g_t)
     {
-        theta   = d_xt[idx];
-        phi     = d_yt[idx];
+        phi     = d_xt[idx];
+        theta   = d_yt[idx];
 
         r_hat[0] = cos(theta) * sin(phi);
         r_hat[1] = sin(theta) * sin(phi);
         r_hat[2] = cos(phi);
 
         // Calculate total incoming E field at point on far-field
-        farfieldAtPoint(d_xs, d_ys, d_zs, d_Jx, d_Jy, d_Jz, d_Mx, d_My, d_Mz, r_hat, d_A, e);
+        farfieldAtPoint(d_xs, d_ys, d_zs,
+                      d_Jx, d_Jy, d_Jz,
+                      d_Mx, d_My, d_Mz,
+                      r_hat, d_A, e);
 
         d_Ext[idx] = e[0];
         d_Eyt[idx] = e[1];
         d_Ezt[idx] = e[2];
+
+        d_Hxt[idx] = e[0];
+        d_Hyt[idx] = e[1];
+        d_Hzt[idx] = e[2];
     }
 }
 
@@ -1031,8 +1041,17 @@ __host__ void _arrCUDACToC(cuFloatComplex* carr, float *rarr, float *iarr, int s
 {
     for (int i=0; i<size; i++)
     {
-        rarr[i] = cuCrealf(carr[i]);
-        iarr[i] = cuCimagf(carr[i]);
+        rarr[i] = carr[i].x;
+        iarr[i] = carr[i].x;
+    }
+}
+
+__host__ void _arrCUDACToR3(cuFloatComplex* carr, float *rarr, float *iarr, int size)
+{
+    for (int i=0; i<size; i++)
+    {
+        rarr[i] = carr[i].x;
+        iarr[i] = carr[i].x;
     }
 }
 
@@ -1043,14 +1062,14 @@ __host__ void _arrCUDACToC3(cuFloatComplex* c1arr, cuFloatComplex* c2arr, cuFloa
 {
     for (int i=0; i<size; i++)
     {
-        r1arr[i] = cuCrealf(c1arr[i]);
-        i1arr[i] = cuCimagf(c1arr[i]);
+        r1arr[i] = c1arr[i].x;
+        i1arr[i] = c1arr[i].y;
 
-        r2arr[i] = cuCrealf(c2arr[i]);
-        i2arr[i] = cuCimagf(c2arr[i]);
+        r2arr[i] = c2arr[i].x;
+        i2arr[i] = c2arr[i].y;
 
-        r3arr[i] = cuCrealf(c3arr[i]);
-        i3arr[i] = cuCimagf(c3arr[i]);
+        r3arr[i] = c3arr[i].x;
+        i3arr[i] = c3arr[i].y;
     }
 }
 
@@ -1202,7 +1221,7 @@ extern "C" void callKernelf_JM(c2Bundlef *res, reflparamsf source, reflparamsf t
 
     std::cout << "Elapsed time : "
             << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-            << " [s]" << std::endl;
+            << " [s]\n" << std::endl;
 
     // Allocate Host arrays for J and M
     cuFloatComplex *h_Jxt = new cuFloatComplex[ct->size];
@@ -1366,7 +1385,7 @@ extern "C" void callKernelf_EH(c2Bundlef *res, reflparamsf source, reflparamsf t
 
     std::cout << "Elapsed time : "
             << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-            << " [s]" << std::endl;
+            << " [s]\n" << std::endl;
 
     // Allocate Host arrays for E and H
     cuFloatComplex *h_Ext = new cuFloatComplex[ct->size];
@@ -1535,7 +1554,7 @@ extern "C" void callKernelf_JMEH(c4Bundlef *res, reflparamsf source, reflparamsf
     std::chrono::steady_clock::time_point end;
 
     // Call to KERNEL 2
-    printf("Calculating J, H, E and H...\n");
+    printf("Calculating J, M, E and H...\n");
     begin = std::chrono::steady_clock::now();
     GpropagateBeam_2<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs,
                                    d_A, d_xt, d_yt, d_zt,
@@ -1553,7 +1572,7 @@ extern "C" void callKernelf_JMEH(c4Bundlef *res, reflparamsf source, reflparamsf
 
     std::cout << "Elapsed time : "
             << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-            << " [s]" << std::endl;
+            << " [s]\n" << std::endl;
 
     // Allocate Host arrays for J and M
     cuFloatComplex *h_Jxt = new cuFloatComplex[ct->size];
@@ -1647,10 +1666,10 @@ extern "C" void callKernelf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf
     // Create pointers to device arrays and allocate/copy source grid and area.
     float *d_xs, *d_ys, *d_zs, *d_A;
 
-    gpuErrchk( cudaMalloc((void**)&d_xs, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_ys, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_zs, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_A, ct->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_xs, cs->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_ys, cs->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_zs, cs->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_A, cs->size * sizeof(float)) );
 
     gpuErrchk( cudaMemcpy(d_xs, cs->x, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
     gpuErrchk( cudaMemcpy(d_ys, cs->y, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
@@ -1663,17 +1682,17 @@ extern "C" void callKernelf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf
     gpuErrchk( cudaMalloc((void**)&d_yt, ct->size * sizeof(float)) );
     gpuErrchk( cudaMalloc((void**)&d_zt, ct->size * sizeof(float)) );
 
-    gpuErrchk( cudaMemcpy(d_xt, ct->x, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_yt, ct->y, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_zt, ct->z, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_xt, ct->x, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_yt, ct->y, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_zt, ct->z, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
 
     gpuErrchk( cudaMalloc((void**)&d_nxt, ct->size * sizeof(float)) );
     gpuErrchk( cudaMalloc((void**)&d_nyt, ct->size * sizeof(float)) );
     gpuErrchk( cudaMalloc((void**)&d_nzt, ct->size * sizeof(float)) );
 
-    gpuErrchk( cudaMemcpy(d_nxt, ct->nx, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_nyt, ct->ny, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_nzt, ct->nz, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_nxt, ct->nx, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_nyt, ct->ny, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_nzt, ct->nz, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
 
     cuFloatComplex *h_Jx = new cuFloatComplex[cs->size];
     cuFloatComplex *h_Jy = new cuFloatComplex[cs->size];
@@ -1760,7 +1779,7 @@ extern "C" void callKernelf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf
 
     std::cout << "Elapsed time : "
             << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-            << " [s]" << std::endl;
+            << " [s]\n" << std::endl;
 
     // Allocate Host arrays for E, H and P
     cuFloatComplex *h_Ext = new cuFloatComplex[ct->size];
@@ -1784,9 +1803,9 @@ extern "C" void callKernelf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf
     gpuErrchk( cudaMemcpy(h_Hyt, d_Hyt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
     gpuErrchk( cudaMemcpy(h_Hzt, d_Hzt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
 
-    gpuErrchk( cudaMemcpy(h_Prxt, d_Prxt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Pryt, d_Pryt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Przt, d_Przt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+    gpuErrchk( cudaMemcpy(h_Prxt, d_Prxt, ct->size * sizeof(float), cudaMemcpyDeviceToHost) );
+    gpuErrchk( cudaMemcpy(h_Pryt, d_Pryt, ct->size * sizeof(float), cudaMemcpyDeviceToHost) );
+    gpuErrchk( cudaMemcpy(h_Przt, d_Przt, ct->size * sizeof(float), cudaMemcpyDeviceToHost) );
 
     // Free Device memory
     gpuErrchk( cudaDeviceReset() );
@@ -1794,9 +1813,12 @@ extern "C" void callKernelf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf
     _arrCUDACToC3(h_Ext, h_Eyt, h_Ezt, res->r1x, res->r1y, res->r1z, res->i1x, res->i1y, res->i1z, ct->size);
     _arrCUDACToC3(h_Hxt, h_Hyt, h_Hzt, res->r2x, res->r2y, res->r2z, res->i2x, res->i2y, res->i2z, ct->size);
 
-    res->r3x = h_Prxt;
-    res->r3y = h_Pryt;
-    res->r3z = h_Przt;
+    for (int i=0; i<ct->size; i++)
+    {
+        res->r3x[i] = h_Prxt[i];
+        res->r3y[i] = h_Pryt[i];
+        res->r3z[i] = h_Przt[i];
+    }
 
     // Delete host arrays for target fields
     delete h_Ext;
@@ -1824,80 +1846,152 @@ extern "C" void callKernelf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf
  * @param h_z Pointer for z array on host.
  * @param size Number of elements of h_x/d_x.
  */
-/*
-extern "C" void callKernelf_FF(arrC3f *res, float *xt, float *yt,
-                                float *xs, float *ys, float *zs,
-                                float *rJxs, float *rJys, float *rJzs,
-                                float *iJxs, float *iJys, float *iJzs,
-                                float *rMxs, float *rMys, float *rMzs,
-                                float *iMxs, float *iMys, float *iMzs,
-                                float *area, float k, float epsilon, int ct->size, int cs->size,
+extern "C" void callKernelf_FF(c2Bundlef *res, reflparamsf source, reflparamsf target,
+                                reflcontainerf *cs, reflcontainerf *ct,
+                                c2Bundlef *currents,
+                                float k, float epsilon,
                                 float t_direction, int nBlocks, int nThreads)
 {
+    // Generate source and target grids
+    generateGridf(source, cs);
+    generateGridf(target, ct);
+
     // Initialize and copy constant memory to device
     std::array<dim3, 2> BT;
     BT = _initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
-
+    //alsd
     // Create pointers to device arrays and allocate/copy source grid and area.
     float *d_xs, *d_ys, *d_zs, *d_A;
-    _allocateGridR3ToGPU(d_xs, d_ys, d_zs, xs, ys, zs, cs->size);
-    _allocateGridR1ToGPU(d_A, area, cs->size);
 
-    // Create pointers to target grid and normal vectors
+    gpuErrchk( cudaMalloc((void**)&d_xs, cs->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_ys, cs->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_zs, cs->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_A, cs->size * sizeof(float)) );
+
+    gpuErrchk( cudaMemcpy(d_xs, cs->x, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_ys, cs->y, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_zs, cs->z, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_A, cs->area, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+
+    // Create pointers to target grid
     float *d_xt, *d_yt;
-    _allocateGridR2ToGPU(d_xt, d_yt, xt, yt, ct->size);
+    gpuErrchk( cudaMalloc((void**)&d_xt, ct->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_yt, ct->size * sizeof(float)) );
 
-    cuFloatComplex *h_Jx, *h_Jy, *h_Jz;
-    cuFloatComplex *h_Mx, *h_My, *h_Mz;
+    gpuErrchk( cudaMemcpy(d_xt, ct->x, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_yt, ct->y, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
+
+    cuFloatComplex *h_Jx = new cuFloatComplex[cs->size];
+    cuFloatComplex *h_Jy = new cuFloatComplex[cs->size];
+    cuFloatComplex *h_Jz = new cuFloatComplex[cs->size];
+
+    cuFloatComplex *h_Mx = new cuFloatComplex[cs->size];
+    cuFloatComplex *h_My = new cuFloatComplex[cs->size];
+    cuFloatComplex *h_Mz = new cuFloatComplex[cs->size];
+
+    _arrC3ToCUDAC(currents->r1x, currents->r1y, currents->r1z,
+                  currents->i1x, currents->i1y, currents->i1z,
+                  h_Jx, h_Jy, h_Jz, cs->size);
+
+    _arrC3ToCUDAC(currents->r2x, currents->r2y, currents->r2z,
+                  currents->i2x, currents->i2y, currents->i2z,
+                  h_Mx, h_My, h_Mz, cs->size);
 
     cuFloatComplex *d_Jx, *d_Jy, *d_Jz;
     cuFloatComplex *d_Mx, *d_My, *d_Mz;
 
-    _arrC3ToCUDAC(rJxs, rJys, rJzs, iJxs, iJys, iJzs,
-                    h_Jx, h_Jy, h_Jz, cs->size);
+    // Allocate and copy J and M currents
+    gpuErrchk( cudaMalloc((void**)&d_Jx, cs->size * sizeof(cuFloatComplex)) );
+    gpuErrchk( cudaMalloc((void**)&d_Jy, cs->size * sizeof(cuFloatComplex)) );
+    gpuErrchk( cudaMalloc((void**)&d_Jz, cs->size * sizeof(cuFloatComplex)) );
 
-    _arrC3ToCUDAC(rMxs, rMys, rMzs, iMxs, iMys, iMzs,
-                    h_Mx, h_My, h_Mz, cs->size);
+    gpuErrchk( cudaMemcpy(d_Jx, h_Jx, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_Jy, h_Jy, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_Jz, h_Jz, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
 
-    _allocateGridC3ToGPU(d_Jx, d_Jy, d_Jz, h_Jx, h_Jy, h_Jz, cs->size);
-    _allocateGridC3ToGPU(d_Mx, d_My, d_Mz, h_Mx, h_My, h_Mz, cs->size);
+    gpuErrchk( cudaMalloc((void**)&d_Mx, cs->size * sizeof(cuFloatComplex)) );
+    gpuErrchk( cudaMalloc((void**)&d_My, cs->size * sizeof(cuFloatComplex)) );
+    gpuErrchk( cudaMalloc((void**)&d_Mz, cs->size * sizeof(cuFloatComplex)) );
+
+    gpuErrchk( cudaMemcpy(d_Mx, h_Mx, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_My, h_My, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_Mz, h_Mz, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
+
+    // Delete host arrays for source currents - not needed anymore
+    delete h_Jx;
+    delete h_Jy;
+    delete h_Jz;
+
+    delete h_Mx;
+    delete h_My;
+    delete h_Mz;
 
     cuFloatComplex *d_Ext, *d_Eyt, *d_Ezt;
+    cuFloatComplex *d_Hxt, *d_Hyt, *d_Hzt;
 
-    _allocateGridC3(d_Ext, d_Eyt, d_Ezt, cs->size);
+    gpuErrchk( cudaMalloc((void**)&d_Ext, ct->size * sizeof(cuFloatComplex)) );
+    gpuErrchk( cudaMalloc((void**)&d_Eyt, ct->size * sizeof(cuFloatComplex)) );
+    gpuErrchk( cudaMalloc((void**)&d_Ezt, ct->size * sizeof(cuFloatComplex)) );
+
+    gpuErrchk( cudaMalloc((void**)&d_Hxt, ct->size * sizeof(cuFloatComplex)) );
+    gpuErrchk( cudaMalloc((void**)&d_Hyt, ct->size * sizeof(cuFloatComplex)) );
+    gpuErrchk( cudaMalloc((void**)&d_Hzt, ct->size * sizeof(cuFloatComplex)) );
 
     // Create stopping event for kernel
     cudaEvent_t event;
     gpuErrchk( cudaEventCreateWithFlags(&event, cudaEventDisableTiming) );
 
-    // Call to KERNEL 4
+    std::chrono::steady_clock::time_point begin;
+    std::chrono::steady_clock::time_point end;
+
+    // Call to KERNEL 1
+    printf("Calculating E and H, far-field...\n");
+    begin = std::chrono::steady_clock::now();
     GpropagateBeam_4<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs,
                                 d_A, d_xt, d_yt,
                                 d_Jx, d_Jy, d_Jz,
                                 d_Mx, d_My, d_Mz,
-                                d_Ext, d_Eyt, d_Ezt);
+                                d_Ext, d_Eyt, d_Ezt,
+                                d_Hxt, d_Hyt, d_Hzt);
 
     gpuErrchk( cudaDeviceSynchronize() );
 
-    // Allocate, on stackframe, Host arrays for E and H
-    cuFloatComplex h_Ext[ct->size], h_Eyt[ct->size], h_Ezt[ct->size];
+    end = std::chrono::steady_clock::now();
+
+    std::cout << "Elapsed time : "
+            << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
+            << " [s]\n" << std::endl;
+
+    // Allocate Host arrays for E and H
+    cuFloatComplex *h_Ext = new cuFloatComplex[ct->size];
+    cuFloatComplex *h_Eyt = new cuFloatComplex[ct->size];
+    cuFloatComplex *h_Ezt = new cuFloatComplex[ct->size];
+
+    cuFloatComplex *h_Hxt = new cuFloatComplex[ct->size];
+    cuFloatComplex *h_Hyt = new cuFloatComplex[ct->size];
+    cuFloatComplex *h_Hzt = new cuFloatComplex[ct->size];
 
     // Copy data back from Device to Host
-    _allocateGridGPUToC3(h_Ext, h_Eyt, h_Ezt, d_Ext, d_Eyt, d_Ezt, ct->size);
+    gpuErrchk( cudaMemcpy(h_Ext, d_Ext, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+    gpuErrchk( cudaMemcpy(h_Eyt, d_Eyt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+    gpuErrchk( cudaMemcpy(h_Ezt, d_Ezt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+
+    gpuErrchk( cudaMemcpy(h_Hxt, d_Hxt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+    gpuErrchk( cudaMemcpy(h_Hyt, d_Hyt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+    gpuErrchk( cudaMemcpy(h_Hzt, d_Hzt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
 
     // Free Device memory
     gpuErrchk( cudaDeviceReset() );
 
-    // Create arrays of floats, for transferring back output
-    float *rExt, *rEyt, *rEzt, *iExt, *iEyt, *iEzt;
+    _arrCUDACToC3(h_Ext, h_Eyt, h_Ezt, res->r1x, res->r1y, res->r1z, res->i1x, res->i1y, res->i1z, ct->size);
+    _arrCUDACToC3(h_Hxt, h_Hyt, h_Hzt, res->r2x, res->r2y, res->r2z, res->i2x, res->i2y, res->i2z, ct->size);
 
-    _arrCUDACToC3(h_Ext, h_Eyt, h_Ezt, rExt, rEyt, rEzt, iExt, iEyt, iEzt, ct->size);
+    // Delete host arrays for target fields
+    delete h_Ext;
+    delete h_Eyt;
+    delete h_Ezt;
 
-    arrC3 *out = new arrC3;
-    if (out == NULL) exit (1); //EXIT_FAILURE
-
-    fill_arrC3(out, rExt, rEyt, rEzt, iExt, iEyt, iEzt);
-
-    return out;
+    delete h_Hxt;
+    delete h_Hyt;
+    delete h_Hzt;
 }
-*/

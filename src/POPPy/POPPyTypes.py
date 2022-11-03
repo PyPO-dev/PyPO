@@ -54,9 +54,9 @@ class fields(object):
 
 class rfield(object):
     def __init__(self, Prx, Pry, Prz):
-        self.Prx = Prx
-        self.Pry = Pry
-        self.Prz = Prz
+        self.x = Prx
+        self.y = Pry
+        self.z = Prz
 
 class reflGrids(object):
     def __init__(self, x, y, z, nx, ny, nz, area):
@@ -69,3 +69,14 @@ class reflGrids(object):
         self.nz = nz
 
         self.area = area
+
+class frame(object):
+    def __init__(self, size, x, y, z, dx, dy, dz):
+        self.size = size
+        self.x = x
+        self.y = y
+        self.z = z
+
+        self.dx = dx
+        self.dy = dy
+        self.dz = dz

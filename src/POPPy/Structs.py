@@ -76,7 +76,7 @@ class reflparams(ctypes.Structure):
                 ("lyv", ctypes.POINTER(ctypes.c_double)),
                 ("n_cells", ctypes.POINTER(ctypes.c_int)),
                 ("flip", ctypes.c_bool),
-                ("gmode", ctypes.c_bool),
+                ("gmode", ctypes.c_int),
                 ("type", ctypes.c_int),
                 ("transf", ctypes.POINTER(ctypes.c_double))]
 
@@ -89,6 +89,33 @@ class reflcontainer(ctypes.Structure):
                 ("ny", ctypes.POINTER(ctypes.c_double)),
                 ("nz", ctypes.POINTER(ctypes.c_double)),
                 ("area", ctypes.POINTER(ctypes.c_double))]
+
+class cframe(ctypes.Structure):
+    _fields_ = [("size", ctypes.c_int),
+                ("x", ctypes.POINTER(ctypes.c_double)),
+                ("y", ctypes.POINTER(ctypes.c_double)),
+                ("z", ctypes.POINTER(ctypes.c_double)),
+                ("dx", ctypes.POINTER(ctypes.c_double)),
+                ("dy", ctypes.POINTER(ctypes.c_double)),
+                ("dz", ctypes.POINTER(ctypes.c_double))]
+
+class RTDict(ctypes.Structure):
+    _fields_ = [("nRays", ctypes.c_int),
+                ("nRing", ctypes.c_int),
+                ("angx", ctypes.c_double),
+                ("angy", ctypes.c_double),
+                ("a", ctypes.c_double),
+                ("b", ctypes.c_double),
+                ("tChief", ctypes.POINTER(ctypes.c_double)),
+                ("oChief", ctypes.POINTER(ctypes.c_double))]
+
+class GDict(ctypes.Structure):
+    _fields_ = [("lam", ctypes.c_double),
+                ("w0", ctypes.c_double),
+                ("n", ctypes.c_double),
+                ("E0", ctypes.c_double),
+                ("z", ctypes.c_double),
+                ("pol", ctypes.POINTER(ctypes.c_double))]
 
 # FLOATS
 class arrC1f(ctypes.Structure):
@@ -164,7 +191,7 @@ class reflparamsf(ctypes.Structure):
                 ("lyv", ctypes.POINTER(ctypes.c_float)),
                 ("n_cells", ctypes.POINTER(ctypes.c_int)),
                 ("flip", ctypes.c_bool),
-                ("gmode", ctypes.c_bool),
+                ("gmode", ctypes.c_int),
                 ("type", ctypes.c_int),
                 ("transf", ctypes.POINTER(ctypes.c_float))]
 
@@ -177,3 +204,30 @@ class reflcontainerf(ctypes.Structure):
                 ("ny", ctypes.POINTER(ctypes.c_float)),
                 ("nz", ctypes.POINTER(ctypes.c_float)),
                 ("area", ctypes.POINTER(ctypes.c_float))]
+
+class cframef(ctypes.Structure):
+    _fields_ = [("size", ctypes.c_int),
+                ("x", ctypes.POINTER(ctypes.c_float)),
+                ("y", ctypes.POINTER(ctypes.c_float)),
+                ("z", ctypes.POINTER(ctypes.c_float)),
+                ("dx", ctypes.POINTER(ctypes.c_float)),
+                ("dy", ctypes.POINTER(ctypes.c_float)),
+                ("dz", ctypes.POINTER(ctypes.c_float))]
+
+class RTDictf(ctypes.Structure):
+    _fields_ = [("nRays", ctypes.c_int),
+                ("nRing", ctypes.c_int),
+                ("angx", ctypes.c_float),
+                ("angy", ctypes.c_float),
+                ("a", ctypes.c_float),
+                ("b", ctypes.c_float),
+                ("tChief", ctypes.POINTER(ctypes.c_float)),
+                ("oChief", ctypes.POINTER(ctypes.c_float))]
+
+class GDictf(ctypes.Structure):
+    _fields_ = [("lam", ctypes.c_float),
+                ("w0", ctypes.c_float),
+                ("n", ctypes.c_float),
+                ("E0", ctypes.c_float),
+                ("z", ctypes.c_float),
+                ("pol", ctypes.POINTER(ctypes.c_float))]

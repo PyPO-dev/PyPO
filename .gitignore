@@ -141,6 +141,9 @@ src/C++/src/bleeding_edge/
 images/
 save/
 
+# User-specific files
+log
+
 # Personal projects/files
 personal/
 literature/
@@ -161,6 +164,7 @@ test_Parallel.py
 SpilloverSec.py
 TaperPri.py
 PlotConfig.py
+tiltGauss.py
 
 #vscode specific
 .vscode/settings.json

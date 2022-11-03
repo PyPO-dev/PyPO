@@ -16,7 +16,8 @@
 #define __Propagation_h
 
 // T is either double or float, U is return struct (double or float as well)
-template <class T, class U, class V, class W> class Propagation
+template <class T, class U, class V, class W>
+class Propagation
 {
     T k;                   // Wavenumber
     int numThreads;             // Number of CPU threads used
@@ -47,7 +48,7 @@ public:
 
     std::vector<std::thread> threadPool;
 
-    Propagation(T k, int numThreads, int gs, int gt, T epsilon, T t_direction);
+    Propagation(T k, int numThreads, int gs, int gt, T epsilon, T t_direction, bool verbose = false);
 
     // Make T precision utility kit
     Utils<T> ut;
@@ -69,12 +70,12 @@ public:
                           V *cs, V *ct,
                           W *currents, U *res);
 
-    std::array<std::array<std::complex<T>, 3>, 2> fieldAtPoint(reflcontainer *cs, T *currents,
-                                                                const std::array<T, 3> &point_target);
+    std::array<std::array<std::complex<T>, 3>, 2> fieldAtPoint(V *cs, W *currents,
+                                              const std::array<T, 3> &point_target);
 
 
-    void parallelProp_JM(reflcontainer *cs, reflcontainer *ct,
-                          c2Bundle *currents, U *res);
+    void parallelProp_JM(V *cs, V *ct,
+                        W *currents, U *res);
 
     void parallelProp_EH(V *cs, V *ct,
                         W *currents, U *res);
@@ -87,45 +88,26 @@ public:
 
     // Functions for calculating angular far-field from reflector directly - no phase term
     void propagateToFarField(int start, int stop,
-                            T *xt, T *yt,
-                            T *xs, T *ys, T *zs,
-                            T *rJxs, T *rJys, T *rJzs,
-                            T *iJxs, T *iJys, T *iJzs,
-                            T *rMxs, T *rMys, T *rMzs,
-                            T *iMxs, T *iMys, T *iMzs,
-                            T *area, U *res);
+                              V *cs, V *ct,
+                              W *currents, U *res);
 
-    std::array<std::complex<T>, 3> farfieldAtPoint(T *xs, T *ys, T *zs,
-                                                T *rJxs, T *rJys, T *rJzs,
-                                                T *iJxs, T *iJys, T *iJzs,
-                                                T *rMxs, T *rMys, T *rMzs,
-                                                T *iMxs, T *iMys, T *iMzs,
-                                                const std::array<T, 3> &r_hat,
-                                                T *area);
+    std::array<std::complex<T>, 3> farfieldAtPoint(V *cs, W *currents,
+                                              const std::array<T, 3> &point_target, int start);
 
-    void parallelFarField(T *xt, T *yt,
-                            T *xs, T *ys, T *zs,
-                            T *rJxs, T *rJys, T *rJzs,
-                            T *iJxs, T *iJys, T *iJzs,
-                            T *rMxs, T *rMys, T *rMzs,
-                            T *iMxs, T *iMys, T *iMzs,
-                            T *area, U *res);
+    void parallelFarField(V *cs, V *ct,
+                        W *currents, U *res);
 
     // Scalar propagation
     void propagateScalarBeam(int start, int stop,
-                             T *xt, T *yt, T *zt,
-                            T *xs, T *ys, T *zs,
-                            T *rEs, T *iEs, T *area, U *res);
+                          V *cs, V *ct,
+                          W *field, U *res);
 
 
-    std::complex<T> fieldScalarAtPoint(T *xs, T *ys, T *zs,
-                                                T *rEs, T *iEs,
-                                                const std::array<T, 3> &point_target,
-                                                T *area);
+    std::complex<T> fieldScalarAtPoint(V *cs, W *field,
+                                      const std::array<T, 3> &point_target);
 
-    void parallelPropScalar(T *xt, T *yt, T *zt,
-                            T *xs, T *ys, T *zs,
-                            T *rEs, T *iEs, T *area, U *res);
+    void parallelPropScalar(V *cs, V *ct,
+                            W *field, U *res);
 
     void joinThreads();
 
@@ -134,7 +116,8 @@ public:
     void _debugArray(std::array<std::complex<T>, 3> arr);
 };
 
-template <class T, class U, class V, class W> Propagation<T, U, V, W>::Propagation(T k, int numThreads, int gs, int gt, T epsilon, T t_direction)
+template <class T, class U, class V, class W>
+Propagation<T, U, V, W>::Propagation(T k, int numThreads, int gs, int gt, T epsilon, T t_direction, bool verbose)
 {
     this->M_PIf = 3.14159265359f;
     this->C_L = 2.99792458e11f; // mm s^-1
@@ -161,20 +144,32 @@ template <class T, class U, class V, class W> Propagation<T, U, V, W>::Propagati
 
     this->t_direction = t_direction;
 
-    std::array<std::array<T, 3>, 3> eye;
-    eye[0].fill(0.);
-    eye[1].fill(0.);
-    eye[2].fill(0.);
+    this->eye[0].fill(0);
+    this->eye[1].fill(0);
+    this->eye[2].fill(0);
 
-    eye[0][0] = 1.;
-    eye[1][1] = 1.;
-    eye[2][2] = 1.;
+    this->eye[0][0] = 1;
+    this->eye[1][1] = 1;
+    this->eye[2][2] = 1;
+
+    if (verbose)
+    {
+        printf("***--------- PO info ---------***\n");
+        printf("--- Source         :   %d cells\n", gs);
+        printf("--- Target         :   %d cells\n", gt);
+        printf("--- Wavenumber     :   %.3f / mm\n", k);
+        printf("--- Threads        :   %d\n", numThreads);
+        printf("--- Device         :   CPU\n");
+        printf("***--------- PO info ---------***\n");
+        printf("\n");
+    }
 }
 
 // This function calculates the propagation between source and target, calculates currents
-template <class T, class U, class V, class W> void Propagation<T,U, V, W>::propagateBeam_JM(int start, int stop,
-                                                                V *cs, V *ct,
-                                                                W *currents, U *res)
+template <class T, class U, class V, class W>
+void Propagation<T,U, V, W>::propagateBeam_JM(int start, int stop,
+                                              V *cs, V *ct,
+                                              W *currents, U *res)
 {
     // Scalars (T & complex T)
     std::complex<T> e_dot_p_r_perp;    // E-field - perpendicular reflected POI polarization vector dot product
@@ -272,7 +267,7 @@ template <class T, class U, class V, class W> void Propagation<T,U, V, W>::propa
         ut.ext(norms, temp1, n_out_e_i_r);
         ut.s_mult(n_out_e_i_r, -1., mt);
 
-        res->r1x[i] = beam_e_h[0][0].real();//jt[0].real();
+        res->r1x[i] = jt[0].real();
         res->r1y[i] = jt[1].real();
         res->r1z[i] = jt[2].real();
 
@@ -298,9 +293,10 @@ template <class T, class U, class V, class W> void Propagation<T,U, V, W>::propa
     }
 }
 
-template <class T, class U, class V, class W> void Propagation<T, U, V, W>::propagateBeam_EH(int start, int stop,
-                                                                V *cs, V *ct,
-                                                                W *currents, U *res)
+template <class T, class U, class V, class W>
+void Propagation<T, U, V, W>::propagateBeam_EH(int start, int stop,
+                                              V *cs, V *ct,
+                                              W *currents, U *res)
 {
     // Arrays of Ts
     std::array<T, 3> point;            // Point on target
@@ -345,9 +341,10 @@ template <class T, class U, class V, class W> void Propagation<T, U, V, W>::prop
     }
 }
 
-template <class T, class U, class V, class W> void Propagation<T, U, V, W>::propagateBeam_JMEH(int start, int stop,
-                                                                V *cs, V *ct,
-                                                                W *currents, U *res)
+template <class T, class U, class V, class W>
+void Propagation<T, U, V, W>::propagateBeam_JMEH(int start, int stop,
+                                                V *cs, V *ct,
+                                                W *currents, U *res)
 {
     // Scalars (T & complex T)
     std::complex<T> e_dot_p_r_perp;    // E-field - perpendicular reflected POI polarization vector dot product
@@ -497,9 +494,10 @@ template <class T, class U, class V, class W> void Propagation<T, U, V, W>::prop
     }
 }
 
-template <class T, class U, class V, class W> void Propagation<T, U, V, W>::propagateBeam_EHP(int start, int stop,
-                                                                V *cs, V *ct,
-                                                                W *currents, U *res)
+template <class T, class U, class V, class W>
+void Propagation<T, U, V, W>::propagateBeam_EHP(int start, int stop,
+                                                V *cs, V *ct,
+                                                W *currents, U *res)
 {
     // Scalars (T & complex T)
     std::complex<T> e_dot_p_r_perp;    // E-field - perpendicular reflected POI polarization vector dot product
@@ -611,10 +609,10 @@ template <class T, class U, class V, class W> void Propagation<T, U, V, W>::prop
     }
 }
 
-template <class T, class U, class V, class W> void Propagation<T, U, V, W>::propagateScalarBeam(int start, int stop,
-                                T *xt, T *yt, T *zt,
-                                T *xs, T *ys, T *zs,
-                                T *rEs, T *iEs, T *area, U *res)
+template <class T, class U, class V, class W>
+void Propagation<T, U, V, W>::propagateScalarBeam(int start, int stop,
+                                                  V *cs, V *ct,
+                                                  W *field, U *res)
 {
     std::array<T, 3> point_target;
     std::complex<T> ets;
@@ -623,11 +621,11 @@ template <class T, class U, class V, class W> void Propagation<T, U, V, W>::prop
 
     for(int i=start; i<stop; i++)
     {
-        point_target[0] = xt[i];
-        point_target[1] = yt[i];
-        point_target[2] = zt[i];
+        point_target[0] = ct->x[i];
+        point_target[1] = ct->y[i];
+        point_target[2] = ct->z[i];
 
-        ets = fieldScalarAtPoint(xs, ys, zs, rEs, iEs, point_target, area);
+        ets = fieldScalarAtPoint(cs, field, point_target);
 
         res->rx[i] = ets.real();
         res->ix[i] = ets.imag();
@@ -641,7 +639,8 @@ template <class T, class U, class V, class W> void Propagation<T, U, V, W>::prop
     }
 }
 
-template <class T, class U, class V, class W> std::array<std::array<std::complex<T>, 3>, 2> Propagation<T, U, V, W>::fieldAtPoint(V *cs,
+template <class T, class U, class V, class W>
+std::array<std::array<std::complex<T>, 3>, 2> Propagation<T, U, V, W>::fieldAtPoint(V *cs,
                                                                              W *currents, const std::array<T, 3> &point_target)
 {
     // Scalars (T & complex T)
@@ -714,7 +713,7 @@ template <class T, class U, class V, class W> std::array<std::array<std::complex
 
         //printf("%.16g\n", r);
 
-        Green = exp(this->t_direction * j * k * r) / (4 * M_PIf * r) * area[i] * j;
+        Green = exp(this->t_direction * j * k * r) / (4 * M_PIf * r) * cs->area[i] * j;
 
         for( int n=0; n<3; n++)
         {
@@ -733,38 +732,38 @@ template <class T, class U, class V, class W> std::array<std::array<std::complex
     return e_h_field;
 }
 
-template <class T, class U, class V, class W> std::complex<T> Propagation<T, U, V, W>::fieldScalarAtPoint(T *xs, T *ys, T *zs,
-                                                T *rEs, T *iEs,
-                                                const std::array<T, 3> &point_target,
-                                                T *area)
+template <class T, class U, class V, class W>
+std::complex<T> Propagation<T, U, V, W>::fieldScalarAtPoint(V *cs,
+                                   W *field, const std::array<T, 3> &point_target)
 {
-    std::complex<T> field(0., 0.);
+    std::complex<T> out(0., 0.);
     std::complex<T> j(0., 1.);
     std::complex<T> _field;
 
     T r;
     std::array<T, 3> r_vec;
-    std::array<T, 3> point_source;
+    std::array<T, 3> source_point;
 
     for(int i=0; i<gs; i++)
     {
-        point_source[0] = xs[i];
-        point_source[1] = ys[i];
-        point_source[2] = zs[i];
+        source_point[0] = cs->x[i];
+        source_point[1] = cs->y[i];
+        source_point[2] = cs->z[i];
 
-        _field = {rEs[i], iEs[i]};
+        _field = {field->rx[i], field->ix[i]};
 
-        ut.diff(point_target, point_source, r_vec);
+        ut.diff(point_target, source_point, r_vec);
         ut.abs(r_vec, r);
 
-        field += - k * k * _field * exp(-j * k * r) / (4 * M_PIf * r) * area[i];
+        out += - k * k * _field * exp(-j * k * r) / (4 * M_PIf * r) * cs->area[i];
 
     }
-    return field;
+    return out;
 }
 
-template <class T, class U, class V, class W> void Propagation<T, U, V, W>::parallelProp_JM(V *cs, V *ct,
-                                                                                        W *currents, U *res)
+template <class T, class U, class V, class W>
+void Propagation<T, U, V, W>::parallelProp_JM(V *cs, V *ct,
+                                              W *currents, U *res)
 {
     int final_step;
 
@@ -790,8 +789,9 @@ template <class T, class U, class V, class W> void Propagation<T, U, V, W>::para
     joinThreads();
 }
 
-template <class T, class U, class V, class W> void Propagation<T, U, V, W>::parallelProp_EH(V *cs, V *ct,
-                                                                                        W *currents, U *res)
+template <class T, class U, class V, class W>
+void Propagation<T, U, V, W>::parallelProp_EH(V *cs, V *ct,
+                                              W *currents, U *res)
 {
     int final_step;
 
@@ -817,8 +817,9 @@ template <class T, class U, class V, class W> void Propagation<T, U, V, W>::para
     joinThreads();
 }
 
-template <class T, class U, class V, class W> void Propagation<T, U, V, W>::parallelProp_JMEH(V *cs, V *ct,
-                                                                                        W *currents, U *res)
+template <class T, class U, class V, class W>
+void Propagation<T, U, V, W>::parallelProp_JMEH(V *cs, V *ct,
+                                                W *currents, U *res)
 {
     int final_step;
 
@@ -841,8 +842,9 @@ template <class T, class U, class V, class W> void Propagation<T, U, V, W>::para
     joinThreads();
 }
 
-template <class T, class U, class V, class W> void Propagation<T, U, V, W>::parallelProp_EHP(V *cs, V *ct,
-                                                                                        W *currents, U *res)
+template <class T, class U, class V, class W>
+void Propagation<T, U, V, W>::parallelProp_EHP(V *cs, V *ct,
+                                              W *currents, U *res)
 {
     int final_step;
 
@@ -866,9 +868,9 @@ template <class T, class U, class V, class W> void Propagation<T, U, V, W>::para
     joinThreads();
 }
 
-<class T, class U, class V, class W> void Propagation<T, U, V, W>::parallelPropScalar(T *xt, T *yt, T *zt,
-                                    T *xs, T *ys, T *zs,
-                                    T *rEs, T *iEs, T *area, U *res)
+template <class T, class U, class V, class W>
+void Propagation<T, U, V, W>::parallelPropScalar(V *cs, V *ct,
+                                              W *field, U *res)
 {
     int final_step;
 
@@ -886,22 +888,16 @@ template <class T, class U, class V, class W> void Propagation<T, U, V, W>::para
 
         threadPool[n] = std::thread(&Propagation::propagateScalarBeam,
                                     this, n * step, final_step,
-                                    xt, yt, zt,
-                                    xs, ys, zs,
-                                    rEs, iEs, area, res);
+                                    cs, ct, field, res);
     }
     joinThreads();
 }
 
 // Far-field functions to calculate E-vector in far-field
-<class T, class U, class V, class W> void Propagation<T, U, V, W>::propagateToFarField(int start, int stop,
-                                T *xt, T *yt,
-                                T *xs, T *ys, T *zs,
-                                T *rJxs, T *rJys, T *rJzs,
-                                T *iJxs, T *iJys, T *iJzs,
-                                T *rMxs, T *rMys, T *rMzs,
-                                T *iMxs, T *iMys, T *iMzs,
-                                T *area, U *res)
+template <class T, class U, class V, class W>
+void Propagation<T, U, V, W>::propagateToFarField(int start, int stop,
+                                              V *cs, V *ct,
+                                              W *currents, U *res)
 {
     // Scalars (T & complex T)
     T theta;
@@ -924,8 +920,8 @@ template <class T, class U, class V, class W> void Propagation<T, U, V, W>::para
     int jc = 0;
     for(int i=start; i<stop; i++)
     {
-        theta   = xt[i];
-        phi     = yt[i];
+        phi     = ct->x[i];
+        theta   = ct->y[i];
         cosEl   = std::sqrt(1 - sin(theta) * sin(phi) * sin(theta) * sin(phi));
 
         r_hat[0] = cos(theta) * sin(phi);
@@ -933,8 +929,7 @@ template <class T, class U, class V, class W> void Propagation<T, U, V, W>::para
         r_hat[2] = cos(phi);
 
         // Calculate total incoming E and H field at point on target
-        e = farfieldAtPoint(xs, ys, zs, rJxs, rJys, rJzs, iJxs, iJys, iJzs,
-                            rMxs, rMys, rMzs, iMxs, iMys, iMzs, r_hat, area);
+        e = farfieldAtPoint(cs, currents, r_hat, start);
 
         res->r1x[i] = e[0].real();
         res->r1y[i] = e[1].real();
@@ -962,18 +957,17 @@ template <class T, class U, class V, class W> void Propagation<T, U, V, W>::para
     }
 }
 
-<class T, class U, class V, class W> std::array<std::complex<T>, 3> Propagation<T, U, V, W>::farfieldAtPoint(T *xs, T *ys, T *zs,
-                                                T *rJxs, T *rJys, T *rJzs,
-                                                T *iJxs, T *iJys, T *iJzs,
-                                                T *rMxs, T *rMys, T *rMzs,
-                                                T *iMxs, T *iMys, T *iMzs,
-                                                const std::array<T, 3> &r_hat,
-                                                T *area)
+template <class T, class U, class V, class W>
+std::array<std::complex<T>, 3> Propagation<T, U, V, W>::farfieldAtPoint(V *cs,
+                                                W *currents,
+                                                const std::array<T, 3> &r_hat, int start)
 {
     // Scalars (T & complex T)
     T omega_mu;                       // Angular frequency of field times mu
     T r_hat_in_rp;                 // r_hat dot product r_prime
     std::complex<T> r_in_s;        // Container for inner products between wavevctor and currents
+    std::complex<T> expo;
+    T area;
 
     // Arrays of Ts
     std::array<T, 3> source_point; // Container for xyz co-ordinates
@@ -1005,34 +999,32 @@ template <class T, class U, class V, class W> void Propagation<T, U, V, W>::para
 
     for(int i=0; i<gs; i++)
     {
-        source_point[0] = xs[i];
-        source_point[1] = ys[i];
-        source_point[2] = zs[i];
+        source_point[0] = cs->x[i];
+        source_point[1] = cs->y[i];
+        source_point[2] = cs->z[i];
 
         ut.dot(r_hat, source_point, r_hat_in_rp);
 
-        std::complex<T> expo = exp(j * k * r_hat_in_rp) * area[i];
+        expo = exp(j * k * r_hat_in_rp);
+        area = cs->area[i];
 
-        std::complex<T> jx(rJxs[i], iJxs[i]);
-        js[0] += jx * expo;
+        _js[0] = {currents->r1x[i], currents->i1x[i]};
+        _js[1] = {currents->r1y[i], currents->i1y[i]};
+        _js[2] = {currents->r1z[i], currents->i1z[i]};
 
-        std::complex<T> jy(rJys[i], iJys[i]);
-        js[1] += jy * expo;
+        _ms[0] = {currents->r2x[i], currents->i2x[i]};
+        _ms[1] = {currents->r2y[i], currents->i2y[i]};
+        _ms[2] = {currents->r2z[i], currents->i2z[i]};
 
-        std::complex<T> jz(rJzs[i], iJzs[i]);
-        js[2] += jz * expo;
-
-        std::complex<T> mx(rMxs[i], iMxs[i]);
-        ms[0] += mx * expo;
-
-        std::complex<T> my(rMys[i], iMys[i]);
-        ms[1] += my * expo;
-
-        std::complex<T> mz(rMzs[i], iMzs[i]);
-        ms[2] += mz * expo;
+        for (int n=0; n<3; n++)
+        {
+            js[n] += _js[n] * expo * area;
+            ms[n] += _ms[n] * expo * area;
+        }
     }
 
     ut.matVec(eye_min_rr, js, _ctemp);
+
     ut.s_mult(_ctemp, omega_mu, js_tot_factor);
 
     ut.ext(r_hat, ms, _ctemp);
@@ -1046,13 +1038,9 @@ template <class T, class U, class V, class W> void Propagation<T, U, V, W>::para
     return e;
 }
 
-<class T, class U, class V, class W> void Propagation<T, U, V, W>::parallelFarField(T *xt, T *yt,
-                                T *xs, T *ys, T *zs,
-                                T *rJxs, T *rJys, T *rJzs,
-                                T *iJxs, T *iJys, T *iJzs,
-                                T *rMxs, T *rMys, T *rMzs,
-                                T *iMxs, T *iMys, T *iMzs,
-                                T *area, U *res)
+template <class T, class U, class V, class W>
+void Propagation<T, U, V, W>::parallelFarField(V *cs, V *ct,
+                                              W *currents, U *res)
 {
     int final_step;
 
@@ -1070,18 +1058,13 @@ template <class T, class U, class V, class W> void Propagation<T, U, V, W>::para
 
         threadPool[n] = std::thread(&Propagation::propagateToFarField,
                                     this, n * step, final_step,
-                                    xt, yt,
-                                    xs, ys, zs,
-                                    rJxs, rJys, rJzs,
-                                    iJxs, iJys, iJzs,
-                                    rMxs, rMys, rMzs,
-                                    iMxs, iMys, iMzs,
-                                    area, res);
+                                    cs, ct, currents, res);
     }
     joinThreads();
 }
 
-<class T, class U, class V, class W> void Propagation<T, U, V, W>::joinThreads()
+template <class T, class U, class V, class W>
+void Propagation<T, U, V, W>::joinThreads()
 {
     for (std::thread &t : threadPool)
     {
@@ -1092,31 +1075,25 @@ template <class T, class U, class V, class W> void Propagation<T, U, V, W>::para
     }
 }
 
-<class T, class U, class V, class W> void Propagation<T, U, V, W>::_debugArray(T *arr, int idx)
+template <class T, class U, class V, class W>
+void Propagation<T, U, V, W>::_debugArray(T *arr, int idx)
 {
     T toPrint = arr[idx];
     std::cout << "Value of c-style array, element " << idx << ", is : " << toPrint << std::endl;
 }
 
-<class T, class U, class V, class W> void Propagation<T, U, V, W>::_debugArray(std::array<T, 3> arr)
+template <class T, class U, class V, class W>
+void Propagation<T, U, V, W>::_debugArray(std::array<T, 3> arr)
 {
-    std::cout << "Value of length-3 real array, element 0, is : " << arr[0] << std::endl;
-    std::cout << "Value of length-3 real array, element 1, is : " << arr[1] << std::endl;
-    std::cout << "Value of length-3 real array, element 2, is : " << arr[2] << std::endl;
+    std::cout << arr[0] << ", " << arr[1] << ", " << arr[2] << std::endl;
 }
 
-<class T, class U, class V, class W> void Propagation<T, U, V, W>::_debugArray(std::array<std::complex<T>, 3> arr)
+template <class T, class U, class V, class W>
+void Propagation<T, U, V, W>::_debugArray(std::array<std::complex<T>, 3> arr)
 {
-    std::cout << "Value of length 3 complex array, element 0, is : "
-                << arr[0].real() << " + " << arr[0].imag() << "j"
-                <<  std::endl;
-
-    std::cout << "Value of length 3 complex array, element 1, is : "
-                << arr[1].real() << " + " << arr[1].imag() << "j"
-                <<  std::endl;
-
-    std::cout << "Value of length 3 complex array, element 2, is : "
-                << arr[2].real() << " + " << arr[2].imag() << "j"
+    std::cout << arr[0].real() << " + " << arr[0].imag() << "j"
+                <<  ", " << arr[1].real() << " + " << arr[1].imag() << "j"
+                <<  ", " << arr[2].real() << " + " << arr[2].imag() << "j"
                 <<  std::endl;
 }
 

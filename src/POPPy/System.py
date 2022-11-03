@@ -2,19 +2,26 @@
 import numbers
 import numpy as np
 import matplotlib.pyplot as pt
+import matplotlib.cm as cm
 import time
 import psutil
 import os
 import sys
 import json
 
+from scipy.interpolate import griddata
+
 # POPPy-specific modules
 from src.POPPy.BindRefl import *
 from src.POPPy.BindGPU import *
+from src.POPPy.BindCPU import *
+from src.POPPy.BindBeam import *
 from src.POPPy.Copy import copyGrid
 from src.POPPy.MatTransform import *
-from src.POPPy.Plotter import Plotter
 from src.POPPy.POPPyTypes import *
+
+import src.POPPy.Plotter as plt
+import src.POPPy.Efficiencies as effs
 
 class System(object):
     customBeamPath = './custom/beam/'
@@ -26,6 +33,20 @@ class System(object):
         self.num_ref = 0
         self.num_cam = 0
         self.system = {}
+
+        self.savePathElem = "./save/elements/"
+
+        saveExist = os.path.isdir(self.savePathElem)
+
+        if not saveExist:
+            os.makedirs(self.savePathElem)
+
+        self.savePath = './images/'
+
+        existSave = os.path.isdir(self.savePath)
+
+        if not existSave:
+            os.makedirs(self.savePath)
 
     def __str__(self):
         pass
@@ -42,9 +63,6 @@ class System(object):
         else:
             self.customReflPath = path
 
-    def addPlotter(self, save='./images/'):
-        self.plotter = Plotter(save='./images/')
-
     #### ADD REFLECTOR METHODS
     # Parabola takes as input the reflectordict from now on.
     # Should build correctness test!
@@ -54,6 +72,9 @@ class System(object):
         Function for adding paraboloid reflector to system. If gmode='uv', lims_x should contain the smallest and largest radius and lims_y
         should contain rotation.
         """
+        if not "name" in reflDict:
+            reflDict["name"] = "Parabola"
+
         if reflDict["name"] == "Parabola":
             reflDict["name"] = reflDict["name"] + "_{}".format(self.num_ref)
 
@@ -92,15 +113,22 @@ class System(object):
             self.system[reflDict["name"]]["coeffs"][1] = b
             self.system[reflDict["name"]]["coeffs"][2] = -1
 
-        if reflDict["gmode"] == "uv":
+        if reflDict["gmode"] == "xy":
             self.system[reflDict["name"]]["gmode"] = 0
 
-        elif reflDict["gmode"] == "xy":
+        elif reflDict["gmode"] == "uv":
+            # Convert v in degrees to radians
+            self.system[reflDict["name"]]["lims_v"] = [self.system[reflDict["name"]]["lims_v"][0],
+                                                        self.system[reflDict["name"]]["lims_v"][1]]
+
             self.system[reflDict["name"]]["gmode"] = 1
 
         self.num_ref += 1
 
     def addHyperbola(self, reflDict):
+
+        if not "name" in reflDict:
+            reflDict["name"] = "Hyperbola"
         if reflDict["name"] == "Hyperbola":
             reflDict["name"] = reflDict["name"] + "_{}".format(self.num_ref)
 
@@ -148,11 +176,77 @@ class System(object):
             self.system[reflDict["name"]]["coeffs"][1] = b3
             self.system[reflDict["name"]]["coeffs"][2] = c3
 
-        if reflDict["gmode"] == "uv":
+        if reflDict["gmode"] == "xy":
             self.system[reflDict["name"]]["gmode"] = 0
 
-        elif reflDict["gmode"] == "xy":
+        elif reflDict["gmode"] == "uv":
+            self.system[reflDict["name"]]["lims_v"] = [self.system[reflDict["name"]]["lims_v"][0],
+                                                        self.system[reflDict["name"]]["lims_v"][1]]
+
             self.system[reflDict["name"]]["gmode"] = 1
+
+        self.num_ref += 1
+
+    def addEllipse(self, reflDict):
+        if not "name" in reflDict:
+            reflDict["name"] = "Ellipse"
+
+        if reflDict["name"] == "Ellipse":
+            reflDict["name"] = reflDict["name"] + "_{}".format(self.num_ref)
+
+        reflDict["type"] = 2
+        reflDict["transf"] = np.eye(4)
+
+        self.system[reflDict["name"]] = copyGrid(reflDict)
+
+        if reflDict["pmode"] == "focus":
+            pass
+
+        if reflDict["gmode"] == "xy":
+            self.system[reflDict["name"]]["gmode"] = 0
+
+        elif reflDict["gmode"] == "uv":
+            self.system[reflDict["name"]]["lims_v"] = [self.system[reflDict["name"]]["lims_v"][0],
+                                                        self.system[reflDict["name"]]["lims_v"][1]]
+
+            self.system[reflDict["name"]]["gmode"] = 1
+
+        self.num_ref += 1
+
+    def addPlane(self, reflDict):
+        if not "name" in reflDict:
+            reflDict["name"] = "Plane"
+
+        if reflDict["name"] == "Plane":
+            reflDict["name"] = reflDict["name"] + "_{}".format(self.num_ref)
+
+        reflDict["type"] = 3
+        reflDict["transf"] = np.eye(4)
+
+        self.system[reflDict["name"]] = copyGrid(reflDict)
+        self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
+
+        self.system[reflDict["name"]]["coeffs"][0] = -1
+        self.system[reflDict["name"]]["coeffs"][1] = -1
+        self.system[reflDict["name"]]["coeffs"][2] = -1
+
+        if reflDict["gmode"] == "xy":
+            self.system[reflDict["name"]]["gmode"] = 0
+
+        elif reflDict["gmode"] == "uv":
+            self.system[reflDict["name"]]["gmode"] = 1
+
+        elif reflDict["gmode"] == "AoE":
+            # Assume is given in degrees
+            # Convert Az and El to radians
+
+            self.system[reflDict["name"]]["lims_Az"] = [self.system[reflDict["name"]]["lims_Az"][0],
+                                                        self.system[reflDict["name"]]["lims_Az"][1]]
+
+            self.system[reflDict["name"]]["lims_El"] = [self.system[reflDict["name"]]["lims_El"][0],
+                                                        self.system[reflDict["name"]]["lims_El"][1]]
+
+            self.system[reflDict["name"]]["gmode"] = 2
 
         self.num_ref += 1
 
@@ -160,95 +254,190 @@ class System(object):
         self.system[name]["transf"] = MatRotate(rotation, self.system[name]["transf"], cRot)
 
     def translateGrids(self, name, translation):
-        self.system[name]["transf"] = MatTranslate(offTrans, self.system[name]["transf"])
+        self.system[name]["transf"] = MatTranslate(translation, self.system[name]["transf"])
 
-    def readCustomBeam(self, name, comp, shape, convert_to_current=True, mode="PMC", ret="currents"):
-        rfield = np.loadtxt(self.customBeamPath + "r" + name + ".txt")
-        ifield = np.loadtxt(self.customBeamPath + "i" + name + ".txt")
+    def generateGrids(self, name):
+        grids = generateGrid(self.system[name])
+        return grids
+
+    def saveElement(self, name):
+        jsonDict = copyGrid(self.system[name])
+
+        for key, value in self.system[name].items():
+            if type(value) == np.ndarray:
+                jsonDict[key] = value.tolist()
+
+            else:
+                jsonDict[key] = value
+
+        with open('./{}{}.json'.format(self.savePathElem, name), 'w') as f:
+            json.dump(jsonDict, f)
+
+    def readCustomBeam(self, name_beam, name_source, comp, shape, convert_to_current=True, mode="PMC"):
+        rfield = np.loadtxt(self.customBeamPath + "r" + name_beam + ".txt")
+        ifield = np.loadtxt(self.customBeamPath + "i" + name_beam + ".txt")
 
         field = rfield.reshape(shape) + 1j*ifield.reshape(shape)
 
         fields_c = self._compToFields(comp, field)
+        currents_c = calcCurrents(fields_c, self.system[name_source], mode)
 
-        if convert_to_current:
+        return currents_c, fields_c
 
-            comps_M = np.zeros((shape[0], shape[1], 3), dtype=complex)
-            np.stack((fields_c.Ex, fields_c.Ey, fields_c.Ez), axis=2, out=comps_M)
-
-            comps_J = np.zeros((shape[0], shape[1], 3), dtype=complex)
-            np.stack((fields_c.Hx, fields_c.Hy, fields_c.Hz), axis=2, out=comps_J)
-
-            null = np.zeros(field.shape, dtype=complex)
-
-            # Because we initialize in xy plane, take norm as z
-            norm = np.array([0,0,1])
-            if mode == 'None':
-                M = -np.cross(norm, comps_M, axisb=2)
-                J = np.cross(norm, comps_J, axisb=2)
-
-                Mx = M[:,:,0]
-                My = M[:,:,1]
-                Mz = M[:,:,2]
-
-                Jx = J[:,:,0]
-                Jy = J[:,:,1]
-                Jz = J[:,:,2]
-
-                currents_c = currents(Jx, Jy, Jz, Mx, My, Mz)
-
-            elif mode == 'PMC':
-                M = -2 * np.cross(norm, comps_M, axisb=2)
-
-                Mx = M[:,:,0]
-                My = M[:,:,1]
-                Mz = M[:,:,2]
-
-                currents_c = currents(null, null, null, Mx, My, Mz)
-
-            elif mode == 'PEC':
-                J = 2 * np.cross(norm, comps_J, axisb=2)
-
-                Jx = J[:,:,0]
-                Jy = J[:,:,1]
-                Jz = J[:,:,2]
-
-                currents_c = currents(Jx, Jy, Jz, null, null, null)
-
-        if ret == "currents":
-            return currents_c
-
-        elif ret == "fields":
-            return fields_c
-
-        elif ret == "both":
-            return currents_c, fields_c
-
-    def propagatePO_CPU(self, source, target, s_currents, k,
+    def propagatePO_CPU(self, source_name, target_name, s_currents, k,
                     epsilon=1, t_direction=-1, nThreads=1,
-                    mode="JM", precision="single"):
+                    mode="JM", precision="double"):
 
-        pass
+        source = self.system[source_name]
+        target = self.system[target_name]
 
-    def propagatePO_GPU(self, source, target, s_currents, k,
+        if precision == "double":
+            out = POPPy_CPUd(source, target, s_currents, k, epsilon, t_direction, nThreads, mode)
+
+        return out
+
+    def propagatePO_GPU(self, source_name, target_name, s_currents, k,
                     epsilon=1, t_direction=-1, nThreads=256,
                     mode="JM", precision="single"):
 
+        source = self.system[source_name]
+        target = self.system[target_name]
+
         if precision == "single":
-            if mode == "JM":
-                out = calcJM_GPUf(source, target, s_currents, k, epsilon, t_direction, nThreads)
-
-            elif mode == "EH":
-                out = calcEH_GPUf(source, target, s_currents, k, epsilon, t_direction, nThreads)
-
-            elif mode == "JMEH":
-                out1, out2 = calcJMEH_GPUf(source, target, s_currents, k, epsilon, t_direction, nThreads)
-                out = [out1, out2]
-
-            elif mode == "EHP":
-                out1, out2 = calcEHP_GPUf(source, target, s_currents, k, epsilon, t_direction, nThreads)
-                out = [out1, out2]
+            out = POPPy_GPUf(source, target, s_currents, k, epsilon, t_direction, nThreads, mode)
 
         return out
+
+    def createFrame(self, argDict):
+        frame_in = makeRTframe(argDict)
+        return frame_in
+
+    def loadFramePoynt(self, Poynting, name_source):
+        grids = generateGrid(self.system[name_source])
+
+        nTot = Poynting.x.shape[0] * Poynting.x.shape[1]
+        frame_in = frame(nTot, grids.x.ravel(), grids.y.ravel(), grids.z.ravel(),
+                        Poynting.x.ravel(), Poynting.y.ravel(), Poynting.z.ravel())
+
+        return frame_in
+
+    def calcRayLen(self, *args, start=0):
+        if isinstance(start, np.ndarray):
+            frame0 = args[0]
+
+            out = []
+            sumd = np.zeros(len(frame0.x))
+
+            diffx = frame0.x - start[0]
+            diffy = frame0.y - start[1]
+            diffz = frame0.z - start[2]
+
+            lens = np.sqrt(diffx**2 + diffy**2 + diffz**2)
+            out.append(lens)
+
+            sumd += lens
+
+            for i in range(len(args) - 1):
+                diffx = args[i+1].x - frame0.x
+                diffy = args[i+1].y - frame0.y
+                diffz = args[i+1].z - frame0.z
+
+                lens = np.sqrt(diffx**2 + diffy**2 + diffz**2)
+                out.append(lens)
+
+                frame0 = args[i+1]
+                sumd += lens
+
+            out.append(sumd)
+
+        else:
+            frame0 = args[0]
+
+            out = []
+            sumd = np.zeros(len(frame0.x))
+
+            for i in range(len(args) - 1):
+                diffx = args[i+1].x - frame0.x
+                diffy = args[i+1].y - frame0.y
+                diffz = args[i+1].z - frame0.z
+
+                lens = np.sqrt(diffx**2 + diffy**2 + diffz**2)
+                out.append(lens)
+
+                frame0 = args[i+1]
+                sumd += lens
+
+            out.append(sumd)
+
+        return out
+
+    def createGauss(self, gaussDict, name_source):
+        gauss_in = makeGauss(gaussDict, self.system[name_source])
+        return gauss_in
+
+    def runRayTracer(self, fr_in, name_target, epsilon=1e-10, nThreads=1, t0=100):
+        fr_out = RT_CPUd(self.system[name_target], fr_in, nThreads, epsilon, t0)
+        return fr_out
+
+    def interpFrame(self, fr_in, field, name_target, method="nearest"):
+        grids = generateGrid(self.system[name_target])
+
+        points = (fr_in.x, fr_in.y, fr_in.z)
+
+        rfield = np.real(field)
+        ifield = np.imag(field)
+
+        grid_interp = (grids.x, grids.y, grids.z)
+
+        rout = griddata(points, rfield, grid_interp, method=method)
+        iout = griddata(points, ifield, grid_interp, method=method)
+
+        out = rout.reshape(self.system[name_target]["gridsize"]) + 1j * iout.reshape(self.system[name_target]["gridsize"])
+
+        return out
+
+    def calcSpillover(self, field, name_target, aperDict):
+        surfaceObj = self.system[name_target]
+        return effs.calcSpillover(field, surfaceObj, aperDict)
+
+    def calcTaper(self, field, name_target, aperDict):
+        surfaceObj = self.system[name_target]
+        return effs.calcTaper(field, surfaceObj, aperDict)
+
+    def plotBeam2D(self, name_surface, field,
+                    vmin=-30, vmax=0, show=True, amp_only=False,
+                    save=False, polar=False, interpolation=None,
+                    aperDict={"plot":False}, mode='dB', project='xy',
+                    units='', name='', titleA="Amp", titleP="Phase"):
+
+        plotObject = self.system[name_surface]
+
+        plt.plotBeam2D(self, plotObject, field,
+                        vmin, vmax, show, amp_only,
+                        save, polar, interpolation,
+                        aperDict, mode, project,
+                        units, name, titleA, titleP, self.savePath)
+
+    def plot3D(self, name_surface, fine=2, cmap=cm.cool,
+                returns=False, ax_append=False, norm=False,
+                show=True, foc1=False, foc2=False, save=True):
+
+        plotObject = self.system[name_surface]
+
+        plt.plot3D(self, plotObject, fine, cmap,
+                    returns, ax_append, norm,
+                    show, foc1, foc2, save, self.savePath)
+
+    def plotSystem(self, fine=2, cmap=cm.cool,
+                ax_append=False, norm=False,
+                show=True, foc1=False, foc2=False, save=True, ret=False, RTframes=[]):
+
+        plt.plotSystem(self, self.system, fine, cmap,
+                    ax_append, norm,
+                    show, foc1, foc2, save, ret, RTframes, self.savePath)
+
+    def plotRTframe(self, frame, project="xy"):
+        plt.plotRTframe(self, frame, project, self.savePath)
 
     def _compToFields(self, comp, field):
         null = np.zeros(field.shape, dtype=complex)
@@ -268,5 +457,7 @@ class System(object):
 
         return field_c
 
+
+
 if __name__ == "__main__":
-    print("Please run System.py from the SystemInterface.py, located in the POPPy directory.")
+    print("System interface for POPPy.")

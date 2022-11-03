@@ -64,7 +64,7 @@ typedef struct reflparams {
     int *n_cells;
 
     bool flip;
-    bool gmode;
+    int gmode;
     int type;
 
     double *transf;
@@ -84,6 +84,38 @@ typedef struct reflcontainer {
 
     double *area;
 } reflcontainer;
+
+typedef struct cframe {
+    int size;
+
+    double *x;
+    double *y;
+    double *z;
+
+    double *dx;
+    double *dy;
+    double *dz;
+} cframe;
+
+typedef struct RTDict {
+    int nRays;
+    int nRing;
+    double angx;
+    double angy;
+    double a;
+    double b;
+    double *tChief;
+    double *oChief;
+} RTDict;
+
+typedef struct GDict {
+    double lam;
+    double w0;
+    double n;
+    double E0;
+    double z;
+    double *pol;
+} GDict;
 
 // Have to write explicit types for float and float: ctypes doesnt support templates
 struct arrC1f;
@@ -146,7 +178,7 @@ typedef struct reflparamsf {
     int *n_cells;
 
     bool flip;
-    bool gmode;
+    int gmode;
     int type;
 
     float *transf;
@@ -166,5 +198,37 @@ typedef struct reflcontainerf {
 
     float *area;
 } reflcontainerf;
+
+typedef struct cframef {
+    int size;
+
+    float *x;
+    float *y;
+    float *z;
+
+    float *dx;
+    float *dy;
+    float *dz;
+} cframef;
+
+typedef struct RTDictf {
+    int nRays;
+    int nRing;
+    float angx;
+    float angy;
+    float a;
+    float b;
+    float *tChief;
+    float *oChief;
+} RTDictf;
+
+typedef struct GDictf {
+    float lam;
+    float w0;
+    float n;
+    float E0;
+    float z;
+    float *pol;
+} GDictf;
 
 #endif

@@ -6,6 +6,7 @@
 #include <thread>
 #include <iomanip>
 
+#define _USE_MATH_DEFINES
 #ifndef __Utils_h
 #define __Utils_h
 
@@ -21,55 +22,61 @@ public:
     void dot(const std::array<std::complex<T>, 3> &cv1, const std::array<std::complex<T>, 3> &cv2, std::complex<T> &out);
     void dot(const std::array<std::complex<T>, 3> &cv1, const std::array<T, 3> &v2, std::complex<T> &out);
     void dot(const std::array<T, 3> &v1, const std::array<std::complex<T>, 3> &cv2, std::complex<T> &out);
-    
+
     // Overloaded cross products
     void ext(const std::array<T, 3> &v1, const std::array<T, 3> &v2, std::array<T, 3> &out);
     void ext(const std::array<std::complex<T>, 3> &cv1, const std::array<std::complex<T>, 3> &cv2, std::array<std::complex<T>, 3> &out);
     void ext(const std::array<std::complex<T>, 3> &cv1, const std::array<T, 3> &v2, std::array<std::complex<T>, 3> &out);
     void ext(const std::array<T, 3> &v1, const std::array<std::complex<T>, 3> &cv2, std::array<std::complex<T>, 3> &out);
-    
+
     // Overloaded absolute value
     void abs(const std::array<T, 3> &v, T &out);
     void abs(const std::array<std::complex<T>, 3> &cv, std::complex<T> &out);
-    
+
     // Difference vectors
     void diff(const std::array<T, 3> &v1, const std::array<T, 3> &v2, std::array<T, 3> &out);
     void diff(const std::array<std::complex<T>, 3> &cv1, const std::array<std::complex<T>, 3> &cv2, std::array<std::complex<T>, 3> &out);
-    
+
     // Normalization
     void normalize(const std::array<T, 3> &v, std::array<T, 3> &out);
     void normalize(const std::array<std::complex<T>, 3> &cv, std::array<std::complex<T>, 3> &out);
-    
+
     // Scalar multiplication
     void s_mult(const std::array<T, 3> &v, const T &s, std::array<T, 3> &out);
     void s_mult(const std::array<std::complex<T>, 3> &cv, const std::complex<T> &cs, std::array<std::complex<T>, 3> &out);
     void s_mult(const std::array<T, 3> &v, const std::complex<T> &cs, std::array<std::complex<T>, 3> &out);
     void s_mult(const std::array<std::complex<T>, 3> &cv, const T &s, std::array<std::complex<T>, 3> &out);
-    
+
     // Conjugation of complex vector
     void conj(const std::array<std::complex<T>, 3> &cv, std::array<std::complex<T>, 3> &out);
-    
+
     // Snell's function
     void snell(const std::array<std::complex<T>, 3> &cvin, const std::array<T, 3> &normal, std::array<std::complex<T>, 3> &out);
     void snell(const std::array<T, 3> &vin, const std::array<T, 3> &normal, std::array<T, 3> &out);
-    
+
     // Dyadic products
     void dyad(const std::array<T, 3> &v1, const std::array<T, 3> &v2, std::array<std::array<T, 3>, 3> &out);
-    
+
     // Real valued matrix-matrix subtraction
     void matDiff(const std::array<std::array<T, 3>, 3> &m1, const std::array<std::array<T, 3>, 3> &m2, std::array<std::array<T, 3>, 3> &out);
-    
+
     // Matrix-vector multiplication
     void matVec(const std::array<std::array<T, 3>, 3> &m1, const std::array<T, 3> &v1, std::array<T, 3> &out);
     void matVec(const std::array<std::array<T, 3>, 3> &m1, const std::array<std::complex<T>, 3> &cv1, std::array<std::complex<T>, 3> &out);
-    
+
+    // 4D-only need real-real method
+    void matVec4(const T *m1, const std::array<T, 3> &v1, std::array<T, 3> &out, bool vec=false);
+
+    void invmatVec4(const T *m1, const std::array<T, 3> &v1, std::array<T, 3> &out, bool vec=false);
+    void matRot(const std::array<T, 3> &rot, const std::array<T, 3> &v1, const std::array<T, 3> &cRot, std::array<T, 3> &out);
 };
 
 // Real dot-product
-template <typename T> inline void Utils<T>::dot(const std::array<T, 3> &v1, const std::array<T, 3> &v2, T &out)
+template <typename T> inline
+void Utils<T>::dot(const std::array<T, 3> &v1, const std::array<T, 3> &v2, T &out)
 {
     out = 0;
-    
+
     for(int n=0; n<3; n++)
     {
         out += v1[n] * v2[n];
@@ -78,10 +85,11 @@ template <typename T> inline void Utils<T>::dot(const std::array<T, 3> &v1, cons
 
 
 // Complex hermitian conjugate inner-product
-template <typename T> inline void Utils<T>::dot(const std::array<std::complex<T>, 3> &cv1, const std::array<std::complex<T>, 3> &cv2, std::complex<T> &out)
+template <typename T> inline
+void Utils<T>::dot(const std::array<std::complex<T>, 3> &cv1, const std::array<std::complex<T>, 3> &cv2, std::complex<T> &out)
 {
     out = (0, 0);
-    
+
     for(int n=0; n<3; n++)
     {
         out += std::conj(cv1[n]) * cv2[n];
@@ -89,10 +97,11 @@ template <typename T> inline void Utils<T>::dot(const std::array<std::complex<T>
 }
 
 // Complex vector - real vector dot-product
-template <typename T> inline void Utils<T>::dot(const std::array<std::complex<T>, 3> &cv1, const std::array<T, 3> &v2, std::complex<T> &out)
+template <typename T> inline
+void Utils<T>::dot(const std::array<std::complex<T>, 3> &cv1, const std::array<T, 3> &v2, std::complex<T> &out)
 {
     out = (0, 0);
-    
+
     for(int n=0; n<3; n++)
     {
         out += std::conj(cv1[n]) * v2[n];
@@ -100,10 +109,11 @@ template <typename T> inline void Utils<T>::dot(const std::array<std::complex<T>
 }
 
 // Real vector - complex vector dot-product
-template <typename T> inline void Utils<T>::dot(const std::array<T, 3> &v1, const std::array<std::complex<T>, 3> &cv2, std::complex<T> &out)
+template <typename T> inline
+void Utils<T>::dot(const std::array<T, 3> &v1, const std::array<std::complex<T>, 3> &cv2, std::complex<T> &out)
 {
     out = (0, 0);
-    
+
     for(int n=0; n<3; n++)
     {
         out += v1[n] * cv2[n];
@@ -111,7 +121,8 @@ template <typename T> inline void Utils<T>::dot(const std::array<T, 3> &v1, cons
 }
 
 // Real cross-product
-template <typename T> inline void Utils<T>::ext(const std::array<T, 3> &v1, const std::array<T, 3> &v2, std::array<T, 3> &out)
+template <typename T> inline
+void Utils<T>::ext(const std::array<T, 3> &v1, const std::array<T, 3> &v2, std::array<T, 3> &out)
 {
     out[0] = v1[1]*v2[2] - v1[2]*v2[1];
     out[1] = v1[2]*v2[0] - v1[0]*v2[2];
@@ -120,7 +131,8 @@ template <typename T> inline void Utils<T>::ext(const std::array<T, 3> &v1, cons
 
 
 // Complex conjugate of cross product
-template <typename T> inline void Utils<T>::ext(const std::array<std::complex<T>, 3> &cv1, const std::array<std::complex<T>, 3> &cv2, std::array<std::complex<T>, 3> &out)
+template <typename T> inline
+void Utils<T>::ext(const std::array<std::complex<T>, 3> &cv1, const std::array<std::complex<T>, 3> &cv2, std::array<std::complex<T>, 3> &out)
 {
     out[0] = cv1[1]*cv2[2] - cv1[2]*cv2[1];
     out[1] = cv1[2]*cv2[0] - cv1[0]*cv2[2];
@@ -128,7 +140,8 @@ template <typename T> inline void Utils<T>::ext(const std::array<std::complex<T>
 }
 
 // Cross product between an complex and a real vector
-template <typename T> inline void Utils<T>::ext(const std::array<std::complex<T>, 3> &cv1, const std::array<T, 3> &v2, std::array<std::complex<T>, 3> &out)
+template <typename T> inline
+void Utils<T>::ext(const std::array<std::complex<T>, 3> &cv1, const std::array<T, 3> &v2, std::array<std::complex<T>, 3> &out)
 {
     out[0] = cv1[1]*v2[2] - cv1[2]*v2[1];
     out[1] = cv1[2]*v2[0] - cv1[0]*v2[2];
@@ -136,7 +149,8 @@ template <typename T> inline void Utils<T>::ext(const std::array<std::complex<T>
 }
 
 // Cross product between a real vector and a complex vector
-template <typename T> inline void Utils<T>::ext(const std::array<T, 3> &v1, const std::array<std::complex<T>, 3> &cv2, std::array<std::complex<T>, 3> &out)
+template <typename T> inline
+void Utils<T>::ext(const std::array<T, 3> &v1, const std::array<std::complex<T>, 3> &cv2, std::array<std::complex<T>, 3> &out)
 {
     out[0] = v1[1]*cv2[2] - v1[2]*cv2[1];
     out[1] = v1[2]*cv2[0] - v1[0]*cv2[2];
@@ -144,7 +158,8 @@ template <typename T> inline void Utils<T>::ext(const std::array<T, 3> &v1, cons
 }
 
 // Difference between two real vectors
-template <typename T> inline void Utils<T>::diff(const std::array<T, 3> &v1, const std::array<T, 3> &v2, std::array<T, 3> &out)
+template <typename T> inline
+void Utils<T>::diff(const std::array<T, 3> &v1, const std::array<T, 3> &v2, std::array<T, 3> &out)
 {
     for(int n=0; n<3; n++)
     {
@@ -153,7 +168,8 @@ template <typename T> inline void Utils<T>::diff(const std::array<T, 3> &v1, con
 }
 
 // Difference between two complex valued vectors
-template <typename T> inline void Utils<T>::diff(const std::array<std::complex<T>, 3> &cv1, const std::array<std::complex<T>, 3> &cv2, std::array<std::complex<T>, 3> &out)
+template <typename T> inline
+void Utils<T>::diff(const std::array<std::complex<T>, 3> &cv1, const std::array<std::complex<T>, 3> &cv2, std::array<std::complex<T>, 3> &out)
 {
     for(int n=0; n<3; n++)
     {
@@ -162,14 +178,16 @@ template <typename T> inline void Utils<T>::diff(const std::array<std::complex<T
 }
 
 // Absolute value of real vector
-template <typename T> inline void Utils<T>::abs(const std::array<T, 3> &v, T &out)
+template <typename T> inline
+void Utils<T>::abs(const std::array<T, 3> &v, T &out)
 {
     dot(v, v, out);
     out = std::sqrt(out);
 }
 
 // Absolute value of a complex vector. Still returns a complex number!
-template <typename T> inline void Utils<T>::abs(const std::array<std::complex<T>, 3> &cv, std::complex<T> &out)
+template <typename T> inline
+void Utils<T>::abs(const std::array<std::complex<T>, 3> &cv, std::complex<T> &out)
 {
     std::array<std::complex<T>, 3> cv_conj;
     conj(cv, cv_conj);
@@ -178,16 +196,17 @@ template <typename T> inline void Utils<T>::abs(const std::array<std::complex<T>
 }
 
 // Return normalized real vector from vector
-template <typename T> inline void Utils<T>::normalize(const std::array<T, 3> &v, std::array<T, 3> &out)
+template <typename T> inline
+void Utils<T>::normalize(const std::array<T, 3> &v, std::array<T, 3> &out)
 {
     T norm;
     abs(v, norm);
-    
+
     if (norm == 0)
     {
         norm = 1;
     }
-    
+
     for( int n=0; n<3; n++)
     {
         out[n] = v[n] / norm;
@@ -195,13 +214,12 @@ template <typename T> inline void Utils<T>::normalize(const std::array<T, 3> &v,
 }
 
 // Normalize complex vector
-template <typename T> inline void Utils<T>::normalize(const std::array<std::complex<T>, 3> &cv, std::array<std::complex<T>, 3> &out)
+template <typename T> inline
+void Utils<T>::normalize(const std::array<std::complex<T>, 3> &cv, std::array<std::complex<T>, 3> &out)
 {
     std::complex<T> cnorm;
     abs(cv, cnorm);
-    printf("never\n");
 
-    
     for( int n=0; n<3; n++)
     {
         out[n] = cv[n] / cnorm;
@@ -209,7 +227,8 @@ template <typename T> inline void Utils<T>::normalize(const std::array<std::comp
 }
 
 // Apply standard real s-multiplication on a real vector
-template <typename T> inline void Utils<T>::s_mult(const std::array<T, 3> &v, const T &s, std::array<T, 3> &out)
+template <typename T> inline
+void Utils<T>::s_mult(const std::array<T, 3> &v, const T &s, std::array<T, 3> &out)
 {
     for(int n=0; n<3; n++)
     {
@@ -219,7 +238,8 @@ template <typename T> inline void Utils<T>::s_mult(const std::array<T, 3> &v, co
 
 
 // Multiply complex vector by complex scalar
-template <typename T> inline void Utils<T>::s_mult(const std::array<std::complex<T>, 3> &cv, const std::complex<T> &cs, std::array<std::complex<T>, 3> &out)
+template <typename T> inline
+void Utils<T>::s_mult(const std::array<std::complex<T>, 3> &cv, const std::complex<T> &cs, std::array<std::complex<T>, 3> &out)
 {
     for(int n=0; n<3; n++)
     {
@@ -228,7 +248,8 @@ template <typename T> inline void Utils<T>::s_mult(const std::array<std::complex
 }
 
 // Multiply real vector by complex scalar
-template <typename T> inline void Utils<T>::s_mult(const std::array<T, 3> &v, const std::complex<T> &cs, std::array<std::complex<T>, 3> &out)
+template <typename T> inline
+void Utils<T>::s_mult(const std::array<T, 3> &v, const std::complex<T> &cs, std::array<std::complex<T>, 3> &out)
 {
     for(int n=0; n<3; n++)
     {
@@ -237,7 +258,8 @@ template <typename T> inline void Utils<T>::s_mult(const std::array<T, 3> &v, co
 }
 
 // Multiply complex vector by real scalar
-template <typename T> inline void Utils<T>::s_mult(const std::array<std::complex<T>, 3> &cv, const T &s, std::array<std::complex<T>, 3> &out)
+template <typename T> inline
+void Utils<T>::s_mult(const std::array<std::complex<T>, 3> &cv, const T &s, std::array<std::complex<T>, 3> &out)
 {
     for(int n=0; n<3; n++)
     {
@@ -248,7 +270,8 @@ template <typename T> inline void Utils<T>::s_mult(const std::array<std::complex
 
 
 // Return complex conjugate of complex vector
-template <typename T> inline void Utils<T>::conj(const std::array<std::complex<T>, 3> &cv, std::array<std::complex<T>, 3> &out)
+template <typename T> inline
+void Utils<T>::conj(const std::array<std::complex<T>, 3> &cv, std::array<std::complex<T>, 3> &out)
 {
     for(int n=0; n<3; n++)
     {
@@ -257,36 +280,39 @@ template <typename T> inline void Utils<T>::conj(const std::array<std::complex<T
 }
 
 // Calculate refected vector from surface using complex incoming vector and real normal vector to surface
-template <typename T> inline void Utils<T>::snell(const std::array<std::complex<T>, 3> &cvin, const std::array<T, 3> &normal, std::array<std::complex<T>, 3> &out)
+template <typename T> inline
+void Utils<T>::snell(const std::array<std::complex<T>, 3> &cvin, const std::array<T, 3> &normal, std::array<std::complex<T>, 3> &out)
 {
     std::complex<T> cfactor;
     dot(cvin, normal, cfactor);
-    
+
     cfactor = 2. * cfactor;
-    
+
     std::array<std::complex<T>, 3> rhs;
     s_mult(normal, cfactor, rhs);
-    
+
     diff(cvin, rhs, out);
 }
 
 // Calculate refected vector from surface using complex incoming vector and real normal vector to surface
-template <typename T> inline void Utils<T>::snell(const std::array<T, 3> &vin, const std::array<T, 3> &normal, std::array<T, 3> &out)
+template <typename T> inline
+void Utils<T>::snell(const std::array<T, 3> &vin, const std::array<T, 3> &normal, std::array<T, 3> &out)
 {
     T factor;
     dot(vin, normal, factor);
-    
+
     factor = 2. * factor;
-    
+
     std::array<T, 3> rhs;
     s_mult(normal, factor, rhs);
-    
+
     diff(vin, rhs, out);
 }
 
 // Calculate Dyadic product between two real vectors
 // Returns array of length 3, containing 3 arrays representing ROWS in the resulting matrix
-template <typename T> inline void Utils<T>::dyad(const std::array<T, 3> &v1, const std::array<T, 3> &v2, std::array<std::array<T, 3>, 3> &out)
+template <typename T> inline
+void Utils<T>::dyad(const std::array<T, 3> &v1, const std::array<T, 3> &v2, std::array<std::array<T, 3>, 3> &out)
 {
     for(int n=0; n<3; n++)
     {
@@ -297,7 +323,8 @@ template <typename T> inline void Utils<T>::dyad(const std::array<T, 3> &v1, con
 }
 
 // Subtract matrix from another matrix element-wise
-template <typename T> inline void Utils<T>::matDiff(const std::array<std::array<T, 3>, 3> &m1, const std::array<std::array<T, 3>, 3> &m2, std::array<std::array<T, 3>, 3> &out)
+template <typename T> inline
+void Utils<T>::matDiff(const std::array<std::array<T, 3>, 3> &m1, const std::array<std::array<T, 3>, 3> &m2, std::array<std::array<T, 3>, 3> &out)
 {
     for(int n=0; n<3; n++)
     {
@@ -308,7 +335,8 @@ template <typename T> inline void Utils<T>::matDiff(const std::array<std::array<
 }
 
 // Multiply matrix with vector to return vector
-template <typename T> inline void Utils<T>::matVec(const std::array<std::array<T, 3>, 3> &m1, const std::array<T, 3> &v1, std::array<T, 3> &out)
+template <typename T> inline
+void Utils<T>::matVec(const std::array<std::array<T, 3>, 3> &m1, const std::array<T, 3> &v1, std::array<T, 3> &out)
 {
     for(int n=0; n<3; n++)
     {
@@ -316,7 +344,8 @@ template <typename T> inline void Utils<T>::matVec(const std::array<std::array<T
     }
 }
 
-template <typename T> inline void Utils<T>::matVec(const std::array<std::array<T, 3>, 3> &m1, const std::array<std::complex<T>, 3> &cv1, std::array<std::complex<T>, 3> &out)
+template <typename T> inline
+void Utils<T>::matVec(const std::array<std::array<T, 3>, 3> &m1, const std::array<std::complex<T>, 3> &cv1, std::array<std::complex<T>, 3> &out)
 {
     for(int n=0; n<3; n++)
     {
@@ -324,4 +353,71 @@ template <typename T> inline void Utils<T>::matVec(const std::array<std::array<T
     }
 }
 
-#endif 
+template <typename T> inline
+void Utils<T>::matVec4(const T *m1, const std::array<T, 3> &cv1, std::array<T, 3> &out, bool vec)
+{
+    if (vec)
+    {
+        for(int n=0; n<3; n++)
+        {
+            out[n] = m1[n*4] * cv1[0] + m1[1+n*4] * cv1[1] + m1[2+n*4] * cv1[2];
+        }
+    }
+
+    else
+    {
+        for(int n=0; n<3; n++)
+        {
+            out[n] = m1[n*4] * cv1[0] + m1[1+n*4] * cv1[1] + m1[2+n*4] * cv1[2] + m1[3+n*4];
+        }
+    }
+}
+
+template <typename T> inline
+void Utils<T>::invmatVec4(const T *m1, const std::array<T, 3> &cv1, std::array<T, 3> &out, bool vec)
+{
+    if (vec)
+    {
+        for(int n=0; n<3; n++)
+        {
+            out[n] = m1[n] * cv1[0] + m1[n+4] * cv1[1] + m1[n+8] * cv1[2];
+        }
+    }
+
+    else
+    {
+        T temp;
+        for(int n=0; n<3; n++)
+        {
+            temp = -m1[n]*m1[3] - m1[n+4]*m1[7] - m1[n+8]*m1[11];
+            out[n] = m1[n] * cv1[0] + m1[n+4] * cv1[1] + m1[n+8] * cv1[2] + temp;
+        }
+    }
+}
+
+template <typename T> inline
+void Utils<T>::matRot(const std::array<T, 3> &rot, const std::array<T, 3> &v1, const std::array<T, 3> &cRot, std::array<T, 3> &out)
+{
+    T cosx = cos(rot[0]);
+    T cosy = cos(rot[1]);
+    T cosz = cos(rot[2]);
+
+    T sinx = sin(rot[0]);
+    T siny = sin(rot[1]);
+    T sinz = sin(rot[2]);
+
+    T mu = cosz * siny;
+    T rho = sinz * siny;
+
+    std::array<T, 3> to_rot;
+
+    for(int n=0; n<3; n++) {to_rot[n] = v1[n] - cRot[n];}
+
+    out[0] = cosz*cosy * to_rot[0] + (mu*sinx - sinz*cosx) * to_rot[1] + (mu*cosx + sinz*sinx) * to_rot[2];
+    out[1] = sinz*cosy * to_rot[0] + (rho*sinx + cosz*cosx) * to_rot[1] + (rho*cosx - cosz*sinx) * to_rot[2];
+    out[2] = -siny * to_rot[0] + cosy*sinx * to_rot[1] + cosy*cosx * to_rot[2];
+
+    for(int n=0; n<3; n++) {out[n] = out[n] + cRot[n];}
+}
+
+#endif

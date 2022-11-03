@@ -5,19 +5,21 @@ DIRSRC = ./src/
 ###########################################################################################
 GCOMP = nvcc
 CFLAGS = -O3
-CC  = $(GCOMP) $(CFLAGS) -c -Xcompiler -fPIC -lineinfo --ptxas-options=-v -w
+LDFLAGS= \"-Wl,-rpath,./src/C++/\"
+#CC  = $(GCOMP) $(CFLAGS) -c -Xcompiler -fPIC -lineinfo --ptxas-options=-v -w
 #CC  = $(GCOMP) $(CFLAGS) -c -w
+CC  = $(GCOMP) $(CFLAGS) -c -Xcompiler -fPIC -lineinfo -w
 CO  = $(GCOMP) $(CFLAGS) -o
 ###########################################################################################
 LIB = libpoppygpu.so
 all: $(LIB)
 ###########################################################################################
-libpoppygpu.so: Kernels.o Kernelsf.o
-	$(CO) libpoppygpu.so -Xcompiler -fPIC --shared Kernels.o Kernelsf.o -L./ -lpoppyrefl
+libpoppygpu.so: Kernelsf.o KernelsRTf.o
+	$(CO) libpoppygpu.so -Xcompiler $(LDFLAGS) -Xcompiler -fPIC --shared Kernelsf.o KernelsRTf.o -L. -lpoppyrefl
 ###########################################################################################
 Kernelsf.o: $(DIRSRC)Kernelsf.cu
-	$(CC) $(DIRSRC)Kernelsf.cu -I$(DIRSRC)
+	$(CC) $(DIRSRC)Kernelsf.cu -I$(DIRSRC) -L. -lpoppyrefl
 ###########################################################################################
-Kernels.o: $(DIRSRC)Kernels.cu
-	$(CC) $(DIRSRC)Kernels.cu -I$(DIRSRC)
+KernelsRTf.o: $(DIRSRC)KernelsRTf.cu
+	$(CC) $(DIRSRC)KernelsRTf.cu -I$(DIRSRC) -L. -lpoppyrefl
 ###########################################################################################

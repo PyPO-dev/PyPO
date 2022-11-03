@@ -1,18 +1,44 @@
 #include <iostream>
 #include <vector>
+#include <array>
+#define _USE_MATH_DEFINES
 #include <cmath>
 
+#include "Utils.h"
 #include "InterfaceReflector.h"
 
-template<typename T, typename U> void Parabola_xy(T *parabola, U xu_lo, U xu_up, U yv_lo,
-                                                U yv_up, U a, U b, int ncx, int ncy, int nfac,
-                                                U mat[16])
+template<typename T, typename U>
+void transformGrids(T *reflc, int idx, std::array<U, 3> &inp, std::array<U, 3> &out, Utils<U> *ut, U mat[16])
 {
-    U _dx = (xu_up - xu_lo) / ncx;
-    U _dy = (yv_up - yv_lo) / ncy;
+    bool vec = true;
+    inp[0] = reflc->x[idx];
+    inp[1] = reflc->y[idx];
+    inp[2] = reflc->z[idx];
 
-    U dx = (xu_up + _dx - xu_lo) / ncx;
-    U dy = (yv_up + _dy - yv_lo) / ncy;
+    ut->matVec4(mat, inp, out);
+
+    reflc->x[idx] = out[0];
+    reflc->y[idx] = out[1];
+    reflc->z[idx] = out[2];
+
+    inp[0] = reflc->nx[idx];
+    inp[1] = reflc->ny[idx];
+    inp[2] = reflc->nz[idx];
+
+    ut->matVec4(mat, inp, out, vec);
+
+    reflc->nx[idx] = out[0];
+    reflc->ny[idx] = out[1];
+    reflc->nz[idx] = out[2];
+}
+
+template<typename T, typename U>
+void Parabola_xy(T *parabola, U xu_lo, U xu_up, U yv_lo,
+                U yv_up, U a, U b, int ncx, int ncy, int nfac,
+                U mat[16], bool transform)
+{
+    U dx = (xu_up - xu_lo) / (ncx - 1);
+    U dy = (yv_up - yv_lo) / (ncy - 1);
 
     // Generate using xy parametrisation
     U x;
@@ -20,6 +46,11 @@ template<typename T, typename U> void Parabola_xy(T *parabola, U xu_lo, U xu_up,
     U prefac;
 
     U norm;
+
+    Utils<U> ut;
+
+
+    std::array<U, 3> inp, out;
 
     for (int i=0; i < ncx; i++)
     {
@@ -30,124 +61,90 @@ template<typename T, typename U> void Parabola_xy(T *parabola, U xu_lo, U xu_up,
 
             y = j * dy + yv_lo;
 
-            parabola->x[i*ncy + j] = x;
-            parabola->y[i*ncy  + j] = y;
-            parabola->z[i*ncy  + j] = x*x / (a*a) + y*y / (b*b);
+            int idx = i*ncy + j;
 
-            parabola->nx[i*ncy  + j] = -2 * x / (a*a);
-            parabola->ny[i*ncy  + j] = -2 * y / (b*b);
-            parabola->nz[i*ncy  + j] = 1;
+            parabola->x[idx] = x;
+            parabola->y[idx] = y;
+            parabola->z[idx] = x*x / (a*a) + y*y / (b*b);
 
-            norm = sqrt(parabola->nx[i*ncy  + j]*parabola->nx[i*ncy  + j] +
-                        parabola->ny[i*ncy  + j]*parabola->ny[i*ncy  + j] + 1);
+            parabola->nx[idx] = -2 * x / (a*a);
+            parabola->ny[idx] = -2 * y / (b*b);
+            parabola->nz[idx] = 1;
 
-            parabola->nx[i*ncy  + j] = nfac * parabola->nx[i*ncy  + j] / norm;
-            parabola->ny[i*ncy  + j] = nfac * parabola->ny[i*ncy  + j] / norm;
-            parabola->nz[i*ncy  + j] = nfac * parabola->nz[i*ncy  + j] / norm;
+            norm = sqrt(parabola->nx[idx]*parabola->nx[idx] +
+                        parabola->ny[idx]*parabola->ny[idx] + 1);
 
-            parabola->area[i*ncy  + j] = norm * dx * dy;
+            parabola->nx[idx] = nfac * parabola->nx[idx] / norm;
+            parabola->ny[idx] = nfac * parabola->ny[idx] / norm;
+            parabola->nz[idx] = nfac * parabola->nz[idx] / norm;
 
-            U xr, yr, zr, nxr, nyr, nzr;
+            parabola->area[idx] = norm * dx * dy;
 
-            xr = mat[0]*parabola->x[i*ncy + j] + mat[1]*parabola->y[i*ncy + j] +
-                  mat[2]*parabola->z[i*ncy + j] + mat[3];
-            yr = mat[4]*parabola->x[i*ncy + j] + mat[5]*parabola->y[i*ncy + j] +
-                  mat[6]*parabola->z[i*ncy + j] + mat[7];
-            zr = mat[8]*parabola->x[i*ncy + j] + mat[9]*parabola->y[i*ncy + j] +
-                  mat[10]*parabola->z[i*ncy + j] + mat[11];
-
-            nxr = mat[0]*parabola->nx[i*ncy + j] + mat[1]*parabola->ny[i*ncy + j] +
-                  mat[2]*parabola->nz[i*ncy + j];
-            nyr = mat[4]*parabola->nx[i*ncy + j] + mat[5]*parabola->ny[i*ncy + j] +
-                  mat[6]*parabola->nz[i*ncy + j];
-            nzr = mat[8]*parabola->nx[i*ncy + j] + mat[9]*parabola->ny[i*ncy + j] +
-                  mat[10]*parabola->nz[i*ncy + j];
-
-            parabola->x[i*ncy + j] = xr;
-            parabola->y[i*ncy  + j] = yr;
-            parabola->z[i*ncy  + j] = zr;
-
-            parabola->nx[i*ncy  + j] = nxr;
-            parabola->ny[i*ncy  + j] = nyr;
-            parabola->nz[i*ncy  + j] = nzr;
+            if (transform)
+            {
+                transformGrids<T, U>(parabola, idx, inp, out, &ut, mat);
+            }
         }
     }
 }
 
-template<typename T, typename U> void Parabola_uv(T *parabola, U xu_lo, U xu_up, U yv_lo,
-                                                U yv_up, U a, U b, int ncx, int ncy, int nfac,
-                                                U mat[16])
+template<typename T, typename U>
+void Parabola_uv(T *parabola, U xu_lo, U xu_up, U yv_lo,
+                U yv_up, U a, U b, int ncx, int ncy, int nfac,
+                U mat[16], bool transform)
 {
-    U _du = (xu_up/a - xu_lo/a) / ncx; // Divide by a to convert aperture radius to u param
-    U _dv = (yv_up - yv_lo) / ncy;
-
-    U du = (xu_up/a + _du - xu_lo/a) / ncx;
-    U dv = (yv_up + _dv - yv_lo) / ncy;
+    U du = (xu_up/a - xu_lo/a) / (ncx - 1);
+    U dv = (yv_up- yv_lo) / (ncy - 1);
 
     // Generate using uv parametrisation
     U u;
     U v;
     U prefac;
 
+    Utils<U> ut;
+
+
+    std::array<U, 3> inp, out;
+
     for (int i=0; i < ncx; i++)
     {
         u = i * du + xu_lo/a;
         for (int j=0; j < ncy; j++)
         {
-            v = j * dv + yv_lo;
+            v = (j * dv + yv_lo) * M_PI/180;
+            int idx = i*ncy + j;
 
-            parabola->x[i*ncy + j] = a * u * cos(v);
-            parabola->y[i*ncy + j] = b * u * sin(v);
-            parabola->z[i*ncy + j] = u * u;
+            parabola->x[idx] = a * u * cos(v);
+            parabola->y[idx] = b * u * sin(v);
+            parabola->z[idx] = u * u;
 
             prefac =  nfac / sqrt(4 * b*b * u*u * cos(v)*cos(v) +
                       4 * a*a * u*u * sin(v)*sin(v) +
                       a*a * b*b);
 
-            parabola->nx[i*ncy + j] = -2 * b * u * cos(v) * prefac;
-            parabola->ny[i*ncy + j] = -2 * a * u * sin(v) * prefac;
-            parabola->nz[i*ncy + j] = b * a * prefac;
+            parabola->nx[idx] = -2 * b * u * cos(v) * prefac;
+            parabola->ny[idx] = -2 * a * u * sin(v) * prefac;
+            parabola->nz[idx] = b * a * prefac;
 
-            parabola->area[i*ncy + j] = u * sqrt(4 * b*b * u*u * cos(v)*cos(v) +
+            parabola->area[idx] = u * sqrt(4 * b*b * u*u * cos(v)*cos(v) +
                                     4 * a*a * u*u * sin(v)*sin(v) +
                                     a*a * b*b) * du * dv;
 
-            U xr, yr, zr, nxr, nyr, nzr;
-
-            xr = mat[0]*parabola->x[i*ncy + j] + mat[1]*parabola->y[i*ncy + j] +
-                  mat[2]*parabola->z[i*ncy + j] + mat[3];
-            yr = mat[4]*parabola->x[i*ncy + j] + mat[5]*parabola->y[i*ncy + j] +
-                  mat[6]*parabola->z[i*ncy + j] + mat[7];
-            zr = mat[8]*parabola->x[i*ncy + j] + mat[9]*parabola->y[i*ncy + j] +
-                  mat[10]*parabola->z[i*ncy + j] + mat[11];
-
-            nxr = mat[0]*parabola->nx[i*ncy + j] + mat[1]*parabola->ny[i*ncy + j] +
-                  mat[2]*parabola->nz[i*ncy + j];
-            nyr = mat[4]*parabola->nx[i*ncy + j] + mat[5]*parabola->ny[i*ncy + j] +
-                  mat[6]*parabola->nz[i*ncy + j];
-            nzr = mat[8]*parabola->nx[i*ncy + j] + mat[9]*parabola->ny[i*ncy + j] +
-                  mat[10]*parabola->nz[i*ncy + j];
-
-            parabola->x[i*ncy + j] = xr;
-            parabola->y[i*ncy  + j] = yr;
-            parabola->z[i*ncy  + j] = zr;
-
-            parabola->nx[i*ncy  + j] = nxr;
-            parabola->ny[i*ncy  + j] = nyr;
-            parabola->nz[i*ncy  + j] = nzr;
+            if (transform)
+            {
+                transformGrids<T, U>(parabola, idx, inp, out, &ut, mat);
+            }
         }
     }
 }
 
-template<typename T, typename U> void Hyperbola_xy(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
-                                                U yv_up, U a, U b, U c, int ncx, int ncy, int nfac,
-                                                U mat[16])
+template<typename T, typename U>
+void Hyperbola_xy(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
+                  U yv_up, U a, U b, U c, int ncx, int ncy, int nfac,
+                  U mat[16], bool transform)
 {
-    U _dx = (xu_up - xu_lo) / ncx;
-    U _dy = (yv_up - yv_lo) / ncy;
-
-    U dx = (xu_up + _dx - xu_lo) / ncx;
-    U dy = (yv_up + _dy - yv_lo) / ncy;
+    U dx = (xu_up - xu_lo) / (ncx - 1);
+    U dy = (yv_up - yv_lo) / (ncy - 1);
 
     // Generate using xy parametrisation
     U x;
@@ -156,6 +153,11 @@ template<typename T, typename U> void Hyperbola_xy(T *hyperbola, U xu_lo, U xu_u
 
     U norm;
 
+    Utils<U> ut;
+
+
+    std::array<U, 3> inp, out;
+
     for (int i=0; i < ncx; i++)
     {
         x = i * dx + xu_lo;
@@ -163,61 +165,41 @@ template<typename T, typename U> void Hyperbola_xy(T *hyperbola, U xu_lo, U xu_u
         for (int j=0; j < ncy; j++)
         {
             y = j * dy + yv_lo;
+            int idx = i*ncy + j;
 
-            hyperbola->x[i*ncy + j] = x;
-            hyperbola->y[i*ncy  + j] = y;
-            hyperbola->z[i*ncy  + j] = c * sqrt(x*x / (a*a) + y*y / (b*b) + 1);
+            hyperbola->x[idx] = x;
+            hyperbola->y[idx] = y;
+            hyperbola->z[idx] = c * sqrt(x*x / (a*a) + y*y / (b*b) + 1);
 
-            hyperbola->nx[i*ncy  + j] = -2 * x / (a*a);
-            hyperbola->ny[i*ncy  + j] = -2 * y / (b*b);
-            hyperbola->nz[i*ncy  + j] = 2 * hyperbola->z[i*ncy  + j] / (c*c);
+            hyperbola->nx[idx] = -2 * x / (a*a);
+            hyperbola->ny[idx] = -2 * y / (b*b);
+            hyperbola->nz[idx] = 2 * hyperbola->z[idx] / (c*c);
 
-            norm = sqrt(hyperbola->nx[i*ncy  + j]*hyperbola->nx[i*ncy  + j] +
-                        hyperbola->ny[i*ncy  + j]*hyperbola->ny[i*ncy  + j] +
-                        hyperbola->nz[i*ncy  + j]*hyperbola->nz[i*ncy  + j]);
+            norm = sqrt(hyperbola->nx[idx]*hyperbola->nx[idx] +
+                        hyperbola->ny[idx]*hyperbola->ny[idx] +
+                        hyperbola->nz[idx]*hyperbola->nz[idx]);
 
-            hyperbola->nx[i*ncy  + j] = nfac * hyperbola->nx[i*ncy  + j] / norm;
-            hyperbola->ny[i*ncy  + j] = nfac * hyperbola->ny[i*ncy  + j] / norm;
-            hyperbola->nz[i*ncy  + j] = nfac * hyperbola->nz[i*ncy  + j] / norm;
+            hyperbola->nx[idx] = nfac * hyperbola->nx[idx] / norm;
+            hyperbola->ny[idx] = nfac * hyperbola->ny[idx] / norm;
+            hyperbola->nz[idx] = nfac * hyperbola->nz[idx] / norm;
 
-            hyperbola->area[i*ncy  + j] = norm * dx * dy;
+            hyperbola->area[idx] = norm * dx * dy;
 
-            U xr, yr, zr, nxr, nyr, nzr;
-
-            xr = mat[0]*hyperbola->x[i*ncy + j] + mat[1]*hyperbola->y[i*ncy + j] +
-                  mat[2]*hyperbola->z[i*ncy + j] + mat[3];
-            yr = mat[4]*hyperbola->x[i*ncy + j] + mat[5]*hyperbola->y[i*ncy + j] +
-                  mat[6]*hyperbola->z[i*ncy + j] + mat[7];
-            zr = mat[8]*hyperbola->x[i*ncy + j] + mat[9]*hyperbola->y[i*ncy + j] +
-                  mat[10]*hyperbola->z[i*ncy + j] + mat[11];
-
-            nxr = mat[0]*hyperbola->nx[i*ncy + j] + mat[1]*hyperbola->ny[i*ncy + j] +
-                  mat[2]*hyperbola->nz[i*ncy + j];
-            nyr = mat[4]*hyperbola->nx[i*ncy + j] + mat[5]*hyperbola->ny[i*ncy + j] +
-                  mat[6]*hyperbola->nz[i*ncy + j];
-            nzr = mat[8]*hyperbola->nx[i*ncy + j] + mat[9]*hyperbola->ny[i*ncy + j] +
-                  mat[10]*hyperbola->nz[i*ncy + j];
-
-            hyperbola->x[i*ncy + j] = xr;
-            hyperbola->y[i*ncy  + j] = yr;
-            hyperbola->z[i*ncy  + j] = zr;
-
-            hyperbola->nx[i*ncy  + j] = nxr;
-            hyperbola->ny[i*ncy  + j] = nyr;
-            hyperbola->nz[i*ncy  + j] = nzr;
+            if (transform)
+            {
+                transformGrids<T, U>(hyperbola, idx, inp, out, &ut, mat);
+            }
         }
     }
 }
 
-template<typename T, typename U> void Hyperbola_uv(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
-                                                U yv_up, U a, U b, U c, int ncx, int ncy, int nfac,
-                                                U mat[16])
+template<typename T, typename U>
+void Hyperbola_uv(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
+                  U yv_up, U a, U b, U c, int ncx, int ncy, int nfac,
+                  U mat[16], bool transform)
 {
-    U _du = (sqrt(xu_up*xu_up/(a*a) + 1) - sqrt(xu_lo*xu_lo/(a*a) + 1)) / ncx;
-    U _dv = (yv_up - yv_lo) / ncy;
-
-    U du = (sqrt(xu_up*xu_up/(a*a) + 1) + _du - sqrt(xu_lo*xu_lo/(a*a) + 1)) / ncx;
-    U dv = (yv_up + _dv - yv_lo) / ncy;
+    U du = (sqrt(xu_up*xu_up/(a*a) + 1) - sqrt(xu_lo*xu_lo/(a*a) + 1)) / (ncx - 1);
+    U dv = (yv_up - yv_lo) / (ncy - 1);
 
     // Generate using xy parametrisation
     U u;
@@ -225,66 +207,49 @@ template<typename T, typename U> void Hyperbola_uv(T *hyperbola, U xu_lo, U xu_u
     U prefac;
 
     U norm;
+
+    Utils<U> ut;
+
+
+    std::array<U, 3> inp, out;
 
     for (int i=0; i < ncx; i++)
     {
         u = i * du + sqrt(xu_lo*xu_lo/(a*a) + 1);
         for (int j=0; j < ncy; j++)
         {
-            v = j * dv + yv_lo;
+            v = (j * dv + yv_lo) * M_PI/180;
+            int idx = i*ncy + j;
 
-            hyperbola->x[i*ncy + j] = a * sqrt(u*u - 1) * cos(v);
-            hyperbola->y[i*ncy + j] = b * sqrt(u*u - 1) * sin(v);
-            hyperbola->z[i*ncy + j] = c * u;
+            hyperbola->x[idx] = a * sqrt(u*u - 1) * cos(v);
+            hyperbola->y[idx] = b * sqrt(u*u - 1) * sin(v);
+            hyperbola->z[idx] = c * u;
 
             prefac = nfac / sqrt(b*b * c*c * (u*u - 1) * cos(v)*cos(v) +
                       a*a * c*c * (u*u - 1) * sin(v)*sin(v) + a*a * b*b * u*u);
 
-            if(i == 0 && j == 0){printf("%f\n", c);}
+            hyperbola->nx[idx] = -b * c * sqrt(u*u - 1) * cos(v) * prefac;
+            hyperbola->ny[idx] = -a * c * sqrt(u*u - 1) * sin(v) * prefac;
+            hyperbola->nz[idx] = b * a * u * prefac;
 
-            hyperbola->nx[i*ncy + j] = -b * c * sqrt(u*u - 1) * cos(v) * prefac;
-            hyperbola->ny[i*ncy + j] = -a * c * sqrt(u*u - 1) * sin(v) * prefac;
-            hyperbola->nz[i*ncy + j] = b * a * u * prefac;
-
-            hyperbola->area[i*ncy + j] = sqrt(b*b * c*c * (u*u - 1) * cos(v)*cos(v) +
+            hyperbola->area[idx] = sqrt(b*b * c*c * (u*u - 1) * cos(v)*cos(v) +
                                         a*a * c*c * (u*u - 1) * sin(v)*sin(v) + a*a * b*b * u*u) * du * dv;
 
-                                        U xr, yr, zr, nxr, nyr, nzr;
-
-            xr = mat[0]*hyperbola->x[i*ncy + j] + mat[1]*hyperbola->y[i*ncy + j] +
-                  mat[2]*hyperbola->z[i*ncy + j] + mat[3];
-            yr = mat[4]*hyperbola->x[i*ncy + j] + mat[5]*hyperbola->y[i*ncy + j] +
-                  mat[6]*hyperbola->z[i*ncy + j] + mat[7];
-            zr = mat[8]*hyperbola->x[i*ncy + j] + mat[9]*hyperbola->y[i*ncy + j] +
-                  mat[10]*hyperbola->z[i*ncy + j] + mat[11];
-
-            nxr = mat[0]*hyperbola->nx[i*ncy + j] + mat[1]*hyperbola->ny[i*ncy + j] +
-                  mat[2]*hyperbola->nz[i*ncy + j];
-            nyr = mat[4]*hyperbola->nx[i*ncy + j] + mat[5]*hyperbola->ny[i*ncy + j] +
-                  mat[6]*hyperbola->nz[i*ncy + j];
-            nzr = mat[8]*hyperbola->nx[i*ncy + j] + mat[9]*hyperbola->ny[i*ncy + j] +
-                  mat[10]*hyperbola->nz[i*ncy + j];
-
-            hyperbola->x[i*ncy + j] = xr;
-            hyperbola->y[i*ncy  + j] = yr;
-            hyperbola->z[i*ncy  + j] = zr;
-
-            hyperbola->nx[i*ncy  + j] = nxr;
-            hyperbola->ny[i*ncy  + j] = nyr;
-            hyperbola->nz[i*ncy  + j] = nzr;
+            if (transform)
+            {
+                transformGrids<T, U>(hyperbola, idx, inp, out, &ut, mat);
+            }
         }
     }
 }
 
-template<typename T, typename U> void Ellipse_xy(T *ellipse, U xu_lo, U xu_up, U yv_lo,
-                                                U yv_up, U a, U b, U c, int ncx, int ncy, int nfac,
-                                                U mat[16])
+template<typename T, typename U>
+void Ellipse_xy(T *ellipse, U xu_lo, U xu_up, U yv_lo,
+                U yv_up, U a, U b, U c, int ncx, int ncy, int nfac,
+                U mat[16], bool transform)
 {
-    U _dx = (xu_up - xu_lo) / ncx;
-    U _dy = (yv_up - yv_lo) / ncy;
-
-    U dx = (xu_up + _dx - xu_lo) / ncx;
-    U dy = (yv_up + _dy - yv_lo) / ncy;
+    U dx = (xu_up - xu_lo) / (ncx - 1);
+    U dy = (yv_up - yv_lo) / (ncy - 1);
 
     // Generate using xy parametrisation
     U x;
@@ -293,6 +258,11 @@ template<typename T, typename U> void Ellipse_xy(T *ellipse, U xu_lo, U xu_up, U
 
     U norm;
 
+    Utils<U> ut;
+
+
+    std::array<U, 3> inp, out;
+
     for (int i=0; i < ncx; i++)
     {
         x = i * dx + xu_lo;
@@ -300,61 +270,41 @@ template<typename T, typename U> void Ellipse_xy(T *ellipse, U xu_lo, U xu_up, U
         for (int j=0; j < ncy; j++)
         {
             y = j * dy + yv_lo;
+            int idx = i*ncy + j;
 
-            ellipse->x[i*ncy + j] = x;
-            ellipse->y[i*ncy  + j] = y;
-            ellipse->z[i*ncy  + j] = c * sqrt(1 - x*x / (a*a) - y*y / (b*b));
+            ellipse->x[idx] = x;
+            ellipse->y[idx] = y;
+            ellipse->z[idx] = c * sqrt(1 - x*x / (a*a) - y*y / (b*b));
 
-            ellipse->nx[i*ncy  + j] = -2 * x / (a*a);
-            ellipse->ny[i*ncy  + j] = -2 * y / (b*b);
-            ellipse->nz[i*ncy  + j] = 2 * ellipse->z[i*ncy  + j] / (c*c);
+            ellipse->nx[idx] = -2 * x / (a*a);
+            ellipse->ny[idx] = -2 * y / (b*b);
+            ellipse->nz[idx] = 2 * ellipse->z[idx] / (c*c);
 
-            norm = sqrt(ellipse->nx[i*ncy  + j]*ellipse->nx[i*ncy  + j] +
-                        ellipse->ny[i*ncy  + j]*ellipse->ny[i*ncy  + j] +
-                        ellipse->nz[i*ncy  + j]*ellipse->nz[i*ncy  + j]);
+            norm = sqrt(ellipse->nx[idx]*ellipse->nx[idx] +
+                        ellipse->ny[idx]*ellipse->ny[idx] +
+                        ellipse->nz[idx]*ellipse->nz[idx]);
 
-            ellipse->nx[i*ncy  + j] = nfac * ellipse->nx[i*ncy  + j] / norm;
-            ellipse->ny[i*ncy  + j] = nfac * ellipse->ny[i*ncy  + j] / norm;
-            ellipse->nz[i*ncy  + j] = nfac * ellipse->nz[i*ncy  + j] / norm;
+            ellipse->nx[idx] = nfac * ellipse->nx[idx] / norm;
+            ellipse->ny[idx] = nfac * ellipse->ny[idx] / norm;
+            ellipse->nz[idx] = nfac * ellipse->nz[idx] / norm;
 
-            ellipse->area[i*ncy  + j] = norm * dx * dy;
+            ellipse->area[idx] = norm * dx * dy;
 
-            U xr, yr, zr, nxr, nyr, nzr;
-
-            xr = mat[0]*ellipse->x[i*ncy + j] + mat[1]*ellipse->y[i*ncy + j] +
-                  mat[2]*ellipse->z[i*ncy + j] + mat[3];
-            yr = mat[4]*ellipse->x[i*ncy + j] + mat[5]*ellipse->y[i*ncy + j] +
-                  mat[6]*ellipse->z[i*ncy + j] + mat[7];
-            zr = mat[8]*ellipse->x[i*ncy + j] + mat[9]*ellipse->y[i*ncy + j] +
-                  mat[10]*ellipse->z[i*ncy + j] + mat[11];
-
-            nxr = mat[0]*ellipse->nx[i*ncy + j] + mat[1]*ellipse->ny[i*ncy + j] +
-                  mat[2]*ellipse->nz[i*ncy + j];
-            nyr = mat[4]*ellipse->nx[i*ncy + j] + mat[5]*ellipse->ny[i*ncy + j] +
-                  mat[6]*ellipse->nz[i*ncy + j];
-            nzr = mat[8]*ellipse->nx[i*ncy + j] + mat[9]*ellipse->ny[i*ncy + j] +
-                  mat[10]*ellipse->nz[i*ncy + j];
-
-            ellipse->x[i*ncy + j] = xr;
-            ellipse->y[i*ncy  + j] = yr;
-            ellipse->z[i*ncy  + j] = zr;
-
-            ellipse->nx[i*ncy  + j] = nxr;
-            ellipse->ny[i*ncy  + j] = nyr;
-            ellipse->nz[i*ncy  + j] = nzr;
+            if (transform)
+            {
+                transformGrids<T, U>(ellipse, idx, inp, out, &ut, mat);
+            }
         }
     }
 }
 
-template<typename T, typename U> void Ellipse_uv(T *ellipse, U xu_lo, U xu_up, U yv_lo,
-                                                U yv_up, U a, U b, U c, int ncx, int ncy, int nfac,
-                                                U mat[16])
+template<typename T, typename U>
+void Ellipse_uv(T *ellipse, U xu_lo, U xu_up, U yv_lo,
+                U yv_up, U a, U b, U c, int ncx, int ncy, int nfac,
+                U mat[16], bool transform)
 {
-    U _du = (asin(xu_up/a) - asin(xu_lo/a)) / ncx;
-    U _dv = (yv_up - yv_lo) / ncy;
-
-    U du = (asin(xu_up/a) + _du - asin(xu_lo/a)) / ncx;
-    U dv = (yv_up + _dv - yv_lo) / ncy;
+    U du = (asin(xu_up/a) - asin(xu_lo/a)) / (ncx - 1);
+    U dv = (yv_up - yv_lo) / (ncy - 1);
 
     // Generate using xy parametrisation
     U u;
@@ -363,56 +313,188 @@ template<typename T, typename U> void Ellipse_uv(T *ellipse, U xu_lo, U xu_up, U
 
     U norm;
 
+    Utils<U> ut;
+
+
+    std::array<U, 3> inp, out;
+
     for (int i=0; i < ncx; i++)
     {
         u = i * du + asin(xu_lo/a);
         for (int j=0; j < ncy; j++)
         {
-            v = j * dv + yv_lo;
+            v = (j * dv + yv_lo) * M_PI/180;
+            int idx = i*ncy + j;
 
-            ellipse->x[i*ncy + j] = a * sin(u) * cos(v);
-            ellipse->y[i*ncy + j] = b * sin(u) * sin(v);
-            ellipse->z[i*ncy + j] = c * cos(u);
+            ellipse->x[idx] = a * sin(u) * cos(v);
+            ellipse->y[idx] = b * sin(u) * sin(v);
+            ellipse->z[idx] = c * cos(u);
 
             prefac = nfac / sqrt(b*b * c*c * sin(u)*sin(u) * cos(v)*cos(v) +
                       a*a * c*c * sin(u)*sin(u) * sin(v)*sin(v) + a*a * b*b * cos(u)*cos(u));
 
-            ellipse->nx[i*ncy + j] = b * c * sin(u) * cos(v) * prefac;
-            ellipse->ny[i*ncy + j] = a * c * sin(u) * sin(v) * prefac;
-            ellipse->nz[i*ncy + j] = b * a * cos(u) * prefac;
+            ellipse->nx[idx] = b * c * sin(u) * cos(v) * prefac;
+            ellipse->ny[idx] = a * c * sin(u) * sin(v) * prefac;
+            ellipse->nz[idx] = b * a * cos(u) * prefac;
 
-            ellipse->area[i*ncy + j] = sin(u) * sqrt(b*b * c*c * sin(u)*sin(u) * cos(v)*cos(v) +
+            ellipse->area[idx] = sin(u) * sqrt(b*b * c*c * sin(u)*sin(u) * cos(v)*cos(v) +
                                         a*a * c*c * sin(u)*sin(u) * sin(v)*sin(v) +
                                         a*a * b*b * cos(u)*cos(u)) * du * dv;
 
-            U xr, yr, zr, nxr, nyr, nzr;
-
-            xr = mat[0]*ellipse->x[i*ncy + j] + mat[1]*ellipse->y[i*ncy + j] +
-                  mat[2]*ellipse->z[i*ncy + j] + mat[3];
-            yr = mat[4]*ellipse->x[i*ncy + j] + mat[5]*ellipse->y[i*ncy + j] +
-                  mat[6]*ellipse->z[i*ncy + j] + mat[7];
-            zr = mat[8]*ellipse->x[i*ncy + j] + mat[9]*ellipse->y[i*ncy + j] +
-                  mat[10]*ellipse->z[i*ncy + j] + mat[11];
-
-            nxr = mat[0]*ellipse->nx[i*ncy + j] + mat[1]*ellipse->ny[i*ncy + j] +
-                  mat[2]*ellipse->nz[i*ncy + j];
-            nyr = mat[4]*ellipse->nx[i*ncy + j] + mat[5]*ellipse->ny[i*ncy + j] +
-                  mat[6]*ellipse->nz[i*ncy + j];
-            nzr = mat[8]*ellipse->nx[i*ncy + j] + mat[9]*ellipse->ny[i*ncy + j] +
-                  mat[10]*ellipse->nz[i*ncy + j];
-
-            ellipse->x[i*ncy + j] = xr;
-            ellipse->y[i*ncy  + j] = yr;
-            ellipse->z[i*ncy  + j] = zr;
-
-            ellipse->nx[i*ncy  + j] = nxr;
-            ellipse->ny[i*ncy  + j] = nyr;
-            ellipse->nz[i*ncy  + j] = nzr;
+            if (transform)
+            {
+                transformGrids<T, U>(ellipse, idx, inp, out, &ut, mat);
+            }
         }
     }
 }
 
-extern "C" void generateGrid(reflparams refl, reflcontainer *container)
+template<typename T, typename U>
+void Plane_xy(T *plane, U xu_lo, U xu_up, U yv_lo,
+              U yv_up, int ncx, int ncy, int nfac,
+              U mat[16], bool transform)
+{
+    U dx = (xu_up - xu_lo) / (ncx - 1);
+    U dy = (yv_up - yv_lo) / (ncy - 1);
+
+    // Generate using xy parametrisation
+    U x;
+    U y;
+    U prefac;
+
+    U norm;
+
+    Utils<U> ut;
+
+
+    std::array<U, 3> inp, out;
+
+    for (int i=0; i < ncx; i++)
+    {
+        x = i * dx + xu_lo;
+        for (int j=0; j < ncy; j++)
+        {
+            y = j * dy + yv_lo;
+            int idx = i*ncy + j;
+
+            plane->x[idx] = x;
+            plane->y[idx] = y;
+            plane->z[idx] = 0;
+
+            plane->nx[idx] = 0;
+            plane->ny[idx] = 0;
+            plane->nz[idx] = nfac * 1;
+
+            plane->area[idx] = dx * dy;
+
+            if (transform)
+            {
+                transformGrids<T, U>(plane, idx, inp, out, &ut, mat);
+            }
+        }
+    }
+}
+
+template<typename T, typename U>
+void Plane_uv(T *plane, U xu_lo, U xu_up, U yv_lo,
+              U yv_up, int ncx, int ncy, int nfac,
+              U mat[16], bool transform)
+{
+    U du = (xu_up - xu_lo) / (ncx - 1);
+    U dv = (yv_up - yv_lo) / (ncy - 1);
+
+    // Generate using xy parametrisation
+    U u;
+    U v;
+
+    U norm;
+
+    Utils<U> ut;
+
+
+    std::array<U, 3> inp, out;
+
+    for (int i=0; i < ncx; i++)
+    {
+        u = i * du + xu_lo;
+
+        for (int j=0; j < ncy; j++)
+        {
+            v = (j * dv + yv_lo) * M_PI/180;
+            int idx = i*ncy + j;
+
+            plane->x[idx] = u * cos(v);
+            plane->y[idx] = u * sin(v);
+            plane->z[idx] = 0;
+
+            plane->nx[idx] = 0;
+            plane->ny[idx] = 0;
+            plane->nz[idx] = nfac * 1;
+
+            plane->area[idx] = u * du * dv;
+
+            if (transform)
+            {
+                transformGrids<T, U>(plane, idx, inp, out, &ut, mat);
+            }
+        }
+    }
+}
+
+template<typename T, typename U>
+void Plane_AoE(T *plane, U xu_lo, U xu_up, U yv_lo,
+              U yv_up, int ncx, int ncy,
+              U mat[16], bool transform, bool spheric)
+{
+    U dA = (xu_up - xu_lo) / (ncx - 1);
+    U dE = (yv_up - yv_lo) / (ncy - 1);
+
+    // Generate using xy parametrisation
+    U Az;
+    U El;
+
+    Utils<U> ut;
+
+
+    std::array<U, 3> inp, out;
+
+    for (int i=0; i < ncx; i++)
+    {
+        Az = i * dA + xu_lo;
+
+        for (int j=0; j < ncy; j++)
+        {
+            El = j * dE + yv_lo;
+            int idx = i*ncy + j;
+
+            if (spheric)
+            {
+                plane->x[idx] = sqrt(Az*Az + El*El) * M_PI/180;
+                plane->y[idx] = atan(El / Az);
+
+                    if (plane->y[idx] != plane->y[idx])
+                    {
+                        plane->y[idx] = 0;
+                    }
+            }
+
+            plane->z[idx] = 0;
+
+            plane->nx[idx] = 0;
+            plane->ny[idx] = 0;
+            plane->nz[idx] = 1;
+
+            plane->area[idx] = 1;
+
+            if (transform)
+            {
+                transformGrids<T, U>(plane, idx, inp, out, &ut, mat);
+            }
+        }
+    }
+}
+
+extern "C" void generateGrid(reflparams refl, reflcontainer *container, bool transform, bool spheric)
 {
     // For readability, assign new temporary placeholders
     double xu_lo = refl.lxu[0];
@@ -434,51 +516,69 @@ extern "C" void generateGrid(reflparams refl, reflcontainer *container)
         nfac = -1;
     }
 
-    if (refl.gmode)
+    if (refl.gmode == 0)
     {
         if (refl.type == 0)
         {
             Parabola_xy<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, a, b, ncx, ncy, nfac, refl.transf);
+                                            yv_up, a, b, ncx, ncy, nfac, refl.transf, transform);
         }
 
         else if (refl.type == 1)
         {
             Hyperbola_xy<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, a, b, c, ncx, ncy, nfac, refl.transf);
+                                            yv_up, a, b, c, ncx, ncy, nfac, refl.transf, transform);
         }
 
         else if (refl.type == 2)
         {
             Ellipse_xy<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, a, b, c, ncx, ncy, nfac, refl.transf);
+                                            yv_up, a, b, c, ncx, ncy, nfac, refl.transf, transform);
+        }
+
+        else if (refl.type == 3)
+        {
+            Plane_xy<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
+                                            yv_up, ncx, ncy, nfac, refl.transf, transform);
         }
     }
 
-    else
+    else if (refl.gmode == 1)
     {
         if (refl.type == 0)
         {
 
             Parabola_uv<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, a, b, ncx, ncy, nfac, refl.transf);
+                                            yv_up, a, b, ncx, ncy, nfac, refl.transf, transform);
         }
 
         else if (refl.type == 1)
         {
             Hyperbola_uv<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, a, b, c, ncx, ncy, nfac, refl.transf);
+                                            yv_up, a, b, c, ncx, ncy, nfac, refl.transf, transform);
         }
 
         else if (refl.type == 2)
         {
             Ellipse_uv<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, a, b, c, ncx, ncy, nfac, refl.transf);
+                                            yv_up, a, b, c, ncx, ncy, nfac, refl.transf, transform);
         }
+
+        else if (refl.type == 3)
+        {
+            Plane_uv<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
+                                            yv_up, ncx, ncy, nfac, refl.transf, transform);
+        }
+    }
+
+    if (refl.gmode == 2)
+    {
+        Plane_AoE<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
+                                        yv_up, ncx, ncy, refl.transf, transform, spheric);
     }
 }
 
-extern "C" void generateGridf(reflparamsf refl, reflcontainerf *container)
+extern "C" void generateGridf(reflparamsf refl, reflcontainerf *container, bool transform, bool spheric)
 {
     // For readability, assign new temporary placeholders
     float xu_lo = refl.lxu[0];
@@ -500,46 +600,64 @@ extern "C" void generateGridf(reflparamsf refl, reflcontainerf *container)
         nfac = -1;
     }
 
-    if (refl.gmode)
+    if (refl.gmode == 0)
     {
         if (refl.type == 0)
         {
             Parabola_xy<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, a, b, ncx, ncy, nfac, refl.transf);
+                                            yv_up, a, b, ncx, ncy, nfac, refl.transf, transform);
         }
 
         else if (refl.type == 1)
         {
             Hyperbola_xy<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, a, b, c, ncx, ncy, nfac, refl.transf);
+                                            yv_up, a, b, c, ncx, ncy, nfac, refl.transf, transform);
         }
 
         else if (refl.type == 2)
         {
             Ellipse_xy<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, a, b, c, ncx, ncy, nfac, refl.transf);
+                                            yv_up, a, b, c, ncx, ncy, nfac, refl.transf, transform);
+        }
+
+        else if (refl.type == 3)
+        {
+            Plane_xy<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
+                                            yv_up, ncx, ncy, nfac, refl.transf, transform);
         }
     }
 
-    else
+    else if (refl.gmode == 1)
     {
         if (refl.type == 0)
         {
 
             Parabola_uv<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, a, b, ncx, ncy, nfac, refl.transf);
+                                            yv_up, a, b, ncx, ncy, nfac, refl.transf, transform);
         }
 
         else if (refl.type == 1)
         {
             Hyperbola_uv<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, a, b, c, ncx, ncy, nfac, refl.transf);
+                                            yv_up, a, b, c, ncx, ncy, nfac, refl.transf, transform);
         }
 
         else if (refl.type == 2)
         {
             Ellipse_uv<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, a, b, c, ncx, ncy, nfac, refl.transf);
+                                            yv_up, a, b, c, ncx, ncy, nfac, refl.transf, transform);
         }
+
+        else if (refl.type == 3)
+        {
+            Plane_uv<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
+                                            yv_up, ncx, ncy, nfac, refl.transf, transform);
+        }
+    }
+
+    else if (refl.gmode == 2)
+    {
+        Plane_AoE<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
+                                        yv_up, ncx, ncy, refl.transf, transform, spheric);
     }
 }

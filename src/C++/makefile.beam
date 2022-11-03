@@ -1,5 +1,5 @@
 # This makefile creates the cpu version of POPPy.
-# To build, type: 'make cpu' in terminal
+# To build, type: 'make beam' in terminal
 
 ###########################################################################################
 DIRSRC = ./src/
@@ -11,12 +11,12 @@ LDFLAGS= -Wl,-rpath,./src/C++/
 CC  = $(COMP) $(CFLAGS) -fpic -c
 CO  = $(COMP) $(CFLAGS) $(LDFLAGS) -o
 ###########################################################################################
-LIB = libpoppycpu.so
+LIB = libpoppybeam.so
 all: $(LIB)
 ###########################################################################################
-libpoppycpu.so: Interface_CPU.o
-	$(CO) libpoppycpu.so -fpic -shared Interface_CPU.o -L. -lpoppyrefl
+libpoppybeam.so: InterfaceBeam.o
+	$(CO) libpoppybeam.so -fpic -shared InterfaceBeam.o -L. -lpoppyrefl
 ###########################################################################################
-Interface_CPU.o: $(DIRSRC)Interface_CPU.cpp
-	$(CC) $(DIRSRC)Interface_CPU.cpp -I$(DIRSRC) -L. -lpoppyrefl
+InterfaceBeam.o: $(DIRSRC)InterfaceBeam.cpp
+	$(CC) $(DIRSRC)InterfaceBeam.cpp -I$(DIRSRC) -L. -lpoppyrefl
 ###########################################################################################

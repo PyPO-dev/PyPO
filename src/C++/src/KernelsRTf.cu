@@ -16,7 +16,7 @@
 #include "InterfaceReflector.h"
 //#include "CompOverload.h"
 
-#define CSIZE 4
+#define CSIZE 5
 #define MILLISECOND 1000
 
 /* Kernels for single precision PO.
@@ -25,7 +25,7 @@
  */
 
 // Declare constant memory for Device
-__constant__ float con[CSIZE]; // a, b, c, t0
+__constant__ float con[CSIZE]; // a, b, c, t0, epsilon
 __constant__ float mat[16]; //
 __constant__ int nTot;
 __constant__ int cflip;
@@ -48,7 +48,7 @@ __host__ inline void gpuAssert(cudaError_t code, const char *file, int line, boo
    }
 }
 
-__host__ __device__ void _debugArray(float arr[3])
+__host__ __device__ void _debugArrayf(float arr[3])
 {
     printf("%f, %f, %f\n", arr[0], arr[1], arr[2]);
 }
@@ -130,7 +130,7 @@ __device__ __inline__ void npl(float xr, float yr, float zr, float (&out)[3])
 }
 
 // Not placed in GUtils.h, because want to place rotMat in constant memory
-__device__ __inline__ void matVec4(float (&cv1)[3], float (&out)[3], bool vec)
+__device__ __inline__ void matVec4(float (&cv1)[3], float (&out)[3], bool vec = false)
 {
     if (vec)
     {
@@ -149,7 +149,7 @@ __device__ __inline__ void matVec4(float (&cv1)[3], float (&out)[3], bool vec)
     }
 }
 
-__device__ __inline__ void invmatVec4(float (&cv1)[3], float (&out)[3], bool vec)
+__device__ __inline__ void invmatVec4(float (&cv1)[3], float (&out)[3], bool vec = false)
 {
     if (vec)
     {
@@ -176,33 +176,32 @@ __device__ __inline__ void transfRays(float *x, float *y, float *z,
 {
     bool vec = true;
     float inp[3], out[3];
-    for (int i=0; i<fr->size; i++)
-    {
-        inp[0] = x[i];
-        inp[1] = y[i];
-        inp[2] = z[i];
 
-        if (inv) {invmatVec4(inp, out);}
-        else {matVec4(inp, out);}
+    inp[0] = x[i];
+    inp[1] = y[i];
+    inp[2] = z[i];
 
-        x[i] = out[0];
-        y[i] = out[1];
-        z[i] = out[2];
+    if (inv) {invmatVec4(inp, out);}
+    else {matVec4(inp, out);}
 
-        inp[0] = dx[i];
-        inp[1] = dy[i];
-        inp[2] = dz[i];
+    x[i] = out[0];
+    y[i] = out[1];
+    z[i] = out[2];
 
-        if (inv) {invmatVec4(inp, out, vec);}
-        else {matVec4(inp, out, vec);}
+    inp[0] = dx[i];
+    inp[1] = dy[i];
+    inp[2] = dz[i];
 
-        dx[i] = out[0];
-        dy[i] = out[1];
-        dz[i] = out[2];
-    }
+    if (inv) {invmatVec4(inp, out, vec);}
+    else {matVec4(inp, out, vec);}
+
+    dx[i] = out[0];
+    dy[i] = out[1];
+    dz[i] = out[2];
+
 }
 
-__host__ std::array<dim3, 2> _initCUDA(reflparamsf ctp,
+__host__ std::array<dim3, 2> _initCUDA(reflparamsf ctp, float epsilon, float t0,
                                       int nTot, int nBlocks, int nThreads)
 {
     // Calculate nr of blocks per grid and nr of threads per block
@@ -210,7 +209,7 @@ __host__ std::array<dim3, 2> _initCUDA(reflparamsf ctp,
 
     // Pack constant array
     cuFloatComplex _con[CSIZE] = {ctp.coeffs[0], ctp.coeffs[1],
-                                  ctp.coeffs[2], nTot, con[3]};
+                                  ctp.coeffs[2], nTot, t0, epsilon};
 
     int iflip = 1;
     if (ctp.flip) {iflip = -1;}
@@ -236,7 +235,7 @@ __global__ void propagateRaysToP(float *xs, float *ys, float *zs,
     bool inv = true;
 
     int idx = blockDim.x*blockIdx.x + threadIdx.x;
-    if (idx < g_t)
+    if (idx < nTot)
     {
         transfRays(xs, ys, zs, dxs, dys, dzs, idx, inv);
 
@@ -253,7 +252,7 @@ __global__ void propagateRaysToP(float *xs, float *ys, float *zs,
         float dy = dys[idx];
         float dz = dzs[idx];
 
-        while (check > epsilon)
+        while (check > con[4])
         {
             t1 = gp(_t, x, y, z, dx, dy, dz);
 
@@ -265,12 +264,12 @@ __global__ void propagateRaysToP(float *xs, float *ys, float *zs,
         yt[idx] = y + _t*dy;
         zt[idx] = z + _t*dz;
 
-        norms = np(xt[idx], yt[idx], zt[idx]);
+        np(xt[idx], yt[idx], zt[idx], norms);
         check = (dxt[idx]*norms[0] + dyt[idx]*norms[1] + dzt[idx]*norms[2]);
 
-        dx[idx] = dx - 2*check*norms[0];
-        dy[idx] = dy - 2*check*norms[1];
-        dz[idx] = dz - 2*check*norms[2];
+        dxt[idx] = dx - 2*check*norms[0];
+        dyt[idx] = dy - 2*check*norms[1];
+        dzt[idx] = dz - 2*check*norms[2];
 
         transfRays(xs, ys, zs, dxs, dys, dzs, idx);
         transfRays(xt, yt, zt, dxt, dyt, dzt, idx);
@@ -286,7 +285,7 @@ __global__ void propagateRaysToH(float *xs, float *ys, float *zs,
     bool inv = true;
 
     int idx = blockDim.x*blockIdx.x + threadIdx.x;
-    if (idx < g_t)
+    if (idx < nTot)
     {
         transfRays(xs, ys, zs, dxs, dys, dzs, idx, inv);
 
@@ -303,7 +302,7 @@ __global__ void propagateRaysToH(float *xs, float *ys, float *zs,
         float dy = dys[idx];
         float dz = dzs[idx];
 
-        while (check > epsilon)
+        while (check > con[4])
         {
             t1 = gh(_t, x, y, z, dx, dy, dz);
 
@@ -315,19 +314,19 @@ __global__ void propagateRaysToH(float *xs, float *ys, float *zs,
         yt[idx] = y + _t*dy;
         zt[idx] = z + _t*dz;
 
-        norms = nhe(xt[idx], yt[idx], zt[idx]);
+        nhe(xt[idx], yt[idx], zt[idx], norms);
         check = (dxt[idx]*norms[0] + dyt[idx]*norms[1] + dzt[idx]*norms[2]);
 
-        dx[idx] = dx - 2*check*norms[0];
-        dy[idx] = dy - 2*check*norms[1];
-        dz[idx] = dz - 2*check*norms[2];
+        dxt[idx] = dx - 2*check*norms[0];
+        dyt[idx] = dy - 2*check*norms[1];
+        dzt[idx] = dz - 2*check*norms[2];
 
         transfRays(xs, ys, zs, dxs, dys, dzs, idx);
         transfRays(xt, yt, zt, dxt, dyt, dzt, idx);
     }
 }
 
-___global__ void propagateRaysToE(float *xs, float *ys, float *zs,
+__global__ void propagateRaysToE(float *xs, float *ys, float *zs,
                                 float *dxs, float *dys, float *dzs,
                                 float *xt, float *yt, float *zt,
                                 float *dxt, float *dyt, float *dzt)
@@ -336,7 +335,7 @@ ___global__ void propagateRaysToE(float *xs, float *ys, float *zs,
     bool inv = true;
 
     int idx = blockDim.x*blockIdx.x + threadIdx.x;
-    if (idx < g_t)
+    if (idx < nTot)
     {
         transfRays(xs, ys, zs, dxs, dys, dzs, idx, inv);
 
@@ -353,7 +352,7 @@ ___global__ void propagateRaysToE(float *xs, float *ys, float *zs,
         float dy = dys[idx];
         float dz = dzs[idx];
 
-        while (check > epsilon)
+        while (check > con[4])
         {
             t1 = ge(_t, x, y, z, dx, dy, dz);
 
@@ -365,12 +364,12 @@ ___global__ void propagateRaysToE(float *xs, float *ys, float *zs,
         yt[idx] = y + _t*dy;
         zt[idx] = z + _t*dz;
 
-        norms = nhe(xt[idx], yt[idx], zt[idx]);
+        nhe(xt[idx], yt[idx], zt[idx], norms);
         check = (dxt[idx]*norms[0] + dyt[idx]*norms[1] + dzt[idx]*norms[2]);
 
-        dx[idx] = dx - 2*check*norms[0];
-        dy[idx] = dy - 2*check*norms[1];
-        dz[idx] = dz - 2*check*norms[2];
+        dxt[idx] = dx - 2*check*norms[0];
+        dyt[idx] = dy - 2*check*norms[1];
+        dzt[idx] = dz - 2*check*norms[2];
 
         transfRays(xs, ys, zs, dxs, dys, dzs, idx);
         transfRays(xt, yt, zt, dxt, dyt, dzt, idx);
@@ -386,7 +385,7 @@ __global__ void propagateRaysToPl(float *xs, float *ys, float *zs,
     bool inv = true;
 
     int idx = blockDim.x*blockIdx.x + threadIdx.x;
-    if (idx < g_t)
+    if (idx < nTot)
     {
         transfRays(xs, ys, zs, dxs, dys, dzs, idx, inv);
 
@@ -403,9 +402,9 @@ __global__ void propagateRaysToPl(float *xs, float *ys, float *zs,
         float dy = dys[idx];
         float dz = dzs[idx];
 
-        while (check > epsilon)
+        while (check > con[4])
         {
-            t1 = gp(_t, x, y, z, dx, dy, dz);
+            t1 = gpl(_t, x, y, z, dx, dy, dz);
 
             check = fabs(t1 - _t);
 
@@ -415,12 +414,12 @@ __global__ void propagateRaysToPl(float *xs, float *ys, float *zs,
         yt[idx] = y + _t*dy;
         zt[idx] = z + _t*dz;
 
-        norms = np(xt[idx], yt[idx], zt[idx]);
+        npl(xt[idx], yt[idx], zt[idx], norms);
         check = (dxt[idx]*norms[0] + dyt[idx]*norms[1] + dzt[idx]*norms[2]);
 
-        dx[idx] = dx - 2*check*norms[0];
-        dy[idx] = dy - 2*check*norms[1];
-        dz[idx] = dz - 2*check*norms[2];
+        dxt[idx] = dx - 2*check*norms[0];
+        dyt[idx] = dy - 2*check*norms[1];
+        dzt[idx] = dz - 2*check*norms[2];
 
         transfRays(xs, ys, zs, dxs, dys, dzs, idx);
         transfRays(xt, yt, zt, dxt, dyt, dzt, idx);
@@ -428,10 +427,11 @@ __global__ void propagateRaysToPl(float *xs, float *ys, float *zs,
 }
 
 extern "C" void callRTKernel(reflparamsf ctp, cframef *fr_in,
-                            cframef *fr_out, float t0, int nBlocks, int nThreads)
+                            cframef *fr_out, float epsilon, float t0,
+                            int nBlocks, int nThreads)
 {
     std::array<dim3, 2> BT;
-    BT = _initCUDA(ctp, fr_in->size, nBlocks, nThreads);
+    BT = _initCUDA(ctp, epsilon, t0, fr_in->size, nBlocks, nThreads);
 
     float *d_xs, *d_ys, *d_zs;
     gpuErrchk( cudaMalloc((void**)&d_xs, fr_in->size * sizeof(float)) );
@@ -461,5 +461,27 @@ extern "C" void callRTKernel(reflparamsf ctp, cframef *fr_in,
     gpuErrchk( cudaMalloc((void**)&d_dyt, fr_in->size * sizeof(float)) );
     gpuErrchk( cudaMalloc((void**)&d_dzt, fr_in->size * sizeof(float)) );
 
-    // Allocate arrays for
+    if (ctp.type == 0)
+    {
+        propagateRaysToP<<<BT[0], BT[1]>>>(xs, ys, zs, dxs, dys, dzs,
+                                          xt, yt, zt, dxt, dyt, dzt);
+    }
+
+    else if (ctp.type == 1)
+    {
+        propagateRaysToH<<<BT[0], BT[1]>>>(xs, ys, zs, dxs, dys, dzs,
+                                          xt, yt, zt, dxt, dyt, dzt);
+    }
+
+    else if (ctp.type == 2)
+    {
+        propagateRaysToE<<<BT[0], BT[1]>>>(xs, ys, zs, dxs, dys, dzs,
+                                          xt, yt, zt, dxt, dyt, dzt);
+    }
+
+    else if (ctp.type == 3)
+    {
+        propagateRaysToPl<<<BT[0], BT[1]>>>(xs, ys, zs, dxs, dys, dzs,
+                                          xt, yt, zt, dxt, dyt, dzt);
+    }
 }

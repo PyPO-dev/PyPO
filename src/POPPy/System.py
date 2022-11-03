@@ -432,9 +432,12 @@ class System(object):
                 ax_append=False, norm=False,
                 show=True, foc1=False, foc2=False, save=True, ret=False, RTframes=[]):
 
-        plt.plotSystem(self, self.system, fine, cmap,
+        figax = plt.plotSystem(self, self.system, fine, cmap,
                     ax_append, norm,
                     show, foc1, foc2, save, ret, RTframes, self.savePath)
+
+        if ret:
+            return figax
 
     def plotRTframe(self, frame, project="xy"):
         plt.plotRTframe(self, frame, project, self.savePath)

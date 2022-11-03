@@ -8,6 +8,8 @@ import os
 import sys
 import json
 
+from scipy.interpolate import griddata
+
 # POPPy-specific modules
 from src.POPPy.BindRefl import *
 from src.POPPy.BindGPU import *
@@ -300,24 +302,53 @@ class System(object):
 
         return frame_in
 
-    def calcRayLen(self, *args):
-        frame0 = args[0]
+    def calcRayLen(self, *args, start=0):
+        if isinstance(start, np.ndarray):
+            frame0 = args[0]
 
-        out = []
-        sumd = np.zeros(len(frame0.x))
+            out = []
+            sumd = np.zeros(len(frame0.x))
 
-        for i in range(len(args) - 1):
-            diffx = args[i+1].x - frame0.x
-            diffy = args[i+1].y - frame0.y
-            diffz = args[i+1].z - frame0.z
+            diffx = frame0.x - start[0]
+            diffy = frame0.y - start[1]
+            diffz = frame0.z - start[2]
 
             lens = np.sqrt(diffx**2 + diffy**2 + diffz**2)
             out.append(lens)
 
-            frame0 = args[i+1]
             sumd += lens
 
-        out.append(sumd)
+            for i in range(len(args) - 1):
+                diffx = args[i+1].x - frame0.x
+                diffy = args[i+1].y - frame0.y
+                diffz = args[i+1].z - frame0.z
+
+                lens = np.sqrt(diffx**2 + diffy**2 + diffz**2)
+                out.append(lens)
+
+                frame0 = args[i+1]
+                sumd += lens
+
+            out.append(sumd)
+
+        else:
+            frame0 = args[0]
+
+            out = []
+            sumd = np.zeros(len(frame0.x))
+
+            for i in range(len(args) - 1):
+                diffx = args[i+1].x - frame0.x
+                diffy = args[i+1].y - frame0.y
+                diffz = args[i+1].z - frame0.z
+
+                lens = np.sqrt(diffx**2 + diffy**2 + diffz**2)
+                out.append(lens)
+
+                frame0 = args[i+1]
+                sumd += lens
+
+            out.append(sumd)
 
         return out
 
@@ -329,6 +360,22 @@ class System(object):
         fr_out = RT_CPUd(self.system[name_target], fr_in, nThreads, epsilon, t0)
         return fr_out
 
+    def interpFrame(self, fr_in, field, name_target):
+        grids = generateGrid(self.system[name_target])
+
+        points = (fr_in.x, fr_in.y, fr_in.z)
+
+        rfield = np.real(field)
+        ifield = np.imag(field)
+
+        grid_interp = (grids.x, grids.y, grids.z)
+
+        rout = griddata(points, rfield, grid_interp, method='nearest')
+        iout = griddata(points, ifield, grid_interp, method='nearest')
+
+        out = rout + 1j * iout
+
+        return out
 
     def _compToFields(self, comp, field):
         null = np.zeros(field.shape, dtype=complex)

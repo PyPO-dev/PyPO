@@ -444,7 +444,7 @@ void Plane_uv(T *plane, U xu_lo, U xu_up, U yv_lo,
 template<typename T, typename U>
 void Plane_AoE(T *plane, U xu_lo, U xu_up, U yv_lo,
               U yv_up, int ncx, int ncy,
-              U mat[16], bool transform)
+              U mat[16], bool transform, bool spheric)
 {
     U dA = (xu_up - xu_lo) / (ncx - 1);
     U dE = (yv_up - yv_lo) / (ncy - 1);
@@ -467,12 +467,15 @@ void Plane_AoE(T *plane, U xu_lo, U xu_up, U yv_lo,
             El = j * dE + yv_lo;
             int idx = i*ncy + j;
 
-            plane->x[idx] = sqrt(Az*Az + El*El) * M_PI/180;
-            plane->y[idx] = atan(El / Az);
-
-            if (plane->y[idx] != plane->y[idx])
+            if (spheric)
             {
-                plane->y[idx] = 0;
+                plane->x[idx] = sqrt(Az*Az + El*El) * M_PI/180;
+                plane->y[idx] = atan(El / Az);
+
+                    if (plane->y[idx] != plane->y[idx])
+                    {
+                        plane->y[idx] = 0;
+                    }
             }
 
             plane->z[idx] = 0;
@@ -491,7 +494,7 @@ void Plane_AoE(T *plane, U xu_lo, U xu_up, U yv_lo,
     }
 }
 
-extern "C" void generateGrid(reflparams refl, reflcontainer *container, bool transform)
+extern "C" void generateGrid(reflparams refl, reflcontainer *container, bool transform, bool spheric)
 {
     // For readability, assign new temporary placeholders
     double xu_lo = refl.lxu[0];
@@ -571,11 +574,11 @@ extern "C" void generateGrid(reflparams refl, reflcontainer *container, bool tra
     if (refl.gmode == 2)
     {
         Plane_AoE<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
-                                        yv_up, ncx, ncy, refl.transf, transform);
+                                        yv_up, ncx, ncy, refl.transf, transform, spheric);
     }
 }
 
-extern "C" void generateGridf(reflparamsf refl, reflcontainerf *container, bool transform)
+extern "C" void generateGridf(reflparamsf refl, reflcontainerf *container, bool transform, bool spheric)
 {
     // For readability, assign new temporary placeholders
     float xu_lo = refl.lxu[0];
@@ -655,6 +658,6 @@ extern "C" void generateGridf(reflparamsf refl, reflcontainerf *container, bool 
     else if (refl.gmode == 2)
     {
         Plane_AoE<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
-                                        yv_up, ncx, ncy, refl.transf, transform);
+                                        yv_up, ncx, ncy, refl.transf, transform, spheric);
     }
 }

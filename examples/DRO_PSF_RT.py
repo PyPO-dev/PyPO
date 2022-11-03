@@ -34,13 +34,13 @@ def ex_DRO_RT():
             }
 
     RTpar = {
-            "nRays"     : 1000,
-            "nRing"     : 1000,
+            "nRays"     : 10,
+            "nRing"     : 10,
             "angx"      : 0,
             "angy"      : 0,
             "a"         : 10000,
             "b"         : 10000,
-            "tChief"    : np.array([180,0,0]),
+            "tChief"    : np.array([181,0,0]),
             "oChief"    : np.array([0,0,12e3])
             }
 

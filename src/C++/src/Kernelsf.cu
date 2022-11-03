@@ -1221,7 +1221,7 @@ extern "C" void callKernelf_JM(c2Bundlef *res, reflparamsf source, reflparamsf t
 
     std::cout << "Elapsed time : "
             << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-            << " [s]" << std::endl;
+            << " [s]\n" << std::endl;
 
     // Allocate Host arrays for J and M
     cuFloatComplex *h_Jxt = new cuFloatComplex[ct->size];
@@ -1385,7 +1385,7 @@ extern "C" void callKernelf_EH(c2Bundlef *res, reflparamsf source, reflparamsf t
 
     std::cout << "Elapsed time : "
             << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-            << " [s]" << std::endl;
+            << " [s]\n" << std::endl;
 
     // Allocate Host arrays for E and H
     cuFloatComplex *h_Ext = new cuFloatComplex[ct->size];
@@ -1572,7 +1572,7 @@ extern "C" void callKernelf_JMEH(c4Bundlef *res, reflparamsf source, reflparamsf
 
     std::cout << "Elapsed time : "
             << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-            << " [s]" << std::endl;
+            << " [s]\n" << std::endl;
 
     // Allocate Host arrays for J and M
     cuFloatComplex *h_Jxt = new cuFloatComplex[ct->size];
@@ -1779,7 +1779,7 @@ extern "C" void callKernelf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf
 
     std::cout << "Elapsed time : "
             << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-            << " [s]" << std::endl;
+            << " [s]\n" << std::endl;
 
     // Allocate Host arrays for E, H and P
     cuFloatComplex *h_Ext = new cuFloatComplex[ct->size];
@@ -1960,7 +1960,7 @@ extern "C" void callKernelf_FF(c2Bundlef *res, reflparamsf source, reflparamsf t
 
     std::cout << "Elapsed time : "
             << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-            << " [s]" << std::endl;
+            << " [s]\n" << std::endl;
 
     // Allocate Host arrays for E and H
     cuFloatComplex *h_Ext = new cuFloatComplex[ct->size];

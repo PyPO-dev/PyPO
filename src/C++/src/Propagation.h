@@ -48,7 +48,7 @@ public:
 
     std::vector<std::thread> threadPool;
 
-    Propagation(T k, int numThreads, int gs, int gt, T epsilon, T t_direction);
+    Propagation(T k, int numThreads, int gs, int gt, T epsilon, T t_direction, bool verbose = false);
 
     // Make T precision utility kit
     Utils<T> ut;
@@ -117,7 +117,7 @@ public:
 };
 
 template <class T, class U, class V, class W>
-Propagation<T, U, V, W>::Propagation(T k, int numThreads, int gs, int gt, T epsilon, T t_direction)
+Propagation<T, U, V, W>::Propagation(T k, int numThreads, int gs, int gt, T epsilon, T t_direction, bool verbose)
 {
     this->M_PIf = 3.14159265359f;
     this->C_L = 2.99792458e11f; // mm s^-1
@@ -152,14 +152,17 @@ Propagation<T, U, V, W>::Propagation(T k, int numThreads, int gs, int gt, T epsi
     this->eye[1][1] = 1;
     this->eye[2][2] = 1;
 
-    printf("***--------- PO info ---------***\n");
-    printf("--- Source         :   %d cells\n", gs);
-    printf("--- Target         :   %d cells\n", gt);
-    printf("--- Wavenumber     :   %.3f / mm\n", k);
-    printf("--- Threads        :   %d\n", numThreads);
-    printf("--- Device         :   CPU\n");
-    printf("***--------- PO info ---------***\n");
-    printf("\n");
+    if (verbose)
+    {
+        printf("***--------- PO info ---------***\n");
+        printf("--- Source         :   %d cells\n", gs);
+        printf("--- Target         :   %d cells\n", gt);
+        printf("--- Wavenumber     :   %.3f / mm\n", k);
+        printf("--- Threads        :   %d\n", numThreads);
+        printf("--- Device         :   CPU\n");
+        printf("***--------- PO info ---------***\n");
+        printf("\n");
+    }
 }
 
 // This function calculates the propagation between source and target, calculates currents

@@ -42,7 +42,8 @@ GDict = {
 PlotAper = {
         "plot"      : False,
         "center"    : np.zeros(2),
-        "radius"    : 1
+        "r_out"     : 1,
+        "r_in"      : 0
         }
 
 PODict = {

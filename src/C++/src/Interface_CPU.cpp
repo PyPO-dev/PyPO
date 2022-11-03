@@ -41,7 +41,7 @@ extern "C" void propagateToGrid_JM(c2Bundle *res, reflparams source, reflparams 
 
     std::cout << "Elapsed time : "
               << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-              << " [s]" << std::endl;
+              << " [s]\n" << std::endl;
 }
 
 extern "C" void propagateToGrid_EH(c2Bundle *res, reflparams source, reflparams target,
@@ -68,7 +68,7 @@ extern "C" void propagateToGrid_EH(c2Bundle *res, reflparams source, reflparams 
 
     std::cout << "Elapsed time : "
               << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-              << " [s]" << std::endl;
+              << " [s]\n" << std::endl;
 }
 
 extern "C" void propagateToGrid_JMEH(c4Bundle *res, reflparams source, reflparams target,
@@ -94,7 +94,7 @@ extern "C" void propagateToGrid_JMEH(c4Bundle *res, reflparams source, reflparam
     end = std::chrono::steady_clock::now();
     std::cout << "Elapsed time : "
               << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-              << " [s]" << std::endl;
+              << " [s]\n" << std::endl;
 }
 
 extern "C" void propagateToGrid_EHP(c2rBundle *res, reflparams source, reflparams target,
@@ -120,7 +120,7 @@ extern "C" void propagateToGrid_EHP(c2rBundle *res, reflparams source, reflparam
     end = std::chrono::steady_clock::now();
     std::cout << "Elapsed time : "
               << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-              << " [s]" << std::endl;
+              << " [s]\n" << std::endl;
 }
 
 extern "C" void propagateToGrid_scalar(arrC1 *res, reflparams source, reflparams target,
@@ -146,7 +146,7 @@ extern "C" void propagateToGrid_scalar(arrC1 *res, reflparams source, reflparams
     end = std::chrono::steady_clock::now();
     std::cout << "Elapsed time : "
               << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-              << " [s]" << std::endl;
+              << " [s]\n" << std::endl;
 }
 
 extern "C" void propagateToFarField(c2Bundle *res, reflparams source, reflparams target,
@@ -172,7 +172,7 @@ extern "C" void propagateToFarField(c2Bundle *res, reflparams source, reflparams
     end = std::chrono::steady_clock::now();
     std::cout << "Elapsed time : "
               << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-              << " [s]" << std::endl;
+              << " [s]\n" << std::endl;
 }
 
 extern "C" void propagateRays(reflparams ctp, cframe *fr_in, cframe *fr_out,
@@ -190,8 +190,8 @@ extern "C" void propagateRays(reflparams ctp, cframe *fr_in, cframe *fr_out,
 
     end = std::chrono::steady_clock::now();
     std::cout << "Elapsed time : "
-              << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()
-              << " [us]" << std::endl;
+              << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count()
+              << " [ms]\n" << std::endl;
 }
 
 // SINGLE PRECISION INTERFACE
@@ -218,7 +218,7 @@ extern "C" void propagateToGridf_JM(c2Bundlef *res, reflparamsf source, reflpara
 
     std::cout << "Elapsed time : "
               << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-              << " [s]" << std::endl;
+              << " [s]\n" << std::endl;
 }
 
 extern "C" void propagateToGridf_EH(c2Bundlef *res, reflparamsf source, reflparamsf target,
@@ -244,7 +244,7 @@ extern "C" void propagateToGridf_EH(c2Bundlef *res, reflparamsf source, reflpara
 
     std::cout << "Elapsed time : "
               << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-              << " [s]" << std::endl;
+              << " [s]\n" << std::endl;
 }
 
 extern "C" void propagateToGridf_JMEH(c4Bundlef *res, reflparamsf source, reflparamsf target,
@@ -270,7 +270,7 @@ extern "C" void propagateToGridf_JMEH(c4Bundlef *res, reflparamsf source, reflpa
     end = std::chrono::steady_clock::now();
     std::cout << "Elapsed time : "
               << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-              << " [s]" << std::endl;
+              << " [s]\n" << std::endl;
 }
 
 extern "C" void propagateToGridf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf target,
@@ -296,7 +296,7 @@ extern "C" void propagateToGridf_EHP(c2rBundlef *res, reflparamsf source, reflpa
     end = std::chrono::steady_clock::now();
     std::cout << "Elapsed time : "
               << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-              << " [s]" << std::endl;
+              << " [s]\n" << std::endl;
 }
 
 extern "C" void propagateToGridf_scalar(arrC1f *res, reflparamsf source, reflparamsf target,
@@ -322,7 +322,7 @@ extern "C" void propagateToGridf_scalar(arrC1f *res, reflparamsf source, reflpar
     end = std::chrono::steady_clock::now();
     std::cout << "Elapsed time : "
               << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-              << " [s]" << std::endl;
+              << " [s]\n" << std::endl;
 }
 
 extern "C" void propagateToFarFieldf(c2Bundlef *res, reflparamsf source, reflparamsf target,
@@ -348,5 +348,5 @@ extern "C" void propagateToFarFieldf(c2Bundlef *res, reflparamsf source, reflpar
     end = std::chrono::steady_clock::now();
     std::cout << "Elapsed time : "
               << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-              << " [s]" << std::endl;
+              << " [s]\n" << std::endl;
 }

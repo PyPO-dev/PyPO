@@ -14,9 +14,12 @@ CO  = $(GCOMP) $(CFLAGS) -o
 LIB = libpoppygpu.so
 all: $(LIB)
 ###########################################################################################
-libpoppygpu.so: Kernelsf.o
-	$(CO) libpoppygpu.so -Xcompiler $(LDFLAGS) -Xcompiler -fPIC --shared Kernelsf.o -L. -lpoppyrefl
+libpoppygpu.so: Kernelsf.o KernelsRTf.o
+	$(CO) libpoppygpu.so -Xcompiler $(LDFLAGS) -Xcompiler -fPIC --shared Kernelsf.o KernelsRTf.o -L. -lpoppyrefl
 ###########################################################################################
 Kernelsf.o: $(DIRSRC)Kernelsf.cu
 	$(CC) $(DIRSRC)Kernelsf.cu -I$(DIRSRC) -L. -lpoppyrefl
+###########################################################################################
+KernelsRTf.o: $(DIRSRC)KernelsRTf.cu
+	$(CC) $(DIRSRC)KernelsRTf.cu -I$(DIRSRC) -L. -lpoppyrefl
 ###########################################################################################

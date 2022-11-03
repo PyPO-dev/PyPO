@@ -72,6 +72,9 @@ class System(object):
         Function for adding paraboloid reflector to system. If gmode='uv', lims_x should contain the smallest and largest radius and lims_y
         should contain rotation.
         """
+        if not "name" in reflDict:
+            reflDict["name"] = "Parabola"
+
         if reflDict["name"] == "Parabola":
             reflDict["name"] = reflDict["name"] + "_{}".format(self.num_ref)
 
@@ -123,6 +126,9 @@ class System(object):
         self.num_ref += 1
 
     def addHyperbola(self, reflDict):
+
+        if not "name" in reflDict:
+            reflDict["name"] = "Hyperbola"
         if reflDict["name"] == "Hyperbola":
             reflDict["name"] = reflDict["name"] + "_{}".format(self.num_ref)
 
@@ -182,6 +188,9 @@ class System(object):
         self.num_ref += 1
 
     def addEllipse(self, reflDict):
+        if not "name" in reflDict:
+            reflDict["name"] = "Ellipse"
+
         if reflDict["name"] == "Ellipse":
             reflDict["name"] = reflDict["name"] + "_{}".format(self.num_ref)
 
@@ -205,6 +214,9 @@ class System(object):
         self.num_ref += 1
 
     def addPlane(self, reflDict):
+        if not "name" in reflDict:
+            reflDict["name"] = "Plane"
+
         if reflDict["name"] == "Plane":
             reflDict["name"] = reflDict["name"] + "_{}".format(self.num_ref)
 
@@ -392,11 +404,13 @@ class System(object):
         surfaceObj = self.system[name_target]
         return effs.calcTaper(field, surfaceObj, aperDict)
 
-    def plotBeam2D(self, plotObject, field,
+    def plotBeam2D(self, name_surface, field,
                     vmin=-30, vmax=0, show=True, amp_only=False,
                     save=False, polar=False, interpolation=None,
                     aperDict={"plot":False}, mode='dB', project='xy',
                     units='', name='', titleA="Amp", titleP="Phase"):
+
+        plotObject = self.system[name_surface]
 
         plt.plotBeam2D(self, plotObject, field,
                         vmin, vmax, show, amp_only,
@@ -404,19 +418,21 @@ class System(object):
                         aperDict, mode, project,
                         units, name, titleA, titleP, self.savePath)
 
-    def plot3D(self, plotObject, fine=2, cmap=cm.cool,
+    def plot3D(self, name_surface, fine=2, cmap=cm.cool,
                 returns=False, ax_append=False, norm=False,
                 show=True, foc1=False, foc2=False, save=True):
+
+        plotObject = self.system[name_surface]
 
         plt.plot3D(self, plotObject, fine, cmap,
                     returns, ax_append, norm,
                     show, foc1, foc2, save, self.savePath)
 
-    def plotSystem(self, systemDict, fine=2, cmap=cm.cool,
+    def plotSystem(self, fine=2, cmap=cm.cool,
                 ax_append=False, norm=False,
                 show=True, foc1=False, foc2=False, save=True, ret=False, RTframes=[]):
 
-        plt.plotSystem(self, systemDict, fine, cmap,
+        plt.plotSystem(self, self.system, fine, cmap,
                     ax_append, norm,
                     show, foc1, foc2, save, ret, RTframes, self.savePath)
 

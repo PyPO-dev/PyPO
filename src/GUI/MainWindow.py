@@ -6,6 +6,7 @@ from src.GUI.ElementsColumn import ElementsWindow
 from src.GUI.SystemsColumn import SystemsWindow
 from src.GUI.ParameterForms import ParabolaForm, HyperbolaForm
 from src.GUI.PlotScreen import PlotScreen
+from src.GUI.TransformationWidget import TransformationWidget
 import numpy as np
 
 sys.path.append('../')
@@ -29,10 +30,11 @@ class MainWidget(QWidget):
 
 
         ### ElementConfigurations
-        self.elementConfigs = []
+        # self.elementConfigs = []
 
         # init System
-        self.SystemsList = {}
+        self.stm = st.System()
+        self.stm.addPlotter()
         
 
 
@@ -41,7 +43,7 @@ class MainWidget(QWidget):
         self.grid = QGridLayout()
 
         self._mkElementsColumn()
-        self._mkSystemsColumn()
+        # self._mkSystemsColumn()
         # self._mkButtons()
         # self.grid.addItem(QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum),3,3)
         self.plotSystem()
@@ -53,31 +55,31 @@ class MainWidget(QWidget):
         if hasattr(self, "ElementsColumn"):
             self.ElementsColumn.setParent(None)
         StmElements = []
-        for c in self.elementConfigs:
-            StmElements.append(c["name"])
-        self.ElementsColumn = ElementsWindow(StmElements)
+        for e,_ in self.stm.system.items():
+            StmElements.append(e)
+        self.ElementsColumn = ElementsWindow(StmElements, [self.setTransromationForm])
         self.ElementsColumn.setMaximumWidth(300)
         self.ElementsColumn.setMinimumWidth(300)
         self.addToWindowGrid(self.ElementsColumn, self.GPElementsColumn)
 
     
-    def _mkSystemsColumn(self):
-        if hasattr(self, "SystemsColumn"):
-            self.SystemsColumn.setParent(None)
-        listofstr = []
-        for k,_ in self.SystemsList.items():
-            listofstr.append(k)
-        self.SystemsColumn = SystemsWindow(listofstr)
-        self.SystemsColumn.setMaximumWidth(300)
-        self.SystemsColumn.setMinimumWidth(300)
-        self.addToWindowGrid(self.SystemsColumn, self.GPSystemsColumn)
+    # def _mkSystemsColumn(self):
+    #     if hasattr(self, "SystemsColumn"):
+    #         self.SystemsColumn.setParent(None)
+    #     listofstr = []
+    #     for k,_ in self.SystemsList.items():
+    #         listofstr.append(k)
+    #     self.SystemsColumn = SystemsWindow(listofstr)
+    #     self.SystemsColumn.setMaximumWidth(300)
+    #     self.SystemsColumn.setMinimumWidth(300)
+    #     self.addToWindowGrid(self.SystemsColumn, self.GPSystemsColumn)
 
     def plotSystem(self):
         if hasattr(self, "PlotScreen"):
             self.PlotScreen.setParent(None)
 
-        if self.SystemsList:
-            figure, _ = self.SystemsList["System 1"].plotter.plotSystem(self.SystemsList["System 1"].system , ret = True, show=False, save=False)
+        if self.stm:
+            figure, _ = self.stm.plotter.plotSystem(self.stm.system , ret = True, show=False, save=False)
         else :
             figure = None
         self.PlotScreen= PlotScreen(figure)
@@ -98,33 +100,50 @@ class MainWidget(QWidget):
     #     self.addToWindowGrid(btnWidget,self.GPButtons)
 
     def addExampleParabola(self):
-        d = {'name': 'parabol', 'type': 'Parabola', 'gridsize': [101, 101], 'flip': False, 'pmode': 'manual', 'coeffs':    np.array[1., 1., 0.], 'gmode': 'xy', 'lims_x': [-1.0, 1.0], 'lims_y': [-1.0, 1.0]}
+        d = {'type': 'Parabola', 'gridsize': [101, 101], 'flip': False, 'pmode': 'manual', 'coeffs':    np.array([1., 1., 0.]), 'gmode': 'xy', 'lims_x': [-1.0, 1.0], 'lims_y': [-1.0, 1.0]}
         self.addElementAction(d)
 
     def addExampleHyperbola(self):
-        d = {'name': 'Hyper', 'type': 'Hyperbola', 'gridsize': [201, 201], 'flip': False, 'pmode': 'manual', 'coeffs': np.array([3., 3., 2.]), 'gmode': 'xy', 'lims_x': [-1.5, 1.5], 'lims_y': [0.5, 0.5]}
-        self.addElementAction(d)
+        hyperbola = {}
+        # hyperbola["name"] = "h1"
+        hyperbola["type"] = "Hyperbola"
+        hyperbola["pmode"] = "focus"
+        hyperbola["gmode"] = "xy"
+        hyperbola["flip"] = False
+        hyperbola["focus_1"] = np.array([0,0,3.5e3])
+        hyperbola["focus_2"] = np.array([0,0,3.5e3 - 5606])
+        hyperbola["ecc"] = 1.08208248
+        hyperbola["lims_x"] = [-310,310]
+        hyperbola["lims_y"] = [-310,310]
+        hyperbola["lims_u"] = [0,310]
+        hyperbola["lims_v"] = [0,2*np.pi]
+        hyperbola["gridsize"] = [501,501]
+        self.addElementAction(hyperbola)
 
     def addElementAction(self, elementDict):
-        self.elementConfigs.append(elementDict)
+        # self.elementConfigs.append(elementDict)
+        if elementDict["type"] == "Parabola":
+            self.stm.addParabola(elementDict) 
+        elif elementDict["type"] == "Hyperbola":
+            self.stm.addHyperbola(elementDict) 
         
-        print(self.elementConfigs[-1])
+        # print(self.elementConfigs[-1])
         self._mkElementsColumn()
 
-    def addSystemAction(self):
-        stm = st.System()
-        stm.addPlotter()
+    # def addSystemAction(self):
+    #     stm = st.System()
+    #     stm.addPlotter()
 
-        for elementDict in self.elementConfigs:
-            if elementDict["type"] == "Parabola":
-                stm.addParabola(elementDict) 
-            elif elementDict["type"] == "Hyperbola":
-                stm.addHyperbola(elementDict) 
+    #     for elementDict in self.elementConfigs:
+    #         if elementDict["type"] == "Parabola":
+    #             stm.addParabola(elementDict) 
+    #         elif elementDict["type"] == "Hyperbola":
+    #             stm.addHyperbola(elementDict) 
 
-        self.SystemsList["System 1"] = stm
+    #     self.SystemsList["System 1"] = stm
         
-        # self.plotSystem()
-        self._mkSystemsColumn()
+    #     # self.plotSystem()
+    #     self._mkSystemsColumn()
 
     def setParabolaForm(self):
         if hasattr(self, "ParameterWid"):
@@ -143,6 +162,29 @@ class MainWidget(QWidget):
         self.ParameterWid.setMaximumWidth(400)
         self.ParameterWid.setMinimumWidth(400)
         self.addToWindowGrid(self.ParameterWid,self.GPParameterForm)
+
+    def setTransromationForm(self, element):
+        if hasattr(self, "ParameterWid"):
+            self.ParameterWid.setParent(None)
+        
+        self.ParameterWid = TransformationWidget(element, self.applyTransformation)
+        self.ParameterWid.setMaximumWidth(400)
+        self.ParameterWid.setMinimumWidth(400)
+        self.addToWindowGrid(self.ParameterWid,self.GPParameterForm)
+
+    def applyTransformation(self, element, transformationType, transformation, rotationCenter=None):
+        # for i in transformation:
+        #     print(i)
+        print(transformation, type(transformation))
+        print(rotationCenter, type(rotationCenter))
+        if transformationType == "trans":
+            self.stm.translateGrids(element, transformation)
+        elif transformationType == "rot":
+            self.stm.rotateGrids(element, transformation, cRot=rotationCenter)
+        
+
+
+
 
 
 class PoppyMainWindow(QMainWindow):
@@ -198,9 +240,13 @@ class PoppyMainWindow(QMainWindow):
         
 
     ### System actions
-        newSystem = QAction('Add System', self)
-        newSystem.triggered.connect(self.mainWid.addSystemAction)
-        SystemsMenu.addAction(newSystem)
+        # newSystem = QAction('Add System', self)
+        # newSystem.triggered.connect(self.mainWid.addSystemAction)
+        # SystemsMenu.addAction(newSystem)
+
+        plotSystem = QAction("Plot System", self)
+        plotSystem.triggered.connect(self.mainWid.plotSystem)
+        SystemsMenu.addAction(plotSystem)
 
 if __name__ == "__main__":
 

@@ -13,8 +13,10 @@ sys.path.append('../../')
 
 
 class ElementWidget(QWidget):
-    def __init__ (self, element, p=None ):
+    def __init__ (self, element, actions , p=None ):
         super().__init__(parent=p)
+        self.transformAction = actions[0]
+        self.element = element
         
         layout = QHBoxLayout()
         label = QLabel(element)
@@ -44,7 +46,7 @@ class ElementWidget(QWidget):
         btn2 = QPushButton("Edit")
         btn3 = QPushButton("Plot")
 
-        btn1.clicked.connect(self._closeOptionsMenu)
+        btn1.clicked.connect(self.transform)
         btn2.clicked.connect(self._closeOptionsMenu)
         btn3.clicked.connect(self._closeOptionsMenu)
 
@@ -60,6 +62,9 @@ class ElementWidget(QWidget):
         
     def _closeOptionsMenu(self):
         self.dlg.close()
+
+    def transform(self):
+        self.transformAction(self.element)
 
    
 

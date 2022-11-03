@@ -6,12 +6,12 @@ from PyQt5.QtGui import QFont, QIcon
 from src.GUI.ElementWidget import ElementWidget
 
 class ElementsWindow(qtw.QWidget):
-    def __init__ (self, elements):
+    def __init__ (self, elements, actions):
         super().__init__()
 
         pushDown = 0
         for elem in elements:
-            label = ElementWidget(elem, self)
+            label = ElementWidget(elem, actions, self)
             label.move(0,pushDown)
             pushDown += 40
            

@@ -16,7 +16,7 @@ pt.rcParams['ytick.right'] = True
 pt.rcParams['xtick.direction'] = "in"
 pt.rcParams['ytick.direction'] = "in"
 
-def plotBeam2D(self, plotObject, field,
+def plotBeam2D(plotObject, field,
                 vmin=-30, vmax=0, show=True, amp_only=False,
                 save=False, polar=False, interpolation=None,
                 aperDict={"plot":False}, mode='dB', project='xy',
@@ -155,12 +155,12 @@ def plotBeam2D(self, plotObject, field,
 
     pt.close()
 
-def plot3D(self, plotObject, fine=2, cmap=cm.cool,
+def plot3D(plotObject, fine=2, cmap=cm.cool,
             returns=False, ax_append=False, norm=False,
             show=True, foc1=False, foc2=False, save=True, savePath="./images/"):
     skip = slice(None,None,fine)
     grids = generateGrid(plotObject)
-
+    print(fine)
     if not ax_append:
         fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
         ax_append = ax
@@ -204,14 +204,14 @@ def plot3D(self, plotObject, fine=2, cmap=cm.cool,
     pt.close()
 
 
-def plotSystem(self, systemDict, fine=2, cmap=cm.cool,
+def plotSystem(systemDict, fine=2, cmap=cm.cool,
             ax_append=False, norm=False,
             show=True, foc1=False, foc2=False, save=True, ret=False, RTframes=[], savePath="./images/"):
 
     fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
 
     for key, refl in systemDict.items():
-        self.plot3D(plotObject=refl, fine=fine, cmap=cmap,
+        plot3D(refl, fine=fine, cmap=cmap,
                     returns=True, ax_append=ax, norm=norm,
                     show=False, foc1=foc1, foc2=foc2, save=False)
 
@@ -309,7 +309,7 @@ def beamCut(self, plotObject, field, cross='', units='', vmin=-50, vmax=0, frac=
     if ret:
         return field[:,y_center], field[:,y_center]
     """
-def plotRTframe(self, frame, project="xy", savePath="./images/"):
+def plotRTframe(frame, project="xy", savePath="./images/"):
     fig, ax = pt.subplots(1,1)
 
     if project == "xy":

@@ -463,25 +463,33 @@ extern "C" void callRTKernel(reflparamsf ctp, cframef *fr_in,
 
     if (ctp.type == 0)
     {
-        propagateRaysToP<<<BT[0], BT[1]>>>(xs, ys, zs, dxs, dys, dzs,
-                                          xt, yt, zt, dxt, dyt, dzt);
+        propagateRaysToP<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs, d_dxs, d_dys, d_dzs,
+                                          d_xt, d_yt, d_zt, d_dxt, d_dyt, d_dzt);
     }
 
     else if (ctp.type == 1)
     {
-        propagateRaysToH<<<BT[0], BT[1]>>>(xs, ys, zs, dxs, dys, dzs,
-                                          xt, yt, zt, dxt, dyt, dzt);
+        propagateRaysToH<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs, d_dxs, d_dys, d_dzs,
+                                          d_xt, d_yt, d_zt, d_dxt, d_dyt, d_dzt);
     }
 
     else if (ctp.type == 2)
     {
-        propagateRaysToE<<<BT[0], BT[1]>>>(xs, ys, zs, dxs, dys, dzs,
-                                          xt, yt, zt, dxt, dyt, dzt);
+        propagateRaysToE<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs, d_dxs, d_dys, d_dzs,
+                                          d_xt, d_yt, d_zt, d_dxt, d_dyt, d_dzt);
     }
 
     else if (ctp.type == 3)
     {
-        propagateRaysToPl<<<BT[0], BT[1]>>>(xs, ys, zs, dxs, dys, dzs,
-                                          xt, yt, zt, dxt, dyt, dzt);
+        propagateRaysToPl<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs, d_dxs, d_dys, d_dzs,
+                                          d_xt, d_yt, d_zt, d_dxt, d_dyt, d_dzt);
     }
+
+    gpuErrchk( cudaMemcpy(fr_out->x, d_xt, fr_in->size * sizeof(float), cudaMemcpyDeviceToHost) );
+    gpuErrchk( cudaMemcpy(fr_out->y, d_yt, fr_in->size * sizeof(float), cudaMemcpyDeviceToHost) );
+    gpuErrchk( cudaMemcpy(fr_out->z, d_zt, fr_in->size * sizeof(float), cudaMemcpyDeviceToHost) );
+
+    gpuErrchk( cudaMemcpy(fr_out->dx, d_dxt, fr_in->size * sizeof(float), cudaMemcpyDeviceToHost) );
+    gpuErrchk( cudaMemcpy(fr_out->dy, d_dyt, fr_in->size * sizeof(float), cudaMemcpyDeviceToHost) );
+    gpuErrchk( cudaMemcpy(fr_out->dz, d_dzt, fr_in->size * sizeof(float), cudaMemcpyDeviceToHost) );
 }

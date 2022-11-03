@@ -49,6 +49,13 @@ def loadGPUlib():
                                    ctypes.c_float, ctypes.c_int, ctypes.c_int]
 
     lib.callKernelf_FF.restype = None
+
+    lib.callKernelRTf.argtypes = [ctypes.POINTER(c2Bundlef), reflparamsf, reflparamsf,
+                                   ctypes.POINTER(reflcontainerf), ctypes.POINTER(reflcontainerf),
+                                   ctypes.POINTER(c2Bundlef), ctypes.c_float, ctypes.c_float,
+                                   ctypes.c_float, ctypes.c_int, ctypes.c_int]
+
+    lib.callKernelRTf.restype = None
     return lib
 
 # WRAPPER FUNCTIONS DOUBLE PREC

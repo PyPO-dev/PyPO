@@ -412,7 +412,7 @@ class System(object):
 
         plotObject = self.system[name_surface]
 
-        plt.plotBeam2D(self, plotObject, field,
+        plt.plotBeam2D(plotObject, field,
                         vmin, vmax, show, amp_only,
                         save, polar, interpolation,
                         aperDict, mode, project,
@@ -424,7 +424,7 @@ class System(object):
 
         plotObject = self.system[name_surface]
 
-        plt.plot3D(self, plotObject, fine, cmap,
+        plt.plot3D(plotObject, fine, cmap,
                     returns, ax_append, norm,
                     show, foc1, foc2, save, self.savePath)
 
@@ -432,7 +432,7 @@ class System(object):
                 ax_append=False, norm=False,
                 show=True, foc1=False, foc2=False, save=True, ret=False, RTframes=[]):
 
-        figax = plt.plotSystem(self, self.system, fine, cmap,
+        figax = plt.plotSystem(self.system, fine, cmap,
                     ax_append, norm,
                     show, foc1, foc2, save, ret, RTframes, self.savePath)
 

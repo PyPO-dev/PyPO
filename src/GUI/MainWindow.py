@@ -104,20 +104,7 @@ class MainWidget(QWidget):
         self.addElementAction(d)
 
     def addExampleHyperbola(self):
-        hyperbola = {}
-        # hyperbola["name"] = "h1"
-        hyperbola["type"] = "Hyperbola"
-        hyperbola["pmode"] = "focus"
-        hyperbola["gmode"] = "xy"
-        hyperbola["flip"] = False
-        hyperbola["focus_1"] = np.array([0,0,3.5e3])
-        hyperbola["focus_2"] = np.array([0,0,3.5e3 - 5606])
-        hyperbola["ecc"] = 1.08208248
-        hyperbola["lims_x"] = [-310,310]
-        hyperbola["lims_y"] = [-310,310]
-        hyperbola["lims_u"] = [0,310]
-        hyperbola["lims_v"] = [0,2*np.pi]
-        hyperbola["gridsize"] = [501,501]
+        hyperbola = {'type': 'Hyperbola', 'pmode': 'focus', 'gmode': 'xy', 'flip': False, 'focus_1': np.array([   0.,    0., 3500.]), 'focus_2': np.array([    0.,     0., -2106.]), 'ecc': 1.08208248, 'lims_x': [-310, 310], 'lims_y': [-310, 310], 'lims_u': [0, 310], 'lims_v': [0, 6.283185307179586], 'gridsize': [501, 501]}
         self.addElementAction(hyperbola)
 
     def addElementAction(self, elementDict):

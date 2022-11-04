@@ -226,7 +226,7 @@ void calcJM(T *res_field, T *res_current, V rdict, int mode)
 
     reflc.area = new U[nTot];
 
-    bool transform = false;
+    bool transform = true;
     generateGrid(rdict, &reflc, transform);
 
     Utils<U> ut;

@@ -141,6 +141,8 @@ src/C++/src/bleeding_edge/
 images/
 save/
 
+*.txt
+
 # User-specific files
 log
 

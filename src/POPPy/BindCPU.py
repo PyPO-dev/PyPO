@@ -182,7 +182,7 @@ def POPPy_CPUd(source, target, currents, k, epsilon, t_direction, nThreads, mode
 
         return EH
 
-def RT_CPUd(target, fr_in, nThreads, epsilon, t0):
+def RT_CPUd(target, fr_in, epsilon, t0, nThreads):
     lib = loadCPUlib()
 
     inp = cframe()

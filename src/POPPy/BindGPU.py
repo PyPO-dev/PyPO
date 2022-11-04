@@ -50,12 +50,11 @@ def loadGPUlib():
 
     lib.callKernelf_FF.restype = None
 
-    lib.callKernelRTf.argtypes = [ctypes.POINTER(c2Bundlef), reflparamsf, reflparamsf,
-                                   ctypes.POINTER(reflcontainerf), ctypes.POINTER(reflcontainerf),
-                                   ctypes.POINTER(c2Bundlef), ctypes.c_float, ctypes.c_float,
-                                   ctypes.c_float, ctypes.c_int, ctypes.c_int]
+    lib.callRTKernel.argtypes = [reflparamsf, ctypes.POINTER(cframef), ctypes.POINTER(cframef),
+                                ctypes.c_float, ctypes.c_float, ctypes.c_int, ctypes.c_int]
 
-    lib.callKernelRTf.restype = None
+    lib.callRTKernel.restype = None
+
     return lib
 
 # WRAPPER FUNCTIONS DOUBLE PREC
@@ -168,6 +167,33 @@ def POPPy_GPUf(source, target, currents, k, epsilon, t_direction, nThreads, mode
         EH = c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
 
         return EH
+
+def RT_GPUf(target, fr_in, epsilon, t0, nThreads):
+    lib = loadGPUlib()
+
+    ctp = reflparamsf()
+    allfill_reflparams(ctp, target, ctypes.c_float)
+
+    inp = cframef()
+    res = cframef()
+
+    allocate_cframe(res, fr_in.size, ctypes.c_float)
+    allfill_cframe(inp, fr_in, fr_in.size, ctypes.c_float)
+
+    nBlocks = math.ceil(fr_in.size / nThreads)
+
+    nBocks      = ctypes.c_int(nBlocks)
+    nThreads    = ctypes.c_int(nThreads)
+    epsilon     = ctypes.c_float(epsilon)
+    t0          = ctypes.c_float(t0)
+
+    lib.callRTKernel(ctp, ctypes.byref(inp), ctypes.byref(res),
+                        epsilon, t0, nBlocks, nThreads)
+
+    shape = (fr_in.size,)
+    fr_out = frameToObj(res, np_t=np.float32, shape=shape)
+
+    return fr_out
 
 if __name__ == "__main__":
     print("Bindings for POPPy GPU.")

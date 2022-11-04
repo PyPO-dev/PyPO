@@ -31,9 +31,11 @@ def ex_DRO_PO(device):
     plane["name"] = "plane1"
     plane["gmode"] = "xy"
     plane["flip"] = False
-    plane["lims_x"] = [-0.1,0.1]
-    plane["lims_y"] = [-0.1,0.1]
-    plane["gridsize"] = [3, 3]
+    #plane["lims_x"] = [-0.1,0.1]
+    #plane["lims_y"] = [-0.1,0.1]
+    plane["lims_x"] = [-80,80]
+    plane["lims_y"] = [-80,80]
+    plane["gridsize"] = [403, 401]
 
     planeff = {}
     planeff["name"] = "planeff"
@@ -44,7 +46,6 @@ def ex_DRO_PO(device):
     planeff["gridsize"] = [201, 201]
 
     s = System()
-    s.addPlotter()
     s.addParabola(parabola)
     s.addPlane(plane)
     s.addPlane(planeff)
@@ -54,12 +55,13 @@ def ex_DRO_PO(device):
     s.setCustomBeamPath(path="ps/", append=True)
 
     cBeam = "ps"
-    JM = s.readCustomBeam(name=cBeam, comp="Ex", shape=[3,3], convert_to_current=True, mode="PMC")
 
     translation = np.array([0, 0, 12e3])
     rotation_plane = np.array([180, 0, 0])
     s.rotateGrids("plane1", rotation_plane)
     s.translateGrids("plane1", translation)
+
+    JM, EH = s.readCustomBeam(cBeam, "plane1", "Ex", convert_to_current=True, mode="PMC")
 
     if device == "CPU":
 

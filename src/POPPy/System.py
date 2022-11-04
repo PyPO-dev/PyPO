@@ -273,11 +273,15 @@ class System(object):
         with open('./{}{}.json'.format(self.savePathElem, name), 'w') as f:
             json.dump(jsonDict, f)
 
-    def readCustomBeam(self, name_beam, name_source, comp, shape, convert_to_current=True, mode="PMC"):
+    def readCustomBeam(self, name_beam, name_source, comp, convert_to_current=True, mode="PMC"):
         rfield = np.loadtxt(self.customBeamPath + "r" + name_beam + ".txt")
         ifield = np.loadtxt(self.customBeamPath + "i" + name_beam + ".txt")
 
-        field = rfield.reshape(shape) + 1j*ifield.reshape(shape)
+        print(rfield.shape)
+
+        field = rfield + 1j*ifield
+
+        shape = self.system[name_source]["gridsize"]
 
         fields_c = self._compToFields(comp, field)
         currents_c = calcCurrents(fields_c, self.system[name_source], mode)
@@ -376,7 +380,11 @@ class System(object):
         return gauss_in
 
     def runRayTracer(self, fr_in, name_target, epsilon=1e-10, nThreads=1, t0=100):
-        fr_out = RT_CPUd(self.system[name_target], fr_in, nThreads, epsilon, t0)
+        fr_out = RT_CPUd(self.system[name_target], fr_in, epsilon, t0, nThreads)
+        return fr_out
+
+    def runRT_GPU(self, fr_in, name_target, epsilon=1e-10, nThreads=256, t0=100):
+        fr_out = RT_GPUf(self.system[name_target], fr_in, epsilon, t0, nThreads)
         return fr_out
 
     def interpFrame(self, fr_in, field, name_target, method="nearest"):
@@ -440,7 +448,7 @@ class System(object):
             return figax
 
     def plotRTframe(self, frame, project="xy"):
-        plt.plotRTframe(self, frame, project, self.savePath)
+        plt.plotRTframe(frame, project, self.savePath)
 
     def _compToFields(self, comp, field):
         null = np.zeros(field.shape, dtype=complex)

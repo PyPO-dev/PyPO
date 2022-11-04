@@ -27,7 +27,8 @@ public:
     T gpl(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr);
 
     std::array<T, 3> np(T xr, T yr, T zr, int flip);
-    std::array<T, 3> nhe(T xr, T yr, T zr, int flip);
+    std::array<T, 3> nh(T xr, T yr, T zr, int flip);
+    std::array<T, 3> ne(T xr, T yr, T zr, int flip);
     std::array<T, 3> npl(T xr, T yr, T zr, int flip);
 };
 
@@ -99,12 +100,30 @@ inline std::array<T, 3> RTRefls<T>::np(T xr, T yr, T zr, int flip)
 }
 
 template<class T>
-inline std::array<T, 3> RTRefls<T>::nhe(T xr, T yr, T zr, int flip)
+inline std::array<T, 3> RTRefls<T>::nh(T xr, T yr, T zr, int flip)
 {
     std::array<T, 3> out;
 
     out[0] = -2 * xr / (a*a) * flip;
     out[1] = -2 * yr / (b*b) * flip;
+    out[2] = 2 * zr / (c*c) * flip;
+
+    T norm = sqrt(out[0]*out[0] + out[1]*out[1] + out[2]*out[2]);
+
+    out[0] = out[0] / norm;
+    out[1] = out[1] / norm;
+    out[2] = out[2] / norm;
+
+    return out;
+}
+
+template<class T>
+inline std::array<T, 3> RTRefls<T>::ne(T xr, T yr, T zr, int flip)
+{
+    std::array<T, 3> out;
+
+    out[0] = 2 * xr / (a*a) * flip;
+    out[1] = 2 * yr / (b*b) * flip;
     out[2] = 2 * zr / (c*c) * flip;
 
     T norm = sqrt(out[0]*out[0] + out[1]*out[1] + out[2]*out[2]);

@@ -42,29 +42,43 @@ def plotBeam2D(plotObject, field,
         grid_x2 = grids.x
         ff_flag = False
 
+    # Transpose plots
+    if project == 'yx':
+        grid_x1 = grids.y
+        grid_x2 = grids.x
+        ff_flag = False
+
+
+    elif project == 'zy':
+        grid_x1 = grids.z
+        grid_x2 = grids.y
+        ff_flag = False
+
+    elif project == 'xz':
+        grid_x1 = grids.x
+        grid_x2 = grids.z
+        ff_flag = False
+
+
     if plotObject["gmode"] == 2:
         ff_flag = True
 
-    extent = [np.min(grid_x1), np.max(grid_x1), np.min(grid_x2), np.max(grid_x2)]
+    comps = list(project)
+
 
     if not amp_only:
         fig, ax = pt.subplots(1,2, figsize=(10,5), gridspec_kw={'wspace':0.5})
 
         if mode == 'linear':
+            extent = [np.min(grid_x1), np.max(grid_x1), np.max(grid_x2), np.min(grid_x2)]
             ampfig = ax[0].imshow(np.absolute(field), origin='lower', extent=extent, cmap=cmaps.parula, interpolation=interpolation)
             phasefig = ax[1].imshow(np.angle(field), origin='lower', extent=extent, cmap=cmaps.parula)
 
         elif mode == 'dB':
-            if polar:
-                ampfig = ax[0].pcolormesh(grid_x1, grid_x2, 20 * np.log10(np.absolute(field) / max_field),
-                                        vmin=vmin, vmax=vmax, cmap=cmaps.parula, shading='auto')
-                phasefig = ax[1].pcolormesh(grid_x1, grid_x2, np.angle(field), cmap=cmaps.parula, shading='auto')
-
-            else:
-                ampfig = ax[0].imshow(20 * np.log10(np.absolute(field.T) / max_field),
-                                    vmin=vmin, vmax=vmax, origin='lower', extent=extent,
-                                    cmap=cmaps.parula, interpolation=interpolation)
-                phasefig = ax[1].imshow(np.angle(field.T), origin='lower', extent=extent, cmap=cmaps.parula)
+            extent = [np.min(grid_x1), np.max(grid_x1), np.min(grid_x2), np.max(grid_x2)]
+            ampfig = ax[0].pcolormesh(grid_x1, grid_x2, 20 * np.log10(np.absolute(field) / max_field),
+                                    vmin=vmin, vmax=vmax, cmap=cmaps.parula, shading='auto')
+            phasefig = ax[1].pcolormesh(grid_x1, grid_x2, np.angle(field), cmap=cmaps.parula, shading='auto')
 
         divider1 = make_axes_locatable(ax[0])
         divider2 = make_axes_locatable(ax[1])
@@ -84,10 +98,10 @@ def plotBeam2D(plotObject, field,
             ax[1].set_box_aspect(1)
 
         else:
-            ax[0].set_ylabel(r"$y$ / [{}]".format(units))
-            ax[0].set_xlabel(r"$x$ / [{}]".format(units))
-            ax[1].set_ylabel(r"$y$ / [{}]".format(units))
-            ax[1].set_xlabel(r"$x$ / [{}]".format(units))
+            ax[0].set_ylabel(r"${}$ / [{}]".format(comps[1], units))
+            ax[0].set_xlabel(r"${}$ / [{}]".format(comps[0], units))
+            ax[1].set_ylabel(r"${}$ / [{}]".format(comps[1], units))
+            ax[1].set_xlabel(r"${}$ / [{}]".format(comps[0], units))
 
         ax[0].set_title(titleA, y=1.08)
         ax[0].set_aspect(1)
@@ -147,7 +161,7 @@ def plotBeam2D(plotObject, field,
 
 
     if save:
-        pt.savefig(fname=savePath + '{}_.jpg'.format(surfaceObject["name"]),
+        pt.savefig(fname=savePath + '{}_{}.jpg'.format(plotObject["name"], name),
                     bbox_inches='tight', dpi=300)
 
     if show:
@@ -160,7 +174,7 @@ def plot3D(plotObject, fine=2, cmap=cm.cool,
             show=True, foc1=False, foc2=False, save=True, savePath="./images/"):
     skip = slice(None,None,fine)
     grids = generateGrid(plotObject)
-    print(fine)
+
     if not ax_append:
         fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
         ax_append = ax
@@ -175,12 +189,12 @@ def plot3D(plotObject, fine=2, cmap=cm.cool,
         ax_append.scatter(plotObject["focus_2"][0], plotObject["focus_2"][1], plotObject["focus_2"][2], color='black')
 
     if norm:
-        length = np.sqrt(np.dot(plotObject["focus_1"], plotObject["focus_1"])) / 5
+        length = 10# np.sqrt(np.dot(plotObject["focus_1"], plotObject["focus_1"])) / 5
         skipn = slice(None,None,10*fine)
         ax_append.quiver(grids.x[skipn,skipn], grids.y[skipn,skipn], grids.z[skipn,skipn],
                         grids.nx[skipn,skipn], grids.ny[skipn,skipn], grids.nz[skipn,skipn],
                         color='black', length=length, normalize=True)
-        print(np.sqrt(grids.nx**2 + grids.ny**2 + grids.nz**2))
+
     if not returns:
         ax_append.set_ylabel(r"$y$ / [mm]", labelpad=20)
         ax_append.set_xlabel(r"$x$ / [mm]", labelpad=10)

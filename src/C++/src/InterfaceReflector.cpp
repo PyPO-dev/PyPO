@@ -276,8 +276,8 @@ void Ellipse_xy(T *ellipse, U xu_lo, U xu_up, U yv_lo,
             ellipse->y[idx] = y;
             ellipse->z[idx] = c * sqrt(1 - x*x / (a*a) - y*y / (b*b));
 
-            ellipse->nx[idx] = -2 * x / (a*a);
-            ellipse->ny[idx] = -2 * y / (b*b);
+            ellipse->nx[idx] = 2 * x / (a*a);
+            ellipse->ny[idx] = 2 * y / (b*b);
             ellipse->nz[idx] = 2 * ellipse->z[idx] / (c*c);
 
             norm = sqrt(ellipse->nx[idx]*ellipse->nx[idx] +

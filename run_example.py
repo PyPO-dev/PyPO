@@ -19,7 +19,7 @@ Possible options: DRO_PO-(CPU/GPU)
         ex_DRO_PO(args[1])
 
     elif args[0] == "DRO_RT":
-        ex_DRO_RT()
+        ex_DRO_RT(args[1])
 
     elif args[0] == "ASTE_PO":
         ex_ASTE_PO(args[1])

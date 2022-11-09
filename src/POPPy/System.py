@@ -22,24 +22,35 @@ from src.POPPy.POPPyTypes import *
 
 import src.POPPy.Plotter as plt
 import src.POPPy.Efficiencies as effs
+import src.POPPy.FitGauss as fgs
 
 class System(object):
     customBeamPath = './custom/beam/'
     customReflPath = './custom/reflector/'
 
     savePathElem = './save/elements/'
+    savePathFields = './save/fields/'
+    savePathCurrents = './save/currents/'
 
     def __init__(self):
         self.num_ref = 0
         self.num_cam = 0
         self.system = {}
 
-        self.savePathElem = "./save/elements/"
+        #self.savePathElem = "./save/elements/"
 
-        saveExist = os.path.isdir(self.savePathElem)
+        saveElemExist = os.path.isdir(self.savePathElem)
+        saveFieldsExist = os.path.isdir(self.savePathFields)
+        saveCurrentsExist = os.path.isdir(self.savePathCurrents)
 
-        if not saveExist:
+        if not saveElemExist:
             os.makedirs(self.savePathElem)
+
+        elif not saveFieldsExist:
+            os.makedirs(self.savePathFields)
+
+        elif not saveCurrentsExist:
+            os.makedirs(self.savePathCurrents)
 
         self.savePath = './images/'
 
@@ -256,8 +267,11 @@ class System(object):
     def translateGrids(self, name, translation):
         self.system[name]["transf"] = MatTranslate(translation, self.system[name]["transf"])
 
-    def generateGrids(self, name):
-        grids = generateGrid(self.system[name])
+    def homeReflector(self, name):
+        self.system[name]["transf"] = np.eye(4)
+
+    def generateGrids(self, name, transform=True, spheric=True):
+        grids = generateGrid(self.system[name], transform, spheric)
         return grids
 
     def saveElement(self, name):
@@ -273,16 +287,92 @@ class System(object):
         with open('./{}{}.json'.format(self.savePathElem, name), 'w') as f:
             json.dump(jsonDict, f)
 
-    def readCustomBeam(self, name_beam, name_source, comp, shape, convert_to_current=True, mode="PMC"):
+    def saveFields(self, fields, name_fields):
+        saveDir = self.savePathFields + name_fields + "/"
+
+        saveDirExist = os.path.isdir(saveDir)
+
+        if not saveDirExist:
+            os.makedirs(saveDir)
+
+        np.save(saveDir + "Ex.npy", fields.Ex)
+        np.save(saveDir + "Ey.npy", fields.Ey)
+        np.save(saveDir + "Ez.npy", fields.Ez)
+
+        np.save(saveDir + "Hx.npy", fields.Hx)
+        np.save(saveDir + "Hy.npy", fields.Hy)
+        np.save(saveDir + "Hz.npy", fields.Hz)
+
+    def saveCurrents(self, currents, name_currents):
+        saveDir = self.savePathCurrents + name_currents + "/"
+
+        saveDirExist = os.path.isdir(saveDir)
+
+        if not saveDirExist:
+            os.makedirs(saveDir)
+
+        np.save(saveDir + "Jx.npy", currents.Jx)
+        np.save(saveDir + "Jy.npy", currents.Jy)
+        np.save(saveDir + "Jz.npy", currents.Jz)
+
+        np.save(saveDir + "Mx.npy", currents.Mx)
+        np.save(saveDir + "My.npy", currents.My)
+        np.save(saveDir + "Mz.npy", currents.Mz)
+
+    def loadCurrents(self, name_currents):
+        try:
+            loadDir = self.savePathCurrents + name_currents + "/"
+
+            Jx = np.load(loadDir + "Jx.npy")
+            Jy = np.load(loadDir + "Jy.npy")
+            Jz = np.load(loadDir + "Jz.npy")
+
+            Mx = np.load(loadDir + "Mx.npy")
+            My = np.load(loadDir + "My.npy")
+            Mz = np.load(loadDir + "Mz.npy")
+
+            out = currents(Jx, Jy, Jz, Mx, My, Mz)
+            return out
+
+        except:
+            print("Could not find {} in {}!".format(name_currents, self.savePathCurrents))
+            return 1
+
+    def loadElement(self, name):
+        with open('./{}{}.json'.format(self.savePathElem, name), 'r') as f:
+            elem = json.load(f)
+
+        for key, value in elem.items():
+            if type(value) == list:
+                elem[key] = np.array(value)
+
+            else:
+                elem[key] = value
+
+        return elem
+
+    def readCustomBeam(self, name_beam, name_source, comp, convert_to_current=True, normalise=True, mode="PMC", scale=1000):
         rfield = np.loadtxt(self.customBeamPath + "r" + name_beam + ".txt")
         ifield = np.loadtxt(self.customBeamPath + "i" + name_beam + ".txt")
 
-        field = rfield.reshape(shape) + 1j*ifield.reshape(shape)
+        field = rfield + 1j*ifield
+
+        if normalise:
+            maxf = np.max(field)
+            field /= maxf
+            field *= scale
+
+
+        shape = self.system[name_source]["gridsize"]
 
         fields_c = self._compToFields(comp, field)
         currents_c = calcCurrents(fields_c, self.system[name_source], mode)
 
         return currents_c, fields_c
+
+    def calcCurrents(self, fields, name_source, mode="PMC"):
+        currents = calcCurrents(fields, self.system[name_source], mode)
+        return currents
 
     def propagatePO_CPU(self, source_name, target_name, s_currents, k,
                     epsilon=1, t_direction=-1, nThreads=1,
@@ -376,7 +466,11 @@ class System(object):
         return gauss_in
 
     def runRayTracer(self, fr_in, name_target, epsilon=1e-10, nThreads=1, t0=100):
-        fr_out = RT_CPUd(self.system[name_target], fr_in, nThreads, epsilon, t0)
+        fr_out = RT_CPUd(self.system[name_target], fr_in, epsilon, t0, nThreads)
+        return fr_out
+
+    def runRT_GPU(self, fr_in, name_target, epsilon=1e-10, nThreads=256, t0=100):
+        fr_out = RT_GPUf(self.system[name_target], fr_in, epsilon, t0, nThreads)
         return fr_out
 
     def interpFrame(self, fr_in, field, name_target, method="nearest"):
@@ -403,6 +497,24 @@ class System(object):
     def calcTaper(self, field, name_target, aperDict):
         surfaceObj = self.system[name_target]
         return effs.calcTaper(field, surfaceObj, aperDict)
+
+    def calcXpol(self, Cofield, Xfield):
+        return effs.calcXpol(Cofield, Xfield)
+
+    def calcDirectivity(self, eta_t, name_target, k):
+        surfaceObj = self.system[name_target]
+        return effs.calcDirectivity(eta_t, surfaceObj, k)
+
+    def fitGaussAbs(self, field, name_surface, thres):
+        surfaceObj = self.system[name_surface]
+        out = fgs.fitGaussAbs(field, surfaceObj, thres)
+
+        return out
+
+    def generateGauss(self, fgs_out, name_surface):
+        surfaceObj = self.system[name_surface]
+        Psi = fgs.generateGauss(fgs_out, surfaceObj)
+        return Psi
 
     def plotBeam2D(self, name_surface, field,
                     vmin=-30, vmax=0, show=True, amp_only=False,
@@ -440,7 +552,7 @@ class System(object):
             return figax
 
     def plotRTframe(self, frame, project="xy"):
-        plt.plotRTframe(self, frame, project, self.savePath)
+        plt.plotRTframe(frame, project, self.savePath)
 
     def _compToFields(self, comp, field):
         null = np.zeros(field.shape, dtype=complex)

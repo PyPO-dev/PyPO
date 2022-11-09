@@ -193,8 +193,7 @@ void RayTracer<T, U, V>::propagateRaysToH(int start, int stop,
         V dz = fr_in->dz[i];
         while (check > epsilon)
         {
-            t1 = refls.gh(_t, fr_in->x[i], fr_in->y[i], fr_in->z[i],
-                      fr_in->dx[i], fr_in->dy[i], fr_in->dz[i]);
+            t1 = refls.gh(_t, x, y, z, dx, dy, dz);
 
             check = fabs(t1 - _t);
 
@@ -205,7 +204,7 @@ void RayTracer<T, U, V>::propagateRaysToH(int start, int stop,
         fr_out->y[i] = y + _t*dy;
         fr_out->z[i] = z + _t*dz;
 
-        norms = refls.nhe(fr_out->x[i], fr_out->y[i], fr_out->z[i], flip);
+        norms = refls.nh(fr_out->x[i], fr_out->y[i], fr_out->z[i], flip);
         check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
 
         fr_out->dx[i] = dx - 2*check*norms[0];
@@ -245,8 +244,7 @@ void RayTracer<T, U, V>::propagateRaysToE(int start, int stop,
         V dz = fr_in->dz[i];
         while (check > epsilon)
         {
-            t1 = refls.ge(_t, fr_in->x[i], fr_in->y[i], fr_in->z[i],
-                      fr_in->dx[i], fr_in->dy[i], fr_in->dz[i]);
+            t1 = refls.ge(_t, x, y, z, dx, dy, dz);
 
             check = fabs(t1 - _t);
 
@@ -257,7 +255,7 @@ void RayTracer<T, U, V>::propagateRaysToE(int start, int stop,
         fr_out->y[i] = y + _t*dy;
         fr_out->z[i] = z + _t*dz;
 
-        norms = refls.nhe(fr_out->x[i], fr_out->y[i], fr_out->z[i], flip);
+        norms = refls.ne(fr_out->x[i], fr_out->y[i], fr_out->z[i], flip);
         check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
 
         fr_out->dx[i] = dx - 2*check*norms[0];
@@ -296,8 +294,7 @@ void RayTracer<T, U, V>::propagateRaysToPl(int start, int stop,
         V dz = fr_in->dz[i];
         while (check > epsilon)
         {
-            t1 = refls.gpl(_t, fr_in->x[i], fr_in->y[i], fr_in->z[i],
-                      fr_in->dx[i], fr_in->dy[i], fr_in->dz[i]);
+            t1 = refls.gpl(_t, x, y, z, dx, dy, dz);
 
             check = fabs(t1 - _t);
 

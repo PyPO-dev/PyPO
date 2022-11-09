@@ -5,6 +5,8 @@ from src.POPPy.BindUtils import *
 from src.POPPy.Structs import *
 from src.POPPy.POPPyTypes import *
 
+import threading
+
 #############################################################################
 #                                                                           #
 #              List of bindings for the CPU interface of POPPy.             #
@@ -98,14 +100,21 @@ def POPPy_CPUd(source, target, currents, k, epsilon, t_direction, nThreads, mode
     epsilon     = ctypes.c_double(epsilon)
     t_direction = ctypes.c_double(t_direction)
 
+    args = [csp, ctp, ctypes.byref(cs), ctypes.byref(ct),
+            ctypes.byref(c_currents), k, nThreads, epsilon,
+            t_direction]
+
     if mode == "JM":
         res = c2Bundle()
+        args.insert(0, res)
+
         allocate_c2Bundle(res, gt, ctypes.c_double)
 
-        lib.propagateToGrid_JM(ctypes.byref(res), csp, ctp,
-                                ctypes.byref(cs), ctypes.byref(ct),
-                                ctypes.byref(c_currents), k, nThreads,
-                                epsilon, t_direction)
+        t = threading.Thread(target=lib.propagateToGrid_JM, args=args)
+        t.daemon = True
+        t.start()
+        while t.is_alive(): # wait for the thread to exit
+            t.join(.1)
 
         # Unpack filled struct
         JM = c2BundleToObj(res, shape=target_shape, obj_t='currents', np_t=np.float64)
@@ -114,12 +123,15 @@ def POPPy_CPUd(source, target, currents, k, epsilon, t_direction, nThreads, mode
 
     elif mode == "EH":
         res = c2Bundle()
+        args.insert(0, res)
+
         allocate_c2Bundle(res, gt, ctypes.c_double)
 
-        lib.propagateToGrid_EH(ctypes.byref(res), csp, ctp,
-                                ctypes.byref(cs), ctypes.byref(ct),
-                                ctypes.byref(c_currents), k, nThreads,
-                                epsilon, t_direction)
+        t = threading.Thread(target=lib.propagateToGrid_EH, args=args)
+        t.daemon = True
+        t.start()
+        while t.is_alive(): # wait for the thread to exit
+            t.join(.1)
 
         # Unpack filled struct
         EH = c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
@@ -128,12 +140,15 @@ def POPPy_CPUd(source, target, currents, k, epsilon, t_direction, nThreads, mode
 
     elif mode == "JMEH":
         res = c4Bundle()
+        args.insert(0, res)
+
         allocate_c4Bundle(res, gt, ctypes.c_double)
 
-        lib.propagateToGrid_JMEH(ctypes.byref(res), csp, ctp,
-                                ctypes.byref(cs), ctypes.byref(ct),
-                                ctypes.byref(c_currents), k, nThreads,
-                                epsilon, t_direction)
+        t = threading.Thread(target=lib.propagateToGrid_JMEH, args=args)
+        t.daemon = True
+        t.start()
+        while t.is_alive(): # wait for the thread to exit
+            t.join(.1)
 
         # Unpack filled struct
         JM, EH = c4BundleToObj(res, shape=target_shape, np_t=np.float64)
@@ -142,12 +157,15 @@ def POPPy_CPUd(source, target, currents, k, epsilon, t_direction, nThreads, mode
 
     elif mode == "EHP":
         res = c2rBundle()
+        args.insert(0, res)
+
         allocate_c2rBundle(res, gt, ctypes.c_double)
 
-        lib.propagateToGrid_EHP(ctypes.byref(res), csp, ctp,
-                                ctypes.byref(cs), ctypes.byref(ct),
-                                ctypes.byref(c_currents), k, nThreads,
-                                epsilon, t_direction)
+        t = threading.Thread(target=lib.propagateToGrid_EHP, args=args)
+        t.daemon = True
+        t.start()
+        while t.is_alive(): # wait for the thread to exit
+            t.join(.1)
 
         # Unpack filled struct
         EH, Pr = c2rBundleToObj(res, shape=target_shape, np_t=np.float64)
@@ -156,12 +174,15 @@ def POPPy_CPUd(source, target, currents, k, epsilon, t_direction, nThreads, mode
 
     elif mode == "Scalar":
         res = arrC1()
+        args.insert(0, res)
+
         allocate_arrC1(res, gt, ctypes.c_double)
 
-        lib.propagateToGrid_scalar(ctypes.byref(res), csp, ctp,
-                                ctypes.byref(cs), ctypes.byref(ct),
-                                ctypes.byref(c_currents), k, nThreads,
-                                epsilon, t_direction)
+        t = threading.Thread(target=lib.propagateToGrid_scalar, args=args)
+        t.daemon = True
+        t.start()
+        while t.is_alive(): # wait for the thread to exit
+            t.join(.1)
 
         # Unpack filled struct
         E = arrC1ToObj(res, shape=target_shape)
@@ -170,19 +191,22 @@ def POPPy_CPUd(source, target, currents, k, epsilon, t_direction, nThreads, mode
 
     elif mode == "FF":
         res = c2Bundle()
+        args.insert(0, res)
+
         allocate_c2Bundle(res, gt, ctypes.c_double)
 
-        lib.propagateToFarField(ctypes.byref(res), csp, ctp,
-                                ctypes.byref(cs), ctypes.byref(ct),
-                                ctypes.byref(c_currents), k, nThreads,
-                                epsilon, t_direction)
+        t = threading.Thread(target=lib.propagateToFarField, args=args)
+        t.daemon = True
+        t.start()
+        while t.is_alive(): # wait for the thread to exit
+            t.join(.1)
 
         # Unpack filled struct
         EH = c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
 
         return EH
 
-def RT_CPUd(target, fr_in, nThreads, epsilon, t0):
+def RT_CPUd(target, fr_in, epsilon, t0, nThreads):
     lib = loadCPUlib()
 
     inp = cframe()
@@ -198,14 +222,19 @@ def RT_CPUd(target, fr_in, nThreads, epsilon, t0):
     epsilon     = ctypes.c_double(epsilon)
     t0          = ctypes.c_double(t0)
 
-    lib.propagateRays(ctp, ctypes.byref(inp), ctypes.byref(res),
-                        nThreads, epsilon, t0)
+    args = [ctp, ctypes.byref(inp), ctypes.byref(res),
+                        nThreads, epsilon, t0]
+
+    t = threading.Thread(target=lib.propagateRays, args=args)
+    t.daemon = True
+    t.start()
+    while t.is_alive(): # wait for the thread to exit
+        t.join(.1)
+
     shape = (fr_in.size,)
     fr_out = frameToObj(res, np_t=np.float64, shape=shape)
 
     return fr_out
-
-
 
 if __name__ == "__main__":
     rint("Bindings for POPPy CPU.")

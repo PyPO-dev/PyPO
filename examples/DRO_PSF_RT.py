@@ -34,8 +34,8 @@ def ex_DRO_RT():
             }
 
     RTpar = {
-            "nRays"     : 10,
-            "nRing"     : 10,
+            "nRays"     : 100,
+            "nRing"     : 100,
             "angx"      : 0,
             "angy"      : 0,
             "a"         : 10000,
@@ -45,12 +45,11 @@ def ex_DRO_RT():
             }
 
     s = System()
-    s.addPlotter()
     s.addParabola(parabola)
     s.addPlane(plane)
     s.translateGrids("plane1", np.array([0,0,12e3]))
 
-    s.plotter.plotSystem(s.system)
+    s.plotSystem()
 
     frame_in = s.createFrame(RTpar)
 
@@ -60,8 +59,8 @@ def ex_DRO_RT():
 
     stack = s.calcRayLen(frame_in, frame_out, frame_out2)
 
-    s.plotter.plotRTframe(frame_out2)
-    s.plotter.plotSystem(s.system, RTframes=[frame_in, frame_out, frame_out2])
+    s.plotRTframe(frame_out2)
+    s.plotSystem(RTframes=[frame_in, frame_out, frame_out2])
 
 
 

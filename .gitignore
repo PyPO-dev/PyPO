@@ -141,8 +141,11 @@ src/C++/src/bleeding_edge/
 images/
 save/
 
+*.txt
+
 # User-specific files
 log
+*.pdf
 
 # Personal projects/files
 personal/
@@ -165,6 +168,13 @@ SpilloverSec.py
 TaperPri.py
 PlotConfig.py
 tiltGauss.py
+calcSNR.py
+calcSpillPri.py
+fit_gauss_to_ff.py
+meas_to_effs_ff.py
+plotEffs.py
+propagate_wfp_sec_pri_ff.py
+
 
 #vscode specific
 .vscode/settings.json

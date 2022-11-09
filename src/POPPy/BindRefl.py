@@ -36,7 +36,7 @@ def generateGrid(reflparams_py, transform=True, spheric=True):
     return grids
 
 #### SINGLE PRECISION
-def generateGridf(reflparams_py, transform=True, spheric=True):
+def generateGridf(reflparams_py, transform, spheric):
     lib = loadRefllib()
     size = reflparams_py["gridsize"][0] * reflparams_py["gridsize"][1]
 

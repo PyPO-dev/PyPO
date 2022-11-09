@@ -5,6 +5,7 @@
 #include <cmath>
 #include <thread>
 #include <iomanip>
+#include <limits>
 
 #define _USE_MATH_DEFINES
 #ifndef __Utils_h
@@ -202,9 +203,9 @@ void Utils<T>::normalize(const std::array<T, 3> &v, std::array<T, 3> &out)
     T norm;
     abs(v, norm);
 
-    if (norm == 0)
+    if (norm <= std::numeric_limits<T>::denorm_min())
     {
-        norm = 1;
+        norm = std::numeric_limits<T>::denorm_min();
     }
 
     for( int n=0; n<3; n++)

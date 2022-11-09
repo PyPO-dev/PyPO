@@ -2,6 +2,7 @@
 #include <cuda.h>
 #include <cuComplex.h>
 
+
 // The Utils file contains mostly linear algebra functions as CUDA device functions
 // File contains overloads for doubles and floats
 // In GUtils, we use CUDA complex library for arithmetic.
@@ -387,6 +388,7 @@ __device__ __inline__ void normalize(float (&v)[3], float (&out)[3])
 {
     float norm;
     abs(v, norm);
+
 
     if (norm == 0)
     {

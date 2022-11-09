@@ -18,7 +18,7 @@ def plotSystem_test():
     parabola["lims_y"] = [-5000,5000]
     parabola["lims_u"] = [200,5e3]
     parabola["lims_v"] = [0,360]
-    parabola["gridsize"] = [501,501]
+    parabola["gridsize"] = [1501,1501]
 
     hyperbola = {}
     hyperbola["name"] = "h1"
@@ -47,8 +47,8 @@ def plotSystem_test():
     plane["name"] = "plane1"
     plane["gmode"] = "xy"
     plane["flip"] = False
-    plane["lims_x"] = [-80,80]
-    plane["lims_y"] = [-80,80]
+    plane["lims_x"] = [-80*1.89,80*1.89]
+    plane["lims_y"] = [-80*1.89,80*1.89]
     plane["gridsize"] = [403, 401]
 
     plane2 = {}
@@ -73,7 +73,7 @@ def plotSystem_test():
     s.addParabola(parabola)
     s.addPlane(plane)
     s.addPlane(planeff)
-    s.plotter.plotSystem(s.system, fine=2)
+    #s.plotter.plotSystem(s.system, fine=2)
 
     translation = np.array([0, 0, 3.5e3-150])
     rotation_plane = np.array([180, 0, 0])

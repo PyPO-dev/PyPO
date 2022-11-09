@@ -44,7 +44,6 @@ def ex_DRO_PO(device):
     planeff["gridsize"] = [201, 201]
 
     s = System()
-    s.addPlotter()
     s.addParabola(parabola)
     s.addPlane(plane)
     s.addPlane(planeff)
@@ -54,12 +53,13 @@ def ex_DRO_PO(device):
     s.setCustomBeamPath(path="ps/", append=True)
 
     cBeam = "ps"
-    JM = s.readCustomBeam(name=cBeam, comp="Ex", shape=[3,3], convert_to_current=True, mode="PMC")
 
     translation = np.array([0, 0, 12e3])
     rotation_plane = np.array([180, 0, 0])
     s.rotateGrids("plane1", rotation_plane)
     s.translateGrids("plane1", translation)
+
+    JM, EH = s.readCustomBeam(cBeam, "plane1", "Ex", convert_to_current=True, mode="PMC")
 
     if device == "CPU":
 
@@ -81,7 +81,17 @@ def ex_DRO_PO(device):
                         epsilon=10, t_direction=-1, nThreads=256,
                         mode="FF", precision="single")
 
-    pt.imshow(20*np.log10(np.absolute(EH.Ex) / np.max(np.absolute(EH.Ex))), vmin=-30, vmax=0)
+    eta_Xpol = s.calcXpol(EH.Ex, EH.Ey)
+    print(eta_Xpol)
+
+    result = s.fitGaussAbs(EH.Ex, "planeff", thres=-11)
+    print(result)
+    #Psi = s.generateGauss(result, "planeff")
+
+    #pt.imshow(20*np.log10(np.absolute(Psi) / np.max(np.absolute(Psi))), vmin=-30, vmax=0)
+    #pt.show()
+
+    pt.imshow(20*np.log10(np.absolute(EH.Ey) / np.max(np.absolute(EH.Ey))), vmin=-30, vmax=0)
     pt.show()
 
 if __name__ == "__main__":

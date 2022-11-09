@@ -3,11 +3,10 @@ import matplotlib.pyplot as pt
 
 from WO import MakeWO
 
-
 def propagateWO(mode):
     RTpar = {
-            "nRays"     : 10,
-            "nRing"     : 10,
+            "nRays"     : 0,
+            "nRing"     : 0,
             "angx"      : 6,
             "angy"      : 6,
             "a"         : 0,
@@ -36,8 +35,12 @@ def propagateWO(mode):
 
     s = MakeWO()
 
+
+
     s.addPlane(wfp)
-    s.addPlane(wfpff)
+    #s.addPlane(wfpff)
+
+    #gridswfff = s.generateGrids("wfpff")
 
     wf = np.array([486.3974883317985, 0.0, 1371.340617233771])
 
@@ -49,7 +52,7 @@ def propagateWO(mode):
         frame_out2 = s.runRayTracer(frame_out, "e1", nThreads=11, t0=1e1)
         frame_out3 = s.runRayTracer(frame_out2, "wfp", nThreads=11, t0=1e3)
 
-        s.plotSystem(RTframes=[fr_in, frame_out, frame_out2, frame_out3])
+        s.plotSystem(RTframes=[fr_in, frame_out, frame_out2, frame_out3], save=True)
         s.plotRTframe(frame_out3)
 
     elif mode == "PO":
@@ -75,9 +78,15 @@ def propagateWO(mode):
         s.translateGrids("cryo", d_cryo)
 
         # MISALIGN BEAM
-        s.rotateGrids("cryo", np.array([0,0,0]))
+        s.rotateGrids("cryo", np.array([0,0.3,-2.3]))
+
+        # TRANSLATE WO
+        s.translateGrids("h1", np.array([0,1,7]))
+        s.translateGrids("e1", np.array([0,1,7]))
 
         JM, EH = s.readCustomBeam("240", "cryo", "Ez", convert_to_current=True, mode="PMC")
+
+        print(np.max(np.absolute(EH.Ez)))
 
         s.plotBeam2D("cryo", EH.Ez, project="yz")
 
@@ -95,17 +104,26 @@ def propagateWO(mode):
                         epsilon=10, t_direction=-1, nThreads=256,
                         mode="JMEH", precision="single")
 
-        s.plotBeam2D("wfp", EH_wf.Ex, project="yx")
+        s.plotBeam2D("wfp", JM_wf.My, project="xy")
+        curr_calc = s.calcCurrents(EH_wf, "wfp", mode="PMC")
 
-        s.translateGrids("wfp", -wf)
+        s.plotBeam2D("wfp", curr_calc.My, project="xy")
+
+        # Store currents and wfp
+        s.saveCurrents(curr_calc, "JM_wf_240GHz_mis")
+        #s.saveElement("wfp")
+
+        s.plotBeam2D("wfp", EH_wf.Ex, project="xy")
+
+        #s.translateGrids("wfp", -wf)
         EH_wfff = s.propagatePO_GPU("wfp", "wfpff", JM_wf, k=k,
                         epsilon=10, t_direction=-1, nThreads=256,
                         mode="FF", precision="single")
 
-        pt.imshow(np.absolute(EH_wfff.Ex))
+        pt.imshow(np.absolute(EH_wfff.Ey))
         pt.show()
 
         s.plotBeam2D("wfpff", EH_wfff.Ex, project="xy")
 
 if __name__ == "__main__":
-    propagateWO("PO")
+    propagateWO("RT")

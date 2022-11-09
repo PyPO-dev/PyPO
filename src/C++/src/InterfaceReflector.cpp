@@ -7,6 +7,15 @@
 #include "Utils.h"
 #include "InterfaceReflector.h"
 
+// Normalize to [-pi, pi)
+template<typename T>
+T constrainAngle(T x){
+    x = fmod(x + M_PI, 2*M_PI);
+    if (x < 0)
+        x += 2*M_PI;
+    return x - M_PI;
+}
+
 template<typename T, typename U>
 void transformGrids(T *reflc, int idx, std::array<U, 3> &inp, std::array<U, 3> &out, Utils<U> *ut, U mat[16])
 {
@@ -455,7 +464,6 @@ void Plane_AoE(T *plane, U xu_lo, U xu_up, U yv_lo,
 
     Utils<U> ut;
 
-
     std::array<U, 3> inp, out;
 
     for (int i=0; i < ncx; i++)
@@ -470,12 +478,19 @@ void Plane_AoE(T *plane, U xu_lo, U xu_up, U yv_lo,
             if (spheric)
             {
                 plane->x[idx] = sqrt(Az*Az + El*El) * M_PI/180;
-                plane->y[idx] = atan(El / Az);
+                plane->y[idx] = atan2(El, Az);
+                //plane->y[idx] = constrainAngle<U>(atan(El / Az));
 
                     if (plane->y[idx] != plane->y[idx])
                     {
                         plane->y[idx] = 0;
                     }
+            }
+
+            else
+            {
+                plane->x[idx] = Az;
+                plane->y[idx] = El;
             }
 
             plane->z[idx] = 0;

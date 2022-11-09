@@ -31,11 +31,9 @@ def ex_DRO_PO(device):
     plane["name"] = "plane1"
     plane["gmode"] = "xy"
     plane["flip"] = False
-    #plane["lims_x"] = [-0.1,0.1]
-    #plane["lims_y"] = [-0.1,0.1]
-    plane["lims_x"] = [-80,80]
-    plane["lims_y"] = [-80,80]
-    plane["gridsize"] = [403, 401]
+    plane["lims_x"] = [-0.1,0.1]
+    plane["lims_y"] = [-0.1,0.1]
+    plane["gridsize"] = [3, 3]
 
     planeff = {}
     planeff["name"] = "planeff"
@@ -83,7 +81,17 @@ def ex_DRO_PO(device):
                         epsilon=10, t_direction=-1, nThreads=256,
                         mode="FF", precision="single")
 
-    pt.imshow(20*np.log10(np.absolute(EH.Ex) / np.max(np.absolute(EH.Ex))), vmin=-30, vmax=0)
+    eta_Xpol = s.calcXpol(EH.Ex, EH.Ey)
+    print(eta_Xpol)
+
+    result = s.fitGaussAbs(EH.Ex, "planeff", thres=-11)
+    print(result)
+    #Psi = s.generateGauss(result, "planeff")
+
+    #pt.imshow(20*np.log10(np.absolute(Psi) / np.max(np.absolute(Psi))), vmin=-30, vmax=0)
+    #pt.show()
+
+    pt.imshow(20*np.log10(np.absolute(EH.Ey) / np.max(np.absolute(EH.Ey))), vmin=-30, vmax=0)
     pt.show()
 
 if __name__ == "__main__":

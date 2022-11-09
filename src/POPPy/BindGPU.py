@@ -6,6 +6,8 @@ from src.POPPy.BindUtils import *
 from src.POPPy.Structs import *
 from src.POPPy.POPPyTypes import *
 
+import threading
+
 #############################################################################
 #                                                                           #
 #              List of bindings for the GPU interface of POPPy.             #
@@ -97,14 +99,22 @@ def POPPy_GPUf(source, target, currents, k, epsilon, t_direction, nThreads, mode
     epsilon     = ctypes.c_float(epsilon)
     t_direction = ctypes.c_float(t_direction)
 
+    args = [csp, ctp, ctypes.byref(cs), ctypes.byref(ct),
+            ctypes.byref(c_currents), k, epsilon,
+            t_direction, nBlocks, nThreads]
+
     if mode == "JM":
         res = c2Bundlef()
+
+        args.insert(0, res)
+
         allocate_c2Bundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
 
-        lib.callKernelf_JM(ctypes.byref(res), csp, ctp,
-                                ctypes.byref(cs), ctypes.byref(ct),
-                                ctypes.byref(c_currents), k, epsilon,
-                                t_direction, nBlocks, nThreads)
+        t = threading.Thread(target=lib.callKernelf_JM, args=args)
+        t.daemon = True
+        t.start()
+        while t.is_alive(): # wait for the thread to exit
+            t.join(.1)
 
         # Unpack filled struct
         JM = c2BundleToObj(res, shape=target_shape, obj_t='currents', np_t=np.float64)
@@ -113,12 +123,16 @@ def POPPy_GPUf(source, target, currents, k, epsilon, t_direction, nThreads, mode
 
     elif mode == "EH":
         res = c2Bundlef()
+
+        args.insert(0, res)
+
         allocate_c2Bundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
 
-        lib.callKernelf_EH(ctypes.byref(res), csp, ctp,
-                                ctypes.byref(cs), ctypes.byref(ct),
-                                ctypes.byref(c_currents), k, epsilon,
-                                t_direction, nBlocks, nThreads)
+        t = threading.Thread(target=lib.callKernelf_EH, args=args)
+        t.daemon = True
+        t.start()
+        while t.is_alive(): # wait for the thread to exit
+            t.join(.1)
 
         # Unpack filled struct
         EH = c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
@@ -127,12 +141,16 @@ def POPPy_GPUf(source, target, currents, k, epsilon, t_direction, nThreads, mode
 
     elif mode == "JMEH":
         res = c4Bundlef()
+
+        args.insert(0, res)
+
         allocate_c4Bundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
 
-        lib.callKernelf_JMEH(ctypes.byref(res), csp, ctp,
-                                ctypes.byref(cs), ctypes.byref(ct),
-                                ctypes.byref(c_currents), k, epsilon,
-                                t_direction, nBlocks, nThreads)
+        t = threading.Thread(target=lib.callKernelf_JMEH, args=args)
+        t.daemon = True
+        t.start()
+        while t.is_alive(): # wait for the thread to exit
+            t.join(.1)
 
         # Unpack filled struct
         JM, EH = c4BundleToObj(res, shape=target_shape, np_t=np.float64)
@@ -140,14 +158,17 @@ def POPPy_GPUf(source, target, currents, k, epsilon, t_direction, nThreads, mode
         return [JM, EH]
 
     elif mode == "EHP":
-
         res = c2rBundlef()
+
+        args.insert(0, res)
+
         allocate_c2rBundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
 
-        lib.callKernelf_EHP(ctypes.byref(res), csp, ctp,
-                                ctypes.byref(cs), ctypes.byref(ct),
-                                ctypes.byref(c_currents), k, epsilon,
-                                t_direction, nBlocks, nThreads)
+        t = threading.Thread(target=lib.callKernelf_EHP, args=args)
+        t.daemon = True
+        t.start()
+        while t.is_alive(): # wait for the thread to exit
+            t.join(.1)
 
         # Unpack filled struct
         EH, Pr = c2rBundleToObj(res, shape=target_shape, np_t=np.float64)
@@ -156,12 +177,16 @@ def POPPy_GPUf(source, target, currents, k, epsilon, t_direction, nThreads, mode
 
     elif mode == "FF":
         res = c2Bundlef()
+
+        args.insert(0, res)
+
         allocate_c2Bundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
 
-        lib.callKernelf_FF(ctypes.byref(res), csp, ctp,
-                                ctypes.byref(cs), ctypes.byref(ct),
-                                ctypes.byref(c_currents), k, epsilon,
-                                t_direction, nBlocks, nThreads)
+        t = threading.Thread(target=lib.callKernelf_FF, args=args)
+        t.daemon = True
+        t.start()
+        while t.is_alive(): # wait for the thread to exit
+            t.join(.1)
 
         # Unpack filled struct
         EH = c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
@@ -187,8 +212,14 @@ def RT_GPUf(target, fr_in, epsilon, t0, nThreads):
     epsilon     = ctypes.c_float(epsilon)
     t0          = ctypes.c_float(t0)
 
-    lib.callRTKernel(ctp, ctypes.byref(inp), ctypes.byref(res),
-                        epsilon, t0, nBlocks, nThreads)
+    args = [ctp, ctypes.byref(inp), ctypes.byref(res),
+            epsilon, t0, nBlocks, nThreads]
+
+    t = threading.Thread(target=lib.callRTKernel, args=args)
+    t.daemon = True
+    t.start()
+    while t.is_alive(): # wait for the thread to exit
+        t.join(.1)
 
     shape = (fr_in.size,)
     fr_out = frameToObj(res, np_t=np.float32, shape=shape)

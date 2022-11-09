@@ -57,7 +57,6 @@ def ex_ASTE_PO(device):
     planeff["gridsize"] = [201, 201]
 
     s = System()
-    s.addPlotter()
     s.addParabola(parabola)
     s.addHyperbola(hyperbola)
     s.addPlane(plane)
@@ -66,7 +65,7 @@ def ex_ASTE_PO(device):
     s.setCustomBeamPath(path="ps/", append=True)
 
     cBeam = "ps"
-    JM = s.readCustomBeam(name=cBeam, comp="Ex", shape=[3,3], convert_to_current=True, mode="PMC")
+    JM, EH = s.readCustomBeam(cBeam, "plane1", "Ex", convert_to_current=True, mode="PMC")
 
     translation = np.array([0,0,3.5e3 - d_foc_h])
     s.translateGrids("plane1", translation)

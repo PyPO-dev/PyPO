@@ -53,12 +53,12 @@ __host__ inline void gpuAssert(cudaError_t code, const char *file, int line, boo
 
 __host__ __device__ void _debugArray(cuFloatComplex arr[3])
 {
-    printf("%f + %fj, %f + %fj, %f + %fj\n", arr[0].x, arr[0].y, arr[1].x, arr[1].y, arr[2].x, arr[2].y);
+    printf("%e + %ej, %e + %ej, %e + %ej\n", arr[0].x, arr[0].y, arr[1].x, arr[1].y, arr[2].x, arr[2].y);
 }
 
 __host__ __device__ void _debugArray(float arr[3])
 {
-    printf("%f, %f, %f\n", arr[0], arr[1], arr[2]);
+    printf("%e, %e, %e\n", arr[0], arr[1], arr[2]);
 }
 
 __device__ __inline__ cuFloatComplex expCo(cuFloatComplex z)
@@ -447,6 +447,8 @@ __global__ void GpropagateBeam_1(float *d_xs, float *d_ys, float *d_zs,
         point[1] = d_yt[idx];
         point[2] = d_zt[idx];
 
+        //printf("%f, %f, %f\n", d_Mx[idx].x, d_My[idx].x, d_Mz[idx].x);
+
         // Calculate total incoming E and H field at point on target
         fieldAtPoint(d_xs, d_ys, d_zs,
                     d_Jx, d_Jy, d_Jz,
@@ -570,7 +572,10 @@ __global__ void GpropagateBeam_2(float *d_xs, float *d_ys, float *d_zs,
             e_out_h_r[n] = temp2[n].x;                      // e_out_h_r
         }
 
+
+
         normalize(e_out_h_r, S_i_norm);                       // S_i_norm
+        //_debugArray(S_i_norm);
 
         // Calculate incoming polarization vectors
         ext(S_i_norm, norms, S_out_n);                      // S_i_out_n
@@ -688,7 +693,6 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
     int idx = blockDim.x*blockIdx.x + threadIdx.x;
     if (idx < g_t)
     {
-
         point[0] = d_xt[idx];
         point[1] = d_yt[idx];
         point[2] = d_zt[idx];
@@ -698,15 +702,18 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
         norms[2] = d_nzt[idx];
 
         // Calculate total incoming E and H field at point on target
+
         fieldAtPoint(d_xs, d_ys, d_zs,
                     d_Jx, d_Jy, d_Jz,
                     d_Mx, d_My, d_Mz,
                     point, d_A, d_ei, d_hi);
 
-        d_Ext[idx] = d_ei[0];
+        //printf("%e\n", d_ei[idx].x);
         // Calculate normalised incoming poynting vector.
         conja(d_hi, temp1);                        // h_conj
         ext(d_ei, temp1, temp2);                  // e_out_h
+
+
 
         for (int n=0; n<3; n++)
         {
@@ -723,12 +730,13 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
         // Now calculate reflected poynting vector.
         snell(S_i_norm, norms, S_r_norm);                // S_r_norm
 
-
-
         // Store REFLECTED Pynting vectors
         d_Prxt[idx] = S_r_norm[0];
         d_Pryt[idx] = S_r_norm[1];
         d_Przt[idx] = S_r_norm[2];
+        //printf("%f\n", d_A[idx]);
+
+
 
         // Calculate normalised reflected polarization vectors
         ext(S_r_norm, norms, S_out_n);                      // S_r_out_n
@@ -749,7 +757,7 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
         s_mult(temp1, con[3], h_r);                     // ZETA_0_INV, h_r
 
         // Store REFLECTED fields
-        //d_Ext[idx] = e_r[0];
+        d_Ext[idx] = e_r[0];
         d_Eyt[idx] = e_r[1];
         d_Ezt[idx] = e_r[2];
 

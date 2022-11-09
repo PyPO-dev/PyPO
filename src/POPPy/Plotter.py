@@ -4,11 +4,17 @@ import matplotlib.pyplot as pt
 import matplotlib.cm as cm
 import matplotlib as mpl
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+import matplotlib.ticker as ticker
 import warnings
 warnings.filterwarnings("ignore")
 
 import src.POPPy.Colormaps as cmaps
 from src.POPPy.BindRefl import *
+
+
+import PlotConfig
+
+
 
 pt.rcParams['xtick.top'] = True
 pt.rcParams['ytick.right'] = True
@@ -16,52 +22,85 @@ pt.rcParams['ytick.right'] = True
 pt.rcParams['xtick.direction'] = "in"
 pt.rcParams['ytick.direction'] = "in"
 
+
+def set_axes_equal(ax):
+    """Set 3D plot axes to equal scale.
+
+    Make axes of 3D plot have equal scale so that spheres appear as
+    spheres and cubes as cubes.  Required since `ax.axis('equal')`
+    and `ax.set_aspect('equal')` don't work on 3D.
+    """
+    limits = np.array([
+        ax.get_xlim3d(),
+        ax.get_ylim3d(),
+        ax.get_zlim3d(),
+    ])
+    origin = np.mean(limits, axis=1)
+    radius = 0.5 * np.max(np.abs(limits[:, 1] - limits[:, 0]))
+    _set_axes_radius(ax, origin, radius)
+
+def _set_axes_radius(ax, origin, radius):
+    x, y, z = origin
+    ax.set_xlim3d([x - radius, x + radius])
+    ax.set_ylim3d([y - radius, y + radius])
+    ax.set_zlim3d([z - radius, z + radius])
+
 def plotBeam2D(plotObject, field,
-                vmin=-30, vmax=0, show=True, amp_only=False,
-                save=False, polar=False, interpolation=None,
-                aperDict={"plot":False}, mode='dB', project='xy',
-                units='', name='', titleA="Amp", titleP="Phase", savePath="./images/"):
+                vmin, vmax, show, amp_only,
+                save, polar, interpolation,
+                aperDict, mode, project,
+                units, name, titleA, titleP, savePath):
 
     # With far-field, generate grid without converting to spherical
 
     max_field = np.max(np.absolute(field))
-    grids = generateGrid(plotObject, spheric=False)
-    if project == 'xy':
-        grid_x1 = grids.x
-        grid_x2 = grids.y
-        ff_flag = False
+    grids = generateGrid(plotObject, transform=True, spheric=False)
+    if not plotObject["gmode"] == 2:
+        if project == 'xy':
+            grid_x1 = grids.x
+            grid_x2 = grids.y
+            ff_flag = False
 
 
-    elif project == 'yz':
-        grid_x1 = grids.y
-        grid_x2 = grids.z
-        ff_flag = False
+        elif project == 'yz':
+            grid_x1 = grids.y
+            grid_x2 = grids.z
+            ff_flag = False
 
-    elif project == 'zx':
-        grid_x1 = grids.z
-        grid_x2 = grids.x
-        ff_flag = False
+        elif project == 'zx':
+            grid_x1 = grids.z
+            grid_x2 = grids.x
+            ff_flag = False
 
-    # Transpose plots
-    if project == 'yx':
-        grid_x1 = grids.y
-        grid_x2 = grids.x
-        ff_flag = False
-
-
-    elif project == 'zy':
-        grid_x1 = grids.z
-        grid_x2 = grids.y
-        ff_flag = False
-
-    elif project == 'xz':
-        grid_x1 = grids.x
-        grid_x2 = grids.z
-        ff_flag = False
+        # Transpose plots
+        if project == 'yx':
+            grid_x1 = grids.y
+            grid_x2 = grids.x
+            ff_flag = False
 
 
-    if plotObject["gmode"] == 2:
-        ff_flag = True
+        elif project == 'zy':
+            grid_x1 = grids.z
+            grid_x2 = grids.y
+            ff_flag = False
+
+        elif project == 'xz':
+            grid_x1 = grids.x
+            grid_x2 = grids.z
+            ff_flag = False
+
+    else:
+        if project == 'xy':
+            grid_x1 = grids.x
+            grid_x2 = grids.y
+            ff_flag = True
+            units = "deg"
+
+        elif project == 'yx':
+            grid_x1 = grids.y
+            grid_x2 = grids.x
+            ff_flag = True
+            units = "deg"
 
     comps = list(project)
 
@@ -70,7 +109,7 @@ def plotBeam2D(plotObject, field,
         fig, ax = pt.subplots(1,2, figsize=(10,5), gridspec_kw={'wspace':0.5})
 
         if mode == 'linear':
-            extent = [np.min(grid_x1), np.max(grid_x1), np.max(grid_x2), np.min(grid_x2)]
+            extent = [np.min(grid_x1), np.max(grid_x1), np.min(grid_x2), np.max(grid_x2)]
             ampfig = ax[0].imshow(np.absolute(field), origin='lower', extent=extent, cmap=cmaps.parula, interpolation=interpolation)
             phasefig = ax[1].imshow(np.angle(field), origin='lower', extent=extent, cmap=cmaps.parula)
 
@@ -169,11 +208,12 @@ def plotBeam2D(plotObject, field,
 
     pt.close()
 
-def plot3D(plotObject, fine=2, cmap=cm.cool,
-            returns=False, ax_append=False, norm=False,
-            show=True, foc1=False, foc2=False, save=True, savePath="./images/"):
+def plot3D(plotObject, fine, cmap,
+            returns, ax_append, norm,
+            show, foc1, foc2, save, savePath):
+
     skip = slice(None,None,fine)
-    grids = generateGrid(plotObject)
+    grids = generateGrid(plotObject, transform=True, spheric=True)
 
     if not ax_append:
         fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
@@ -203,6 +243,7 @@ def plot3D(plotObject, fine=2, cmap=cm.cool,
         world_limits = ax_append.get_w_lims()
         ax_append.set_box_aspect((world_limits[1]-world_limits[0],world_limits[3]-world_limits[2],world_limits[5]-world_limits[4]))
         ax_append.tick_params(axis='x', which='major', pad=-3)
+        set_axes_equal(ax_append)
 
     if save:
         pt.savefig(fname=savePath + '{}.jpg'.format(plotObject["name"]),bbox_inches='tight', dpi=300)
@@ -218,23 +259,27 @@ def plot3D(plotObject, fine=2, cmap=cm.cool,
     pt.close()
 
 
-def plotSystem(systemDict, fine=2, cmap=cm.cool,
-            ax_append=False, norm=False,
-            show=True, foc1=False, foc2=False, save=True, ret=False, RTframes=[], savePath="./images/"):
+def plotSystem(systemDict, fine, cmap,
+            ax_append, norm,
+            show, foc1, foc2, save, ret, RTframes, savePath):
 
     fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
+
+    #ax.set_xlim3d(-10,800)
+    #ax.set_ylim3d(-250,250)
 
     for key, refl in systemDict.items():
         plot3D(refl, fine=fine, cmap=cmap,
                     returns=True, ax_append=ax, norm=norm,
-                    show=False, foc1=foc1, foc2=foc2, save=False)
+                    show=False, foc1=foc1, foc2=foc2, save=False, savePath=savePath)
 
     ax.set_ylabel(r"$y$ / [mm]", labelpad=20)
     ax.set_xlabel(r"$x$ / [mm]", labelpad=10)
-    ax.set_zlabel(r"$z$ / [mm]", labelpad=50)
-    ax.set_title("System", fontsize=20)
+    ax.set_zlabel(r"$z$ / [mm]", labelpad=20)
+    #ax.set_title("System", fontsize=20)
     world_limits = ax.get_w_lims()
-    ax.set_box_aspect((world_limits[1]-world_limits[0],world_limits[3]-world_limits[2],world_limits[5]-world_limits[4]))
+
+    #ax.set_box_aspect((1,1,1))
     ax.tick_params(axis='x', which='major', pad=-3)
 
     if RTframes:
@@ -248,7 +293,11 @@ def plotSystem(systemDict, fine=2, cmap=cm.cool,
                 y.append(frame.y[i])
                 z.append(frame.z[i])
 
-            pt.plot(x, y, z, color='grey')
+            ax.plot(x, y, z, color='black', zorder=100)
+
+
+    set_axes_equal(ax)
+    #ax.set_box_aspect((world_limits[1]-world_limits[0],world_limits[3]-world_limits[2],world_limits[5]-world_limits[4]))
 
     if save:
         pt.savefig(fname=savePath + 'system.jpg',bbox_inches='tight', dpi=300)
@@ -323,7 +372,7 @@ def beamCut(self, plotObject, field, cross='', units='', vmin=-50, vmax=0, frac=
     if ret:
         return field[:,y_center], field[:,y_center]
     """
-def plotRTframe(frame, project="xy", savePath="./images/"):
+def plotRTframe(frame, projec, savePath):
     fig, ax = pt.subplots(1,1)
 
     if project == "xy":

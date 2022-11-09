@@ -465,12 +465,13 @@ class System(object):
         gauss_in = makeGauss(gaussDict, self.system[name_source])
         return gauss_in
 
-    def runRayTracer(self, fr_in, name_target, epsilon=1e-10, nThreads=1, t0=100):
-        fr_out = RT_CPUd(self.system[name_target], fr_in, epsilon, t0, nThreads)
-        return fr_out
+    def runRayTracer(self, fr_in, name_target, epsilon=1e-3, nThreads=1, t0=100, device="CPU"):
+        if device == "CPU":
+            fr_out = RT_CPUd(self.system[name_target], fr_in, epsilon, t0, nThreads)
 
-    def runRT_GPU(self, fr_in, name_target, epsilon=1e-10, nThreads=256, t0=100):
-        fr_out = RT_GPUf(self.system[name_target], fr_in, epsilon, t0, nThreads)
+        elif device == "GPU":
+            fr_out = RT_GPUf(self.system[name_target], fr_in, epsilon, t0, nThreads)
+
         return fr_out
 
     def interpFrame(self, fr_in, field, name_target, method="nearest"):

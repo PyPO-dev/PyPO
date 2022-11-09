@@ -6,7 +6,7 @@ import matplotlib.pyplot as pt
 
 from src.POPPy.System import System
 
-def ex_DRO_RT():
+def ex_DRO_RT(device):
     """
     In this example script we will build the Dwingeloo Radio Observatory (DRO).
     The setup consists of a parabolic reflector and feed.
@@ -34,13 +34,13 @@ def ex_DRO_RT():
             }
 
     RTpar = {
-            "nRays"     : 100,
-            "nRing"     : 100,
+            "nRays"     : 10,
+            "nRing"     : 10,
             "angx"      : 0,
             "angy"      : 0,
             "a"         : 10000,
             "b"         : 10000,
-            "tChief"    : np.array([181,0,0]),
+            "tChief"    : np.array([180.1,0,0]),
             "oChief"    : np.array([0,0,12e3])
             }
 
@@ -53,9 +53,15 @@ def ex_DRO_RT():
 
     frame_in = s.createFrame(RTpar)
 
-    frame_out = s.runRayTracer(frame_in, "p1", nThreads=11, t0=1e4)
+    if device == "CPU":
+        frame_out = s.runRayTracer(frame_in, "p1", nThreads=11, t0=1e4)
 
-    frame_out2 = s.runRayTracer(frame_out, "plane1", nThreads=11, t0=1e4)
+        frame_out2 = s.runRayTracer(frame_out, "plane1", nThreads=11, t0=1e4)
+
+    elif device == "GPU":
+        frame_out = s.runRayTracer(frame_in, "p1", nThreads=256, t0=1e4, device=device)
+
+        frame_out2 = s.runRayTracer(frame_out, "plane1", nThreads=256, t0=1e4, device=device)
 
     stack = s.calcRayLen(frame_in, frame_out, frame_out2)
 

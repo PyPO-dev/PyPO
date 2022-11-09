@@ -372,7 +372,7 @@ def beamCut(self, plotObject, field, cross='', units='', vmin=-50, vmax=0, frac=
     if ret:
         return field[:,y_center], field[:,y_center]
     """
-def plotRTframe(frame, projec, savePath):
+def plotRTframe(frame, project, savePath):
     fig, ax = pt.subplots(1,1)
 
     if project == "xy":

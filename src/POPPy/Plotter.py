@@ -220,7 +220,7 @@ def plot3D(plotObject, fine, cmap,
         ax_append = ax
 
     reflector = ax_append.plot_surface(grids.x[skip], grids.y[skip], grids.z[skip],
-                   linewidth=0, antialiased=False, alpha=0.5, cmap=cmap)
+                   linewidth=0, antialiased=False, alpha=1, cmap=cmap)
 
     if foc1:
         ax_append.scatter(plotObject["focus_1"][0], plotObject["focus_1"][1], plotObject["focus_1"][2], color='black')
@@ -268,8 +268,14 @@ def plotSystem(systemDict, fine, cmap,
     #ax.set_xlim3d(-10,800)
     #ax.set_ylim3d(-250,250)
 
-    for key, refl in systemDict.items():
-        plot3D(refl, fine=fine, cmap=cmap,
+    for i, (key, refl) in enumerate(systemDict.items()):
+        if isinstance(cmap, list):
+            _cmap = cmap[i]
+
+        else:
+            _cmap = cmap
+
+        plot3D(refl, fine=fine, cmap=_cmap,
                     returns=True, ax_append=ax, norm=norm,
                     show=False, foc1=foc1, foc2=foc2, save=False, savePath=savePath)
 
@@ -297,7 +303,7 @@ def plotSystem(systemDict, fine, cmap,
 
 
     set_axes_equal(ax)
-    #ax.set_box_aspect((world_limits[1]-world_limits[0],world_limits[3]-world_limits[2],world_limits[5]-world_limits[4]))
+    ax.set_box_aspect((world_limits[1]-world_limits[0],world_limits[3]-world_limits[2],world_limits[5]-world_limits[4]))
 
     if save:
         pt.savefig(fname=savePath + 'system.jpg',bbox_inches='tight', dpi=300)

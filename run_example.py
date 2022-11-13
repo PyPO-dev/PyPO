@@ -8,11 +8,37 @@ def select_example():
 Please select an example to run.
 
 Possible options: DRO_PO-(CPU/GPU)
-                  DRO_RT-CPU
+                  DRO_RT-(CPU/GPU)
                   ASTE_PO-(CPU/GPU)
-                  ASTE_RT-CPU
+                  ASTE_RT-(CPU/GPU)
 
 > """)
+
+    if example == "0":
+        example = "DRO_PO-CPU"
+
+    elif example == "1":
+        example = "DRO_PO-GPU"
+
+    elif example == "2":
+        example = "DRO_RT-CPU"
+
+    elif example == "3":
+        example = "DRO_RT-GPU"
+
+
+    elif example == "4":
+        example = "ASTE_PO-CPU"
+
+    elif example == "5":
+        example = "ASTE_PO-GPU"
+
+    elif example == "6":
+        example = "ASTE_RT-CPU"
+
+    elif example == "7":
+        example = "ASTE_RT-GPU"
+
     args = example.split("-")
     print("Running ex_{}.py on {}\n".format(args[0], args[1]))
     if args[0] == "DRO_PO":

@@ -83,9 +83,15 @@ def MakeWO():
 
     s.rotateGrids("e1", np.array([180, 90, 0]))
     s.translateGrids("e1", e_center)
-    s.rotateGrids("e1", np.array([0, theta, 0]), e_center)
+    s.rotateGrids("e1", np.array([0, theta, 0]), e_center) 
+    
 
-    #s.plotSystem()
+    fig, ax = s.plotSystem(show=False, save=False, ret=True)
+    print(fig)
+    print(ax)
+    ax.scatter(e_f0[0], e_f0[1], e_f0[2], color="red")
+    ax.scatter(0, 0, 0, color="blue")
+    pt.show()
 
     return s
 

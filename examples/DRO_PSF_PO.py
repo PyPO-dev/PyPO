@@ -91,8 +91,10 @@ def ex_DRO_PO(device):
     #pt.imshow(20*np.log10(np.absolute(Psi) / np.max(np.absolute(Psi))), vmin=-30, vmax=0)
     #pt.show()
 
-    pt.imshow(20*np.log10(np.absolute(EH.Ey) / np.max(np.absolute(EH.Ey))), vmin=-30, vmax=0)
+    pt.imshow(20*np.log10(np.absolute(EH.Ex) / np.max(np.absolute(EH.Ex))), vmin=-30, vmax=0)
     pt.show()
 
+    pt.imshow(np.angle(EH.Ex))
+    pt.show()
 if __name__ == "__main__":
     ex_DRO()

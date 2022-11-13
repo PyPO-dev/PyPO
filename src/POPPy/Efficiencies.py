@@ -16,7 +16,8 @@ def calcSpillover(field, surfaceObject, aperDict):
     mask = cond1 & cond2
 
     field_ap = field * mask.astype(complex)
-    eff_s = np.absolute(np.sum(np.conj(field_ap) * field)**2) / (np.sum(np.absolute(field)**2) * np.sum(np.absolute(field_ap)**2))
+    area_m = area * mask.astype(int)
+    eff_s = np.absolute(np.sum(np.conj(field_ap) * field * area))**2 / (np.sum(np.absolute(field)**2 * area) * np.sum(np.absolute(field_ap)**2 *area_m))
 
     return eff_s
 

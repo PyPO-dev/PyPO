@@ -137,6 +137,9 @@ class System(object):
             self.system[reflDict["name"]]["coeffs"][1] = b
             self.system[reflDict["name"]]["coeffs"][2] = -1
 
+        elif reflDict["pmode"] == "manual":
+            self.system[reflDict["name"]]["coeffs"] = np.array([reflDict["coeffs"][0], reflDict["coeffs"][1], -1])
+
         if reflDict["gmode"] == "xy":
             self.system[reflDict["name"]]["gmode"] = 0
 
@@ -158,7 +161,7 @@ class System(object):
 
         reflDict["type"] = 1
         reflDict["transf"] = np.eye(4)
-
+        check_ElemDict(reflDict) 
         self.system[reflDict["name"]] = copyGrid(reflDict)
 
         if reflDict["pmode"] == "focus":
@@ -220,7 +223,7 @@ class System(object):
 
         reflDict["type"] = 2
         reflDict["transf"] = np.eye(4)
-
+        check_ElemDict(reflDict) 
         self.system[reflDict["name"]] = copyGrid(reflDict)
 
         if reflDict["pmode"] == "focus":
@@ -246,7 +249,7 @@ class System(object):
 
         reflDict["type"] = 3
         reflDict["transf"] = np.eye(4)
-
+        check_ElemDict(reflDict) 
         self.system[reflDict["name"]] = copyGrid(reflDict)
         self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
 
@@ -405,6 +408,7 @@ class System(object):
         return out
 
     def createFrame(self, argDict):
+        check_RTDict(argDict)
         frame_in = makeRTframe(argDict)
         return frame_in
 

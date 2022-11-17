@@ -17,9 +17,9 @@ def ex_ASTE_RT(device):
             "flip"          : False,
             "vertex"        : np.zeros(3),
             "focus_1"       : np.array([0,0,3.5e3]),
-            "lims_u"        : [200,5e3],
-            "lims_v"        : [0,360],
-            "gridsize"      : [1501,1501]
+            "lims_u"        : np.array([200,5e3]),
+            "lims_v"        : np.array([0,360]),
+            "gridsize"      : np.array([1501,1501])
             }
 
     d_foc_h = 5606.286
@@ -31,9 +31,9 @@ def ex_ASTE_RT(device):
             "focus_1"       : np.array([0,0,3.5e3]),
             "focus_2"       : np.array([0,0,3.5e3 - d_foc_h]),
             "ecc"           : 1.08208248,
-            "lims_u"        : [0,310],
-            "lims_v"        : [0,360],
-            "gridsize"      : [501,501]
+            "lims_u"        : np.array([0,310]),
+            "lims_v"        : np.array([0,360]),
+            "gridsize"      : np.array([501,501])
             }
 
 
@@ -41,9 +41,9 @@ def ex_ASTE_RT(device):
             "name"          : "plane1",
             "gmode"         : "xy",
             "flip"          : False,
-            "lims_x"        : [-1000,1000],
-            "lims_y"        : [-1000,1000],
-            "gridsize"      : [3, 3]
+            "lims_x"        : np.array([-1000,1000]),
+            "lims_y"        : np.array([-1000,1000]),
+            "gridsize"      : np.array([3, 3])
             }
 
     RTpar = {
@@ -59,7 +59,6 @@ def ex_ASTE_RT(device):
 
     rotation = np.array([0, 0, 0])
 
-    #s = System()
     s = MakeWO()
     s.addPlane(plane)
 

@@ -19,18 +19,18 @@ def ex_DRO_RT(device):
             "flip"      : False,
             "vertex"    : np.zeros(3),
             "focus_1"   : np.array([0,0,12e3]),
-            "lims_u"    : [200,12.5e3],
-            "lims_v"    : [0,360],
-            "gridsize"  : [1501,1501]
+            "lims_u"    : np.array([200,12.5e3]),
+            "lims_v"    : np.array([0,360]),
+            "gridsize"  : np.array([1501,1501])
             }
 
     plane = {
             "name"      : "plane1",
             "gmode"     : "xy",
             "flip"      : False,
-            "lims_x"    : [-100,100],
-            "lims_y"    : [-100,100],
-            "gridsize"  : [3, 3]
+            "lims_x"    : np.array([-100,100]),
+            "lims_y"    : np.array([-100,100]),
+            "gridsize"  : np.array([3, 3])
             }
 
     RTpar = {

@@ -42,18 +42,18 @@ def MakeWO():
 
     # Add parabolic reflector and hyperbolic reflector by focus, vertex and two foci and eccentricity
     h_coeff = np.array([_B_HYPERBO, _B_HYPERBO, _A_HYPERBO])
-    h_gridsize = [601, 601]
+    h_gridsize = np.array([601, 601])
 
     # Define ellipse coefficients. Note that _X_LIM_ELL is in frame where ellipse vertex is at origin
     # In our definition, ellipse is centered at origin. Semi-major axis is along x-axis
     #_X_LIM_ELL -= _A_ELLIPSE
 
     e_coeff = np.array([_B_ELLIPSE, _B_ELLIPSE, _A_ELLIPSE])
-    e_gridsize = [401, 401]
+    e_gridsize = np.array([401, 401])
 
     hyperbola = {
             "name"      : "h1",
-            "pmode"     : "man",
+            "pmode"     : "manual",
             "coeffs"    : h_coeff,
             "gmode"     : "xy",
             "flip"      : False,
@@ -64,7 +64,7 @@ def MakeWO():
 
     ellipse = {
             "name"      : "e1",
-            "pmode"     : "man",
+            "pmode"     : "manual",
             "coeffs"    : e_coeff,
             "gmode"     : "xy",
             "flip"      : True,

@@ -1,9 +1,10 @@
 import numpy as np
 from src.POPPy.POPPyTypes import *
 
-class InputError(Exception):
-    #def __init__(self, errStr):
-    #    print(errStr)
+class InputReflError(Exception):
+    pass
+
+class InputRTError(Exception):
     pass
 
 def errMsg_field(fieldName, elemName):
@@ -96,8 +97,8 @@ def check_ElemDict(elemDict):
                     errStr += errMsg_field("focus_2", elemDict["name"])
                 
                 if "ecc" in elemDict:
-                    if not isinstance(elemDict["ecc"], int) or isinstance(elemDict["ecc"], float):
-                        errStr += errMsg_type("ecc", type(elemDict["ecc"]), elemDict["name"], "int, float")
+                    if not (isinstance(elemDict["ecc"], float) or isinstance(elemDict["ecc"], int)):
+                        errStr += errMsg_type("ecc", type(elemDict["ecc"]), elemDict["name"], [float, int])
 
                 else:
                     errStr += errMsg_field("ecc", elemDict["name"])
@@ -213,5 +214,76 @@ def check_ElemDict(elemDict):
             errStr += errMsg_type("gridsize[1]", type(elemDict["gridsize"][1]), elemDict["name"], np.int64)
     
     if errStr:
-        raise InputError(errStr)
+        raise InputReflError(errStr)
 
+def check_RTDict(RTDict):
+    errStr = ""
+
+    if "nRays" in RTDict:
+        if not isinstance(RTDict["nRays"], int):
+            errStr += errMsg_type("nRays", type(RTDict["nRays"]), "RTDict", int)
+
+    else:
+        errStr += errMsg_field("nRays", "RTDict")
+
+    if "nRing" in RTDict:
+        if not isinstance(RTDict["nRing"], int):
+            errStr += errMsg_type("nRing", type(RTDict["nRays"]), "RTDict", int)
+
+    else:
+        errStr += errMsg_field("nRays", "RTDict")
+
+
+    if "angx" in RTDict:
+        if not (isinstance(RTDict["angx"], float) or isinstance(RTDict["angx"], int)):
+            errStr += errMsg_type("angx", type(RTDict["angx"]), "RTDict", [float, int])
+
+    else:
+        errStr += errMsg_field("angx", "RTDict")
+
+
+    if "angy" in RTDict:
+        if not (isinstance(RTDict["angy"], float) or isinstance(RTDict["angy"], int)):
+            errStr += errMsg_type("angy", type(RTDict["angy"]), "RTDict", [float, int])
+
+    else:
+        errStr += errMsg_field("angy", "RTDict")
+
+
+    if "a" in RTDict:
+        if not (isinstance(RTDict["a"], float) or isinstance(RTDict["a"], int)):
+            errStr += errMsg_type("a", type(RTDict["a"]), "RTDict", [float, int])
+
+    else:
+        errStr += errMsg_field("a", "RTDict")
+
+
+    if "b" in RTDict:
+        if not (isinstance(RTDict["b"], float) or isinstance(RTDict["b"], int)):
+            errStr += errMsg_type("b", type(RTDict["b"]), "RTDict", [float, int])
+
+    else:
+        errStr += errMsg_field("b", "RTDict")
+
+    if "tChief" in RTDict:
+        if not isinstance(RTDict["tChief"], np.ndarray):
+            errStr += errMsg_type("tChief", type(RTDict["tChief"]), "RTDict", np.ndarray)
+
+        elif not RTDict["tChief"].shape == (3,):
+            errStr += errMsg_shape("tChief", RTDict["tChief"].shape, "RTDict", "(3,)")
+
+    else:
+        errStr += errMsg_field("tChief", "RTDict")
+
+    if "oChief" in RTDict:
+        if not isinstance(RTDict["oChief"], np.ndarray):
+            errStr += errMsg_type("oChief", type(RTDict["oChief"]), "RTDict", np.ndarray)
+                     
+        elif not RTDict["oChief"].shape == (3,):
+            errStr += errMsg_shape("oChief", RTDict["oChief"].shape, "RTDict", "(3,)")
+
+    else:
+        errStr += errMsg_field("oChief", "RTDict")
+
+    if errStr:
+        raise InputRTError(errStr)

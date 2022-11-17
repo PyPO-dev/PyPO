@@ -23,9 +23,9 @@ def ex_ASTE_PO(device):
     parabola["flip"] = False
     parabola["vertex"] = np.zeros(3)
     parabola["focus_1"] = np.array([0,0,3.5e3])
-    parabola["lims_u"] = [200,5e3]
-    parabola["lims_v"] = [0,360]
-    parabola["gridsize"] = [1501,1501]
+    parabola["lims_u"] = np.array([200,5e3])
+    parabola["lims_v"] = np.array([0,360])
+    parabola["gridsize"] = np.array([1501,1501])
 
     d_foc_h = 5606.286
     hyperbola = {}
@@ -36,25 +36,25 @@ def ex_ASTE_PO(device):
     hyperbola["focus_1"] = np.array([0,0,3.5e3])
     hyperbola["focus_2"] = np.array([0,0,3.5e3 - d_foc_h])
     hyperbola["ecc"] = 1.08208248
-    hyperbola["lims_u"] = [0,310]
-    hyperbola["lims_v"] = [0,360]
-    hyperbola["gridsize"] = [501,501]
+    hyperbola["lims_u"] = np.array([0,310])
+    hyperbola["lims_v"] = np.array([0,360])
+    hyperbola["gridsize"] = np.array([501,501])
 
     plane = {}
     plane["name"] = "plane1"
     plane["gmode"] = "xy"
     plane["flip"] = False
-    plane["lims_x"] = [-0.1,0.1]
-    plane["lims_y"] = [-0.1,0.1]
-    plane["gridsize"] = [3, 3]
+    plane["lims_x"] = np.array([-0.1,0.1])
+    plane["lims_y"] = np.array([-0.1,0.1])
+    plane["gridsize"] = np.array([3, 3])
 
     planeff = {}
     planeff["name"] = "planeff"
     planeff["gmode"] = "AoE"
     planeff["flip"] = False
-    planeff["lims_Az"] = [-0.03,0.03]
-    planeff["lims_El"] = [-0.03,0.03]
-    planeff["gridsize"] = [201, 201]
+    planeff["lims_Az"] = np.array([-0.03,0.03])
+    planeff["lims_El"] = np.array([-0.03,0.03])
+    planeff["gridsize"] = np.array([201, 201])
 
     s = System()
     s.addParabola(parabola)

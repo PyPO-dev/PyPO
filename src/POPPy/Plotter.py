@@ -49,7 +49,7 @@ def plotBeam2D(plotObject, field,
                 vmin, vmax, show, amp_only,
                 save, polar, interpolation,
                 aperDict, mode, project,
-                units, name, titleA, titleP, savePath):
+                units, name, titleA, titleP, savePath, unwrap_phase):
 
     # With far-field, generate grid without converting to spherical
 
@@ -114,10 +114,16 @@ def plotBeam2D(plotObject, field,
             phasefig = ax[1].imshow(np.angle(field), origin='lower', extent=extent, cmap=cmaps.parula)
 
         elif mode == 'dB':
+            if unwrap_phase:
+                phase = np.unwrap(np.unwrap(np.angle(field), axis=0), axis=1)
+
+            else:
+                phase = np.angle(field)
+
             extent = [np.min(grid_x1), np.max(grid_x1), np.min(grid_x2), np.max(grid_x2)]
             ampfig = ax[0].pcolormesh(grid_x1, grid_x2, 20 * np.log10(np.absolute(field) / max_field),
                                     vmin=vmin, vmax=vmax, cmap=cmaps.parula, shading='auto')
-            phasefig = ax[1].pcolormesh(grid_x1, grid_x2, np.angle(field), cmap=cmaps.parula, shading='auto')
+            phasefig = ax[1].pcolormesh(grid_x1, grid_x2, phase, cmap=cmaps.parula, shading='auto')
 
         divider1 = make_axes_locatable(ax[0])
         divider2 = make_axes_locatable(ax[1])

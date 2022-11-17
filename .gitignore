@@ -176,6 +176,9 @@ plotEffs.py
 propagate_wfp_sec_pri_ff.py
 FF_from_pri_aper.py
 
+# vim stuff
+*.swp
+
 #vscode specific
 .vscode/settings.json
 .idea/misc.xml

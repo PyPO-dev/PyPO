@@ -19,10 +19,21 @@ from src.POPPy.BindBeam import *
 from src.POPPy.Copy import copyGrid
 from src.POPPy.MatTransform import *
 from src.POPPy.POPPyTypes import *
+from src.POPPy.Checks import *
 
 import src.POPPy.Plotter as plt
 import src.POPPy.Efficiencies as effs
 import src.POPPy.FitGauss as fgs
+
+class NpEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super(NpEncoder, self).default(obj)
 
 class System(object):
     customBeamPath = './custom/beam/'
@@ -91,6 +102,8 @@ class System(object):
 
         reflDict["type"] = 0
         reflDict["transf"] = np.eye(4)
+
+        check_ElemDict(reflDict) 
 
         self.system[reflDict["name"]] = copyGrid(reflDict)
 
@@ -276,16 +289,9 @@ class System(object):
 
     def saveElement(self, name):
         jsonDict = copyGrid(self.system[name])
-
-        for key, value in self.system[name].items():
-            if type(value) == np.ndarray:
-                jsonDict[key] = value.tolist()
-
-            else:
-                jsonDict[key] = value
-
+        
         with open('./{}{}.json'.format(self.savePathElem, name), 'w') as f:
-            json.dump(jsonDict, f)
+            json.dump(jsonDict, f, cls=NpEncoder)
 
     def saveFields(self, fields, name_fields):
         saveDir = self.savePathFields + name_fields + "/"
@@ -521,7 +527,8 @@ class System(object):
                     vmin=-30, vmax=0, show=True, amp_only=False,
                     save=False, polar=False, interpolation=None,
                     aperDict={"plot":False}, mode='dB', project='xy',
-                    units='', name='', titleA="Amp", titleP="Phase"):
+                    units='', name='', titleA="Amp", titleP="Phase",
+                    unwrap_phase=False):
 
         plotObject = self.system[name_surface]
 
@@ -529,7 +536,7 @@ class System(object):
                         vmin, vmax, show, amp_only,
                         save, polar, interpolation,
                         aperDict, mode, project,
-                        units, name, titleA, titleP, self.savePath)
+                        units, name, titleA, titleP, self.savePath, unwrap_phase)
 
     def plot3D(self, name_surface, fine=2, cmap=cm.cool,
                 returns=False, ax_append=False, norm=False,

@@ -528,4 +528,6 @@ extern "C" void callRTKernel(reflparamsf ctp, cframef *fr_in,
     gpuErrchk( cudaMemcpy(fr_out->dx, d_dxt, fr_in->size * sizeof(float), cudaMemcpyDeviceToHost) );
     gpuErrchk( cudaMemcpy(fr_out->dy, d_dyt, fr_in->size * sizeof(float), cudaMemcpyDeviceToHost) );
     gpuErrchk( cudaMemcpy(fr_out->dz, d_dzt, fr_in->size * sizeof(float), cudaMemcpyDeviceToHost) );
+    
+    gpuErrchk( cudaDeviceReset() );
 }

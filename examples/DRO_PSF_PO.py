@@ -23,25 +23,25 @@ def ex_DRO_PO(device):
     parabola["flip"] = False
     parabola["vertex"] = np.zeros(3)
     parabola["focus_1"] = np.array([0,0,12e3])
-    parabola["lims_u"] = [200,12.5e3]
-    parabola["lims_v"] = [0,360]
-    parabola["gridsize"] = [1501,1501]
+    parabola["lims_u"] = np.array([200,12.5e3])
+    parabola["lims_v"] = np.array([0,360])
+    parabola["gridsize"] = np.array([1501,1501])
 
     plane = {}
     plane["name"] = "plane1"
     plane["gmode"] = "xy"
     plane["flip"] = False
-    plane["lims_x"] = [-0.1,0.1]
-    plane["lims_y"] = [-0.1,0.1]
-    plane["gridsize"] = [3, 3]
+    plane["lims_x"] = np.array([-0.1,0.1])
+    plane["lims_y"] = np.array([-0.1,0.1])
+    plane["gridsize"] = np.array([3, 3])
 
     planeff = {}
     planeff["name"] = "planeff"
     planeff["gmode"] = "AoE"
     planeff["flip"] = False
-    planeff["lims_Az"] = [-3,3]
-    planeff["lims_El"] = [-3,3]
-    planeff["gridsize"] = [201, 201]
+    planeff["lims_Az"] = np.array([-3,3])
+    planeff["lims_El"] = np.array([-3,3])
+    planeff["gridsize"] = np.array([201, 201])
 
     s = System()
     s.addParabola(parabola)

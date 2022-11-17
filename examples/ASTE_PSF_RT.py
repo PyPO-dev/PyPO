@@ -41,8 +41,8 @@ def ex_ASTE_RT(device):
             "name"          : "plane1",
             "gmode"         : "xy",
             "flip"          : False,
-            "lims_x"        : [-100,100],
-            "lims_y"        : [-100,100],
+            "lims_x"        : [-1000,1000],
+            "lims_y"        : [-1000,1000],
             "gridsize"      : [3, 3]
             }
 

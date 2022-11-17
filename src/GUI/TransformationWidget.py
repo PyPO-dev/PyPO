@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QApplication, QWidget, QHBoxLayout, QLineEdit, QPushButton, QFormLayout , QLabel, QVBoxLayout, QComboBox, QGridLayout
-from PyQt5.QtGui import QDoubleValidator, QRegExpValidator
+from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtCore import QRegExp, Qt
 
 import numpy as np

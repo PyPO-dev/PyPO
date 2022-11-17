@@ -17,11 +17,15 @@ def loadRefllib():
 
 #### DOUBLE PRECISION
 def generateGrid(reflparams_py, transform=True, spheric=True):
+    
     lib = loadRefllib()
+    
+
     size = reflparams_py["gridsize"][0] * reflparams_py["gridsize"][1]
 
     inp = reflparams()
     res = reflcontainer()
+    
 
     allfill_reflparams(inp, reflparams_py, ctypes.c_double)
     allocate_reflcontainer(res, size, ctypes.c_double)
@@ -31,7 +35,10 @@ def generateGrid(reflparams_py, transform=True, spheric=True):
     lib.generateGrid.restype = None
 
     lib.generateGrid(inp, ctypes.byref(res), transform, spheric)
+    
+
     grids = creflToObj(res, reflparams_py["gridsize"], np.float64)
+    
 
     return grids
 

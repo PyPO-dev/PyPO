@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QWidget, QApplication
 
 
 from src.GUI.ElementsColumn import ElementsWindow
-from src.GUI.ElementWidget_Systems import SystemWidget
+from src.GUI.archive.ElementWidget_Systems import SystemWidget
 
 class SystemsWindow(QWidget):
     def __init__ (self, elements):

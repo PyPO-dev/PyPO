@@ -12,7 +12,7 @@ import src.POPPy.Colormaps as cmaps
 from src.POPPy.BindRefl import *
 
 
-import PlotConfig
+# import PlotConfig
 
 
 
@@ -212,6 +212,7 @@ def plot3D(plotObject, fine, cmap,
             returns, ax_append, norm,
             show, foc1, foc2, save, savePath):
 
+
     skip = slice(None,None,fine)
     grids = generateGrid(plotObject, transform=True, spheric=True)
 
@@ -262,7 +263,7 @@ def plot3D(plotObject, fine, cmap,
 def plotSystem(systemDict, fine, cmap,
             ax_append, norm,
             show, foc1, foc2, save, ret, RTframes, savePath):
-
+    print("ps1")
     fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
 
     #ax.set_xlim3d(-10,800)
@@ -272,6 +273,7 @@ def plotSystem(systemDict, fine, cmap,
         plot3D(refl, fine=fine, cmap=cmap,
                     returns=True, ax_append=ax, norm=norm,
                     show=False, foc1=foc1, foc2=foc2, save=False, savePath=savePath)
+    print("ps2")
 
     ax.set_ylabel(r"$y$ / [mm]", labelpad=20)
     ax.set_xlabel(r"$x$ / [mm]", labelpad=10)
@@ -280,6 +282,7 @@ def plotSystem(systemDict, fine, cmap,
     world_limits = ax.get_w_lims()
 
     #ax.set_box_aspect((1,1,1))
+    print("ps3")
     ax.tick_params(axis='x', which='major', pad=-3)
 
     if RTframes:

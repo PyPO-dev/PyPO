@@ -1,9 +1,9 @@
 from PyQt5.QtWidgets import QWidget, QGridLayout, QVBoxLayout, QPushButton, QApplication
 from ElementsColumn import ElementsWindow
 from PyQt5 import QtCore
-from GUI.ParameterForms.ParabolaForm import ParabolaFormLayout
+from src.GUI.ParameterForms.ParabolaForm import ParabolaFormLayout
 import PlotScreen as PS
-from GUI.TransformationWidget import TransformationWidget
+from src.GUI.TransformationWidget import TransformationWidget
 import sys
 import numpy as np
 from matplotlib.figure import Figure

@@ -3,8 +3,9 @@ import sys
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSpacerItem, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction
 from PyQt5.QtGui import QFont, QIcon
 from src.GUI.ElementsColumn import ElementsWindow
-from src.GUI.SystemsColumn import SystemsWindow
-from src.GUI.ParameterForms import ParabolaForm, HyperbolaForm
+from src.GUI.archive.SystemsColumn import SystemsWindow
+from src.GUI.ParameterForms import ParabolaForm, HyperbolaForm, formGenerator
+import src.GUI.ParameterForms.formData as fData
 from src.GUI.PlotScreen import PlotScreen
 from src.GUI.TransformationWidget import TransformationWidget
 import numpy as np
@@ -34,7 +35,6 @@ class MainWidget(QWidget):
 
         # init System
         self.stm = st.System()
-        self.stm.addPlotter()
         
 
 
@@ -43,9 +43,6 @@ class MainWidget(QWidget):
         self.grid = QGridLayout()
 
         self._mkElementsColumn()
-        # self._mkSystemsColumn()
-        # self._mkButtons()
-        # self.grid.addItem(QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum),3,3)
         self.plotSystem()
 
 
@@ -63,23 +60,12 @@ class MainWidget(QWidget):
         self.addToWindowGrid(self.ElementsColumn, self.GPElementsColumn)
 
     
-    # def _mkSystemsColumn(self):
-    #     if hasattr(self, "SystemsColumn"):
-    #         self.SystemsColumn.setParent(None)
-    #     listofstr = []
-    #     for k,_ in self.SystemsList.items():
-    #         listofstr.append(k)
-    #     self.SystemsColumn = SystemsWindow(listofstr)
-    #     self.SystemsColumn.setMaximumWidth(300)
-    #     self.SystemsColumn.setMinimumWidth(300)
-    #     self.addToWindowGrid(self.SystemsColumn, self.GPSystemsColumn)
-
     def plotSystem(self):
         if hasattr(self, "PlotScreen"):
             self.PlotScreen.setParent(None)
 
-        if self.stm:
-            figure, _ = self.stm.plotter.plotSystem(self.stm.system , ret = True, show=False, save=False)
+        if self.stm.system:
+            figure, _ = self.stm.plotSystem(ret = True, show=False, save=False)
         else :
             figure = None
         self.PlotScreen= PlotScreen(figure)
@@ -88,16 +74,6 @@ class MainWidget(QWidget):
     def addToWindowGrid(self, widget, param):
         self.grid.addWidget(widget, param[0], param[1], param[2], param[3])
 
-
-    # def _mkButtons(self):
-    #     btn = QPushButton("addParabola")
-    #     btn.clicked.connect(self.btnAction)
-
-    #     btnWidget = QWidget()
-    #     btnLayout = QVBoxLayout()
-    #     btnLayout.addWidget(btn)
-    #     btnWidget.setLayout(btnLayout)
-    #     self.addToWindowGrid(btnWidget,self.GPButtons)
 
     def addExampleParabola(self):
         d = {'type': 'Parabola', 'gridsize': [101, 101], 'flip': False, 'pmode': 'manual', 'coeffs':    np.array([1., 1., 0.]), 'gmode': 'xy', 'lims_x': [-1.0, 1.0], 'lims_y': [-1.0, 1.0]}
@@ -108,35 +84,20 @@ class MainWidget(QWidget):
         self.addElementAction(hyperbola)
 
     def addElementAction(self, elementDict):
-        # self.elementConfigs.append(elementDict)
         if elementDict["type"] == "Parabola":
             self.stm.addParabola(elementDict) 
         elif elementDict["type"] == "Hyperbola":
             self.stm.addHyperbola(elementDict) 
         
-        # print(self.elementConfigs[-1])
         self._mkElementsColumn()
 
-    # def addSystemAction(self):
-    #     stm = st.System()
-    #     stm.addPlotter()
-
-    #     for elementDict in self.elementConfigs:
-    #         if elementDict["type"] == "Parabola":
-    #             stm.addParabola(elementDict) 
-    #         elif elementDict["type"] == "Hyperbola":
-    #             stm.addHyperbola(elementDict) 
-
-    #     self.SystemsList["System 1"] = stm
-        
-    #     # self.plotSystem()
-    #     self._mkSystemsColumn()
+ 
 
     def setParabolaForm(self):
         if hasattr(self, "ParameterWid"):
             self.ParameterWid.setParent(None)
 
-        self.ParameterWid = ParabolaForm.Form(self.addElementAction)
+        self.ParameterWid = formGenerator.FormGenerator(fData.parabola,self.addElementAction)
         self.ParameterWid.setMaximumWidth(400)
         self.ParameterWid.setMinimumWidth(400)
         self.addToWindowGrid(self.ParameterWid,self.GPParameterForm)

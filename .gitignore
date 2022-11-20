@@ -178,7 +178,7 @@ FF_from_pri_aper.py
 anyl_taper.py
 WO.py
 propagateWO.py
-
+new_POPPy.py
 
 # vim stuff
 *.swp

@@ -19,12 +19,12 @@ def ex_DRO_PO(device):
     parabola = {}
     parabola["name"] = "p1"
     parabola["pmode"] = "focus"
-    parabola["gmode"] = "xy"
+    parabola["gmode"] = "uv"
     parabola["flip"] = False
     parabola["vertex"] = np.zeros(3)
     parabola["focus_1"] = np.array([0,0,12e3])
-    parabola["lims_x"] = np.array([-12.5e3,12.5e3])
-    parabola["lims_y"] = np.array([-12.5e3, 12.5e3])
+    parabola["lims_u"] = np.array([200,12.5e3])
+    parabola["lims_v"] = np.array([0, 360])
     parabola["gridsize"] = np.array([1501,1501])
 
     plane = {}
@@ -48,13 +48,15 @@ def ex_DRO_PO(device):
     s.addPlane(plane)
     s.addPlane(planeff)
 
+    s.plotSystem()
+
     s.saveElement("p1")
 
     s.setCustomBeamPath(path="ps/", append=True)
 
     cBeam = "ps"
 
-    translation = np.array([0, 0, 12e3])
+    translation = np.array([0, 0, 12e3])# + np.array([210, 210, -210])
     rotation_plane = np.array([180, 0, 0])
     s.rotateGrids("plane1", rotation_plane)
     s.translateGrids("plane1", translation)

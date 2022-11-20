@@ -2003,3 +2003,9 @@ extern "C" void callKernelf_FF(c2Bundlef *res, reflparamsf source, reflparamsf t
     delete h_Hyt;
     delete h_Hzt;
 }
+
+//__host__ getComputeCapability
+
+//cudaDeviceProp deviceProp;
+//cudaGetDeviceProperties(&deviceProp, dev);
+//std::printf("%d.%d\n", deviceProp.major, deviceProp.minor);

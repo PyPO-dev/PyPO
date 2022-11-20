@@ -287,3 +287,6 @@ def check_RTDict(RTDict):
 
     if errStr:
         raise InputRTError(errStr)
+
+def check_GBDict(GBDict):
+    errStr = ""

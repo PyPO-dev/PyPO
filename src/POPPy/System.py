@@ -522,9 +522,9 @@ class System(object):
 
         return out
 
-    def generateGauss(self, fgs_out, name_surface):
+    def generateGauss(self, fgs_out, name_surface, mode="dB"):
         surfaceObj = self.system[name_surface]
-        Psi = fgs.generateGauss(fgs_out, surfaceObj)
+        Psi = fgs.generateGauss(fgs_out, surfaceObj, mode)
         return Psi
 
     def plotBeam2D(self, name_surface, field,

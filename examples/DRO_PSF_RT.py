@@ -20,7 +20,7 @@ def ex_DRO_RT(device):
             "vertex"    : np.zeros(3),
             "focus_1"   : np.array([0,0,12e3]),
             "lims_u"    : np.array([200,12.5e3]),
-            "lims_v"    : np.array([0,360]),
+            "lims_v"    : np.array([0,180]),
             "gridsize"  : np.array([1501,1501])
             }
 
@@ -34,13 +34,13 @@ def ex_DRO_RT(device):
             }
 
     RTpar = {
-            "nRays"     : 100,
-            "nRing"     : 100,
+            "nRays"     : 1000,
+            "nRing"     : 1000,
             "angx"      : 0,
             "angy"      : 0,
             "a"         : 10000,
             "b"         : 10000,
-            "tChief"    : np.array([180,0,0]),
+            "tChief"    : np.array([210,0,0]),
             "oChief"    : np.array([0,0,12e3])
             }
 
@@ -48,6 +48,8 @@ def ex_DRO_RT(device):
     s.addParabola(parabola)
     s.addPlane(plane)
     s.translateGrids("plane1", np.array([0,0,12e3]))
+    
+    s.rotateGrids("p1", np.array([30,0,0]), np.array([0,0,12e3]))
 
     s.plotSystem()
 

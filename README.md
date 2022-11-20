@@ -4,34 +4,27 @@ Welcome to the Physical OPtics for Python (POPPy) package!
 Any Unix-like operating system should work.
 A fully functioning [Python 3.8](https://docs.python-guide.org/starting/install3/linux/) installation.
 If the PIP package manager was not automatically installed with your Python install, it can be installed [manually](https://pip.pypa.io/en/stable/installation/).
-Run the following command to install the necessary Python packages:
+
+To install the prerequisites for POPPy, navigate to the main folder and run:
 ```
-    python3 -m pip install numpy matplotlib scipy setuptools nose PyQt5
+python Build.py --prereq
 ```
-POPPy is capable of producing figures using LaTeX typesetting. For this, a LaTeX installation should be present on the machine. To install the proper packages for the backend, run:
+Alternatively, the prerequisites can be installed manually by running:
 ```
-    sudo apt install cm-super dvipng
+sudo apt install cm-super dvipng gcc build-essential
+python3 -m pip install numpy matplotlib scipy setuptools nose PyQt5
 ```
-The [g++](https://gcc.gnu.org/install/) compiler, capable of compiling code written in the C++11 standard, and [GNU make](https://www.gnu.org/software/make/). Both can be installed using:
-```
-    sudo apt-get install gcc build-essential
-```
-The GPU version of POPPy needs a [CUDA installation](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html) and a CUDA-compatible NVIDIA graphics card. Please refer to the NVIDIA documentation on how to install NVIDIA drivers and CUDA.
+POPPy is capable of producing figures using LaTeX typesetting. For this, a [LaTeX installation](https://www.tug.org/texlive/quickinstall.html) should be present on the machine.
+The GPU version of POPPy needs a [CUDA installation](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html) and a CUDA-compatible NVIDIA graphics card. These are not installed through the Build.py interface and should be installed manually. Please refer to the NVIDIA documentation on how to install NVIDIA drivers and CUDA.
 
 -- INSTALLATION --\
-The physical optics calculations in POPPy can be run on the CPU or GPU.
-In order to build the program for both CPU and GPU, run the following two commands from the POPPy root directory:
+The CPU version for POPPy is created by running:
 ```
-    cd ./src/C++
-    make all
+python Build.py
 ```
-This will create the executables for CPU and GPU. If, for example, you only want to install the CPU parallel version, run:
+To compile the CUDA version of POPPy, run:
 ```
-    make cpu
-```
-The GPU version is installed separately by running:
-```
-    make gpu
+python Build.py --enable-cuda
 ```
 
 -- TESTING --\

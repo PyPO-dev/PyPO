@@ -175,6 +175,10 @@ meas_to_effs_ff.py
 plotEffs.py
 propagate_wfp_sec_pri_ff.py
 FF_from_pri_aper.py
+anyl_taper.py
+WO.py
+propagateWO.py
+
 
 # vim stuff
 *.swp

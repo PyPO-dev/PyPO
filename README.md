@@ -18,7 +18,7 @@ POPPy is capable of producing figures using LaTeX typesetting. For this, a [LaTe
 The GPU version of POPPy needs a [CUDA installation](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html) and a CUDA-compatible NVIDIA graphics card. These are not installed through the Build.py interface and should be installed manually. Please refer to the NVIDIA documentation on how to install NVIDIA drivers and CUDA.
 
 -- INSTALLATION --\
-The CPU version for POPPy is created by running:
+The CPU version for POPPy is compiled by running:
 ```
 python Build.py
 ```
@@ -26,9 +26,13 @@ To compile the CUDA version of POPPy, run:
 ```
 python Build.py --enable-cuda
 ```
+For an overview of build options, run:
+```
+python Build.py --help
+```
 
 -- TESTING --\
 To run the Python unittests, go to the main POPPy directory and from there run:
 ```
-    nosetests --exe
+nosetests --exe
 ```

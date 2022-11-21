@@ -1,5 +1,6 @@
 import sys
 import os
+import shutil
 
 def BuildPOPPy():
     pathToBuild = os.path.join("src")
@@ -11,21 +12,29 @@ def BuildPOPPy():
     clean   = sys.argv.count("--clean") or sys.argv.count("-c")
     prereq  = sys.argv.count("--prereqs") or sys.argv.count("-p")
     cmake   = sys.argv.count("--cmake")
+    cmakec  = sys.argv.count("--cmake-clean")
 
     if verbose:
         stream = ""
     else:
         stream = " > /dev/null"
 
+
+    if cmakec:
+        print("Cleaning CMake build directory...")
+        dir_build = os.path.join(os.getcwd(), "out", "build")
+        shutil.rmtree(dir_build)
+        return 0
+
     if cmake:
         print("Building POPPy using CMake...")
         dir_lists = os.path.join(os.getcwd(), "src")
-        dir_build = os.path.join(dir_lists, "out", "build")
+        dir_build = os.path.join(os.getcwd(), "out", "build")
 
         if not os.path.exists(dir_build):
             os.makedirs(dir_build)
 
-        os.system("cmake -S{} -B{}".format(dir_lists, dir_build))
+        os.system("cmake -S {} -B {}".format(dir_lists, dir_build))
 
         return 0
 

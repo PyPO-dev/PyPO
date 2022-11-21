@@ -1,22 +1,21 @@
-# This makefile creates the cpu version of POPPy.
-# To build, type: 'make cpu' in terminal
+# This makefile creates the reflector shared library.
+# To build, type: 'make refl' in terminal
 
 ###########################################################################################
-DIRSRC = ./src/
+DIRINC = include/
+DIRCOM = common/
 ###########################################################################################
 COMP = g++
-CFLAGS = -O3 -std=c++11 -pthread
-LDFLAGS= -Wl,-rpath,./src/C++/
-
+CFLAGS = -O3 -std=c++11
 CC  = $(COMP) $(CFLAGS) -fpic -c
-CO  = $(COMP) $(CFLAGS) $(LDFLAGS) -o
+CO  = $(COMP) $(CFLAGS) -o
 ###########################################################################################
-LIB = libpoppycpu.so
+LIB = libpoppyrefl.so
 all: $(LIB)
 ###########################################################################################
-libpoppycpu.so: Interface_CPU.o
-	$(CO) libpoppycpu.so -fpic -shared Interface_CPU.o -L. -lpoppyrefl
+libpoppyrefl.so: InterfaceReflector.o
+	$(CO) libpoppyrefl.so -fpic -shared InterfaceReflector.o
 ###########################################################################################
-Interface_CPU.o: $(DIRSRC)Interface_CPU.cpp
-	$(CC) $(DIRSRC)Interface_CPU.cpp -I$(DIRSRC) -L. -lpoppyrefl
+InterfaceReflector.o: $(DIRCOM)InterfaceReflector.cpp
+	$(CC) $(DIRCOM)InterfaceReflector.cpp -I$(DIRINC)
 ###########################################################################################

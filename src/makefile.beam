@@ -1,20 +1,23 @@
-# This makefile creates the reflector shared library.
-# To build, type: 'make refl' in terminal
+# This makefile creates the cpu version of POPPy.
+# To build, type: 'make beam' in terminal
 
 ###########################################################################################
-DIRSRC = ./src/
+DIRINC = include/
+DIRCOM = common/
 ###########################################################################################
 COMP = g++
-CFLAGS = -O3 -std=c++11
+CFLAGS = -O3 -std=c++11 -pthread
+LDFLAGS= -Wl,-rpath,./src/
+
 CC  = $(COMP) $(CFLAGS) -fpic -c
-CO  = $(COMP) $(CFLAGS) -o
+CO  = $(COMP) $(CFLAGS) $(LDFLAGS) -o
 ###########################################################################################
-LIB = libpoppyrefl.so
+LIB = libpoppybeam.so
 all: $(LIB)
 ###########################################################################################
-libpoppyrefl.so: InterfaceReflector.o
-	$(CO) libpoppyrefl.so -fpic -shared InterfaceReflector.o
+libpoppybeam.so: InterfaceBeam.o
+	$(CO) libpoppybeam.so -fpic -shared InterfaceBeam.o -L. -lpoppyrefl
 ###########################################################################################
-InterfaceReflector.o: $(DIRSRC)InterfaceReflector.cpp
-	$(CC) $(DIRSRC)InterfaceReflector.cpp -I$(DIRSRC)
+InterfaceBeam.o: $(DIRCOM)InterfaceBeam.cpp
+	$(CC) $(DIRCOM)InterfaceBeam.cpp -I$(DIRINC) -I$(DIRCOM)  -L. -lpoppyrefl
 ###########################################################################################

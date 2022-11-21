@@ -14,7 +14,7 @@ import threading
 #############################################################################
 
 def loadCPUlib():
-    lib = ctypes.CDLL('./src/C++/libpoppycpu.so')
+    lib = ctypes.CDLL('./src/libpoppycpu.so')
 
     lib.propagateToGrid_JM.argtypes = [ctypes.POINTER(c2Bundle), reflparams, reflparams,
                                         ctypes.POINTER(reflcontainer), ctypes.POINTER(reflcontainer),

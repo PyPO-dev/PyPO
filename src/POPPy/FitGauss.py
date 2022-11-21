@@ -53,8 +53,8 @@ def fitGaussAbs(field, surfaceObject, thres):
     field_est = 20 * np.log10(field_norm[mask_f])
     x0, y0, xs, ys, theta = calcEstimates(x[mask_f], y[mask_f], area[mask_f], field_est)
 
-    pt.imshow(field_norm * mask_f)
-    pt.show()
+    #pt.imshow(field_norm * mask_f)
+    #pt.show()
 
     p0 = [x0, y0, xs, ys, theta]
 
@@ -66,9 +66,6 @@ def fitGaussAbs(field, surfaceObject, thres):
 
     popt, pcov = opt.curve_fit(couplingMasked, xy, field_est.ravel(), p0, bounds=bounds)
     perr = np.sqrt(np.diag(pcov))
-
-    print(popt)
-    print(perr)
 
     return popt, perr
 
@@ -99,15 +96,15 @@ def fitGaussAbs(field, surfaceObject, thres):
 def GaussAbs(mask, mode, xy, x0, y0, xs, ys, theta):
     x, y = xy
     a = np.cos(theta)**2 / (2 * x0**2) + np.sin(theta)**2 / (2 * y0**2)
-    b = -np.sin(2 * theta) / (4 * x0**2) + np.sin(2 * theta) / (4 * y0**2)
-    c = np.sin(theta)**2 / (2 * x0**2) + np.cos(theta)**2 / (2 * y0**2)
+    c = np.sin(2 * theta) / (4 * x0**2) - np.sin(2 * theta) / (4 * y0**2)
+    b = np.sin(theta)**2 / (2 * x0**2) + np.cos(theta)**2 / (2 * y0**2)
 
     if mode == "dB":
-        Psi = 20*np.log10(np.exp(-(a*(x - xs)**2 + 2*b*(x - xs)*(y - ys) + c*(y - ys)**2)))
+        Psi = 20*np.log10(np.exp(-(a*(x - xs)**2 + 2*c*(x - xs)*(y - ys) + b*(y - ys)**2)))
 
     elif mode == "linear":
 
-        Psi = np.exp(-(a*(x - xs)**2 + 2*b*(x - xs)*(y - ys) + c*(y - ys)**2))
+        Psi = np.exp(-(a*(x - xs)**2 + 2*c*(x - xs)*(y - ys) + b*(y - ys)**2))
 
     #Psi = np.exp(-(((x-xs)/x0*np.cos(theta) + (y-ys)/y0*np.sin(theta)))**2 -(((x-xs)/x0*np.sin(theta) + (y-ys)/y0*np.cos(theta)))**2) * mask
 

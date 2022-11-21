@@ -15,7 +15,7 @@ import threading
 #############################################################################
 
 def loadGPUlib():
-    lib = ctypes.CDLL('./src/C++/libpoppygpu.so')
+    lib = ctypes.CDLL('./src/libpoppygpu.so')
 
     lib.callKernelf_JM.argtypes = [ctypes.POINTER(c2Bundlef), reflparamsf, reflparamsf,
                                    ctypes.POINTER(reflcontainerf), ctypes.POINTER(reflcontainerf),

@@ -7,7 +7,7 @@ import matplotlib.cm as cm
 import src.POPPy.Colormaps as cmaps
 
 from src.POPPy.System import System
-from WO import MakeWO
+#from WO import MakeWO
 
 def ex_ASTE_RT(device):
     parabola = {
@@ -59,7 +59,7 @@ def ex_ASTE_RT(device):
 
     rotation = np.array([0, 0, 0])
 
-    s = MakeWO()
+    s = System()#MakeWO()
     s.addPlane(plane)
 
     s.addParabola(parabola)

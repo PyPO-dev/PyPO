@@ -12,7 +12,7 @@ from src.POPPy.POPPyTypes import *
 #############################################################################
 
 def loadRefllib():
-    lib = ctypes.CDLL('./src/C++/libpoppyrefl.so')
+    lib = ctypes.CDLL('./src/libpoppyrefl.so')
     return lib
 
 #### DOUBLE PRECISION

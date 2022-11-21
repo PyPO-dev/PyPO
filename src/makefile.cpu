@@ -1,22 +1,24 @@
 # This makefile creates the cpu version of POPPy.
-# To build, type: 'make beam' in terminal
+# To build, type: 'make cpu' in terminal
 
 ###########################################################################################
-DIRSRC = ./src/
+DIRINC = include/
+DIRCOM = common/
+DIRCPU = CPU/
 ###########################################################################################
 COMP = g++
 CFLAGS = -O3 -std=c++11 -pthread
-LDFLAGS= -Wl,-rpath,./src/C++/
+LDFLAGS= -Wl,-rpath,./src/
 
 CC  = $(COMP) $(CFLAGS) -fpic -c
 CO  = $(COMP) $(CFLAGS) $(LDFLAGS) -o
 ###########################################################################################
-LIB = libpoppybeam.so
+LIB = libpoppycpu.so
 all: $(LIB)
 ###########################################################################################
-libpoppybeam.so: InterfaceBeam.o
-	$(CO) libpoppybeam.so -fpic -shared InterfaceBeam.o -L. -lpoppyrefl
+libpoppycpu.so: InterfaceCPU.o
+	$(CO) libpoppycpu.so -fpic -shared InterfaceCPU.o -L. -lpoppyrefl
 ###########################################################################################
-InterfaceBeam.o: $(DIRSRC)InterfaceBeam.cpp
-	$(CC) $(DIRSRC)InterfaceBeam.cpp -I$(DIRSRC) -L. -lpoppyrefl
+InterfaceCPU.o: $(DIRCPU)InterfaceCPU.cpp
+	$(CC) $(DIRCPU)InterfaceCPU.cpp -I$(DIRINC) -I$(DIRCOM) -L. -lpoppyrefl
 ###########################################################################################

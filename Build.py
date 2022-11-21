@@ -2,7 +2,7 @@ import sys
 import os
 
 def BuildPOPPy():
-    pathToBuild = os.path.join("src", "C++")
+    pathToBuild = os.path.join("src")
     # Parse command line input
 
     helpf   = sys.argv.count("--help") or sys.argv.count("-h")
@@ -10,12 +10,24 @@ def BuildPOPPy():
     verbose = sys.argv.count("--verbose") or sys.argv.count("-v")
     clean   = sys.argv.count("--clean") or sys.argv.count("-c")
     prereq  = sys.argv.count("--prereqs") or sys.argv.count("-p")
-
+    cmake   = sys.argv.count("--cmake")
 
     if verbose:
         stream = ""
     else:
         stream = " > /dev/null"
+
+    if cmake:
+        print("Building POPPy using CMake...")
+        dir_lists = os.path.join(os.getcwd(), "src")
+        dir_build = os.path.join(dir_lists, "out", "build")
+
+        if not os.path.exists(dir_build):
+            os.makedirs(dir_build)
+
+        os.system("cmake -S{} -B{}".format(dir_lists, dir_build))
+
+        return 0
 
     if helpf:
         print("POPPy build interface list of options:")

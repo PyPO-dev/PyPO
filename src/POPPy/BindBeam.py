@@ -13,7 +13,7 @@ from src.POPPy.POPPyTypes import *
 #############################################################################
 
 def loadBeamlib():
-    lib = ctypes.CDLL('./src/C++/libpoppybeam.so')
+    lib = ctypes.CDLL('./src/libpoppybeam.so')
 
     lib.makeRTframe.argtypes = [RTDict, ctypes.POINTER(cframe)]
     lib.makeRTframe.restype = None

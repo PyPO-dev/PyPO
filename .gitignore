@@ -179,7 +179,8 @@ anyl_taper.py
 WO.py
 propagateWO.py
 new_POPPy.py
-
+FindCenterWFP.py
+DiffLim.py
 # vim stuff
 *.swp
 

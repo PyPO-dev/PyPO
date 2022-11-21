@@ -8,20 +8,9 @@ import matplotlib.ticker as ticker
 import warnings
 warnings.filterwarnings("ignore")
 
+import src.POPPy.PlotConfig
 import src.POPPy.Colormaps as cmaps
 from src.POPPy.BindRefl import *
-
-
-import PlotConfig
-
-
-
-pt.rcParams['xtick.top'] = True
-pt.rcParams['ytick.right'] = True
-
-pt.rcParams['xtick.direction'] = "in"
-pt.rcParams['ytick.direction'] = "in"
-
 
 def set_axes_equal(ax):
     """Set 3D plot axes to equal scale.

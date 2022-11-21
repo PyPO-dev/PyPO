@@ -88,15 +88,7 @@ def ex_DRO_PO(device):
 
     result = s.fitGaussAbs(EH.Ex, "planeff", thres=-11)
     print(result)
-    #Psi = s.generateGauss(result, "planeff")
 
-    #pt.imshow(20*np.log10(np.absolute(Psi) / np.max(np.absolute(Psi))), vmin=-30, vmax=0)
-    #pt.show()
-
-    pt.imshow(20*np.log10(np.absolute(EH.Ex) / np.max(np.absolute(EH.Ex))), vmin=-30, vmax=0)
-    pt.show()
-
-    pt.imshow(np.angle(EH.Ex))
-    pt.show()
+    s.plotBeam2D("planeff", EH.Ex)
 if __name__ == "__main__":
     ex_DRO()

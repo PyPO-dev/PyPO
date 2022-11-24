@@ -16,6 +16,7 @@ add_library(poppybeam SHARED common/InterfaceBeam.cpp)
 target_link_libraries(poppybeam PRIVATE poppyrefl)
 
 add_library(poppycpu SHARED CPU/InterfaceCPU.cpp)
+target_include_directories(poppycpu PRIVATE CPU)
 
 if(NOT WIN32)
     target_compile_options(poppycpu PRIVATE -pthread)
@@ -32,6 +33,7 @@ if(CMAKE_CUDA_COMPILER)
     file(GLOB CUDAfiles CUDA/*.cu)
 
     add_library(poppygpu SHARED ${CUDAfiles})
+    target_include_directories(poppygpu PRIVATE CUDA)
     target_link_libraries(poppygpu PRIVATE poppyrefl)
 else()
     message(STATUS "WARNING: no CUDA compiler detected.")

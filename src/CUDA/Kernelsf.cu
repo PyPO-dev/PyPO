@@ -1,29 +1,5 @@
-#include <iostream>
-#include <chrono>
-#include <string>
-#include <iterator>
-#include <cmath>
-#include <array>
-#include <iomanip>
+#include "InterfaceCUDA.h"
 
-#include <cuda.h>
-#include <cuComplex.h>
-#include <cuda_runtime.h>
-#include <unistd.h>
-
-#include "GUtils.h"
-#include "Structs.h"
-#include "InterfaceReflector.h"
-//#include "CompOverload.h"
-
-#define CSIZE 10
-#define MILLISECOND 1000
-
-#ifdef _WIN32
-#   define POPPY_DLL __declspec(dllexport)
-#else
-#   define POPPY_DLL
-#endif
 /* Kernels for single precision PO.
  * Author: Arend Moerman
  * For questions, contact: arendmoerman@gmail.com
@@ -1098,7 +1074,7 @@ __host__ void _arrCUDACToC3(cuFloatComplex* c1arr, cuFloatComplex* c2arr, cuFloa
  * @param h_z Pointer for z array on host.
  * @param size Number of elements of h_x/d_x.
  */
-POPPY_DLL extern "C" void callKernelf_JM(c2Bundlef *res, reflparamsf source, reflparamsf target,
+void callKernelf_JM(c2Bundlef *res, reflparamsf source, reflparamsf target,
                                 reflcontainerf *cs, reflcontainerf *ct,
                                 c2Bundlef *currents,
                                 float k, float epsilon,
@@ -1282,7 +1258,7 @@ POPPY_DLL extern "C" void callKernelf_JM(c2Bundlef *res, reflparamsf source, ref
  * @param h_z Pointer for z array on host.
  * @param size Number of elements of h_x/d_x.
  */
-POPPY_DLL extern "C" void callKernelf_EH(c2Bundlef *res, reflparamsf source, reflparamsf target,
+void callKernelf_EH(c2Bundlef *res, reflparamsf source, reflparamsf target,
                                 reflcontainerf *cs, reflcontainerf *ct,
                                 c2Bundlef *currents,
                                 float k, float epsilon,
@@ -1446,7 +1422,7 @@ POPPY_DLL extern "C" void callKernelf_EH(c2Bundlef *res, reflparamsf source, ref
  * @param h_z Pointer for z array on host.
  * @param size Number of elements of h_x/d_x.
  */
-POPPY_DLL extern "C" void callKernelf_JMEH(c4Bundlef *res, reflparamsf source, reflparamsf target,
+void callKernelf_JMEH(c4Bundlef *res, reflparamsf source, reflparamsf target,
                                 reflcontainerf *cs, reflcontainerf *ct,
                                 c2Bundlef *currents,
                                 float k, float epsilon,
@@ -1662,7 +1638,7 @@ POPPY_DLL extern "C" void callKernelf_JMEH(c4Bundlef *res, reflparamsf source, r
  * @param h_z Pointer for z array on host.
  * @param size Number of elements of h_x/d_x.
  */
-POPPY_DLL extern "C" void callKernelf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf target,
+void callKernelf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf target,
                                 reflcontainerf *cs, reflcontainerf *ct,
                                 c2Bundlef *currents,
                                 float k, float epsilon,
@@ -1859,7 +1835,7 @@ POPPY_DLL extern "C" void callKernelf_EHP(c2rBundlef *res, reflparamsf source, r
  * @param h_z Pointer for z array on host.
  * @param size Number of elements of h_x/d_x.
  */
-POPPY_DLL extern "C" void callKernelf_FF(c2Bundlef *res, reflparamsf source, reflparamsf target,
+void callKernelf_FF(c2Bundlef *res, reflparamsf source, reflparamsf target,
                                 reflcontainerf *cs, reflcontainerf *ct,
                                 c2Bundlef *currents,
                                 float k, float epsilon,

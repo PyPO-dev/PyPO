@@ -17,7 +17,7 @@ from src.POPPy.POPPyTypes import *
 def loadBeamlib():
     try:
         LD_PATH = pathlib.Path(__file__).parents[2]/"out/build/Debug"
-        lib = ctypes.CDLL(LD_PATH/"poppybeam.dll")
+        lib = ctypes.CDLL(str(LD_PATH/"poppybeam.dll"))
     except:
         LD_PATH = pathlib.Path(__file__).parents[2]/"out/build"
         lib = ctypes.CDLL(LD_PATH/"libpoppybeam.so")

@@ -18,7 +18,7 @@ import threading
 def loadCPUlib():
     try:
         LD_PATH = pathlib.Path(__file__).parents[2]/"out/build/Debug"
-        lib = ctypes.CDLL(LD_PATH/"poppycpu.dll")
+        lib = ctypes.CDLL(str(LD_PATH/"poppycpu.dll"))
     except:
         LD_PATH = pathlib.Path(__file__).parents[2]/"out/build"
         lib = ctypes.CDLL(LD_PATH/"libpoppycpu.so")

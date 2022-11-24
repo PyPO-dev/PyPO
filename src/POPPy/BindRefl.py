@@ -17,7 +17,7 @@ from src.POPPy.POPPyTypes import *
 def loadRefllib():
     try:
         LD_PATH = pathlib.Path(__file__).parents[2]/"out/build/Debug"
-        lib = ctypes.CDLL(LD_PATH/"poppyrefl.dll")
+        lib = ctypes.CDLL(str(LD_PATH/"poppyrefl.dll"))
     except:
         LD_PATH = pathlib.Path(__file__).parents[2]/"out/build"
         lib = ctypes.CDLL(LD_PATH/"libpoppyrefl.so")

@@ -18,6 +18,11 @@
 
 #define CSIZERT 5
 
+#ifdef _WIN32
+#   define POPPY_DLL __declspec(dllexport)
+#else
+#   define POPPY_DLL
+#endif
 /* Kernels for single precision PO.
  * Author: Arend Moerman
  * For questions, contact: arendmoerman@gmail.com
@@ -445,7 +450,7 @@ __global__ void propagateRaysToPl(float *xs, float *ys, float *zs,
     }
 }
 
-extern "C" void callRTKernel(reflparamsf ctp, cframef *fr_in,
+POPPY_DLL extern "C" void callRTKernel(reflparamsf ctp, cframef *fr_in,
                             cframef *fr_out, float epsilon, float t0,
                             int nBlocks, int nThreads)
 {

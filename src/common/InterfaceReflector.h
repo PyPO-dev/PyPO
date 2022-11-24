@@ -3,11 +3,17 @@
 #ifndef __InterfaceReflector_h
 #define __InterfaceReflector_h
 
+#ifdef _WIN32
+#   define POPPY_DLL __declspec(dllexport)
+#else
+#   define POPPY_DLL
+#endif
+
 extern "C"
 {
-    void generateGrid(reflparams refl, reflcontainer *container,
+    POPPY_DLL void generateGrid(reflparams refl, reflcontainer *container,
                       bool transform=true, bool spheric=true);
-    void generateGridf(reflparamsf refl, reflcontainerf *container,
+    POPPY_DLL void generateGridf(reflparamsf refl, reflcontainerf *container,
                       bool transform=true, bool spheric=true);
 }
 #endif

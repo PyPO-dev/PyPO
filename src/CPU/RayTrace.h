@@ -152,7 +152,7 @@ void RayTracer<T, U, V>::propagateRaysToP(int start, int stop,
         fr_out->dy[i] = dy - 2*check*norms[1];
         fr_out->dz[i] = dz - 2*check*norms[2];
 
-        if((i * 100 / this->step) > jc and start == 0 * this->step)
+        if((i * 100 / this->step) > jc && start == 0 * this->step)
         {
             std::cout << jc << " / 100" << '\r';
             std::cout.flush();

@@ -1,6 +1,7 @@
 import ctypes
 import numpy as np
 import os
+import sys
 from src.POPPy.BindUtils import allfill_reflparams, allocate_reflcontainer, creflToObj
 from src.POPPy.Structs import *
 from src.POPPy.POPPyTypes import *
@@ -13,7 +14,9 @@ from src.POPPy.POPPyTypes import *
 
 def loadRefllib():
     try:
-        lib = ctypes.CDLL("libpoppyrefl")
+        LD_PATH = os.path.dirname(os.path.join(os.path.abspath(__file__), "..", "..", "out", "build", "Debug"))
+        sys.platlibdir += [LD_PATH]
+        lib = ctypes.CDLL("poppyrefl.dll")
     except:
         lib = ctypes.CDLL("libpoppyrefl.so")
     return lib

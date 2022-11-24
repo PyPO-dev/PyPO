@@ -2,6 +2,7 @@ import ctypes
 import math
 import numpy as np
 import os
+import sys
 from src.POPPy.BindUtils import *
 from src.POPPy.Structs import *
 from src.POPPy.POPPyTypes import *
@@ -16,7 +17,9 @@ import threading
 
 def loadGPUlib():
     try:
-        lib = ctypes.CDLL("libpoppygpu")
+        LD_PATH = os.path.dirname(os.path.join(os.path.abspath(__file__), "..", "..", "out", "build", "Debug"))
+        sys.platlibdir += [LD_PATH]
+        lib = ctypes.CDLL("poppygpu.dll")
 
     except:
         lib = ctypes.CDLL("libpoppygpu.so")

@@ -1,6 +1,7 @@
 import ctypes
 import numpy as np
 import os
+import sys
 from src.POPPy.BindUtils import *
 from src.POPPy.Structs import *
 from src.POPPy.POPPyTypes import *
@@ -15,7 +16,9 @@ import threading
 
 def loadCPUlib():
     try:
-        lib = ctypes.CDLL("libpoppycpu")
+        LD_PATH = os.path.dirname(os.path.join(os.path.abspath(__file__), "..", "..", "out", "build", "Debug"))
+        sys.platlibdir += [LD_PATH]
+        lib = ctypes.CDLL("poppycpu.dll")
 
     except:
         lib = ctypes.CDLL("libpoppycpu.so")

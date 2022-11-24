@@ -97,7 +97,7 @@ def check_ElemDict(elemDict):
                     errStr += errMsg_field("focus_2", elemDict["name"])
                 
                 if "ecc" in elemDict:
-                    if not (isinstance(elemDict["ecc"], float) or isinstance(elemDict["ecc"], int)):
+                    if not ((isinstance(elemDict["ecc"], float) or isinstance(elemDict["ecc"], int))):
                         errStr += errMsg_type("ecc", type(elemDict["ecc"]), elemDict["name"], [float, int])
 
                     elif elemDict["type"] == 1:
@@ -129,12 +129,12 @@ def check_ElemDict(elemDict):
 
     elif elemDict["type"] == 3:
         if "ecc" in elemDict:
-            if not (isinstance(elemDict["ecc"], float) or isinstance(elemDict["ecc"], int)):
-                errStr += errMsg_type("ecc", type(elemDict["ecc"]), elemDict["name"], [float, int])
+            #if not (isinstance(elemDict["ecc"], float) and not isinstance(elemDict["ecc"], int)):
+            #    errStr += errMsg_type("ecc", type(elemDict["ecc"]), elemDict["name"], [float, int])
 
-            elif elemDict["ecc"] < 0 or elemDict["ecc"] >= 1:
-                errStr += errMsg_value("ecc", elemDict["ecc"], elemDict["name"])
-            
+            #elif elemDict["ecc"] < 0 or elemDict["ecc"] >= 1:
+            #    errStr += errMsg_value("ecc", elemDict["ecc"], elemDict["name"])
+            pass
         else:
             errStr += errMsg_field("ecc", elemDict["name"])
 
@@ -225,10 +225,10 @@ def check_ElemDict(elemDict):
         elif not elemDict["gridsize"].shape == (2,):
             errStr += errMsg_shape("gridsize", elemDict["gridsize"], elemDict["name"], "(2,)")
 
-        if not isinstance(elemDict["gridsize"][0], np.int64) or isinstance(elemDict["gridsize"][0], np.int32):
+        if not (isinstance(elemDict["gridsize"][0], np.int64) or isinstance(elemDict["gridsize"][0], np.int32)):
             errStr += errMsg_type("gridsize[0]", type(elemDict["gridsize"][0]), elemDict["name"], [np.int64, np.int32])
 
-        if not isinstance(elemDict["gridsize"][1], np.int64) or isinstance(elemDict["gridsize"][0], np.int32):
+        if not (isinstance(elemDict["gridsize"][1], np.int64) or isinstance(elemDict["gridsize"][1], np.int32)):
             errStr += errMsg_type("gridsize[1]", type(elemDict["gridsize"][1]), elemDict["name"], [np.int64, np.int32])
     
     if errStr:
@@ -253,7 +253,7 @@ def check_RTDict(RTDict):
 
 
     if "angx" in RTDict:
-        if not (isinstance(RTDict["angx"], float) or isinstance(RTDict["angx"], int)):
+        if not ((isinstance(RTDict["angx"], float) or isinstance(RTDict["angx"], int))):
             errStr += errMsg_type("angx", type(RTDict["angx"]), "RTDict", [float, int])
 
     else:
@@ -261,7 +261,7 @@ def check_RTDict(RTDict):
 
 
     if "angy" in RTDict:
-        if not (isinstance(RTDict["angy"], float) or isinstance(RTDict["angy"], int)):
+        if not ((isinstance(RTDict["angy"], float) or isinstance(RTDict["angy"], int))):
             errStr += errMsg_type("angy", type(RTDict["angy"]), "RTDict", [float, int])
 
     else:
@@ -269,7 +269,7 @@ def check_RTDict(RTDict):
 
 
     if "a" in RTDict:
-        if not (isinstance(RTDict["a"], float) or isinstance(RTDict["a"], int)):
+        if not ((isinstance(RTDict["a"], float) or isinstance(RTDict["a"], int))):
             errStr += errMsg_type("a", type(RTDict["a"]), "RTDict", [float, int])
 
     else:
@@ -277,7 +277,7 @@ def check_RTDict(RTDict):
 
 
     if "b" in RTDict:
-        if not (isinstance(RTDict["b"], float) or isinstance(RTDict["b"], int)):
+        if not ((isinstance(RTDict["b"], float) or isinstance(RTDict["b"], int))):
             errStr += errMsg_type("b", type(RTDict["b"]), "RTDict", [float, int])
 
     else:

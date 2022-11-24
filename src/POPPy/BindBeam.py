@@ -2,6 +2,7 @@ import ctypes
 import math
 import numpy as np
 import os
+import sys
 from src.POPPy.BindUtils import *
 from src.POPPy.Structs import *
 from src.POPPy.POPPyTypes import *
@@ -14,7 +15,10 @@ from src.POPPy.POPPyTypes import *
 
 def loadBeamlib():
     try:
-        lib = ctypes.CDLL("libpoppybeam")
+        LD_PATH = os.path.dirname(os.path.join(os.path.abspath(__file__), "..", "..", "out", "build", "Debug"))
+        sys.platlibdir += [LD_PATH]
+
+        lib = ctypes.CDLL("poppybeam.dll")
     except:
         lib = ctypes.CDLL("libpoppybeam.so")
 

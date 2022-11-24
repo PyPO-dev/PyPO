@@ -25,7 +25,7 @@ python Build.py --make
 This will check if you have CUDA installed. It will also generate the build instructions.
 Then install by running:
 ```
-python Build.py --enable-cuda
+python Build.py --install
 ```
 For an overview of build options, run:
 ```

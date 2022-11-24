@@ -3,6 +3,7 @@ import math
 import numpy as np
 import os
 import sys
+import pathlib
 from src.POPPy.BindUtils import *
 from src.POPPy.Structs import *
 from src.POPPy.POPPyTypes import *
@@ -17,12 +18,11 @@ import threading
 
 def loadGPUlib():
     try:
-        LD_PATH = os.path.dirname(os.path.join(os.path.abspath(__file__), "..", "..", "out", "build", "Debug"))
-        sys.platlibdir += [LD_PATH]
-        lib = ctypes.CDLL("poppygpu.dll")
-
+        LD_PATH = pathlib.Path(__file__).parents[2]/"out/build/Debug"
+        lib = ctypes.CDLL(LD_PATH/"poppygpu.dll")
     except:
-        lib = ctypes.CDLL("libpoppygpu.so")
+        LD_PATH = pathlib.Path(__file__).parents[2]/"out/build"
+        lib = ctypes.CDLL(LD_PATH/"libpoppygpu.so")
 
     lib.callKernelf_JM.argtypes = [ctypes.POINTER(c2Bundlef), reflparamsf, reflparamsf,
                                    ctypes.POINTER(reflcontainerf), ctypes.POINTER(reflcontainerf),

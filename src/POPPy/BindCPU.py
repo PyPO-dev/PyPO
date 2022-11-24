@@ -2,6 +2,7 @@ import ctypes
 import numpy as np
 import os
 import sys
+import pathlib
 from src.POPPy.BindUtils import *
 from src.POPPy.Structs import *
 from src.POPPy.POPPyTypes import *
@@ -16,12 +17,12 @@ import threading
 
 def loadCPUlib():
     try:
-        LD_PATH = os.path.dirname(os.path.join(os.path.abspath(__file__), "..", "..", "out", "build", "Debug"))
-        sys.platlibdir += [LD_PATH]
-        lib = ctypes.CDLL("poppycpu.dll")
-
+        LD_PATH = pathlib.Path(__file__).parents[2]/"out/build/Debug"
+        lib = ctypes.CDLL(LD_PATH/"poppycpu.dll")
     except:
-        lib = ctypes.CDLL("libpoppycpu.so")
+        LD_PATH = pathlib.Path(__file__).parents[2]/"out/build"
+        lib = ctypes.CDLL(LD_PATH/"libpoppycpu.so")
+
     lib.propagateToGrid_JM.argtypes = [ctypes.POINTER(c2Bundle), reflparams, reflparams,
                                         ctypes.POINTER(reflcontainer), ctypes.POINTER(reflcontainer),
                                         ctypes.POINTER(c2Bundle),ctypes.c_double, ctypes.c_int,

@@ -225,11 +225,11 @@ def check_ElemDict(elemDict):
         elif not elemDict["gridsize"].shape == (2,):
             errStr += errMsg_shape("gridsize", elemDict["gridsize"], elemDict["name"], "(2,)")
 
-        if not isinstance(elemDict["gridsize"][0], np.int64):
-            errStr += errMsg_type("gridsize[0]", type(elemDict["gridsize"][0]), elemDict["name"], np.int64)
+        if not isinstance(elemDict["gridsize"][0], np.int64) or isinstance(elemDict["gridsize"][0], np.int32):
+            errStr += errMsg_type("gridsize[0]", type(elemDict["gridsize"][0]), elemDict["name"], [np.int64, np.int32])
 
-        if not isinstance(elemDict["gridsize"][1], np.int64):
-            errStr += errMsg_type("gridsize[1]", type(elemDict["gridsize"][1]), elemDict["name"], np.int64)
+        if not isinstance(elemDict["gridsize"][1], np.int64) or isinstance(elemDict["gridsize"][0], np.int32):
+            errStr += errMsg_type("gridsize[1]", type(elemDict["gridsize"][1]), elemDict["name"], [np.int64, np.int32])
     
     if errStr:
         raise InputReflError(errStr)

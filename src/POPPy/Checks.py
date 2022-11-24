@@ -129,11 +129,11 @@ def check_ElemDict(elemDict):
 
     elif elemDict["type"] == 3:
         if "ecc" in elemDict:
-            #if not (isinstance(elemDict["ecc"], float) and not isinstance(elemDict["ecc"], int)):
-            #    errStr += errMsg_type("ecc", type(elemDict["ecc"]), elemDict["name"], [float, int])
+            if not ((isinstance(elemDict["ecc"], float) or isinstance(elemDict["ecc"], int))):
+                errStr += errMsg_type("ecc", type(elemDict["ecc"]), elemDict["name"], [float, int])
 
-            #elif elemDict["ecc"] < 0 or elemDict["ecc"] >= 1:
-            #    errStr += errMsg_value("ecc", elemDict["ecc"], elemDict["name"])
+            elif elemDict["ecc"] < 0 or elemDict["ecc"] >= 1:
+                errStr += errMsg_value("ecc", elemDict["ecc"], elemDict["name"])
             pass
         else:
             errStr += errMsg_field("ecc", elemDict["name"])

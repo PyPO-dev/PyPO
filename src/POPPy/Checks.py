@@ -100,10 +100,17 @@ def check_ElemDict(elemDict):
                     if not (isinstance(elemDict["ecc"], float) or isinstance(elemDict["ecc"], int)):
                         errStr += errMsg_type("ecc", type(elemDict["ecc"]), elemDict["name"], [float, int])
 
+                    elif elemDict["type"] == 1:
+                        if elemDict["ecc"] <= 1:
+                            errStr += errMsg_value("ecc", elemDict["ecc"], elemDict["name"])
+
+                    elif elemDict["type"] == 2:
+                        if elemDict["ecc"] < 0 or elemDict["ecc"] >= 1:
+                            errStr += errMsg_value("ecc", elemDict["ecc"], elemDict["name"])
+                
                 else:
                     errStr += errMsg_field("ecc", elemDict["name"])
-
-
+            
             elif elemDict["pmode"] == "manual":
                 if "coeffs" in elemDict:
                     if not isinstance(elemDict["coeffs"], np.ndarray):
@@ -119,6 +126,17 @@ def check_ElemDict(elemDict):
             else:
                 args = ["focus", "manual"]
                 errStr += errMsg_option("pmode", elemDict["pmode"], elemDict["name"], args=args)
+
+    elif elemDict["type"] == 3:
+        if "ecc" in elemDict:
+            if not (isinstance(elemDict["ecc"], float) or isinstance(elemDict["ecc"], int)):
+                errStr += errMsg_type("ecc", type(elemDict["ecc"]), elemDict["name"], [float, int])
+
+            elif elemDict["ecc"] < 0 or elemDict["ecc"] >= 1:
+                errStr += errMsg_value("ecc", elemDict["ecc"], elemDict["name"])
+            
+        else:
+            errStr += errMsg_field("ecc", elemDict["name"])
 
     if "gmode" in elemDict:
         if elemDict["gmode"] == "xy":

@@ -1,6 +1,6 @@
 import ctypes
 import numpy as np
-
+import os
 from src.POPPy.BindUtils import *
 from src.POPPy.Structs import *
 from src.POPPy.POPPyTypes import *
@@ -14,8 +14,11 @@ import threading
 #############################################################################
 
 def loadCPUlib():
-    lib = ctypes.CDLL('./src/libpoppycpu.so')
+    try:
+        lib = ctypes.CDLL("libpoppycpu")
 
+    except:
+        lib = ctypes.CDLL("libpoppycpu.so")
     lib.propagateToGrid_JM.argtypes = [ctypes.POINTER(c2Bundle), reflparams, reflparams,
                                         ctypes.POINTER(reflcontainer), ctypes.POINTER(reflcontainer),
                                         ctypes.POINTER(c2Bundle),ctypes.c_double, ctypes.c_int,

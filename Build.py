@@ -7,19 +7,11 @@ def BuildPOPPy():
     # Parse command line input
 
     helpf   = sys.argv.count("--help") or sys.argv.count("-h")
-    cuda    = sys.argv.count("--enable-cuda") or sys.argv.count("-ec")
-    verbose = sys.argv.count("--verbose") or sys.argv.count("-v")
-    clean   = sys.argv.count("--clean") or sys.argv.count("-c")
     prereq  = sys.argv.count("--prereqs") or sys.argv.count("-p")
-    cmake   = sys.argv.count("--cmake")
-    cmakec  = sys.argv.count("--cmake-clean")
-
-    if verbose:
-        stream = ""
-    else:
-        stream = " > /dev/null"
-
-
+    cmake   = sys.argv.count("--make")
+    cinstall = sys.argv.count("--install")
+    cmakec  = sys.argv.count("--clean")
+    
     if cmakec:
         print("Cleaning CMake build directory...")
         dir_build = os.path.join(os.getcwd(), "out", "build")
@@ -27,6 +19,18 @@ def BuildPOPPy():
         return 0
 
     if cmake:
+        print("Configuring POPPy using CMake...")
+        dir_lists = os.path.join(os.getcwd(), "src")
+        dir_build = os.path.join(os.getcwd(), "out", "build")
+
+        if not os.path.exists(dir_build):
+            os.makedirs(dir_build)
+
+        os.system(f"cmake -S {dir_lists} -B {dir_build} -DCMAKE_BUILD_TYPE=Release")#.format(dir_lists, dir_build))
+
+        return 0
+
+    if cinstall:
         print("Building POPPy using CMake...")
         dir_lists = os.path.join(os.getcwd(), "src")
         dir_build = os.path.join(os.getcwd(), "out", "build")
@@ -34,15 +38,12 @@ def BuildPOPPy():
         if not os.path.exists(dir_build):
             os.makedirs(dir_build)
 
-        os.system("cmake -S {} -B {}".format(dir_lists, dir_build))
+        os.system(f"cmake --build {dir_build}")#.format(dir_lists, dir_build))
 
         return 0
-
     if helpf:
         print("POPPy build interface list of options:")
         print("'--help', '-h'           : get build options.")
-        print("'--enable-cuda', '-ec'   : enable CUDA compilation.")
-        print("'--verbose', '-v'        : enable verbose compiler output.")
         print("'--clean', '-c'          : remove POPPy objects and libraries.")
         print("'--prereqs', '-p'        : install POPPy prerequisites.")
         return 0
@@ -58,40 +59,5 @@ def BuildPOPPy():
         except:
             return 1
             
-
-    if clean:
-        try:
-            print("Removing POPPy objects and libraries...")
-            os.chdir(pathToBuild)
-            os.system("make clean" + stream)
-            print("Succesfully removed POPPy objects and libraries!")
-            return 0
-        except:
-            return 1
-
-    if cuda: 
-        try:
-            print("Compiling POPPy, enabling CUDA...")
-            
-            os.chdir(pathToBuild)
-            os.system("make all" + stream)
-            print("Succesfully compiled POPPy, CUDA enabled!")
-            return 0
-        except:
-            return 1
-
-    else: 
-        try:
-            print("Compiling POPPy, disabling CUDA...")
-            
-            os.chdir(pathToBuild)
-            os.system("make cpu" + stream)
-            print("Succesfully compiled POPPy, CUDA disabled!")
-            return 0
-        except:
-            return 1
-
-    return 0
-
 if __name__ == "__main__":
 	BuildPOPPy()

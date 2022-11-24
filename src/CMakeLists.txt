@@ -16,10 +16,12 @@ add_library(poppybeam SHARED common/InterfaceBeam.cpp)
 target_link_libraries(poppybeam PRIVATE poppyrefl)
 
 add_library(poppycpu SHARED CPU/InterfaceCPU.cpp)
-target_compile_options(poppycpu PRIVATE -pthread)
-target_link_libraries(poppycpu PRIVATE poppyrefl)
 
-option(ENABLE_CUDA "CUDA library for POPPy." OFF)
+if(NOT WIN32)
+    target_compile_options(poppycpu PRIVATE -pthread)
+endif()
+
+target_link_libraries(poppycpu PRIVATE poppyrefl)
 
 include(CheckLanguage)
 

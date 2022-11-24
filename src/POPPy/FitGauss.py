@@ -7,16 +7,16 @@ from functools import partial
 from src.POPPy.POPPyTypes import *
 from src.POPPy.BindRefl import *
 
-def calcEstimates(x, y, area, field_norm_dB):
+def calcEstimates(x, y, area, field_norm):
 
-    M0 = np.sum(field_norm_dB)
+    M0 = np.sum(field_norm)
 
-    xm = np.sum(x * field_norm_dB) / M0
-    ym = np.sum(y * field_norm_dB) / M0
+    xm = np.sum(x * field_norm) / M0
+    ym = np.sum(y * field_norm) / M0
 
-    Mxx = np.sum(x**2 * field_norm_dB - xm**2) / M0
-    Myy = np.sum(y**2 * field_norm_dB - ym**2) / M0
-    Mxy = np.sum(x*y * field_norm_dB - xm*ym) / M0
+    Mxx = np.sum(x**2 * field_norm - xm**2) / M0
+    Myy = np.sum(y**2 * field_norm - ym**2) / M0
+    Mxy = np.sum(x*y * field_norm - xm*ym) / M0
 
     D = 1 / (2 * (Mxx*Myy - Mxy**2))
 
@@ -46,14 +46,20 @@ def fitGaussAbs(field, surfaceObject, thres):
 
     x = grids.x
     y = grids.y
+
+    #pt.imshow(x)
+    #pt.show()
+    
     area = grids.area
 
-    field_norm = np.absolute(field) / np.max(np.absolute(field))
-    mask_f = 20*np.log10(field_norm) >= thres
-    field_est = 20 * np.log10(field_norm[mask_f])
-    x0, y0, xs, ys, theta = calcEstimates(x[mask_f], y[mask_f], area[mask_f], field_est)
+    mask_f = np.absolute(field) >= 10**(thres/20) * np.max(np.absolute(field))
 
-    #pt.imshow(field_norm * mask_f)
+    field /= np.max(np.absolute(field))
+
+    field_est = field[mask_f]
+    x0, y0, xs, ys, theta = calcEstimates(x[mask_f], y[mask_f], area[mask_f], field_est)
+    print("Initial estimate from image moments:\nmu_x = {}, mu_y = {}\nTheta = {}".format(xs, ys, theta))
+    #pt.imshow(np.absolute(field) * mask_f)
     #pt.show()
 
     p0 = [x0, y0, xs, ys, theta]
@@ -62,11 +68,12 @@ def fitGaussAbs(field, surfaceObject, thres):
     
     bounds = ([np.finfo(float).eps, np.finfo(float).eps, -np.inf, -np.inf, theta-np.pi/2], 
             [np.inf, np.inf, np.inf, np.inf, theta+np.pi/2])
-    couplingMasked = partial(GaussAbs, mask_f, "dB")
+    couplingMasked = partial(GaussAbs, mask_f, "linear")
 
     popt, pcov = opt.curve_fit(couplingMasked, xy, field_est.ravel(), p0, bounds=bounds)
     perr = np.sqrt(np.diag(pcov))
 
+    print("Fitted shift and rotation:\nmu_x = {}, mu_y = {}\nTheta = {}".format(popt[-3], popt[-2], popt[-1]))
     return popt, perr
 
 #def couplingAbs(pars, *args):
@@ -105,6 +112,7 @@ def GaussAbs(mask, mode, xy, x0, y0, xs, ys, theta):
     elif mode == "linear":
 
         Psi = np.exp(-(a*(x - xs)**2 + 2*c*(x - xs)*(y - ys) + b*(y - ys)**2))
+        #Psi = np.exp(-(x)**2/(2*x0**2) - (y)**2/(2*y0**2))
 
     #Psi = np.exp(-(((x-xs)/x0*np.cos(theta) + (y-ys)/y0*np.sin(theta)))**2 -(((x-xs)/x0*np.sin(theta) + (y-ys)/y0*np.cos(theta)))**2) * mask
 

@@ -1,7 +1,7 @@
 import ctypes
 import math
 import numpy as np
-
+import os
 from src.POPPy.BindUtils import *
 from src.POPPy.Structs import *
 from src.POPPy.POPPyTypes import *
@@ -15,7 +15,11 @@ import threading
 #############################################################################
 
 def loadGPUlib():
-    lib = ctypes.CDLL('./src/libpoppygpu.so')
+    try:
+        lib = ctypes.CDLL("libpoppygpu")
+
+    except:
+        lib = ctypes.CDLL("libpoppygpu.so")
 
     lib.callKernelf_JM.argtypes = [ctypes.POINTER(c2Bundlef), reflparamsf, reflparamsf,
                                    ctypes.POINTER(reflcontainerf), ctypes.POINTER(reflcontainerf),

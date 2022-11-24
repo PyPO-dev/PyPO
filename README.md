@@ -30,6 +30,11 @@ For an overview of build options, run:
 ```
 python Build.py --help
 ```
+To include POPPy from anywhere, the following two lines should be added to your .bashrc file:
+``` 
+export PYTHONPATH=${PYTHONPATH}:<absolue/path/to/POPPy>
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:<absolute/path/to/POPPy>/src
+```
 
 -- TESTING --\
 To run the Python unittests, go to the main POPPy directory and from there run:

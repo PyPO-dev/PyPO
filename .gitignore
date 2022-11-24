@@ -136,9 +136,13 @@ dmypy.json
 images/
 save/
 custom/
+out/
 
 # User-specific files
 log
+*.jpg
+*.pdf
+*.png
 
 # Personal projects/files
 personal/

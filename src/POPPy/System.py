@@ -25,6 +25,11 @@ import src.POPPy.Plotter as plt
 import src.POPPy.Efficiencies as effs
 import src.POPPy.FitGauss as fgs
 
+from pathlib import Path
+
+# Set POPPy absolute root path
+sysPath = Path(__file__).parents[2]
+
 class NpEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.integer):
@@ -36,12 +41,12 @@ class NpEncoder(json.JSONEncoder):
         return super(NpEncoder, self).default(obj)
 
 class System(object):
-    customBeamPath = './custom/beam/'
-    customReflPath = './custom/reflector/'
+    customBeamPath = os.path.join(sysPath, "custom", "beam")
+    customReflPath = os.path.join(sysPath, "custom", "reflector")
 
-    savePathElem = './save/elements/'
-    savePathFields = './save/fields/'
-    savePathCurrents = './save/currents/'
+    savePathElem = os.path.join(sysPath, "save", "elements")
+    savePathFields = os.path.join(sysPath, "save", "fields")
+    savePathCurrents = os.path.join(sysPath, "save", "currents")
 
     def __init__(self):
         self.num_ref = 0
@@ -63,7 +68,7 @@ class System(object):
         elif not saveCurrentsExist:
             os.makedirs(self.savePathCurrents)
 
-        self.savePath = './images/'
+        self.savePath = os.path.join(sysPath, "images")
 
         existSave = os.path.isdir(self.savePath)
 
@@ -75,13 +80,13 @@ class System(object):
 
     def setCustomBeamPath(self, path, append=False):
         if append:
-            self.customBeamPath += path
+            self.customBeamPath = os.path.join(self.customBeamPath, path)
         else:
             self.customBeamPath = path
 
     def setCustomReflPath(self, path, append=False):
         if append:
-            self.customReflPath += path
+            self.customReflPath = os.path.join(self.customReflPath, path)
         else:
             self.customReflPath = path
 
@@ -246,6 +251,9 @@ class System(object):
 
         if reflDict["name"] == "Plane":
             reflDict["name"] = reflDict["name"] + "_{}".format(self.num_ref)
+        
+        if not "ecc" in reflDict:
+            reflDict["ecc"] = 0
 
         reflDict["type"] = 3
         reflDict["transf"] = np.eye(4)
@@ -293,52 +301,52 @@ class System(object):
     def saveElement(self, name):
         jsonDict = copyGrid(self.system[name])
         
-        with open('./{}{}.json'.format(self.savePathElem, name), 'w') as f:
+        with open('{}.json'.format(os.path.join(self.savePathElem, name)), 'w') as f:
             json.dump(jsonDict, f, cls=NpEncoder)
 
     def saveFields(self, fields, name_fields):
-        saveDir = self.savePathFields + name_fields + "/"
+        saveDir = os.path.join(self.savePathFields, name_fields)
 
         saveDirExist = os.path.isdir(saveDir)
 
         if not saveDirExist:
             os.makedirs(saveDir)
 
-        np.save(saveDir + "Ex.npy", fields.Ex)
-        np.save(saveDir + "Ey.npy", fields.Ey)
-        np.save(saveDir + "Ez.npy", fields.Ez)
+        np.save(os.path.join(saveDir, "Ex.npy"), fields.Ex)
+        np.save(os.path.join(saveDir, "Ey.npy"), fields.Ey)
+        np.save(os.path.join(saveDir, "Ez.npy"), fields.Ez)
 
-        np.save(saveDir + "Hx.npy", fields.Hx)
-        np.save(saveDir + "Hy.npy", fields.Hy)
-        np.save(saveDir + "Hz.npy", fields.Hz)
+        np.save(os.path.join(saveDir, "Hx.npy"), fields.Hx)
+        np.save(os.path.join(saveDir, "Hy.npy"), fields.Hy)
+        np.save(os.path.join(saveDir, "Hz.npy"), fields.Hz)
 
     def saveCurrents(self, currents, name_currents):
-        saveDir = self.savePathCurrents + name_currents + "/"
+        saveDir = os.path.join(self.savePathCurrents, name_currents)
 
         saveDirExist = os.path.isdir(saveDir)
 
         if not saveDirExist:
             os.makedirs(saveDir)
 
-        np.save(saveDir + "Jx.npy", currents.Jx)
-        np.save(saveDir + "Jy.npy", currents.Jy)
-        np.save(saveDir + "Jz.npy", currents.Jz)
+        np.save(os.path.join(saveDir, "Jx.npy"), currents.Jx)
+        np.save(os.path.join(saveDir, "Jy.npy"), currents.Jy)
+        np.save(os.path.join(saveDir, "Jz.npy"), currents.Jz)
 
-        np.save(saveDir + "Mx.npy", currents.Mx)
-        np.save(saveDir + "My.npy", currents.My)
-        np.save(saveDir + "Mz.npy", currents.Mz)
+        np.save(os.path.join(saveDir, "Mx.npy"), currents.Mx)
+        np.save(os.path.join(saveDir, "My.npy"), currents.My)
+        np.save(os.path.join(saveDir, "Mz.npy"), currents.Mz)
 
     def loadCurrents(self, name_currents):
         try:
-            loadDir = self.savePathCurrents + name_currents + "/"
+            loadDir = os.path.join(self.savePathCurrents, name_currents)
 
-            Jx = np.load(loadDir + "Jx.npy")
-            Jy = np.load(loadDir + "Jy.npy")
-            Jz = np.load(loadDir + "Jz.npy")
+            Jx = np.load(os.path.join(loadDir, "Jx.npy"))
+            Jy = np.load(os.path.join(loadDir, "Jy.npy"))
+            Jz = np.load(os.path.join(loadDir, "Jz.npy"))
 
-            Mx = np.load(loadDir + "Mx.npy")
-            My = np.load(loadDir + "My.npy")
-            Mz = np.load(loadDir + "Mz.npy")
+            Mx = np.load(os.path.join(loadDir, "Mx.npy"))
+            My = np.load(os.path.join(loadDir, "My.npy"))
+            Mz = np.load(os.path.join(loadDir, "Mz.npy"))
 
             out = currents(Jx, Jy, Jz, Mx, My, Mz)
             return out
@@ -348,7 +356,7 @@ class System(object):
             return 1
 
     def loadElement(self, name):
-        with open('./{}{}.json'.format(self.savePathElem, name), 'r') as f:
+        with open('{}.json'.format(os.path.join(self.savePathElem, name)), 'r') as f:
             elem = json.load(f)
 
         for key, value in elem.items():
@@ -361,8 +369,8 @@ class System(object):
         return elem
 
     def readCustomBeam(self, name_beam, name_source, comp, convert_to_current=True, normalise=True, mode="PMC", scale=1000):
-        rfield = np.loadtxt(self.customBeamPath + "r" + name_beam + ".txt")
-        ifield = np.loadtxt(self.customBeamPath + "i" + name_beam + ".txt")
+        rfield = np.loadtxt(os.path.join(self.customBeamPath, "r" + name_beam + ".txt"))
+        ifield = np.loadtxt(os.path.join(self.customBeamPath, "i" + name_beam + ".txt"))
 
         field = rfield + 1j*ifield
 

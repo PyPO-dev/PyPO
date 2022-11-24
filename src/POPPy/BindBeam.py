@@ -1,7 +1,7 @@
 import ctypes
 import math
 import numpy as np
-
+import os
 from src.POPPy.BindUtils import *
 from src.POPPy.Structs import *
 from src.POPPy.POPPyTypes import *
@@ -13,7 +13,10 @@ from src.POPPy.POPPyTypes import *
 #############################################################################
 
 def loadBeamlib():
-    lib = ctypes.CDLL('./src/libpoppybeam.so')
+    try:
+        lib = ctypes.CDLL("libpoppybeam")
+    except:
+        lib = ctypes.CDLL("libpoppybeam.so")
 
     lib.makeRTframe.argtypes = [RTDict, ctypes.POINTER(cframe)]
     lib.makeRTframe.restype = None

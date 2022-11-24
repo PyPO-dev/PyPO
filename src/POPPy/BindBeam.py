@@ -3,6 +3,7 @@ import math
 import numpy as np
 import os
 import sys
+import pathlib 
 from src.POPPy.BindUtils import *
 from src.POPPy.Structs import *
 from src.POPPy.POPPyTypes import *
@@ -15,12 +16,11 @@ from src.POPPy.POPPyTypes import *
 
 def loadBeamlib():
     try:
-        LD_PATH = os.path.dirname(os.path.join(os.path.abspath(__file__), "..", "..", "out", "build", "Debug"))
-        sys.platlibdir += [LD_PATH]
-
-        lib = ctypes.CDLL("poppybeam.dll")
+        LD_PATH = pathlib.Path(__file__).parents[2]/"out/build/Debug"
+        lib = ctypes.CDLL(LD_PATH/"poppybeam.dll")
     except:
-        lib = ctypes.CDLL("libpoppybeam.so")
+        LD_PATH = pathlib.Path(__file__).parents[2]/"out/build"
+        lib = ctypes.CDLL(LD_PATH/"libpoppybeam.so")
 
     lib.makeRTframe.argtypes = [RTDict, ctypes.POINTER(cframe)]
     lib.makeRTframe.restype = None

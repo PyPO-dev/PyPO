@@ -20,12 +20,12 @@ The GPU version of POPPy needs a [CUDA installation](https://docs.nvidia.com/cud
 -- INSTALLATION --\
 Configure POPPy by running:
 ```
-python Build.py --make
+python Build.py --config
 ```
 This will check if you have CUDA installed. It will also generate the build instructions.
 Then install by running:
 ```
-python Build.py --install
+python Build.py --make
 ```
 For an overview of build options, run:
 ```

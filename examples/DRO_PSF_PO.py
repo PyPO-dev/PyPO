@@ -63,32 +63,20 @@ def ex_DRO_PO(device):
 
     JM, EH = s.readCustomBeam(cBeam, "plane1", "Ex", convert_to_current=True, mode="PMC")
 
-    if device == "CPU":
+    if device == "GPU":
+        nThreads = 256
 
-        JM1 = s.propagatePO_CPU("plane1", "p1", JM, k=k,
-                        epsilon=10, t_direction=-1, nThreads=11,
-                        mode="JM", precision="double")
+    else:
+        nThreads = 11
 
-        EH = s.propagatePO_CPU("p1", "planeff", JM1, k=k,
-                        epsilon=10, t_direction=-1, nThreads=11,
-                        mode="FF", precision="double")
+    JM1 = s.runPO("plane1", "p1", JM, k=k,
+                epsilon=10, t_direction=-1, nThreads=nThreads,
+                mode="JM", precision="double", device=device)
 
-    elif device == "GPU":
-
-        JM1 = s.propagatePO_GPU("plane1", "p1", JM, k=k,
-                        epsilon=10, t_direction=-1, nThreads=256,
-                        mode="JM", precision="single")
-
-        EH = s.propagatePO_GPU("p1", "planeff", JM1, k=k,
-                        epsilon=10, t_direction=-1, nThreads=256,
-                        mode="FF", precision="single")
-
-    eta_Xpol = s.calcXpol(EH.Ex, EH.Ey)
-    print(eta_Xpol)
-
-    result = s.fitGaussAbs(EH.Ex, "planeff", thres=-11)
-    print(result)
-
+    EH = s.runPO("p1", "planeff", JM1, k=k,
+                epsilon=10, t_direction=-1, nThreads=nThreads,
+                mode="FF", precision="double", device=device)
+    
     s.plotBeam2D("planeff", EH.Ex)
 if __name__ == "__main__":
     ex_DRO()

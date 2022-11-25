@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QWidget, QApplication, QComboBox, QFormLayout, QVBox
 from PyQt5.QtCore import Qt
 import numpy as np
 
-from src.GUI.ParameterForms.variableInputWidget import VariableInputWidget
+from src.GUI.ParameterForms.variableInputWidgetcopy import VariableInputWidget
 
 
 

@@ -122,7 +122,7 @@ class Form(QWidget):
             self.limU2.setEnabled(True)
             self.limV1.setEnabled(True)
             self.limV2.setEnabled(True)
-            print("dis2")
+            # print("dis2")
 
     def GetDict(self):
         paramdict = {"name"     : None if self.name.text()=="" else self.name.text(),

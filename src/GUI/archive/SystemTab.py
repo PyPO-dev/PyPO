@@ -72,8 +72,8 @@ class SystemTab(QWidget):
     def plotSystem(self):
         self.PlotScreen.setParent(QWidget())
 
-        for attr in self.System.system['Parabola_0']:
-            print(attr)
+        # for attr in self.System.system['Parabola_0']:
+        #     print(attr)
         figure = self.System.plotSystem(ret = True)
         self.PlotScreen= PS.PlotScreen(figure)
         self.Layout.addWidget(self.PlotScreen, 0, 2, 3, 1)

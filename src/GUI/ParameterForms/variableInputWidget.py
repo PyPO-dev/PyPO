@@ -1,81 +1,81 @@
 from PyQt5.QtWidgets import QWidget, QApplication, QComboBox, QFormLayout, QVBoxLayout, QGridLayout, QLabel,QSpacerItem, QSizePolicy, QLineEdit, QHBoxLayout
-from PyQt5.QtGui import QRegExpValidator
-from PyQt5.QtCore import QRegExp, Qt
+
+from src.GUI.ParameterForms.SimpleInputWidget import SimpleInput
+
 import numpy as np
 
 
 
 class VariableInputWidget(QWidget):
-    def __init__ (self, key, data):
+    def __init__ (self, inp):
         super().__init__()
-
-        self.key = key
-        self.formData = data
+        self.inputDiscription = inp
+        # self.key = key
+        # self.formData = data
+        self.labels = []
+        self.fields = []
 
         self.layout = QFormLayout()
-        
-        self.children = []
-        
+        self.hasChildren = hasattr(self.inputDiscription, 'subdict')
+        print (self.hasChildren)
         self.inputs = {}
         self.mode = QComboBox()
-        self.mode.addItems(self.formData.keys())
+        self.mode.addItems(self.inputDiscription.subdict.keys())
 
-        label = self.makeLabelFromString(self.key)
+        label = self.makeLabelFromString(self.inputDiscription.label)
+        self.labels.append(label)
+        self.fields.append(self.mode)
 
         self.layout.addRow(label, self.mode)
 
-        for cKey, subdict in self.formData.items():
-            child = self.makeChildform(cKey, subdict)
-            self.children.append(child)
-            self.layout.addRow(child)
+        if self.hasChildren:
+            self.children = []
+            self.makeCildren()
             
         self.mode.currentIndexChanged.connect(self.modeChanged)
         self.modeChanged()
 
         self.setLayout(self.layout)
 
-    def modeChanged(self):
-        for w in self.children:
-            w.setVisible(False)
-        self.children[self.mode.currentIndex()].setVisible(True)
+    def get(self):
+        if len(self.labels) != len(self.fields):
+            raise Exception("Labels and Fields don't match. labels: %d fields: %d" %(len(self.labels), len(self.fields)))
+        return (self.labels, self.fields)
+        # if self.hasChildren:
 
-    def makeChildform(self, childKey, childDict):
+    def makeCildren(self):
+        print("makeCildren")
+        for childKey, childInDisList in self.inputDiscription.subdict.items():
+            child = self.makeChildform(childKey, childInDisList)
+            self.children.append(child)
+            self.layout.addRow(child)
+
+
+    def modeChanged(self):
+        if self.hasChildren:
+            for w in self.children:
+                w.setVisible(False)
+            self.children[self.mode.currentIndex()].setVisible(True)
+
+    def makeChildform(self, childKey,childIndistList):
         childWidget = QWidget()
         childLayout = QFormLayout()
         self.inputs[childKey]={}
-        for k,v in childDict.items():
-            self.inputs[childKey][k] = self.addInputToLayout(childLayout, k, v)
+        for i in range(len(childIndistList)):
+            label, widget = SimpleInput(childIndistList[i]).get()
+            self.inputs[childKey][childIndistList[i].outputName] = widget
+            self.labels.append(label)
+            self.fields.append(widget)
+            childLayout.addRow(label, widget)
+            # self.inputs[childKey][k] = self.addInputToLayout(childLayout, k, v)
         childWidget.setLayout(childLayout)
         return childWidget
-
-    def addInputToLayout(self, layout, k, v):
-        ### Make inputs and add them to self.inputs
-        edits = [QLineEdit() for k in range(v)]
-
-        ### Make inputs only accept numbers
-        Validator = QRegExpValidator(QRegExp("[-+]?[0-9]*[\.,]?[0-9]*"))
-        for i in range(len(edits)):
-            edits[i].setValidator(Validator)
-
-        ### put them in a widget
-        inputWidget = QWidget()
-        inputLayout = QHBoxLayout()
-        for inp in edits:
-            inputLayout.addWidget(inp)
-        inputWidget.setLayout(inputLayout)
-
-        ### make label
-        label = self.makeLabelFromString(k)
-
-        ### add to form
-        layout.addRow(label, inputWidget)
-        return edits
     
     def read(self):
         ind = self.mode.currentIndex()
-        mode = list(self.formData.keys())[ind]
-        paramDict = {self.key: mode}
-        for par, inps in self.inputs[mode].items():
+        modeOut = list(self.formData.keys())[ind]
+        paramDict = {self.inputDiscription.outputName: modeOut}
+        for par, inps in self.inputs[modeOut].items():
             paramDict [par] = np.array(list([float(inp.text())for inp in inps])) 
         return paramDict
 

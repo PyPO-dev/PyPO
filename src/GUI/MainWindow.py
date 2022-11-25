@@ -123,8 +123,8 @@ class MainWidget(QWidget):
     def applyTransformation(self, element, transformationType, transformation, rotationCenter=None):
         # for i in transformation:
         #     print(i)
-        print(transformation, type(transformation))
-        print(rotationCenter, type(rotationCenter))
+        # print(transformation, type(transformation))
+        # print(rotationCenter, type(rotationCenter))
         if transformationType == "trans":
             self.stm.translateGrids(element, transformation)
         elif transformationType == "rot":

@@ -142,7 +142,7 @@ class TransformationWidget(QWidget):
         #     print("parsed: ", i)
         vals = np.array(list(map(lambda x: float(x), vals)))
         # for i in vals:
-        print(vals)
+        # print(vals)
         return vals
 
 
@@ -153,7 +153,7 @@ class TransformationWidget(QWidget):
 
         if self.transformationType == "trans":
             translation = self.parseVector(self.trans)
-            print("!!!",self.element, self.transformationType, translation)
+            # print("!!!",self.element, self.transformationType, translation)
             self.applyTransformation(self.element, self.transformationType, translation)
         elif self.transformationType == "rot":
             rotation = self.parseVector(self.rot)

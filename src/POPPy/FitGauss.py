@@ -58,7 +58,8 @@ def fitGaussAbs(field, surfaceObject, thres):
 
     field_est = field[mask_f]
     x0, y0, xs, ys, theta = calcEstimates(x[mask_f], y[mask_f], area[mask_f], field_est)
-    print("Initial estimate from image moments:\nmu_x = {}, mu_y = {}\nTheta = {}".format(xs, ys, theta))
+    print(f"Initial estimate from image moments:\nmu_x = {xs}, mu_y = {ys}\nTheta = {theta}")
+
     #pt.imshow(np.absolute(field) * mask_f)
     #pt.show()
 
@@ -73,7 +74,7 @@ def fitGaussAbs(field, surfaceObject, thres):
     popt, pcov = opt.curve_fit(couplingMasked, xy, field_est.ravel(), p0, bounds=bounds)
     perr = np.sqrt(np.diag(pcov))
 
-    print("Fitted shift and rotation:\nmu_x = {}, mu_y = {}\nTheta = {}".format(popt[-3], popt[-2], popt[-1]))
+    print(f"Fitted shift and rotation:\nmu_x = {popt[-3]}, mu_y = {popt[-2]}\nTheta = {popt[-1]}")
     return popt, perr
 
 #def couplingAbs(pars, *args):

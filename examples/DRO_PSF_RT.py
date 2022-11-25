@@ -20,7 +20,7 @@ def ex_DRO_RT(device):
             "vertex"    : np.zeros(3),
             "focus_1"   : np.array([0,0,12e3]),
             "lims_u"    : np.array([200,12.5e3]),
-            "lims_v"    : np.array([0,180]),
+            "lims_v"    : np.array([0,360]),
             "gridsize"  : np.array([1501,1501])
             }
 
@@ -34,8 +34,8 @@ def ex_DRO_RT(device):
             }
 
     RTpar = {
-            "nRays"     : 1000,
-            "nRing"     : 1000,
+            "nRays"     : 100,
+            "nRing"     : 100,
             "angx"      : 0,
             "angy"      : 0,
             "a"         : 10000,
@@ -49,7 +49,7 @@ def ex_DRO_RT(device):
     s.addPlane(plane)
     s.translateGrids("plane1", np.array([0,0,12e3]))
     
-    s.rotateGrids("p1", np.array([30,0,0]), np.array([0,0,12e3]))
+    #s.rotateGrids("p1", np.array([30,0,0]), np.array([0,0,12e3]))
 
     s.plotSystem()
 
@@ -69,10 +69,6 @@ def ex_DRO_RT(device):
 
     s.plotRTframe(frame_out2)
     s.plotSystem(RTframes=[frame_in, frame_out, frame_out2])
-
-
-
-
 
 if __name__ == "__main__":
     ex_DRO()

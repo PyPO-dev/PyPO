@@ -1,30 +1,44 @@
 import numpy as np
 from src.POPPy.POPPyTypes import *
 
+# Error classes to be used
 class InputReflError(Exception):
     pass
 
 class InputRTError(Exception):
     pass
 
+# Error message definitions
 def errMsg_field(fieldName, elemName):
-    return "\nMissing field \"{}\", element {}.".format(fieldName, elemName)
+    return f"\nMissing field \"{fieldName}\", element {elemName}."
 
 def errMsg_type(fieldName, inpType, elemName, fieldType):
-    return "\nWrong type {} in field \"{}\", element {}. Expected {}.".format(inpType, fieldName, elemName, fieldType)
+    return f"\nWrong type {inpType} in field \"{fieldName}\", element {elemName}. Expected {fieldType}."
 
 def errMsg_option(fieldName, option, elemName, args):
     if len(args) == 2:
-        return "\nUnknown option \"{}\" in field \"{}\", element {}. Expected \"{}\" or \"{}\".".format(option, fieldName, elemName, args[0], args[1])
+        return f"\nUnknown option \"{option}\" in field \"{fieldName}\", element {elemName}. Expected \"{args[0]}\" or \"{args[1]}\"."
 
     elif len(args) == 3:
-        return "\nUnknown option \"{}\" in field \"{}\", element {}. Expected \"{}\", \"{}\" or \"{}\".".format(option, fieldName, elemName, args[0], args[1], args[2])
+        return f"\nUnknown option \"{option}\" in field \"{fieldName}\", element {elemName}. Expected \"{args[0]}\", \"{args[1]}\" or \"{args[2]}\"."
 
 def errMsg_shape(fieldName, shape, elemName, shapeExpect):
-    return "\nIncorrect input shape of {} for field \"{}\", element {}. Expected {}.".format(shape, fieldName, elemName, shapeExpect)
+    return f"\nIncorrect input shape of {shape} for field \"{fieldName}\", element {elemName}. Expected {shapeExpect}."
 
 def errMsg_value(fieldName, value, elemName):
-    return "\nIncorrect value {} encountered in field \"{}\", element {}.".format(value, fieldName, elemName)
+    return f"\nIncorrect value {value} encountered in field \"{fieldName}\", element {elemName}."
+
+# Check blocks for different datatypes
+def block_ndarray(fieldName, elemDict, shape):
+    _errStr = ""
+    if not isinstance(elemDict[fieldName], np.ndarray):
+        _errStr += errMsg_type(fieldName, type(elemDict[fieldName]), elemDict["name"], np.ndarray)
+
+    elif not elemDict[fieldName].shape == shape:
+        _errStr += errMsg_shape(fieldName, elemDict[fieldName].shape, elemDict["name"], f"{shape}")
+    
+    return _errStr
+
 
 def check_ElemDict(elemDict):
     """
@@ -38,32 +52,21 @@ def check_ElemDict(elemDict):
         if "pmode" in elemDict:
             if elemDict["pmode"] == "focus":
                 if "vertex" in elemDict:
-                    if not isinstance(elemDict["vertex"], np.ndarray):
-                        errStr += errMsg_type("vertex", type(elemDict["vertex"]), elemDict["name"], np.ndarray)
-
-                    elif not elemDict["vertex"].shape == (3,):
-                        errStr += errMsg_shape("vertex", elemDict["vertex"].shape, elemDict["name"], "(3,)")
-                
+                    errStr += block_ndarray("vertex", elemDict, (3,))
                 else:
                     errStr += errMsg_field("vertex", elemDict["name"])
 
                 if "focus_1" in elemDict:
-                    if not isinstance(elemDict["focus_1"], np.ndarray):
-                         errStr += errMsg_type("focus_1", type(elemDict["focus_1"]), elemDict["name"], np.ndarray)
-                     
-                    elif not elemDict["focus_1"].shape == (3,):
-                        errStr += errMsg_shape("focus_1", elemDict["focus_1"].shape, elemDict["name"], "(3,)")
-
+                    errStr += block_ndarray("focus_1", elemDict, (3,))
                 else:
                     errStr += errMsg_field("focus_1", elemDict["name"])
 
             elif elemDict["pmode"] == "manual":
                 if "coeffs" in elemDict:
-                    if not isinstance(elemDict["coeffs"], np.ndarray):
-                        errStr += errMsg_type("coeffs", type(elemDict["coeffs"]), elemDict["name"], np.ndarray)
+                    errStr += block_ndarray("coeffs", elemDict, (2,))
 
-                    elif not elemDict["coeffs"].shape == (2,):
-                        errStr += errMsg_shape("coeffs", elemDict["coeffs"].shape, elemDict["name"], "(2,)")
+                else:
+                    errStr += errMsg_field("coeffs", elemDict["name"])
 
             else:
                 args = ["focus", "manual"]
@@ -77,22 +80,12 @@ def check_ElemDict(elemDict):
         if "pmode" in elemDict:
             if elemDict["pmode"] == "focus":
                 if "focus_1" in elemDict:
-                    if not isinstance(elemDict["focus_1"], np.ndarray):
-                        errStr += errMsg_type("focus_1", type(elemDict["focus_1"]), elemDict["name"], np.ndarray)
-
-                    elif not elemDict["focus_1"].shape == (3,):
-                        errStr += errMsg_shape("focus_1", elemDict["focus_1"].shape, elemDict["name"], "(3,)")
-
+                    errStr += block_ndarray("focus_1", elemDict, (3,))
                 else:
                     errStr += errMsg_field("focus_1", elemDict["name"])
 
                 if "focus_2" in elemDict:
-                    if not isinstance(elemDict["focus_2"], np.ndarray):
-                         errStr += errMsg_type("focus_2", type(elemDict["focus_2"]), elemDict["name"], np.ndarray)
-                     
-                    elif not elemDict["focus_2"].shape == (3,):
-                        errStr += errMsg_shape("focus_2", elemDict["focus_2"].shape, elemDict["name"], "(3,)")
-
+                    errStr += block_ndarray("focus_2", elemDict, (3,))
                 else:
                     errStr += errMsg_field("focus_2", elemDict["name"])
                 
@@ -113,15 +106,9 @@ def check_ElemDict(elemDict):
             
             elif elemDict["pmode"] == "manual":
                 if "coeffs" in elemDict:
-                    if not isinstance(elemDict["coeffs"], np.ndarray):
-                        errStr += errMsg_type("coeffs", type(elemDict["coeffs"]), elemDict["name"], np.ndarray)
-
-                    elif not elemDict["coeffs"].shape == (3,):
-                        errStr += errMsg_shape("coeffs", elemDict["coeffs"].shape, elemDict["name"], "(3,)")
-
+                    errStr += block_ndarray("coeffs", elemDict, (3,))
                 else:
                     errStr += errMsg_field("coeffs", elemDict["name"])
-
 
             else:
                 args = ["focus", "manual"]
@@ -141,32 +128,18 @@ def check_ElemDict(elemDict):
     if "gmode" in elemDict:
         if elemDict["gmode"] == "xy":
             if "lims_x" in elemDict:
-                if not isinstance(elemDict["lims_x"], np.ndarray):
-                    errStr += errMsg_type("lims_x", type(elemDict["lims_x"]), elemDict["name"], np.ndarray)
-
-                elif not elemDict["lims_x"].shape == (2,):
-                    errStr += errMsg_shape("lims_x", elemDict["lims_x"].shape, elemDict["name"], "(2,)")
-
+                errStr += block_ndarray("lims_x", elemDict, (2,))
             else:
                 errStr += errMsg_field("lims_x", elemDict["name"])
 
             if "lims_y" in elemDict:
-                if not isinstance(elemDict["lims_y"], np.ndarray):
-                    errStr += errMsg_type("lims_y", type(elemDict["lims_y"]), elemDict["name"], np.ndarray)
-
-                elif not elemDict["lims_y"].shape == (2,):
-                    errStr += errMsg_shape("lims_y", elemDict["lims_y"].shape, elemDict["name"], "(2,)")
-
+                errStr += block_ndarray("lims_y", elemDict, (2,))
             else:
                 errStr += errMsg_field("lims_y", elemDict["name"])
 
         elif elemDict["gmode"] == "uv":
             if "lims_u" in elemDict:
-                if not isinstance(elemDict["lims_u"], np.ndarray):
-                    errStr += errMsg_type("lims_u", type(elemDict["lims_u"]), elemDict["name"], np.ndarray)
-
-                elif not elemDict["lims_u"].shape == (2,):
-                    errStr += errMsg_shape("lims_u", elemDict["lims_u"].shape, elemDict["name"], "(2,)")
+                errStr += block_ndarray("lims_u", elemDict, (2,))
 
                 if elemDict["lims_u"][0] < 0:
                     errStr += errMsg_value("lims_u", elemDict["lims_u"], elemDict["name"])
@@ -175,11 +148,7 @@ def check_ElemDict(elemDict):
                 errStr += errMsg_field("lims_u", elemDict["name"])
 
             if "lims_v" in elemDict:
-                if not isinstance(elemDict["lims_v"], np.ndarray):
-                    errStr += errMsg_type("lims_v", type(elemDict["lims_v"]), elemDict["name"], np.ndarray)
-
-                elif not elemDict["lims_v"].shape == (2,):
-                    errStr += errMsg_shape("lims_v", elemDict["lims_v"].shape, elemDict["name"], "(2,)")
+                errStr += block_ndarray("lims_v", elemDict, (2,))
 
                 if elemDict["lims_v"][0] < 0:
                     errStr += errMsg_value("lims_v", elemDict["lims_v"][0], elemDict["name"])
@@ -192,22 +161,12 @@ def check_ElemDict(elemDict):
 
         elif elemDict["gmode"] == "AoE":
             if "lims_Az" in elemDict:
-                if not isinstance(elemDict["lims_Az"], np.ndarray):
-                    errStr += errMsg_type("lims_Az", type(elemDict["lims_Az"]), elemDict["name"], np.ndarray)
-
-                elif not elemDict["lims_Az"].shape == (2,):
-                    errStr += errMsg_shape("lims_Az", elemDict["lims_Az"].shape, elemDict["name"], "(2,)")
-
+                errStr += block_ndarray("lims_Az", elemDict, (2,))
             else:
                 errStr += errMsg_field("lims_Az", elemDict["name"])
 
             if "lims_El" in elemDict:
-                if not isinstance(elemDict["lims_El"], np.ndarray):
-                    errStr += errMsg_type("lims_El", type(elemDict["lims_El"]), elemDict["name"], np.ndarray)
-
-                elif not elemDict["lims_El"].shape == (2,):
-                    errStr += errMsg_shape("lims_El", elemDict["lims_El"].shape, elemDict["name"], "(2,)")
-
+                errStr += block_ndarray("lims_El", elemDict, (2,))
             else:
                 errStr += errMsg_field("lims_El", elemDict["name"])
     
@@ -219,11 +178,7 @@ def check_ElemDict(elemDict):
         errStr += errMsg_field("gmode", elemDict["name"])
 
     if "gridsize" in elemDict:
-        if not isinstance(elemDict["gridsize"], np.ndarray):
-            errStr += errMsg_type("gridsize", type(elemDict["gridsize"]), elemDict["name"], np.ndarray)
-
-        elif not elemDict["gridsize"].shape == (2,):
-            errStr += errMsg_shape("gridsize", elemDict["gridsize"], elemDict["name"], "(2,)")
+        errStr += block_ndarray("gridsize", elemDict, (2,))
 
         if not (isinstance(elemDict["gridsize"][0], np.int64) or isinstance(elemDict["gridsize"][0], np.int32)):
             errStr += errMsg_type("gridsize[0]", type(elemDict["gridsize"][0]), elemDict["name"], [np.int64, np.int32])
@@ -233,6 +188,9 @@ def check_ElemDict(elemDict):
     
     if errStr:
         raise InputReflError(errStr)
+    
+    else:
+        return 0
 
 def check_RTDict(RTDict):
     errStr = ""
@@ -284,22 +242,12 @@ def check_RTDict(RTDict):
         errStr += errMsg_field("b", "RTDict")
 
     if "tChief" in RTDict:
-        if not isinstance(RTDict["tChief"], np.ndarray):
-            errStr += errMsg_type("tChief", type(RTDict["tChief"]), "RTDict", np.ndarray)
-
-        elif not RTDict["tChief"].shape == (3,):
-            errStr += errMsg_shape("tChief", RTDict["tChief"].shape, "RTDict", "(3,)")
-
+        errStr += block_ndarray("tChief", "RTDict", (3,))
     else:
         errStr += errMsg_field("tChief", "RTDict")
 
     if "oChief" in RTDict:
-        if not isinstance(RTDict["oChief"], np.ndarray):
-            errStr += errMsg_type("oChief", type(RTDict["oChief"]), "RTDict", np.ndarray)
-                     
-        elif not RTDict["oChief"].shape == (3,):
-            errStr += errMsg_shape("oChief", RTDict["oChief"].shape, "RTDict", "(3,)")
-
+        errStr += block_ndarray("oChief", "RTDict", (3,))
     else:
         errStr += errMsg_field("oChief", "RTDict")
 

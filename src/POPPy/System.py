@@ -352,7 +352,7 @@ class System(object):
             return out
 
         except:
-            print("Could not find {} in {}!".format(name_currents, self.savePathCurrents))
+            print(f"Could not find {name_currents} in {self.savePathCurrents}!")
             return 1
 
     def loadElement(self, name):
@@ -391,27 +391,19 @@ class System(object):
         currents = calcCurrents(fields, self.system[name_source], mode)
         return currents
 
-    def propagatePO_CPU(self, source_name, target_name, s_currents, k,
+    def runPO(self, source_name, target_name, s_currents, k,
                     epsilon=1, t_direction=-1, nThreads=1,
-                    mode="JM", precision="double"):
+                    mode="JM", precision="double", device="CPU"):
 
         source = self.system[source_name]
         target = self.system[target_name]
 
-        if precision == "double":
+        if device == "CPU":
             out = POPPy_CPUd(source, target, s_currents, k, epsilon, t_direction, nThreads, mode)
 
-        return out
-
-    def propagatePO_GPU(self, source_name, target_name, s_currents, k,
-                    epsilon=1, t_direction=-1, nThreads=256,
-                    mode="JM", precision="single"):
-
-        source = self.system[source_name]
-        target = self.system[target_name]
-
-        if precision == "single":
+        elif device == "GPU":
             out = POPPy_GPUf(source, target, s_currents, k, epsilon, t_direction, nThreads, mode)
+
 
         return out
 
@@ -591,8 +583,6 @@ class System(object):
             field_c = fields(null, null, null, null, null, field)
 
         return field_c
-
-
 
 if __name__ == "__main__":
     print("System interface for POPPy.")

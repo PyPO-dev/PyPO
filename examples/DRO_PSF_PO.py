@@ -13,86 +13,88 @@ def ex_DRO_PO(device):
     The setup consists of a parabolic reflector and feed.
     """
 
-    lam = 210 # [mm]
-    k = 2 * np.pi / lam
+    lam = 210 # mm
 
-    parabola = {}
-    parabola["name"] = "p1"
-    parabola["pmode"] = "focus"
-    parabola["gmode"] = "uv"
-    parabola["flip"] = False
-    parabola["vertex"] = np.zeros(3)
-    parabola["focus_1"] = np.array([0,0,12e3])
-    parabola["lims_u"] = [200,12.5e3]
-    parabola["lims_v"] = [0,360]
-    parabola["gridsize"] = [1501,1501]
+    parabola = {
+            "name"      : "p1",
+            "pmode"     : "focus",
+            "gmode"     : "uv",
+            "flip"      : False,
+            "vertex"    : np.zeros(3),
+            "focus_1"   : np.array([0,0,12e3]),
+            "lims_u"    : np.array([200,12.5e3]),
+            "lims_v"    : np.array([0, 360]),
+            "gridsize"  : np.array([1501,1501])
+            }
 
-    plane = {}
-    plane["name"] = "plane1"
-    plane["gmode"] = "xy"
-    plane["flip"] = False
-    plane["lims_x"] = [-0.1,0.1]
-    plane["lims_y"] = [-0.1,0.1]
-    plane["gridsize"] = [3, 3]
+    plane = {
+            "name"      : "plane1",
+            "gmode"     : "xy",
+            "flip"      : False,
+            "lims_x"    : np.array([-0.1,0.1]),
+            "lims_y"    : np.array([-0.1,0.1]),
+            "gridsize"  : np.array([3, 3])
+            }
 
-    planeff = {}
-    planeff["name"] = "planeff"
-    planeff["gmode"] = "AoE"
-    planeff["flip"] = False
-    planeff["lims_Az"] = [-3,3]
-    planeff["lims_El"] = [-3,3]
-    planeff["gridsize"] = [201, 201]
+    planeff = {
+            "name"      : "planeff",
+            "gmode"     : "AoE",
+            "flip"      : False,
+            "lims_Az"   : np.array([-3,3]),
+            "lims_El"   : np.array([-3,3]),
+            "gridsize"  : np.array([201, 201])
+            }
 
     s = System()
     s.addParabola(parabola)
     s.addPlane(plane)
     s.addPlane(planeff)
 
-    s.saveElement("p1")
+    s.plotSystem()
 
-    s.setCustomBeamPath(path="ps/", append=True)
+    ps = s.generatePointSource("plane1") 
+    JM = s.calcCurrents(ps, "plane1", mode="PMC")
 
-    cBeam = "ps"
-
-    translation = np.array([0, 0, 12e3])
+    translation = np.array([0, 0, 12e3])# + np.array([210, 210, -210])
     rotation_plane = np.array([180, 0, 0])
     s.rotateGrids("plane1", rotation_plane)
     s.translateGrids("plane1", translation)
 
-    JM, EH = s.readCustomBeam(cBeam, "plane1", "Ex", convert_to_current=True, mode="PMC")
 
-    if device == "CPU":
+    if device == "GPU":
+        nThreads = 256
 
-        JM1 = s.propagatePO_CPU("plane1", "p1", JM, k=k,
-                        epsilon=10, t_direction=-1, nThreads=11,
-                        mode="JM", precision="double")
+    else:
+        nThreads = 11
 
-        EH = s.propagatePO_CPU("p1", "planeff", JM1, k=k,
-                        epsilon=10, t_direction=-1, nThreads=11,
-                        mode="FF", precision="double")
+    plane1_to_p1 = {
+            "s_name"    : "plane1",
+            "t_name"    : "p1",
+            "s_current" : JM,
+            "lam"       : lam,
+            "epsilon"   : 10,
+            "exp"       : "fwd",
+            "nThreads"  : nThreads,
+            "device"    : device,
+            "mode"      : "JM"
+            }
 
-    elif device == "GPU":
+    JM1 = s.runPO(plane1_to_p1)
 
-        JM1 = s.propagatePO_GPU("plane1", "p1", JM, k=k,
-                        epsilon=10, t_direction=-1, nThreads=256,
-                        mode="JM", precision="single")
+    p1_to_planeff = {
+            "s_name"    : "p1",
+            "t_name"    : "planeff",
+            "s_current" : JM1,
+            "lam"       : lam,
+            "epsilon"   : 10,
+            "exp"       : "fwd",
+            "nThreads"  : nThreads,
+            "device"    : device,
+            "mode"      : "FF"
+            }
 
-        EH = s.propagatePO_GPU("p1", "planeff", JM1, k=k,
-                        epsilon=10, t_direction=-1, nThreads=256,
-                        mode="FF", precision="single")
-
-    eta_Xpol = s.calcXpol(EH.Ex, EH.Ey)
-    print(eta_Xpol)
-
-    result = s.fitGaussAbs(EH.Ex, "planeff", thres=-11)
-    print(result)
-    #Psi = s.generateGauss(result, "planeff")
-
-    #pt.imshow(20*np.log10(np.absolute(Psi) / np.max(np.absolute(Psi))), vmin=-30, vmax=0)
-    #pt.show()
-
-    pt.imshow(20*np.log10(np.absolute(EH.Ey) / np.max(np.absolute(EH.Ey))), vmin=-30, vmax=0)
-    pt.show()
-
+    EH = s.runPO(p1_to_planeff)
+    
+    s.plotBeam2D("planeff", EH.Ex)
 if __name__ == "__main__":
     ex_DRO()

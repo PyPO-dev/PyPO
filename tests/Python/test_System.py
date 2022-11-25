@@ -37,11 +37,6 @@ class TestParabola(unittest.TestCase):
         self.system.setCustomReflPath(to_append, append=True)
         self.assertEqual(test_path + to_append, self.system.customReflPath)
         
-    def test_addParabola(self):
-        a = 100
-        b = 100
-        #### TODO: write tests
-        
         
         
 if __name__ == "__main__":

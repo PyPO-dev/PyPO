@@ -1,6 +1,8 @@
 import ctypes
 import numpy as np
-
+import os
+import sys
+import pathlib
 from src.POPPy.BindUtils import *
 from src.POPPy.Structs import *
 from src.POPPy.POPPyTypes import *
@@ -14,7 +16,12 @@ import threading
 #############################################################################
 
 def loadCPUlib():
-    lib = ctypes.CDLL('./src/C++/libpoppycpu.so')
+    try:
+        LD_PATH = pathlib.Path(__file__).parents[2]/"out/build/Debug"
+        lib = ctypes.CDLL(str(LD_PATH/"poppycpu.dll"))
+    except:
+        LD_PATH = pathlib.Path(__file__).parents[2]/"out/build"
+        lib = ctypes.CDLL(LD_PATH/"libpoppycpu.so")
 
     lib.propagateToGrid_JM.argtypes = [ctypes.POINTER(c2Bundle), reflparams, reflparams,
                                         ctypes.POINTER(reflcontainer), ctypes.POINTER(reflcontainer),
@@ -66,7 +73,7 @@ def loadCPUlib():
     return lib
 
 # WRAPPER FUNCTIONS DOUBLE PREC
-def POPPy_CPUd(source, target, currents, k, epsilon, t_direction, nThreads, mode):
+def POPPy_CPUd(source, target, PODict):
     lib = loadCPUlib()
 
     # Create structs with pointers for source and target
@@ -85,26 +92,32 @@ def POPPy_CPUd(source, target, currents, k, epsilon, t_direction, nThreads, mode
     allocate_reflcontainer(cs, gs, ctypes.c_double)
     allocate_reflcontainer(ct, gt, ctypes.c_double)
 
-    if mode == "Scalar":
+    if PODict["mode"] == "Scalar":
         c_cfield = arrC1()
-        fieldConv(field, c_field, gs, ctypes.c_double)
+        fieldConv(PODict["s_field"], c_field, gs, ctypes.c_double)
 
     else:
         c_currents = c2Bundle()
-        currentConv(currents, c_currents, gs, ctypes.c_double)
+        currentConv(PODict["s_current"], c_currents, gs, ctypes.c_double)
 
     target_shape = (target["gridsize"][0], target["gridsize"][1])
 
-    k           = ctypes.c_double(k)
-    nThreads    = ctypes.c_int(nThreads)
-    epsilon     = ctypes.c_double(epsilon)
-    t_direction = ctypes.c_double(t_direction)
+    if PODict["exp"] == "fwd":
+        exp_prop = -1
+
+    elif PODict["exp"] == "bwd":
+        exp_prop = 1
+
+    k           = ctypes.c_double(PODict["k"])
+    nThreads    = ctypes.c_int(PODict["nThreads"])
+    epsilon     = ctypes.c_double(PODict["epsilon"])
+    t_direction = ctypes.c_double(exp_prop)
 
     args = [csp, ctp, ctypes.byref(cs), ctypes.byref(ct),
             ctypes.byref(c_currents), k, nThreads, epsilon,
             t_direction]
 
-    if mode == "JM":
+    if PODict["mode"] == "JM":
         res = c2Bundle()
         args.insert(0, res)
 
@@ -121,7 +134,7 @@ def POPPy_CPUd(source, target, currents, k, epsilon, t_direction, nThreads, mode
 
         return JM
 
-    elif mode == "EH":
+    elif PODict["mode"] == "EH":
         res = c2Bundle()
         args.insert(0, res)
 
@@ -138,7 +151,7 @@ def POPPy_CPUd(source, target, currents, k, epsilon, t_direction, nThreads, mode
 
         return EH
 
-    elif mode == "JMEH":
+    elif PODict["mode"] == "JMEH":
         res = c4Bundle()
         args.insert(0, res)
 
@@ -155,7 +168,7 @@ def POPPy_CPUd(source, target, currents, k, epsilon, t_direction, nThreads, mode
 
         return [JM, EH]
 
-    elif mode == "EHP":
+    elif PODict["mode"] == "EHP":
         res = c2rBundle()
         args.insert(0, res)
 
@@ -172,7 +185,7 @@ def POPPy_CPUd(source, target, currents, k, epsilon, t_direction, nThreads, mode
 
         return [EH, Pr]
 
-    elif mode == "Scalar":
+    elif PODict["mode"] == "Scalar":
         res = arrC1()
         args.insert(0, res)
 
@@ -189,7 +202,7 @@ def POPPy_CPUd(source, target, currents, k, epsilon, t_direction, nThreads, mode
 
         return E
 
-    elif mode == "FF":
+    elif PODict["mode"] == "FF":
         res = c2Bundle()
         args.insert(0, res)
 

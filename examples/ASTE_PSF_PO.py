@@ -13,48 +13,51 @@ def ex_ASTE_PO(device):
     The setup consists of a parabolic reflector and feed.
     """
 
-    lam = 1# [mm]
-    k = 2 * np.pi / lam
+    lam = 1 # [mm]
 
-    parabola = {}
-    parabola["name"] = "p1"
-    parabola["pmode"] = "focus"
-    parabola["gmode"] = "uv"
-    parabola["flip"] = False
-    parabola["vertex"] = np.zeros(3)
-    parabola["focus_1"] = np.array([0,0,3.5e3])
-    parabola["lims_u"] = [200,5e3]
-    parabola["lims_v"] = [0,360]
-    parabola["gridsize"] = [1501,1501]
+    parabola = {
+            "name"      : "pri",
+            "pmode"     : "focus",
+            "gmode"     : "uv",
+            "flip"      : False,
+            "vertex"    : np.zeros(3),
+            "focus_1"   : np.array([0,0,3.5e3]),
+            "lims_u"    : np.array([200,5e3]),
+            "lims_v"    : np.array([0,360]),
+            "gridsize"  : np.array([1501,1501])
+            }
 
     d_foc_h = 5606.286
-    hyperbola = {}
-    hyperbola["name"] = "h1"
-    hyperbola["pmode"] = "focus"
-    hyperbola["gmode"] = "uv"
-    hyperbola["flip"] = True
-    hyperbola["focus_1"] = np.array([0,0,3.5e3])
-    hyperbola["focus_2"] = np.array([0,0,3.5e3 - d_foc_h])
-    hyperbola["ecc"] = 1.08208248
-    hyperbola["lims_u"] = [0,310]
-    hyperbola["lims_v"] = [0,360]
-    hyperbola["gridsize"] = [501,501]
+    hyperbola = {
+            "name"      : "sec",
+            "pmode"     : "focus",
+            "gmode"     : "uv",
+            "flip"      : True,
+            "focus_1"   : np.array([0,0,3.5e3]),
+            "focus_2"   : np.array([0,0,3.5e3 - d_foc_h]),
+            "ecc"       : 1.08208248,
+            "lims_u"    : np.array([0,310]),
+            "lims_v"    : np.array([0,360]),
+            "gridsize"  : np.array([501,501])
+            }
 
-    plane = {}
-    plane["name"] = "plane1"
-    plane["gmode"] = "xy"
-    plane["flip"] = False
-    plane["lims_x"] = [-0.1,0.1]
-    plane["lims_y"] = [-0.1,0.1]
-    plane["gridsize"] = [3, 3]
+    plane = {
+            "name"      : "plane1",
+            "gmode"     : "xy",
+            "flip"      : False,
+            "lims_x"    : np.array([-0.1,0.1]),
+            "lims_y"    : np.array([-0.1,0.1]),
+            "gridsize"  : np.array([3, 3])
+            }
 
-    planeff = {}
-    planeff["name"] = "planeff"
-    planeff["gmode"] = "AoE"
-    planeff["flip"] = False
-    planeff["lims_Az"] = [-0.03,0.03]
-    planeff["lims_El"] = [-0.03,0.03]
-    planeff["gridsize"] = [201, 201]
+    planeff = {
+            "name"      : "planeff",
+            "gmode"     : "AoE",
+            "flip"      : False,
+            "lims_Az"   : np.array([-0.03,0.03]),
+            "lims_El"   : np.array([-0.03,0.03]),
+            "gridsize"  : np.array([201, 201])
+            }
 
     s = System()
     s.addParabola(parabola)
@@ -62,39 +65,59 @@ def ex_ASTE_PO(device):
     s.addPlane(plane)
     s.addPlane(planeff)
 
-    s.setCustomBeamPath(path="ps/", append=True)
-
-    cBeam = "ps"
-    JM, EH = s.readCustomBeam(cBeam, "plane1", "Ex", convert_to_current=True, mode="PMC")
+    ps = s.generatePointSource("plane1") 
+    JM = s.calcCurrents(ps, "plane1", mode="PMC")
 
     translation = np.array([0,0,3.5e3 - d_foc_h])
     s.translateGrids("plane1", translation)
 
     if device == "GPU":
-        JM1 = s.propagatePO_GPU("plane1", "h1", JM, k=k,
-                        epsilon=10, t_direction=-1, nThreads=256,
-                        mode="JM", precision="single")
+        nThreads = 256
 
-        JM2 = s.propagatePO_GPU("h1", "p1", JM1, k=k,
-                        epsilon=10, t_direction=-1, nThreads=256,
-                        mode="JM", precision="single")
+    else:
+        nThreads = 11
 
-        EH = s.propagatePO_GPU("p1", "planeff", JM2, k=k,
-                        epsilon=10, t_direction=-1, nThreads=256,
-                        mode="FF", precision="single")
+    plane1_to_sec = {
+            "s_name"    : "plane1",
+            "t_name"    : "sec",
+            "s_current" : JM,
+            "lam"       : lam,
+            "epsilon"   : 10,
+            "exp"       : "fwd",
+            "nThreads"  : nThreads,
+            "device"    : device,
+            "mode"      : "JM"
+            }
 
-    elif device == "CPU":
-        JM1 = s.propagatePO_CPU("plane1", "h1", JM, k=k,
-                        epsilon=10, t_direction=-1, nThreads=11,
-                        mode="JM", precision="double")
+    JM1 = s.runPO(plane1_to_sec)
 
-        JM2 = s.propagatePO_CPU("h1", "p1", JM1, k=k,
-                        epsilon=10, t_direction=-1, nThreads=11,
-                        mode="JM", precision="double")
+    sec_to_pri = {
+            "s_name"    : "sec",
+            "t_name"    : "pri",
+            "s_current" : JM1,
+            "lam"       : lam,
+            "epsilon"   : 10,
+            "exp"       : "fwd",
+            "nThreads"  : nThreads,
+            "device"    : device,
+            "mode"      : "JM"
+            }
 
-        EH = s.propagatePO_CPU("p1", "planeff", JM2, k=k,
-                        epsilon=10, t_direction=-1, nThreads=11,
-                        mode="FF", precision="double")
+    JM2 = s.runPO(sec_to_pri)
+
+    pri_to_planeff = {
+            "s_name"    : "pri",
+            "t_name"    : "planeff",
+            "s_current" : JM2,
+            "lam"       : lam,
+            "epsilon"   : 10,
+            "exp"       : "fwd",
+            "nThreads"  : nThreads,
+            "device"    : device,
+            "mode"      : "FF"
+            }
+
+    EH = s.runPO(pri_to_planeff)
 
     pt.imshow(20*np.log10(np.absolute(EH.Ex) / np.max(np.absolute(EH.Ex))), vmin=-30, vmax=0)
     pt.show()

@@ -1,7 +1,9 @@
 import ctypes
 import math
 import numpy as np
-
+import os
+import sys
+import pathlib
 from src.POPPy.BindUtils import *
 from src.POPPy.Structs import *
 from src.POPPy.POPPyTypes import *
@@ -15,7 +17,12 @@ import threading
 #############################################################################
 
 def loadGPUlib():
-    lib = ctypes.CDLL('./src/C++/libpoppygpu.so')
+    try:
+        LD_PATH = pathlib.Path(__file__).parents[2]/"out/build/Debug"
+        lib = ctypes.CDLL(str(LD_PATH/"poppygpu.dll"))
+    except:
+        LD_PATH = pathlib.Path(__file__).parents[2]/"out/build"
+        lib = ctypes.CDLL(LD_PATH/"libpoppygpu.so")
 
     lib.callKernelf_JM.argtypes = [ctypes.POINTER(c2Bundlef), reflparamsf, reflparamsf,
                                    ctypes.POINTER(reflcontainerf), ctypes.POINTER(reflcontainerf),
@@ -62,7 +69,7 @@ def loadGPUlib():
 # WRAPPER FUNCTIONS DOUBLE PREC
 
 #### SINGLE PRECISION
-def POPPy_GPUf(source, target, currents, k, epsilon, t_direction, nThreads, mode):
+def POPPy_GPUf(source, target, PODict):
     lib = loadGPUlib()
 
     # Create structs with pointers for source and target
@@ -81,29 +88,35 @@ def POPPy_GPUf(source, target, currents, k, epsilon, t_direction, nThreads, mode
     allocate_reflcontainer(cs, gs, ctypes.c_float)
     allocate_reflcontainer(ct, gt, ctypes.c_float)
 
-    if mode == "Scalar":
+    if PODict["mode"] == "Scalar":
         c_cfield = arrC1f()
-        fieldConv(field, c_field, gs, ctypes.c_float)
+        fieldConv(PODict["s_field"], c_field, gs, ctypes.c_float)
 
     else:
         c_currents = c2Bundlef()
-        currentConv(currents, c_currents, gs, ctypes.c_float)
+        currentConv(PODict["s_current"], c_currents, gs, ctypes.c_float)
 
     target_shape = (target["gridsize"][0], target["gridsize"][1])
 
-    nBlocks = math.ceil(gt / nThreads)
+    nBlocks = math.ceil(gt / PODict["nThreads"])
 
-    k           = ctypes.c_float(k)
-    nThreads    = ctypes.c_int(nThreads)
+    if PODict["exp"] == "fwd":
+        exp_prop = -1
+
+    elif PODict["exp"] == "bwd":
+        exp_prop = 1
+
+    k           = ctypes.c_float(PODict["k"])
+    nThreads    = ctypes.c_int(PODict["nThreads"])
     nBlocks     = ctypes.c_int(nBlocks)
-    epsilon     = ctypes.c_float(epsilon)
-    t_direction = ctypes.c_float(t_direction)
+    epsilon     = ctypes.c_float(PODict["epsilon"])
+    t_direction = ctypes.c_float(exp_prop)
 
     args = [csp, ctp, ctypes.byref(cs), ctypes.byref(ct),
             ctypes.byref(c_currents), k, epsilon,
             t_direction, nBlocks, nThreads]
 
-    if mode == "JM":
+    if PODict["mode"] == "JM":
         res = c2Bundlef()
 
         args.insert(0, res)
@@ -121,7 +134,7 @@ def POPPy_GPUf(source, target, currents, k, epsilon, t_direction, nThreads, mode
 
         return JM
 
-    elif mode == "EH":
+    elif PODict["mode"] == "EH":
         res = c2Bundlef()
 
         args.insert(0, res)
@@ -139,7 +152,7 @@ def POPPy_GPUf(source, target, currents, k, epsilon, t_direction, nThreads, mode
 
         return EH
 
-    elif mode == "JMEH":
+    elif PODict["mode"] == "JMEH":
         res = c4Bundlef()
 
         args.insert(0, res)
@@ -157,7 +170,7 @@ def POPPy_GPUf(source, target, currents, k, epsilon, t_direction, nThreads, mode
 
         return [JM, EH]
 
-    elif mode == "EHP":
+    elif PODict["mode"] == "EHP":
         res = c2rBundlef()
 
         args.insert(0, res)
@@ -175,7 +188,7 @@ def POPPy_GPUf(source, target, currents, k, epsilon, t_direction, nThreads, mode
 
         return [EH, Pr]
 
-    elif mode == "FF":
+    elif PODict["mode"] == "FF":
         res = c2Bundlef()
 
         args.insert(0, res)

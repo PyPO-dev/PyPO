@@ -19,24 +19,40 @@ from src.POPPy.BindBeam import *
 from src.POPPy.Copy import copyGrid
 from src.POPPy.MatTransform import *
 from src.POPPy.POPPyTypes import *
+from src.POPPy.Checks import *
 
 import src.POPPy.Plotter as plt
 import src.POPPy.Efficiencies as effs
 import src.POPPy.FitGauss as fgs
 
-class System(object):
-    customBeamPath = './custom/beam/'
-    customReflPath = './custom/reflector/'
+from pathlib import Path
 
-    savePathElem = './save/elements/'
-    savePathFields = './save/fields/'
-    savePathCurrents = './save/currents/'
+# Set POPPy absolute root path
+sysPath = Path(__file__).parents[2]
+
+class NpEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super(NpEncoder, self).default(obj)
+
+class System(object):
+    customBeamPath = os.path.join(sysPath, "custom", "beam")
+    customReflPath = os.path.join(sysPath, "custom", "reflector")
+
+    savePathElem = os.path.join(sysPath, "save", "elements")
+    savePathFields = os.path.join(sysPath, "save", "fields")
+    savePathCurrents = os.path.join(sysPath, "save", "currents")
 
     def __init__(self):
         self.num_ref = 0
         self.num_cam = 0
         self.system = {}
-
+        self.cl = 2.99792458e11 # mm / s
         #self.savePathElem = "./save/elements/"
 
         saveElemExist = os.path.isdir(self.savePathElem)
@@ -52,7 +68,7 @@ class System(object):
         elif not saveCurrentsExist:
             os.makedirs(self.savePathCurrents)
 
-        self.savePath = './images/'
+        self.savePath = os.path.join(sysPath, "images")
 
         existSave = os.path.isdir(self.savePath)
 
@@ -64,13 +80,13 @@ class System(object):
 
     def setCustomBeamPath(self, path, append=False):
         if append:
-            self.customBeamPath += path
+            self.customBeamPath = os.path.join(self.customBeamPath, path)
         else:
             self.customBeamPath = path
 
     def setCustomReflPath(self, path, append=False):
         if append:
-            self.customReflPath += path
+            self.customReflPath = os.path.join(self.customReflPath, path)
         else:
             self.customReflPath = path
 
@@ -91,6 +107,8 @@ class System(object):
 
         reflDict["type"] = 0
         reflDict["transf"] = np.eye(4)
+
+        check_ElemDict(reflDict) 
 
         self.system[reflDict["name"]] = copyGrid(reflDict)
 
@@ -124,6 +142,9 @@ class System(object):
             self.system[reflDict["name"]]["coeffs"][1] = b
             self.system[reflDict["name"]]["coeffs"][2] = -1
 
+        elif reflDict["pmode"] == "manual":
+            self.system[reflDict["name"]]["coeffs"] = np.array([reflDict["coeffs"][0], reflDict["coeffs"][1], -1])
+
         if reflDict["gmode"] == "xy":
             self.system[reflDict["name"]]["gmode"] = 0
 
@@ -145,7 +166,7 @@ class System(object):
 
         reflDict["type"] = 1
         reflDict["transf"] = np.eye(4)
-
+        check_ElemDict(reflDict) 
         self.system[reflDict["name"]] = copyGrid(reflDict)
 
         if reflDict["pmode"] == "focus":
@@ -207,7 +228,7 @@ class System(object):
 
         reflDict["type"] = 2
         reflDict["transf"] = np.eye(4)
-
+        check_ElemDict(reflDict) 
         self.system[reflDict["name"]] = copyGrid(reflDict)
 
         if reflDict["pmode"] == "focus":
@@ -230,10 +251,13 @@ class System(object):
 
         if reflDict["name"] == "Plane":
             reflDict["name"] = reflDict["name"] + "_{}".format(self.num_ref)
+        
+        if not "ecc" in reflDict:
+            reflDict["ecc"] = 0
 
         reflDict["type"] = 3
         reflDict["transf"] = np.eye(4)
-
+        check_ElemDict(reflDict) 
         self.system[reflDict["name"]] = copyGrid(reflDict)
         self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
 
@@ -276,70 +300,63 @@ class System(object):
 
     def saveElement(self, name):
         jsonDict = copyGrid(self.system[name])
-
-        for key, value in self.system[name].items():
-            if type(value) == np.ndarray:
-                jsonDict[key] = value.tolist()
-
-            else:
-                jsonDict[key] = value
-
-        with open('./{}{}.json'.format(self.savePathElem, name), 'w') as f:
-            json.dump(jsonDict, f)
+        
+        with open('{}.json'.format(os.path.join(self.savePathElem, name)), 'w') as f:
+            json.dump(jsonDict, f, cls=NpEncoder)
 
     def saveFields(self, fields, name_fields):
-        saveDir = self.savePathFields + name_fields + "/"
+        saveDir = os.path.join(self.savePathFields, name_fields)
 
         saveDirExist = os.path.isdir(saveDir)
 
         if not saveDirExist:
             os.makedirs(saveDir)
 
-        np.save(saveDir + "Ex.npy", fields.Ex)
-        np.save(saveDir + "Ey.npy", fields.Ey)
-        np.save(saveDir + "Ez.npy", fields.Ez)
+        np.save(os.path.join(saveDir, "Ex.npy"), fields.Ex)
+        np.save(os.path.join(saveDir, "Ey.npy"), fields.Ey)
+        np.save(os.path.join(saveDir, "Ez.npy"), fields.Ez)
 
-        np.save(saveDir + "Hx.npy", fields.Hx)
-        np.save(saveDir + "Hy.npy", fields.Hy)
-        np.save(saveDir + "Hz.npy", fields.Hz)
+        np.save(os.path.join(saveDir, "Hx.npy"), fields.Hx)
+        np.save(os.path.join(saveDir, "Hy.npy"), fields.Hy)
+        np.save(os.path.join(saveDir, "Hz.npy"), fields.Hz)
 
     def saveCurrents(self, currents, name_currents):
-        saveDir = self.savePathCurrents + name_currents + "/"
+        saveDir = os.path.join(self.savePathCurrents, name_currents)
 
         saveDirExist = os.path.isdir(saveDir)
 
         if not saveDirExist:
             os.makedirs(saveDir)
 
-        np.save(saveDir + "Jx.npy", currents.Jx)
-        np.save(saveDir + "Jy.npy", currents.Jy)
-        np.save(saveDir + "Jz.npy", currents.Jz)
+        np.save(os.path.join(saveDir, "Jx.npy"), currents.Jx)
+        np.save(os.path.join(saveDir, "Jy.npy"), currents.Jy)
+        np.save(os.path.join(saveDir, "Jz.npy"), currents.Jz)
 
-        np.save(saveDir + "Mx.npy", currents.Mx)
-        np.save(saveDir + "My.npy", currents.My)
-        np.save(saveDir + "Mz.npy", currents.Mz)
+        np.save(os.path.join(saveDir, "Mx.npy"), currents.Mx)
+        np.save(os.path.join(saveDir, "My.npy"), currents.My)
+        np.save(os.path.join(saveDir, "Mz.npy"), currents.Mz)
 
     def loadCurrents(self, name_currents):
         try:
-            loadDir = self.savePathCurrents + name_currents + "/"
+            loadDir = os.path.join(self.savePathCurrents, name_currents)
 
-            Jx = np.load(loadDir + "Jx.npy")
-            Jy = np.load(loadDir + "Jy.npy")
-            Jz = np.load(loadDir + "Jz.npy")
+            Jx = np.load(os.path.join(loadDir, "Jx.npy"))
+            Jy = np.load(os.path.join(loadDir, "Jy.npy"))
+            Jz = np.load(os.path.join(loadDir, "Jz.npy"))
 
-            Mx = np.load(loadDir + "Mx.npy")
-            My = np.load(loadDir + "My.npy")
-            Mz = np.load(loadDir + "Mz.npy")
+            Mx = np.load(os.path.join(loadDir, "Mx.npy"))
+            My = np.load(os.path.join(loadDir, "My.npy"))
+            Mz = np.load(os.path.join(loadDir, "Mz.npy"))
 
             out = currents(Jx, Jy, Jz, Mx, My, Mz)
             return out
 
         except:
-            print("Could not find {} in {}!".format(name_currents, self.savePathCurrents))
+            print(f"Could not find {name_currents} in {self.savePathCurrents}!")
             return 1
 
     def loadElement(self, name):
-        with open('./{}{}.json'.format(self.savePathElem, name), 'r') as f:
+        with open('{}.json'.format(os.path.join(self.savePathElem, name)), 'r') as f:
             elem = json.load(f)
 
         for key, value in elem.items():
@@ -352,8 +369,8 @@ class System(object):
         return elem
 
     def readCustomBeam(self, name_beam, name_source, comp, convert_to_current=True, normalise=True, mode="PMC", scale=1000):
-        rfield = np.loadtxt(self.customBeamPath + "r" + name_beam + ".txt")
-        ifield = np.loadtxt(self.customBeamPath + "i" + name_beam + ".txt")
+        rfield = np.loadtxt(os.path.join(self.customBeamPath, "r" + name_beam + ".txt"))
+        ifield = np.loadtxt(os.path.join(self.customBeamPath, "i" + name_beam + ".txt"))
 
         field = rfield + 1j*ifield
 
@@ -374,31 +391,33 @@ class System(object):
         currents = calcCurrents(fields, self.system[name_source], mode)
         return currents
 
-    def propagatePO_CPU(self, source_name, target_name, s_currents, k,
-                    epsilon=1, t_direction=-1, nThreads=1,
-                    mode="JM", precision="double"):
+    def runPO(self, PODict):
 
-        source = self.system[source_name]
-        target = self.system[target_name]
+        source = self.system[PODict["s_name"]]
+        target = self.system[PODict["t_name"]]
 
-        if precision == "double":
-            out = POPPy_CPUd(source, target, s_currents, k, epsilon, t_direction, nThreads, mode)
+        # Default exponent to -1
+        if not "exp" in PODict:
+            PODict["exp"] = "fwd"
 
-        return out
+        # TODO: insert check for PODict
 
-    def propagatePO_GPU(self, source_name, target_name, s_currents, k,
-                    epsilon=1, t_direction=-1, nThreads=256,
-                    mode="JM", precision="single"):
+        if "lam" and not "k" in PODict:
+            PODict["k"] = 2 * np.pi / PODict["lam"]
 
-        source = self.system[source_name]
-        target = self.system[target_name]
+        if "freq" and not "k" in PODict:
+            PODict["k"] = 2 * np.pi / (self.cl / PODict["freq"] *1e-9)
 
-        if precision == "single":
-            out = POPPy_GPUf(source, target, s_currents, k, epsilon, t_direction, nThreads, mode)
+        if PODict["device"] == "CPU":
+            out = POPPy_CPUd(source, target, PODict)
+
+        elif PODict["device"] == "GPU":
+            out = POPPy_GPUf(source, target, PODict)
 
         return out
 
     def createFrame(self, argDict):
+        check_RTDict(argDict)
         frame_in = makeRTframe(argDict)
         return frame_in
 
@@ -465,12 +484,13 @@ class System(object):
         gauss_in = makeGauss(gaussDict, self.system[name_source])
         return gauss_in
 
-    def runRayTracer(self, fr_in, name_target, epsilon=1e-10, nThreads=1, t0=100):
-        fr_out = RT_CPUd(self.system[name_target], fr_in, epsilon, t0, nThreads)
-        return fr_out
+    def runRayTracer(self, fr_in, name_target, epsilon=1e-3, nThreads=1, t0=100, device="CPU"):
+        if device == "CPU":
+            fr_out = RT_CPUd(self.system[name_target], fr_in, epsilon, t0, nThreads)
 
-    def runRT_GPU(self, fr_in, name_target, epsilon=1e-10, nThreads=256, t0=100):
-        fr_out = RT_GPUf(self.system[name_target], fr_in, epsilon, t0, nThreads)
+        elif device == "GPU":
+            fr_out = RT_GPUf(self.system[name_target], fr_in, epsilon, t0, nThreads)
+
         return fr_out
 
     def interpFrame(self, fr_in, field, name_target, method="nearest"):
@@ -511,16 +531,30 @@ class System(object):
 
         return out
 
-    def generateGauss(self, fgs_out, name_surface):
+    def generateGauss(self, fgs_out, name_surface, mode="dB"):
         surfaceObj = self.system[name_surface]
-        Psi = fgs.generateGauss(fgs_out, surfaceObj)
+        Psi = fgs.generateGauss(fgs_out, surfaceObj, mode)
         return Psi
+
+    def generatePointSource(self, name_surface, comp="Ex"):
+        surfaceObj = self.system[name_surface]
+        ps = np.zeros(surfaceObj["gridsize"], dtype=complex)
+
+        xs_idx = int((surfaceObj["gridsize"][0] - 1) / 2)
+        ys_idx = int((surfaceObj["gridsize"][1] - 1) / 2)
+
+        ps[xs_idx, ys_idx] = 1 + 1j * 0
+
+        out = self._compToFields(comp, ps)
+
+        return out
 
     def plotBeam2D(self, name_surface, field,
                     vmin=-30, vmax=0, show=True, amp_only=False,
                     save=False, polar=False, interpolation=None,
                     aperDict={"plot":False}, mode='dB', project='xy',
-                    units='', name='', titleA="Amp", titleP="Phase"):
+                    units='', name='', titleA="Amp", titleP="Phase",
+                    unwrap_phase=False):
 
         plotObject = self.system[name_surface]
 
@@ -528,7 +562,7 @@ class System(object):
                         vmin, vmax, show, amp_only,
                         save, polar, interpolation,
                         aperDict, mode, project,
-                        units, name, titleA, titleP, self.savePath)
+                        units, name, titleA, titleP, self.savePath, unwrap_phase)
 
     def plot3D(self, name_surface, fine=2, cmap=cm.cool,
                 returns=False, ax_append=False, norm=False,
@@ -572,8 +606,6 @@ class System(object):
             field_c = fields(null, null, null, null, null, field)
 
         return field_c
-
-
 
 if __name__ == "__main__":
     print("System interface for POPPy.")

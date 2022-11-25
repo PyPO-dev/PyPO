@@ -58,3 +58,13 @@ def MatTranslate(trans, matAppend):
                     [0, 0, 0, 1]])
 
     return np.matmul(trans, matAppend)
+
+def InvertMat(mat):
+    R_T = mat[:3, :3].T
+    R_Tt = np.matmul(-R_T, mat[:3, -1])
+
+    matInv = np.eye(4)
+    matInv[:3, :3] = R_T
+    matInv[:3, -1] = R_Tt
+
+    return matInv

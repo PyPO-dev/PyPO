@@ -48,7 +48,13 @@ PlotAper = {
         }
 
 PODict = {
-        "s_name"    : "",
-        "t_name"    : "",
-        "s_current" : "JM-current object"
+        "s_name"    : "Name of source surface (string)",
+        "t_name"    : "Name of target surface (string)",
+        "s_current" : "JM-current object (current object)",
+        "s_field"   : "Scalar complex field for scalar propagation only (np array)",
+        "k"         : "Wavenumber (real)",
+        "epsilon"   : "Relative permittivity of source surface (real)",
+        "exp"       : "Divergent or convergent beam (string)",
+        "nThreads"  : "Number of CPU/GPU threads (int)",
+        "mode"      : "Determine return object (string)",
         }

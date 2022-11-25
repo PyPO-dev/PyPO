@@ -1,23 +1,7 @@
-#include <iostream>
-#include <vector>
-#include <complex>
-#include <chrono>
-#include <cmath>
-#include <string>
-#include <iterator>
-#include <new>
-#include "stdlib.h"
-
-#include "Propagation.h"
-#include "RayTrace.h"
-
-#ifdef __cplusplus
-    extern "C"
-#endif
-
+#include <InterfaceCPU.h>
 // DOUBLE PRECISION INTERFACE
 
-extern "C" void propagateToGrid_JM(c2Bundle *res, reflparams source, reflparams target,
+void propagateToGrid_JM(c2Bundle *res, reflparams source, reflparams target,
                                 reflcontainer *cs, reflcontainer *ct,
                                 c2Bundle *currents,
                                 double k, int numThreads, double epsilon,
@@ -44,7 +28,7 @@ extern "C" void propagateToGrid_JM(c2Bundle *res, reflparams source, reflparams 
               << " [s]\n" << std::endl;
 }
 
-extern "C" void propagateToGrid_EH(c2Bundle *res, reflparams source, reflparams target,
+void propagateToGrid_EH(c2Bundle *res, reflparams source, reflparams target,
                                 reflcontainer *cs, reflcontainer *ct,
                                 c2Bundle *currents,
                                 double k, int numThreads, double epsilon,
@@ -71,7 +55,7 @@ extern "C" void propagateToGrid_EH(c2Bundle *res, reflparams source, reflparams 
               << " [s]\n" << std::endl;
 }
 
-extern "C" void propagateToGrid_JMEH(c4Bundle *res, reflparams source, reflparams target,
+void propagateToGrid_JMEH(c4Bundle *res, reflparams source, reflparams target,
                                 reflcontainer *cs, reflcontainer *ct,
                                 c2Bundle *currents,
                                 double k, int numThreads, double epsilon,
@@ -97,7 +81,7 @@ extern "C" void propagateToGrid_JMEH(c4Bundle *res, reflparams source, reflparam
               << " [s]\n" << std::endl;
 }
 
-extern "C" void propagateToGrid_EHP(c2rBundle *res, reflparams source, reflparams target,
+void propagateToGrid_EHP(c2rBundle *res, reflparams source, reflparams target,
                                 reflcontainer *cs, reflcontainer *ct,
                                 c2Bundle *currents,
                                 double k, int numThreads, double epsilon,
@@ -123,7 +107,7 @@ extern "C" void propagateToGrid_EHP(c2rBundle *res, reflparams source, reflparam
               << " [s]\n" << std::endl;
 }
 
-extern "C" void propagateToGrid_scalar(arrC1 *res, reflparams source, reflparams target,
+void propagateToGrid_scalar(arrC1 *res, reflparams source, reflparams target,
                                 reflcontainer *cs, reflcontainer *ct,
                                 arrC1 *field,
                                 double k, int numThreads, double epsilon,
@@ -149,7 +133,7 @@ extern "C" void propagateToGrid_scalar(arrC1 *res, reflparams source, reflparams
               << " [s]\n" << std::endl;
 }
 
-extern "C" void propagateToFarField(c2Bundle *res, reflparams source, reflparams target,
+void propagateToFarField(c2Bundle *res, reflparams source, reflparams target,
                                 reflcontainer *cs, reflcontainer *ct,
                                 c2Bundle *currents,
                                 double k, int numThreads, double epsilon,
@@ -175,7 +159,7 @@ extern "C" void propagateToFarField(c2Bundle *res, reflparams source, reflparams
               << " [s]\n" << std::endl;
 }
 
-extern "C" void propagateRays(reflparams ctp, cframe *fr_in, cframe *fr_out,
+void propagateRays(reflparams ctp, cframe *fr_in, cframe *fr_out,
                               int numThreads, double epsilon, double t0)
 {
     int nTot = fr_in->size;
@@ -195,7 +179,7 @@ extern "C" void propagateRays(reflparams ctp, cframe *fr_in, cframe *fr_out,
 }
 
 // SINGLE PRECISION INTERFACE
-extern "C" void propagateToGridf_JM(c2Bundlef *res, reflparamsf source, reflparamsf target,
+void propagateToGridf_JM(c2Bundlef *res, reflparamsf source, reflparamsf target,
                                 reflcontainerf *cs, reflcontainerf *ct,
                                 c2Bundlef *currents,
                                 float k, int numThreads, float epsilon,
@@ -221,7 +205,7 @@ extern "C" void propagateToGridf_JM(c2Bundlef *res, reflparamsf source, reflpara
               << " [s]\n" << std::endl;
 }
 
-extern "C" void propagateToGridf_EH(c2Bundlef *res, reflparamsf source, reflparamsf target,
+void propagateToGridf_EH(c2Bundlef *res, reflparamsf source, reflparamsf target,
                                 reflcontainerf *cs, reflcontainerf *ct,
                                 c2Bundlef *currents,
                                 float k, int numThreads, float epsilon,
@@ -247,7 +231,7 @@ extern "C" void propagateToGridf_EH(c2Bundlef *res, reflparamsf source, reflpara
               << " [s]\n" << std::endl;
 }
 
-extern "C" void propagateToGridf_JMEH(c4Bundlef *res, reflparamsf source, reflparamsf target,
+void propagateToGridf_JMEH(c4Bundlef *res, reflparamsf source, reflparamsf target,
                                 reflcontainerf *cs, reflcontainerf *ct,
                                 c2Bundlef *currents,
                                 float k, int numThreads, float epsilon,
@@ -273,7 +257,7 @@ extern "C" void propagateToGridf_JMEH(c4Bundlef *res, reflparamsf source, reflpa
               << " [s]\n" << std::endl;
 }
 
-extern "C" void propagateToGridf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf target,
+void propagateToGridf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf target,
                                 reflcontainerf *cs, reflcontainerf *ct,
                                 c2Bundlef *currents,
                                 float k, int numThreads, float epsilon,
@@ -299,7 +283,7 @@ extern "C" void propagateToGridf_EHP(c2rBundlef *res, reflparamsf source, reflpa
               << " [s]\n" << std::endl;
 }
 
-extern "C" void propagateToGridf_scalar(arrC1f *res, reflparamsf source, reflparamsf target,
+void propagateToGridf_scalar(arrC1f *res, reflparamsf source, reflparamsf target,
                                 reflcontainerf *cs, reflcontainerf *ct,
                                 arrC1f *field,
                                 float k, int numThreads, float epsilon,
@@ -325,7 +309,7 @@ extern "C" void propagateToGridf_scalar(arrC1f *res, reflparamsf source, reflpar
               << " [s]\n" << std::endl;
 }
 
-extern "C" void propagateToFarFieldf(c2Bundlef *res, reflparamsf source, reflparamsf target,
+void propagateToFarFieldf(c2Bundlef *res, reflparamsf source, reflparamsf target,
                                 reflcontainerf *cs, reflcontainerf *ct,
                                 c2Bundlef *currents,
                                 float k, int numThreads, float epsilon,

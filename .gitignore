@@ -133,48 +133,28 @@ dmypy.json
 *.exe
 
 # User-specific folders
-src/C++/input/
-src/C++/output/
-src/C++/src/bak/
-src/C++/src/bak2/
-src/C++/src/bleeding_edge/
 images/
 save/
-
-*.txt
+custom/
+out/
 
 # User-specific files
 log
+*.jpg
 *.pdf
+*.png
 
 # Personal projects/files
 personal/
 literature/
 movie/
-ex_APWS.py
-custom/
-images/
 examples/ASTE/
 examples/images/
 tests/Python/datadir/
 datadir/
-buildSystem.py
-ChopperPointing.py
-Plot_spillover.py
-*.png
-*.jpg
-test_Parallel.py
-SpilloverSec.py
-TaperPri.py
-PlotConfig.py
-tiltGauss.py
-calcSNR.py
-calcSpillPri.py
-fit_gauss_to_ff.py
-meas_to_effs_ff.py
-plotEffs.py
-propagate_wfp_sec_pri_ff.py
 
+# vim stuff
+*.swp
 
 #vscode specific
 .vscode/settings.json

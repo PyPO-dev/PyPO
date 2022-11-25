@@ -1,22 +1,4 @@
-#include <iostream>
-#include <chrono>
-#include <string>
-#include <iterator>
-#include <cmath>
-#include <array>
-#include <iomanip>
-
-#include <cuda.h>
-#include <cuComplex.h>
-#include <cuda_runtime.h>
-#include <unistd.h>
-
-#include "GUtils.h"
-#include "Structs.h"
-#include "InterfaceReflector.h"
-//#include "CompOverload.h"
-
-#define CSIZERT 5
+#include "InterfaceCUDA.h"
 
 /* Kernels for single precision PO.
  * Author: Arend Moerman
@@ -202,8 +184,6 @@ __device__ __inline__ void transfRays(float *x, float *y, float *z,
     y[i] = out[1];
     z[i] = out[2];
 
-
-
     inp[0] = dx[i];
     inp[1] = dy[i];
     inp[2] = dz[i];
@@ -256,8 +236,6 @@ __global__ void propagateRaysToP(float *xs, float *ys, float *zs,
     {
         transfRays(xs, ys, zs, dxs, dys, dzs, idx, inv);
 
-        if (idx == 0) {printf("%f\n", conrt[0]);}
-
         float _t = conrt[3];
         float t1 = 1e99;
 
@@ -285,7 +263,7 @@ __global__ void propagateRaysToP(float *xs, float *ys, float *zs,
         zt[idx] = z + _t*dz;
 
         np(xt[idx], yt[idx], zt[idx], norms);
-        check = (dxt[idx]*norms[0] + dyt[idx]*norms[1] + dzt[idx]*norms[2]);
+        check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
 
         dxt[idx] = dx - 2*check*norms[0];
         dyt[idx] = dy - 2*check*norms[1];
@@ -335,7 +313,7 @@ __global__ void propagateRaysToH(float *xs, float *ys, float *zs,
         zt[idx] = z + _t*dz;
 
         nh(xt[idx], yt[idx], zt[idx], norms);
-        check = (dxt[idx]*norms[0] + dyt[idx]*norms[1] + dzt[idx]*norms[2]);
+        check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
 
         dxt[idx] = dx - 2*check*norms[0];
         dyt[idx] = dy - 2*check*norms[1];
@@ -385,7 +363,7 @@ __global__ void propagateRaysToE(float *xs, float *ys, float *zs,
         zt[idx] = z + _t*dz;
 
         ne(xt[idx], yt[idx], zt[idx], norms);
-        check = (dxt[idx]*norms[0] + dyt[idx]*norms[1] + dzt[idx]*norms[2]);
+        check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
 
         dxt[idx] = dx - 2*check*norms[0];
         dyt[idx] = dy - 2*check*norms[1];
@@ -438,7 +416,7 @@ __global__ void propagateRaysToPl(float *xs, float *ys, float *zs,
         zt[idx] = z + _t*dz;
 
         npl(xt[idx], yt[idx], zt[idx], norms);
-        check = (dxt[idx]*norms[0] + dyt[idx]*norms[1] + dzt[idx]*norms[2]);
+        check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
 
         dxt[idx] = dx - 2*check*norms[0];
         dyt[idx] = dy - 2*check*norms[1];
@@ -449,7 +427,7 @@ __global__ void propagateRaysToPl(float *xs, float *ys, float *zs,
     }
 }
 
-extern "C" void callRTKernel(reflparamsf ctp, cframef *fr_in,
+void callRTKernel(reflparamsf ctp, cframef *fr_in,
                             cframef *fr_out, float epsilon, float t0,
                             int nBlocks, int nThreads)
 {
@@ -490,32 +468,35 @@ extern "C" void callRTKernel(reflparamsf ctp, cframef *fr_in,
     printf("Calculating ray-trace...\n");
     begin = std::chrono::steady_clock::now();
 
-
     if (ctp.type == 0)
     {
         propagateRaysToP<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs, d_dxs, d_dys, d_dzs,
                                           d_xt, d_yt, d_zt, d_dxt, d_dyt, d_dzt);
+        //printf("made it\n");
+        gpuErrchk( cudaDeviceSynchronize() );
+
     }
 
     else if (ctp.type == 1)
     {
         propagateRaysToH<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs, d_dxs, d_dys, d_dzs,
                                           d_xt, d_yt, d_zt, d_dxt, d_dyt, d_dzt);
+        gpuErrchk( cudaDeviceSynchronize() );
     }
 
     else if (ctp.type == 2)
     {
         propagateRaysToE<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs, d_dxs, d_dys, d_dzs,
                                           d_xt, d_yt, d_zt, d_dxt, d_dyt, d_dzt);
+        gpuErrchk( cudaDeviceSynchronize() );
     }
 
     else if (ctp.type == 3)
     {
         propagateRaysToPl<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs, d_dxs, d_dys, d_dzs,
                                           d_xt, d_yt, d_zt, d_dxt, d_dyt, d_dzt);
+        gpuErrchk( cudaDeviceSynchronize() );
     }
-
-    gpuErrchk( cudaDeviceSynchronize() );
 
     end = std::chrono::steady_clock::now();
     std::cout << "Elapsed time : "
@@ -529,4 +510,6 @@ extern "C" void callRTKernel(reflparamsf ctp, cframef *fr_in,
     gpuErrchk( cudaMemcpy(fr_out->dx, d_dxt, fr_in->size * sizeof(float), cudaMemcpyDeviceToHost) );
     gpuErrchk( cudaMemcpy(fr_out->dy, d_dyt, fr_in->size * sizeof(float), cudaMemcpyDeviceToHost) );
     gpuErrchk( cudaMemcpy(fr_out->dz, d_dzt, fr_in->size * sizeof(float), cudaMemcpyDeviceToHost) );
+    
+    gpuErrchk( cudaDeviceReset() );
 }

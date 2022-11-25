@@ -8,23 +8,13 @@ import matplotlib.ticker as ticker
 import warnings
 warnings.filterwarnings("ignore")
 
+import src.POPPy.PlotConfig
 import src.POPPy.Colormaps as cmaps
 from src.POPPy.BindRefl import *
 
-
-# import PlotConfig
-
-
-
-pt.rcParams['xtick.top'] = True
-pt.rcParams['ytick.right'] = True
-
-pt.rcParams['xtick.direction'] = "in"
-pt.rcParams['ytick.direction'] = "in"
-
-
 def set_axes_equal(ax):
-    """Set 3D plot axes to equal scale.
+    """
+    Set 3D plot axes to equal scale.
 
     Make axes of 3D plot have equal scale so that spheres appear as
     spheres and cubes as cubes.  Required since `ax.axis('equal')`
@@ -49,7 +39,7 @@ def plotBeam2D(plotObject, field,
                 vmin, vmax, show, amp_only,
                 save, polar, interpolation,
                 aperDict, mode, project,
-                units, name, titleA, titleP, savePath):
+                units, name, titleA, titleP, savePath, unwrap_phase):
 
     # With far-field, generate grid without converting to spherical
 
@@ -114,10 +104,16 @@ def plotBeam2D(plotObject, field,
             phasefig = ax[1].imshow(np.angle(field), origin='lower', extent=extent, cmap=cmaps.parula)
 
         elif mode == 'dB':
+            if unwrap_phase:
+                phase = np.unwrap(np.unwrap(np.angle(field), axis=0), axis=1)
+
+            else:
+                phase = np.angle(field)
+
             extent = [np.min(grid_x1), np.max(grid_x1), np.min(grid_x2), np.max(grid_x2)]
             ampfig = ax[0].pcolormesh(grid_x1, grid_x2, 20 * np.log10(np.absolute(field) / max_field),
                                     vmin=vmin, vmax=vmax, cmap=cmaps.parula, shading='auto')
-            phasefig = ax[1].pcolormesh(grid_x1, grid_x2, np.angle(field), cmap=cmaps.parula, shading='auto')
+            phasefig = ax[1].pcolormesh(grid_x1, grid_x2, phase, cmap=cmaps.parula, shading='auto')
 
         divider1 = make_axes_locatable(ax[0])
         divider2 = make_axes_locatable(ax[1])
@@ -221,7 +217,7 @@ def plot3D(plotObject, fine, cmap,
         ax_append = ax
 
     reflector = ax_append.plot_surface(grids.x[skip], grids.y[skip], grids.z[skip],
-                   linewidth=0, antialiased=False, alpha=0.5, cmap=cmap)
+                   linewidth=0, antialiased=False, alpha=1, cmap=cmap)
 
     if foc1:
         ax_append.scatter(plotObject["focus_1"][0], plotObject["focus_1"][1], plotObject["focus_1"][2], color='black')
@@ -269,8 +265,14 @@ def plotSystem(systemDict, fine, cmap,
     #ax.set_xlim3d(-10,800)
     #ax.set_ylim3d(-250,250)
 
-    for key, refl in systemDict.items():
-        plot3D(refl, fine=fine, cmap=cmap,
+    for i, (key, refl) in enumerate(systemDict.items()):
+        if isinstance(cmap, list):
+            _cmap = cmap[i]
+
+        else:
+            _cmap = cmap
+
+        plot3D(refl, fine=fine, cmap=_cmap,
                     returns=True, ax_append=ax, norm=norm,
                     show=False, foc1=foc1, foc2=foc2, save=False, savePath=savePath)
     print("ps2")
@@ -296,11 +298,11 @@ def plotSystem(systemDict, fine, cmap,
                 y.append(frame.y[i])
                 z.append(frame.z[i])
 
-            ax.plot(x, y, z, color='black', zorder=100)
+            ax.plot(x, y, z, color='grey', zorder=100)
 
 
     set_axes_equal(ax)
-    #ax.set_box_aspect((world_limits[1]-world_limits[0],world_limits[3]-world_limits[2],world_limits[5]-world_limits[4]))
+    ax.set_box_aspect((world_limits[1]-world_limits[0],world_limits[3]-world_limits[2],world_limits[5]-world_limits[4]))
 
     if save:
         pt.savefig(fname=savePath + 'system.jpg',bbox_inches='tight', dpi=300)
@@ -313,7 +315,7 @@ def plotSystem(systemDict, fine, cmap,
 
     pt.close()
     return 0
-    """
+
 def beamCut(self, plotObject, field, cross='', units='', vmin=-50, vmax=0, frac=1, show=True, save=False, ret=False):
 
     x_center = int((plotObject["gridsize"][0] - 1) / 2)
@@ -374,8 +376,8 @@ def beamCut(self, plotObject, field, cross='', units='', vmin=-50, vmax=0, frac=
 
     if ret:
         return field[:,y_center], field[:,y_center]
-    """
-def plotRTframe(frame, projec, savePath):
+
+def plotRTframe(frame, project, savePath):
     fig, ax = pt.subplots(1,1)
 
     if project == "xy":

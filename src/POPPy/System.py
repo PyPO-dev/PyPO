@@ -52,7 +52,7 @@ class System(object):
         self.num_ref = 0
         self.num_cam = 0
         self.system = {}
-
+        self.cl = 2.99792458e11 # mm / s
         #self.savePathElem = "./save/elements/"
 
         saveElemExist = os.path.isdir(self.savePathElem)
@@ -391,19 +391,28 @@ class System(object):
         currents = calcCurrents(fields, self.system[name_source], mode)
         return currents
 
-    def runPO(self, source_name, target_name, s_currents, k,
-                    epsilon=1, t_direction=-1, nThreads=1,
-                    mode="JM", precision="double", device="CPU"):
+    def runPO(self, PODict):
 
-        source = self.system[source_name]
-        target = self.system[target_name]
+        source = self.system[PODict["s_name"]]
+        target = self.system[PODict["t_name"]]
 
-        if device == "CPU":
-            out = POPPy_CPUd(source, target, s_currents, k, epsilon, t_direction, nThreads, mode)
+        # Default exponent to -1
+        if not "exp" in PODict:
+            PODict["exp"] = "fwd"
 
-        elif device == "GPU":
-            out = POPPy_GPUf(source, target, s_currents, k, epsilon, t_direction, nThreads, mode)
+        # TODO: insert check for PODict
 
+        if "lam" and not "k" in PODict:
+            PODict["k"] = 2 * np.pi / PODict["lam"]
+
+        if "freq" and not "k" in PODict:
+            PODict["k"] = 2 * np.pi / (self.cl / PODict["freq"] *1e-9)
+
+        if PODict["device"] == "CPU":
+            out = POPPy_CPUd(source, target, PODict)
+
+        elif PODict["device"] == "GPU":
+            out = POPPy_GPUf(source, target, PODict)
 
         return out
 
@@ -526,6 +535,19 @@ class System(object):
         surfaceObj = self.system[name_surface]
         Psi = fgs.generateGauss(fgs_out, surfaceObj, mode)
         return Psi
+
+    def generatePointSource(self, name_surface, comp="Ex"):
+        surfaceObj = self.system[name_surface]
+        ps = np.zeros(surfaceObj["gridsize"], dtype=complex)
+
+        xs_idx = int((surfaceObj["gridsize"][0] - 1) / 2)
+        ys_idx = int((surfaceObj["gridsize"][1] - 1) / 2)
+
+        ps[xs_idx, ys_idx] = 1 + 1j * 0
+
+        out = self._compToFields(comp, ps)
+
+        return out
 
     def plotBeam2D(self, name_surface, field,
                     vmin=-30, vmax=0, show=True, amp_only=False,

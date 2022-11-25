@@ -11,7 +11,7 @@ from src.POPPy.System import System
 
 def ex_ASTE_RT(device):
     parabola = {
-            "name"          : "p1",
+            "name"          : "pri",
             "pmode"         : "focus",
             "gmode"         : "uv",
             "flip"          : False,
@@ -64,28 +64,19 @@ def ex_ASTE_RT(device):
 
     s.addParabola(parabola)
     s.addHyperbola(hyperbola)
-    #s.translateGrids("plane1", np.array([0,0,3.5e3 - d_foc_h]))
-
-    e_f0 = np.array([486.3974883317985, 0.0, 1371.340617233771]) # Warm focus
-
-    s.translateGrids("p1", -np.array([0,0,3.5e3 - d_foc_h]))
-    s.translateGrids("h1", -e_f0)
-    s.translateGrids("e1", -e_f0)
-    s.translateGrids("sec", -np.array([0,0,3.5e3 - d_foc_h]))
-
-    s.rotateGrids("p1", rotation)
-    s.rotateGrids("sec", rotation)
-    #s.rotateGrids("plane1", rotation)
-    
-    cm_l = [cm.cool, cm.cool, cm.autumn, cm.cool, cm.cool]
-
-    s.plotSystem(cmap=cm_l)
-
+    s.translateGrids("plane1", np.array([0,0,3.5e3 - d_foc_h]))
+ 
     frame_in = s.createFrame(argDict=RTpar)
 
-    frame_out = s.runRayTracer(frame_in, "p1", nThreads=11)
-    frame_out1 = s.runRayTracer(frame_out, "sec", nThreads=11)
-    frame_out2 = s.runRayTracer(frame_out1, "plane1", nThreads=11)
+    if device == "CPU":
+        frame_out = s.runRayTracer(frame_in, "pri", nThreads=11)
+        frame_out1 = s.runRayTracer(frame_out, "sec", nThreads=11)
+        frame_out2 = s.runRayTracer(frame_out1, "plane1", nThreads=11)
+
+    if device == "GPU":
+        frame_out = s.runRayTracer(frame_in, "pri", nThreads=256, device=device)
+        frame_out1 = s.runRayTracer(frame_out, "sec", nThreads=256, device=device)
+        frame_out2 = s.runRayTracer(frame_out1, "plane1", nThreads=256, device=device)
 
     s.plotRTframe(frame_out2, project="xy")
     s.plotSystem(RTframes=[frame_in, frame_out, frame_out1, frame_out2])

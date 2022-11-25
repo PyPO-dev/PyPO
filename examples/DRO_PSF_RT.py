@@ -34,13 +34,13 @@ def ex_DRO_RT(device):
             }
 
     RTpar = {
-            "nRays"     : 100,
-            "nRing"     : 100,
+            "nRays"     : 10,
+            "nRing"     : 10,
             "angx"      : 0,
             "angy"      : 0,
             "a"         : 10000,
             "b"         : 10000,
-            "tChief"    : np.array([210,0,0]),
+            "tChief"    : np.array([180,0,0]),
             "oChief"    : np.array([0,0,12e3])
             }
 
@@ -57,12 +57,10 @@ def ex_DRO_RT(device):
 
     if device == "CPU":
         frame_out = s.runRayTracer(frame_in, "p1", nThreads=11, t0=1e4)
-
         frame_out2 = s.runRayTracer(frame_out, "plane1", nThreads=11, t0=1e4)
 
     elif device == "GPU":
         frame_out = s.runRayTracer(frame_in, "p1", nThreads=256, t0=1e4, device=device)
-
         frame_out2 = s.runRayTracer(frame_out, "plane1", nThreads=256, t0=1e4, device=device)
 
     stack = s.calcRayLen(frame_in, frame_out, frame_out2)

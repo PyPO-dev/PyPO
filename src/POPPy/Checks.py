@@ -241,13 +241,15 @@ def check_RTDict(RTDict):
     else:
         errStr += errMsg_field("b", "RTDict")
 
+    RTDict["name"] = "RTDict"
+
     if "tChief" in RTDict:
-        errStr += block_ndarray("tChief", "RTDict", (3,))
+        errStr += block_ndarray("tChief", RTDict, (3,))
     else:
         errStr += errMsg_field("tChief", "RTDict")
 
     if "oChief" in RTDict:
-        errStr += block_ndarray("oChief", "RTDict", (3,))
+        errStr += block_ndarray("oChief", RTDict, (3,))
     else:
         errStr += errMsg_field("oChief", "RTDict")
 

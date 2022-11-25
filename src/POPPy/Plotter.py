@@ -13,7 +13,8 @@ import src.POPPy.Colormaps as cmaps
 from src.POPPy.BindRefl import *
 
 def set_axes_equal(ax):
-    """Set 3D plot axes to equal scale.
+    """
+    Set 3D plot axes to equal scale.
 
     Make axes of 3D plot have equal scale so that spheres appear as
     spheres and cubes as cubes.  Required since `ax.axis('equal')`
@@ -294,7 +295,7 @@ def plotSystem(systemDict, fine, cmap,
                 y.append(frame.y[i])
                 z.append(frame.z[i])
 
-            ax.plot(x, y, z, color='black', zorder=100)
+            ax.plot(x, y, z, color='grey', zorder=100)
 
 
     set_axes_equal(ax)
@@ -311,7 +312,7 @@ def plotSystem(systemDict, fine, cmap,
 
     pt.close()
     return 0
-    """
+
 def beamCut(self, plotObject, field, cross='', units='', vmin=-50, vmax=0, frac=1, show=True, save=False, ret=False):
 
     x_center = int((plotObject["gridsize"][0] - 1) / 2)
@@ -372,7 +373,7 @@ def beamCut(self, plotObject, field, cross='', units='', vmin=-50, vmax=0, frac=
 
     if ret:
         return field[:,y_center], field[:,y_center]
-    """
+
 def plotRTframe(frame, project, savePath):
     fig, ax = pt.subplots(1,1)
 

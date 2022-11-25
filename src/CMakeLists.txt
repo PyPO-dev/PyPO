@@ -8,6 +8,7 @@ project(POPPy
     LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 add_library(poppyrefl SHARED common/InterfaceReflector.cpp)
 target_include_directories(poppyrefl PUBLIC common include)

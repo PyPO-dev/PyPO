@@ -17,7 +17,12 @@ def BuildPOPPy():
             try:
                 print("Installing prerequisites...")
                 os.system("python3 -m pip install numpy matplotlib scipy setuptools nose PyQt5")
-                os.system("sudo apt-get install cm-super dvipng gcc build-essential")
+                try:
+                    os.system("sudo apt-get install cm-super dvipng gcc build-essential cmake")
+                except:
+                    os.system("brew install gcc cmake")
+                    os.system("xcode-select --install")
+                
                 print("Succesfully installed POPPy prerequisites!")
                 print("WARNING: CUDA not installed. Install CUDA manually to enable POPPy on GPU.")
                 return 0

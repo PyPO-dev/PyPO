@@ -13,7 +13,12 @@ Alternatively, the prerequisites can be installed manually on Linux by running:
 sudo apt install cm-super dvipng gcc build-essential cmake
 python3 -m pip install numpy matplotlib scipy setuptools nose PyQt5
 ```
-On Mac OS, [CMake](https://cmake.org/install/) can be installed manually. The Python prerequisites can still be installed manually from the command line or Build.py script.
+On Mac OS, the prereqs are installed using:
+```
+brew install gcc cmake
+xcode-select --install
+python3 -m pip install numpy matplotlib scipy setuptools nose PyQt5
+```
 On Windows, things are slightly more complicated. First, install [Visual Studio](https://visualstudio.microsoft.com/#2010-Visual-CPP). 
 This is necessary as Visual Studio contains CMake and the build tool [NMake](https://learn.microsoft.com/en-us/cpp/build/reference/nmake-reference?view=msvc-170), which are important for building POPPy.
 During installation, select the 'Community' install.

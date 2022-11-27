@@ -13,19 +13,22 @@ Alternatively, the prerequisites can be installed manually on Linux by running:
 sudo apt install cm-super dvipng gcc build-essential cmake
 python3 -m pip install numpy matplotlib scipy setuptools nose PyQt5
 ```
-On Windows or Mac OS, [CMake](https://cmake.org/install/) can be installed manually. The Python prerequisites can still be installed manually from the command line. The cm-super and dvipng packages are included on most TeX installations.
+On Mac OS, [CMake](https://cmake.org/install/) can be installed manually. The Python prerequisites can still be installed manually from the command line or Build.py script.
+On Windows, things are slightly more complicated. First, install [Visual Studio](https://visualstudio.microsoft.com/#2010-Visual-CPP). 
+This is necessary as Visual Studio contains CMake and the build tool [NMake](https://learn.microsoft.com/en-us/cpp/build/reference/nmake-reference?view=msvc-170), which are important for building POPPy.
+During installation, select the 'Community' install.
+You will be prompted to install components and/or workloads. 
+Under 'Desktop & Mobile', tick 'Desktop development with C++' and proceed. 
+This is the minimum requirement, and more components/workloads can be installed, if so desired. After installation, proceed with regular installation.
+
 POPPy is capable of producing figures using LaTeX typesetting. For this, a [LaTeX installation](https://www.tug.org/texlive/quickinstall.html) should be present on the machine.
-The GPU version of POPPy needs a [CUDA installation](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html) and a CUDA-compatible NVIDIA graphics card. These are not installed through the Build.py interface and should be installed manually. Please refer to the NVIDIA documentation on how to install NVIDIA drivers and CUDA.
+The GPU version of POPPy needs a [CUDA installation](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html) and a CUDA-compatible NVIDIA graphics card. 
+These are not installed through the Build.py interface and should be installed manually. Please refer to the NVIDIA documentation on how to install NVIDIA drivers and CUDA on your specific Platform.
 
 -- INSTALLATION --\
-On Windows, if CMake was not installed on the user PATH, it needs to be added. 
-Open cmd in admin mode and run:
-```
-set PATH=%PATH%;<path\to\>CMake\bin
-```
-Note that this will add CMake to the path for just this single shell session.
-This should not be necessary on Linux or MacOs.
-Configure POPPy by running:
+On Linux and MacOs, the following instructions can be run in the regular terminal.
+On Windows, they should be run in the 'x64_x86 Cross Tools Command Promp for VS <year>'.
+Navigate to the POPPy root folder and configure POPPy by running:
 ```
 python Build.py --config
 ```

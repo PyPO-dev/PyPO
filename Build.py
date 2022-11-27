@@ -53,7 +53,7 @@ def BuildPOPPy():
             os.system(f"cmake -S {dir_lists} -B {dir_build} -DCMAKE_BUILD_TYPE=Release")
 
         elif os.name == "nt":
-            os.system(f"cmake -S {dir_lists} -B {dir_build} -G 'MinGW Makefiles'")
+            os.system(f"cmake -S {dir_lists} -B {dir_build}")
         
         return 0
 

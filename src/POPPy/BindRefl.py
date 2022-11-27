@@ -20,7 +20,13 @@ def loadRefllib():
         lib = ctypes.CDLL(str(LD_PATH/"poppyrefl.dll"))
     except:
         LD_PATH = pathlib.Path(__file__).parents[2]/"out/build"
-        lib = ctypes.CDLL(LD_PATH/"libpoppyrefl.so")
+        
+        try:
+            lib = ctypes.CDLL(LD_PATH/"libpoppyrefl.so")
+
+        except:
+            lib = ctypes.CDLL(LD_PATH/"libpoppyrefl.dylib")
+
     return lib
 
 #### DOUBLE PRECISION

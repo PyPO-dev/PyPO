@@ -22,8 +22,12 @@ def loadGPUlib():
         lib = ctypes.CDLL(str(LD_PATH/"poppygpu.dll"))
     except:
         LD_PATH = pathlib.Path(__file__).parents[2]/"out/build"
-        lib = ctypes.CDLL(LD_PATH/"libpoppygpu.so")
-
+        
+        try:
+            lib = ctypes.CDLL(LD_PATH/"libpoppygpu.so")
+        except:
+            lib = ctypes.CDLL(LD_PATH/"libpoppygpu.dylib")
+    
     lib.callKernelf_JM.argtypes = [ctypes.POINTER(c2Bundlef), reflparamsf, reflparamsf,
                                    ctypes.POINTER(reflcontainerf), ctypes.POINTER(reflcontainerf),
                                    ctypes.POINTER(c2Bundlef), ctypes.c_float, ctypes.c_float,

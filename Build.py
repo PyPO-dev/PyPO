@@ -18,7 +18,7 @@ def BuildPOPPy():
         if platform.system() == "Linux":
             os.system("sudo apt-get install cm-super dvipng gcc build-essential cmake")
             os.system("python3 -m pip install numpy matplotlib scipy setuptools nose PyQt5")
-         elif platform.system() == "Darwin":
+        elif platform.system() == "Darwin":
             os.system("brew install gcc cmake qt5")
             os.system("python3 -m pip install numpy matplotlib scipy setuptools nose")
             os.system("xcode-select --install")

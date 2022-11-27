@@ -18,6 +18,13 @@ POPPy is capable of producing figures using LaTeX typesetting. For this, a [LaTe
 The GPU version of POPPy needs a [CUDA installation](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html) and a CUDA-compatible NVIDIA graphics card. These are not installed through the Build.py interface and should be installed manually. Please refer to the NVIDIA documentation on how to install NVIDIA drivers and CUDA.
 
 -- INSTALLATION --\
+On Windows, if CMake was not installed on the user PATH, it needs to be added. 
+Open cmd in admin mode and run:
+```
+set PATH=%PATH%;<path/to/CMake/install>
+```
+Note that this will add CMake to the path for just this single shell session.
+This should not be necessary on Linux or MacOs.
 Configure POPPy by running:
 ```
 python Build.py --config

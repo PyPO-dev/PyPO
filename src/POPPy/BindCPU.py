@@ -253,4 +253,4 @@ def RT_CPUd(target, fr_in, epsilon, t0, nThreads):
     return fr_out
 
 if __name__ == "__main__":
-    rint("Bindings for POPPy CPU.")
+    print("Bindings for POPPy CPU.")

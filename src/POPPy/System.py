@@ -4,7 +4,6 @@ import numpy as np
 import matplotlib.pyplot as pt
 import matplotlib.cm as cm
 import time
-import psutil
 import os
 import sys
 import json

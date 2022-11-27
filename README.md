@@ -1,7 +1,7 @@
 Welcome to the Physical OPtics for Python (POPPy) package!
 
 -- PREREQS --\
-A fully functioning [Python 3.8](https://docs.python-guide.org/starting/install3/linux/) installation.
+A fully functioning [Python 3.8](https://docs.python-guide.org/starting/install3/linux/) installation. At the moment, the GUI only supports a Python version of 3.9 or lower.
 If the PIP package manager was not automatically installed with your Python install, it can be installed [manually](https://pip.pypa.io/en/stable/installation/).
 
 To install the prerequisites for POPPy, navigate to the main folder and run:

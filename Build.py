@@ -16,11 +16,12 @@ def BuildPOPPy():
         if os.name == "posix":
             try:
                 print("Installing prerequisites...")
-                os.system("python3 -m pip install numpy matplotlib scipy setuptools nose PyQt5")
                 try:
                     os.system("sudo apt-get install cm-super dvipng gcc build-essential cmake")
+                    os.system("python3 -m pip install numpy matplotlib scipy setuptools nose PyQt5")
                 except:
-                    os.system("brew install gcc cmake")
+                    os.system("brew install gcc cmake qt5")
+                    os.system("python3 -m pip install numpy matplotlib scipy setuptools nose")
                     os.system("xcode-select --install")
                 
                 print("Succesfully installed POPPy prerequisites!")
@@ -32,7 +33,7 @@ def BuildPOPPy():
         elif os.name == "nt": 
             try:
                 print("Installing prerequisites...")
-                os.system("pip install numpy matplotlib scipy setuptools nose PyQt5")
+                os.system("py -m pip install numpy matplotlib scipy setuptools nose PyQt5")
                 print("Succesfully installed POPPy Python prerequisites! Refer to README for CMake installation.")
                 print("WARNING: CUDA not installed. Install CUDA manually to enable POPPy on GPU.")
                 return 0

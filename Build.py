@@ -15,7 +15,7 @@ def BuildPOPPy():
     
     if prereq:
         print("Installing prerequisites...")
-         if platform.system() == "Linux":
+        if platform.system() == "Linux":
             os.system("sudo apt-get install cm-super dvipng gcc build-essential cmake")
             os.system("python3 -m pip install numpy matplotlib scipy setuptools nose PyQt5")
          elif platform.system() == "Darwin":

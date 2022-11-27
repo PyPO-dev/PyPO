@@ -20,7 +20,10 @@ def loadBeamlib():
         lib = ctypes.CDLL(str(LD_PATH/"poppybeam.dll"))
     except:
         LD_PATH = pathlib.Path(__file__).parents[2]/"out/build"
-        lib = ctypes.CDLL(LD_PATH/"libpoppybeam.so")
+        try:
+            lib = ctypes.CDLL(LD_PATH/"libpoppybeam.so")
+        except:
+            lib = ctypes.CDLL(LD_PATH/"libpoppybeam.dylib")
 
     lib.makeRTframe.argtypes = [RTDict, ctypes.POINTER(cframe)]
     lib.makeRTframe.restype = None

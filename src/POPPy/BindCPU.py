@@ -21,7 +21,10 @@ def loadCPUlib():
         lib = ctypes.CDLL(str(LD_PATH/"poppycpu.dll"))
     except:
         LD_PATH = pathlib.Path(__file__).parents[2]/"out/build"
-        lib = ctypes.CDLL(LD_PATH/"libpoppycpu.so")
+        try:
+            lib = ctypes.CDLL(LD_PATH/"libpoppycpu.so")
+        except:
+            lib = ctypes.CDLL(LD_PATH/"libpoppycpu.dylib")
 
     lib.propagateToGrid_JM.argtypes = [ctypes.POINTER(c2Bundle), reflparams, reflparams,
                                         ctypes.POINTER(reflcontainer), ctypes.POINTER(reflcontainer),

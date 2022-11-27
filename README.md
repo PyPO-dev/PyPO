@@ -21,7 +21,7 @@ The GPU version of POPPy needs a [CUDA installation](https://docs.nvidia.com/cud
 On Windows, if CMake was not installed on the user PATH, it needs to be added. 
 Open cmd in admin mode and run:
 ```
-set PATH=%PATH%;<path/to/CMake/install>
+set PATH=%PATH%;<path\to\>CMake\bin
 ```
 Note that this will add CMake to the path for just this single shell session.
 This should not be necessary on Linux or MacOs.

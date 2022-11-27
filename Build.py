@@ -48,7 +48,13 @@ def BuildPOPPy():
         if not os.path.exists(dir_build):
             os.makedirs(dir_build)
 
-        os.system(f"cmake -S {dir_lists} -B {dir_build} -DCMAKE_BUILD_TYPE=Release")
+
+        if os.name == "posix":
+            os.system(f"cmake -S {dir_lists} -B {dir_build} -DCMAKE_BUILD_TYPE=Release")
+
+        elif os.name == "nt":
+            os.system(f"cmake -S {dir_lists} -B {dir_build} -G 'MinGW Makefiles'")
+        
         return 0
 
     if cmake:

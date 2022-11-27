@@ -33,7 +33,7 @@ def BuildPOPPy():
         elif os.name == "nt": 
             try:
                 print("Installing prerequisites...")
-                os.system("pip install numpy matplotlib scipy setuptools nose PyQt5")
+                os.system("py -m pip install numpy matplotlib scipy setuptools nose PyQt5")
                 print("Succesfully installed POPPy Python prerequisites! Refer to README for CMake installation.")
                 print("WARNING: CUDA not installed. Install CUDA manually to enable POPPy on GPU.")
                 return 0

@@ -6,7 +6,7 @@ If the PIP package manager was not automatically installed with your Python inst
 
 To install the prerequisites for POPPy, navigate to the main folder and run:
 ```
-python Build.py --prereq
+python Build.py --prereqs
 ```
 Alternatively, the prerequisites can be installed manually on Linux by running:
 ```

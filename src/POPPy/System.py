@@ -75,7 +75,10 @@ class System(object):
             os.makedirs(self.savePath)
 
     def __str__(self):
-        pass
+        s = "Reflectors in system:\n"
+        for key, item in self.system.items():
+            s += f"{key}\n"
+        return s
 
     def setCustomBeamPath(self, path, append=False):
         if append:
@@ -88,6 +91,10 @@ class System(object):
             self.customReflPath = os.path.join(self.customReflPath, path)
         else:
             self.customReflPath = path
+
+    def mergeSystem(self, sysObject):
+        sys_copy = copyGrid(sysObject.system)
+        self.system.update(sys_copy)
 
     #### ADD REFLECTOR METHODS
     # Parabola takes as input the reflectordict from now on.
@@ -227,6 +234,7 @@ class System(object):
 
         reflDict["type"] = 2
         reflDict["transf"] = np.eye(4)
+
         check_ElemDict(reflDict) 
         self.system[reflDict["name"]] = copyGrid(reflDict)
 
@@ -478,7 +486,7 @@ class System(object):
             out.append(sumd)
 
         return out
-
+    # Beam!
     def createGauss(self, gaussDict, name_source):
         gauss_in = makeGauss(gaussDict, self.system[name_source])
         return gauss_in
@@ -524,9 +532,9 @@ class System(object):
         surfaceObj = self.system[name_target]
         return effs.calcDirectivity(eta_t, surfaceObj, k)
 
-    def fitGaussAbs(self, field, name_surface, thres):
+    def fitGaussAbs(self, field, name_surface, thres, mode):
         surfaceObj = self.system[name_surface]
-        out = fgs.fitGaussAbs(field, surfaceObj, thres)
+        out = fgs.fitGaussAbs(field, surfaceObj, thres, mode)
 
         return out
 

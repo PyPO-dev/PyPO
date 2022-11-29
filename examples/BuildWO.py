@@ -39,33 +39,53 @@ def MakeWO():
     e_center = (e_f1 + e_f0) / 2 
     diff = (e_f1 - e_f0) / np.sqrt(np.dot(e_f1 - e_f0, e_f1 - e_f0))
     theta = np.degrees(np.arccos(np.dot(np.array([1,0,0]), diff)))
-    print(theta)
+    #print(theta)
     
     # Initialize system
     s = System()
     
     # Add parabolic reflector and hyperbolic reflector by focus, vertex and two foci and eccentricity
-    h_coeff = [_B_HYPERBO, _B_HYPERBO, _A_HYPERBO]
-    h_gridsize = [601, 401]
+    h_coeff = np.array([_B_HYPERBO, _B_HYPERBO, _A_HYPERBO])
+    h_gridsize = np.array([601, 401])
     
     # Define ellipse coefficients. Note that _X_LIM_ELL is in frame where ellipse vertex is at origin
     # In our definition, ellipse is centered at origin. Semi-major axis is along x-axis
     #_X_LIM_ELL -= _A_ELLIPSE
     
-    e_coeff = [_B_ELLIPSE, _B_ELLIPSE, _A_ELLIPSE]
-    e_gridsize = [401, 401]
+    e_coeff = np.array([_B_ELLIPSE, _B_ELLIPSE, _A_ELLIPSE])
+    e_gridsize = np.array([401, 401])
+
+    h_wo = {
+            "name"      : "h_wo",
+            "pmode"     : "manual",
+            "gmode"     : "xy",
+            "coeffs"    : h_coeff,
+            "flip"      : False,
+            "lims_x"    : _X_LIM_HYP,
+            "lims_y"    : _Y_LIM_HYP,
+            "gridsize"  : h_gridsize
+            }
     
-    #s.addParabola(name="e1", coef=e_coeff, lims_x=_X_LIM_ELL, lims_y=_Y_LIM_ELL, gridsize=e_gridsize, pmode='man', gmode='xy')
-    s.addEllipse(name="e1", coef=e_coeff, lims_x=_X_LIM_ELL, lims_y=_Y_LIM_ELL, gridsize=e_gridsize, pmode='man', gmode='xy', ori='vertical')
-    s.system['e1'].rotateGrid(np.array([0, 90, 0]))
-    s.system['e1'].translateGrid(e_center)
-    s.system['e1'].cRot = e_center
-    s.system['e1'].rotateGrid(np.array([0, theta, 0]))
-    
-    s.addHyperbola(name="h1", coef=h_coeff, lims_x=_X_LIM_HYP, lims_y=_Y_LIM_HYP, gridsize=h_gridsize, pmode='man', gmode='xy', sec='lower')
-    s.system['h1'].translateGrid(np.array([0, 0, _C_HYPERBO]))
-    s.system['h1'].rotateGrid(np.array([0, 65, 0]))
-    
+    e_wo = {
+            "name"      : "e_wo",
+            "pmode"     : "manual",
+            "gmode"     : "xy",
+            "coeffs"    : e_coeff,
+            "flip"      : False,
+            "lims_x"    : _X_LIM_ELL,
+            "lims_y"    : _Y_LIM_ELL,
+            "gridsize"  : e_gridsize
+            }
+
+    s.addHyperbola(h_wo)
+    s.addEllipse(e_wo)
+
+    s.translateGrids("h_wo", np.array([0, 0, _C_HYPERBO]))
+    s.rotateGrids("h_wo", np.array([0, 65, 0]))
+
+    s.rotateGrids("e_wo", np.array([0, 90, 0]))
+    s.translateGrids("e_wo", e_center)
+    s.rotateGrids("e_wo", np.array([0, theta, 0]), e_center)
     #s.plotSystem(focus_1=True, focus_2=True)
     
     return s

@@ -11,30 +11,6 @@ warnings.filterwarnings("ignore")
 import src.POPPy.PlotConfig
 import src.POPPy.Colormaps as cmaps
 from src.POPPy.BindRefl import *
-
-def set_axes_equal(ax):
-    """
-    Set 3D plot axes to equal scale.
-
-    Make axes of 3D plot have equal scale so that spheres appear as
-    spheres and cubes as cubes.  Required since `ax.axis('equal')`
-    and `ax.set_aspect('equal')` don't work on 3D.
-    """
-    limits = np.array([
-        ax.get_xlim3d(),
-        ax.get_ylim3d(),
-        ax.get_zlim3d(),
-    ])
-    origin = np.mean(limits, axis=1)
-    radius = 0.5 * np.max(np.abs(limits[:, 1] - limits[:, 0]))
-    _set_axes_radius(ax, origin, radius)
-
-def _set_axes_radius(ax, origin, radius):
-    x, y, z = origin
-    ax.set_xlim3d([x - radius, x + radius])
-    ax.set_ylim3d([y - radius, y + radius])
-    ax.set_zlim3d([z - radius, z + radius])
-
 def plotBeam2D(plotObject, field,
                 vmin, vmax, show, amp_only,
                 save, polar, interpolation,
@@ -239,7 +215,8 @@ def plot3D(plotObject, fine, cmap,
         world_limits = ax_append.get_w_lims()
         ax_append.set_box_aspect((world_limits[1]-world_limits[0],world_limits[3]-world_limits[2],world_limits[5]-world_limits[4]))
         ax_append.tick_params(axis='x', which='major', pad=-3)
-        set_axes_equal(ax_append)
+        ax_append.minorticks_off()
+        #set_axes_equal(ax_append)
 
     if save:
         pt.savefig(fname=savePath + '{}.jpg'.format(plotObject["name"]),bbox_inches='tight', dpi=300)
@@ -281,7 +258,7 @@ def plotSystem(systemDict, fine, cmap,
     #ax.set_title("System", fontsize=20)
     world_limits = ax.get_w_lims()
 
-    #ax.set_box_aspect((1,1,1))
+    ax.set_box_aspect((1,1,1))
     ax.tick_params(axis='x', which='major', pad=-3)
 
     if RTframes:
@@ -298,7 +275,8 @@ def plotSystem(systemDict, fine, cmap,
             ax.plot(x, y, z, color='grey', zorder=100)
 
 
-    set_axes_equal(ax)
+    #set_axes_equal(ax)
+    ax.minorticks_off()
     ax.set_box_aspect((world_limits[1]-world_limits[0],world_limits[3]-world_limits[2],world_limits[5]-world_limits[4]))
 
     if save:

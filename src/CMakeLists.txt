@@ -31,15 +31,16 @@ check_language(CUDA)
 
 if(CMAKE_CUDA_COMPILER)
     enable_language(CUDA)
+    set(CMAKE_CUDA_STANDARD 11)
     file(GLOB CUDAfiles CUDA/*.cu)
 
     add_library(poppygpu SHARED ${CUDAfiles})
     target_include_directories(poppygpu PRIVATE CUDA)
     target_link_libraries(poppygpu PRIVATE poppyrefl)
+    set_target_properties(poppygpu PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 else()
     message(STATUS "WARNING: no CUDA compiler detected.")
 endif()
 
-#add_library(libpoppycpu SHARED  )
 
 

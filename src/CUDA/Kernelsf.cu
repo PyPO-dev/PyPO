@@ -1,10 +1,5 @@
 #include "InterfaceCUDA.h"
 
-/* Kernels for single precision PO.
- * Author: Arend Moerman
- * For questions, contact: arendmoerman@gmail.com
- */
-
 // Declare constant memory for Device
 __constant__ cuFloatComplex con[CSIZE];     // Contains: k, eps, mu0, zeta0, pi, C_l, Time direction, unit, zero, c4 as complex numbers
 //__constant__ cuDoubleComplex con[CSIZE];
@@ -31,17 +26,31 @@ __host__ inline void gpuAssert(cudaError_t code, const char *file, int line, boo
    }
 }
 
-
+/**
+ * Print complex array of len 3.
+ * Useful for debugging
+ * @param arr Array of cuFloatComplex len 3
+ */
 __host__ __device__ void _debugArray(cuFloatComplex arr[3])
 {
     printf("%e + %ej, %e + %ej, %e + %ej\n", arr[0].x, arr[0].y, arr[1].x, arr[1].y, arr[2].x, arr[2].y);
 }
 
+/**
+ * Print float array of len 3
+ * @param arr Array of cuFloatComplex len 3
+ */
 __host__ __device__ void _debugArray(float arr[3])
 {
     printf("%e, %e, %e\n", arr[0], arr[1], arr[2]);
 }
 
+/**
+ * Take complex exponential.
+ * @param z Complex number
+ *
+ * @return res Complex number
+ */
 __device__ __inline__ cuFloatComplex expCo(cuFloatComplex z)
 {
     cuFloatComplex res;
@@ -55,13 +64,12 @@ __device__ __inline__ cuFloatComplex expCo(cuFloatComplex z)
 }
 
 /**
- * (PRIVATE)
  * Instantiate program and populate constant memory.
  *
  * @param k Wavenumber of incoming field.
  * @param epsilon Relative permittivity of source.
- * @param ct->size Number of elements in target.
- * @param cs->size Number of elements in source.
+ * @param gt Number of elements in target.
+ * @param gs Number of elements in source.
  * @param t_direction Sign of exponent in Green function.
  * @param nBlock Number of blocks per grid.
  * @param nThreads Number of threads per block.
@@ -124,19 +132,19 @@ __device__ __inline__ cuFloatComplex expCo(cuFloatComplex z)
 /**
  * Calculate total field at point on target.
  *
- * @param d_xs C-style array containing source points x-coordinate.
- * @param d_ys C-style array containing source points y-coordinate.
- * @param d_zs C-style array containing source points z-coordinate.
- * @param d_Jx C-style array containing source J x-component.
- * @param d_Jy C-style array containing source J y-component.
- * @param d_Jz C-style array containing source J z-component.
- * @param d_Mx C-style array containing source M x-component.
- * @param d_My C-style array containing source M y-component.
- * @param d_Mz C-style array containing source M z-component.
- * @param point C-style array of lenct->sizeh 3 containing xyz coordinates of target point.
- * @param d_A C-style array containing area elements.
- * @param d_ei C-style array of lenct->sizeh 3 to be filled with E-field at point.
- * @param d_hi C-style array of lenct->sizeh 3 to be filled with H-field at point.
+ * @param d_xs array containing source points x-coordinate.
+ * @param d_ys array containing source points y-coordinate.
+ * @param d_zs array containing source points z-coordinate.
+ * @param d_Jx array containing source J x-component.
+ * @param d_Jy array containing source J y-component.
+ * @param d_Jz array containing source J z-component.
+ * @param d_Mx array containing source M x-component.
+ * @param d_My array containing source M y-component.
+ * @param d_Mz array containing source M z-component.
+ * @param point array of len 3 containing xyz coordinates of target point.
+ * @param d_A array containing area elements.
+ * @param d_ei array of len 3 to be filled with E-field at point.
+ * @param d_hi array of len 3 to be filled with H-field at point.
  */
 __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
                     cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
@@ -223,15 +231,7 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
         {
             e_field[n] = cuCsubf(e_field[n], cuCmulf(cuCsubf(cuCmulf(omega, cuCmulf(con[2], e_vec_thing[n])), k_out_ms[n]), Green));
             h_field[n] = cuCsubf(h_field[n], cuCmulf(cuCaddf(cuCmulf(omega, cuCmulf(con[1], h_vec_thing[n])), k_out_js[n]), Green));
-
-            //if (i == 2){printf("%.16f\n", e_vec_thing[n].x);}
-            //if (i == 2){printf("%.16f\n", h_vec_thing[n].x);}
-
-            //if (i == 2){printf("%.16f\n", k_out_ms[n].x);}
-            //if (i == 2){printf("%.16f\n", k_out_js[n].x);}
         }
-        //if (i == 2){printf("%.16f\n", k_out_js[1].x);}
-
     }
 
     d_ei[0] = e_field[0];
@@ -356,7 +356,8 @@ __global__ void GpropagateBeam_0(float *d_xs, float *d_ys, float *d_zs,
         // Calculate reflected field from reflection matrix
         for(int n=0; n<3; n++)
         {
-            e_r[n] = cuCsubf(cuCmulf(e_dot_p_r_perp, make_cuFloatComplex(-p_i_perp[n], 0.)), cuCmulf(e_dot_p_r_parr, make_cuFloatComplex(p_i_parr[n], 0.)));
+            e_r[n] = cuCsubf(cuCmulf(e_dot_p_r_perp, make_cuFloatComplex(-p_i_perp[n], 0.)), 
+                            cuCmulf(e_dot_p_r_parr, make_cuFloatComplex(p_i_parr[n], 0.)));
         }
 
         ext(S_r_norm, e_r, temp1);                       // h_r_temp
@@ -407,7 +408,7 @@ __global__ void GpropagateBeam_0(float *d_xs, float *d_ys, float *d_zs,
  * @param d_Hyt C-style array to be filled with target Hi y-component.
  * @param d_Hzt C-style array to be filled with target Hi z-component.
  */
-__global__ void GpropagateBeam_1(float *d_xs, float *d_ys, float *d_zs,
+__global__ void GpropagateBeam_1(float* d_xs, float* d_ys, float* d_zs,
                                 float *d_A, float *d_xt, float *d_yt, float *d_zt,
                                 cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
                                 cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz,
@@ -428,8 +429,6 @@ __global__ void GpropagateBeam_1(float *d_xs, float *d_ys, float *d_zs,
         point[1] = d_yt[idx];
         point[2] = d_zt[idx];
 
-        //printf("%f, %f, %f\n", d_Mx[idx].x, d_My[idx].x, d_Mz[idx].x);
-
         // Calculate total incoming E and H field at point on target
         fieldAtPoint(d_xs, d_ys, d_zs,
                     d_Jx, d_Jy, d_Jz,
@@ -439,8 +438,6 @@ __global__ void GpropagateBeam_1(float *d_xs, float *d_ys, float *d_zs,
         d_Ext[idx] = d_ei[0];
         d_Eyt[idx] = d_ei[1];
         d_Ezt[idx] = d_ei[2];
-
-        //printf("%f\n", d_ei[0].x);
 
         d_Hxt[idx] = d_hi[0];
         d_Hyt[idx] = d_hi[1];
@@ -556,7 +553,6 @@ __global__ void GpropagateBeam_2(float *d_xs, float *d_ys, float *d_zs,
 
 
         normalize(e_out_h_r, S_i_norm);                       // S_i_norm
-        //_debugArray(S_i_norm);
 
         // Calculate incoming polarization vectors
         ext(S_i_norm, norms, S_out_n);                      // S_i_out_n
@@ -578,7 +574,8 @@ __global__ void GpropagateBeam_2(float *d_xs, float *d_ys, float *d_zs,
         // Calculate reflected field from reflection matrix
         for(int n=0; n<3; n++)
         {
-            e_r[n] = cuCsubf(cuCmulf(e_dot_p_r_perp, make_cuFloatComplex(-p_i_perp[n], 0.)), cuCmulf(e_dot_p_r_parr, make_cuFloatComplex(p_i_parr[n], 0.)));
+            e_r[n] = cuCsubf(cuCmulf(e_dot_p_r_perp, make_cuFloatComplex(-p_i_perp[n], 0.)), 
+                            cuCmulf(e_dot_p_r_parr, make_cuFloatComplex(p_i_parr[n], 0.)));
         }
 
         ext(S_r_norm, e_r, temp1);                       // h_r_temp
@@ -689,7 +686,6 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
                     d_Mx, d_My, d_Mz,
                     point, d_A, d_ei, d_hi);
 
-        //printf("%e\n", d_ei[idx].x);
         // Calculate normalised incoming poynting vector.
         conja(d_hi, temp1);                        // h_conj
         ext(d_ei, temp1, temp2);                  // e_out_h
@@ -715,9 +711,6 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
         d_Prxt[idx] = S_r_norm[0];
         d_Pryt[idx] = S_r_norm[1];
         d_Przt[idx] = S_r_norm[2];
-        //printf("%f\n", d_A[idx]);
-
-
 
         // Calculate normalised reflected polarization vectors
         ext(S_r_norm, norms, S_out_n);                      // S_r_out_n
@@ -731,7 +724,8 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
         // Calculate reflected field from reflection matrix
         for(int n=0; n<3; n++)
         {
-            e_r[n] = cuCsubf(cuCmulf(e_dot_p_r_perp, make_cuFloatComplex(-p_i_perp[n], 0.)), cuCmulf(e_dot_p_r_parr, make_cuFloatComplex(p_i_parr[n], 0.)));
+            e_r[n] = cuCsubf(cuCmulf(e_dot_p_r_perp, make_cuFloatComplex(-p_i_perp[n], 0.)), 
+                            cuCmulf(e_dot_p_r_parr, make_cuFloatComplex(p_i_parr[n], 0.)));
         }
 
         ext(S_r_norm, e_r, temp1);                       // h_r_temp
@@ -792,7 +786,6 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
 
         expo = expCo(cuCmulf(con[7], make_cuFloatComplex((con[0].x * r_hat_in_rp), 0.)));
 
-        //if (i==100){printf("%f\n", expo.x);}
         cfact = cuCmulf(expo, make_cuFloatComplex(d_A[i], 0.));
 
         js[0] = cuCaddf(js[0], cuCmulf(d_Jx[i], cfact));

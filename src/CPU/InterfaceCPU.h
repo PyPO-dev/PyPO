@@ -1,13 +1,10 @@
-
 #include <iostream>
 #include <vector>
 #include <complex>
 #include <chrono>
 #include <cmath>
 #include <string>
-#include <iterator>
-#include <new>
-#include "stdlib.h"
+
 #include "Propagation.h"
 #include "RayTrace.h"
 
@@ -16,6 +13,9 @@
 #else
 #   define POPPY_DLL
 #endif
+
+#ifndef __InterfaceCPU_h
+#define __InterfaceCPU_h
 
 // DOUBLE PRECISION INTERFACE
 extern "C"
@@ -96,3 +96,5 @@ extern "C"
                                     float k, int numThreads, float epsilon,
                                     float t_direction);
 }
+
+#endif

@@ -1,20 +1,16 @@
 #include <iostream>
 #include <chrono>
 #include <string>
-#include <iterator>
 #include <cmath>
 #include <array>
-#include <iomanip>
 
-#include <cuda.h>
-#include <cuComplex.h>
-#include <cuda_runtime.h>
-#include <unistd.h>
+//#include <cuda.h>
+//#include <cuComplex.h>
+//#include <cuda_runtime.h>
 
 #include "GUtils.h"
 #include "Structs.h"
 #include "InterfaceReflector.h"
-//#include "CompOverload.h"
 
 #define CSIZE 10
 #define CSIZERT 5
@@ -25,6 +21,9 @@
 #else
 #   define POPPY_DLL
 #endif
+
+#ifndef __InterfaceCUDA_h
+#define __InterfaceCUDA_h
 /* Kernels for single precision PO.
  * Author: Arend Moerman
  * For questions, contact: arendmoerman@gmail.com
@@ -62,7 +61,9 @@ extern "C"
                float k, float epsilon,
                float t_direction, int nBlocks, int nThreads);
     
-    POPPY_DLL extern "C" void callRTKernel(reflparamsf ctp, cframef *fr_in,
+    POPPY_DLL void callRTKernel(reflparamsf ctp, cframef *fr_in,
                cframef *fr_out, float epsilon, float t0,
                int nBlocks, int nThreads);
 }
+
+#endif

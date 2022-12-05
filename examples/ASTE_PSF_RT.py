@@ -66,6 +66,9 @@ def ex_ASTE_RT(device):
     s.addHyperbola(hyperbola)
     s.translateGrids("plane1", np.array([0,0,3.5e3 - d_foc_h]))
  
+    s.translateGrids("sec", np.array([1064e-6, 1064e-6, 1064e-6]))
+    s.rotateGrids("sec", np.array([1,0,0]), np.array([0,0,3.5e3]))
+
     frame_in = s.createFrame(argDict=RTpar)
 
     if device == "CPU":

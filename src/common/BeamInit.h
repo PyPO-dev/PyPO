@@ -1,17 +1,14 @@
 #include <iostream>
-#include <vector>
 #include <array>
-#define _USE_MATH_DEFINES
+
 #include <cmath>
 #include <complex>
-#include <thread>
-#include <iomanip>
-#include <algorithm>
-#include <new>
 
 #include "Utils.h"
 #include "Structs.h"
 #include "InterfaceReflector.h"
+
+#define _USE_MATH_DEFINES
 
 #ifndef __BeamInit_h
 #define __BeamInit_h
@@ -25,7 +22,6 @@ void initGauss(T gdict, U rdict, V *res_field, V *res_current);
 
 template<typename T, typename U, typename V, typename W>
 void calcJM(T *res_field, T *res_current, V rdict, int mode);
-
 
 template<typename T, typename U, typename V>
 void initFrame(T rdict, U *fr)
@@ -124,6 +120,8 @@ void initGauss(T gdict, U rdict, V *res_field, V *res_current)
 
     bool transform = false;
     generateGrid(rdict, &reflc, transform);
+
+    //TODO ADD ASTIGMATIC DEFINITION
 
     G zR      = M_PI * gdict.w0*gdict.w0 * gdict.n / gdict.lam;
     G wz      = gdict.w0 * sqrt(1 + (gdict.z / zR)*(gdict.z / zR));

@@ -168,14 +168,14 @@ void propagateRays(reflparams ctp, cframe *fr_in, cframe *fr_out,
     std::chrono::steady_clock::time_point begin;
     std::chrono::steady_clock::time_point end;
 
-    printf("Calculating ray-trace...\n");
+    //printf("Calculating ray-trace...\n");
     begin = std::chrono::steady_clock::now();
     RT.parallelRays(ctp, fr_in, fr_out, t0);
 
     end = std::chrono::steady_clock::now();
-    std::cout << "Elapsed time : "
-              << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count()
-              << " [ms]\n" << std::endl;
+    //std::cout << "Elapsed time : "
+    //          << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count()
+    //          << " [ms]\n" << std::endl;
 }
 
 // SINGLE PRECISION INTERFACE

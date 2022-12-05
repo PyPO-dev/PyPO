@@ -7,6 +7,9 @@
 #   define POPPY_DLL
 #endif
 
+#ifndef InterfaceBeam_h
+#define InterfaceBeam_h
+
 extern "C"
 {
     POPPY_DLL void makeRTframe(RTDict rdict, cframe *fr);
@@ -15,3 +18,5 @@ extern "C"
 
     POPPY_DLL void calcCurrents(c2Bundle *res_field, c2Bundle *res_current, reflparams rdict, int mode);
 }
+
+#endif

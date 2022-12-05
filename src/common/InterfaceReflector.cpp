@@ -406,15 +406,21 @@ void Plane_xy(T *plane, U xu_lo, U xu_up, U yv_lo,
 
 template<typename T, typename U>
 void Plane_uv(T *plane, U xu_lo, U xu_up, U yv_lo,
-              U yv_up, int ncx, int ncy, int nfac,
+              U yv_up, U a, U b, int ncx, int ncy, int nfac,
               U mat[16], bool transform)
 {
-    U du = (xu_up - xu_lo) / (ncx - 1);
-    U dv = (yv_up - yv_lo) / (ncy - 1);
+
 
     // Generate using xy parametrisation
-    U u;
-    U v;
+    U u, du, duv, dux, duy;
+    U v, dv, r;
+
+    dux = a / (ncx - 1);
+    duy = b / (ncx - 1);
+
+    dv = (yv_up - yv_lo) / (ncy - 1) * M_PI/180;
+    
+    U majmin = b / a;
 
     U norm;
 
@@ -424,24 +430,35 @@ void Plane_uv(T *plane, U xu_lo, U xu_up, U yv_lo,
     std::array<U, 3> inp, out;
 
     for (int i=0; i < ncx; i++)
-    {
+    {        
+        du = (xu_up - xu_lo) / (ncx - 1);
         u = i * du + xu_lo;
+
+        //dux = a / (ncx - 1);
+        //duy = b / (ncx - 1);
 
         for (int j=0; j < ncy; j++)
         {
-            v = (j * dv + yv_lo) * M_PI/180;
+            v = (j * dv + yv_lo);
             int idx = i*ncy + j;
-
+          
+            //du = dux * cos(v) + duy * sin(v); 
+            //u = i * du + xu_lo;
+            
             plane->x[idx] = u * cos(v);
-            plane->y[idx] = u * sin(v);
+            plane->y[idx] = u * sin(v) * majmin;
             plane->z[idx] = 0;
+
+            r = u * sqrt(cos(v)*cos(v) + sin(v)*sin(v)*majmin*majmin);
 
             plane->nx[idx] = 0;
             plane->ny[idx] = 0;
             plane->nz[idx] = nfac * 1;
 
-            plane->area[idx] = u * du * dv;
+            duv = sqrt(dux*dux*cos(v)*cos(v) + duy*duy*sin(v)*sin(v));
 
+            plane->area[idx] = r * duv * dv;// / (a*a*cos(v)*cos(v) + sin(v)*sin(v)*b*b);// * (cos(v) + sin(v)*majmin);// * (cos(v) + sin(v)*majmin);
+            //plane->area[idx] = u * du * dv;//a*a * b*b / 2 * dv / (b*b * cos(v)*cos(v) + a*a * sin(v)*sin(v));
             if (transform)
             {
                 transformGrids<T, U>(plane, idx, inp, out, &ut, mat);
@@ -582,7 +599,7 @@ extern "C" void generateGrid(reflparams refl, reflcontainer *container, bool tra
         else if (refl.type == 3)
         {
             Plane_uv<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, ncx, ncy, nfac, refl.transf, transform);
+                                            yv_up, a, b, ncx, ncy, nfac, refl.transf, transform);
         }
     }
 
@@ -666,7 +683,7 @@ extern "C" void generateGridf(reflparamsf refl, reflcontainerf *container, bool 
         else if (refl.type == 3)
         {
             Plane_uv<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, ncx, ncy, nfac, refl.transf, transform);
+                                            yv_up, a, b, ncx, ncy, nfac, refl.transf, transform);
         }
     }
 

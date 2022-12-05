@@ -1,17 +1,14 @@
 #include <iostream>
 #include <vector>
-#include <complex>
 #include <array>
-#define _USE_MATH_DEFINES
 #include <cmath>
 #include <thread>
-#include <iomanip>
-#include <algorithm>
-#include <new>
 
 #include "Utils.h"
 #include "Structs.h"
 #include "RTRefls.h"
+
+#define _USE_MATH_DEFINES
 
 #ifndef __RayTracer_h
 #define __RayTracer_h

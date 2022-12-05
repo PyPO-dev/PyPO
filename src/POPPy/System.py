@@ -7,7 +7,8 @@ import time
 import os
 import sys
 import json
-
+from pathlib import Path
+from contextlib import contextmanager
 from scipy.interpolate import griddata
 
 # POPPy-specific modules
@@ -24,10 +25,18 @@ import src.POPPy.Plotter as plt
 import src.POPPy.Efficiencies as effs
 import src.POPPy.FitGauss as fgs
 
-from pathlib import Path
-
 # Set POPPy absolute root path
 sysPath = Path(__file__).parents[2]
+
+@contextmanager
+def suppress_stdout():
+    with open(os.devnull, "w") as devnull:
+        old_stdout = sys.stdout
+        sys.stdout = devnull
+        try:  
+            yield
+        finally:
+            sys.stdout = old_stdout
 
 class NpEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -86,15 +95,22 @@ class System(object):
         else:
             self.customBeamPath = path
 
+    def setSavePath(self, path, append=False):
+        if append:
+            self.savePath = os.path.join(self.savePath, path)
+        else:
+            self.savePath = path
+    
     def setCustomReflPath(self, path, append=False):
         if append:
             self.customReflPath = os.path.join(self.customReflPath, path)
         else:
             self.customReflPath = path
 
-    def mergeSystem(self, sysObject):
-        sys_copy = copyGrid(sysObject.system)
-        self.system.update(sys_copy)
+    def mergeSystem(self, *args):
+        for sysObject in args:
+            sys_copy = copyGrid(sysObject.system)
+            self.system.update(sys_copy)
 
     #### ADD REFLECTOR METHODS
     # Parabola takes as input the reflectordict from now on.
@@ -276,6 +292,8 @@ class System(object):
             self.system[reflDict["name"]]["gmode"] = 0
 
         elif reflDict["gmode"] == "uv":
+            self.system[reflDict["name"]]["coeffs"][0] = reflDict["lims_u"][1]
+            self.system[reflDict["name"]]["coeffs"][1] = reflDict["lims_u"][1] * np.sqrt(1 - reflDict["ecc"]**2)
             self.system[reflDict["name"]]["gmode"] = 1
 
         elif reflDict["gmode"] == "AoE":
@@ -362,6 +380,25 @@ class System(object):
             print(f"Could not find {name_currents} in {self.savePathCurrents}!")
             return 1
 
+    def loadFields(self, name_fields):
+        try:
+            loadDir = os.path.join(self.savePathFields, name_fields)
+
+            Ex = np.load(os.path.join(loadDir, "Ex.npy"))
+            Ey = np.load(os.path.join(loadDir, "Ey.npy"))
+            Ez = np.load(os.path.join(loadDir, "Ez.npy"))
+
+            Hx = np.load(os.path.join(loadDir, "Hx.npy"))
+            Hy = np.load(os.path.join(loadDir, "Hy.npy"))
+            Hz = np.load(os.path.join(loadDir, "Hz.npy"))
+
+            out = fields(Ex, Ey, Ez, Hx, Hy, Hz)
+            return out
+
+        except:
+            print(f"Could not find {name_fields} in {self.savePathFields}!")
+            return 1
+    
     def loadElement(self, name):
         with open('{}.json'.format(os.path.join(self.savePathElem, name)), 'r') as f:
             elem = json.load(f)
@@ -491,13 +528,22 @@ class System(object):
         gauss_in = makeGauss(gaussDict, self.system[name_source])
         return gauss_in
 
-    def runRayTracer(self, fr_in, name_target, epsilon=1e-3, nThreads=1, t0=100, device="CPU"):
-        if device == "CPU":
-            fr_out = RT_CPUd(self.system[name_target], fr_in, epsilon, t0, nThreads)
+    def runRayTracer(self, fr_in, name_target, epsilon=1e-3, nThreads=1, t0=100, device="CPU", verbose=True):
+        if verbose:
+            if device == "CPU":
+                fr_out = RT_CPUd(self.system[name_target], fr_in, epsilon, t0, nThreads)
 
-        elif device == "GPU":
-            fr_out = RT_GPUf(self.system[name_target], fr_in, epsilon, t0, nThreads)
+            elif device == "GPU":
+                fr_out = RT_GPUf(self.system[name_target], fr_in, epsilon, t0, nThreads)
 
+        else:
+            with suppress_stdout():
+                if device == "CPU":
+                    fr_out = RT_CPUd(self.system[name_target], fr_in, epsilon, t0, nThreads)
+
+                elif device == "GPU":
+                    fr_out = RT_GPUf(self.system[name_target], fr_in, epsilon, t0, nThreads)
+        
         return fr_out
 
     def interpFrame(self, fr_in, field, name_target, method="nearest"):
@@ -583,9 +629,17 @@ class System(object):
 
     def plotSystem(self, fine=2, cmap=cm.cool,
                 ax_append=False, norm=False,
-                show=True, foc1=False, foc2=False, save=True, ret=False, RTframes=[]):
+                show=True, foc1=False, foc2=False, save=True, ret=False, select=[], RTframes=[]):
 
-        figax = plt.plotSystem(self.system, fine, cmap,
+        plotDict = {}
+        if select:
+            for name in select:
+                plotDict[name] = self.system[name]
+
+        else:
+            plotDict = self.system
+
+        figax = plt.plotSystem(plotDict, fine, cmap,
                     ax_append, norm,
                     show, foc1, foc2, save, ret, RTframes, self.savePath)
 

@@ -31,7 +31,7 @@ def calcEstimates(x, y, area, field_norm):
         theta += np.pi/2
     if theta < 0:
         theta += np.pi
-
+    
     p = np.sqrt((a - b)**2 + 4 * c**2)
 
     _x0 = 1 / (a + b - p)
@@ -80,7 +80,7 @@ def fitGaussAbs(field, surfaceObject, thres, mode):
 
     field_est = fit_field[mask_f]
     x0, y0, xs, ys, theta = calcEstimates(x[mask_f], y[mask_f], area[mask_f], field_est)
-    print(f"Initial estimate from image moments:\nmu_x = {xs}, mu_y = {ys}\nTheta = {theta}")
+    #print(f"Initial estimate from image moments:\nmu_x = {xs}, mu_y = {ys}\nTheta = {theta}")
 
     p0 = [x0, y0, xs, ys, theta]
 
@@ -93,7 +93,7 @@ def fitGaussAbs(field, surfaceObject, thres, mode):
     popt, pcov = opt.curve_fit(couplingMasked, xy, field_est.ravel(), p0, bounds=bounds, method="dogbox")
     perr = np.sqrt(np.diag(pcov))
 
-    print(f"Fitted shift and rotation:\nmu_x = {popt[-3]}, mu_y = {popt[-2]}\nTheta = {popt[-1]}")
+    #print(f"Fitted shift and rotation:\nmu_x = {popt[-3]}, mu_y = {popt[-2]}\nTheta = {popt[-1]}")
     return popt, perr
 
 def GaussAbs(mask, mode, xy, x0, y0, xs, ys, theta):

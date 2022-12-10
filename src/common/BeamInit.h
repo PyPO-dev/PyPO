@@ -121,12 +121,15 @@ void initGauss(T gdict, U rdict, V *res_field, V *res_current)
     bool transform = false;
     generateGrid(rdict, &reflc, transform);
 
-    //TODO ADD ASTIGMATIC DEFINITION
 
-    G zR      = M_PI * gdict.w0*gdict.w0 * gdict.n / gdict.lam;
-    G wz      = gdict.w0 * sqrt(1 + (gdict.z / zR)*(gdict.z / zR));
-    G Rz_inv  = gdict.z / (gdict.z*gdict.z + zR*zR);
-    G phiz    = atan(gdict.z / zR);
+    G zRx      = M_PI * gdict.w0x*gdict.w0x * gdict.n / gdict.lam;
+    G zRy      = M_PI * gdict.w0x*gdict.w0x * gdict.n / gdict.lam;
+    G wzx      = gdict.w0x * sqrt(1 + (gdict.z / zRx)*(gdict.z / zRx));
+    G wzy      = gdict.w0y * sqrt(1 + (gdict.z / zRy)*(gdict.z / zRy));
+    G Rzx_inv  = gdict.z / (gdict.z*gdict.z + zRx*zRx);
+    G Rzy_inv  = gdict.z / (gdict.z*gdict.z + zRy*zRy);
+    G phizx    = atan(gdict.z / zRx);
+    G phizy    = atan(gdict.z / zRy);
     G k       = 2 * M_PI / gdict.lam;
 
     G r2;
@@ -142,9 +145,10 @@ void initGauss(T gdict, U rdict, V *res_field, V *res_current)
     {
         r2 = reflc.x[i]*reflc.x[i] + reflc.y[i]*reflc.y[i];
 
-        field_atPoint = gdict.E0 * gdict.w0/wz * exp(-r2/(wz*wz)) *
-                        exp(-j * (k*gdict.z + k*r2*Rz_inv/2 - phiz));
-
+        //field_atPoint = gdict.E0 * gdict.w0/wz * exp(-r2/(wz*wz)) * exp(-j * (k*gdict.z + k*r2*Rz_inv/2 - phiz));
+        field_atPoint = gdict.E0 * sqrt(2 / (M_PI * wzx * wzy)) * exp(-(reflc.x[i]/wzx)*(reflc.x[i]/wzx) - (reflc.y[i]/wzy)*(reflc.y[i]/wzy) -
+                j*M_PI/gdict.lam * (reflc.x[i]*reflc.x[i]*Rzx_inv + reflc.y[i]*reflc.y[i]*Rzy_inv) - j*k*gdict.z + j*(phizx - phizy)*0.5);
+        
         efield[0] = field_atPoint * gdict.pol[0];
         efield[1] = field_atPoint * gdict.pol[1];
         efield[2] = field_atPoint * gdict.pol[2];

@@ -65,6 +65,7 @@ typedef struct reflparams {
 
     bool flip;
     int gmode;
+    double *gcenter;
     int type;
 
     double *transf;
@@ -110,7 +111,8 @@ typedef struct RTDict {
 
 typedef struct GDict {
     double lam;
-    double w0;
+    double w0x;
+    double w0y;
     double n;
     double E0;
     double z;
@@ -179,6 +181,7 @@ typedef struct reflparamsf {
 
     bool flip;
     int gmode;
+    float *gcenter;
     int type;
 
     float *transf;
@@ -224,7 +227,8 @@ typedef struct RTDictf {
 
 typedef struct GDictf {
     float lam;
-    float w0;
+    float w0x;
+    float w0y;
     float n;
     float E0;
     float z;

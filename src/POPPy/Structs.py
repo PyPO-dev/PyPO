@@ -77,6 +77,7 @@ class reflparams(ctypes.Structure):
                 ("n_cells", ctypes.POINTER(ctypes.c_int)),
                 ("flip", ctypes.c_bool),
                 ("gmode", ctypes.c_int),
+                ("gcenter", ctypes.POINTER(ctypes.c_double)),
                 ("type", ctypes.c_int),
                 ("transf", ctypes.POINTER(ctypes.c_double))]
 
@@ -111,7 +112,8 @@ class RTDict(ctypes.Structure):
 
 class GDict(ctypes.Structure):
     _fields_ = [("lam", ctypes.c_double),
-                ("w0", ctypes.c_double),
+                ("w0x", ctypes.c_double),
+                ("w0y", ctypes.c_double),
                 ("n", ctypes.c_double),
                 ("E0", ctypes.c_double),
                 ("z", ctypes.c_double),
@@ -192,6 +194,7 @@ class reflparamsf(ctypes.Structure):
                 ("n_cells", ctypes.POINTER(ctypes.c_int)),
                 ("flip", ctypes.c_bool),
                 ("gmode", ctypes.c_int),
+                ("gcenter", ctypes.POINTER(ctypes.c_float)),
                 ("type", ctypes.c_int),
                 ("transf", ctypes.POINTER(ctypes.c_float))]
 
@@ -226,7 +229,8 @@ class RTDictf(ctypes.Structure):
 
 class GDictf(ctypes.Structure):
     _fields_ = [("lam", ctypes.c_float),
-                ("w0", ctypes.c_float),
+                ("w0x", ctypes.c_float),
+                ("w0y", ctypes.c_float),
                 ("n", ctypes.c_float),
                 ("E0", ctypes.c_float),
                 ("z", ctypes.c_float),

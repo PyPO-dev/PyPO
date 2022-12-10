@@ -1,13 +1,10 @@
-#include <iostream>
-#include <vector>
 #include <complex>
 #include <array>
 #include <cmath>
-#include <thread>
-#include <iomanip>
 #include <limits>
 
 #define _USE_MATH_DEFINES
+
 #ifndef __Utils_h
 #define __Utils_h
 

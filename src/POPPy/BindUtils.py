@@ -225,6 +225,7 @@ def allfill_reflparams(inp, reflparams_py, ct_t):
 
     inp.lxu = (ct_t * 2)()
     inp.lyv = (ct_t * 2)()
+    inp.gcenter = (ct_t * 2)()
     inp.n_cells = (ctypes.c_int * 2)()
 
     for i in range(2):
@@ -240,6 +241,7 @@ def allfill_reflparams(inp, reflparams_py, ct_t):
             inp.lxu[i] = ct_t(reflparams_py["lims_Az"][i])
             inp.lyv[i] = ct_t(reflparams_py["lims_El"][i])
 
+        inp.gcenter[i] = ct_t(reflparams_py["gcenter"][i])
         inp.n_cells[i] = ctypes.c_int(reflparams_py["gridsize"][i])
 
     inp.flip = ctypes.c_bool(reflparams_py["flip"])
@@ -298,7 +300,8 @@ def allfill_RTDict(res, rdict_py, ct_t):
 
 def allfill_GDict(res, gdict_py, ct_t):
     res.lam = ct_t(gdict_py["lam"])
-    res.w0 = ct_t(gdict_py["w0"])
+    res.w0x = ct_t(gdict_py["w0x"])
+    res.w0y = ct_t(gdict_py["w0y"])
     res.n = ct_t(gdict_py["n"])
     res.E0 = ct_t(gdict_py["E0"])
     res.z = ct_t(gdict_py["z"])

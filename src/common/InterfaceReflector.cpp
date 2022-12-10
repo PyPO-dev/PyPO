@@ -43,7 +43,7 @@ void transformGrids(T *reflc, int idx, std::array<U, 3> &inp, std::array<U, 3> &
 
 template<typename T, typename U>
 void Parabola_xy(T *parabola, U xu_lo, U xu_up, U yv_lo,
-                U yv_up, U a, U b, int ncx, int ncy, int nfac,
+                U yv_up, U xcenter, U ycenter, U a, U b, int ncx, int ncy, int nfac,
                 U mat[16], bool transform)
 {
     U dx = (xu_up - xu_lo) / (ncx - 1);
@@ -63,12 +63,12 @@ void Parabola_xy(T *parabola, U xu_lo, U xu_up, U yv_lo,
 
     for (int i=0; i < ncx; i++)
     {
-        x = i * dx + xu_lo;
+        x = i * dx + xu_lo + xcenter;
 
         for (int j=0; j < ncy; j++)
         {
 
-            y = j * dy + yv_lo;
+            y = j * dy + yv_lo + ycenter;
 
             int idx = i*ncy + j;
 
@@ -99,7 +99,7 @@ void Parabola_xy(T *parabola, U xu_lo, U xu_up, U yv_lo,
 
 template<typename T, typename U>
 void Parabola_uv(T *parabola, U xu_lo, U xu_up, U yv_lo,
-                U yv_up, U a, U b, int ncx, int ncy, int nfac,
+                U yv_up, U xcenter, U ycenter, U a, U b, int ncx, int ncy, int nfac,
                 U mat[16], bool transform)
 {
     U du = (xu_up/a - xu_lo/a) / (ncx - 1);
@@ -109,6 +109,8 @@ void Parabola_uv(T *parabola, U xu_lo, U xu_up, U yv_lo,
     U u;
     U v;
     U prefac;
+
+    U x, y, norm;
 
     Utils<U> ut;
 
@@ -123,10 +125,27 @@ void Parabola_uv(T *parabola, U xu_lo, U xu_up, U yv_lo,
             v = (j * dv + yv_lo) * M_PI/180;
             int idx = i*ncy + j;
 
-            parabola->x[idx] = a * u * cos(v);
-            parabola->y[idx] = b * u * sin(v);
-            parabola->z[idx] = u * u;
+            x = a * u * cos(v) + xcenter;
+            y = b * u * sin(v) + ycenter;
 
+            parabola->x[idx] = x;
+            parabola->y[idx] = y;
+            parabola->z[idx] = x*x / (a*a) + y*y / (b*b);
+
+            parabola->nx[idx] = -2 * x / (a*a);
+            parabola->ny[idx] = -2 * y / (b*b);
+            parabola->nz[idx] = 1;
+
+            norm = sqrt(parabola->nx[idx]*parabola->nx[idx] +
+                        parabola->ny[idx]*parabola->ny[idx] + 1);
+
+            parabola->nx[idx] = nfac * parabola->nx[idx] / norm;
+            parabola->ny[idx] = nfac * parabola->ny[idx] / norm;
+            parabola->nz[idx] = nfac * parabola->nz[idx] / norm;
+
+            parabola->area[idx] = norm * u * du * dv;
+
+            /*
             prefac =  nfac / sqrt(4 * b*b * u*u * cos(v)*cos(v) +
                       4 * a*a * u*u * sin(v)*sin(v) +
                       a*a * b*b);
@@ -138,7 +157,7 @@ void Parabola_uv(T *parabola, U xu_lo, U xu_up, U yv_lo,
             parabola->area[idx] = u * sqrt(4 * b*b * u*u * cos(v)*cos(v) +
                                     4 * a*a * u*u * sin(v)*sin(v) +
                                     a*a * b*b) * du * dv;
-
+            */
             if (transform)
             {
                 transformGrids<T, U>(parabola, idx, inp, out, &ut, mat);
@@ -149,7 +168,7 @@ void Parabola_uv(T *parabola, U xu_lo, U xu_up, U yv_lo,
 
 template<typename T, typename U>
 void Hyperbola_xy(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
-                  U yv_up, U a, U b, U c, int ncx, int ncy, int nfac,
+                  U yv_up, U xcenter, U ycenter, U a, U b, U c, int ncx, int ncy, int nfac,
                   U mat[16], bool transform)
 {
     U dx = (xu_up - xu_lo) / (ncx - 1);
@@ -169,11 +188,11 @@ void Hyperbola_xy(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
 
     for (int i=0; i < ncx; i++)
     {
-        x = i * dx + xu_lo;
+        x = i * dx + xu_lo + xcenter;
 
         for (int j=0; j < ncy; j++)
         {
-            y = j * dy + yv_lo;
+            y = j * dy + yv_lo + ycenter;
             int idx = i*ncy + j;
 
             hyperbola->x[idx] = x;
@@ -204,7 +223,7 @@ void Hyperbola_xy(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
 
 template<typename T, typename U>
 void Hyperbola_uv(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
-                  U yv_up, U a, U b, U c, int ncx, int ncy, int nfac,
+                  U yv_up, U xcenter, U ycenter, U a, U b, U c, int ncx, int ncy, int nfac,
                   U mat[16], bool transform)
 {
     U du = (sqrt(xu_up*xu_up/(a*a) + 1) - sqrt(xu_lo*xu_lo/(a*a) + 1)) / (ncx - 1);
@@ -215,7 +234,7 @@ void Hyperbola_uv(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
     U v;
     U prefac;
 
-    U norm;
+    U x, y, norm;
 
     Utils<U> ut;
 
@@ -230,10 +249,28 @@ void Hyperbola_uv(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
             v = (j * dv + yv_lo) * M_PI/180;
             int idx = i*ncy + j;
 
-            hyperbola->x[idx] = a * sqrt(u*u - 1) * cos(v);
-            hyperbola->y[idx] = b * sqrt(u*u - 1) * sin(v);
-            hyperbola->z[idx] = c * u;
+            x = a * sqrt(u*u - 1) * cos(v) + xcenter;
+            y = b * sqrt(u*u - 1) * sin(v) + ycenter;
 
+            hyperbola->x[idx] = x;
+            hyperbola->y[idx] = y;
+            hyperbola->z[idx] = c * sqrt(x*x / (a*a) + y*y / (b*b) + 1);
+
+            hyperbola->nx[idx] = -2 * x / (a*a);
+            hyperbola->ny[idx] = -2 * y / (b*b);
+            hyperbola->nz[idx] = 2 * hyperbola->z[idx] / (c*c);
+
+            norm = sqrt(hyperbola->nx[idx]*hyperbola->nx[idx] +
+                        hyperbola->ny[idx]*hyperbola->ny[idx] +
+                        hyperbola->nz[idx]*hyperbola->nz[idx]);
+
+            hyperbola->nx[idx] = nfac * hyperbola->nx[idx] / norm;
+            hyperbola->ny[idx] = nfac * hyperbola->ny[idx] / norm;
+            hyperbola->nz[idx] = nfac * hyperbola->nz[idx] / norm;
+
+            hyperbola->area[idx] = norm * u * du * dv;
+
+            /*
             prefac = nfac / sqrt(b*b * c*c * (u*u - 1) * cos(v)*cos(v) +
                       a*a * c*c * (u*u - 1) * sin(v)*sin(v) + a*a * b*b * u*u);
 
@@ -243,7 +280,7 @@ void Hyperbola_uv(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
 
             hyperbola->area[idx] = sqrt(b*b * c*c * (u*u - 1) * cos(v)*cos(v) +
                                         a*a * c*c * (u*u - 1) * sin(v)*sin(v) + a*a * b*b * u*u) * du * dv;
-
+            */
             if (transform)
             {
                 transformGrids<T, U>(hyperbola, idx, inp, out, &ut, mat);
@@ -254,7 +291,7 @@ void Hyperbola_uv(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
 
 template<typename T, typename U>
 void Ellipse_xy(T *ellipse, U xu_lo, U xu_up, U yv_lo,
-                U yv_up, U a, U b, U c, int ncx, int ncy, int nfac,
+                U yv_up, U xcenter, U ycenter, U a, U b, U c, int ncx, int ncy, int nfac,
                 U mat[16], bool transform)
 {
     U dx = (xu_up - xu_lo) / (ncx - 1);
@@ -309,7 +346,7 @@ void Ellipse_xy(T *ellipse, U xu_lo, U xu_up, U yv_lo,
 
 template<typename T, typename U>
 void Ellipse_uv(T *ellipse, U xu_lo, U xu_up, U yv_lo,
-                U yv_up, U a, U b, U c, int ncx, int ncy, int nfac,
+                U yv_up, U xcenter, U ycenter, U a, U b, U c, int ncx, int ncy, int nfac,
                 U mat[16], bool transform)
 {
     U du = (asin(xu_up/a) - asin(xu_lo/a)) / (ncx - 1);
@@ -360,7 +397,7 @@ void Ellipse_uv(T *ellipse, U xu_lo, U xu_up, U yv_lo,
 
 template<typename T, typename U>
 void Plane_xy(T *plane, U xu_lo, U xu_up, U yv_lo,
-              U yv_up, int ncx, int ncy, int nfac,
+              U yv_up, U xcenter, U ycenter, int ncx, int ncy, int nfac,
               U mat[16], bool transform)
 {
     U dx = (xu_up - xu_lo) / (ncx - 1);
@@ -406,7 +443,7 @@ void Plane_xy(T *plane, U xu_lo, U xu_up, U yv_lo,
 
 template<typename T, typename U>
 void Plane_uv(T *plane, U xu_lo, U xu_up, U yv_lo,
-              U yv_up, U a, U b, int ncx, int ncy, int nfac,
+              U yv_up, U xcenter, U ycenter, U a, U b, int ncx, int ncy, int nfac,
               U mat[16], bool transform)
 {
 
@@ -469,7 +506,7 @@ void Plane_uv(T *plane, U xu_lo, U xu_up, U yv_lo,
 
 template<typename T, typename U>
 void Plane_AoE(T *plane, U xu_lo, U xu_up, U yv_lo,
-              U yv_up, int ncx, int ncy,
+              U yv_up, U xcenter, U ycenter, int ncx, int ncy,
               U mat[16], bool transform, bool spheric)
 {
     U dA = (xu_up - xu_lo) / (ncx - 1);
@@ -534,6 +571,9 @@ extern "C" void generateGrid(reflparams refl, reflcontainer *container, bool tra
     double yv_lo = refl.lyv[0];
     double yv_up = refl.lyv[1];
 
+    double xcenter = refl.gcenter[0];
+    double ycenter = refl.gcenter[1];
+
     double a = refl.coeffs[0];
     double b = refl.coeffs[1];
     double c = refl.coeffs[2];
@@ -553,25 +593,25 @@ extern "C" void generateGrid(reflparams refl, reflcontainer *container, bool tra
         if (refl.type == 0)
         {
             Parabola_xy<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, a, b, ncx, ncy, nfac, refl.transf, transform);
+                                            yv_up, xcenter, ycenter, a, b, ncx, ncy, nfac, refl.transf, transform);
         }
 
         else if (refl.type == 1)
         {
             Hyperbola_xy<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, a, b, c, ncx, ncy, nfac, refl.transf, transform);
+                                            yv_up, xcenter, ycenter, a, b, c, ncx, ncy, nfac, refl.transf, transform);
         }
 
         else if (refl.type == 2)
         {
             Ellipse_xy<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, a, b, c, ncx, ncy, nfac, refl.transf, transform);
+                                            yv_up, xcenter, ycenter, a, b, c, ncx, ncy, nfac, refl.transf, transform);
         }
 
         else if (refl.type == 3)
         {
             Plane_xy<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, ncx, ncy, nfac, refl.transf, transform);
+                                            yv_up, xcenter, ycenter, ncx, ncy, nfac, refl.transf, transform);
         }
     }
 
@@ -581,32 +621,32 @@ extern "C" void generateGrid(reflparams refl, reflcontainer *container, bool tra
         {
 
             Parabola_uv<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, a, b, ncx, ncy, nfac, refl.transf, transform);
+                                            yv_up, xcenter, ycenter, a, b, ncx, ncy, nfac, refl.transf, transform);
         }
 
         else if (refl.type == 1)
         {
             Hyperbola_uv<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, a, b, c, ncx, ncy, nfac, refl.transf, transform);
+                                            yv_up, xcenter, ycenter, a, b, c, ncx, ncy, nfac, refl.transf, transform);
         }
 
         else if (refl.type == 2)
         {
             Ellipse_uv<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, a, b, c, ncx, ncy, nfac, refl.transf, transform);
+                                            yv_up, xcenter, ycenter, a, b, c, ncx, ncy, nfac, refl.transf, transform);
         }
 
         else if (refl.type == 3)
         {
             Plane_uv<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, a, b, ncx, ncy, nfac, refl.transf, transform);
+                                            yv_up, xcenter, ycenter, a, b, ncx, ncy, nfac, refl.transf, transform);
         }
     }
 
     if (refl.gmode == 2)
     {
         Plane_AoE<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
-                                        yv_up, ncx, ncy, refl.transf, transform, spheric);
+                                        yv_up, xcenter, ycenter, ncx, ncy, refl.transf, transform, spheric);
     }
 }
 
@@ -617,6 +657,9 @@ extern "C" void generateGridf(reflparamsf refl, reflcontainerf *container, bool 
     float xu_up = refl.lxu[1];
     float yv_lo = refl.lyv[0];
     float yv_up = refl.lyv[1];
+
+    float xcenter = refl.gcenter[0];
+    float ycenter = refl.gcenter[1];
 
     float a = refl.coeffs[0];
     float b = refl.coeffs[1];
@@ -637,25 +680,25 @@ extern "C" void generateGridf(reflparamsf refl, reflcontainerf *container, bool 
         if (refl.type == 0)
         {
             Parabola_xy<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, a, b, ncx, ncy, nfac, refl.transf, transform);
+                                            yv_up, xcenter, ycenter, a, b, ncx, ncy, nfac, refl.transf, transform);
         }
 
         else if (refl.type == 1)
         {
             Hyperbola_xy<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, a, b, c, ncx, ncy, nfac, refl.transf, transform);
+                                            yv_up, xcenter, ycenter, a, b, c, ncx, ncy, nfac, refl.transf, transform);
         }
 
         else if (refl.type == 2)
         {
             Ellipse_xy<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, a, b, c, ncx, ncy, nfac, refl.transf, transform);
+                                            yv_up, xcenter, ycenter, a, b, c, ncx, ncy, nfac, refl.transf, transform);
         }
 
         else if (refl.type == 3)
         {
             Plane_xy<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, ncx, ncy, nfac, refl.transf, transform);
+                                            yv_up, xcenter, ycenter, ncx, ncy, nfac, refl.transf, transform);
         }
     }
 
@@ -665,31 +708,31 @@ extern "C" void generateGridf(reflparamsf refl, reflcontainerf *container, bool 
         {
 
             Parabola_uv<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, a, b, ncx, ncy, nfac, refl.transf, transform);
+                                            yv_up, xcenter, ycenter, a, b, ncx, ncy, nfac, refl.transf, transform);
         }
 
         else if (refl.type == 1)
         {
             Hyperbola_uv<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, a, b, c, ncx, ncy, nfac, refl.transf, transform);
+                                            yv_up, xcenter, ycenter, a, b, c, ncx, ncy, nfac, refl.transf, transform);
         }
 
         else if (refl.type == 2)
         {
             Ellipse_uv<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, a, b, c, ncx, ncy, nfac, refl.transf, transform);
+                                            yv_up, xcenter, ycenter, a, b, c, ncx, ncy, nfac, refl.transf, transform);
         }
 
         else if (refl.type == 3)
         {
             Plane_uv<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, a, b, ncx, ncy, nfac, refl.transf, transform);
+                                            yv_up, xcenter, ycenter, a, b, ncx, ncy, nfac, refl.transf, transform);
         }
     }
 
     else if (refl.gmode == 2)
     {
         Plane_AoE<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
-                                        yv_up, ncx, ncy, refl.transf, transform, spheric);
+                                        yv_up, xcenter, ycenter, ncx, ncy, refl.transf, transform, spheric);
     }
 }

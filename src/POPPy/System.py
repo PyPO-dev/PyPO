@@ -124,6 +124,9 @@ class System(object):
         if not "name" in reflDict:
             reflDict["name"] = "Parabola"
 
+        if not "gcenter" in reflDict:
+            reflDict["gcenter"] = np.zeros(2)
+
         if reflDict["name"] == "Parabola":
             reflDict["name"] = reflDict["name"] + "_{}".format(self.num_ref)
 
@@ -185,6 +188,8 @@ class System(object):
             reflDict["name"] = "Hyperbola"
         if reflDict["name"] == "Hyperbola":
             reflDict["name"] = reflDict["name"] + "_{}".format(self.num_ref)
+        if not "gcenter" in reflDict:
+            reflDict["gcenter"] = np.zeros(2)
 
         reflDict["type"] = 1
         reflDict["transf"] = np.eye(4)
@@ -248,6 +253,8 @@ class System(object):
         if reflDict["name"] == "Ellipse":
             reflDict["name"] = reflDict["name"] + "_{}".format(self.num_ref)
 
+        if not "gcenter" in reflDict:
+            reflDict["gcenter"] = np.zeros(2)
         reflDict["type"] = 2
         reflDict["transf"] = np.eye(4)
 
@@ -272,6 +279,8 @@ class System(object):
         if not "name" in reflDict:
             reflDict["name"] = "Plane"
 
+        if not "gcenter" in reflDict:
+            reflDict["gcenter"] = np.zeros(2)
         if reflDict["name"] == "Plane":
             reflDict["name"] = reflDict["name"] + "_{}".format(self.num_ref)
         
@@ -431,7 +440,7 @@ class System(object):
 
         return currents_c, fields_c
 
-    def calcCurrents(self, fields, name_source, mode="PMC"):
+    def calcCurrents(self, name_source, fields, mode="PMC"):
         currents = calcCurrents(fields, self.system[name_source], mode)
         return currents
 
@@ -524,6 +533,7 @@ class System(object):
 
         return out
     # Beam!
+            
     def createGauss(self, gaussDict, name_source):
         gauss_in = makeGauss(gaussDict, self.system[name_source])
         return gauss_in
@@ -606,16 +616,22 @@ class System(object):
                     vmin=-30, vmax=0, show=True, amp_only=False,
                     save=False, polar=False, interpolation=None,
                     aperDict={"plot":False}, mode='dB', project='xy',
-                    units='', name='', titleA="Amp", titleP="Phase",
+                    units="", name='', titleA="Amp", titleP="Phase",
                     unwrap_phase=False):
 
         plotObject = self.system[name_surface]
+
+        default = "mm"
+        if plotObject["gmode"] == 2 and not units:
+            default = "deg"
+
+        unitl = self._units(units, default)
 
         plt.plotBeam2D(plotObject, field,
                         vmin, vmax, show, amp_only,
                         save, polar, interpolation,
                         aperDict, mode, project,
-                        units, name, titleA, titleP, self.savePath, unwrap_phase)
+                        unitl, name, titleA, titleP, self.savePath, unwrap_phase)
 
     def plot3D(self, name_surface, fine=2, cmap=cm.cool,
                 returns=False, ax_append=False, norm=False,
@@ -666,6 +682,28 @@ class System(object):
             field_c = fields(null, null, null, null, null, field)
 
         return field_c
+
+    def _units(self, unit, default="mm"):
+        if unit == "m":
+            return [unit, 1e-3]
+
+        elif unit == "mm":
+            return [unit, 1.]
+
+        elif unit == "cm":
+            return [unit, 1e-2]
+
+        elif unit == "deg":
+            return [unit, 1.]
+
+        elif unit == "am":
+            return [unit, 60]
+
+        elif unit == "as":
+            return [unit, 3600]
+
+        else:
+            return [default, 1.]
 
 if __name__ == "__main__":
     print("System interface for POPPy.")

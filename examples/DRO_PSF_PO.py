@@ -53,7 +53,7 @@ def ex_DRO_PO(device):
     s.plotSystem()
 
     ps = s.generatePointSource("plane1") 
-    JM = s.calcCurrents(ps, "plane1", mode="PMC")
+    JM = s.calcCurrents("plane1", ps, mode="PMC")
 
     translation = np.array([0, 0, 12e3])# + np.array([210, 210, -210])
     rotation_plane = np.array([180, 0, 0])
@@ -95,6 +95,6 @@ def ex_DRO_PO(device):
 
     EH = s.runPO(p1_to_planeff)
     
-    s.plotBeam2D("planeff", EH.Ex)
+    s.plotBeam2D("planeff", EH.Ex, units="am")
 if __name__ == "__main__":
     ex_DRO()

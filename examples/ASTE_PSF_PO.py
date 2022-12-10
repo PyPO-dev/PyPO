@@ -66,7 +66,7 @@ def ex_ASTE_PO(device):
     s.addPlane(planeff)
 
     ps = s.generatePointSource("plane1") 
-    JM = s.calcCurrents(ps, "plane1", mode="PMC")
+    JM = s.calcCurrents("plane1", ps, mode="PMC")
 
     translation = np.array([0,0,3.5e3 - d_foc_h])
     s.translateGrids("plane1", translation)
@@ -118,9 +118,8 @@ def ex_ASTE_PO(device):
             }
 
     EH = s.runPO(pri_to_planeff)
-
-    pt.imshow(20*np.log10(np.absolute(EH.Ex) / np.max(np.absolute(EH.Ex))), vmin=-30, vmax=0)
-    pt.show()
+    
+    s.plotBeam2D("planeff", EH.Ex, units="as")
 
 if __name__ == "__main__":
     ex_DRO()

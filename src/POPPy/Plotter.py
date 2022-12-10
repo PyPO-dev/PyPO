@@ -18,7 +18,6 @@ def plotBeam2D(plotObject, field,
                 units, name, titleA, titleP, savePath, unwrap_phase):
 
     # With far-field, generate grid without converting to spherical
-
     max_field = np.max(np.absolute(field))
     grids = generateGrid(plotObject, transform=True, spheric=False)
     if not plotObject["gmode"] == 2:
@@ -60,13 +59,11 @@ def plotBeam2D(plotObject, field,
             grid_x1 = grids.x
             grid_x2 = grids.y
             ff_flag = True
-            units = "deg"
 
         elif project == 'yx':
             grid_x1 = grids.y
             grid_x2 = grids.x
             ff_flag = True
-            units = "deg"
 
     comps = list(project)
 
@@ -86,10 +83,9 @@ def plotBeam2D(plotObject, field,
             else:
                 phase = np.angle(field)
 
-            extent = [np.min(grid_x1), np.max(grid_x1), np.min(grid_x2), np.max(grid_x2)]
-            ampfig = ax[0].pcolormesh(grid_x1, grid_x2, 20 * np.log10(np.absolute(field) / max_field),
+            ampfig = ax[0].pcolormesh(grid_x1 * units[1], grid_x2 * units[1], 20 * np.log10(np.absolute(field) / max_field),
                                     vmin=vmin, vmax=vmax, cmap=cmaps.parula, shading='auto')
-            phasefig = ax[1].pcolormesh(grid_x1, grid_x2, phase, cmap=cmaps.parula, shading='auto')
+            phasefig = ax[1].pcolormesh(grid_x1 * units[1], grid_x2 * units[1], phase, cmap=cmaps.parula, shading='auto')
 
         divider1 = make_axes_locatable(ax[0])
         divider2 = make_axes_locatable(ax[1])
@@ -101,18 +97,18 @@ def plotBeam2D(plotObject, field,
         c2 = fig.colorbar(phasefig, cax=cax2, orientation='vertical')
 
         if ff_flag:
-            ax[0].set_ylabel(r"El / [{}]".format(units))
-            ax[0].set_xlabel(r"Az / [{}]".format(units))
-            ax[1].set_ylabel(r"El / [{}]".format(units))
-            ax[1].set_xlabel(r"Az / [{}]".format(units))
+            ax[0].set_ylabel(r"dEl / {}".format(units[0]))
+            ax[0].set_xlabel(r"dAz / {}".format(units[0]))
+            ax[1].set_ylabel(r"dEl / {}".format(units[0]))
+            ax[1].set_xlabel(r"dAz / {}".format(units[0]))
             ax[0].set_box_aspect(1)
             ax[1].set_box_aspect(1)
 
         else:
-            ax[0].set_ylabel(r"${}$ / [{}]".format(comps[1], units))
-            ax[0].set_xlabel(r"${}$ / [{}]".format(comps[0], units))
-            ax[1].set_ylabel(r"${}$ / [{}]".format(comps[1], units))
-            ax[1].set_xlabel(r"${}$ / [{}]".format(comps[0], units))
+            ax[0].set_ylabel(r"${}$ / {}".format(comps[1], units[0]))
+            ax[0].set_xlabel(r"${}$ / {}".format(comps[0], units[0]))
+            ax[1].set_ylabel(r"${}$ / {}".format(comps[1], units[0]))
+            ax[1].set_xlabel(r"${}$ / {}".format(comps[0], units[0]))
 
         ax[0].set_title(titleA, y=1.08)
         ax[0].set_aspect(1)
@@ -142,34 +138,38 @@ def plotBeam2D(plotObject, field,
         cax = divider.append_axes('right', size='5%', pad=0.05)
 
         if mode == 'linear':
-            ampfig = ax.imshow(np.absolute(field), origin='lower', extent=extent, cmap=cmaps.parula)
+            ampfig = ax.pcolormesh(grid_x1 * units[1], grid_x2 * units[1], np.absolute(field),
+                                    vmin=vmin, vmax=vmax, cmap=cmaps.parula, shading='auto')
 
         elif mode == 'dB':
-            ampfig = ax.imshow(20 * np.log10(np.absolute(field) / np.max(np.absolute(field))), vmin=vmin, vmax=vmax, origin='lower', extent=extent, cmap=cmaps.parula, interpolation=interpolation)
+            ampfig = ax.pcolormesh(grid_x1 * units[1], grid_x2 * units[1], 20 * np.log10(np.absolute(field) / max_field),
+                                    vmin=vmin, vmax=vmax, cmap=cmaps.parula, shading='auto')
 
-        if ff:
-            ax.set_ylabel(r"El / [{}]".format(units))
-            ax.set_xlabel(r"Az / [{}]".format(units))
+        if ff_flag:
+            ax.set_ylabel(r"El / [{}]".format(units[0]))
+            ax.set_xlabel(r"Az / [{}]".format(units[0]))
 
         else:
-            ax.set_ylabel(r"$y$ / [{}]".format(conv))
-            ax.set_xlabel(r"$x$ / [{}]".format(conv))
+            ax.set_ylabel(r"$y$ / [{}]".format(units[0]))
+            ax.set_xlabel(r"$x$ / [{}]".format(units[0]))
 
         ax.set_title(titleA, y=1.08)
         ax.set_box_aspect(1)
 
         c = fig.colorbar(ampfig, cax=cax, orientation='vertical')
 
-        if plot_aper["plot"]:
-            xc = plot_aper["center"][0]
-            yc = plot_aper["center"][1]
-            R = plot_aper["radius"]
+        if aperDict["plot"]:
+            xc = aperDict["center"][0]
+            yc = aperDict["center"][1]
+            Ro = aperDict["r_out"]
+            Ri = aperDict["r_in"]
 
-            circle=mpl.patches.Circle((xc,yc),R, color='black', fill=False)
+            circleo=mpl.patches.Circle((xc,yc),Ro, color='black', fill=False)
+            circlei=mpl.patches.Circle((xc,yc),Ri, color='black', fill=False)
 
-            ax.add_patch(circle)
+            ax.add_patch(circleo)
+            ax.add_patch(circlei)
             ax.scatter(xc, yc, color='black', marker='x')
-
 
     if save:
         pt.savefig(fname=savePath + '{}_{}.jpg'.format(plotObject["name"], name),

@@ -1,24 +1,39 @@
 Welcome to the Physical OPtics for Python (POPPy) package!
 
 -- PREREQS --\
-A fully functioning [Python 3.8](https://docs.python-guide.org/starting/install3/linux/) installation.
+A fully functioning [Python 3.8](https://docs.python-guide.org/starting/install3/linux/) installation. At the moment, the GUI only supports a Python version of 3.9 or lower.
 If the PIP package manager was not automatically installed with your Python install, it can be installed [manually](https://pip.pypa.io/en/stable/installation/).
 
 To install the prerequisites for POPPy, navigate to the main folder and run:
 ```
-python Build.py --prereq
+python Build.py --prereqs
 ```
 Alternatively, the prerequisites can be installed manually on Linux by running:
 ```
 sudo apt install cm-super dvipng gcc build-essential cmake
 python3 -m pip install numpy matplotlib scipy setuptools nose PyQt5
 ```
-On Windows or Mac OS, [CMake](https://cmake.org/install/) can be installed manually. The Python prerequisites can still be installed manually from the command line. The cm-super and dvipng packages are included on most TeX installations.
+On Mac OS, the prereqs are installed using:
+```
+brew install gcc cmake
+xcode-select --install
+python3 -m pip install numpy matplotlib scipy setuptools nose PyQt5
+```
+On Windows, things are slightly more complicated. First, install [Visual Studio](https://visualstudio.microsoft.com/#2010-Visual-CPP). 
+This is necessary as Visual Studio contains CMake and the build tool [NMake](https://learn.microsoft.com/en-us/cpp/build/reference/nmake-reference?view=msvc-170), which are important for building POPPy.
+During installation, select the 'Community' install.
+You will be prompted to install components and/or workloads. 
+Under 'Desktop & Mobile', tick 'Desktop development with C++' and proceed. 
+This is the minimum requirement, and more components/workloads can be installed, if so desired. After installation, proceed with regular installation.
+
 POPPy is capable of producing figures using LaTeX typesetting. For this, a [LaTeX installation](https://www.tug.org/texlive/quickinstall.html) should be present on the machine.
-The GPU version of POPPy needs a [CUDA installation](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html) and a CUDA-compatible NVIDIA graphics card. These are not installed through the Build.py interface and should be installed manually. Please refer to the NVIDIA documentation on how to install NVIDIA drivers and CUDA.
+The GPU version of POPPy needs a [CUDA installation](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html) and a CUDA-compatible NVIDIA graphics card. 
+These are not installed through the Build.py interface and should be installed manually. Please refer to the NVIDIA documentation on how to install NVIDIA drivers and CUDA on your specific Platform.
 
 -- INSTALLATION --\
-Configure POPPy by running:
+On Linux and MacOs, the following instructions can be run in the regular terminal.
+On Windows, they should be run in the 'x64_x86 Cross Tools Command Promp for VS <year>'.
+Navigate to the POPPy root folder and configure POPPy by running:
 ```
 python Build.py --config
 ```

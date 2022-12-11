@@ -24,7 +24,7 @@ def calcEstimates(x, y, area, field_norm):
     b = Mxx * D
     c = -Mxy * D
 
-    Amp = 0 #M0 * np.sqrt(a * b - c**2) * area[0,0]
+    Amp = 1 #M0 * np.sqrt(a * b - c**2) * area[0,0]
     theta = 0.5 * np.arctan(2 * c / (a - b))
 
     if a-b > 0: # Not HW1 but the largest axis corresponds to theta.
@@ -34,8 +34,21 @@ def calcEstimates(x, y, area, field_norm):
 
     p = np.sqrt((a - b)**2 + 4 * c**2)
 
-    x0 = np.sqrt(1 / (a + b - p))
-    y0 = np.sqrt(1 / (a + b + p))
+    _x0 = 1 / (a + b - p)
+    _y0 = 1 / (a + b - p) 
+
+    if _x0 <= 0 and _y0 > 0:
+        _x0 = _y0
+
+    elif _y0 <= 0 and _x0 > 0:
+        _y0 = _x0
+
+    elif _y0 <= 0 and _x0 <= 0:
+        _x0 *= -1
+        _y0 *= -1
+
+    x0 = np.sqrt(_x0)
+    y0 = np.sqrt(_y0)
 
     return x0, y0, xm, ym, theta
 
@@ -46,9 +59,6 @@ def fitGaussAbs(field, surfaceObject, thres):
 
     x = grids.x
     y = grids.y
-
-    #pt.imshow(x)
-    #pt.show()
     
     area = grids.area
 
@@ -59,9 +69,6 @@ def fitGaussAbs(field, surfaceObject, thres):
     field_est = field[mask_f]
     x0, y0, xs, ys, theta = calcEstimates(x[mask_f], y[mask_f], area[mask_f], field_est)
     print(f"Initial estimate from image moments:\nmu_x = {xs}, mu_y = {ys}\nTheta = {theta}")
-
-    #pt.imshow(np.absolute(field) * mask_f)
-    #pt.show()
 
     p0 = [x0, y0, xs, ys, theta]
 
@@ -77,30 +84,6 @@ def fitGaussAbs(field, surfaceObject, thres):
     print(f"Fitted shift and rotation:\nmu_x = {popt[-3]}, mu_y = {popt[-2]}\nTheta = {popt[-1]}")
     return popt, perr
 
-#def couplingAbs(pars, *args):
-#def couplingAbs(mask, xy, x0, y0, xs, ys, theta)
-#    field = np.absolute(field)
-#
-#    Psi = np.absolute(GaussAbs(x, y, x0, y0, xs, ys, theta))
-#    Psi_max = np.max(Psi)
-
-#    mask_P = 20*np.log10(Psi / Psi_max) > thres_g
-
-    #pt.imshow(mask_P)
-    #pt.show()
-
-    #pt.imshow(20*np.log10(mask_P * Psi / Psi_max))
-    #pt.show()
-
-#    coupling = np.absolute(np.sum(Psi*mask * field*mask))**2 / (np.sum(np.absolute(field*mask)**2) * np.sum(np.absolute(Psi*mask)**2))
-    #print(coupling)
-
-    #eta = coupling**2
-    #coupling = np.sum(np.absolute(Psi*mask_P))**2 / (np.sum(np.absolute(field)**2))
-#    eta = coupling
-#    eps = np.absolute(1 - eta)
-#    return eps
-
 def GaussAbs(mask, mode, xy, x0, y0, xs, ys, theta):
     x, y = xy
     a = np.cos(theta)**2 / (2 * x0**2) + np.sin(theta)**2 / (2 * y0**2)
@@ -113,12 +96,6 @@ def GaussAbs(mask, mode, xy, x0, y0, xs, ys, theta):
     elif mode == "linear":
 
         Psi = np.exp(-(a*(x - xs)**2 + 2*c*(x - xs)*(y - ys) + b*(y - ys)**2))
-        #Psi = np.exp(-(x)**2/(2*x0**2) - (y)**2/(2*y0**2))
-
-    #Psi = np.exp(-(((x-xs)/x0*np.cos(theta) + (y-ys)/y0*np.sin(theta)))**2 -(((x-xs)/x0*np.sin(theta) + (y-ys)/y0*np.cos(theta)))**2) * mask
-
-    #Psi = np.exp(-(((x-xs)/x0*np.cos(theta) + (y-ys)/y0*np.sin(theta)))**2 -(((x-xs)/x0*np.sin(theta) + (y-ys)/y0*np.cos(theta)))**2)
-    #Psi = np.exp(-((x-xs)/x0)**2 -((y-ys)/y0)**2)
     return (Psi).ravel()
 
 def generateGauss(fgs_out, surfaceObject, mode, mask=None):

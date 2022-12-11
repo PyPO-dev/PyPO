@@ -137,7 +137,7 @@ class Form(QWidget):
     def GetDict(self):
         paramdict = {"name"     : None if self.name.text()=="" else self.name.text(),
                  "type"     : "Parabola",
-                 "gridsize" : [int(self.gridSizeX.text()),int(self.gridSizeY.text())],
+                 "gridsize" : np.array([np.int(self.gridSizeX.text()),np.int(self.gridSizeY.text())]),
                 #  "uvaxis"   : self.uvaxis,
                 #  "units"    : self.units,
                 #  "cRot"     : self.cRot.tolist(),
@@ -161,16 +161,16 @@ class Form(QWidget):
 
         if self.gmode.currentIndex() == 0:
             paramdict ["gmode"] = "xy"
-            paramdict["lims_x"] = [float(self.limX1.text()), float(self.limX2.text())]
-            paramdict["lims_y"] = [float(self.limY1.text()), float(self.limY2.text())]
+            paramdict["lims_x"] = np.array([float(self.limX1.text()), float(self.limX2.text())])
+            paramdict["lims_y"] = np.array([float(self.limY1.text()), float(self.limY2.text())])
             if "lims_u" in paramdict:
                 del paramdict["lims_u"]
             if "lims_v" in paramdict:
                 del paramdict["lims_v"]
         else:
             paramdict ["gmode"] = "uv"
-            paramdict["lims_u"] = [float(self.limU1.text()), float(self.limU2.text())]
-            paramdict["lims_v"] = [float(self.limV1.text()), float(self.limV2.text())]
+            paramdict["lims_u"] = np.array([float(self.limU1.text()), float(self.limU2.text())])
+            paramdict["lims_v"] = np.array([float(self.limV1.text()), float(self.limV2.text())])
             if "lims_x" in paramdict:
                 del paramdict["lims_x"]
             if "lims_y" in paramdict:

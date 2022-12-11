@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import QWidget, QApplication, QComboBox, QFormLayout, QVBoxLayout, QGridLayout, QLabel,QSpacerItem, QSizePolicy, QLineEdit, QHBoxLayout
+from PyQt5.QtCore import Qt
 
 from src.GUI.ParameterForms.SimpleInputWidget import SimpleInput
 
@@ -10,23 +11,28 @@ class VariableInputWidget(QWidget):
     def __init__ (self, inp):
         super().__init__()
         self.inputDiscription = inp
-        # self.key = key
-        # self.formData = data
+        self.placeholderparent = QWidget()
+        
         self.labels = []
         self.fields = []
 
-        self.layout = QFormLayout()
+        self.layout = QVBoxLayout()
         self.hasChildren = hasattr(self.inputDiscription, 'subdict')
         print (self.hasChildren)
         self.inputs = {}
         self.mode = QComboBox()
         self.mode.addItems(self.inputDiscription.subdict.keys())
+        self.mode.setParent(self.placeholderparent)
 
         label = self.makeLabelFromString(self.inputDiscription.label)
-        self.labels.append(label)
-        self.fields.append(self.mode)
+        toplayout = QHBoxLayout()
+        toplayout.addWidget(label)
+        toplayout.addWidget(self.mode)
+        grandtop = QWidget()
+        topWidget = QWidget(parent=grandtop)
+        topWidget.setLayout(toplayout)
 
-        self.layout.addRow(label, self.mode)
+        self.layout.addWidget(grandtop)
 
         if self.hasChildren:
             self.children = []
@@ -44,29 +50,32 @@ class VariableInputWidget(QWidget):
         # if self.hasChildren:
 
     def makeCildren(self):
-        print("makeCildren")
+        i=0
         for childKey, childInDisList in self.inputDiscription.subdict.items():
             child = self.makeChildform(childKey, childInDisList)
-            self.children.append(child)
-            self.layout.addRow(child)
+            self.children.append(list(child.findChildren(QWidget)))
+            self.layout.addWidget(child)
+            i += 1
 
 
     def modeChanged(self):
         if self.hasChildren:
-            for w in self.children:
-                w.setVisible(False)
-            self.children[self.mode.currentIndex()].setVisible(True)
+            for childlist in self.children:
+                for child in childlist:
+                    child.setVisible(False)
+                    print("iv", type(child))
+            for i in self.children[self.mode.currentIndex()]:
+                i.setVisible(True)
+                print("v", type(child))
 
     def makeChildform(self, childKey,childIndistList):
         childWidget = QWidget()
-        childLayout = QFormLayout()
+        childLayout = QVBoxLayout()
         self.inputs[childKey]={}
         for i in range(len(childIndistList)):
-            label, widget = SimpleInput(childIndistList[i]).get()
+            widget = SimpleInput(childIndistList[i])
             self.inputs[childKey][childIndistList[i].outputName] = widget
-            self.labels.append(label)
-            self.fields.append(widget)
-            childLayout.addRow(label, widget)
+            childLayout.addWidget(widget)
             # self.inputs[childKey][k] = self.addInputToLayout(childLayout, k, v)
         childWidget.setLayout(childLayout)
         return childWidget
@@ -82,3 +91,12 @@ class VariableInputWidget(QWidget):
     @staticmethod
     def makeLabelFromString(s):
         return QLabel(s.replace("_"," ").capitalize())
+
+    # def unpackAndAddToForm(self, wid, form):
+    #     children = wid.findChildren(QWidget, '', Qt.FindDirectChildrenOnly)
+    #     if len(children) != 2:
+    #         raise Exception("Number of children insuccichient!!!")
+    #     label,edit = tuple(children) 
+    #     label.setParent(None)
+    #     edit.setParent(None)
+    #     form.addRow(label, edit)

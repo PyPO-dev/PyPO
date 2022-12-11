@@ -23,18 +23,24 @@ class SimpleInput(QWidget):
         self.setLayout(self.layout)
 
     def get(self):
-        label = self.makeLabelFromString(self.inputDiscription.label)
-        return (label, self)
+        return (self.label, self.editsWid)
 
     def setupUI(self):
         inp = self.inputDiscription
         
         self.inputs = [QLineEdit() for k in range(inp.numFields)]
+        editLayout = QHBoxLayout()
         
         for i in range(inp.numFields):
             edit = self.inputs[i]
             edit.setPlaceholderText(str(inp.hints[i]))
-            self.layout.addWidget(edit)
+            editLayout.addWidget(edit)
+        self.editsWid = QWidget()
+        self.editsWid.setLayout(editLayout)
+
+        self.label = self.makeLabelFromString(self.inputDiscription.label)
+        self.layout.addWidget(self.label)
+        self.layout.addWidget(self.editsWid)
     
     def read(self):
         l =[i.text() for i in self.inputs] 

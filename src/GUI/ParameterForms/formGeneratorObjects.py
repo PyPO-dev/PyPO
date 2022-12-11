@@ -25,18 +25,23 @@ class FormGeneratorObjects(QWidget):
     def setupInputs(self):
         for inp in self.formData:
             if inp.inType.value < 4:
-                label, fields = SimpleInput(inp).get()
-                self.inputLabels.append(label)
-                self.inputFields.append(fields)
-                self.layout.addRow(label,fields)
+                i = SimpleInput(inp)
+                # self.inputLabels.append(label)
+                # self.inputFields.append(fields)
+                # self.layout.addRow(i)
+                self.unpackAndAddToForm(i,self.layout)
             elif inp.inType.value == 4:
                 pass
             elif inp.inType.value == 5:
-                labels, fields = VariableInputWidget(inp).get()
+                w = VariableInputWidget(inp)
+                labels, fields = w.get()
                 self.inputLabels.append(labels)
                 self.inputFields.append(fields)
-                for i in range(len(labels)):
-                    self.layout.addRow(labels[i],fields[i])
+                for child in w.findChildren(QWidget, '', Qt.FindDirectChildrenOnly):
+                    for input in child.findChildren(QWidget, '', Qt.FindDirectChildrenOnly):
+                        self.unpackAndAddToForm(input,self.layout)
+                    # self.layout.addRow(labels[i],fields[i])
+                # self.layout.addRow(w)
 
 
     def makeInputVariable(self, inp):
@@ -83,6 +88,18 @@ class FormGeneratorObjects(QWidget):
             # print(input.read())
             paramDict.update(input.read())
         # print(paramDict)
+    
+
+    def unpackAndAddToForm(self, wid, form):
+        children = wid.findChildren(QWidget, '', Qt.FindDirectChildrenOnly)
+        print(len(children))
+        if len(children) != 2:
+            print(wid.text())
+            raise Exception("Number of children insuccichient!!!")
+        label,edit = tuple(children) 
+        label.setParent(None)
+        edit.setParent(None)
+        form.addRow(label, edit)
 
         
 

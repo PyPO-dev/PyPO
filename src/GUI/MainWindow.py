@@ -76,7 +76,18 @@ class MainWidget(QWidget):
 
 
     def addExampleParabola(self):
-        d = {'type': 'Parabola', 'gridsize': [101, 101], 'flip': False, 'pmode': 'manual', 'coeffs':    np.array([1., 1., 0.]), 'gmode': 'xy', 'lims_x': [-1.0, 1.0], 'lims_y': [-1.0, 1.0]}
+        d = {
+            "name"      : "pri",
+            "type"      : "Parabola",
+            "pmode"     : "focus",
+            "gmode"     : "uv",
+            "flip"      : False,
+            "vertex"    : np.zeros(3),
+            "focus_1"   : np.array([0,0,3.5e3]),
+            "lims_u"    : np.array([200,5e3]),
+            "lims_v"    : np.array([0,360]),
+            "gridsize"  : np.array([1501,1501])
+            }
         self.addElementAction(d)
 
     def addExampleHyperbola(self):

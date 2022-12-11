@@ -73,3 +73,17 @@ To run the Python unittests, go to the main POPPy directory and from there run:
 ```
 nosetests --exe
 ```
+
+-- DOCUMENTATION --\
+POPPy uses [Doxygen](https://www.doxygen.nl/download.html) for generating documentation for the source code. 
+Please refer to the link for download and installation instructions.
+If the installation fails on Linux, try:
+```
+sudo apt install flex
+sudo apt install bison
+```
+Generate the documentation by running:
+```
+python Build.py --docs
+```
+which should place the documentation in the man/ folder.

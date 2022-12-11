@@ -14,7 +14,8 @@ def BuildPOPPy():
     config   = sys.argv.count("--config") or sys.argv.count("-f")
     cmake = sys.argv.count("--make") or sys.argv.count("-m")
     cmakec  = sys.argv.count("--clean") or sys.argv.count("-c")
-    
+    docs    = sys.argv.count("--docs") or sys.argv.count("-d")
+
     if prereq:
         print("Installing prerequisites...")
         if platform.system() == "Linux":
@@ -63,6 +64,16 @@ def BuildPOPPy():
             os.makedirs(dir_build)
 
         os.system(f"cmake --build {dir_build}")
+        return 0
+
+    if docs:
+        print("Generating POPPy documentation...")
+        try:
+            shutil.rmtree("man")
+            os.system(f"doxygen Doxyfile")
+
+        except:
+            print("ERROR: failed to generate documentation!")
         return 0
 
     if helpf:

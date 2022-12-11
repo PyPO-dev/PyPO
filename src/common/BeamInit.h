@@ -14,11 +14,32 @@
 #define __BeamInit_h
 
 
+/** 
+ * Initialize ray-trace frame from RTDict or RTDictf.
+ *
+ * Takes an RTDict or RTDictf and generates a frame object, which can be used 
+ *      to initialize a ray-trace.
+ *
+ * @param rdict RTDict or RTDictf object from which to generate a frame.
+ * @param fr Pointer to cframe or cframef object.
+ */
 template<typename T, typename U, typename V>
 void initFrame(T rdict, U *fr);
 
+/** 
+ * Initialize Gaussian beam from GDict or GDictf.
+ *
+ * Takes a GDict or GDictf and generates two arrC3 or arrC3f objects, which contain the field and 
+ *      associated currents and are allocated to passed pointer arguments.
+ *
+ * @param gdict GDict or GDictf object from which to generate a Gaussian beam.
+ * @param refldict reflparams or reflparamsf object corresponding to surface on
+ *      which to generate the Gaussian beam.
+ * @param res_field Pointer to arrC3 or arrC3f object.
+ * @param res_current Pointer to arrC3 or arrC3f object.
+ */
 template<typename T, typename U, typename V, typename W, typename G>
-void initGauss(T gdict, U rdict, V *res_field, V *res_current);
+void initGauss(T gdict, U refldict, V *res_field, V *res_current);
 
 template<typename T, typename U, typename V, typename W>
 void calcJM(T *res_field, T *res_current, V rdict, int mode);
@@ -98,9 +119,9 @@ void initFrame(T rdict, U *fr)
 }
 
 template<typename T, typename U, typename V, typename W, typename G>
-void initGauss(T gdict, U rdict, V *res_field, V *res_current)
+void initGauss(T gdict, U refldict, V *res_field, V *res_current)
 {
-    int nTot = rdict.n_cells[0] * rdict.n_cells[1];
+    int nTot = refldict.n_cells[0] * refldict.n_cells[1];
 
     W reflc;
 
@@ -119,7 +140,7 @@ void initGauss(T gdict, U rdict, V *res_field, V *res_current)
     Utils<G> ut;
 
     bool transform = false;
-    generateGrid(rdict, &reflc, transform);
+    generateGrid(refldict, &reflc, transform);
 
 
     G zRx      = M_PI * gdict.w0x*gdict.w0x * gdict.n / gdict.lam;

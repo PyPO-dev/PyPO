@@ -69,7 +69,11 @@ def BuildPOPPy():
     if docs:
         print("Generating POPPy documentation...")
         try:
-            shutil.rmtree("man")
+            try:
+                shutil.rmtree("docs")
+            except:
+                pass
+
             os.system(f"doxygen Doxyfile")
 
         except:
@@ -83,6 +87,7 @@ def BuildPOPPy():
         print("'--prereqs', '-p'        : install POPPy prerequisites.")
         print("'--config', '-f'         : configure POPPy.")
         print("'--make', '-m'           : build POPPy libraries.")
+        print("'--docs', '-d'           : generate POPPy documentation. Needs doxygen!")
         return 0
  
 if __name__ == "__main__":

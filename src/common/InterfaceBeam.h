@@ -10,6 +10,12 @@
 #ifndef InterfaceBeam_h
 #define InterfaceBeam_h
 
+/*! \file InterfaceBeam.h
+    \brief Header for beam initialization interface.
+    
+    Declaration of interface for initializing ray-trace frames, Gaussian beams and custom beams by calculating currents.
+*/
+
 extern "C"
 {
     POPPY_DLL void makeRTframe(RTDict rdict, cframe *fr);

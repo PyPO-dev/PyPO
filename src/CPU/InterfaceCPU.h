@@ -17,7 +17,11 @@
 #ifndef __InterfaceCPU_h
 #define __InterfaceCPU_h
 
-// DOUBLE PRECISION INTERFACE
+/*! \file InterfaceCPU.h
+    \brief Declarations of PO and RT library for CPU.
+
+    Provides double and single precision interface for CPU PO and RT.
+*/
 extern "C"
 {
     POPPY_DLL void propagateToGrid_JM(c2Bundle *res, reflparams source, reflparams target,

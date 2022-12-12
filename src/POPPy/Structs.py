@@ -78,6 +78,8 @@ class reflparams(ctypes.Structure):
                 ("flip", ctypes.c_bool),
                 ("gmode", ctypes.c_int),
                 ("gcenter", ctypes.POINTER(ctypes.c_double)),
+                ("ecc_uv", ctypes.c_double),
+                ("rot_uv", ctypes.c_double),
                 ("type", ctypes.c_int),
                 ("transf", ctypes.POINTER(ctypes.c_double))]
 
@@ -195,6 +197,8 @@ class reflparamsf(ctypes.Structure):
                 ("flip", ctypes.c_bool),
                 ("gmode", ctypes.c_int),
                 ("gcenter", ctypes.POINTER(ctypes.c_float)),
+                ("ecc_uv", ctypes.c_float),
+                ("rot_uv", ctypes.c_float),
                 ("type", ctypes.c_int),
                 ("transf", ctypes.POINTER(ctypes.c_float))]
 

@@ -139,7 +139,7 @@ images/
 save/
 custom/
 out/
-man/
+docs/
 
 # User-specific files
 log

@@ -5,7 +5,7 @@
 #define __Structs_h
 
 /*! \file Structs.h
-    \brief Contains all structs used within POPPy. 
+    \brief Structs used within POPPy. 
         
     This file contains all object that are used to either store results from calculations internally
         or pass data back/fetch data from the Python interface. 
@@ -41,7 +41,7 @@ struct arrR3 {
 struct c2Bundle {
     double *r1x,      /**<array of double, field 1, real part, x-axis.*/ 
            *r1y,      /**<array of double, field 1, real part, y-axis.*/ 
-           *r1z;      /**<array of double, field 1, real part, x-axis.*/
+           *r1z;      /**<array of double, field 1, real part, z-axis.*/
     double *i1x,      /**<array of double, field 1, imaginary part, x-axis.*/
            *i1y,      /**<array of double, field 1, imaginary part, y-axis.*/ 
            *i1z;      /**<array of double, field 1, imaginary part, z-axis.*/
@@ -58,7 +58,7 @@ struct c2Bundle {
 struct c4Bundle {
     double *r1x,      /**<array of double, field 1, real part, x-axis.*/ 
            *r1y,      /**<array of double, field 1, real part, y-axis.*/ 
-           *r1z;      /**<array of double, field 1, real part, x-axis.*/
+           *r1z;      /**<array of double, field 1, real part, z-axis.*/
     double *i1x,      /**<array of double, field 1, imaginary part, x-axis.*/
            *i1y,      /**<array of double, field 1, imaginary part, y-axis.*/ 
            *i1z;      /**<array of double, field 1, imaginary part, z-axis.*/
@@ -72,7 +72,7 @@ struct c4Bundle {
 
     double *r3x,      /**<array of double, field 3, real part, x-axis.*/ 
            *r3y,      /**<array of double, field 3, real part, y-axis.*/ 
-           *r3z;      /**<array of double, field 3, real part, x-axis.*/
+           *r3z;      /**<array of double, field 3, real part, z-axis.*/
     double *i3x,      /**<array of double, field 3, imaginary part, x-axis.*/
            *i3y,      /**<array of double, field 3, imaginary part, y-axis.*/ 
            *i3z;      /**<array of double, field 3, imaginary part, z-axis.*/
@@ -89,7 +89,7 @@ struct c4Bundle {
 struct c2rBundle {
     double *r1x,      /**<array of double, field 1, real part, x-axis.*/ 
            *r1y,      /**<array of double, field 1, real part, y-axis.*/ 
-           *r1z;      /**<array of double, field 1, real part, x-axis.*/
+           *r1z;      /**<array of double, field 1, real part, z-axis.*/
     double *i1x,      /**<array of double, field 1, imaginary part, x-axis.*/
            *i1y,      /**<array of double, field 1, imaginary part, y-axis.*/ 
            *i1z;      /**<array of double, field 1, imaginary part, z-axis.*/
@@ -118,6 +118,10 @@ struct reflparams {
     bool flip;          /**<Whether or not to flip normal vectors. Only relevant for quadric surfaces.*/
     int gmode;          /**<How to grid surface. 0 is "xy", 1 is "uv" and 2 is "AoE".*/
     double *gcenter;    /**<array of two double. Contains x and y co-ordinates for center of selection area.*/
+    
+    double ecc_uv;       /**<Eccentricity of uv-generated xy grid.*/
+    double rot_uv;       /**<Position angle of uv-generated xy_grid, w.r.t. x-axis.*/
+   
     int type;           /**<What type the reflector is. 0 is paraboloid, 1 is hyperboloid, 2 is ellipsoid and 3 is planar.*/
 
     double *transf;     /**<array of 16 double. Contains the transformation matrix of reflector surface.*/
@@ -205,7 +209,7 @@ struct arrR3f {
 struct c2Bundlef {
     float *r1x,      /**<array of float, field 1, real part, x-axis.*/ 
            *r1y,      /**<array of float, field 1, real part, y-axis.*/ 
-           *r1z;      /**<array of float, field 1, real part, x-axis.*/
+           *r1z;      /**<array of float, field 1, real part, z-axis.*/
     float *i1x,      /**<array of float, field 1, imaginary part, x-axis.*/
            *i1y,      /**<array of float, field 1, imaginary part, y-axis.*/ 
            *i1z;      /**<array of float, field 1, imaginary part, z-axis.*/
@@ -222,7 +226,7 @@ struct c2Bundlef {
 struct c4Bundlef {
     float *r1x,      /**<array of float, field 1, real part, x-axis.*/ 
            *r1y,      /**<array of float, field 1, real part, y-axis.*/ 
-           *r1z;      /**<array of float, field 1, real part, x-axis.*/
+           *r1z;      /**<array of float, field 1, real part, z-axis.*/
     float *i1x,      /**<array of float, field 1, imaginary part, x-axis.*/
            *i1y,      /**<array of float, field 1, imaginary part, y-axis.*/ 
            *i1z;      /**<array of float, field 1, imaginary part, z-axis.*/
@@ -236,7 +240,7 @@ struct c4Bundlef {
 
     float *r3x,      /**<array of float, field 3, real part, x-axis.*/ 
            *r3y,      /**<array of float, field 3, real part, y-axis.*/ 
-           *r3z;      /**<array of float, field 3, real part, x-axis.*/
+           *r3z;      /**<array of float, field 3, real part, z-axis.*/
     float *i3x,      /**<array of float, field 3, imaginary part, x-axis.*/
            *i3y,      /**<array of float, field 3, imaginary part, y-axis.*/ 
            *i3z;      /**<array of float, field 3, imaginary part, z-axis.*/
@@ -253,7 +257,7 @@ struct c4Bundlef {
 struct c2rBundlef {
     float *r1x,      /**<array of float, field 1, real part, x-axis.*/ 
            *r1y,      /**<array of float, field 1, real part, y-axis.*/ 
-           *r1z;      /**<array of float, field 1, real part, x-axis.*/
+           *r1z;      /**<array of float, field 1, real part, z-axis.*/
     float *i1x,      /**<array of float, field 1, imaginary part, x-axis.*/
            *i1y,      /**<array of float, field 1, imaginary part, y-axis.*/ 
            *i1z;      /**<array of float, field 1, imaginary part, z-axis.*/
@@ -282,6 +286,10 @@ struct reflparamsf {
     bool flip;          /**<Whether or not to flip normal vectors. Only relevant for quadric surfaces.*/
     int gmode;          /**<How to grid surface. 0 is "xy", 1 is "uv" and 2 is "AoE".*/
     float *gcenter;    /**<array of two float. Contains x and y co-ordinates for center of selection area.*/
+    
+    float ecc_uv;       /**<Eccentricity of uv-generated xy grid.*/
+    float rot_uv;       /**<Position angle of uv-generated xy_grid, w.r.t. x-axis.*/
+
     int type;           /**<What type the reflector is. 0 is paraboloid, 1 is hyperboloid, 2 is ellipsoid and 3 is planar.*/
 
     float *transf;     /**<array of 16 float. Contains the transformation matrix of reflector surface.*/

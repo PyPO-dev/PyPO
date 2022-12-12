@@ -5,7 +5,7 @@ sys.path.append('../')
 import matplotlib.pyplot as pt
 
 #import src.Python.System as System
-from src.POPPy.System import System
+from src.PyPO.System import System
 
 """
 In this script, we build the warm optics (WO) block as described for DESHIMA.

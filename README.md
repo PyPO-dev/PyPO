@@ -75,7 +75,7 @@ nosetests --exe
 ```
 
 -- DOCUMENTATION --\
-Please find a detailed software documentation on the Github site. The following instructions are for people
+Please find a detailed software documentation on the [PyPO Github site](https://arend95.github.io/PyPO/index.html). The following instructions are for people
 who would like to develop PyPO and generate documentation along the way.
 PyPO uses [Doxygen](https://www.doxygen.nl/download.html) for generating documentation for the source code. 
 Please refer to the link for download and installation instructions.

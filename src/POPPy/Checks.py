@@ -114,17 +114,6 @@ def check_ElemDict(elemDict):
                 args = ["focus", "manual"]
                 errStr += errMsg_option("pmode", elemDict["pmode"], elemDict["name"], args=args)
 
-    elif elemDict["type"] == 3:
-        if "ecc" in elemDict:
-            if not ((isinstance(elemDict["ecc"], float) or isinstance(elemDict["ecc"], int))):
-                errStr += errMsg_type("ecc", type(elemDict["ecc"]), elemDict["name"], [float, int])
-
-            elif elemDict["ecc"] < 0 or elemDict["ecc"] >= 1:
-                errStr += errMsg_value("ecc", elemDict["ecc"], elemDict["name"])
-            pass
-        else:
-            errStr += errMsg_field("ecc", elemDict["name"])
-
     if "gmode" in elemDict:
         if elemDict["gmode"] == "xy":
             if "lims_x" in elemDict:
@@ -157,8 +146,18 @@ def check_ElemDict(elemDict):
                     errStr += errMsg_value("lims_v", elemDict["lims_v"][1], elemDict["name"])
             else:
                 errStr += errMsg_field("lims_v", elemDict["name"])
-    
 
+            if "ecc_uv" in elemDict:
+                if not ((isinstance(elemDict["ecc_uv"], float) or isinstance(elemDict["ecc_uv"], int))):
+                    errStr += errMsg_type("ecc_uv", type(elemDict["ecc_uv"]), elemDict["name"], [float, int])
+
+                if elemDict["ecc_uv"] < 0 or elemDict["ecc_uv"] > 1:
+                    errStr += errMsg_value("ecc_uv", elemDict["ecc_uv"], elemDict["name"])
+
+            if "rot_uv" in elemDict:
+                if not ((isinstance(elemDict["rot_uv"], float) or isinstance(elemDict["rot_uv"], int))):
+                    errStr += errMsg_type("rot_uv", type(elemDict["rot_uv"]), elemDict["name"], [float, int])
+        
         elif elemDict["gmode"] == "AoE":
             if "lims_Az" in elemDict:
                 errStr += block_ndarray("lims_Az", elemDict, (2,))

@@ -13,6 +13,8 @@ Refl = {
         "lims_y"    : "Upper and lower y-limit (gmode=xy, list of 2 reals)",
         "lims_u"    : "Aperture and vertex radii (gmode=uv, list of 2 reals)",
         "lims_v"    : "Upper and lower rotation angle (gmode=uv, list of 2 reals)",
+        "ecc_uv"    : "Eccentricity of uv-generated xy_grid (uv only)",
+        "rot_uv"    : "Position angle of uv-generated xy grid (uv only)",
         "gridsize"  : "Number of cells along x(u) and y(v) axes (list of 2 ints)"
         }
 

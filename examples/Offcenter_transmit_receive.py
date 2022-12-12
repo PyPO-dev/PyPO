@@ -3,18 +3,19 @@ import matplotlib.pyplot as pt
 
 from src.POPPy.System import System
 
-D = 5e4
+D = 5e5
 
 def transmitter(sysObject):
     transmitter = {
             "name"      : "transmitter",
             "gmode"     : "uv",
-            "gcenter"   : np.array([0, 5e2]),
+            "gcenter"   : np.array([0, 0]),
             "flip"      : False,
-            "lims_u"    : np.array([0, 1e3]),
+            "lims_u"    : np.array([0, 2e3]),
             "lims_v"    : np.array([0, 360]),
             "gridsize"  : np.array([501, 501]),
             "pmode"     : "focus",
+            "ecc_uv"    : 0.5,
             "vertex"    : np.zeros(3),
             "focus_1"   : np.array([0, 0, 1e3])
             }
@@ -25,14 +26,14 @@ def receiver(sysObject):
     receiver = {
             "name"      : "receiver",
             "gmode"     : "uv",
-            "gcenter"   : np.array([0, 5e2]),
+            "gcenter"   : np.array([0, 0]),
             "flip"      : False,
-            "lims_u"    : np.array([0, 1e3]),
+            "lims_u"    : np.array([0, 2e3]),
             "lims_v"    : np.array([0, 360]),
             "gridsize"  : np.array([501, 501]),
             "pmode"     : "focus",
             "vertex"    : np.zeros(3),
-            "focus_1"   : np.array([0, 0, 3.5e3])
+            "focus_1"   : np.array([0, 0, 3e3])
             }
 
     sysObject.addParabola(receiver)
@@ -50,7 +51,7 @@ def source_plane(sysObject):
             }
     
     sysObject.addPlane(source)
-    sysObject.rotateGrids("source", np.array([0, -31.3, 0]))
+    sysObject.rotateGrids("source", np.array([0, -31.46, 0]))
     sysObject.translateGrids("source", np.array([0, 0, 1e3]))
 
 def target_plane(sysObject):
@@ -58,14 +59,14 @@ def target_plane(sysObject):
             "name"      : "target",
             "gmode"     : "xy",
             "flip"      : False,
-            "lims_x"    : np.array([-500, 500]),
-            "lims_y"    : np.array([-500, 500]),
+            "lims_x"    : np.array([-50, 50]),
+            "lims_y"    : np.array([-50, 50]),
             "gridsize"  : np.array([301, 301]),
             }
     
     sysObject.addPlane(target)
-    sysObject.rotateGrids("target", np.array([-8.2, 0, 0]))
-    sysObject.translateGrids("target", np.array([0, 0, D - 3.5e3]))
+    sysObject.rotateGrids("target", np.array([0, 0, 0]))
+    sysObject.translateGrids("target", np.array([0, 0, D - 3e3]))
 
 def trans_ff(sysObject):
     trans_ff = {
@@ -90,7 +91,7 @@ def Offcenter_transmit_receive():
 
     grid_trans = s.generateGrids("transmitter")
 
-    s.plotSystem()#select=["receiver", "target"])
+    s.plotSystem(select=["receiver", "target"])
 
     PS = s.generatePointSource("source")
     JM = s.calcCurrents("source", PS)
@@ -98,7 +99,7 @@ def Offcenter_transmit_receive():
     nThreads = 256
     device = "GPU"
 
-    lam = 1e2
+    lam = 10
 
     source_to_transmitter = {
             "s_name"    : "source",

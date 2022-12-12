@@ -134,6 +134,11 @@ class System(object):
         reflDict["transf"] = np.eye(4)
 
         check_ElemDict(reflDict) 
+        if not "ecc_uv" in reflDict:
+            reflDict["ecc_uv"] = 0
+
+        if not "rot_uv" in reflDict:
+            reflDict["rot_uv"] = 0
 
         self.system[reflDict["name"]] = copyGrid(reflDict)
 
@@ -171,6 +176,8 @@ class System(object):
             self.system[reflDict["name"]]["coeffs"] = np.array([reflDict["coeffs"][0], reflDict["coeffs"][1], -1])
 
         if reflDict["gmode"] == "xy":
+            self.system[reflDict["name"]]["ecc_uv"] = 0
+            self.system[reflDict["name"]]["rot_uv"] = 0
             self.system[reflDict["name"]]["gmode"] = 0
 
         elif reflDict["gmode"] == "uv":
@@ -194,6 +201,11 @@ class System(object):
         reflDict["type"] = 1
         reflDict["transf"] = np.eye(4)
         check_ElemDict(reflDict) 
+        if not "ecc_uv" in reflDict:
+            reflDict["ecc_uv"] = 0
+
+        if not "rot_uv" in reflDict:
+            reflDict["rot_uv"] = 0
         self.system[reflDict["name"]] = copyGrid(reflDict)
 
         if reflDict["pmode"] == "focus":
@@ -236,6 +248,8 @@ class System(object):
             self.system[reflDict["name"]]["coeffs"][2] = c3
 
         if reflDict["gmode"] == "xy":
+            self.system[reflDict["name"]]["ecc_uv"] = 0
+            self.system[reflDict["name"]]["rot_uv"] = 0
             self.system[reflDict["name"]]["gmode"] = 0
 
         elif reflDict["gmode"] == "uv":
@@ -259,12 +273,19 @@ class System(object):
         reflDict["transf"] = np.eye(4)
 
         check_ElemDict(reflDict) 
+        if not "ecc_uv" in reflDict:
+            reflDict["ecc_uv"] = 0
+
+        if not "rot_uv" in reflDict:
+            reflDict["rot_uv"] = 0
         self.system[reflDict["name"]] = copyGrid(reflDict)
 
         if reflDict["pmode"] == "focus":
             pass
 
         if reflDict["gmode"] == "xy":
+            self.system[reflDict["name"]]["ecc_uv"] = 0
+            self.system[reflDict["name"]]["rot_uv"] = 0
             self.system[reflDict["name"]]["gmode"] = 0
 
         elif reflDict["gmode"] == "uv":
@@ -277,19 +298,24 @@ class System(object):
 
     def addPlane(self, reflDict):
         if not "name" in reflDict:
-            reflDict["name"] = "Plane"
+            reflDict["name"] = "plane"
 
         if not "gcenter" in reflDict:
             reflDict["gcenter"] = np.zeros(2)
-        if reflDict["name"] == "Plane":
+
+        if reflDict["name"] == "plane":
             reflDict["name"] = reflDict["name"] + "_{}".format(self.num_ref)
-        
-        if not "ecc" in reflDict:
-            reflDict["ecc"] = 0
 
         reflDict["type"] = 3
         reflDict["transf"] = np.eye(4)
         check_ElemDict(reflDict) 
+
+        if not "ecc_uv" in reflDict:
+            reflDict["ecc_uv"] = 0
+
+        if not "rot_uv" in reflDict:
+            reflDict["rot_uv"] = 0
+        
         self.system[reflDict["name"]] = copyGrid(reflDict)
         self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
 
@@ -298,11 +324,11 @@ class System(object):
         self.system[reflDict["name"]]["coeffs"][2] = -1
 
         if reflDict["gmode"] == "xy":
+            self.system[reflDict["name"]]["ecc_uv"] = 0
+            self.system[reflDict["name"]]["rot_uv"] = 0
             self.system[reflDict["name"]]["gmode"] = 0
 
         elif reflDict["gmode"] == "uv":
-            self.system[reflDict["name"]]["coeffs"][0] = reflDict["lims_u"][1]
-            self.system[reflDict["name"]]["coeffs"][1] = reflDict["lims_u"][1] * np.sqrt(1 - reflDict["ecc"]**2)
             self.system[reflDict["name"]]["gmode"] = 1
 
         elif reflDict["gmode"] == "AoE":

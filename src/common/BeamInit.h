@@ -13,6 +13,11 @@
 #ifndef __BeamInit_h
 #define __BeamInit_h
 
+/*! \file BeamInit.h
+    \brief Initialize beam objects.
+    
+    Initializes ray-trace frames, Gaussian beams and custom beams by calculating currents.
+*/
 
 /** 
  * Initialize ray-trace frame from RTDict or RTDictf.
@@ -22,6 +27,11 @@
  *
  * @param rdict RTDict or RTDictf object from which to generate a frame.
  * @param fr Pointer to cframe or cframef object.
+ * 
+ * @see RTDict
+ * @see RTDictf
+ * @see cframe
+ * @see cframef
  */
 template<typename T, typename U, typename V>
 void initFrame(T rdict, U *fr);
@@ -29,20 +39,44 @@ void initFrame(T rdict, U *fr);
 /** 
  * Initialize Gaussian beam from GDict or GDictf.
  *
- * Takes a GDict or GDictf and generates two arrC3 or arrC3f objects, which contain the field and 
+ * Takes a GDict or GDictf and generates two c2Bundle or c2Bundlef objects, which contain the field and 
  *      associated currents and are allocated to passed pointer arguments.
  *
  * @param gdict GDict or GDictf object from which to generate a Gaussian beam.
  * @param refldict reflparams or reflparamsf object corresponding to surface on
  *      which to generate the Gaussian beam.
- * @param res_field Pointer to arrC3 or arrC3f object.
- * @param res_current Pointer to arrC3 or arrC3f object.
+ * @param res_field Pointer to c2Bundle or c2Bundlef object.
+ * @param res_current Pointer to c2Bundle or c2Bundlef object.
+ *
+ * @see GDict
+ * @see GDictf
+ * @see reflparams
+ * @see reflparamsf
+ * @see c2Bundle
+ * @see c2Bundlef
  */
 template<typename T, typename U, typename V, typename W, typename G>
 void initGauss(T gdict, U refldict, V *res_field, V *res_current);
 
+/** 
+ * Calculate currents from electromagnetic field.
+ * 
+ * Calculate the J and M vectorial currents given a vectorial E and H field.
+ *      Can calculate full currents, PMC and PEC surfaces.
+ *
+ * @param res_field Pointer to c2Bundle or c2Bundlef object.
+ * @param res_current Pointer to c2Bundle or c2Bundlef object.
+ * @param refldict reflparams or reflparamsf object corresponding to surface on
+ *      which to calculate currents.
+ * @param mode How to calculate currents. 0 is full currents, 1 is PMC and 2 is PEC.
+ *
+ * @see c2Bundle
+ * @see c2Bundlef
+ * @see reflparams
+ * @see reflparamsf
+ */
 template<typename T, typename U, typename V, typename W>
-void calcJM(T *res_field, T *res_current, V rdict, int mode);
+void calcJM(T *res_field, T *res_current, V refldict, int mode);
 
 template<typename T, typename U, typename V>
 void initFrame(T rdict, U *fr)
@@ -232,10 +266,10 @@ void initGauss(T gdict, U refldict, V *res_field, V *res_current)
 }
 
 template<typename T, typename U, typename V, typename W>
-void calcJM(T *res_field, T *res_current, V rdict, int mode)
+void calcJM(T *res_field, T *res_current, V refldict, int mode)
 {
     W reflc;
-    int nTot = rdict.n_cells[0] * rdict.n_cells[1];
+    int nTot = refldict.n_cells[0] * refldict.n_cells[1];
 
     reflc.size = nTot;
 
@@ -250,7 +284,7 @@ void calcJM(T *res_field, T *res_current, V rdict, int mode)
     reflc.area = new U[nTot];
 
     bool transform = true;
-    generateGrid(rdict, &reflc, transform);
+    generateGrid(refldict, &reflc, transform);
 
     Utils<U> ut;
 

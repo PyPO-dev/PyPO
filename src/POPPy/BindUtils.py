@@ -218,7 +218,9 @@ def allocate_c2rBundle(res, size, ct_t):
 
 def allfill_reflparams(inp, reflparams_py, ct_t):
     inp.coeffs = (ct_t * 3)()
-    inp.type = reflparams_py["type"]
+    inp.type = ctypes.c_int(reflparams_py["type"])
+    inp.ecc_uv = ct_t(reflparams_py["ecc_uv"])
+    inp.rot_uv = ct_t(reflparams_py["rot_uv"])
 
     for i in range(3):
         inp.coeffs[i] = ct_t(reflparams_py["coeffs"][i])

@@ -15,43 +15,60 @@
 #ifndef __Propagation_h
 #define __Propagation_h
 
-// T is either double or float, U is return struct (double or float as well)
+/*! \file Propagation.h
+    \brief Functions for PO calculations on CPU.
+
+    Provides functions for performing PO calculations on the CPU.
+*/
+
+/**
+ * Main class for running PO calculations.
+ *
+ * Contains functions that run PO calculations. All calculations can be performed in a parallel way.
+ *
+ * @see Utils
+ * @see Structs
+ * @see InterfaceReflector
+ */
 template <class T, class U, class V, class W>
 class Propagation
 {
-    T k;                   // Wavenumber
-    int numThreads;             // Number of CPU threads used
-    int gs;             // Flattened gridsize of source grids
-    int gt;             // Flattened gridsize of target grids
+    T k;                /**<Wavenumber of radiation, double/float.*/  
+    int numThreads;     /**<Number of computing threads to employ.*/
+    int gs;             /**<Number of cells on source surface.*/
+    int gt;             /**<Number of cells on target surface.*/
 
-    int step;                   // Number of points calculated by n-1 threads.
-                                // Thread n gets slightly different amount, possibly
-    T t_direction;         // Time direction. If -1, propagate field forward in time
-                                // If 1, propagate backwards in time
-    T EPS;
-
-    int toPrint;
-
-    float C_L;
-    float MU_0;
-    float EPS_VAC;
-    float ZETA_0_INV;
-    float M_PIf;
+    int step;           /**<Number of threads per block.*/
+                      
+    T t_direction;      /**<Time direction (experimental!).*/
+                      
+    T EPS;              /**<Relative electric permittivity of source medium, double/float.*/
+    float C_L;          /**<Speed of light in vacuum, in mm / s.*/
+    float MU_0;         /**<Magnetic permeability.*/
+    float EPS_VAC;      /**<Vacuum electric permittivity.*/
+    float ZETA_0_INV;   /**<Conductance of surrounding medium.*/
+    float M_PIf;        /**<Floating point pi (redundant?).*/
 
 
-    std::complex<T> j;
-    std::complex<T> z0;
+    std::complex<T> j;  /**<Complex unit.*/
+    std::complex<T> z0; /**<Complex zero.*/
 
-    std::array<std::array<T, 3>, 3> eye;
+    std::array<std::array<T, 3>, 3> eye; /**<Real-valued 3x3 unit matrix.*/
+    
+    void joinThreads();
+
+    void _debugArray(T *arr, int idx);
+    void _debugArray(std::array<T, 3> arr);
+    void _debugArray(std::array<std::complex<T>, 3> arr);
 
 public:
 
-    std::vector<std::thread> threadPool;
+    std::vector<std::thread> threadPool;    /**<Vector of thread objects.*/
 
     Propagation(T k, int numThreads, int gs, int gt, T epsilon, T t_direction, bool verbose = false);
 
     // Make T precision utility kit
-    Utils<T> ut;
+    Utils<T> ut;    /**<Utils object for vector operations.*/
 
     // Functions for propagating fields between two surfaces
     void propagateBeam_JM(int start, int stop,
@@ -92,7 +109,7 @@ public:
                               W *currents, U *res);
 
     std::array<std::complex<T>, 3> farfieldAtPoint(V *cs, W *currents,
-                                              const std::array<T, 3> &point_target, int start);
+                                              const std::array<T, 3> &point_target);
 
     void parallelFarField(V *cs, V *ct,
                         W *currents, U *res);
@@ -109,13 +126,21 @@ public:
     void parallelPropScalar(V *cs, V *ct,
                             W *field, U *res);
 
-    void joinThreads();
-
-    void _debugArray(T *arr, int idx);
-    void _debugArray(std::array<T, 3> arr);
-    void _debugArray(std::array<std::complex<T>, 3> arr);
 };
 
+/**
+ * Constructor.
+ *
+ * Set important parameters internally, given input.
+ *
+ * @param k Wavenumber of radiation, double/float.
+ * @param numThreads Number of computing threads to employ.
+ * @param gs Number of cells on source surface.
+ * @param gt Number of cells on target grid.
+ * @param epsilon Relative electric permittivity of source surface.
+ * @param t_direction Time direction (experimental!).
+ * @param verbose Whether to print internal state info.
+ */
 template <class T, class U, class V, class W>
 Propagation<T, U, V, W>::Propagation(T k, int numThreads, int gs, int gt, T epsilon, T t_direction, bool verbose)
 {
@@ -165,7 +190,23 @@ Propagation<T, U, V, W>::Propagation(T k, int numThreads, int gs, int gt, T epsi
     }
 }
 
-// This function calculates the propagation between source and target, calculates currents
+/**
+ * Calculate JM on target.
+ *
+ * Calculate the J, M currents on a target surface.
+ *
+ * @param start Index of first loop iteration in parallel block.
+ * @param stop Index of last loop iteration in parallel block.
+ * @param cs Pointer to reflcontainer or reflcontainerf object containing source grids.
+ * @param ct Pointer to reflcontainer or reflcontainerf object containing target grids.
+ * @param currents Pointer to c2Bundle or c2Bundlef object containing currents on source.
+ * @param res Pointer to c2Bundle or c2Bundlef object, to be filled with caculation results.
+ *
+ * @see reflcontainer
+ * @see reflcontainerf
+ * @see c2Bundle
+ * @see c2Bundlef
+ */
 template <class T, class U, class V, class W>
 void Propagation<T,U, V, W>::propagateBeam_JM(int start, int stop,
                                               V *cs, V *ct,
@@ -293,6 +334,23 @@ void Propagation<T,U, V, W>::propagateBeam_JM(int start, int stop,
     }
 }
 
+/**
+ * Calculate EH on target.
+ *
+ * Calculate the E, H fields on a target surface.
+ *
+ * @param start Index of first loop iteration in parallel block.
+ * @param stop Index of last loop iteration in parallel block.
+ * @param cs Pointer to reflcontainer or reflcontainerf object containing source grids.
+ * @param ct Pointer to reflcontainer or reflcontainerf object containing target grids.
+ * @param currents Pointer to c2Bundle or c2Bundlef object containing currents on source.
+ * @param res Pointer to c2Bundle or c2Bundlef object, to be filled with caculation results.
+ *
+ * @see reflcontainer
+ * @see reflcontainerf
+ * @see c2Bundle
+ * @see c2Bundlef
+ */
 template <class T, class U, class V, class W>
 void Propagation<T, U, V, W>::propagateBeam_EH(int start, int stop,
                                               V *cs, V *ct,
@@ -341,6 +399,25 @@ void Propagation<T, U, V, W>::propagateBeam_EH(int start, int stop,
     }
 }
 
+/**
+ * Calculate JM and EH on target.
+ *
+ * Calculate the J, M currents and E, H fields on a target surface.
+ *
+ * @param start Index of first loop iteration in parallel block.
+ * @param stop Index of last loop iteration in parallel block.
+ * @param cs Pointer to reflcontainer or reflcontainerf object containing source grids.
+ * @param ct Pointer to reflcontainer or reflcontainerf object containing target grids.
+ * @param currents Pointer to c2Bundle or c2Bundlef object containing currents on source.
+ * @param res Pointer to c4Bundle or c4Bundlef object, to be filled with caculation results.
+ *
+ * @see reflcontainer
+ * @see reflcontainerf
+ * @see c2Bundle
+ * @see c2Bundlef
+ * @see c4Bundle
+ * @see c4Bundlef
+ */
 template <class T, class U, class V, class W>
 void Propagation<T, U, V, W>::propagateBeam_JMEH(int start, int stop,
                                                 V *cs, V *ct,
@@ -494,6 +571,25 @@ void Propagation<T, U, V, W>::propagateBeam_JMEH(int start, int stop,
     }
 }
 
+/**
+ * Calculate reflected EH and P on target.
+ *
+ * Calculate the reflected E, H fields and P, the reflected Poynting vector field, on a target surface.
+ *
+ * @param start Index of first loop iteration in parallel block.
+ * @param stop Index of last loop iteration in parallel block.
+ * @param cs Pointer to reflcontainer or reflcontainerf object containing source grids.
+ * @param ct Pointer to reflcontainer or reflcontainerf object containing target grids.
+ * @param currents Pointer to c2Bundle or c2Bundlef object containing currents on source.
+ * @param res Pointer to c2rBundle or c2rBundlef object, to be filled with caculation results.
+ *
+ * @see reflcontainer
+ * @see reflcontainerf
+ * @see c2Bundle
+ * @see c2Bundlef
+ * @see c2rBundle
+ * @see c2rBundlef
+ */
 template <class T, class U, class V, class W>
 void Propagation<T, U, V, W>::propagateBeam_EHP(int start, int stop,
                                                 V *cs, V *ct,
@@ -609,6 +705,23 @@ void Propagation<T, U, V, W>::propagateBeam_EHP(int start, int stop,
     }
 }
 
+/**
+ * Calculate scalar field on target.
+ *
+ * Calculate the scalar fields on a target surface.
+ *
+ * @param start Index of first loop iteration in parallel block.
+ * @param stop Index of last loop iteration in parallel block.
+ * @param cs Pointer to reflcontainer or reflcontainerf object containing source grids.
+ * @param ct Pointer to reflcontainer or reflcontainerf object containing target grids.
+ * @param field Pointer to arrC1 or arrC1f object containing field on source.
+ * @param res Pointer to arrC1 or arrC1f object, to be filled with caculation results.
+ *
+ * @see reflcontainer
+ * @see reflcontainerf
+ * @see c2Bundle
+ * @see c2Bundlef
+ */
 template <class T, class U, class V, class W>
 void Propagation<T, U, V, W>::propagateScalarBeam(int start, int stop,
                                                   V *cs, V *ct,
@@ -639,6 +752,20 @@ void Propagation<T, U, V, W>::propagateScalarBeam(int start, int stop,
     }
 }
 
+/**
+ * Calculate field on target.
+ *
+ * Calculate integrated E and H fields on a target point.
+ *
+ * @param cs Pointer to reflcontainer or reflcontainerf object containing source grids.
+ * @param currents Pointer to c2Bundle or c2Bundlef object containing currents on source.
+ * @param point_target Array of 3 double/float containing target point co-ordinate.
+ *
+ * @see reflcontainer
+ * @see reflcontainerf
+ * @see c2Bundle
+ * @see c2Bundlef
+ */
 template <class T, class U, class V, class W>
 std::array<std::array<std::complex<T>, 3>, 2> Propagation<T, U, V, W>::fieldAtPoint(V *cs,
                                                                              W *currents, const std::array<T, 3> &point_target)
@@ -732,6 +859,20 @@ std::array<std::array<std::complex<T>, 3>, 2> Propagation<T, U, V, W>::fieldAtPo
     return e_h_field;
 }
 
+/**
+ * Calculate scalar field on target.
+ *
+ * Calculate integrated scalar field on a target point.
+ *
+ * @param cs Pointer to reflcontainer or reflcontainerf object containing source grids.
+ * @param field Pointer to arrC1 or arrC1f object containing currents on source.
+ * @param point_target Array of 3 double/float containing target point co-ordinate.
+ *
+ * @see reflcontainer
+ * @see reflcontainerf
+ * @see arrC1
+ * @see arrC1f
+ */
 template <class T, class U, class V, class W>
 std::complex<T> Propagation<T, U, V, W>::fieldScalarAtPoint(V *cs,
                                    W *field, const std::array<T, 3> &point_target)
@@ -761,6 +902,21 @@ std::complex<T> Propagation<T, U, V, W>::fieldScalarAtPoint(V *cs,
     return out;
 }
 
+/**
+ * Calculate JM parallel.
+ *
+ * Run the propagateBeam_JM function in parallel blocks.
+ *
+ * @param cs Pointer to reflcontainer or reflontainerf object containing source grids.
+ * @param ct Pointer to reflcontainer or reflcontainerf object containing target grids.
+ * @param currents Pointer to c2Bundle or c2Bundlef object containing source currents.
+ * @param res Pointer to c2Bundle or c2Bundlef object to be filled with calculation results.
+ *
+ * @see reflcontainer
+ * @see reflcontainerf
+ * @see c2Bundle
+ * @see c2Bundlef
+ */
 template <class T, class U, class V, class W>
 void Propagation<T, U, V, W>::parallelProp_JM(V *cs, V *ct,
                                               W *currents, U *res)
@@ -789,6 +945,21 @@ void Propagation<T, U, V, W>::parallelProp_JM(V *cs, V *ct,
     joinThreads();
 }
 
+/**
+ * Calculate EH parallel.
+ *
+ * Run the propagateBeam_EH function in parallel blocks.
+ *
+ * @param cs Pointer to reflcontainer or reflontainerf object containing source grids.
+ * @param ct Pointer to reflcontainer or reflcontainerf object containing target grids.
+ * @param currents Pointer to c2Bundle or c2Bundlef object containing source currents.
+ * @param res Pointer to c2Bundle or c2Bundlef object to be filled with calculation results.
+ *
+ * @see reflcontainer
+ * @see reflcontainerf
+ * @see c2Bundle
+ * @see c2Bundlef
+ */
 template <class T, class U, class V, class W>
 void Propagation<T, U, V, W>::parallelProp_EH(V *cs, V *ct,
                                               W *currents, U *res)
@@ -817,6 +988,23 @@ void Propagation<T, U, V, W>::parallelProp_EH(V *cs, V *ct,
     joinThreads();
 }
 
+/**
+ * Calculate JM and EH parallel.
+ *
+ * Run the propagateBeam_JMEH function in parallel blocks.
+ *
+ * @param cs Pointer to reflcontainer or reflontainerf object containing source grids.
+ * @param ct Pointer to reflcontainer or reflcontainerf object containing target grids.
+ * @param currents Pointer to c2Bundle or c2Bundlef object containing source currents.
+ * @param res Pointer to c4Bundle or c4Bundlef object to be filled with calculation results.
+ *
+ * @see reflcontainer
+ * @see reflcontainerf
+ * @see c2Bundle
+ * @see c2Bundlef
+ * @see c4Bundle
+ * @see c4Bundlef
+ */
 template <class T, class U, class V, class W>
 void Propagation<T, U, V, W>::parallelProp_JMEH(V *cs, V *ct,
                                                 W *currents, U *res)
@@ -842,6 +1030,23 @@ void Propagation<T, U, V, W>::parallelProp_JMEH(V *cs, V *ct,
     joinThreads();
 }
 
+/**
+ * Calculate reflected EH and P parallel.
+ *
+ * Run the propagateBeam_EHP function in parallel blocks.
+ *
+ * @param cs Pointer to reflcontainer or reflontainerf object containing source grids.
+ * @param ct Pointer to reflcontainer or reflcontainerf object containing target grids.
+ * @param currents Pointer to c2Bundle or c2Bundlef object containing source currents.
+ * @param res Pointer to c2rBundle or c2rBundlef object to be filled with calculation results.
+ *
+ * @see reflcontainer
+ * @see reflcontainerf
+ * @see c2Bundle
+ * @see c2Bundlef
+ * @see c2rBundle
+ * @see c2rBundlef
+ */
 template <class T, class U, class V, class W>
 void Propagation<T, U, V, W>::parallelProp_EHP(V *cs, V *ct,
                                               W *currents, U *res)
@@ -868,6 +1073,21 @@ void Propagation<T, U, V, W>::parallelProp_EHP(V *cs, V *ct,
     joinThreads();
 }
 
+/**
+ * Calculate scalar field parallel.
+ *
+ * Run the propagateScalarBeam function in parallel blocks.
+ *
+ * @param cs Pointer to reflcontainer or reflontainerf object containing source grids.
+ * @param ct Pointer to reflcontainer or reflcontainerf object containing target grids.
+ * @param field Pointer to arrC1 or arrC1f object containing source currents.
+ * @param res Pointer to arrC1 or arrC1f object to be filled with calculation results.
+ *
+ * @see reflcontainer
+ * @see reflcontainerf
+ * @see arrC1
+ * @see arrC1f
+ */
 template <class T, class U, class V, class W>
 void Propagation<T, U, V, W>::parallelPropScalar(V *cs, V *ct,
                                               W *field, U *res)
@@ -893,7 +1113,23 @@ void Propagation<T, U, V, W>::parallelPropScalar(V *cs, V *ct,
     joinThreads();
 }
 
-// Far-field functions to calculate E-vector in far-field
+/**
+ * Calculate far-field on target.
+ *
+ * Calculate integrated E and H fields on a far-field target point.
+ *
+ * @param start Index of first loop iteration in parallel block.
+ * @param stop Index of last loop iteration in parallel block.
+ * @param cs Pointer to reflcontainer or reflcontainerf object containing source grids.
+ * @param ct Pointer to reflcontainer or reflcontainerf object containing target grids.
+ * @param currents Pointer to c2Bundle or c2Bundlef object containing currents on source.
+ * @param res Pointer to c2Bundle or c2Bundlef object, to be filled with caculation results.
+ *
+ * @see reflcontainer
+ * @see reflcontainerf
+ * @see c2Bundle
+ * @see c2Bundlef
+ */
 template <class T, class U, class V, class W>
 void Propagation<T, U, V, W>::propagateToFarField(int start, int stop,
                                               V *cs, V *ct,
@@ -929,7 +1165,7 @@ void Propagation<T, U, V, W>::propagateToFarField(int start, int stop,
         r_hat[2] = cos(phi);
 
         // Calculate total incoming E and H field at point on target
-        e = farfieldAtPoint(cs, currents, r_hat, start);
+        e = farfieldAtPoint(cs, currents, r_hat);
 
         res->r1x[i] = e[0].real();
         res->r1y[i] = e[1].real();
@@ -957,10 +1193,24 @@ void Propagation<T, U, V, W>::propagateToFarField(int start, int stop,
     }
 }
 
+/**
+ * Calculate far-field on target.
+ *
+ * Calculate integrated E and H fields on a far-field target point.
+ *
+ * @param cs Pointer to reflcontainer or reflcontainerf object containing source grids.
+ * @param currents Pointer to c2Bundle or c2Bundlef object containing currents on source.
+ * @param r_hat Array of 3 double/float containing target direction angles.
+ *
+ * @see reflcontainer
+ * @see reflcontainerf
+ * @see c2Bundle
+ * @see c2Bundlef
+ */
 template <class T, class U, class V, class W>
 std::array<std::complex<T>, 3> Propagation<T, U, V, W>::farfieldAtPoint(V *cs,
                                                 W *currents,
-                                                const std::array<T, 3> &r_hat, int start)
+                                                const std::array<T, 3> &r_hat)
 {
     // Scalars (T & complex T)
     T omega_mu;                       // Angular frequency of field times mu
@@ -1038,6 +1288,21 @@ std::array<std::complex<T>, 3> Propagation<T, U, V, W>::farfieldAtPoint(V *cs,
     return e;
 }
 
+/**
+ * Calculate far-field parallel.
+ *
+ * Run the propagateToFarField function in parallel blocks.
+ *
+ * @param cs Pointer to reflcontainer or reflontainerf object containing source grids.
+ * @param ct Pointer to reflcontainer or reflcontainerf object containing target grids.
+ * @param currents Pointer to c2Bundle or c2Bundlef object containing source currents.
+ * @param res Pointer to c2Bundle or c2Bundlef object to be filled with calculation results.
+ *
+ * @see reflcontainer
+ * @see reflcontainerf
+ * @see c2Bundle
+ * @see c2Bundlef
+ */
 template <class T, class U, class V, class W>
 void Propagation<T, U, V, W>::parallelFarField(V *cs, V *ct,
                                               W *currents, U *res)

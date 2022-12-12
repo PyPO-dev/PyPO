@@ -4,8 +4,8 @@ import matplotlib.pyplot as pt
 
 from functools import partial
 
-from src.POPPy.POPPyTypes import *
-from src.POPPy.BindRefl import *
+from src.PyPO.PyPOTypes import *
+from src.PyPO.BindRefl import *
 
 def calcEstimates(x, y, area, field_norm):
 

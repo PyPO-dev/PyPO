@@ -8,7 +8,7 @@
 #define __RTRefls_h
 
 /*! \file RTRefls.h
-    \brief Simple reflector definitions used for POPPy ray-tracer. 
+    \brief Simple reflector definitions used for PyPO ray-tracer. 
         
     Simple, bare-bones definitions of reflectors for CPU/GPU ray-tracing.
         Use only for raytracing; for PO, use the elaborate definitions.

@@ -8,9 +8,9 @@ import matplotlib.ticker as ticker
 import warnings
 warnings.filterwarnings("ignore")
 
-import src.POPPy.PlotConfig
-import src.POPPy.Colormaps as cmaps
-from src.POPPy.BindRefl import *
+import src.PyPO.PlotConfig
+import src.PyPO.Colormaps as cmaps
+from src.PyPO.BindRefl import *
 def plotBeam2D(plotObject, field,
                 vmin, vmax, show, amp_only,
                 save, polar, interpolation,

@@ -4,9 +4,9 @@
 #define __InterfaceReflector_h
 
 #ifdef _WIN32
-#   define POPPY_DLL __declspec(dllexport)
+#   define PYPO_DLL __declspec(dllexport)
 #else
-#   define POPPY_DLL
+#   define PYPO_DLL
 #endif
 
 /*! \file InterfaceReflector.h
@@ -19,10 +19,10 @@
 */
 extern "C"
 {
-    POPPY_DLL void generateGrid(reflparams refl, reflcontainer *container,
+    PYPO_DLL void generateGrid(reflparams refl, reflcontainer *container,
                       bool transform=true, bool spheric=true);
     
-    POPPY_DLL void generateGridf(reflparamsf refl, reflcontainerf *container,
+    PYPO_DLL void generateGridf(reflparamsf refl, reflcontainerf *container,
                       bool transform=true, bool spheric=true);
 }
 #endif

@@ -4,28 +4,28 @@ import os
 import sys
 import pathlib
 
-from src.POPPy.BindUtils import allfill_reflparams, allocate_reflcontainer, creflToObj
-from src.POPPy.Structs import *
-from src.POPPy.POPPyTypes import *
+from src.PyPO.BindUtils import allfill_reflparams, allocate_reflcontainer, creflToObj
+from src.PyPO.Structs import *
+from src.PyPO.PyPOTypes import *
 
 #############################################################################
 #                                                                           #
-#           List of bindings for the reflector interface of POPPy.          #
+#           List of bindings for the reflector interface of PyPO.          #
 #                                                                           #
 #############################################################################
 
 def loadRefllib():
     try:
         LD_PATH = pathlib.Path(__file__).parents[2]/"out/build/Debug"
-        lib = ctypes.CDLL(str(LD_PATH/"poppyrefl.dll"))
+        lib = ctypes.CDLL(str(LD_PATH/"pyporefl.dll"))
     except:
         LD_PATH = pathlib.Path(__file__).parents[2]/"out/build"
         
         try:
-            lib = ctypes.CDLL(LD_PATH/"libpoppyrefl.so")
+            lib = ctypes.CDLL(LD_PATH/"libpyporefl.so")
 
         except:
-            lib = ctypes.CDLL(LD_PATH/"libpoppyrefl.dylib")
+            lib = ctypes.CDLL(LD_PATH/"libpyporefl.dylib")
 
     return lib
 
@@ -71,4 +71,4 @@ def generateGridf(reflparams_py, transform, spheric):
     return grids
 
 if __name__ == "__main__":
-    print("Bindings for POPPy reflectors.")
+    print("Bindings for PyPO reflectors.")

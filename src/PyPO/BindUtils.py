@@ -1,8 +1,8 @@
 import ctypes
 import numpy as np
 
-from src.POPPy.POPPyTypes import *
-from src.POPPy.Copy import copyGrid
+from src.PyPO.PyPOTypes import *
+from src.PyPO.Copy import copyGrid
 
 # UTILITY FUNCTIONS
 

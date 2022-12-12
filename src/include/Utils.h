@@ -9,7 +9,7 @@
 #define __Utils_h
 
 /*! \file Utils.h
-    \brief Linear algebra functions for the CPU version of POPPy. 
+    \brief Linear algebra functions for the CPU version of PyPO. 
     
     Contains double/float overloaded functions for doing basic 3D vector operations.
 */

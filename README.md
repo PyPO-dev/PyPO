@@ -1,6 +1,6 @@
 Welcome to the Python Physical Optics (PyPO) package!
 
--- PREREQS --\
+<h2>Prerequisites</h2>
 A fully functioning [Python 3.8](https://docs.python-guide.org/starting/install3/linux/) installation. At the moment, the GUI only supports a Python version of 3.9 or lower.
 If the PIP package manager was not automatically installed with your Python install, it can be installed [manually](https://pip.pypa.io/en/stable/installation/).
 
@@ -30,7 +30,7 @@ PyPO is capable of producing figures using LaTeX typesetting. For this, a [LaTeX
 The GPU version of PyPO needs a [CUDA installation](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html) and a CUDA-compatible NVIDIA graphics card. 
 These are not installed through the Build.py interface and should be installed manually. Please refer to the NVIDIA documentation on how to install NVIDIA drivers and CUDA on your specific Platform.
 
--- INSTALLATION --\
+<h2>Installation</h2>
 On Linux and MacOs, the following instructions can be run in the regular terminal.
 On Windows, they should be run in the 'x64_x86 Cross Tools Command Promp for VS <year>'.
 Navigate to the PyPO root folder and configure PyPO by running:
@@ -68,15 +68,14 @@ export PYTHONPATH
 ```
 and source the script.
 
--- TESTING --\
+<h2>Testing</h2>
 To run the Python unittests, go to the main PyPO directory and from there run:
 ```
 nosetests --exe
 ```
 
--- DOCUMENTATION --\
-Please find a detailed software documentation on the [PyPO Github site](https://arend95.github.io/PyPO/index.html). The following instructions are for people
-who would like to develop PyPO and generate documentation along the way.
+<h2>Documentation</h2>
+The following instructions are for people who would like to develop PyPO and generate documentation along the way.
 PyPO uses [Doxygen](https://www.doxygen.nl/download.html) for generating documentation for the source code. 
 Please refer to the link for download and installation instructions.
 If the installation fails on Linux, try:

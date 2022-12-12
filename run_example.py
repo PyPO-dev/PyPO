@@ -6,7 +6,7 @@ from examples.ASTE_PSF_PO import ex_ASTE_PO
 from examples.ASTE_PSF_RT import ex_ASTE_RT
 
 def select_example():
-    example = input("""Welcome to the POPPy example interface!
+    example = input("""Welcome to the PyPO example interface!
 Please select an example to run.
 
 Possible options: DRO_PO-(CPU/GPU)

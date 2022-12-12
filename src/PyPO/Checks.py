@@ -1,5 +1,5 @@
 import numpy as np
-from src.POPPy.POPPyTypes import *
+from src.PyPO.PyPOTypes import *
 
 # Error classes to be used
 class InputReflError(Exception):

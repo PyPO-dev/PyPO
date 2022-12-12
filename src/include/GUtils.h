@@ -3,7 +3,7 @@
 #include <cuComplex.h>
 
 /*! \file GUtils.h
-    \brief Linear algebra functions for the CUDA version of POPPy. 
+    \brief Linear algebra functions for the CUDA version of PyPO. 
     
     Contains float overloaded functions for doing basic 3D vector operations.
         For the CUDA complex valued linear algebra, we employ the cuComplex.h library.

@@ -1,0 +1,20 @@
+/*! \mainpage PyPO software documentation
+ *
+ * \section intro_sec Introduction
+ *
+ * This is the software documentation of PyPO, a Python Physical Optics package.
+ * The goal of these pages is to provide a detailed and comprehensive overview of the source code that makes PyPO run.
+ * For installation instructions, we refer to our PyPO Github README.
+ *
+ * For most users of PyPO, the Python interface documentation is a nice reference for quick lookup of that one function, or that one input argument.
+ *
+ * For the user who is planning on getting hands-on with PyPO development, the C/C++ and CUDA documentation should get you started.
+ * 
+ * \subsection contact Contact
+ * 
+ * For inquiries concerning the C/C++/CUDA codebase and the PyPO Python source, please contact:
+ * arendmoerman@gmail.com
+ *
+ * For inquiries concerning the GUI, please contact:
+ * maikel.gafaji@gmail.com
+ */

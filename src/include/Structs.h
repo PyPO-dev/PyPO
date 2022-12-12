@@ -5,14 +5,13 @@
 #define __Structs_h
 
 /*! \file Structs.h
-    \brief Structs used within POPPy. 
+    \brief Structs used within PyPO. 
         
     This file contains all object that are used to either store results from calculations internally
         or pass data back/fetch data from the Python interface. 
         As ctypes does not support templates or overloading, this file contains
         explicit descriptions of double and float variants.
 */
-
 struct arrC1;
 struct arrR3;
 struct c2Bundle;

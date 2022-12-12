@@ -4,26 +4,26 @@ import numpy as np
 import os
 import sys
 import pathlib 
-from src.POPPy.BindUtils import *
-from src.POPPy.Structs import *
-from src.POPPy.POPPyTypes import *
+from src.PyPO.BindUtils import *
+from src.PyPO.Structs import *
+from src.PyPO.PyPOTypes import *
 
 #############################################################################
 #                                                                           #
-#           List of bindings for the beam init interface of POPPy.          #
+#           List of bindings for the beam init interface of PyPO.          #
 #                                                                           #
 #############################################################################
 
 def loadBeamlib():
     try:
         LD_PATH = pathlib.Path(__file__).parents[2]/"out/build/Debug"
-        lib = ctypes.CDLL(str(LD_PATH/"poppybeam.dll"))
+        lib = ctypes.CDLL(str(LD_PATH/"pypobeam.dll"))
     except:
         LD_PATH = pathlib.Path(__file__).parents[2]/"out/build"
         try:
-            lib = ctypes.CDLL(LD_PATH/"libpoppybeam.so")
+            lib = ctypes.CDLL(LD_PATH/"libpypobeam.so")
         except:
-            lib = ctypes.CDLL(LD_PATH/"libpoppybeam.dylib")
+            lib = ctypes.CDLL(LD_PATH/"libpypobeam.dylib")
 
     lib.makeRTframe.argtypes = [RTDict, ctypes.POINTER(cframe)]
     lib.makeRTframe.restype = None

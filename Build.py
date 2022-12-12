@@ -5,7 +5,7 @@ import os
 import shutil
 import platform
 
-def BuildPOPPy():
+def BuildPyPO():
     pathToBuild = os.path.join("src")
     # Parse command line input
 
@@ -29,8 +29,8 @@ def BuildPOPPy():
         elif platform.system() == "Windows":
             os.system("py -m pip install numpy matplotlib scipy setuptools nose PyQt5")
             
-        print("Succesfully installed POPPy Python prerequisites! Refer to README for CMake installation.")
-        print("WARNING: CUDA not installed. Install CUDA manually to enable POPPy on GPU.")
+        print("Succesfully installed PyPO Python prerequisites! Refer to README for CMake installation.")
+        print("WARNING: CUDA not installed. Install CUDA manually to enable PyPO on GPU.")
     
     if cmakec:
         print("Cleaning build directory...")
@@ -39,7 +39,7 @@ def BuildPOPPy():
         return 0
 
     if config:
-        print("Configuring POPPy...")
+        print("Configuring PyPO...")
         dir_lists = os.path.join(os.getcwd(), "src")
         dir_build = os.path.join(os.getcwd(), "out", "build")
 
@@ -56,7 +56,7 @@ def BuildPOPPy():
         return 0
 
     if cmake:
-        print("Building POPPy...")
+        print("Building PyPO...")
         dir_lists = os.path.join(os.getcwd(), "src")
         dir_build = os.path.join(os.getcwd(), "out", "build")
 
@@ -67,7 +67,7 @@ def BuildPOPPy():
         return 0
 
     if docs:
-        print("Generating POPPy documentation...")
+        print("Generating PyPO documentation...")
         try:
             try:
                 shutil.rmtree("docs")
@@ -81,14 +81,14 @@ def BuildPOPPy():
         return 0
 
     if helpf:
-        print("POPPy build interface list of options:")
+        print("PyPO build interface list of options:")
         print("'--help', '-h'           : get build options.")
-        print("'--clean', '-c'          : remove POPPy objects and libraries.")
-        print("'--prereqs', '-p'        : install POPPy prerequisites.")
-        print("'--config', '-f'         : configure POPPy.")
-        print("'--make', '-m'           : build POPPy libraries.")
-        print("'--docs', '-d'           : generate POPPy documentation. Needs doxygen!")
+        print("'--clean', '-c'          : remove PyPO objects and libraries.")
+        print("'--prereqs', '-p'        : install PyPO prerequisites.")
+        print("'--config', '-f'         : configure PyPO.")
+        print("'--make', '-m'           : build PyPO libraries.")
+        print("'--docs', '-d'           : generate PyPO documentation. Needs doxygen!")
         return 0
  
 if __name__ == "__main__":
-	BuildPOPPy()
+	BuildPyPO()

@@ -3,28 +3,28 @@ import numpy as np
 import os
 import sys
 import pathlib
-from src.POPPy.BindUtils import *
-from src.POPPy.Structs import *
-from src.POPPy.POPPyTypes import *
+from src.PyPO.BindUtils import *
+from src.PyPO.Structs import *
+from src.PyPO.PyPOTypes import *
 
 import threading
 
 #############################################################################
 #                                                                           #
-#              List of bindings for the CPU interface of POPPy.             #
+#              List of bindings for the CPU interface of PyPO.             #
 #                                                                           #
 #############################################################################
 
 def loadCPUlib():
     try:
         LD_PATH = pathlib.Path(__file__).parents[2]/"out/build/Debug"
-        lib = ctypes.CDLL(str(LD_PATH/"poppycpu.dll"))
+        lib = ctypes.CDLL(str(LD_PATH/"pypocpu.dll"))
     except:
         LD_PATH = pathlib.Path(__file__).parents[2]/"out/build"
         try:
-            lib = ctypes.CDLL(LD_PATH/"libpoppycpu.so")
+            lib = ctypes.CDLL(LD_PATH/"libpypocpu.so")
         except:
-            lib = ctypes.CDLL(LD_PATH/"libpoppycpu.dylib")
+            lib = ctypes.CDLL(LD_PATH/"libpypocpu.dylib")
 
     lib.propagateToGrid_JM.argtypes = [ctypes.POINTER(c2Bundle), reflparams, reflparams,
                                         ctypes.POINTER(reflcontainer), ctypes.POINTER(reflcontainer),
@@ -76,7 +76,7 @@ def loadCPUlib():
     return lib
 
 # WRAPPER FUNCTIONS DOUBLE PREC
-def POPPy_CPUd(source, target, PODict):
+def PyPO_CPUd(source, target, PODict):
     lib = loadCPUlib()
 
     # Create structs with pointers for source and target
@@ -253,4 +253,4 @@ def RT_CPUd(target, fr_in, epsilon, t0, nThreads):
     return fr_out
 
 if __name__ == "__main__":
-    print("Bindings for POPPy CPU.")
+    print("Bindings for PyPO CPU.")

@@ -11,21 +11,21 @@ from pathlib import Path
 from contextlib import contextmanager
 from scipy.interpolate import griddata
 
-# POPPy-specific modules
-from src.POPPy.BindRefl import *
-from src.POPPy.BindGPU import *
-from src.POPPy.BindCPU import *
-from src.POPPy.BindBeam import *
-from src.POPPy.Copy import copyGrid
-from src.POPPy.MatTransform import *
-from src.POPPy.POPPyTypes import *
-from src.POPPy.Checks import *
+# PyPO-specific modules
+from src.PyPO.BindRefl import *
+from src.PyPO.BindGPU import *
+from src.PyPO.BindCPU import *
+from src.PyPO.BindBeam import *
+from src.PyPO.Copy import copyGrid
+from src.PyPO.MatTransform import *
+from src.PyPO.PyPOTypes import *
+from src.PyPO.Checks import *
 
-import src.POPPy.Plotter as plt
-import src.POPPy.Efficiencies as effs
-import src.POPPy.FitGauss as fgs
+import src.PyPO.Plotter as plt
+import src.PyPO.Efficiencies as effs
+import src.PyPO.FitGauss as fgs
 
-# Set POPPy absolute root path
+# Set PyPO absolute root path
 sysPath = Path(__file__).parents[2]
 
 @contextmanager
@@ -488,10 +488,10 @@ class System(object):
             PODict["k"] = 2 * np.pi / (self.cl / PODict["freq"] *1e-9)
 
         if PODict["device"] == "CPU":
-            out = POPPy_CPUd(source, target, PODict)
+            out = PyPO_CPUd(source, target, PODict)
 
         elif PODict["device"] == "GPU":
-            out = POPPy_GPUf(source, target, PODict)
+            out = PyPO_GPUf(source, target, PODict)
 
         return out
 
@@ -732,4 +732,4 @@ class System(object):
             return [default, 1.]
 
 if __name__ == "__main__":
-    print("System interface for POPPy.")
+    print("System interface for PyPO.")

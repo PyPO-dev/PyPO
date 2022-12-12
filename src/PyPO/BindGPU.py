@@ -4,29 +4,29 @@ import numpy as np
 import os
 import sys
 import pathlib
-from src.POPPy.BindUtils import *
-from src.POPPy.Structs import *
-from src.POPPy.POPPyTypes import *
+from src.PyPO.BindUtils import *
+from src.PyPO.Structs import *
+from src.PyPO.PyPOTypes import *
 
 import threading
 
 #############################################################################
 #                                                                           #
-#              List of bindings for the GPU interface of POPPy.             #
+#              List of bindings for the GPU interface of PyPO.             #
 #                                                                           #
 #############################################################################
 
 def loadGPUlib():
     try:
         LD_PATH = pathlib.Path(__file__).parents[2]/"out/build/Debug"
-        lib = ctypes.CDLL(str(LD_PATH/"poppygpu.dll"))
+        lib = ctypes.CDLL(str(LD_PATH/"pypogpu.dll"))
     except:
         LD_PATH = pathlib.Path(__file__).parents[2]/"out/build"
         
         try:
-            lib = ctypes.CDLL(LD_PATH/"libpoppygpu.so")
+            lib = ctypes.CDLL(LD_PATH/"libpypogpu.so")
         except:
-            lib = ctypes.CDLL(LD_PATH/"libpoppygpu.dylib")
+            lib = ctypes.CDLL(LD_PATH/"libpypogpu.dylib")
     
     lib.callKernelf_JM.argtypes = [ctypes.POINTER(c2Bundlef), reflparamsf, reflparamsf,
                                    ctypes.POINTER(reflcontainerf), ctypes.POINTER(reflcontainerf),
@@ -73,7 +73,7 @@ def loadGPUlib():
 # WRAPPER FUNCTIONS DOUBLE PREC
 
 #### SINGLE PRECISION
-def POPPy_GPUf(source, target, PODict):
+def PyPO_GPUf(source, target, PODict):
     lib = loadGPUlib()
 
     # Create structs with pointers for source and target
@@ -244,4 +244,4 @@ def RT_GPUf(target, fr_in, epsilon, t0, nThreads):
     return fr_out
 
 if __name__ == "__main__":
-    print("Bindings for POPPy GPU.")
+    print("Bindings for PyPO GPU.")

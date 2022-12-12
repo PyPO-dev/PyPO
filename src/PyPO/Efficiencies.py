@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as pt
-from src.POPPy.POPPyTypes import *
-from src.POPPy.BindRefl import *
+from src.PyPO.PyPOTypes import *
+from src.PyPO.BindRefl import *
 
 def _generateMask(x, y, aperDict):
     

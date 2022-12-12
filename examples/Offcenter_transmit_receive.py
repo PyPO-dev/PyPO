@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as pt
 
-from src.POPPy.System import System
+from src.PyPO.System import System
 
 D = 5e5
 

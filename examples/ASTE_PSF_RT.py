@@ -4,9 +4,9 @@ sys.path.append('../')
 
 import matplotlib.pyplot as pt
 import matplotlib.cm as cm
-import src.POPPy.Colormaps as cmaps
+import src.PyPO.Colormaps as cmaps
 
-from src.POPPy.System import System
+from src.PyPO.System import System
 #from WO import MakeWO
 
 def ex_ASTE_RT(device):

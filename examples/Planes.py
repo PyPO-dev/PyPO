@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.POPPy.System import System 
+from src.PyPO.System import System 
 
 def Planes():
     plane = {

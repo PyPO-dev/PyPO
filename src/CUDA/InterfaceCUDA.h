@@ -4,10 +4,6 @@
 #include <cmath>
 #include <array>
 
-//#include <cuda.h>
-//#include <cuComplex.h>
-//#include <cuda_runtime.h>
-
 #include "GUtils.h"
 #include "Structs.h"
 #include "InterfaceReflector.h"
@@ -24,10 +20,11 @@
 
 #ifndef __InterfaceCUDA_h
 #define __InterfaceCUDA_h
-/* Kernels for single precision PO.
- * Author: Arend Moerman
- * For questions, contact: arendmoerman@gmail.com
- */
+/*! \file InterfaceCUDA.h
+    \brief Declarations of PO and RT library for GPU.
+
+    Provides double and single precision interface for NVIDIA GPUs running CUDA.
+*/
 
 extern "C"
 {

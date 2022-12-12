@@ -1,4 +1,4 @@
-Welcome to the Python Physical Optics (PyPO) package!
+<h1>Welcome to the Python Physical Optics (PyPO) package!</h1>
 
 <h2>Prerequisites</h2>
 A fully functioning [Python 3.8](https://docs.python-guide.org/starting/install3/linux/) installation. At the moment, the GUI only supports a Python version of 3.9 or lower.
@@ -73,7 +73,6 @@ To run the Python unittests, go to the main PyPO directory and from there run:
 ```
 nosetests --exe
 ```
-
 <h2>Documentation</h2>
 The following instructions are for people who would like to develop PyPO and generate documentation along the way.
 PyPO uses [Doxygen](https://www.doxygen.nl/download.html) for generating documentation for the source code. 

@@ -428,7 +428,7 @@ void Hyperbola_uv(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
  * Generate a ellipsoid using an xy parametrization. Also generates the normal vectors and area elements.
  *      Applies specified transformations as well, if enabled.
  *
- * @param ellipsoid Pointer to reflcontainer or reflcontainerf object.
+ * @param ellipse Pointer to reflcontainer or reflcontainerf object.
  * @param xu_lo Lower limit on x co-ordinate, double/float.
  * @param xu_up Upper limit on x co-ordinate, double/float.
  * @param yv_lo Lower limit on y co-ordinate, double/float.
@@ -507,7 +507,7 @@ void Ellipse_xy(T *ellipse, U xu_lo, U xu_up, U yv_lo,
  * Generate a ellipsoid using a uv parametrization. Also generates the normal vectors and area elements.
  *      Applies specified transformations as well, if enabled.
  *
- * @param ellipsoid Pointer to reflcontainer or reflcontainerf object.
+ * @param ellipse Pointer to reflcontainer or reflcontainerf object.
  * @param xu_lo Lower limit on u co-ordinate, double/float.
  * @param xu_up Upper limit on u co-ordinate, double/float.
  * @param yv_lo Lower limit on v co-ordinate, double/float.
@@ -779,7 +779,6 @@ void Plane_uv(T *plane, U xu_lo, U xu_up, U yv_lo,
  * @param ycenter Center El co-ordinate of Az-El region.
  * @param ncx Number of cells along Az-axis.
  * @param ncy Number of cells along El-axis.
- * @param nfac Flip normal vectors.
  * @param mat Array of 16 double/float, transformation matrix.
  * @param transform Whether or not to apply transformation to plane.
  * @param spheric Whether or not to apply spherical transformation to plane, for plotting purposes..

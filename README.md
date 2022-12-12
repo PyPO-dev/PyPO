@@ -74,8 +74,14 @@ To run the Python unittests, go to the main PyPO directory and from there run:
 nosetests --exe
 ```
 
+<<<<<<< HEAD
 <h2>Documentation</h2>
 The following instructions are for people who would like to develop PyPO and generate documentation along the way.
+=======
+-- DOCUMENTATION --\
+Please find a detailed software documentation on the [PyPO Github site](https://arend95.github.io/PyPO/index.html). The following instructions are for people
+who would like to develop PyPO and generate documentation along the way.
+>>>>>>> c0c91bb2d765adfd9a5bff64cf2894859e3c360f
 PyPO uses [Doxygen](https://www.doxygen.nl/download.html) for generating documentation for the source code. 
 Please refer to the link for download and installation instructions.
 If the installation fails on Linux, try:

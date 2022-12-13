@@ -73,33 +73,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><h1>Welcome to the Python Physical Optics (PyPO) package!</h1>
-<h2>Prerequisites</h2>
-<p>A fully functioning <a href="https://docs.python-guide.org/starting/install3/linux/">Python 3.8</a> installation. At the moment, the GUI only supports a Python version of 3.9 or lower. If the PIP package manager was not automatically installed with your Python install, it can be installed <a href="https://pip.pypa.io/en/stable/installation/">manually</a>.</p>
-<p>To install the prerequisites for PyPO, navigate to the main folder and run: </p><div class="fragment"><div class="line">python Build.py --prereqs</div>
-</div><!-- fragment --><p> Alternatively, the prerequisites can be installed manually on Linux by running: </p><div class="fragment"><div class="line">sudo apt install cm-super dvipng gcc build-essential cmake</div>
-<div class="line">python3 -m pip install numpy matplotlib scipy setuptools nose PyQt5</div>
-</div><!-- fragment --><p> On Mac OS, the prereqs are installed using: </p><div class="fragment"><div class="line">brew install gcc cmake</div>
-<div class="line">xcode-select --install</div>
-<div class="line">python3 -m pip install numpy matplotlib scipy setuptools nose PyQt5</div>
-</div><!-- fragment --><p> On Windows, things are slightly more complicated. First, install <a href="https://visualstudio.microsoft.com/#2010-Visual-CPP">Visual Studio</a>. This is necessary as Visual Studio contains CMake and the build tool <a href="https://learn.microsoft.com/en-us/cpp/build/reference/nmake-reference?view=msvc-170">NMake</a>, which are important for building PyPO. During installation, select the 'Community' install. You will be prompted to install components and/or workloads. Under 'Desktop &amp; Mobile', tick 'Desktop development with C++' and proceed. This is the minimum requirement, and more components/workloads can be installed, if so desired. After installation, proceed with regular installation.</p>
-<p>PyPO is capable of producing figures using LaTeX typesetting. For this, a <a href="https://www.tug.org/texlive/quickinstall.html">LaTeX installation</a> should be present on the machine. The GPU version of PyPO needs a <a href="https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html">CUDA installation</a> and a CUDA-compatible NVIDIA graphics card. These are not installed through the Build.py interface and should be installed manually. Please refer to the NVIDIA documentation on how to install NVIDIA drivers and CUDA on your specific Platform.</p>
-<h2>Installation</h2>
-<p>On Linux and MacOs, the following instructions can be run in the regular terminal. On Windows, they should be run in the 'x64_x86 Cross Tools Command Promp for VS &lt;year&gt;'. Navigate to the PyPO root folder and configure PyPO by running: </p><div class="fragment"><div class="line">python Build.py --config</div>
-</div><!-- fragment --><p> This will check if you have CUDA installed. It will also generate the build instructions. Then install by running: </p><div class="fragment"><div class="line">python Build.py --make</div>
-</div><!-- fragment --><p> For an overview of build options, run: </p><div class="fragment"><div class="line">python Build.py --help</div>
-</div><!-- fragment --><p>To include PyPO from anywhere, the following two lines should be added to your .bashrc file: </p><div class="fragment"><div class="line">export PYTHONPATH=${PYTHONPATH}:&lt;absolue/path/to/PyPO&gt;</div>
-</div><!-- fragment --><p> and source the script. On Windows, do the following: </p><div class="fragment"><div class="line">My Computer &gt; Properties &gt; Advanced System Settings &gt; Environment Variables &gt;</div>
-</div><!-- fragment --><p> and select 'Edit System Variable'. Create a new variable called 'PYTHONPATH' and give it the following value: </p><div class="fragment"><div class="line">&lt;absolue/path/to/PyPO&gt;</div>
-</div><!-- fragment --><p> Select 'OK' and select 'OK' again when in 'Environment Variables'. On Mac OS, add the following to your ~/.bash_profile: </p><div class="fragment"><div class="line">PYTHONPATH=&quot;&lt;absolue/path/to/PyPO&gt;:$PYTHONPATH&quot;</div>
-<div class="line">export PYTHONPATH</div>
-</div><!-- fragment --><p> and source the script.</p>
-<h2>Testing</h2>
-<p>To run the Python unittests, go to the main PyPO directory and from there run: </p><div class="fragment"><div class="line">nosetests --exe</div>
-</div><!-- fragment --><h2>Documentation</h2>
-<p>The following instructions are for people who would like to develop PyPO and generate documentation along the way. PyPO uses <a href="https://www.doxygen.nl/download.html">Doxygen</a> for generating documentation for the source code. Please refer to the link for download and installation instructions. If the installation fails on Linux, try: </p><div class="fragment"><div class="line">sudo apt install flex</div>
-<div class="line">sudo apt install bison</div>
-</div><!-- fragment --><p> Generate the documentation by running: </p><div class="fragment"><div class="line">python Build.py --docs</div>
-</div><!-- fragment --><p> which should place the documentation in the docs/ folder. </p>
+<p>For full documentation and instructions on how to install and use PyPO, we kindly refer to the <a href="https://arend95.github.io/PyPO/">documentation page</a>. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

@@ -5,5 +5,6 @@ var searchData=
   ['transf_2',['transf',['../structreflparams.html#a8434d4e674be3ec03170fb0088e2c760',1,'reflparams::transf()'],['../structreflparamsf.html#a15b792a2a65a1834a09990a17ed649dd',1,'reflparamsf::transf()']]],
   ['transformgrids_3',['transformGrids',['../InterfaceReflector_8cpp.html#ac12e89b8d533f7b60f638452323be9a3',1,'InterfaceReflector.cpp']]],
   ['transfrays_4',['transfRays',['../classRayTracer.html#a54308039ddbee81e5c2d2cb0cc7f992f',1,'RayTracer::transfRays()'],['../KernelsRTf_8cu.html#a8e11820281e7691d1ebe20e66176bb53',1,'transfRays():&#160;KernelsRTf.cu']]],
-  ['type_5',['type',['../structreflparams.html#a8ac54ddf87ce608439170fc70bbddb4d',1,'reflparams::type()'],['../structreflparamsf.html#aee4936b839c62673c1d12a2924579e32',1,'reflparamsf::type()']]]
+  ['translategrids_5',['translateGrids',['../classPyPO_1_1System_1_1System.html#a161bdb6a88e7c0716b9af6e7dda92699',1,'PyPO::System::System']]],
+  ['type_6',['type',['../structreflparams.html#a8ac54ddf87ce608439170fc70bbddb4d',1,'reflparams::type()'],['../structreflparamsf.html#aee4936b839c62673c1d12a2924579e32',1,'reflparamsf::type()']]]
 ];

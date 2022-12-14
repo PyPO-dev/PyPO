@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['i1x_0',['i1x',['../structc2rBundlef.html#a382395b9a6f655edcbda6f947ee12a69',1,'c2rBundlef::i1x()'],['../structc4Bundlef.html#aa2d664a8571f52d0e51e18e7b5d3232b',1,'c4Bundlef::i1x()'],['../structc2Bundlef.html#a8fb5f5a3e0509da150355c9538ecb407',1,'c2Bundlef::i1x()'],['../structc2Bundle.html#a52d33746abc4e3d7c70e5da2d10cfb71',1,'c2Bundle::i1x()'],['../structc4Bundle.html#ac58268680002141c68e385b05b1b9446',1,'c4Bundle::i1x()'],['../structc2rBundle.html#a9926fadf5cadd372bb6996fc3da4dd8a',1,'c2rBundle::i1x()']]],
-  ['i1y_1',['i1y',['../structc2Bundlef.html#a43018280d254d8bf39a0cf3e7ee49042',1,'c2Bundlef::i1y()'],['../structc2rBundle.html#a4b8a389ad9356029a338cf0563a0dbec',1,'c2rBundle::i1y()'],['../structc4Bundle.html#af1c77f77f9a059c0d1095ca03ba7e25c',1,'c4Bundle::i1y()'],['../structc2Bundle.html#aba5f0336fe281d8acf55e8c8d6f7b465',1,'c2Bundle::i1y()'],['../structc4Bundlef.html#ab7582a15121d88eed284a044338db2cb',1,'c4Bundlef::i1y()'],['../structc2rBundlef.html#a8095fe219183281b636ac68ca0098ad8',1,'c2rBundlef::i1y()']]],
-  ['i1z_2',['i1z',['../structc2Bundle.html#af014a8314c424491572194095420630e',1,'c2Bundle::i1z()'],['../structc4Bundle.html#ac061900424e61c6c95629f20acbe05e4',1,'c4Bundle::i1z()'],['../structc2rBundle.html#a53752cab3e6e9ccb7d74725adb281ae2',1,'c2rBundle::i1z()'],['../structc2Bundlef.html#ad9660c20a0f906191e85b83ea30b9f3f',1,'c2Bundlef::i1z()'],['../structc4Bundlef.html#a89891041164be0c9b8ba09f5503b76ff',1,'c4Bundlef::i1z()'],['../structc2rBundlef.html#a53dcd5ac687b8e3045ca7ff2b33b558d',1,'c2rBundlef::i1z()']]],
+  ['i1x_0',['i1x',['../structc2Bundle.html#a52d33746abc4e3d7c70e5da2d10cfb71',1,'c2Bundle::i1x()'],['../structc4Bundle.html#ac58268680002141c68e385b05b1b9446',1,'c4Bundle::i1x()'],['../structc2rBundle.html#a9926fadf5cadd372bb6996fc3da4dd8a',1,'c2rBundle::i1x()'],['../structc2Bundlef.html#a8fb5f5a3e0509da150355c9538ecb407',1,'c2Bundlef::i1x()'],['../structc4Bundlef.html#aa2d664a8571f52d0e51e18e7b5d3232b',1,'c4Bundlef::i1x()'],['../structc2rBundlef.html#a382395b9a6f655edcbda6f947ee12a69',1,'c2rBundlef::i1x()']]],
+  ['i1y_1',['i1y',['../structc2rBundlef.html#a8095fe219183281b636ac68ca0098ad8',1,'c2rBundlef::i1y()'],['../structc4Bundlef.html#ab7582a15121d88eed284a044338db2cb',1,'c4Bundlef::i1y()'],['../structc2Bundlef.html#a43018280d254d8bf39a0cf3e7ee49042',1,'c2Bundlef::i1y()'],['../structc2rBundle.html#a4b8a389ad9356029a338cf0563a0dbec',1,'c2rBundle::i1y()'],['../structc4Bundle.html#af1c77f77f9a059c0d1095ca03ba7e25c',1,'c4Bundle::i1y()'],['../structc2Bundle.html#aba5f0336fe281d8acf55e8c8d6f7b465',1,'c2Bundle::i1y()']]],
+  ['i1z_2',['i1z',['../structc2Bundlef.html#ad9660c20a0f906191e85b83ea30b9f3f',1,'c2Bundlef::i1z()'],['../structc2rBundle.html#a53752cab3e6e9ccb7d74725adb281ae2',1,'c2rBundle::i1z()'],['../structc4Bundle.html#ac061900424e61c6c95629f20acbe05e4',1,'c4Bundle::i1z()'],['../structc2Bundle.html#af014a8314c424491572194095420630e',1,'c2Bundle::i1z()'],['../structc4Bundlef.html#a89891041164be0c9b8ba09f5503b76ff',1,'c4Bundlef::i1z()'],['../structc2rBundlef.html#a53dcd5ac687b8e3045ca7ff2b33b558d',1,'c2rBundlef::i1z()']]],
   ['i2x_3',['i2x',['../structc2Bundle.html#a6c3d4503941205ac697710a51eab2965',1,'c2Bundle::i2x()'],['../structc4Bundle.html#afbbfd3998a4e0436f56e84c67cf6be8f',1,'c4Bundle::i2x()'],['../structc2rBundle.html#a420d88a051b296608705df17b6346d07',1,'c2rBundle::i2x()'],['../structc2Bundlef.html#af727b9ec0723b41c000de10ff3149333',1,'c2Bundlef::i2x()'],['../structc4Bundlef.html#ae20241483c6c76b81ad449dafe5247f5',1,'c4Bundlef::i2x()'],['../structc2rBundlef.html#acbac8108b7518b222d6cfd3ccaaa3b7e',1,'c2rBundlef::i2x()']]],
   ['i2y_4',['i2y',['../structc2Bundle.html#a50eae5cbbd94e949e4fa82395e1597e7',1,'c2Bundle::i2y()'],['../structc4Bundle.html#a311d46074b70bba6c180df9deff56593',1,'c4Bundle::i2y()'],['../structc2rBundle.html#a87236f833f998ba2870b4fedf610f064',1,'c2rBundle::i2y()'],['../structc2Bundlef.html#aa8f64867b219031e69eacb21bc19219e',1,'c2Bundlef::i2y()'],['../structc4Bundlef.html#a77d9370f9738ef5a9b29ea74f76299f8',1,'c4Bundlef::i2y()'],['../structc2rBundlef.html#ab83e0a2f2f85b3ae9f520d57047a28a1',1,'c2rBundlef::i2y()']]],
   ['i2z_5',['i2z',['../structc2Bundle.html#a2ca9754a013ebedb16536a13b0316dca',1,'c2Bundle::i2z()'],['../structc4Bundle.html#a6bdf37c567d013e73a25c8a35ced7b54',1,'c4Bundle::i2z()'],['../structc2rBundle.html#a0486d6897cd22bffde950e990ceb6ed3',1,'c2rBundle::i2z()'],['../structc2Bundlef.html#a05cdcd64876ac69b511df0bc6fdfd6cd',1,'c2Bundlef::i2z()'],['../structc4Bundlef.html#a7605d43023d43909a75bd33869d5a240',1,'c4Bundlef::i2z()'],['../structc2rBundlef.html#ab29a6899dc84613c969489c22546adc1',1,'c2rBundlef::i2z()']]],
@@ -14,13 +14,15 @@ var searchData=
   ['i4z_11',['i4z',['../structc4Bundle.html#ab4fbcccb08842b48ff5568319427fe0d',1,'c4Bundle::i4z()'],['../structc4Bundlef.html#acce3a13270d4e4ffdfa1e43caa79b562',1,'c4Bundlef::i4z()']]],
   ['initframe_12',['initFrame',['../BeamInit_8h.html#aa1ee8f6478af52fd972fc68bb5a5c6a6',1,'BeamInit.h']]],
   ['initgauss_13',['initGauss',['../BeamInit_8h.html#aebee209858ba31b61058c5691e9a7cba',1,'BeamInit.h']]],
-  ['interfacebeam_2ecpp_14',['InterfaceBeam.cpp',['../InterfaceBeam_8cpp.html',1,'']]],
-  ['interfacebeam_2eh_15',['InterfaceBeam.h',['../InterfaceBeam_8h.html',1,'']]],
-  ['interfacecpu_2ecpp_16',['InterfaceCPU.cpp',['../InterfaceCPU_8cpp.html',1,'']]],
-  ['interfacecpu_2eh_17',['InterfaceCPU.h',['../InterfaceCPU_8h.html',1,'']]],
-  ['interfacecuda_2eh_18',['InterfaceCUDA.h',['../InterfaceCUDA_8h.html',1,'']]],
-  ['interfacereflector_2ecpp_19',['InterfaceReflector.cpp',['../InterfaceReflector_8cpp.html',1,'']]],
-  ['interfacereflector_2eh_20',['InterfaceReflector.h',['../InterfaceReflector_8h.html',1,'']]],
-  ['invmatvec4_21',['invmatVec4',['../classUtils.html#a35cba5ab0f77ff7a2d96ca9b72dbc5fd',1,'Utils::invmatVec4()'],['../KernelsRTf_8cu.html#a649d89f5441887504550b7ea70fa7dc8',1,'invmatVec4():&#160;KernelsRTf.cu']]],
-  ['ix_22',['ix',['../structarrC1.html#ac54f4431fa2581fa829ef3b0dd5cdd5e',1,'arrC1::ix()'],['../structarrC1f.html#a8d99e8702c040d5b06a1339fc541e7bd',1,'arrC1f::ix()']]]
+  ['inputreflerror_14',['InputReflError',['../classPyPO_1_1Checks_1_1InputReflError.html',1,'PyPO::Checks']]],
+  ['inputrterror_15',['InputRTError',['../classPyPO_1_1Checks_1_1InputRTError.html',1,'PyPO::Checks']]],
+  ['interfacebeam_2ecpp_16',['InterfaceBeam.cpp',['../InterfaceBeam_8cpp.html',1,'']]],
+  ['interfacebeam_2eh_17',['InterfaceBeam.h',['../InterfaceBeam_8h.html',1,'']]],
+  ['interfacecpu_2ecpp_18',['InterfaceCPU.cpp',['../InterfaceCPU_8cpp.html',1,'']]],
+  ['interfacecpu_2eh_19',['InterfaceCPU.h',['../InterfaceCPU_8h.html',1,'']]],
+  ['interfacecuda_2eh_20',['InterfaceCUDA.h',['../InterfaceCUDA_8h.html',1,'']]],
+  ['interfacereflector_2ecpp_21',['InterfaceReflector.cpp',['../InterfaceReflector_8cpp.html',1,'']]],
+  ['interfacereflector_2eh_22',['InterfaceReflector.h',['../InterfaceReflector_8h.html',1,'']]],
+  ['invmatvec4_23',['invmatVec4',['../classUtils.html#a35cba5ab0f77ff7a2d96ca9b72dbc5fd',1,'Utils::invmatVec4()'],['../KernelsRTf_8cu.html#a649d89f5441887504550b7ea70fa7dc8',1,'invmatVec4():&#160;KernelsRTf.cu']]],
+  ['ix_24',['ix',['../structarrC1.html#ac54f4431fa2581fa829ef3b0dd5cdd5e',1,'arrC1::ix()'],['../structarrC1f.html#a8d99e8702c040d5b06a1339fc541e7bd',1,'arrC1f::ix()']]]
 ];

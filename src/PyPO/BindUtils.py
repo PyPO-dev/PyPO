@@ -2,7 +2,6 @@ import ctypes
 import numpy as np
 
 from src.PyPO.PyPOTypes import *
-from src.PyPO.Copy import copyGrid
 
 # UTILITY FUNCTIONS
 

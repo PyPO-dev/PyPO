@@ -6,10 +6,11 @@
  * The goal of these pages is to provide a detailed and comprehensive overview of the source code that makes PyPO run.
  * For information regarding prerequisites, installation, etc., we refer to the [General information](General.md) page.
  *
- * For most users of PyPO, the Python interface documentation is a nice reference for quick lookup of that one function, or that one input argument.
- *
+ * For most users of PyPO, the Python interface documentation is a nice reference for quick lookup of that one specific function, 
+ * or that one elusive input argument.
  * For the user who is planning on getting hands-on with PyPO development, the C/C++ and CUDA documentation should get you started.
- * 
+ * \subsection license License
+ * This project is released under the [MIT License](https://opensource.org/licenses/MIT).
  * \subsection contact Contact
  * 
  * For inquiries concerning the C/C++/CUDA codebase and the PyPO Python source, please contact:

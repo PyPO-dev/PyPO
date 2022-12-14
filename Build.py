@@ -1,9 +1,20 @@
 #!/usr/bin/env python3
-
 import sys
 import os
 import shutil
 import platform
+
+##
+# @file
+# PyPO build script.
+#
+# Configures CMake, generates makefiles and runs them.
+# Also contains functions to install prerequisites and clean build directories.
+# There is one flag for generating documentation, but most users (probably) won't use this option.
+# For an overview of the possible flags, run in a terminal:
+#```
+# python Build.py --help
+#```
 
 def BuildPyPO():
     pathToBuild = os.path.join("src")
@@ -74,8 +85,26 @@ def BuildPyPO():
             except:
                 pass
 
-            os.system(f"doxygen Doxyfile")
-
+            os.system("doxygen doxy/Doxyfile")
+            
+            # Read html to set default detail level of menus
+            annotated_path = os.path.join("docs", "annotated.html")
+            filelist_path = os.path.join("docs", "files.html")
+            
+            with open(annotated_path, 'r') as file :
+                filedata = file.read()
+                filedata = filedata.replace('init_search(); });', 'init_search(); toggleLevel(2); });')
+            
+            with open(annotated_path, 'w') as file:
+                file.write(filedata)
+            
+            with open(filelist_path, 'r') as file :
+                filedata = file.read()
+                filedata = filedata.replace('init_search(); });', 'init_search(); toggleLevel(2); });')
+            
+            with open(filelist_path, 'w') as file:
+                file.write(filedata)
+        
         except:
             print("ERROR: failed to generate documentation!")
         return 0

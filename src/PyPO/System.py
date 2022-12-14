@@ -6,6 +6,7 @@ import matplotlib.cm as cm
 import time
 import os
 import sys
+import copy
 import json
 from pathlib import Path
 from contextlib import contextmanager
@@ -16,7 +17,6 @@ from src.PyPO.BindRefl import *
 from src.PyPO.BindGPU import *
 from src.PyPO.BindCPU import *
 from src.PyPO.BindBeam import *
-from src.PyPO.Copy import copyGrid
 from src.PyPO.MatTransform import *
 from src.PyPO.PyPOTypes import *
 from src.PyPO.Checks import *
@@ -47,6 +47,12 @@ class NpEncoder(json.JSONEncoder):
         if isinstance(obj, np.ndarray):
             return obj.tolist()
         return super(NpEncoder, self).default(obj)
+
+##
+# @file
+# System interface for PyPO.
+#
+# This script contains the System class definition.
 
 class System(object):
     customBeamPath = os.path.join(sysPath, "custom", "beam")
@@ -109,7 +115,7 @@ class System(object):
 
     def mergeSystem(self, *args):
         for sysObject in args:
-            sys_copy = copyGrid(sysObject.system)
+            sys_copy = self.copyObj(sysObject.system)
             self.system.update(sys_copy)
 
     #### ADD REFLECTOR METHODS
@@ -140,7 +146,7 @@ class System(object):
         if not "rot_uv" in reflDict:
             reflDict["rot_uv"] = 0
 
-        self.system[reflDict["name"]] = copyGrid(reflDict)
+        self.system[reflDict["name"]] = self.copyObj(reflDict)
 
         if reflDict["pmode"] == "focus":
             self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
@@ -206,7 +212,7 @@ class System(object):
 
         if not "rot_uv" in reflDict:
             reflDict["rot_uv"] = 0
-        self.system[reflDict["name"]] = copyGrid(reflDict)
+        self.system[reflDict["name"]] = self.copyObj(reflDict)
 
         if reflDict["pmode"] == "focus":
             self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
@@ -278,7 +284,7 @@ class System(object):
 
         if not "rot_uv" in reflDict:
             reflDict["rot_uv"] = 0
-        self.system[reflDict["name"]] = copyGrid(reflDict)
+        self.system[reflDict["name"]] = self.copyObj(reflDict)
 
         if reflDict["pmode"] == "focus":
             pass
@@ -316,7 +322,7 @@ class System(object):
         if not "rot_uv" in reflDict:
             reflDict["rot_uv"] = 0
         
-        self.system[reflDict["name"]] = copyGrid(reflDict)
+        self.system[reflDict["name"]] = self.copyObj(reflDict)
         self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
 
         self.system[reflDict["name"]]["coeffs"][0] = -1
@@ -344,22 +350,52 @@ class System(object):
             self.system[reflDict["name"]]["gmode"] = 2
 
         self.num_ref += 1
-
+    
+    ##
+    # Rotate reflector grids.
+    #
+    # Apply a rotation, around a center of rotation, to a (selection of) reflector(s).
+    #
+    # @param name Reflector name or list of reflector names.
+    # @param rotation Numpy ndarray of length 3, containing rotation angles around x,y and z axes, in degrees.
+    # @param cRot Numpy ndarray of length 3, containing center of rotation x,y and z co-ordinates, in mm.
+    
     def rotateGrids(self, name, rotation, cRot=np.zeros(3)):
-        self.system[name]["transf"] = MatRotate(rotation, self.system[name]["transf"], cRot)
+        if isinstance(name, list):
+            for _name in name:
+                self.system[_name]["transf"] = MatRotate(rotation, self.system[_name]["transf"], cRot)
 
+        else:
+            self.system[name]["transf"] = MatRotate(rotation, self.system[name]["transf"], cRot)
+
+    ##
+    # Translate reflector grids.
+    #
+    # Apply a translation to a (selection of) reflector(s).
+    #
+    # @param name Reflector name or list of reflector names.
+    # @param translation Numpy ndarray of length 3, containing translation x,y and z co-ordinates, in mm.
+    
     def translateGrids(self, name, translation):
-        self.system[name]["transf"] = MatTranslate(translation, self.system[name]["transf"])
+        if isinstance(name, list):
+            for _name in name:
+                self.system[_name]["transf"] = MatTranslate(translation, self.system[_name]["transf"])
+        else:
+            self.system[name]["transf"] = MatTranslate(translation, self.system[name]["transf"])
 
     def homeReflector(self, name):
-        self.system[name]["transf"] = np.eye(4)
+        if isinstance(name, list):
+            for _name in name:
+                self.system[_name]["transf"] = np.eye(4)
+        else:
+            self.system[name]["transf"] = np.eye(4)
 
     def generateGrids(self, name, transform=True, spheric=True):
         grids = generateGrid(self.system[name], transform, spheric)
         return grids
 
     def saveElement(self, name):
-        jsonDict = copyGrid(self.system[name])
+        jsonDict = self.copyObj(self.system[name])
         
         with open('{}.json'.format(os.path.join(self.savePathElem, name)), 'w') as f:
             json.dump(jsonDict, f, cls=NpEncoder)
@@ -690,6 +726,9 @@ class System(object):
 
     def plotRTframe(self, frame, project="xy"):
         plt.plotRTframe(frame, project, self.savePath)
+
+    def copyObj(self, obj):
+        return copy.deepcopy(obj)
 
     def _compToFields(self, comp, field):
         null = np.zeros(field.shape, dtype=complex)

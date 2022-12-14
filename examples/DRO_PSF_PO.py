@@ -59,7 +59,7 @@ def ex_DRO_PO(device):
     rotation_plane = np.array([180, 0, 0])
     s.rotateGrids("plane1", rotation_plane)
     s.translateGrids("plane1", translation)
-
+    s.rotateGrids(["p1", "plane1"], np.array([1, 0, 0]))
 
     if device == "GPU":
         nThreads = 256
@@ -95,6 +95,6 @@ def ex_DRO_PO(device):
 
     EH = s.runPO(p1_to_planeff)
     
-    s.plotBeam2D("planeff", EH.Ex, units="am")
+    s.plotBeam2D("planeff", EH.Ex, units="deg")
 if __name__ == "__main__":
     ex_DRO()

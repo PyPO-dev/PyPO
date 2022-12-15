@@ -260,8 +260,7 @@ def plotSystem(systemDict, fine, cmap,
     #ax.set_title("System", fontsize=20)
     world_limits = ax.get_w_lims()
 
-    #ax.set_box_aspect((1,1,1))
-    print("ps3")
+    ax.set_box_aspect((1,1,1))
     ax.tick_params(axis='x', which='major', pad=-3)
 
     if RTframes:

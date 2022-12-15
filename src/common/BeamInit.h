@@ -1,31 +1,82 @@
 #include <iostream>
-#include <vector>
 #include <array>
-#define _USE_MATH_DEFINES
+
 #include <cmath>
 #include <complex>
-#include <thread>
-#include <iomanip>
-#include <algorithm>
-#include <new>
 
 #include "Utils.h"
 #include "Structs.h"
 #include "InterfaceReflector.h"
 
+#define _USE_MATH_DEFINES
+
 #ifndef __BeamInit_h
 #define __BeamInit_h
 
+/*! \file BeamInit.h
+    \brief Initialize beam objects.
+    
+    Initializes ray-trace frames, Gaussian beams and custom beams by calculating currents.
+*/
 
+/** 
+ * Initialize ray-trace frame from RTDict or RTDictf.
+ *
+ * Takes an RTDict or RTDictf and generates a frame object, which can be used 
+ *      to initialize a ray-trace.
+ *
+ * @param rdict RTDict or RTDictf object from which to generate a frame.
+ * @param fr Pointer to cframe or cframef object.
+ * 
+ * @see RTDict
+ * @see RTDictf
+ * @see cframe
+ * @see cframef
+ */
 template<typename T, typename U, typename V>
 void initFrame(T rdict, U *fr);
 
+/** 
+ * Initialize Gaussian beam from GDict or GDictf.
+ *
+ * Takes a GDict or GDictf and generates two c2Bundle or c2Bundlef objects, which contain the field and 
+ *      associated currents and are allocated to passed pointer arguments.
+ *
+ * @param gdict GDict or GDictf object from which to generate a Gaussian beam.
+ * @param refldict reflparams or reflparamsf object corresponding to surface on
+ *      which to generate the Gaussian beam.
+ * @param res_field Pointer to c2Bundle or c2Bundlef object.
+ * @param res_current Pointer to c2Bundle or c2Bundlef object.
+ *
+ * @see GDict
+ * @see GDictf
+ * @see reflparams
+ * @see reflparamsf
+ * @see c2Bundle
+ * @see c2Bundlef
+ */
 template<typename T, typename U, typename V, typename W, typename G>
-void initGauss(T gdict, U rdict, V *res_field, V *res_current);
+void initGauss(T gdict, U refldict, V *res_field, V *res_current);
 
+/** 
+ * Calculate currents from electromagnetic field.
+ * 
+ * Calculate the J and M vectorial currents given a vectorial E and H field.
+ *      Can calculate full currents, PMC and PEC surfaces.
+ *
+ * @param res_field Pointer to c2Bundle or c2Bundlef object.
+ * @param res_current Pointer to c2Bundle or c2Bundlef object.
+ * @param refldict reflparams or reflparamsf object corresponding to surface on
+ *      which to calculate currents.
+ * @param mode How to calculate currents. 0 is full currents, 1 is PMC and 2 is PEC.
+ *
+ * @see c2Bundle
+ * @see c2Bundlef
+ * @see reflparams
+ * @see reflparamsf
+ */
 template<typename T, typename U, typename V, typename W>
-void calcJM(T *res_field, T *res_current, V rdict, int mode);
-
+void calcJM(T *res_field, T *res_current, V refldict, int mode);
 
 template<typename T, typename U, typename V>
 void initFrame(T rdict, U *fr)
@@ -102,9 +153,9 @@ void initFrame(T rdict, U *fr)
 }
 
 template<typename T, typename U, typename V, typename W, typename G>
-void initGauss(T gdict, U rdict, V *res_field, V *res_current)
+void initGauss(T gdict, U refldict, V *res_field, V *res_current)
 {
-    int nTot = rdict.n_cells[0] * rdict.n_cells[1];
+    int nTot = refldict.n_cells[0] * refldict.n_cells[1];
 
     W reflc;
 
@@ -123,12 +174,17 @@ void initGauss(T gdict, U rdict, V *res_field, V *res_current)
     Utils<G> ut;
 
     bool transform = false;
-    generateGrid(rdict, &reflc, transform);
+    generateGrid(refldict, &reflc, transform);
 
-    G zR      = M_PI * gdict.w0*gdict.w0 * gdict.n / gdict.lam;
-    G wz      = gdict.w0 * sqrt(1 + (gdict.z / zR)*(gdict.z / zR));
-    G Rz_inv  = gdict.z / (gdict.z*gdict.z + zR*zR);
-    G phiz    = atan(gdict.z / zR);
+
+    G zRx      = M_PI * gdict.w0x*gdict.w0x * gdict.n / gdict.lam;
+    G zRy      = M_PI * gdict.w0x*gdict.w0x * gdict.n / gdict.lam;
+    G wzx      = gdict.w0x * sqrt(1 + (gdict.z / zRx)*(gdict.z / zRx));
+    G wzy      = gdict.w0y * sqrt(1 + (gdict.z / zRy)*(gdict.z / zRy));
+    G Rzx_inv  = gdict.z / (gdict.z*gdict.z + zRx*zRx);
+    G Rzy_inv  = gdict.z / (gdict.z*gdict.z + zRy*zRy);
+    G phizx    = atan(gdict.z / zRx);
+    G phizy    = atan(gdict.z / zRy);
     G k       = 2 * M_PI / gdict.lam;
 
     G r2;
@@ -144,9 +200,10 @@ void initGauss(T gdict, U rdict, V *res_field, V *res_current)
     {
         r2 = reflc.x[i]*reflc.x[i] + reflc.y[i]*reflc.y[i];
 
-        field_atPoint = gdict.E0 * gdict.w0/wz * exp(-r2/(wz*wz)) *
-                        exp(-j * (k*gdict.z + k*r2*Rz_inv/2 - phiz));
-
+        //field_atPoint = gdict.E0 * gdict.w0/wz * exp(-r2/(wz*wz)) * exp(-j * (k*gdict.z + k*r2*Rz_inv/2 - phiz));
+        field_atPoint = gdict.E0 * sqrt(2 / (M_PI * wzx * wzy)) * exp(-(reflc.x[i]/wzx)*(reflc.x[i]/wzx) - (reflc.y[i]/wzy)*(reflc.y[i]/wzy) -
+                j*M_PI/gdict.lam * (reflc.x[i]*reflc.x[i]*Rzx_inv + reflc.y[i]*reflc.y[i]*Rzy_inv) - j*k*gdict.z + j*(phizx - phizy)*0.5);
+        
         efield[0] = field_atPoint * gdict.pol[0];
         efield[1] = field_atPoint * gdict.pol[1];
         efield[2] = field_atPoint * gdict.pol[2];
@@ -209,10 +266,10 @@ void initGauss(T gdict, U rdict, V *res_field, V *res_current)
 }
 
 template<typename T, typename U, typename V, typename W>
-void calcJM(T *res_field, T *res_current, V rdict, int mode)
+void calcJM(T *res_field, T *res_current, V refldict, int mode)
 {
     W reflc;
-    int nTot = rdict.n_cells[0] * rdict.n_cells[1];
+    int nTot = refldict.n_cells[0] * refldict.n_cells[1];
 
     reflc.size = nTot;
 
@@ -227,7 +284,7 @@ void calcJM(T *res_field, T *res_current, V rdict, int mode)
     reflc.area = new U[nTot];
 
     bool transform = true;
-    generateGrid(rdict, &reflc, transform);
+    generateGrid(refldict, &reflc, transform);
 
     Utils<U> ut;
 

@@ -1,9 +1,10 @@
 #include "InterfaceCUDA.h"
 
-/* Kernels for single precision PO.
- * Author: Arend Moerman
- * For questions, contact: arendmoerman@gmail.com
- */
+/*! \file Kernelsf.cu
+    \brief Kernels for CUDA PO calculations.
+    
+    Contains kernels for PO calculations. Multiple kernels are defined, each one optimized for a certain calculation.
+*/
 
 // Declare constant memory for Device
 __constant__ cuFloatComplex con[CSIZE];     // Contains: k, eps, mu0, zeta0, pi, C_l, Time direction, unit, zero, c4 as complex numbers
@@ -13,7 +14,11 @@ __constant__ float eye[3][3];      // Identity matrix
 __constant__ int g_s;               // Gridsize on source
 __constant__ int g_t;               // Gridsize on target
 
+#define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
+
 /**
+ * Check CUDA call.
+ *
  * Wrapper for finding errors in CUDA API calls.
  *
  * @param code The errorcode returned from failed API call.
@@ -21,7 +26,6 @@ __constant__ int g_t;               // Gridsize on target
  * @param line The line in file in which error occured.
  * @param abort Exit code upon error.
  */
-#define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
 __host__ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
 {
    if (code != cudaSuccess)
@@ -31,17 +35,41 @@ __host__ inline void gpuAssert(cudaError_t code, const char *file, int line, boo
    }
 }
 
+/**
+ * Debug complex array.
+ *
+ * Print complex array of size 3.
+ *      Useful for debugging.
 
+ * @param arr Array of 3 cuFloatComplex.
+ */
 __host__ __device__ void _debugArray(cuFloatComplex arr[3])
 {
     printf("%e + %ej, %e + %ej, %e + %ej\n", arr[0].x, arr[0].y, arr[1].x, arr[1].y, arr[2].x, arr[2].y);
 }
 
+/**
+ * Debug real array.
+ *
+ * Print real valued array of size 3.
+ *      Useful for debugging.
+
+ * @param arr Array of 3 float.
+ */
 __host__ __device__ void _debugArray(float arr[3])
 {
     printf("%e, %e, %e\n", arr[0], arr[1], arr[2]);
 }
 
+/**
+ * Take complex exponential.
+ *
+ * Take complex exponential by decomposing into sine and cosine.
+ *
+ * @param z cuFloatComplex number.
+ *
+ * @return res cuFloatComplex number.
+ */
 __device__ __inline__ cuFloatComplex expCo(cuFloatComplex z)
 {
     cuFloatComplex res;
@@ -55,15 +83,16 @@ __device__ __inline__ cuFloatComplex expCo(cuFloatComplex z)
 }
 
 /**
- * (PRIVATE)
+ * Initialize CUDA.
+ *
  * Instantiate program and populate constant memory.
  *
- * @param k Wavenumber of incoming field.
- * @param epsilon Relative permittivity of source.
- * @param ct->size Number of elements in target.
- * @param cs->size Number of elements in source.
- * @param t_direction Sign of exponent in Green function.
- * @param nBlock Number of blocks per grid.
+ * @param k Wavenumber of incoming field in 1 / mm.
+ * @param epsilon Relative electric permittivity of source.
+ * @param gt Number of cells on target.
+ * @param gs Number of cells on source.
+ * @param t_direction Time direction (experimental!).
+ * @param nBlocks Number of blocks per grid.
  * @param nThreads Number of threads per block.
  *
  * @return BT Array of two dim3 objects.
@@ -122,21 +151,21 @@ __device__ __inline__ cuFloatComplex expCo(cuFloatComplex z)
  }
 
 /**
- * Calculate total field at point on target.
+ * Calculate total E and H field at point on target.
  *
- * @param d_xs C-style array containing source points x-coordinate.
- * @param d_ys C-style array containing source points y-coordinate.
- * @param d_zs C-style array containing source points z-coordinate.
- * @param d_Jx C-style array containing source J x-component.
- * @param d_Jy C-style array containing source J y-component.
- * @param d_Jz C-style array containing source J z-component.
- * @param d_Mx C-style array containing source M x-component.
- * @param d_My C-style array containing source M y-component.
- * @param d_Mz C-style array containing source M z-component.
- * @param point C-style array of lenct->sizeh 3 containing xyz coordinates of target point.
- * @param d_A C-style array containing area elements.
- * @param d_ei C-style array of lenct->sizeh 3 to be filled with E-field at point.
- * @param d_hi C-style array of lenct->sizeh 3 to be filled with H-field at point.
+ * @param d_xs Array containing source points x-coordinate.
+ * @param d_ys Array containing source points y-coordinate.
+ * @param d_zs Array containing source points z-coordinate.
+ * @param d_Jx Array containing source J x-component.
+ * @param d_Jy Array containing source J y-component.
+ * @param d_Jz Array containing source J z-component.
+ * @param d_Mx Array containing source M x-component.
+ * @param d_My Array containing source M y-component.
+ * @param d_Mz Array containing source M z-component.
+ * @param point Array of 3 float, containing xyz coordinates of target point.
+ * @param d_A Array containing area elements.
+ * @param d_ei Array of 3 cuFloatComplex, to be filled with E-field at point.
+ * @param d_hi Array of 3 cuFloatComplex, to be filled with H-field at point.
  */
 __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
                     cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
@@ -223,15 +252,7 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
         {
             e_field[n] = cuCsubf(e_field[n], cuCmulf(cuCsubf(cuCmulf(omega, cuCmulf(con[2], e_vec_thing[n])), k_out_ms[n]), Green));
             h_field[n] = cuCsubf(h_field[n], cuCmulf(cuCaddf(cuCmulf(omega, cuCmulf(con[1], h_vec_thing[n])), k_out_js[n]), Green));
-
-            //if (i == 2){printf("%.16f\n", e_vec_thing[n].x);}
-            //if (i == 2){printf("%.16f\n", h_vec_thing[n].x);}
-
-            //if (i == 2){printf("%.16f\n", k_out_ms[n].x);}
-            //if (i == 2){printf("%.16f\n", k_out_js[n].x);}
         }
-        //if (i == 2){printf("%.16f\n", k_out_js[1].x);}
-
     }
 
     d_ei[0] = e_field[0];
@@ -246,30 +267,32 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
 }
 
 /**
- * Kernel for toPrint == 0: save J and M.
+ * Calculate JM on target.
  *
- * @param d_xs C-style array containing source points x-coordinate.
- * @param d_ys C-style array containing source points y-coordinate.
- * @param d_zs C-style array containing source points z-coordinate.
- * @param d_A C-style array containing area elements.
- * @param d_xt C-style array containing target points x-coordinate.
- * @param d_yt C-style array containing target points y-coordinate.
- * @param d_zt C-style array containing target points z-coordinate.
- * @param d_nxt C-style array containing target norms x-component.
- * @param d_nyt C-style array containing target norms y-component.
- * @param d_nzt C-style array containing target norms z-component.
- * @param d_Jx C-style array containing source J x-component.
- * @param d_Jy C-style array containing source J y-component.
- * @param d_Jz C-style array containing source J z-component.
- * @param d_Mx C-style array containing source M x-component.
- * @param d_My C-style array containing source M y-component.
- * @param d_Mz C-style array containing source M z-component.
- * @param d_Jxt C-style array to be filled with target J x-component.
- * @param d_Jyt C-style array to be filled with target J y-component.
- * @param d_Jzt C-style array to be filled with target J z-component.
- * @param d_Mxt C-style array to be filled with target M x-component.
- * @param d_Myt C-style array to be filled with target M y-component.
- * @param d_Mzt C-style array to be filled with target M z-component.
+ * Kernel for calculating J, M currents on target surface.
+ *
+ * @param d_xs Array containing source points x-coordinate.
+ * @param d_ys Array containing source points y-coordinate.
+ * @param d_zs Array containing source points z-coordinate.
+ * @param d_A Array containing area elements.
+ * @param d_xt Array containing target points x-coordinate.
+ * @param d_yt Array containing target points y-coordinate.
+ * @param d_zt Array containing target points z-coordinate.
+ * @param d_nxt Array containing target norms x-component.
+ * @param d_nyt Array containing target norms y-component.
+ * @param d_nzt Array containing target norms z-component.
+ * @param d_Jx Array containing source J x-component.
+ * @param d_Jy Array containing source J y-component.
+ * @param d_Jz Array containing source J z-component.
+ * @param d_Mx Array containing source M x-component.
+ * @param d_My Array containing source M y-component.
+ * @param d_Mz Array containing source M z-component.
+ * @param d_Jxt Array to be filled with target J x-component.
+ * @param d_Jyt Array to be filled with target J y-component.
+ * @param d_Jzt Array to be filled with target J z-component.
+ * @param d_Mxt Array to be filled with target M x-component.
+ * @param d_Myt Array to be filled with target M y-component.
+ * @param d_Mzt Array to be filled with target M z-component.
  */
 __global__ void GpropagateBeam_0(float *d_xs, float *d_ys, float *d_zs,
                                 float *d_A, float *d_xt, float *d_yt, float *d_zt,
@@ -356,7 +379,8 @@ __global__ void GpropagateBeam_0(float *d_xs, float *d_ys, float *d_zs,
         // Calculate reflected field from reflection matrix
         for(int n=0; n<3; n++)
         {
-            e_r[n] = cuCsubf(cuCmulf(e_dot_p_r_perp, make_cuFloatComplex(-p_i_perp[n], 0.)), cuCmulf(e_dot_p_r_parr, make_cuFloatComplex(p_i_parr[n], 0.)));
+            e_r[n] = cuCsubf(cuCmulf(e_dot_p_r_perp, make_cuFloatComplex(-p_i_perp[n], 0.)), 
+                            cuCmulf(e_dot_p_r_parr, make_cuFloatComplex(p_i_parr[n], 0.)));
         }
 
         ext(S_r_norm, e_r, temp1);                       // h_r_temp
@@ -385,29 +409,31 @@ __global__ void GpropagateBeam_0(float *d_xs, float *d_ys, float *d_zs,
 }
 
 /**
- * Kernel for toPrint == 1: save Ei and Hi.
+ * Calculate EH on target.
  *
- * @param d_xs C-style array containing source points x-coordinate.
- * @param d_ys C-style array containing source points y-coordinate.
- * @param d_zs C-style array containing source points z-coordinate.
- * @param d_A C-style array containing area elements.
- * @param d_xt C-style array containing target points x-coordinate.
- * @param d_yt C-style array containing target points y-coordinate.
- * @param d_zt C-style array containing target points z-coordinate.
- * @param d_Jx C-style array containing source J x-component.
- * @param d_Jy C-style array containing source J y-component.
- * @param d_Jz C-style array containing source J z-component.
- * @param d_Mx C-style array containing source M x-component.
- * @param d_My C-style array containing source M y-component.
- * @param d_Mz C-style array containing source M z-component.
- * @param d_Ext C-style array to be filled with target Ei x-component.
- * @param d_Eyt C-style array to be filled with target Ei y-component.
- * @param d_Ezt C-style array to be filled with target Ei z-component.
- * @param d_Hxt C-style array to be filled with target Hi x-component.
- * @param d_Hyt C-style array to be filled with target Hi y-component.
- * @param d_Hzt C-style array to be filled with target Hi z-component.
+ * Kernel for calculating E, H fields on target surface.
+ *
+ * @param d_xs Array containing source points x-coordinate.
+ * @param d_ys Array containing source points y-coordinate.
+ * @param d_zs Array containing source points z-coordinate.
+ * @param d_A Array containing area elements.
+ * @param d_xt Array containing target points x-coordinate.
+ * @param d_yt Array containing target points y-coordinate.
+ * @param d_zt Array containing target points z-coordinate.
+ * @param d_Jx Array containing source J x-component.
+ * @param d_Jy Array containing source J y-component.
+ * @param d_Jz Array containing source J z-component.
+ * @param d_Mx Array containing source M x-component.
+ * @param d_My Array containing source M y-component.
+ * @param d_Mz Array containing source M z-component.
+ * @param d_Ext Array to be filled with target E x-component.
+ * @param d_Eyt Array to be filled with target E y-component.
+ * @param d_Ezt Array to be filled with target E z-component.
+ * @param d_Hxt Array to be filled with target H x-component.
+ * @param d_Hyt Array to be filled with target H y-component.
+ * @param d_Hzt Array to be filled with target H z-component.
  */
-__global__ void GpropagateBeam_1(float *d_xs, float *d_ys, float *d_zs,
+__global__ void GpropagateBeam_1(float* d_xs, float* d_ys, float* d_zs,
                                 float *d_A, float *d_xt, float *d_yt, float *d_zt,
                                 cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
                                 cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz,
@@ -428,8 +454,6 @@ __global__ void GpropagateBeam_1(float *d_xs, float *d_ys, float *d_zs,
         point[1] = d_yt[idx];
         point[2] = d_zt[idx];
 
-        //printf("%f, %f, %f\n", d_Mx[idx].x, d_My[idx].x, d_Mz[idx].x);
-
         // Calculate total incoming E and H field at point on target
         fieldAtPoint(d_xs, d_ys, d_zs,
                     d_Jx, d_Jy, d_Jz,
@@ -440,8 +464,6 @@ __global__ void GpropagateBeam_1(float *d_xs, float *d_ys, float *d_zs,
         d_Eyt[idx] = d_ei[1];
         d_Ezt[idx] = d_ei[2];
 
-        //printf("%f\n", d_ei[0].x);
-
         d_Hxt[idx] = d_hi[0];
         d_Hyt[idx] = d_hi[1];
         d_Hzt[idx] = d_hi[2];
@@ -449,36 +471,38 @@ __global__ void GpropagateBeam_1(float *d_xs, float *d_ys, float *d_zs,
 }
 
 /**
- * Kernel for toPrint == 2: save J, M, Ei and Hi.
+ * Calculate JM on target.
  *
- * @param d_xs C-style array containing source points x-coordinate.
- * @param d_ys C-style array containing source points y-coordinate.
- * @param d_zs C-style array containing source points z-coordinate.
- * @param d_A C-style array containing area elements.
- * @param d_xt C-style array containing target points x-coordinate.
- * @param d_yt C-style array containing target points y-coordinate.
- * @param d_zt C-style array containing target points z-coordinate.
- * @param d_nxt C-style array containing target norms x-component.
- * @param d_nyt C-style array containing target norms y-component.
- * @param d_nzt C-style array containing target norms z-component.
- * @param d_Jx C-style array containing source J x-component.
- * @param d_Jy C-style array containing source J y-component.
- * @param d_Jz C-style array containing source J z-component.
- * @param d_Mx C-style array containing source M x-component.
- * @param d_My C-style array containing source M y-component.
- * @param d_Mz C-style array containing source M z-component.
- * @param d_Jxt C-style array to be filled with target J x-component.
- * @param d_Jyt C-style array to be filled with target J y-component.
- * @param d_Jzt C-style array to be filled with target J z-component.
- * @param d_Mxt C-style array to be filled with target M x-component.
- * @param d_Myt C-style array to be filled with target M y-component.
- * @param d_Mzt C-style array to be filled with target M z-component.
- * @param d_Ext C-style array to be filled with target Ei x-component.
- * @param d_Eyt C-style array to be filled with target Ei y-component.
- * @param d_Ezt C-style array to be filled with target Ei z-component.
- * @param d_Hxt C-style array to be filled with target Hi x-component.
- * @param d_Hyt C-style array to be filled with target Hi y-component.
- * @param d_Hzt C-style array to be filled with target Hi z-component.
+ * Kernel for calculating J, M currents on target surface.
+ *
+ * @param d_xs Array containing source points x-coordinate.
+ * @param d_ys Array containing source points y-coordinate.
+ * @param d_zs Array containing source points z-coordinate.
+ * @param d_A Array containing area elements.
+ * @param d_xt Array containing target points x-coordinate.
+ * @param d_yt Array containing target points y-coordinate.
+ * @param d_zt Array containing target points z-coordinate.
+ * @param d_nxt Array containing target norms x-component.
+ * @param d_nyt Array containing target norms y-component.
+ * @param d_nzt Array containing target norms z-component.
+ * @param d_Jx Array containing source J x-component.
+ * @param d_Jy Array containing source J y-component.
+ * @param d_Jz Array containing source J z-component.
+ * @param d_Mx Array containing source M x-component.
+ * @param d_My Array containing source M y-component.
+ * @param d_Mz Array containing source M z-component.
+ * @param d_Jxt Array to be filled with target J x-component.
+ * @param d_Jyt Array to be filled with target J y-component.
+ * @param d_Jzt Array to be filled with target J z-component.
+ * @param d_Mxt Array to be filled with target M x-component.
+ * @param d_Myt Array to be filled with target M y-component.
+ * @param d_Mzt Array to be filled with target M z-component.
+ * @param d_Ext Array to be filled with target E x-component.
+ * @param d_Eyt Array to be filled with target E y-component.
+ * @param d_Ezt Array to be filled with target E z-component.
+ * @param d_Hxt Array to be filled with target H x-component.
+ * @param d_Hyt Array to be filled with target H y-component.
+ * @param d_Hzt Array to be filled with target H z-component.
  */
 __global__ void GpropagateBeam_2(float *d_xs, float *d_ys, float *d_zs,
                                 float *d_A, float *d_xt, float *d_yt, float *d_zt,
@@ -556,7 +580,6 @@ __global__ void GpropagateBeam_2(float *d_xs, float *d_ys, float *d_zs,
 
 
         normalize(e_out_h_r, S_i_norm);                       // S_i_norm
-        //_debugArray(S_i_norm);
 
         // Calculate incoming polarization vectors
         ext(S_i_norm, norms, S_out_n);                      // S_i_out_n
@@ -578,7 +601,8 @@ __global__ void GpropagateBeam_2(float *d_xs, float *d_ys, float *d_zs,
         // Calculate reflected field from reflection matrix
         for(int n=0; n<3; n++)
         {
-            e_r[n] = cuCsubf(cuCmulf(e_dot_p_r_perp, make_cuFloatComplex(-p_i_perp[n], 0.)), cuCmulf(e_dot_p_r_parr, make_cuFloatComplex(p_i_parr[n], 0.)));
+            e_r[n] = cuCsubf(cuCmulf(e_dot_p_r_perp, make_cuFloatComplex(-p_i_perp[n], 0.)), 
+                            cuCmulf(e_dot_p_r_parr, make_cuFloatComplex(p_i_parr[n], 0.)));
         }
 
         ext(S_r_norm, e_r, temp1);                       // h_r_temp
@@ -607,33 +631,35 @@ __global__ void GpropagateBeam_2(float *d_xs, float *d_ys, float *d_zs,
 }
 
 /**
- * Kernel for toPrint == 3: save Pr, Er and Hr.
+ * Calculate reflected EH and P on target.
  *
- * @param d_xs C-style array containing source points x-coordinate.
- * @param d_ys C-style array containing source points y-coordinate.
- * @param d_zs C-style array containing source points z-coordinate.
- * @param d_A C-style array containing area elements.
- * @param d_xt C-style array containing target points x-coordinate.
- * @param d_yt C-style array containing target points y-coordinate.
- * @param d_zt C-style array containing target points z-coordinate.
- * @param d_nxt C-style array containing target norms x-component.
- * @param d_nyt C-style array containing target norms y-component.
- * @param d_nzt C-style array containing target norms z-component.
- * @param d_Jx C-style array containing source J x-component.
- * @param d_Jy C-style array containing source J y-component.
- * @param d_Jz C-style array containing source J z-component.
- * @param d_Mx C-style array containing source M x-component.
- * @param d_My C-style array containing source M y-component.
- * @param d_Mz C-style array containing source M z-component.
- * @param d_Prxt C-style array to be filled with Pr x-component.
- * @param d_Pryt C-style array to be filled with Pr y-component.
- * @param d_Przt C-style array to be filled with Pr z-component.
- * @param d_Ext C-style array to be filled with target Er x-component.
- * @param d_Eyt C-style array to be filled with target Er y-component.
- * @param d_Ezt C-style array to be filled with target Er z-component.
- * @param d_Hxt C-style array to be filled with target Hr x-component.
- * @param d_Hyt C-style array to be filled with target Hr y-component.
- * @param d_Hzt C-style array to be filled with target Hr z-component.
+ * Kernel for calculating reflected E, H fields and P, the reflected Poynting vector field, on target surface.
+ *
+ * @param d_xs Array containing source points x-coordinate.
+ * @param d_ys Array containing source points y-coordinate.
+ * @param d_zs Array containing source points z-coordinate.
+ * @param d_A Array containing area elements.
+ * @param d_xt Array containing target points x-coordinate.
+ * @param d_yt Array containing target points y-coordinate.
+ * @param d_zt Array containing target points z-coordinate.
+ * @param d_nxt Array containing target norms x-component.
+ * @param d_nyt Array containing target norms y-component.
+ * @param d_nzt Array containing target norms z-component.
+ * @param d_Jx Array containing source J x-component.
+ * @param d_Jy Array containing source J y-component.
+ * @param d_Jz Array containing source J z-component.
+ * @param d_Mx Array containing source M x-component.
+ * @param d_My Array containing source M y-component.
+ * @param d_Mz Array containing source M z-component.
+ * @param d_Ext Array to be filled with target E x-component.
+ * @param d_Eyt Array to be filled with target E y-component.
+ * @param d_Ezt Array to be filled with target E z-component.
+ * @param d_Hxt Array to be filled with target H x-component.
+ * @param d_Hyt Array to be filled with target H y-component.
+ * @param d_Hzt Array to be filled with target H z-component.
+ * @param d_Prxt Array to be filled with target P x-component.
+ * @param d_Pryt Array to be filled with target P y-component.
+ * @param d_Przt Array to be filled with target P z-component.
  */
 __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
                                 float *d_A, float *d_xt, float *d_yt, float *d_zt,
@@ -689,7 +715,6 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
                     d_Mx, d_My, d_Mz,
                     point, d_A, d_ei, d_hi);
 
-        //printf("%e\n", d_ei[idx].x);
         // Calculate normalised incoming poynting vector.
         conja(d_hi, temp1);                        // h_conj
         ext(d_ei, temp1, temp2);                  // e_out_h
@@ -715,9 +740,6 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
         d_Prxt[idx] = S_r_norm[0];
         d_Pryt[idx] = S_r_norm[1];
         d_Przt[idx] = S_r_norm[2];
-        //printf("%f\n", d_A[idx]);
-
-
 
         // Calculate normalised reflected polarization vectors
         ext(S_r_norm, norms, S_out_n);                      // S_r_out_n
@@ -731,7 +753,8 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
         // Calculate reflected field from reflection matrix
         for(int n=0; n<3; n++)
         {
-            e_r[n] = cuCsubf(cuCmulf(e_dot_p_r_perp, make_cuFloatComplex(-p_i_perp[n], 0.)), cuCmulf(e_dot_p_r_parr, make_cuFloatComplex(p_i_parr[n], 0.)));
+            e_r[n] = cuCsubf(cuCmulf(e_dot_p_r_perp, make_cuFloatComplex(-p_i_perp[n], 0.)), 
+                            cuCmulf(e_dot_p_r_parr, make_cuFloatComplex(p_i_parr[n], 0.)));
         }
 
         ext(S_r_norm, e_r, temp1);                       // h_r_temp
@@ -748,6 +771,22 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
     }
 }
 
+/**
+ * Calculate total E and H field at point on far-field target.
+ *
+ * @param d_xs Array containing source points x-coordinate.
+ * @param d_ys Array containing source points y-coordinate.
+ * @param d_zs Array containing source points z-coordinate.
+ * @param d_Jx Array containing source J x-component.
+ * @param d_Jy Array containing source J y-component.
+ * @param d_Jz Array containing source J z-component.
+ * @param d_Mx Array containing source M x-component.
+ * @param d_My Array containing source M y-component.
+ * @param d_Mz Array containing source M z-component.
+ * @param r_hat Array of 3 float, containing xyz coordinates of target point direction.
+ * @param d_A Array containing area elements.
+ * @param e Array of 3 cuFloatComplex, to be filled with E-field at point.
+ */
 __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
                                 cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
                                 cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz,
@@ -792,7 +831,6 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
 
         expo = expCo(cuCmulf(con[7], make_cuFloatComplex((con[0].x * r_hat_in_rp), 0.)));
 
-        //if (i==100){printf("%f\n", expo.x);}
         cfact = cuCmulf(expo, make_cuFloatComplex(d_A[i], 0.));
 
         js[0] = cuCaddf(js[0], cuCmulf(d_Jx[i], cfact));
@@ -816,10 +854,30 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
     }
 }
 
-
-/*
- * Kernel 4, propagation to far field
- * */
+/**
+ * Calculate EH on far-field target.
+ *
+ * Kernel for calculating E, H fields on a far-field target.
+ *
+ * @param d_xs Array containing source points x-coordinate.
+ * @param d_ys Array containing source points y-coordinate.
+ * @param d_zs Array containing source points z-coordinate.
+ * @param d_A Array containing area elements.
+ * @param d_xt Array containing target direction x-coordinate.
+ * @param d_yt Array containing target direction y-coordinate.
+ * @param d_Jx Array containing source J x-component.
+ * @param d_Jy Array containing source J y-component.
+ * @param d_Jz Array containing source J z-component.
+ * @param d_Mx Array containing source M x-component.
+ * @param d_My Array containing source M y-component.
+ * @param d_Mz Array containing source M z-component.
+ * @param d_Ext Array to be filled with target E x-component.
+ * @param d_Eyt Array to be filled with target E y-component.
+ * @param d_Ezt Array to be filled with target E z-component.
+ * @param d_Hxt Array to be filled with target H x-component.
+ * @param d_Hyt Array to be filled with target H y-component.
+ * @param d_Hzt Array to be filled with target H z-component.
+ */
 void __global__ GpropagateBeam_4(float *d_xs, float *d_ys, float *d_zs,
                                 float *d_A, float *d_xt, float *d_yt,
                                 cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
@@ -864,145 +922,19 @@ void __global__ GpropagateBeam_4(float *d_xs, float *d_ys, float *d_zs,
 }
 
 /**
- * (PRIVATE)
- * Allocate and copy grid in R1 from Host to Device.
+ * Convert 6 arrays of floats to 3 arrays of cuComplex
  *
- * @param d_x Pointer for array on device.
- * @param h_x Pointer for array on host.
- * @param size Number of elements of h_x/d_x.
- */
-__host__ void _allocateGridR1ToGPU(float *d_x, float *h_x, int size)
-{
-    gpuErrchk( cudaMalloc((void**)&d_x, size * sizeof(float)) );
-    gpuErrchk( cudaMemcpy(d_x, h_x, size * sizeof(float), cudaMemcpyHostToDevice) );
-}
-
-/**
- * (PRIVATE)
- * Allocate R3 to Device.
- *
- * @param d_x Pointer for x array on device.
- * @param d_y Pointer for y array on device.
- * @param d_z Pointer for z array on device.
- * */
-__host__ void _allocateGridR3(float *d_x, float *d_y, float *d_z, int size)
-{
-    gpuErrchk( cudaMalloc((void**)&d_x, size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_y, size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_z, size * sizeof(float)) );
-}
-
-__host__ void _allocateGridR2ToGPU(float *d_x, float *d_y,
-                                  float *h_x, float *h_y,
-                                    int size)
-{
-    gpuErrchk( cudaMalloc((void**)&d_x, size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_y, size * sizeof(float)) );
-
-    gpuErrchk( cudaMemcpy(d_x, h_x, size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_y, h_y, size * sizeof(float), cudaMemcpyHostToDevice) );
-}
-
-/**
- * (PRIVATE)
- * Allocate and copy grid in R3 from Host to Device.
- *
- * @param d_x Pointer for x array on device.
- * @param d_y Pointer for y array on device.
- * @param d_z Pointer for z array on device.
- * @param h_x Pointer for x array on host.
- * @param h_y Pointer for y array on host.
- * @param h_z Pointer for z array on host.
- * @param size Number of elements of h_x/d_x.
- */
-__host__ void _allocateGridR3ToGPU(float *d_x, float *d_y, float *d_z,
-                                  float *h_x, float *h_y, float *h_z,
-                                    int size)
-{
-    gpuErrchk( cudaMalloc((void**)&d_x, size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_y, size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_z, size * sizeof(float)) );
-
-    gpuErrchk( cudaMemcpy(d_x, h_x, size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_y, h_y, size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_z, h_z, size * sizeof(float), cudaMemcpyHostToDevice) );
-}
-
-__host__ void _allocateGridGPUToR3(float *h_x, float *h_y, float *h_z,
-                                   float *d_x, float *d_y, float *d_z,
-                                   int size)
-{
-    gpuErrchk( cudaMemcpy(h_x, d_x, size * sizeof(float), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_y, d_y, size * sizeof(float), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_z, d_z, size * sizeof(float), cudaMemcpyDeviceToHost) );
-}
-
-/**
- * (PRIVATE)
- * Allocate C3 to Device.
- *
- * @param d_x Pointer for x array on device.
- * @param d_y Pointer for y array on device.
- * @param d_z Pointer for z array on device.
- * */
-__host__ void _allocateGridC3(cuFloatComplex *d_x, cuFloatComplex *d_y, cuFloatComplex *d_z, int size)
-{
-    gpuErrchk( cudaMalloc((void**)&d_x, size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_y, size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_z, size * sizeof(cuFloatComplex)) );
-}
-
-/**
- * (PRIVATE)
- * Allocate and copy grid in C3 from Host to Device.
- *
- * @param d_x Pointer for x array on device.
- * @param d_y Pointer for y array on device.
- * @param d_z Pointer for z array on device.
- * @param h_x Pointer for x array on host.
- * @param h_y Pointer for y array on host.
- * @param h_z Pointer for z array on host.
- * @param size Number of elements of h_x/d_x.
- */
-__host__ void _allocateGridC3ToGPU(cuFloatComplex *d_x, cuFloatComplex *d_y, cuFloatComplex *d_z,
-                                  cuFloatComplex *h_x, cuFloatComplex *h_y, cuFloatComplex *h_z,
-                                    int size)
-{
-    gpuErrchk( cudaMalloc((void**)&d_x, size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_y, size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_z, size * sizeof(cuFloatComplex)) );
-
-    gpuErrchk( cudaMemcpy(d_x, h_x, size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_y, h_y, size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_y, h_z, size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-}
-
-__host__ void _allocateGridGPUToC3(cuFloatComplex *h_x, cuFloatComplex *h_y, cuFloatComplex *h_z,
-                                  cuFloatComplex *d_x, cuFloatComplex *d_y, cuFloatComplex *d_z,
-                                    int size)
-{
-    gpuErrchk( cudaMemcpy(h_x, d_x, size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_y, d_y, size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_y, d_z, size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-}
-
-/**
- * (PRIVATE)
- * Convert two arrays of floats to array of cuComplex
- *
- * @param rarr Real part of complex array.
- * @param iarr Imaginary part of complex array.
- * @param carr Array of cuFloatComplex, to be filled.
+ * @param r1arr Real part of complex array.
+ * @param r2arr Real part of complex array.
+ * @param r3arr Real part of complex array.
+ * @param i1arr Imaginary part of complex array.
+ * @param i2arr Imaginary part of complex array.
+ * @param i3arr Imaginary part of complex array.
+ * @param c1arr Array of cuFloatComplex, to be filled.
+ * @param c2arr Array of cuFloatComplex, to be filled.
+ * @param c3arr Array of cuFloatComplex, to be filled.
  * @param size Size of arrays.
  */
-__host__ void _arrToCUDAC(float *rarr, float *iarr, cuFloatComplex* carr, int size)
-{
-    for (int i=0; i<size; i++)
-    {
-        carr[i] = make_cuFloatComplex(rarr[i], iarr[i]);
-    }
-}
-
 __host__ void _arrC3ToCUDAC(float *r1arr, float *r2arr, float *r3arr,
                             float *i1arr, float *i2arr, float *i3arr,
                             cuFloatComplex* c1arr, cuFloatComplex* c2arr, cuFloatComplex* c3arr,
@@ -1018,32 +950,19 @@ __host__ void _arrC3ToCUDAC(float *r1arr, float *r2arr, float *r3arr,
 }
 
 /**
- * (PRIVATE)
- * Convert array of cuComplex to two arrays of floats.
+ * Convert 3 arrays of cuComplex to 6 arrays of floats.
  *
- * @param carr Array of cuFloatComplex.
- * @param rarr Real part of complex array, to be filled.
- * @param iarr Imaginary part of complex array, to be filled.
+ * @param c1arr Array of cuFloatComplex.
+ * @param c2arr Array of cuFloatComplex.
+ * @param c3arr Array of cuFloatComplex.
+ * @param r1arr Real part of complex array, to be filled.
+ * @param r2arr Real part of complex array, to be filled.
+ * @param r3arr Real part of complex array, to be filled.
+ * @param i1arr Imaginary part of complex array, to be filled.
+ * @param i2arr Imaginary part of complex array, to be filled.
+ * @param i3arr Imaginary part of complex array, to be filled.
  * @param size Size of arrays.
  */
-__host__ void _arrCUDACToC(cuFloatComplex* carr, float *rarr, float *iarr, int size)
-{
-    for (int i=0; i<size; i++)
-    {
-        rarr[i] = carr[i].x;
-        iarr[i] = carr[i].x;
-    }
-}
-
-__host__ void _arrCUDACToR3(cuFloatComplex* carr, float *rarr, float *iarr, int size)
-{
-    for (int i=0; i<size; i++)
-    {
-        rarr[i] = carr[i].x;
-        iarr[i] = carr[i].x;
-    }
-}
-
 __host__ void _arrCUDACToC3(cuFloatComplex* c1arr, cuFloatComplex* c2arr, cuFloatComplex* c3arr,
                            float *r1arr, float *r2arr, float *r3arr,
                            float *i1arr, float *i2arr, float *i3arr,
@@ -1063,16 +982,25 @@ __host__ void _arrCUDACToC3(cuFloatComplex* c1arr, cuFloatComplex* c2arr, cuFloa
 }
 
 /**
- * (PUBLIC)
- * Wrapper for calling kernel 0.
+ * Call JM kernel.
  *
- * @param d_x Pointer for x array on device.
- * @param d_y Pointer for y array on device.
- * @param d_z Pointer for z array on device.
- * @param h_x Pointer for x array on host.
- * @param h_y Pointer for y array on host.
- * @param h_z Pointer for z array on host.
- * @param size Number of elements of h_x/d_x.
+ * Calculate J, M currents on a target surface using CUDA.
+ *
+ * @param res Pointer to c2Bundlef object.
+ * @param source reflparamsf object containing source surface parameters.
+ * @param target reflparamsf object containing target surface parameters.
+ * @param cs Pointer to reflcontainerf object containing source grids.
+ * @param ct Pointer to reflcontainerf object containing target grids.
+ * @param currents Pointer to c2Bundlef object containing source currents.
+ * @param k Wavenumber of radiation in 1 /mm.
+ * @param epsilon Relative permittivity of source surface.
+ * @param t_direction Time direction (experimental!).
+ * @param nBlocks Number of blocks in GPU grid.
+ * @param nThreads Number of threads in a block.
+ *
+ * @see c2Bundlef
+ * @see reflparamsf
+ * @see reflcontainerf
  */
 void callKernelf_JM(c2Bundlef *res, reflparamsf source, reflparamsf target,
                                 reflcontainerf *cs, reflcontainerf *ct,
@@ -1247,16 +1175,25 @@ void callKernelf_JM(c2Bundlef *res, reflparamsf source, reflparamsf target,
 }
 
 /**
- * (PUBLIC)
- * Wrapper for calling kernel 1.
+ * Call EH kernel.
  *
- * @param d_x Pointer for x array on device.
- * @param d_y Pointer for y array on device.
- * @param d_z Pointer for z array on device.
- * @param h_x Pointer for x array on host.
- * @param h_y Pointer for y array on host.
- * @param h_z Pointer for z array on host.
- * @param size Number of elements of h_x/d_x.
+ * Calculate E, H fields on a target surface using CUDA.
+ *
+ * @param res Pointer to c2Bundlef object.
+ * @param source reflparamsf object containing source surface parameters.
+ * @param target reflparamsf object containing target surface parameters.
+ * @param cs Pointer to reflcontainerf object containing source grids.
+ * @param ct Pointer to reflcontainerf object containing target grids.
+ * @param currents Pointer to c2Bundlef object containing source currents.
+ * @param k Wavenumber of radiation in 1 /mm.
+ * @param epsilon Relative permittivity of source surface.
+ * @param t_direction Time direction (experimental!).
+ * @param nBlocks Number of blocks in GPU grid.
+ * @param nThreads Number of threads in a block.
+ *
+ * @see c2Bundlef
+ * @see reflparamsf
+ * @see reflcontainerf
  */
 void callKernelf_EH(c2Bundlef *res, reflparamsf source, reflparamsf target,
                                 reflcontainerf *cs, reflcontainerf *ct,
@@ -1411,16 +1348,26 @@ void callKernelf_EH(c2Bundlef *res, reflparamsf source, reflparamsf target,
 }
 
 /**
- * (PUBLIC)
- * Wrapper for calling kernel 2.
+ * Call JMEH kernel.
  *
- * @param d_x Pointer for x array on device.
- * @param d_y Pointer for y array on device.
- * @param d_z Pointer for z array on device.
- * @param h_x Pointer for x array on host.
- * @param h_y Pointer for y array on host.
- * @param h_z Pointer for z array on host.
- * @param size Number of elements of h_x/d_x.
+ * Calculate J, M currents and E, H fields on a target surface using CUDA.
+ *
+ * @param res Pointer to c4Bundlef object.
+ * @param source reflparamsf object containing source surface parameters.
+ * @param target reflparamsf object containing target surface parameters.
+ * @param cs Pointer to reflcontainerf object containing source grids.
+ * @param ct Pointer to reflcontainerf object containing target grids.
+ * @param currents Pointer to c2Bundlef object containing source currents.
+ * @param k Wavenumber of radiation in 1 /mm.
+ * @param epsilon Relative permittivity of source surface.
+ * @param t_direction Time direction (experimental!).
+ * @param nBlocks Number of blocks in GPU grid.
+ * @param nThreads Number of threads in a block.
+ *
+ * @see c4Bundlef
+ * @see c2Bundlef
+ * @see reflparamsf
+ * @see reflcontainerf
  */
 void callKernelf_JMEH(c4Bundlef *res, reflparamsf source, reflparamsf target,
                                 reflcontainerf *cs, reflcontainerf *ct,
@@ -1627,16 +1574,26 @@ void callKernelf_JMEH(c4Bundlef *res, reflparamsf source, reflparamsf target,
 }
 
 /**
- * (PUBLIC)
- * Wrapper for calling kernel 3.
+ * Call EHP kernel.
  *
- * @param d_x Pointer for x array on device.
- * @param d_y Pointer for y array on device.
- * @param d_z Pointer for z array on device.
- * @param h_x Pointer for x array on host.
- * @param h_y Pointer for y array on host.
- * @param h_z Pointer for z array on host.
- * @param size Number of elements of h_x/d_x.
+ * Calculate reflected E, H fields and P, the reflected Poynting vectorfield, on a target surface using CUDA.
+ *
+ * @param res Pointer to c2rBundlef object.
+ * @param source reflparamsf object containing source surface parameters.
+ * @param target reflparamsf object containing target surface parameters.
+ * @param cs Pointer to reflcontainerf object containing source grids.
+ * @param ct Pointer to reflcontainerf object containing target grids.
+ * @param currents Pointer to c2Bundlef object containing source currents.
+ * @param k Wavenumber of radiation in 1 /mm.
+ * @param epsilon Relative permittivity of source surface.
+ * @param t_direction Time direction (experimental!).
+ * @param nBlocks Number of blocks in GPU grid.
+ * @param nThreads Number of threads in a block.
+ *
+ * @see c2rBundlef
+ * @see c2Bundlef
+ * @see reflparamsf
+ * @see reflcontainerf
  */
 void callKernelf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf target,
                                 reflcontainerf *cs, reflcontainerf *ct,
@@ -1824,16 +1781,25 @@ void callKernelf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf target,
 }
 
 /**
- * (PUBLIC)
- * Wrapper for calling kernel 4 (far-field).
+ * Call FF kernel.
  *
- * @param d_x Pointer for x array on device.
- * @param d_y Pointer for y array on device.
- * @param d_z Pointer for z array on device.
- * @param h_x Pointer for x array on host.
- * @param h_y Pointer for y array on host.
- * @param h_z Pointer for z array on host.
- * @param size Number of elements of h_x/d_x.
+ * Calculate E, H fields on a far-field target surface using CUDA.
+ *
+ * @param res Pointer to c2Bundlef object.
+ * @param source reflparamsf object containing source surface parameters.
+ * @param target reflparamsf object containing target surface parameters.
+ * @param cs Pointer to reflcontainerf object containing source grids.
+ * @param ct Pointer to reflcontainerf object containing target grids.
+ * @param currents Pointer to c2Bundlef object containing source currents.
+ * @param k Wavenumber of radiation in 1 /mm.
+ * @param epsilon Relative permittivity of source surface.
+ * @param t_direction Time direction (experimental!).
+ * @param nBlocks Number of blocks in GPU grid.
+ * @param nThreads Number of threads in a block.
+ *
+ * @see c2Bundlef
+ * @see reflparamsf
+ * @see reflcontainerf
  */
 void callKernelf_FF(c2Bundlef *res, reflparamsf source, reflparamsf target,
                                 reflcontainerf *cs, reflcontainerf *ct,

@@ -1,21 +1,32 @@
 #include <iostream>
 #include <vector>
-#include <complex>
 #include <array>
-#define _USE_MATH_DEFINES
 #include <cmath>
 #include <thread>
-#include <iomanip>
-#include <algorithm>
-#include <new>
 
 #include "Utils.h"
 #include "Structs.h"
 #include "RTRefls.h"
 
+#define _USE_MATH_DEFINES
+
 #ifndef __RayTracer_h
 #define __RayTracer_h
 
+/*! \file RayTrace.h
+    \brief Functions for RT calculations on CPU.
+
+    Provides functions for performing PO calculations on the CPU.
+*/
+
+/**
+ * Ray-trace class.
+ *
+ * Contains methods for performing ray-traces between arbitrarily oriented and curved surfaces.
+ *
+ * @see Utils
+ * @see RTRefls
+ */
 template<class T, class U, class V>
 class RayTracer
 {
@@ -25,9 +36,11 @@ class RayTracer
 
     V epsilon;
 
+    void joinThreads();
+
 public:
-    Utils<V> ut;
-    std::vector<std::thread> threadPool;
+    Utils<V> ut;    /**<Utils object.*/
+    std::vector<std::thread> threadPool;    /**<Vector of thread object.*/
 
     RayTracer(int numThreads, int nTot, V epsilon, bool verbose = false);
 
@@ -43,10 +56,18 @@ public:
                       T ctp, U *fr_in, U *fr_out, V t0);
 
     void parallelRays(T ctp, U *fr_in, U *fr_out, V t0);
-
-    void joinThreads();
 };
 
+/**
+ * Constructor.
+ *
+ * Set internal parameters for ray-tracing.
+ *
+ * @param numThreads Number of computing threads to employ.
+ * @param nTot Total amount of rays in beam.
+ * @param epsilon Precision of NR method, double/float.
+ * @param verbose Whether or not to print internal state information upon construction.
+ */
 template<class T, class U, class V>
 RayTracer<T, U, V>::RayTracer(int numThreads, int nTot, V epsilon, bool verbose)
 {
@@ -67,8 +88,19 @@ RayTracer<T, U, V>::RayTracer(int numThreads, int nTot, V epsilon, bool verbose)
     }
 }
 
-/*
- * Transform ray-trace frame into target surface restframe.
+/**
+ * Transform to surface.
+ *
+ * Transform ray-trace frame into target surface restframe, using target surface transformation matrix.
+ *
+ * @param ctp reflparams or reflparamsf of target surface.
+ * @param fr Pointer to cframe or cframef object to be transformed.
+ * @param inv Whether or not to apply the inverse of the transformation matrix.
+ *
+ * @see reflparams
+ * @see reflparamsf
+ * @see cframe
+ * @see cframef
  */
 template<class T, class U, class V>
 void RayTracer<T, U, V>::transfRays(T ctp, U *fr, bool inv)
@@ -101,6 +133,23 @@ void RayTracer<T, U, V>::transfRays(T ctp, U *fr, bool inv)
     }
 }
 
+/**
+ * Propagate rays to paraboloid.
+ *
+ * Propagate a frame of rays to a paraboloid surface.
+ *
+ * @param start Index of first loop iteration in parallel block.
+ * @param stop Index of last loop iteration in parallel block.
+ * @param ctp reflparams or reflparamsf object containing target surface parameters.
+ * @param fr_in Pointer to input cframe or cframef object.
+ * @param fr_out Pointer to output cframe or cframef object.
+ * @param t0 Starting guess for NR method, double/float.
+ *
+ * @see reflparams
+ * @see reflparamsf
+ * @see cframe
+ * @see cframef
+ */
 template<class T, class U, class V>
 void RayTracer<T, U, V>::propagateRaysToP(int start, int stop,
                   T ctp, U *fr_in, U *fr_out, V t0)
@@ -162,6 +211,23 @@ void RayTracer<T, U, V>::propagateRaysToP(int start, int stop,
     }
 }
 
+/**
+ * Propagate rays to hyperboloid.
+ *
+ * Propagate a frame of rays to a hyperboloid surface.
+ *
+ * @param start Index of first loop iteration in parallel block.
+ * @param stop Index of last loop iteration in parallel block.
+ * @param ctp reflparams or reflparamsf object containing target surface parameters.
+ * @param fr_in Pointer to input cframe or cframef object.
+ * @param fr_out Pointer to output cframe or cframef object.
+ * @param t0 Starting guess for NR method, double/float.
+ *
+ * @see reflparams
+ * @see reflparamsf
+ * @see cframe
+ * @see cframef
+ */
 template<class T, class U, class V>
 void RayTracer<T, U, V>::propagateRaysToH(int start, int stop,
                   T ctp, U *fr_in, U *fr_out, V t0)
@@ -213,6 +279,23 @@ void RayTracer<T, U, V>::propagateRaysToH(int start, int stop,
     }
 }
 
+/**
+ * Propagate rays to ellipsoid.
+ *
+ * Propagate a frame of rays to a ellipsoid surface.
+ *
+ * @param start Index of first loop iteration in parallel block.
+ * @param stop Index of last loop iteration in parallel block.
+ * @param ctp reflparams or reflparamsf object containing target surface parameters.
+ * @param fr_in Pointer to input cframe or cframef object.
+ * @param fr_out Pointer to output cframe or cframef object.
+ * @param t0 Starting guess for NR method, double/float.
+ *
+ * @see reflparams
+ * @see reflparamsf
+ * @see cframe
+ * @see cframef
+ */
 template<class T, class U, class V>
 void RayTracer<T, U, V>::propagateRaysToE(int start, int stop,
                   T ctp, U *fr_in, U *fr_out, V t0)
@@ -264,6 +347,23 @@ void RayTracer<T, U, V>::propagateRaysToE(int start, int stop,
     }
 }
 
+/**
+ * Propagate rays to plane.
+ *
+ * Propagate a frame of rays to a planar surface.
+ *
+ * @param start Index of first loop iteration in parallel block.
+ * @param stop Index of last loop iteration in parallel block.
+ * @param ctp reflparams or reflparamsf object containing target surface parameters.
+ * @param fr_in Pointer to input cframe or cframef object.
+ * @param fr_out Pointer to output cframe or cframef object.
+ * @param t0 Starting guess for NR method, double/float.
+ *
+ * @see reflparams
+ * @see reflparamsf
+ * @see cframe
+ * @see cframef
+ */
 template<class T, class U, class V>
 void RayTracer<T, U, V>::propagateRaysToPl(int start, int stop,
                   T ctp, U *fr_in, U *fr_out, V t0)
@@ -314,7 +414,21 @@ void RayTracer<T, U, V>::propagateRaysToPl(int start, int stop,
     }
 }
 
-
+/**
+ * Run ray-trace in parallel.
+ *
+ * Run a parallel ray-trace, depending on the type of target surface.
+ *
+ * @param ctp reflparams or reflparamsf object containing target surface parameters.
+ * @param fr_in Pointer to input cframe or cframef object.
+ * @param fr_out Pointer to output cframe or cframef object.
+ * @param t0 Starting guess for NR method, double/float.
+ *
+ * @see reflparams
+ * @see reflparamsf
+ * @see cframe
+ * @see cframef
+ */
 template <class T, class U, class V>
 void RayTracer<T, U, V>::parallelRays(T ctp, U *fr_in, U *fr_out, V t0)
 {

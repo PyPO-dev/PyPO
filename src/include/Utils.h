@@ -1,20 +1,24 @@
-#include <iostream>
-#include <vector>
 #include <complex>
 #include <array>
 #include <cmath>
-#include <thread>
-#include <iomanip>
 #include <limits>
 
 #define _USE_MATH_DEFINES
+
 #ifndef __Utils_h
 #define __Utils_h
 
-/* The Utils class contains often used vector operations. All operations are overloaded to deal with
- * complex and real vectors of length 3 by means of template.
- */
+/*! \file Utils.h
+    \brief Linear algebra functions for the CPU version of PyPO. 
+    
+    Contains double/float overloaded functions for doing basic 3D vector operations.
+*/
 
+/**
+ * Class for basic 3D linear algebra functions.
+ *
+ * Note that no function returns. All values are stored inside a variable which is passed by reference to the function.
+ */
 template <typename T> class Utils
 {
 public:
@@ -72,7 +76,15 @@ public:
     void matRot(const std::array<T, 3> &rot, const std::array<T, 3> &v1, const std::array<T, 3> &cRot, std::array<T, 3> &out);
 };
 
-// Real dot-product
+/**
+ * Dot product.
+ *
+ * Take the dot (inner) product of two real valued arrays of size 3.
+ * 
+ * @param v1 Array of 3 double/float.
+ * @param v2 Array of 3 double/float.
+ * @param out Scalar double/float.
+ */
 template <typename T> inline
 void Utils<T>::dot(const std::array<T, 3> &v1, const std::array<T, 3> &v2, T &out)
 {
@@ -84,8 +96,15 @@ void Utils<T>::dot(const std::array<T, 3> &v1, const std::array<T, 3> &v2, T &ou
     }
 }
 
-
-// Complex hermitian conjugate inner-product
+/**
+ * Dot product.
+ *
+ * Take the dot (inner) product of two complex valued double/float arrays of size 3.
+ * 
+ * @param cv1 Array of 3 complex double/float.
+ * @param cv2 Array of 3 complex double/float.
+ * @param out Scalar complex double/float.
+ */
 template <typename T> inline
 void Utils<T>::dot(const std::array<std::complex<T>, 3> &cv1, const std::array<std::complex<T>, 3> &cv2, std::complex<T> &out)
 {
@@ -97,7 +116,15 @@ void Utils<T>::dot(const std::array<std::complex<T>, 3> &cv1, const std::array<s
     }
 }
 
-// Complex vector - real vector dot-product
+/**
+ * Dot product.
+ *
+ * Take the dot (inner) product of one complex valued and one real valued double/float array of size 3.
+ * 
+ * @param cv1 Array of 3 complex double/float.
+ * @param v2 Array of 3 double/float.
+ * @param out Scalar complex double/float.
+ */
 template <typename T> inline
 void Utils<T>::dot(const std::array<std::complex<T>, 3> &cv1, const std::array<T, 3> &v2, std::complex<T> &out)
 {
@@ -109,7 +136,15 @@ void Utils<T>::dot(const std::array<std::complex<T>, 3> &cv1, const std::array<T
     }
 }
 
-// Real vector - complex vector dot-product
+/**
+ * Dot product.
+ *
+ * Take the dot (inner) product of one real valued and one complex valued double/float array of size 3.
+ * 
+ * @param v1 Array of 3 double/float.
+ * @param cv2 Array of 3 complex double/float.
+ * @param out Scalar complex double/float.
+ */
 template <typename T> inline
 void Utils<T>::dot(const std::array<T, 3> &v1, const std::array<std::complex<T>, 3> &cv2, std::complex<T> &out)
 {
@@ -121,7 +156,15 @@ void Utils<T>::dot(const std::array<T, 3> &v1, const std::array<std::complex<T>,
     }
 }
 
-// Real cross-product
+/**
+ * Cross product.
+ *
+ * Take the cross (outer) product of two real valued double/float arrays of size 3.
+ * 
+ * @param v1 Array of 3 double/float.
+ * @param v2 Array of 3 double/float.
+ * @param out Array of 3 double/float.
+ */
 template <typename T> inline
 void Utils<T>::ext(const std::array<T, 3> &v1, const std::array<T, 3> &v2, std::array<T, 3> &out)
 {
@@ -130,8 +173,15 @@ void Utils<T>::ext(const std::array<T, 3> &v1, const std::array<T, 3> &v2, std::
     out[2] = v1[0]*v2[1] - v1[1]*v2[0];
 }
 
-
-// Complex conjugate of cross product
+/**
+ * Cross product.
+ *
+ * Take the cross (outer) product of two complex valued double/float arrays of size 3.
+ * 
+ * @param cv1 Array of 3 complex double/float.
+ * @param cv2 Array of 3 complex double/float.
+ * @param out Array of 3 complex double/float.
+ */
 template <typename T> inline
 void Utils<T>::ext(const std::array<std::complex<T>, 3> &cv1, const std::array<std::complex<T>, 3> &cv2, std::array<std::complex<T>, 3> &out)
 {
@@ -140,7 +190,15 @@ void Utils<T>::ext(const std::array<std::complex<T>, 3> &cv1, const std::array<s
     out[2] = cv1[0]*cv2[1] - cv1[1]*cv2[0];
 }
 
-// Cross product between an complex and a real vector
+/**
+ * Cross product.
+ *
+ * Take the cross (outer) product of one complex valued and one real valued double/float array of size 3.
+ * 
+ * @param cv1 Array of 3 complex double/float.
+ * @param v2 Array of 3 double/float.
+ * @param out Array of 3 complex double/float.
+ */
 template <typename T> inline
 void Utils<T>::ext(const std::array<std::complex<T>, 3> &cv1, const std::array<T, 3> &v2, std::array<std::complex<T>, 3> &out)
 {
@@ -149,7 +207,15 @@ void Utils<T>::ext(const std::array<std::complex<T>, 3> &cv1, const std::array<T
     out[2] = cv1[0]*v2[1] - cv1[1]*v2[0];
 }
 
-// Cross product between a real vector and a complex vector
+/**
+ * Cross product.
+ *
+ * Take the cross (outer) product of one real valued and one complex valued double/float array of size 3.
+ * 
+ * @param v1 Array of 3 double/float.
+ * @param cv2 Array of 3 complex double/float.
+ * @param out Array of 3 complex double/float.
+ */
 template <typename T> inline
 void Utils<T>::ext(const std::array<T, 3> &v1, const std::array<std::complex<T>, 3> &cv2, std::array<std::complex<T>, 3> &out)
 {
@@ -158,7 +224,15 @@ void Utils<T>::ext(const std::array<T, 3> &v1, const std::array<std::complex<T>,
     out[2] = v1[0]*cv2[1] - v1[1]*cv2[0];
 }
 
-// Difference between two real vectors
+/**
+ * Component-wise vector difference.
+ *
+ * Subtract two real valued vectors of size 3, element-wise.
+ * 
+ * @param v1 Array of 3 double/float.
+ * @param v2 Array of 3 double/float.
+ * @param out Array of 3 double/float.
+ */
 template <typename T> inline
 void Utils<T>::diff(const std::array<T, 3> &v1, const std::array<T, 3> &v2, std::array<T, 3> &out)
 {
@@ -168,7 +242,15 @@ void Utils<T>::diff(const std::array<T, 3> &v1, const std::array<T, 3> &v2, std:
     }
 }
 
-// Difference between two complex valued vectors
+/**
+ * Component-wise vector difference.
+ *
+ * Subtract two complex valued vectors of size 3, element-wise.
+ * 
+ * @param cv1 Array of 3 complex double/float.
+ * @param cv2 Array of 3 complex double/float.
+ * @param out Array of 3 complex double/float.
+ */
 template <typename T> inline
 void Utils<T>::diff(const std::array<std::complex<T>, 3> &cv1, const std::array<std::complex<T>, 3> &cv2, std::array<std::complex<T>, 3> &out)
 {
@@ -178,7 +260,14 @@ void Utils<T>::diff(const std::array<std::complex<T>, 3> &cv1, const std::array<
     }
 }
 
-// Absolute value of real vector
+/**
+ * Absolute value.
+ *
+ * Calculate absolute value of real valued vector of size 3.
+ * 
+ * @param v Array of 3 double/float.
+ * @param out Scalar double/float.
+ */
 template <typename T> inline
 void Utils<T>::abs(const std::array<T, 3> &v, T &out)
 {
@@ -186,7 +275,14 @@ void Utils<T>::abs(const std::array<T, 3> &v, T &out)
     out = std::sqrt(out);
 }
 
-// Absolute value of a complex vector. Still returns a complex number!
+/**
+ * Absolute value.
+ *
+ * Calculate absolute value of complex valued vector of size 3.
+ * 
+ * @param cv Array of 3 complex double/float.
+ * @param out Scalar complex double/float.
+ */
 template <typename T> inline
 void Utils<T>::abs(const std::array<std::complex<T>, 3> &cv, std::complex<T> &out)
 {
@@ -196,7 +292,14 @@ void Utils<T>::abs(const std::array<std::complex<T>, 3> &cv, std::complex<T> &ou
     out = std::sqrt(out);
 }
 
-// Return normalized real vector from vector
+/**
+ * Normalize vector.
+ *
+ * Normalize real valued vector of size 3.
+ * 
+ * @param v Array of 3 double/float.
+ * @param out Array of 3 double/float.
+ */
 template <typename T> inline
 void Utils<T>::normalize(const std::array<T, 3> &v, std::array<T, 3> &out)
 {
@@ -214,7 +317,14 @@ void Utils<T>::normalize(const std::array<T, 3> &v, std::array<T, 3> &out)
     }
 }
 
-// Normalize complex vector
+/**
+ * Normalize vector.
+ *
+ * Normalize complex valued vector of size 3.
+ * 
+ * @param cv Array of 3 complex double/float.
+ * @param out Array of 3 complex double/float.
+ */
 template <typename T> inline
 void Utils<T>::normalize(const std::array<std::complex<T>, 3> &cv, std::array<std::complex<T>, 3> &out)
 {
@@ -227,7 +337,15 @@ void Utils<T>::normalize(const std::array<std::complex<T>, 3> &cv, std::array<st
     }
 }
 
-// Apply standard real s-multiplication on a real vector
+/**
+ * Scalar multiplication.
+ *
+ * Multiply real valued vector of size 3 by real scalar, element-wise.
+ * 
+ * @param v Array of 3 double/float.
+ * @param s Scalar double/float.
+ * @param out Array of 3 double/float.
+ */
 template <typename T> inline
 void Utils<T>::s_mult(const std::array<T, 3> &v, const T &s, std::array<T, 3> &out)
 {
@@ -237,8 +355,15 @@ void Utils<T>::s_mult(const std::array<T, 3> &v, const T &s, std::array<T, 3> &o
     }
 }
 
-
-// Multiply complex vector by complex scalar
+/**
+ * Scalar multiplication.
+ *
+ * Multiply complex valued vector of size 3 by complex scalar, element-wise.
+ * 
+ * @param cv Array of 3 complex double/float.
+ * @param cs Scalar complex double/float.
+ * @param out Array of 3 complex double/float.
+ */
 template <typename T> inline
 void Utils<T>::s_mult(const std::array<std::complex<T>, 3> &cv, const std::complex<T> &cs, std::array<std::complex<T>, 3> &out)
 {
@@ -248,7 +373,15 @@ void Utils<T>::s_mult(const std::array<std::complex<T>, 3> &cv, const std::compl
     }
 }
 
-// Multiply real vector by complex scalar
+/**
+ * Scalar multiplication.
+ *
+ * Multiply real valued vector of size 3 by complex scalar, element-wise.
+ * 
+ * @param v Array of 3 double/float.
+ * @param cs Scalar complex double/float.
+ * @param out Array of 3 complex double/float.
+ */
 template <typename T> inline
 void Utils<T>::s_mult(const std::array<T, 3> &v, const std::complex<T> &cs, std::array<std::complex<T>, 3> &out)
 {
@@ -258,7 +391,15 @@ void Utils<T>::s_mult(const std::array<T, 3> &v, const std::complex<T> &cs, std:
     }
 }
 
-// Multiply complex vector by real scalar
+/**
+ * Scalar multiplication.
+ *
+ * Multiply complex valued vector of size 3 by real scalar, element-wise.
+ * 
+ * @param cv Array of 3 complex double/float.
+ * @param s Scalar double/float.
+ * @param out Array of 3 complex double/float.
+ */
 template <typename T> inline
 void Utils<T>::s_mult(const std::array<std::complex<T>, 3> &cv, const T &s, std::array<std::complex<T>, 3> &out)
 {
@@ -268,9 +409,14 @@ void Utils<T>::s_mult(const std::array<std::complex<T>, 3> &cv, const T &s, std:
     }
 }
 
-
-
-// Return complex conjugate of complex vector
+/**
+ * Conjugate.
+ *
+ * Conjugate complex valued vector of size 3.
+ * 
+ * @param cv Array of 3 complex double/float.
+ * @param out Array of 3 complex double/float.
+ */
 template <typename T> inline
 void Utils<T>::conj(const std::array<std::complex<T>, 3> &cv, std::array<std::complex<T>, 3> &out)
 {
@@ -280,7 +426,15 @@ void Utils<T>::conj(const std::array<std::complex<T>, 3> &cv, std::array<std::co
     }
 }
 
-// Calculate refected vector from surface using complex incoming vector and real normal vector to surface
+/**
+ * Snell's law.
+ *
+ * Calculate reflected direction vector from incoming direction and normal vector.
+ * 
+ * @param cvin Array of 3 complex double/float, incoming direction vector.
+ * @param normal Array of 3 double/float, normal vector of surface.
+ * @param out Array of 3 complex double/float.
+ */
 template <typename T> inline
 void Utils<T>::snell(const std::array<std::complex<T>, 3> &cvin, const std::array<T, 3> &normal, std::array<std::complex<T>, 3> &out)
 {
@@ -295,7 +449,15 @@ void Utils<T>::snell(const std::array<std::complex<T>, 3> &cvin, const std::arra
     diff(cvin, rhs, out);
 }
 
-// Calculate refected vector from surface using complex incoming vector and real normal vector to surface
+/**
+ * Snell's law.
+ *
+ * Calculate reflected direction vector from incoming direction and normal vector.
+ * 
+ * @param vin Array of 3 double/float, incoming direction vector.
+ * @param normal Array of 3 double/float, normal vector of surface.
+ * @param out Array of 3 double/float.
+ */
 template <typename T> inline
 void Utils<T>::snell(const std::array<T, 3> &vin, const std::array<T, 3> &normal, std::array<T, 3> &out)
 {
@@ -310,8 +472,15 @@ void Utils<T>::snell(const std::array<T, 3> &vin, const std::array<T, 3> &normal
     diff(vin, rhs, out);
 }
 
-// Calculate Dyadic product between two real vectors
-// Returns array of length 3, containing 3 arrays representing ROWS in the resulting matrix
+/**
+ * Dyadic product.
+ *
+ * Calculate dyadic product between two real valued double/float vectors of size 3.
+ * 
+ * @param v1 Array of 3 double/float.
+ * @param v2 Array of 3 double/float.
+ * @param out Array of 3 double/float, nested inside array of size 3.
+ */
 template <typename T> inline
 void Utils<T>::dyad(const std::array<T, 3> &v1, const std::array<T, 3> &v2, std::array<std::array<T, 3>, 3> &out)
 {
@@ -323,7 +492,15 @@ void Utils<T>::dyad(const std::array<T, 3> &v1, const std::array<T, 3> &v2, std:
     }
 }
 
-// Subtract matrix from another matrix element-wise
+/**
+ * Matrix difference, element wise.
+ *
+ * Subtract two 3x3 matrices, element wise.
+ * 
+ * @param m1 Array of 3 double/float, nested inside array of size 3.
+ * @param m2 Array of 3 double/float, nested inside array of size 3.
+ * @param out Array of 3 double/float, nested inside array of size 3.
+ */
 template <typename T> inline
 void Utils<T>::matDiff(const std::array<std::array<T, 3>, 3> &m1, const std::array<std::array<T, 3>, 3> &m2, std::array<std::array<T, 3>, 3> &out)
 {
@@ -335,7 +512,15 @@ void Utils<T>::matDiff(const std::array<std::array<T, 3>, 3> &m1, const std::arr
     }
 }
 
-// Multiply matrix with vector to return vector
+/**
+ * Matrix-vector product.
+ *
+ * Multiply a real valued 3x3 matrix and a real valued size 3 vector to generate a new real valued size 3 vector.
+ * 
+ * @param m1 Array of 3 double/float, nested inside array of size 3.
+ * @param v1 Array of 3 double/float.
+ * @param out Array of 3 double/float.
+ */
 template <typename T> inline
 void Utils<T>::matVec(const std::array<std::array<T, 3>, 3> &m1, const std::array<T, 3> &v1, std::array<T, 3> &out)
 {
@@ -345,6 +530,15 @@ void Utils<T>::matVec(const std::array<std::array<T, 3>, 3> &m1, const std::arra
     }
 }
 
+/**
+ * Matrix-vector product.
+ *
+ * Multiply a real valued 3x3 matrix and a complex valued size 3 vector to generate a new complex valued size 3 vector.
+ * 
+ * @param m1 Array of 3 double/float, nested inside array of size 3.
+ * @param cv1 Array of 3 complex double/float.
+ * @param out Array of 3 complex double/float.
+ */
 template <typename T> inline
 void Utils<T>::matVec(const std::array<std::array<T, 3>, 3> &m1, const std::array<std::complex<T>, 3> &cv1, std::array<std::complex<T>, 3> &out)
 {
@@ -354,14 +548,25 @@ void Utils<T>::matVec(const std::array<std::array<T, 3>, 3> &m1, const std::arra
     }
 }
 
+/**
+ * Matrix-vector product.
+ *
+ * Multiply a real valued 4x4 matrix and a real valued size 3 vector to generate a new real valued size 3 vector.
+ *      This function is only used for multiplying 3D vectors by a 4D transformation matrix.
+ * 
+ * @param m1 Array of 4 double/float, nested inside array of size 4.
+ * @param v1 Array of 3 double/float.
+ * @param out Array of 3 double/float.
+ * @param vec Whether or not to transform v1 as a point or a vector.
+ */
 template <typename T> inline
-void Utils<T>::matVec4(const T *m1, const std::array<T, 3> &cv1, std::array<T, 3> &out, bool vec)
+void Utils<T>::matVec4(const T *m1, const std::array<T, 3> &v1, std::array<T, 3> &out, bool vec)
 {
     if (vec)
     {
         for(int n=0; n<3; n++)
         {
-            out[n] = m1[n*4] * cv1[0] + m1[1+n*4] * cv1[1] + m1[2+n*4] * cv1[2];
+            out[n] = m1[n*4] * v1[0] + m1[1+n*4] * v1[1] + m1[2+n*4] * v1[2];
         }
     }
 
@@ -369,19 +574,30 @@ void Utils<T>::matVec4(const T *m1, const std::array<T, 3> &cv1, std::array<T, 3
     {
         for(int n=0; n<3; n++)
         {
-            out[n] = m1[n*4] * cv1[0] + m1[1+n*4] * cv1[1] + m1[2+n*4] * cv1[2] + m1[3+n*4];
+            out[n] = m1[n*4] * v1[0] + m1[1+n*4] * v1[1] + m1[2+n*4] * v1[2] + m1[3+n*4];
         }
     }
 }
 
+/**
+ * Inverse matrix-vector product.
+ *
+ * Multiply the inverse of a real valued 4x4 matrix by a real valued size 3 vector to generate a new size 3 vector.
+ *      This function is only used for multiplying 3D vectors by a 4D transformation matrix.
+ * 
+ * @param m1 Array of 4 double/float, nested inside array of size 4.
+ * @param v1 Array of 3 double/float.
+ * @param out Array of 3 double/float.
+ * @param vec Whether or not to transform v1 as a point or a vector.
+ */
 template <typename T> inline
-void Utils<T>::invmatVec4(const T *m1, const std::array<T, 3> &cv1, std::array<T, 3> &out, bool vec)
+void Utils<T>::invmatVec4(const T *m1, const std::array<T, 3> &v1, std::array<T, 3> &out, bool vec)
 {
     if (vec)
     {
         for(int n=0; n<3; n++)
         {
-            out[n] = m1[n] * cv1[0] + m1[n+4] * cv1[1] + m1[n+8] * cv1[2];
+            out[n] = m1[n] * v1[0] + m1[n+4] * v1[1] + m1[n+8] * v1[2];
         }
     }
 
@@ -391,11 +607,21 @@ void Utils<T>::invmatVec4(const T *m1, const std::array<T, 3> &cv1, std::array<T
         for(int n=0; n<3; n++)
         {
             temp = -m1[n]*m1[3] - m1[n+4]*m1[7] - m1[n+8]*m1[11];
-            out[n] = m1[n] * cv1[0] + m1[n+4] * cv1[1] + m1[n+8] * cv1[2] + temp;
+            out[n] = m1[n] * v1[0] + m1[n+4] * v1[1] + m1[n+8] * v1[2] + temp;
         }
     }
 }
 
+/**
+ * Manual vector rotation.
+ *  
+ * Rotate a real valued size 3 vector without defining a transformation matrix.
+ * 
+ * @param rot Array of 3 double/float, containing rotation angles.
+ * @param v1 Array of 3 double/float.
+ * @param cRot Array of 3, center of rotation.
+ * @param out Array of 3 double/float.
+ */
 template <typename T> inline
 void Utils<T>::matRot(const std::array<T, 3> &rot, const std::array<T, 3> &v1, const std::array<T, 3> &cRot, std::array<T, 3> &out)
 {

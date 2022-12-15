@@ -4,7 +4,7 @@ sys.path.append('../')
 
 import matplotlib.pyplot as pt
 
-from src.POPPy.System import System
+from src.PyPO.System import System
 
 def ex_DRO_RT(device):
     """

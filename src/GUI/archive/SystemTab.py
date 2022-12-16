@@ -11,7 +11,7 @@ from matplotlib.figure import Figure
 
 sys.path.append('../')
 sys.path.append('../../')
-import POPPy.System as st
+import PyPO.System as st
 
 
 

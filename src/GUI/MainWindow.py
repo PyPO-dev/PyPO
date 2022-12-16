@@ -12,7 +12,7 @@ import numpy as np
 
 sys.path.append('../')
 sys.path.append('../../')
-import src.POPPy.System as st
+import src.PyPO.System as st
 
 class MainWidget(QWidget):
     """Main Window."""
@@ -20,7 +20,7 @@ class MainWidget(QWidget):
         """Initializer."""
         super().__init__(parent)
         # Window settings
-        self.setWindowTitle("POPPy")
+        self.setWindowTitle("PyPO")
 
         # GridParameters
         self.GPElementsColumn = [0, 0, 2, 1]
@@ -91,7 +91,20 @@ class MainWidget(QWidget):
         self.addElementAction(d)
 
     def addExampleHyperbola(self):
-        hyperbola = {'type': 'Hyperbola', 'pmode': 'focus', 'gmode': 'xy', 'flip': False, 'focus_1': np.array([   0.,    0., 3500.]), 'focus_2': np.array([    0.,     0., -2106.]), 'ecc': 1.08208248, 'lims_x': [-310, 310], 'lims_y': [-310, 310], 'lims_u': [0, 310], 'lims_v': [0, 6.283185307179586], 'gridsize': [501, 501]}
+        hyperbola = {
+            'type': 'Hyperbola', 
+            'pmode': 'focus',
+            'gmode': 'xy',
+            'flip': False,
+            'focus_1': np.array([   0.,    0., 3500.]),
+            'focus_2': np.array([    0.,     0., -2106.]),
+            'ecc': 1.08208248, 
+            'lims_x': np.array([-310, 310]),
+            'lims_y': np.array([-310, 310]), 
+            'lims_u': np.array([0, 310]), 
+            'lims_v': np.array([0, 6.283185307179586]),
+            'gridsize': np.array([501, 501])
+        }
         self.addElementAction(hyperbola)
 
     def addElementAction(self, elementDict):
@@ -140,13 +153,8 @@ class MainWidget(QWidget):
             self.stm.translateGrids(element, transformation)
         elif transformationType == "rot":
             self.stm.rotateGrids(element, transformation, cRot=rotationCenter)
-        
 
-
-
-
-
-class PoppyMainWindow(QMainWindow):
+class PyPOMainWindow(QMainWindow):
     def __init__(self, parent=None):
         """Initializer."""
         super().__init__(parent)
@@ -210,6 +218,6 @@ class PoppyMainWindow(QMainWindow):
 if __name__ == "__main__":
 
     app = QApplication(sys.argv)
-    win = PoppyMainWindow(parent=None)
+    win = PyPOMainWindow(parent=None)
     win.show()
     app.exec_()

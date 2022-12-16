@@ -2,7 +2,7 @@ from PyQt5 import QtWidgets as qtw
 import sys
 sys.path.append('../')
 sys.path.append('../../')
-# import POPPy.System as st
+# import PyPO.System as st
 
 
 

@@ -167,8 +167,8 @@ class Form(QWidget):
                 del paramdict["lims_y"]
 
 
-        for k in paramdict:
-            print(k, (15 - len(k))*" ",paramdict[k], (20 - len(str(paramdict[k])))*" ",type(paramdict[k]))
+        # for k in paramdict:
+        #     print(k, (15 - len(k))*" ",paramdict[k], (20 - len(str(paramdict[k])))*" ",type(paramdict[k]))
 
         self.addElementAction(paramdict)
 

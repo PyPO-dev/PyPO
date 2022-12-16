@@ -18,7 +18,7 @@ class VariableInputWidget(QWidget):
 
         self.layout = QVBoxLayout()
         self.hasChildren = hasattr(self.inputDiscription, 'subdict')
-        print (self.hasChildren)
+        # print (self.hasChildren)
         self.inputs = {}
         self.mode = QComboBox()
         self.mode.addItems(self.inputDiscription.subdict.keys())
@@ -63,10 +63,10 @@ class VariableInputWidget(QWidget):
             for childlist in self.children:
                 for child in childlist:
                     child.setVisible(False)
-                    print("iv", type(child))
+                    # print("iv", type(child))
             for i in self.children[self.mode.currentIndex()]:
                 i.setVisible(True)
-                print("v", type(child))
+                # print("v", type(child))
 
     def makeChildform(self, childKey,childIndistList):
         childWidget = QWidget()

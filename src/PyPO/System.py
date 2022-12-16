@@ -722,7 +722,7 @@ class System(object):
                     show, foc1, foc2, save, ret, RTframes, self.savePath)
 
         if ret:
-            return fig, ax
+            return figax
 
     def plotRTframe(self, frame, project="xy"):
         plt.plotRTframe(frame, project, self.savePath)

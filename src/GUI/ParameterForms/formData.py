@@ -20,4 +20,4 @@ parabola = {
     "gridsize": 2
     
 }
-print(plane)
+# print(plane)

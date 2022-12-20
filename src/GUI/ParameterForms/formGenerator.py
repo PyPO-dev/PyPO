@@ -44,7 +44,7 @@ class FormGenerator(QWidget):
 
     def setupButtons(self):
         addBtn = QPushButton("Add")
-        addBtn.clicked.connect(self.addAction)
+        addBtn.clicked.connect(self.readme)
         canselBtn = QPushButton("Cancel")
         canselBtn.clicked.connect(self.cancelAction)
         self.layout.addRow(canselBtn, addBtn)

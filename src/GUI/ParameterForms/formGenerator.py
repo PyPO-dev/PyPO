@@ -56,7 +56,6 @@ class FormGenerator(QWidget):
         paramDict = {"type": "Parabola"}
         for input in self.inputs:
             paramDict.update(input.read())
-            # print(type(input))
         return paramDict
         
     

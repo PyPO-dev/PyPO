@@ -39,11 +39,20 @@ class SimpleInput(QWidget):
         self.layout.addWidget(self.editsWid)
     
     def read(self):
-        l =[i.text() for i in self.inputs] 
-        if self.inputDiscription.oArray:
-            l = array(l)
+        l =[self.enumToType(self.inputDiscription.inType)(i.text()) for i in self.inputs] 
+        if len(l)>1:        
+            if self.inputDiscription.oArray:
+                l = array(l)
+        else:
+            l = l[0]
         l = {self.inputDiscription.outputName:l}
         return l
+
+    @staticmethod
+    def enumToType(intype):
+        if intype == inType.integers: return int
+        if intype == inType.floats: return float
+        if intype == inType.string: return str
 
     @staticmethod
     def makeLabelFromString(s):

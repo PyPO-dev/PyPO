@@ -6,6 +6,7 @@ from src.GUI.ElementsColumn import ElementsWindow
 from src.GUI.archive.SystemsColumn import SystemsWindow
 from src.GUI.ParameterForms import ParabolaForm, HyperbolaForm, formGenerator
 import src.GUI.ParameterForms.formData as fData
+import src.GUI.ParameterForms.formDataObjects as fDataObj
 from src.GUI.PlotScreen import PlotScreen
 from src.GUI.TransformationWidget import TransformationWidget
 import numpy as np
@@ -47,6 +48,10 @@ class MainWidget(QWidget):
 
 
         self.setLayout(self.grid)
+
+        # NOTE Raytrace stuff
+        self.frameDict = {}
+        # end NOTE
     
     def _mkElementsColumn(self):
         if hasattr(self, "ElementsColumn"):
@@ -154,6 +159,39 @@ class MainWidget(QWidget):
         elif transformationType == "rot":
             self.stm.rotateGrids(element, transformation, cRot=rotationCenter)
 
+    #NOTE Raytrace widgets
+    def setInitFrameForm(self):
+        if hasattr(self, "ParameterWid"):
+            self.ParameterWid.setParent(None)
+
+        self.ParameterWid = formGenerator.FormGenerator(fDataObj.RTGen, self.addFrameAction)
+        self.ParameterWid.setMaximumWidth(400)
+        self.ParameterWid.setMinimumWidth(400)
+        self.addToWindowGrid(self.ParameterWid, self.GPParameterForm)
+
+    def addFrameAction(self):
+        RTDict = self.ParameterWid.read()
+        _frame = self.stm.createFrame(RTDict)
+        name = f"frame_{len(self.frameDict)}"
+        self.frameDict[name] = _frame
+    
+    def setPlotFrameForm(self):
+        if hasattr(self, "ParameterWid"):
+            self.ParameterWid.setParent(None)
+
+        self.ParameterWid = formGenerator.FormGenerator(fDataObj.plotFrameInp(self.frameDict), self.addPlotAction)
+        self.ParameterWid.setMaximumWidth(400)
+        self.ParameterWid.setMinimumWidth(400)
+        self.addToWindowGrid(self.ParameterWid, self.GPParameterForm)
+
+    def addPlotAction(self):
+        RTDict = self.ParameterWid.read()
+        _frame = self.stm.createFrame(RTDict)
+        name = f"frame_{len(self.frameDict)}"
+        self.frameDict[name] = _frame
+
+    #END NOTE
+
 class PyPOMainWindow(QMainWindow):
     def __init__(self, parent=None):
         """Initializer."""
@@ -173,6 +211,7 @@ class PyPOMainWindow(QMainWindow):
 
         ElementsMenu = menuBar.addMenu("Elements")
         SystemsMenu = menuBar.addMenu("Systems")
+        RaytraceMenu = menuBar.addMenu("Ray-tracer")
 
         ### Generate test parabola
         AddTestParabola = QAction('Add Test Parabola', self)
@@ -215,6 +254,21 @@ class PyPOMainWindow(QMainWindow):
         plotSystem.triggered.connect(self.mainWid.plotSystem)
         SystemsMenu.addAction(plotSystem)
 
+        # NOTE Raytrace actions
+        makeFrame = RaytraceMenu.addMenu("Make frame")
+        initFrameAction = QAction("Initialize", self)
+        initFrameAction.setStatusTip("Initialize ray-trace frame from input form")
+        initFrameAction.triggered.connect(self.mainWid.setInitFrameForm)
+        makeFrame.addAction(initFrameAction)
+        
+        poyntingFrameAction = QAction("Poynting", self)
+
+        # Plot frames
+        plotFrameAction = QAction("Plot frame", self)
+        plotFrameAction.triggered.connect(self.mainWid.setPlotFrameForm)
+        RaytraceMenu.addAction(plotFrameAction)
+
+        # END NOTE
 if __name__ == "__main__":
 
     app = QApplication(sys.argv)

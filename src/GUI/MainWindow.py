@@ -179,12 +179,12 @@ class MainWidget(QWidget):
         if hasattr(self, "ParameterWid"):
             self.ParameterWid.setParent(None)
 
-        self.ParameterWid = formGenerator.FormGenerator(fDataObj.plotFrameInp(self.frameDict), self.addPlotAction)
+        self.ParameterWid = formGenerator.FormGenerator(fDataObj.plotFrameInp(self.frameDict), self.addPlotFrameAction)
         self.ParameterWid.setMaximumWidth(400)
         self.ParameterWid.setMinimumWidth(400)
         self.addToWindowGrid(self.ParameterWid, self.GPParameterForm)
 
-    def addPlotAction(self):
+    def addPlotFrameAction(self):
         if hasattr(self, "PlotScreen"):
             self.PlotScreen.setParent(None)
         
@@ -193,6 +193,22 @@ class MainWidget(QWidget):
         self.PlotScreen = PlotScreen(fig)
         self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
 
+    def setPropRaysForm(self):
+        if hasattr(self, "ParameterWid"):
+            self.ParameterWid.setParent(None)
+
+        self.ParameterWid = formGenerator.FormGenerator(fDataObj.propRaysInp(self.frameDict, self.stm.system), self.addPropRaysAction)
+        self.ParameterWid.setMaximumWidth(400)
+        self.ParameterWid.setMinimumWidth(400)
+        self.addToWindowGrid(self.ParameterWid, self.GPParameterForm)
+
+    def addPropRaysAction(self): 
+        propRaysDict = self.ParameterWid.read()
+        frame_out = self.stm.runRayTracer(self.frameDict[propRaysDict["frame_in"]], 
+                                    propRaysDict["target"], propRaysDict["epsilon"], propRaysDict["nThreads"], 
+                                    propRaysDict["t0"], propRaysDict["device"], verbose=False)
+        name = f"frame_{len(self.frameDict)}"
+        self.frameDict[name] = frame_out
     #END NOTE
 
 class PyPOMainWindow(QMainWindow):

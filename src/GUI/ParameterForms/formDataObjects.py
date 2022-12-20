@@ -29,5 +29,28 @@ def plotFrameInp(frameDict):
 
     return plotFrame
 
+def propRaysInp(frameDict, elemDict):
+    sublist_frames = []
+    sublist_target = []
+    if frameDict:
+        for key, item in frameDict.items():
+            sublist_frames.append(key)
+    
+    if elemDict:
+        for key, item in elemDict.items():
+            sublist_target.append(key)
+    
+    sublist_dev = ["CPU", "GPU"]
+
+    propRays = [
+            InputDescription(inType.dropdown, "frame_in", label="Input frame", sublist = sublist_frames),
+            InputDescription(inType.dropdown, "target", label="Target surface", sublist = sublist_target),
+            InputDescription(inType.floats, "epsilon", label="Accuracy", hints=[1e-3], numFields=1),
+            InputDescription(inType.integers, "nThreads", label="# of threads", hints=[1], numFields=1),
+            InputDescription(inType.floats, "t0", label="Initial guess", hints=[100], numFields=1),
+            InputDescription(inType.dropdown, "device", label="Hardware to use", sublist = sublist_dev)
+            ]
+
+    return propRays
 
 # END NOTE

@@ -11,72 +11,53 @@ class VariableInputWidget(QWidget):
     def __init__ (self, inp):
         super().__init__()
         self.inputDiscription = inp
-        self.placeholderparent = QWidget()
         
-        self.labels = []
-        self.fields = []
-
-        self.layout = QVBoxLayout()
-        self.hasChildren = hasattr(self.inputDiscription, 'subdict')
-        # print (self.hasChildren)
-        self.inputs = {}
+        self.layout = QFormLayout()
+        label = self.makeLabelFromString(self.inputDiscription.label)
         self.mode = QComboBox()
         self.mode.addItems(self.inputDiscription.subdict.keys())
-        self.mode.setParent(self.placeholderparent)
+        self.mode.activated.connect(self.modeUpdate)
+        self.layout.addRow(label, self.mode)
 
-        label = self.makeLabelFromString(self.inputDiscription.label)
-        toplayout = QHBoxLayout()
-        toplayout.addWidget(label)
-        toplayout.addWidget(self.mode)
-        grandtop = QWidget()
-        topWidget = QWidget(parent=grandtop)
-        topWidget.setLayout(toplayout)
 
-        self.layout.addWidget(grandtop)
-
+        self.hasChildren = hasattr(self.inputDiscription, 'subdict')
         if self.hasChildren:
+            self.placeHolderParent = QWidget(self)
+            self.placeHolderParent.setMaximumSize(0,0)
+            self.placeHolderParent.setStyleSheet("background: red")
             self.children = []
             self.makeCildren()
-            
-        self.mode.currentIndexChanged.connect(self.modeChanged)
-        self.modeChanged()
+        self.modeUpdate()
 
+
+
+        self.setStyleSheet("background: orange")
+
+        self.layout.setContentsMargins(0,0,0,0)
         self.setLayout(self.layout)
 
-    def get(self):
-        if len(self.labels) != len(self.fields):
-            raise Exception("Labels and Fields don't match. labels: %d fields: %d" %(len(self.labels), len(self.fields)))
-        return (self.labels, self.fields)
-        # if self.hasChildren:
-
     def makeCildren(self):
-        i=0
         for childKey, childInDisList in self.inputDiscription.subdict.items():
             child = self.makeChildform(childKey, childInDisList)
-            self.children.append(list(child.findChildren(QWidget)))
-            self.layout.addWidget(child)
-            i += 1
+            self.children.append(child)
+            self.layout.addRow(child)
+            
+            
 
 
-    def modeChanged(self):
+    def modeUpdate(self):
         if self.hasChildren:
-            for childlist in self.children:
-                for child in childlist:
-                    child.setVisible(False)
-                    # print("iv", type(child))
-            for i in self.children[self.mode.currentIndex()]:
-                i.setVisible(True)
-                # print("v", type(child))
+            for child in self.children:
+                child.setParent(self.placeHolderParent)
+            self.layout.addRow(self.children[self.mode.currentIndex()])
 
     def makeChildform(self, childKey,childIndistList):
         childWidget = QWidget()
-        childLayout = QVBoxLayout()
-        self.inputs[childKey]={}
+        childLayout = QFormLayout()
+        childLayout.setContentsMargins(0,0,0,0)
         for i in range(len(childIndistList)):
             widget = SimpleInput(childIndistList[i])
-            self.inputs[childKey][childIndistList[i].outputName] = widget
-            childLayout.addWidget(widget)
-            # self.inputs[childKey][k] = self.addInputToLayout(childLayout, k, v)
+            childLayout.addRow(widget)
         childWidget.setLayout(childLayout)
         return childWidget
     
@@ -91,12 +72,3 @@ class VariableInputWidget(QWidget):
     @staticmethod
     def makeLabelFromString(s):
         return QLabel(s.replace("_"," ").capitalize())
-
-    # def unpackAndAddToForm(self, wid, form):
-    #     children = wid.findChildren(QWidget, '', Qt.FindDirectChildrenOnly)
-    #     if len(children) != 2:
-    #         raise Exception("Number of children insuccichient!!!")
-    #     label,edit = tuple(children) 
-    #     label.setParent(None)
-    #     edit.setParent(None)
-    #     form.addRow(label, edit)

@@ -2,11 +2,11 @@ from PyQt5.QtWidgets import QWidget, QApplication, QComboBox, QFormLayout, QVBox
 from PyQt5.QtCore import Qt
 import numpy as np
 
-from src.GUI.ParameterForms.variableInputWidgetcopy import VariableInputWidget
+from src.GUI.ParameterForms.variableInputWidget import VariableInputWidget
+from src.GUI.ParameterForms.SimpleInputWidget import SimpleInput
 
 
-
-class FormGenerator(QWidget):
+class FormGeneratorObjects(QWidget):
     def __init__ (self, ElementData, addAction):
         super().__init__()
         self.formData = ElementData
@@ -14,7 +14,8 @@ class FormGenerator(QWidget):
 
         self.layout = QFormLayout()
 
-        self.inputs = {}
+        self.inputLabels = []
+        self.inputFields = []
         self.subForms = {}
         self.setupInputs()
         self.setupButtons()
@@ -22,35 +23,30 @@ class FormGenerator(QWidget):
         self.setLayout(self.layout)
 
     def setupInputs(self):
-        for k,v in self.formData.items():
-            if type(v) == int:
-                self.makeInputSimple(k,v)
-            elif type(v) == dict:
-                self.makeInputVariable(k,v)
+        for inp in self.formData:
+            if inp.inType.value < 4:
+                i = SimpleInput(inp)
+                self.unpackAndAddToForm(i,self.layout)
+            elif inp.inType.value == 4:
+                pass
+            elif inp.inType.value == 5:
+                self.layout.addRow(VariableInputWidget(inp))
+                # labels, fields = w.get()
+                # self.inputLabels.append(labels)
+                # self.inputFields.append(fields)
+                # for child in w.findChildren(QWidget, '', Qt.FindDirectChildrenOnly):
+                #     for input in child.findChildren(QWidget, '', Qt.FindDirectChildrenOnly):
+                #         self.unpackAndAddToForm(input,self.layout)
+                #     # self.layout.addRow(labels[i],fields[i])
+                # # self.layout.addRow(w)
 
-    def makeInputVariable(self, k, v):
+    def makeInputVariable(self, inp):
         ### make label
-        subform = VariableInputWidget(k, v)
-        self.subForms[k] = subform
+        subform = VariableInputWidget(inp)
+        self.subForms[inp.outputName] = subform
         self.layout.addRow(subform)
 
-    def makeInputSimple(self, k, v):
-        ### Make inputs and add them to self.inputs
-        inputs = [QLineEdit() for k in range(v)]
-        self.inputs[k] = inputs
-
-        ### put them in a widget
-        inputWidget = QWidget()
-        inputLayout = QHBoxLayout()
-        for inp in inputs:
-            inputLayout.addWidget(inp)
-        inputWidget.setLayout(inputLayout)
-
-        ### make label
-        label = self.makeLabelFromString(k)
-
-        ### add to form
-        self.layout.addRow(label, inputWidget)
+    
 
     def setupButtons(self):
         addBtn = QPushButton("Add")
@@ -64,22 +60,24 @@ class FormGenerator(QWidget):
 
     def addAction(self):
         paramDict = {"type": "Parabola"}
-        for k, v in self.formData.items():
-            if type(v) == int:
-                if v<2:
-                    paramDict[k]=self.inputs[k][0].text()
-                else:
-                    paramDict[k]= np.array([float(le.text()) for le in self.inputs[k]])
-            elif type(v) == dict:
-                paramDict.update(self.subForms[k].read())
-            print(k, paramDict[k])
-        self.addElement(paramDict)
+        # print(self.inputFields)
+        for input in self.inputFields:
+            # print(input.read())
+            paramDict.update(input.read())
+        # print(paramDict)
+    
 
-    @staticmethod
-    def makeLabelFromString(s):
-        return QLabel(s.replace("_"," ").capitalize())
+    def unpackAndAddToForm(self, wid, form):
+        children = wid.findChildren(QWidget, '', Qt.FindDirectChildrenOnly)
+        # print(len(children))
+        if len(children) != 2:
+            # print(wid.text())
+            raise Exception("Number of children insuccichient!!!")
+        label,edit = tuple(children) 
+        label.setParent(None)
+        edit.setParent(None)
+        form.addRow(label, edit)
 
-
-
+        
 
 

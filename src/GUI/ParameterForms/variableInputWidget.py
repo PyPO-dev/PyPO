@@ -13,7 +13,7 @@ class VariableInputWidget(QWidget):
         self.inputDiscription = inp
         
         self.layout = QFormLayout()
-        self.hasChildren = hasattr(self.inputDiscription, 'subdict')
+        self.hasChildren = self.inputDiscriptionsubdict != None
 
         label = self.makeLabelFromString(self.inputDiscription.label)
         self.mode = QComboBox()

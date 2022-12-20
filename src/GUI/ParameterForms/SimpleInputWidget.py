@@ -43,10 +43,7 @@ class SimpleInput(QWidget):
         if self.inputDiscription.oArray:
             l = array(l)
         l = {self.inputDiscription.outputName:l}
-        # print (l)
         return l
-
-    
 
     @staticmethod
     def makeLabelFromString(s):

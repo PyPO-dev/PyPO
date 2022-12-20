@@ -25,7 +25,7 @@ class VariableInputWidget(QWidget):
             self.placeHolderParent = QWidget(self)
             self.placeHolderParent.setMaximumSize(0,0)
             self.placeHolderParent.setStyleSheet("background: red")
-            self.children = []
+            self.childrenn = []
             self.makeCildren()
         self.modeUpdate()
 
@@ -39,7 +39,7 @@ class VariableInputWidget(QWidget):
     def makeCildren(self):
         for childKey, childInDisList in self.inputDiscription.subdict.items():
             child = self.makeChildform(childKey, childInDisList)
-            self.children.append(child)
+            self.childrenn.append(child)
             self.layout.addRow(child)
             
             
@@ -47,9 +47,10 @@ class VariableInputWidget(QWidget):
 
     def modeUpdate(self):
         if self.hasChildren:
-            for child in self.children:
+            for child in self.childrenn:
                 child.setParent(self.placeHolderParent)
-            self.layout.addRow(self.children[self.mode.currentIndex()])
+            self.layout.addRow(self.childrenn[self.mode.currentIndex()])
+            self.currentChild = self.childrenn[self.mode.currentIndex()]
 
     def makeChildform(self, childKey,childIndistList):
         childWidget = QWidget()
@@ -63,10 +64,11 @@ class VariableInputWidget(QWidget):
     
     def read(self):
         ind = self.mode.currentIndex()
-        modeOut = list(self.formData.keys())[ind]
+        modeOut = list(self.inputDiscription.subdict.keys())[ind]
         paramDict = {self.inputDiscription.outputName: modeOut}
-        for par, inps in self.inputs[modeOut].items():
-            paramDict [par] = np.array(list([float(inp.text())for inp in inps])) 
+        if self.hasChildren:
+            for input in self.currentChild.findChildren(SimpleInput):
+                paramDict.update(input.read())
         return paramDict
 
     @staticmethod

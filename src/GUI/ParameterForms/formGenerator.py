@@ -7,16 +7,14 @@ from src.GUI.ParameterForms.SimpleInputWidget import SimpleInput
 
 
 class FormGenerator(QWidget):
-    def __init__ (self, ElementData, addAction):
+    def __init__ (self, ElementData, readAction):
         super().__init__()
         self.formData = ElementData
-        self.addElement = addAction
+        self.readme = readAction
 
         self.layout = QFormLayout()
 
-        self.inputLabels = []
-        self.inputFields = []
-        self.subForms = {}
+        self.inputs = []
         self.setupInputs()
         self.setupButtons()
 
@@ -25,11 +23,15 @@ class FormGenerator(QWidget):
     def setupInputs(self):
         for inp in self.formData:
             if inp.inType.value < 4:
-                self.layout.addRow(SimpleInput(inp))
+                input = SimpleInput(inp)
+                self.inputs.append(input)
+                self.layout.addRow(input)
             elif inp.inType.value == 4:
                 pass
             elif inp.inType.value == 5:
-                self.layout.addRow(VariableInputWidget(inp))
+                input = VariableInputWidget(inp)
+                self.inputs.append(input)
+                self.layout.addRow(input)
           
 
     # def makeInputVariable(self, inp):
@@ -50,10 +52,12 @@ class FormGenerator(QWidget):
     def cancelAction(self):
         self.setParent(None)
 
-    def addAction(self):
+    def read(self):
         paramDict = {"type": "Parabola"}
-        for input in self.inputFields:
+        for input in self.inputs:
             paramDict.update(input.read())
+            print(type(input))
+        
     
         
 

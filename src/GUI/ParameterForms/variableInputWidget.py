@@ -68,7 +68,10 @@ class VariableInputWidget(QWidget):
     
     def read(self):
         ind = self.mode.currentIndex()
-        modeOut = list(self.inputDescription.subdict.keys())[ind]
+        if self.hasChildren:
+            modeOut = list(self.inputDescription.subdict.keys())[ind]
+        else: 
+            modeOut = list(self.inputDescription.sublist)[ind]
         paramDict = {self.inputDescription.outputName: modeOut}
         if self.hasChildren:
             for input in self.currentChild.findChildren(SimpleInput):

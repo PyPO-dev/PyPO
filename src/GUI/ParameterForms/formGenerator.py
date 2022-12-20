@@ -32,15 +32,6 @@ class FormGenerator(QWidget):
                 input = VariableInputWidget(inp)
                 self.inputs.append(input)
                 self.layout.addRow(input)
-          
-
-    # def makeInputVariable(self, inp):
-    #     ### make label
-    #     subform = VariableInputWidget(inp)
-    #     self.subForms[inp.outputName] = subform
-    #     self.layout.addRow(subform)
-
-    
 
     def setupButtons(self):
         addBtn = QPushButton("Add")
@@ -53,9 +44,10 @@ class FormGenerator(QWidget):
         self.setParent(None)
 
     def read(self):
-        paramDict = {"type": "Parabola"}
+        paramDict = {}
         for input in self.inputs:
             paramDict.update(input.read())
+        print(paramDict)
         return paramDict
         
     

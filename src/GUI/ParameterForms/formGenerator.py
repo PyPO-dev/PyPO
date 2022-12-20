@@ -6,7 +6,7 @@ from src.GUI.ParameterForms.variableInputWidget import VariableInputWidget
 from src.GUI.ParameterForms.SimpleInputWidget import SimpleInput
 
 
-class FormGeneratorObjects(QWidget):
+class FormGenerator(QWidget):
     def __init__ (self, ElementData, addAction):
         super().__init__()
         self.formData = ElementData
@@ -25,26 +25,18 @@ class FormGeneratorObjects(QWidget):
     def setupInputs(self):
         for inp in self.formData:
             if inp.inType.value < 4:
-                i = SimpleInput(inp)
-                self.unpackAndAddToForm(i,self.layout)
+                self.layout.addRow(SimpleInput(inp))
             elif inp.inType.value == 4:
                 pass
             elif inp.inType.value == 5:
                 self.layout.addRow(VariableInputWidget(inp))
-                # labels, fields = w.get()
-                # self.inputLabels.append(labels)
-                # self.inputFields.append(fields)
-                # for child in w.findChildren(QWidget, '', Qt.FindDirectChildrenOnly):
-                #     for input in child.findChildren(QWidget, '', Qt.FindDirectChildrenOnly):
-                #         self.unpackAndAddToForm(input,self.layout)
-                #     # self.layout.addRow(labels[i],fields[i])
-                # # self.layout.addRow(w)
+          
 
-    def makeInputVariable(self, inp):
-        ### make label
-        subform = VariableInputWidget(inp)
-        self.subForms[inp.outputName] = subform
-        self.layout.addRow(subform)
+    # def makeInputVariable(self, inp):
+    #     ### make label
+    #     subform = VariableInputWidget(inp)
+    #     self.subForms[inp.outputName] = subform
+    #     self.layout.addRow(subform)
 
     
 
@@ -60,24 +52,9 @@ class FormGeneratorObjects(QWidget):
 
     def addAction(self):
         paramDict = {"type": "Parabola"}
-        # print(self.inputFields)
         for input in self.inputFields:
-            # print(input.read())
             paramDict.update(input.read())
-        # print(paramDict)
     
-
-    def unpackAndAddToForm(self, wid, form):
-        children = wid.findChildren(QWidget, '', Qt.FindDirectChildrenOnly)
-        # print(len(children))
-        if len(children) != 2:
-            # print(wid.text())
-            raise Exception("Number of children insuccichient!!!")
-        label,edit = tuple(children) 
-        label.setParent(None)
-        edit.setParent(None)
-        form.addRow(label, edit)
-
         
 
 

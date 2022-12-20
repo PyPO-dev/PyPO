@@ -9,7 +9,6 @@ from src.GUI.MainWindow import *
 # from src.GUI.archive.ElementWidget_Systems import *
 from src.GUI.ElementsColumn import *
 from src.GUI.ParameterForms.formGenerator import *
-from src.GUI.ParameterForms.formGeneratorObjects import *
 from src.GUI.ParameterForms.InputDiscription import *
 from src.GUI.ParameterForms.variableInputWidget import *
 
@@ -25,7 +24,6 @@ __all__ = [
     # 'ElementWidget_Systems',
     'ElementsColumn',
     'FormGenerator',
-    'FormGeneratorObjects',
     'inType',
     'InputDescription',
     'VariableInputWidget'

@@ -22,9 +22,6 @@ class SimpleInput(QWidget):
         # self.makeTestBtn()
         self.setLayout(self.layout)
 
-    def get(self):
-        return (self.label, self.editsWid)
-
     def setupUI(self):
         inp = self.inputDiscription
         

@@ -724,8 +724,11 @@ class System(object):
         if ret:
             return figax
 
-    def plotRTframe(self, frame, project="xy"):
-        plt.plotRTframe(frame, project, self.savePath)
+    def plotRTframe(self, frame, project="xy", returns=False):
+        if returns:
+            return plt.plotRTframe(frame, project, self.savePath, returns)
+        else:
+            plt.plotRTframe(frame, project, self.savePath, returns)
 
     def copyObj(self, obj):
         return copy.deepcopy(obj)

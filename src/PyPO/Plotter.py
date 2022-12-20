@@ -354,7 +354,7 @@ def beamCut(self, plotObject, field, cross='', units='', vmin=-50, vmax=0, frac=
     if ret:
         return field[:,y_center], field[:,y_center]
 
-def plotRTframe(frame, project, savePath):
+def plotRTframe(frame, project, savePath, returns):
     fig, ax = pt.subplots(1,1)
 
     if project == "xy":
@@ -372,5 +372,10 @@ def plotRTframe(frame, project, savePath):
         ax.set_xlabel(r"$z$ / mm")
         ax.set_ylabel(r"$x$ / mm")
 
-    ax.set_box_aspect(1)
+    ax.set_aspect(1)
+    
+    if returns:
+        return fig
+
+
     pt.show()

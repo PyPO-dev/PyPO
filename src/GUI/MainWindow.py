@@ -185,10 +185,13 @@ class MainWidget(QWidget):
         self.addToWindowGrid(self.ParameterWid, self.GPParameterForm)
 
     def addPlotAction(self):
-        RTDict = self.ParameterWid.read()
-        _frame = self.stm.createFrame(RTDict)
-        name = f"frame_{len(self.frameDict)}"
-        self.frameDict[name] = _frame
+        if hasattr(self, "PlotScreen"):
+            self.PlotScreen.setParent(None)
+        
+        plotFrameDict = self.ParameterWid.read()
+        fig = self.stm.plotRTframe(self.frameDict[plotFrameDict["frame"]], project=plotFrameDict["project"], returns=True)
+        self.PlotScreen = PlotScreen(fig)
+        self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
 
     #END NOTE
 
@@ -267,6 +270,11 @@ class PyPOMainWindow(QMainWindow):
         plotFrameAction = QAction("Plot frame", self)
         plotFrameAction.triggered.connect(self.mainWid.setPlotFrameForm)
         RaytraceMenu.addAction(plotFrameAction)
+
+        # Propagate rays
+        propRaysAction = QAction("Propagate rays", self)
+        propRaysAction.triggered.connect(self.mainWid.setPropRaysForm)
+        RaytraceMenu.addAction(propRaysAction)
 
         # END NOTE
 if __name__ == "__main__":

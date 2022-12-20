@@ -3,7 +3,6 @@ from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtCore import QRegExp
 import sys
 from numpy import array
-import operator
 
 from src.GUI.ParameterForms.InputDiscription import *
 

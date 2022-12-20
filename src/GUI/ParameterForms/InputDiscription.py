@@ -2,6 +2,8 @@
 from enum import Enum
 from attr import define, field, Factory
 from attrs import validators
+import operator
+
 class inType(Enum):
     string = 1
     integers = 2
@@ -33,8 +35,8 @@ class InputDescription:
             self.numFields = None
         else: 
             self.filloutHints()
-        if not (self.subdict == None ^ self.sublist == None):
-            raise Exception("Sublist/subdict Error")
+        # if not operator.xor(self.subdict == None , self.sublist == None):
+        #     raise Exception("Sublist/subdict Error")
 
     def filloutHints(self):
         while len(self.hints) < self.numFields:

@@ -10,17 +10,17 @@ import numpy as np
 class VariableInputWidget(QWidget):
     def __init__ (self, inp):
         super().__init__()
-        self.inputDiscription = inp
+        self.inputDescription = inp
         
         self.layout = QFormLayout()
-        self.hasChildren = self.inputDiscriptionsubdict != None
+        self.hasChildren = self.inputDescription.subdict != None
 
-        label = self.makeLabelFromString(self.inputDiscription.label)
+        label = self.makeLabelFromString(self.inputDescription.label)
         self.mode = QComboBox()
         if self.hasChildren:
-            self.mode.addItems(self.inputDiscription.subdict.keys())
+            self.mode.addItems(self.inputDescription.subdict.keys())
         else:
-            self.mode.addItems(self.inputDiscription.sublist)
+            self.mode.addItems(self.inputDescription.sublist)
         self.mode.activated.connect(self.modeUpdate)
         self.layout.addRow(label, self.mode)
 
@@ -41,8 +41,8 @@ class VariableInputWidget(QWidget):
         self.setLayout(self.layout)
 
     def makeCildren(self):
-        for childKey, childInDisList in self.inputDiscription.subdict.items():
-            child = self.makeChildform(childKey, childInDisList)
+        for childKey, childInDesList in self.inputDescription.subdict.items():
+            child = self.makeChildform(childKey, childInDesList)
             self.childrenn.append(child)
             self.layout.addRow(child)
             
@@ -68,8 +68,8 @@ class VariableInputWidget(QWidget):
     
     def read(self):
         ind = self.mode.currentIndex()
-        modeOut = list(self.inputDiscription.subdict.keys())[ind]
-        paramDict = {self.inputDiscription.outputName: modeOut}
+        modeOut = list(self.inputDescription.subdict.keys())[ind]
+        paramDict = {self.inputDescription.outputName: modeOut}
         if self.hasChildren:
             for input in self.currentChild.findChildren(SimpleInput):
                 paramDict.update(input.read())

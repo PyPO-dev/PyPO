@@ -4,7 +4,7 @@ from PyQt5.QtCore import QRegExp
 import sys
 from numpy import array
 
-from src.GUI.ParameterForms.InputDiscription import *
+from src.GUI.ParameterForms.InputDescription import *
 
 Validator_floats = QRegExpValidator(QRegExp("[-+]?[0-9]*[\.,]?[0-9]*"))
 Validator_ints = QRegExpValidator(QRegExp("[-+]?[0-9]*"))
@@ -13,7 +13,7 @@ Validator_ints = QRegExpValidator(QRegExp("[-+]?[0-9]*"))
 class SimpleInput(QWidget):
     def __init__ (self, inp:InputDescription):
         super().__init__()
-        self.inputDiscription = inp
+        self.inputDescription = inp
 
         self.layout = QHBoxLayout()
         self.setupUI()
@@ -21,7 +21,7 @@ class SimpleInput(QWidget):
         self.setLayout(self.layout)
 
     def setupUI(self):
-        inp = self.inputDiscription
+        inp = self.inputDescription
         
         self.inputs = [QLineEdit() for k in range(inp.numFields)]
         # validator = 
@@ -36,18 +36,18 @@ class SimpleInput(QWidget):
         self.editsWid = QWidget()
         self.editsWid.setLayout(editLayout)
 
-        self.label = self.makeLabelFromString(self.inputDiscription.label)
+        self.label = self.makeLabelFromString(self.inputDescription.label)
         self.layout.addWidget(self.label)
         self.layout.addWidget(self.editsWid)
     
     def read(self):
-        l =[self.enumToType(self.inputDiscription.inType)(i.text()) for i in self.inputs] 
+        l =[self.enumToType(self.inputDescription.inType)(i.text()) for i in self.inputs] 
         if len(l)>1:        
-            if self.inputDiscription.oArray:
+            if self.inputDescription.oArray:
                 l = array(l)
         else:
             l = l[0]
-        l = {self.inputDiscription.outputName:l}
+        l = {self.inputDescription.outputName:l}
         return l
 
     @staticmethod

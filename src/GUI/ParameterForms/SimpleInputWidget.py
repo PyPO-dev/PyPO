@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QApplication, QComboBox, QFormLayout, QVBoxLayout, QGridLayout, QLabel,QSpacerItem, QSizePolicy, QLineEdit, QHBoxLayout, QPushButton
+from PyQt5.QtWidgets import QWidget, QLabel,QSpacerItem, QSizePolicy, QLineEdit, QHBoxLayout, QPushButton
 from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtCore import QRegExp
 import sys
@@ -6,7 +6,6 @@ from numpy import array
 
 
 from src.GUI.ParameterForms.InputDiscription import *
-# from InputDiscription import *
 
 Validator_floats = QRegExpValidator(QRegExp("[-+]?[0-9]*[\.,]?[0-9]*"))
 Validator_ints = QRegExpValidator(QRegExp("[-+]?[0-9]*"))
@@ -47,18 +46,10 @@ class SimpleInput(QWidget):
         # print (l)
         return l
 
-    # def makeTestBtn(self):
-    #     btn = QPushButton("ok")
-    #     btn.clicked.connect(self.read)
-    #     self.layout.addWidget(btn)
+    
 
     @staticmethod
     def makeLabelFromString(s):
         if type(s) == str:
             return QLabel(s.replace("_"," ").capitalize())
         else: return QLabel(s)
-# app = QApplication(sys.argv)
-# win = SimpleInput(InputDescription(inType.floats, "name", hints=["1","1","1"], numFields=3, oArray=True))
-
-# win.show()
-# app.exec_()

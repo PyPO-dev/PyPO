@@ -28,7 +28,7 @@ Plane = [
                 InputDescription(inType.string, "vlims", oArray= True, numFields=2)]
     })
 ]
-win = FormGeneratorObjects(Plane, None)
+win = FormGenerator(Plane, None)
 
 
 with open('src/GUI/style.css') as f:

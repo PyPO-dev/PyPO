@@ -1,4 +1,4 @@
-from GUI.ParameterForms.InputDescription import inType, InputDescription
+from src.GUI.ParameterForms.InputDescription import inType, InputDescription
 
 Plane = [
     InputDescription(inType.string, "name"),

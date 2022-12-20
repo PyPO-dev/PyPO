@@ -80,17 +80,34 @@ def MakeWO():
     s.addHyperbola(h_wo)
     s.addEllipse(e_wo)
 
+    s.rotateGrids("h_wo", np.array([180, 0, 0]))
     s.translateGrids("h_wo", np.array([0, 0, _C_HYPERBO]))
     s.rotateGrids("h_wo", np.array([0, 65, 0]))
 
-    s.rotateGrids("e_wo", np.array([0, 90, 0]))
+    s.rotateGrids("e_wo", np.array([180, 90, 0]))
     s.translateGrids("e_wo", e_center)
     s.rotateGrids("e_wo", np.array([0, theta, 0]), e_center)
-    #s.plotSystem(focus_1=True, focus_2=True)
+    s.plotSystem()
     
     return s
     
 if __name__ == "__main__":
+    s = MakeWO()
+
+    grids_h = s.generateGrids("h_wo")
+    grids_e = s.generateGrids("e_wo")
+
+    center_h = 300
+    center_e = 200
+   
+    fig, ax = pt.subplots(1,1, figsize=(5,5))
+    ax.plot(grids_h.x[:,center_h], grids_h.z[:,center_h], color="dimgrey", lw=10)
+    ax.plot(grids_e.x[:,center_e], grids_e.z[:,center_e], color="dimgrey", lw=10)
+    #ax.set_box_aspect(1)
+    ax.set_aspect('equal', adjustable='box')
+    pt.show()
+
+
     print("In this script, we build the warm optics (WO) block as described for DESHIMA. The script can be loaded into any other script and returns a system object with the WO as two separate elements.")
     
     

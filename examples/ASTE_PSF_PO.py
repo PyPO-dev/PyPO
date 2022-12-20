@@ -38,7 +38,7 @@ def ex_ASTE_PO(device):
             "ecc"       : 1.08208248,
             "lims_u"    : np.array([0,310]),
             "lims_v"    : np.array([0,360]),
-            "gridsize"  : np.array([501,501])
+            "gridsize"  : np.array([501,1501])
             }
 
     plane = {
@@ -70,6 +70,17 @@ def ex_ASTE_PO(device):
 
     translation = np.array([0,0,3.5e3 - d_foc_h])
     s.translateGrids("plane1", translation)
+
+    grids_p = s.generateGrids("pri")
+    grids_s = s.generateGrids("sec")
+    
+    fig, ax = pt.subplots(1,1, figsize=(5,5))
+    ax.plot(grids_p.x[:,0], grids_p.z[:,0], color="dimgrey", lw=10)
+    ax.plot(grids_p.x[:,750], grids_p.z[:,750], color="dimgrey", lw=10)
+    ax.plot(grids_s.x[:,0], grids_s.z[:,0], color="dimgrey", lw=10)
+    ax.plot(grids_s.x[:,750], grids_s.z[:,750], color="dimgrey", lw=10)
+    ax.set_aspect('equal', adjustable='box')
+    pt.show()
 
     if device == "GPU":
         nThreads = 256

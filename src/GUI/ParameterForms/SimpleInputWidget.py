@@ -3,7 +3,7 @@ from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtCore import QRegExp
 import sys
 from numpy import array
-
+import operator
 
 from src.GUI.ParameterForms.InputDiscription import *
 
@@ -25,6 +25,9 @@ class SimpleInput(QWidget):
         inp = self.inputDiscription
         
         self.inputs = [QLineEdit() for k in range(inp.numFields)]
+        # validator = 
+        for edit in self.inputs:
+            edit.setValidator(None)
         editLayout = QHBoxLayout()
         
         for i in range(inp.numFields):

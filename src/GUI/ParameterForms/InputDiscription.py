@@ -19,6 +19,7 @@ class InputDescription:
     numFields : int = 1
     oArray: bool = False
     subdict: dict = field(default=None)
+    sublist: list = field(default=None)
 
     def __attrs_post_init__(self):
 
@@ -32,6 +33,8 @@ class InputDescription:
             self.numFields = None
         else: 
             self.filloutHints()
+        if not (self.subdict == None ^ self.sublist == None):
+            raise Exception("Sublist/subdict Error")
 
     def filloutHints(self):
         while len(self.hints) < self.numFields:

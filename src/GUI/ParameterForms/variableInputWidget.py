@@ -13,14 +13,18 @@ class VariableInputWidget(QWidget):
         self.inputDiscription = inp
         
         self.layout = QFormLayout()
+        self.hasChildren = hasattr(self.inputDiscription, 'subdict')
+
         label = self.makeLabelFromString(self.inputDiscription.label)
         self.mode = QComboBox()
-        self.mode.addItems(self.inputDiscription.subdict.keys())
+        if self.hasChildren:
+            self.mode.addItems(self.inputDiscription.subdict.keys())
+        else:
+            self.mode.addItems(self.inputDiscription.sublist)
         self.mode.activated.connect(self.modeUpdate)
         self.layout.addRow(label, self.mode)
 
 
-        self.hasChildren = hasattr(self.inputDiscription, 'subdict')
         if self.hasChildren:
             self.placeHolderParent = QWidget(self)
             self.placeHolderParent.setMaximumSize(0,0)

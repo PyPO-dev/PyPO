@@ -1,20 +1,70 @@
 from src.GUI.ParameterForms.InputDescription import inType, InputDescription
 
-Plane = [
-    InputDescription(inType.string, "name"),
-    InputDescription(inType.integers, "gridsize", label="Grid Size", hints=[101,101], numFields=2)
-]
+def xy_opts():
+    return [InputDescription(inType.floats, "lims_x", label="X limits", oArray=True, numFields=2),
+            InputDescription(inType.floats, "lims_y", label="Y limits", oArray=True, numFields=2)]
+
+def uv_opts():
+    return [InputDescription(inType.floats, "lims_u", label="U limits", oArray=True, numFields=2),
+            InputDescription(inType.floats, "lims_v", label="V limits", oArray=True, numFields=2),
+            InputDescription(inType.floats, "gcenter", label="XY center", oArray=True, numFields=2),
+            InputDescription(inType.floats, "ecc_uv", label="UV eccentricity", numFields=1),
+            InputDescription(inType.floats, "rot_uv", label="UV position angle", numFields=1)]
+
+def AoE_opts():
+    return [InputDescription(inType.floats, "lims_Az", label="Azimuth limits", oArray=True, numFields=2),
+            InputDescription(inType.floats, "lims_El", label="Elevation limits", oArray=True, numFields=2)]
+
+def focus_opts_hyp_ell():
+    return [InputDescription(inType.floats, "focus_1", label="Upper focus xyz", oArray=True, numFields=3),
+            InputDescription(inType.floats, "focus_2", label="Lower focus xyz", oArray=True, numFields=3),
+            InputDescription(inType.floats, "ecc", label="Eccentricity", numFields=1)]
+
+def makeParabolaInp():
+    return [InputDescription(inType.string, "name"),
+            InputDescription(inType.dropdown, "pmode", label="Parameter mode", subdict={
+                "focus"     : [InputDescription(inType.floats, "focus_1", label="Focus xyz", oArray=True, numFields=3),
+                                InputDescription(inType.floats, "vertex", label="Vertex xyz", oArray=True, numFields=3)],
+                "manual"    : [InputDescription(inType.floats, "coeffs", label="AB coefficients", oArray=True, numFields=2)]
+                }),
+            InputDescription(inType.integers, "gridsize", label="Grid size", hints=[101,101], numFields=2, oArray=True),
+            InputDescription(inType.dropdown, "gmode", label="Grid mode", subdict={
+                "xy" : xy_opts(),
+                "uv" : uv_opts()
+            })]
+
+def makeHyperbolaEllipseInp():
+    return [InputDescription(inType.string, "name"),
+            InputDescription(inType.dropdown, "pmode", label="Parameter mode", subdict={
+                "focus"     : focus_opts_hyp_ell(),
+                "manual"    : [InputDescription(inType.floats, "coeffs", label="ABC coefficients", oArray=True, numFields=3)]
+                }),
+            InputDescription(inType.integers, "gridsize", label="Grid size", hints=[101,101], numFields=2, oArray=True),
+            InputDescription(inType.dropdown, "gmode", label="Grid mode", subdict={
+                "xy" : xy_opts(),
+                "uv" : uv_opts()
+            })]
+
+def makePlaneInp():
+    return [InputDescription(inType.string, "name"),
+            InputDescription(inType.integers, "gridsize", label="Grid size", hints=[101,101], numFields=2, oArray=True),
+            InputDescription(inType.dropdown, "gmode", label="Grid mode", subdict={
+                "xy" : xy_opts(),
+                "uv" : uv_opts(),
+                "AoE" : AoE_opts()
+            })]
+            #InputDescription(inType.integers, "flip", label="Flip normal vectors", numFields=1)]
+
 # NOTE
-RTGen = [
-    InputDescription(inType.integers, "nRays", label="# of rays", hints=[0], numFields=1),
-    InputDescription(inType.integers, "nRing", label="# of rings", hints=[0], numFields=1),
-    InputDescription(inType.floats, "angx", label="X-apex angle", hints=[0], numFields=1),
-    InputDescription(inType.floats, "angy", label="Y-apex angle", hints=[0], numFields=1),
-    InputDescription(inType.floats, "a", label="X radius of outer ring", hints=[0], numFields=1),
-    InputDescription(inType.floats, "b", label="Y radius of outer ring", hints=[0], numFields=1),
-    InputDescription(inType.floats, "tChief", label="Chief ray tilt", hints=[0,0,1], numFields=3, oArray=True),
-    InputDescription(inType.floats, "oChief", label="Chief ray origin", hints=[0,0,0], numFields=3, oArray=True)
-]
+def initFrameInp():
+    return [InputDescription(inType.integers, "nRays", label="# of rays", hints=[0], numFields=1),
+            InputDescription(inType.integers, "nRing", label="# of rings", hints=[0], numFields=1),
+            InputDescription(inType.floats, "angx", label="X-apex angle", hints=[0], numFields=1),
+            InputDescription(inType.floats, "angy", label="Y-apex angle", hints=[0], numFields=1),
+            InputDescription(inType.floats, "a", label="X radius of outer ring", hints=[0], numFields=1),
+            InputDescription(inType.floats, "b", label="Y radius of outer ring", hints=[0], numFields=1),
+            InputDescription(inType.floats, "tChief", label="Chief ray tilt", hints=[0,0,1], numFields=3, oArray=True),
+            InputDescription(inType.floats, "oChief", label="Chief ray origin", hints=[0,0,0], numFields=3, oArray=True)]
 
 def plotFrameInp(frameDict):
     sublist_frames = []

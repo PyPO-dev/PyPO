@@ -1,4 +1,3 @@
-
 from enum import Enum
 from attr import define, field, Factory
 from attrs import validators

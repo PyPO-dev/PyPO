@@ -409,6 +409,9 @@ class System(object):
         with open('{}.json'.format(os.path.join(self.savePathElem, name)), 'w') as f:
             json.dump(jsonDict, f, cls=NpEncoder)
 
+    def removeElement(self, name):
+        del self.system[name]
+
     def saveFields(self, fields, name_fields):
         saveDir = os.path.join(self.savePathFields, name_fields)
 

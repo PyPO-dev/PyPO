@@ -22,10 +22,13 @@ Plane = [
     InputDescription(inType.floats, "coeffs", label="Coefficients", hints=[2], numFields=2),
     InputDescription(inType.integers, "gridsize", label="Grid Size", hints=[101,101], numFields=2),
     InputDescription(inType.dropdown, "pmode", label="Parameter Mode", subdict={
-        "xy" : [InputDescription(inType.string, "xlims", oArray= True, numFields=2),
-                InputDescription(inType.string, "ylims", oArray= True, numFields=2)],
-        "uv" : [InputDescription(inType.string, "ulims", oArray= True, numFields=2),
-                InputDescription(inType.string, "vlims", oArray= True, numFields=2)]
+        "xy" : [
+            InputDescription(inType.string, "xlims", oArray= True, numFields=2),
+            InputDescription(inType.dropdown, "grandVar", subdict={
+            "xy" : [InputDescription(inType.string, "alims", oArray= True, numFields=2),
+                    InputDescription(inType.string, "blims", oArray= True, numFields=2)],
+            })
+        ] 
     })
 ]
 win = FormGenerator(Plane, None)

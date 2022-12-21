@@ -272,9 +272,9 @@ class PyPOMainWindow(QMainWindow):
         RaytraceMenu.addAction(plotFrameAction)
 
         # Propagate rays
-        propRaysAction = QAction("Propagate rays", self)
-        propRaysAction.triggered.connect(self.mainWid.setPropRaysForm)
-        RaytraceMenu.addAction(propRaysAction)
+        # propRaysAction = QAction("Propagate rays", self)
+        # propRaysAction.triggered.connect(self.mainWid.setPropRaysForm)
+        # RaytraceMenu.addAction(propRaysAction)
 
         # END NOTE
 if __name__ == "__main__":

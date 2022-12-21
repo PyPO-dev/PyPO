@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QWidget, QApplication, QComboBox, QFormLayout, QVBox
 from PyQt5.QtCore import Qt
 
 from src.GUI.ParameterForms.SimpleInputWidget import SimpleInput
+from src.GUI.ParameterForms.formGenerator import FormGenerator
 
 import numpy as np
 
@@ -42,12 +43,10 @@ class VariableInputWidget(QWidget):
 
     def makeCildren(self):
         for childKey, childInDesList in self.inputDescription.subdict.items():
-            child = self.makeChildform(childKey, childInDesList)
+            # child = self.makeChildform(childKey, childInDesList)
+            child = FormGenerator(childInDesList, None, addButtons=False)
             self.childrenn.append(child)
             self.layout.addRow(child)
-            
-            
-
 
     def modeUpdate(self):
         if self.hasChildren:
@@ -56,15 +55,15 @@ class VariableInputWidget(QWidget):
             self.layout.addRow(self.childrenn[self.mode.currentIndex()])
             self.currentChild = self.childrenn[self.mode.currentIndex()]
 
-    def makeChildform(self, childKey,childIndistList):
-        childWidget = QWidget()
-        childLayout = QFormLayout()
-        childLayout.setContentsMargins(0,0,0,0)
-        for i in range(len(childIndistList)):
-            widget = SimpleInput(childIndistList[i])
-            childLayout.addRow(widget)
-        childWidget.setLayout(childLayout)
-        return childWidget
+    # def makeChildform(self, childKey,childIndistList):
+    #     childWidget = QWidget()
+    #     childLayout = QFormLayout()
+    #     childLayout.setContentsMargins(0,0,0,0)
+    #     for i in range(len(childIndistList)):
+    #         widget = SimpleInput(childIndistList[i])
+    #         childLayout.addRow(widget)
+    #     childWidget.setLayout(childLayout)
+    #     return childWidget
     
     def read(self):
         ind = self.mode.currentIndex()

@@ -209,7 +209,7 @@ class MainWidget(QWidget):
         if hasattr(self, "ParameterWid"):
             self.ParameterWid.setParent(None)
 
-        self.ParameterWid = formGenerator.FormGenerator(fDataObj.propRaysInp(self.frameDict, readAction=self.stm.system), self.addPropRaysAction)
+        self.ParameterWid = formGenerator.FormGenerator(fDataObj.propRaysInp(self.frameDict, self.stm.system), self.addPropRaysAction)
         self.ParameterWid.setMaximumWidth(400)
         self.ParameterWid.setMinimumWidth(400)
         self.addToWindowGrid(self.ParameterWid, self.GPParameterForm)
@@ -300,9 +300,9 @@ class PyPOMainWindow(QMainWindow):
         RaytraceMenu.addAction(plotFrameAction)
 
         # Propagate rays
-        # propRaysAction = QAction("Propagate rays", self)
-        # propRaysAction.triggered.connect(self.mainWid.setPropRaysForm)
-        # RaytraceMenu.addAction(propRaysAction)
+        propRaysAction = QAction("Propagate rays", self)
+        propRaysAction.triggered.connect(self.mainWid.setPropRaysForm)
+        RaytraceMenu.addAction(propRaysAction)
 
         # PO actions
         makeBeam = PhysOptMenu.addMenu("Initialize beam")

@@ -2,11 +2,9 @@ import sys
 
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSpacerItem, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction
 from PyQt5.QtGui import QFont, QIcon
-from GUI.archive import HyperbolaForm, ParabolaForm
 from src.GUI.ElementsColumn import ElementsWindow
 from src.GUI.archive.SystemsColumn import SystemsWindow
 from src.GUI.ParameterForms import formGenerator
-import src.GUI.ParameterForms.formData as fData
 import src.GUI.ParameterForms.formDataObjects as fDataObj
 from src.GUI.PlotScreen import PlotScreen
 from src.GUI.TransformationWidget import TransformationWidget

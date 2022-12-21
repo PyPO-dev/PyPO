@@ -112,25 +112,61 @@ class MainWidget(QWidget):
         }
         self.addElementAction(hyperbola)
 
-    def addElementAction(self, elementDict):
-        if elementDict["type"] == "Parabola":
+    def addElementAction(self):
+        elementDict = self.ParameterWid.read()
+        if elemType == "Parabola":
             self.stm.addParabola(elementDict) 
-        elif elementDict["type"] == "Hyperbola":
+        elif elemType == "Hyperbola":
             self.stm.addHyperbola(elementDict) 
+        elif elemType == "Plane":
+            self.stm.addPlane(elementDict) 
         
         self._mkElementsColumn()
 
  
 
-    def setParabolaForm(self):
+    def setHyperbolaForm(self):
         if hasattr(self, "ParameterWid"):
             self.ParameterWid.setParent(None)
 
-        self.ParameterWid = formGenerator.FormGenerator(fData.parabola,self.addElementAction)
+        self.ParameterWid = formGenerator.FormGenerator(fDataObj.makeHyperbolaEllipseInp(), self.addHyperbolaAction)
         self.ParameterWid.setMaximumWidth(400)
         self.ParameterWid.setMinimumWidth(400)
         self.addToWindowGrid(self.ParameterWid,self.GPParameterForm)
 
+    def addHyperbolaAction(self):
+        elementDict = self.ParameterWid.read()
+        self.stm.addHyperbola(elementDict) 
+        self._mkElementsColumn()
+    
+    def setEllipseForm(self):
+        if hasattr(self, "ParameterWid"):
+            self.ParameterWid.setParent(None)
+
+        self.ParameterWid = formGenerator.FormGenerator(fDataObj.makeHyperbolaEllipseInp(), self.addEllipseAction)
+        self.ParameterWid.setMaximumWidth(400)
+        self.ParameterWid.setMinimumWidth(400)
+        self.addToWindowGrid(self.ParameterWid,self.GPParameterForm)
+
+    def addEllipseAction(self):
+        elementDict = self.ParameterWid.read()
+        self.stm.addEllipse(elementDict) 
+        self._mkElementsColumn()
+    
+    def setParabolaForm(self):
+        if hasattr(self, "ParameterWid"):
+            self.ParameterWid.setParent(None)
+
+        self.ParameterWid = formGenerator.FormGenerator(fDataObj.makeParabolaInp(), self.addParabolaAction)
+        self.ParameterWid.setMaximumWidth(400)
+        self.ParameterWid.setMinimumWidth(400)
+        self.addToWindowGrid(self.ParameterWid,self.GPParameterForm)
+
+    def addParabolaAction(self):
+        elementDict = self.ParameterWid.read()
+        self.stm.addParabola(elementDict) 
+        self._mkElementsColumn()
+    """
     def setHyperbolaForm(self):
         if hasattr(self, "ParameterWid"):
             self.ParameterWid.setParent(None)
@@ -139,7 +175,21 @@ class MainWidget(QWidget):
         self.ParameterWid.setMaximumWidth(400)
         self.ParameterWid.setMinimumWidth(400)
         self.addToWindowGrid(self.ParameterWid,self.GPParameterForm)
+    """
+    def setPlaneForm(self):
+        if hasattr(self, "ParameterWid"):
+            self.ParameterWid.setParent(None)
 
+        self.ParameterWid = formGenerator.FormGenerator(fDataObj.makePlaneInp(), self.addPlaneAction)        
+        self.ParameterWid.setMaximumWidth(400)
+        self.ParameterWid.setMinimumWidth(400)
+        self.addToWindowGrid(self.ParameterWid,self.GPParameterForm)
+    
+    def addPlaneAction(self):
+        elementDict = self.ParameterWid.read()
+        self.stm.addPlane(elementDict) 
+        self._mkElementsColumn()
+    
     def setTransromationForm(self, element):
         if hasattr(self, "ParameterWid"):
             self.ParameterWid.setParent(None)
@@ -164,7 +214,7 @@ class MainWidget(QWidget):
         if hasattr(self, "ParameterWid"):
             self.ParameterWid.setParent(None)
 
-        self.ParameterWid = formGenerator.FormGenerator(fDataObj.RTGen, self.addFrameAction)
+        self.ParameterWid = formGenerator.FormGenerator(fDataObj.initFrameInp(), self.addFrameAction)
         self.ParameterWid.setMaximumWidth(400)
         self.ParameterWid.setMinimumWidth(400)
         self.addToWindowGrid(self.ParameterWid, self.GPParameterForm)
@@ -179,12 +229,12 @@ class MainWidget(QWidget):
         if hasattr(self, "ParameterWid"):
             self.ParameterWid.setParent(None)
 
-        self.ParameterWid = formGenerator.FormGenerator(fDataObj.plotFrameInp(self.frameDict), self.addPlotAction)
+        self.ParameterWid = formGenerator.FormGenerator(fDataObj.plotFrameInp(self.frameDict), self.addPlotFrameAction)
         self.ParameterWid.setMaximumWidth(400)
         self.ParameterWid.setMinimumWidth(400)
         self.addToWindowGrid(self.ParameterWid, self.GPParameterForm)
 
-    def addPlotAction(self):
+    def addPlotFrameAction(self):
         if hasattr(self, "PlotScreen"):
             self.PlotScreen.setParent(None)
         
@@ -193,6 +243,22 @@ class MainWidget(QWidget):
         self.PlotScreen = PlotScreen(fig)
         self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
 
+    def setPropRaysForm(self):
+        if hasattr(self, "ParameterWid"):
+            self.ParameterWid.setParent(None)
+
+        self.ParameterWid = formGenerator.FormGenerator(fDataObj.propRaysInp(self.frameDict, self.stm.system), self.addPropRaysAction)
+        self.ParameterWid.setMaximumWidth(400)
+        self.ParameterWid.setMinimumWidth(400)
+        self.addToWindowGrid(self.ParameterWid, self.GPParameterForm)
+
+    def addPropRaysAction(self): 
+        propRaysDict = self.ParameterWid.read()
+        frame_out = self.stm.runRayTracer(self.frameDict[propRaysDict["frame_in"]], 
+                                    propRaysDict["target"], propRaysDict["epsilon"], propRaysDict["nThreads"], 
+                                    propRaysDict["t0"], propRaysDict["device"], verbose=False)
+        name = f"frame_{len(self.frameDict)}"
+        self.frameDict[name] = frame_out
     #END NOTE
 
 class PyPOMainWindow(QMainWindow):
@@ -215,6 +281,7 @@ class PyPOMainWindow(QMainWindow):
         ElementsMenu = menuBar.addMenu("Elements")
         SystemsMenu = menuBar.addMenu("Systems")
         RaytraceMenu = menuBar.addMenu("Ray-tracer")
+        PhysOptMenu = menuBar.addMenu("Physical optics")
 
         ### Generate test parabola
         AddTestParabola = QAction('Add Test Parabola', self)
@@ -234,19 +301,29 @@ class PyPOMainWindow(QMainWindow):
         newElementMenu = ElementsMenu.addMenu("New Element")
         reflectorSelector = newElementMenu.addMenu("Reflector")
         ### Parabola
-        parabolaAction = QAction('Parabola', self)
+        parabolaAction = QAction('Paraboloid', self)
         parabolaAction.setShortcut('Ctrl+P')
-        parabolaAction.setStatusTip("Add a parabolic Reflector")
+        parabolaAction.setStatusTip("Add a paraboloid Reflector")
         parabolaAction.triggered.connect(self.mainWid.setParabolaForm)
         reflectorSelector.addAction(parabolaAction)
         ### Hyperbola
-        hyperbolaAction = QAction('Hyperbola', self)
+        hyperbolaAction = QAction('Hyperboloid', self)
         hyperbolaAction.setShortcut('Ctrl+H')
-        hyperbolaAction.setStatusTip("Add a parabolic Reflector")
+        hyperbolaAction.setStatusTip("Add a hyperboloid Reflector")
         hyperbolaAction.triggered.connect(self.mainWid.setHyperbolaForm)
         reflectorSelector.addAction(hyperbolaAction)
         ### Ellipse
-        
+        ellipseAction = QAction('Ellipsoid', self)
+        ellipseAction.setShortcut('Ctrl+H')
+        ellipseAction.setStatusTip("Add an ellipsoid Reflector")
+        ellipseAction.triggered.connect(self.mainWid.setEllipseForm)
+        reflectorSelector.addAction(ellipseAction)
+        ### Plane 
+        planeAction = QAction("Plane", self)
+        planeAction.setShortcut("Ctrl+L")
+        planeAction.setStatusTip("Add a plane surface.")
+        planeAction.triggered.connect(self.mainWid.setPlaneForm)
+        reflectorSelector.addAction(planeAction)
 
     ### System actions
         # newSystem = QAction('Add System', self)
@@ -275,6 +352,11 @@ class PyPOMainWindow(QMainWindow):
         # propRaysAction = QAction("Propagate rays", self)
         # propRaysAction.triggered.connect(self.mainWid.setPropRaysForm)
         # RaytraceMenu.addAction(propRaysAction)
+
+        # PO actions
+        makeBeam = PhysOptMenu.addMenu("Initialize beam")
+        initPointAction = QAction("Point source", self)
+        makeBeam.addAction(initPointAction)
 
         # END NOTE
 if __name__ == "__main__":

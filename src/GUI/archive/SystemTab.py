@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QGridLayout, QVBoxLayout, QPushButton, QApplication
 from ElementsColumn import ElementsWindow
 from PyQt5 import QtCore
-from src.GUI.ParameterForms.ParabolaForm import ParabolaFormLayout
+from GUI.archive.ParabolaForm import ParabolaFormLayout
 import PlotScreen as PS
 from src.GUI.TransformationWidget import TransformationWidget
 import sys

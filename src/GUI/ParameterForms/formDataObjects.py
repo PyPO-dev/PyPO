@@ -45,6 +45,15 @@ def makeHyperbolaEllipseInp():
                 "uv" : uv_opts()
             })]
 
+def makeQuadricSurfaceInp():
+    return [
+        InputDescription(inType.dropdown, "type", subdict={
+            "Parabola": makeParabolaInp(),
+            "Hyperbola": makeHyperbolaEllipseInp(),
+            "Ellipse": makeHyperbolaEllipseInp()
+        })
+    ]
+
 def makePlaneInp():
     return [InputDescription(inType.string, "name"),
             InputDescription(inType.integers, "gridsize", label="Grid size", hints=[101,101], numFields=2, oArray=True),

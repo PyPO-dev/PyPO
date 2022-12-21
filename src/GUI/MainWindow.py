@@ -2,9 +2,10 @@ import sys
 
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSpacerItem, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction
 from PyQt5.QtGui import QFont, QIcon
+from GUI.archive import HyperbolaForm, ParabolaForm
 from src.GUI.ElementsColumn import ElementsWindow
 from src.GUI.archive.SystemsColumn import SystemsWindow
-from src.GUI.ParameterForms import ParabolaForm, HyperbolaForm, formGenerator
+from src.GUI.ParameterForms import formGenerator
 import src.GUI.ParameterForms.formData as fData
 import src.GUI.ParameterForms.formDataObjects as fDataObj
 from src.GUI.PlotScreen import PlotScreen
@@ -93,7 +94,8 @@ class MainWidget(QWidget):
             "lims_v"    : np.array([0,360]),
             "gridsize"  : np.array([1501,1501])
             }
-        self.addElementAction(d)
+        self.stm.addParabola(d)
+        self._mkElementsColumn()
 
     def addExampleHyperbola(self):
         hyperbola = {
@@ -110,26 +112,23 @@ class MainWidget(QWidget):
             'lims_v': np.array([0, 6.283185307179586]),
             'gridsize': np.array([501, 501])
         }
-        self.addElementAction(hyperbola)
-
-    def addElementAction(self):
-        elementDict = self.ParameterWid.read()
-        if elemType == "Parabola":
-            self.stm.addParabola(elementDict) 
-        elif elemType == "Hyperbola":
-            self.stm.addHyperbola(elementDict) 
-        elif elemType == "Plane":
-            self.stm.addPlane(elementDict) 
-        
+        self.stm.addHyperbola(hyperbola)
         self._mkElementsColumn()
 
- 
-
-    def setHyperbolaForm(self):
+    def setQuadricForm(self):
         if hasattr(self, "ParameterWid"):
             self.ParameterWid.setParent(None)
 
-        self.ParameterWid = formGenerator.FormGenerator(fDataObj.makeHyperbolaEllipseInp(), self.addHyperbolaAction)
+        self.ParameterWid = formGenerator.FormGenerator(fDataObj.makeQuadricSurfaceInp(), readAction=self.addParabolaAction)
+        self.ParameterWid.setMaximumWidth(400)
+        self.ParameterWid.setMinimumWidth(400)
+        self.addToWindowGrid(self.ParameterWid,self.GPParameterForm)
+    
+    def setPlaneForm(self):
+        if hasattr(self, "ParameterWid"):
+            self.ParameterWid.setParent(None)
+
+        self.ParameterWid = formGenerator.FormGenerator(fDataObj.makePlaneInp(), readAction=self.addPlaneAction)        
         self.ParameterWid.setMaximumWidth(400)
         self.ParameterWid.setMinimumWidth(400)
         self.addToWindowGrid(self.ParameterWid,self.GPParameterForm)
@@ -139,51 +138,16 @@ class MainWidget(QWidget):
         self.stm.addHyperbola(elementDict) 
         self._mkElementsColumn()
     
-    def setEllipseForm(self):
-        if hasattr(self, "ParameterWid"):
-            self.ParameterWid.setParent(None)
-
-        self.ParameterWid = formGenerator.FormGenerator(fDataObj.makeHyperbolaEllipseInp(), self.addEllipseAction)
-        self.ParameterWid.setMaximumWidth(400)
-        self.ParameterWid.setMinimumWidth(400)
-        self.addToWindowGrid(self.ParameterWid,self.GPParameterForm)
-
     def addEllipseAction(self):
         elementDict = self.ParameterWid.read()
         self.stm.addEllipse(elementDict) 
         self._mkElementsColumn()
     
-    def setParabolaForm(self):
-        if hasattr(self, "ParameterWid"):
-            self.ParameterWid.setParent(None)
-
-        self.ParameterWid = formGenerator.FormGenerator(fDataObj.makeParabolaInp(), self.addParabolaAction)
-        self.ParameterWid.setMaximumWidth(400)
-        self.ParameterWid.setMinimumWidth(400)
-        self.addToWindowGrid(self.ParameterWid,self.GPParameterForm)
 
     def addParabolaAction(self):
         elementDict = self.ParameterWid.read()
         self.stm.addParabola(elementDict) 
         self._mkElementsColumn()
-    """
-    def setHyperbolaForm(self):
-        if hasattr(self, "ParameterWid"):
-            self.ParameterWid.setParent(None)
-
-        self.ParameterWid = HyperbolaForm.Form(self.addElementAction)
-        self.ParameterWid.setMaximumWidth(400)
-        self.ParameterWid.setMinimumWidth(400)
-        self.addToWindowGrid(self.ParameterWid,self.GPParameterForm)
-    """
-    def setPlaneForm(self):
-        if hasattr(self, "ParameterWid"):
-            self.ParameterWid.setParent(None)
-
-        self.ParameterWid = formGenerator.FormGenerator(fDataObj.makePlaneInp(), self.addPlaneAction)        
-        self.ParameterWid.setMaximumWidth(400)
-        self.ParameterWid.setMinimumWidth(400)
-        self.addToWindowGrid(self.ParameterWid,self.GPParameterForm)
     
     def addPlaneAction(self):
         elementDict = self.ParameterWid.read()
@@ -214,7 +178,7 @@ class MainWidget(QWidget):
         if hasattr(self, "ParameterWid"):
             self.ParameterWid.setParent(None)
 
-        self.ParameterWid = formGenerator.FormGenerator(fDataObj.initFrameInp(), self.addFrameAction)
+        self.ParameterWid = formGenerator.FormGenerator(fDataObj.initFrameInp(), readAction=self.addFrameAction)
         self.ParameterWid.setMaximumWidth(400)
         self.ParameterWid.setMinimumWidth(400)
         self.addToWindowGrid(self.ParameterWid, self.GPParameterForm)
@@ -229,7 +193,7 @@ class MainWidget(QWidget):
         if hasattr(self, "ParameterWid"):
             self.ParameterWid.setParent(None)
 
-        self.ParameterWid = formGenerator.FormGenerator(fDataObj.plotFrameInp(self.frameDict), self.addPlotFrameAction)
+        self.ParameterWid = formGenerator.FormGenerator(fDataObj.plotFrameInp(self.frameDict), readAction=self.addPlotFrameAction)
         self.ParameterWid.setMaximumWidth(400)
         self.ParameterWid.setMinimumWidth(400)
         self.addToWindowGrid(self.ParameterWid, self.GPParameterForm)
@@ -247,7 +211,7 @@ class MainWidget(QWidget):
         if hasattr(self, "ParameterWid"):
             self.ParameterWid.setParent(None)
 
-        self.ParameterWid = formGenerator.FormGenerator(fDataObj.propRaysInp(self.frameDict, self.stm.system), self.addPropRaysAction)
+        self.ParameterWid = formGenerator.FormGenerator(fDataObj.propRaysInp(self.frameDict, readAction=self.stm.system), self.addPropRaysAction)
         self.ParameterWid.setMaximumWidth(400)
         self.ParameterWid.setMinimumWidth(400)
         self.addToWindowGrid(self.ParameterWid, self.GPParameterForm)
@@ -298,32 +262,21 @@ class PyPOMainWindow(QMainWindow):
         ElementsMenu.addAction(AddTestHyperbola)
 
         ### Add Element
-        newElementMenu = ElementsMenu.addMenu("New Element")
-        reflectorSelector = newElementMenu.addMenu("Reflector")
-        ### Parabola
-        parabolaAction = QAction('Paraboloid', self)
-        parabolaAction.setShortcut('Ctrl+P')
-        parabolaAction.setStatusTip("Add a paraboloid Reflector")
-        parabolaAction.triggered.connect(self.mainWid.setParabolaForm)
-        reflectorSelector.addAction(parabolaAction)
-        ### Hyperbola
-        hyperbolaAction = QAction('Hyperboloid', self)
-        hyperbolaAction.setShortcut('Ctrl+H')
-        hyperbolaAction.setStatusTip("Add a hyperboloid Reflector")
-        hyperbolaAction.triggered.connect(self.mainWid.setHyperbolaForm)
-        reflectorSelector.addAction(hyperbolaAction)
-        ### Ellipse
-        ellipseAction = QAction('Ellipsoid', self)
-        ellipseAction.setShortcut('Ctrl+H')
-        ellipseAction.setStatusTip("Add an ellipsoid Reflector")
-        ellipseAction.triggered.connect(self.mainWid.setEllipseForm)
-        reflectorSelector.addAction(ellipseAction)
-        ### Plane 
+        reflectorSelector = ElementsMenu.addMenu("Reflector")
+        ### Planar Surface
         planeAction = QAction("Plane", self)
         planeAction.setShortcut("Ctrl+L")
         planeAction.setStatusTip("Add a plane surface.")
         planeAction.triggered.connect(self.mainWid.setPlaneForm)
         reflectorSelector.addAction(planeAction)
+        
+        ### Quadric Surface
+        hyperbolaAction = QAction('Quadric Surface', self)
+        hyperbolaAction.setShortcut('Ctrl+Q')
+        hyperbolaAction.setStatusTip("Quadric Surface")
+        hyperbolaAction.triggered.connect(self.mainWid.setQuadricForm)
+        reflectorSelector.addAction(hyperbolaAction)
+        
 
     ### System actions
         # newSystem = QAction('Add System', self)

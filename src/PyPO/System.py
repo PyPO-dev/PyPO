@@ -249,10 +249,9 @@ class System(object):
             rz = 0
 
             offRot = np.array([rx, ry, rz])
-            cRot = offTrans
 
-            self.system[reflDict["name"]]["transf"] = MatRotate(offRot, reflDict["transf"], cRot)
-            self.system[reflDict["name"]]["transf"] = MatTranslate(offTrans, reflDict["transf"])
+            _transf = MatRotate(offRot, reflDict["transf"])
+            self.system[reflDict["name"]]["transf"] = MatTranslate(offTrans, _transf)
 
             self.system[reflDict["name"]]["coeffs"][0] = a3
             self.system[reflDict["name"]]["coeffs"][1] = b3
@@ -294,7 +293,37 @@ class System(object):
         self.system[reflDict["name"]] = self.copyObj(reflDict)
 
         if reflDict["pmode"] == "focus":
-            pass
+            self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
+            f1 = reflDict["focus_1"]
+            f2 = reflDict["focus_2"]
+            ecc = reflDict["ecc"]
+
+            diff = f1 - f2
+
+            trans = (f1 + f2) / 2
+
+            f_norm = diff / np.sqrt(np.dot(diff, diff))
+            fxy = np.array([f_norm[0], f_norm[1], 0])
+            fxy /= np.sqrt(np.dot(fxy, fxy))
+
+            rot_z = np.degrees(np.arccos(np.dot(fxy, np.array([1, 0, 0]))))
+            fxz = np.array([f_norm[0], 0, f_norm[2]])
+            fxz /= np.sqrt(np.dot(fxz, fxz))
+
+            rot_y = np.degrees(np.arccos(np.dot(fxz, np.array([1, 0, 0]))))
+            print(trans)
+            rotation = np.array([0, rot_y, rot_z])
+
+            a = np.sqrt(np.dot(diff, diff)) / (2 * ecc)
+            b = a * np.sqrt(1 - ecc**2)
+            
+            _transf = MatRotate(rotation, reflDict["transf"])
+            self.system[reflDict["name"]]["transf"] = MatTranslate(trans, _transf)
+
+            self.system[reflDict["name"]]["coeffs"][0] = a
+            self.system[reflDict["name"]]["coeffs"][1] = b
+            self.system[reflDict["name"]]["coeffs"][2] = b
+
 
         if reflDict["gmode"] == "xy":
             self.system[reflDict["name"]]["ecc_uv"] = 0

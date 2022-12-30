@@ -28,6 +28,7 @@ def makeParabolaInp():
                 "manual"    : [InputDescription(inType.floats, "coeffs", label="AB coefficients", oArray=True, numFields=2)]
                 }),
             InputDescription(inType.integers, "gridsize", label="Grid size", hints=[101,101], numFields=2, oArray=True),
+            InputDescription(inType.boolean, "flip", label="Flip Normal Vectors"),
             InputDescription(inType.dropdown, "gmode", label="Grid mode", subdict={
                 "xy" : xy_opts(),
                 "uv" : uv_opts()
@@ -111,5 +112,6 @@ def propRaysInp(frameDict, elemDict):
             ]
 
     return propRays
+    
 
 # END NOTE

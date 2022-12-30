@@ -1,15 +1,20 @@
-from PyQt5.QtWidgets import QWidget, QComboBox, QFormLayout, QLabel, QLineEdit, QHBoxLayout, QPushButton
-from PyQt5.QtCore import QRegExp
+from PyQt5.QtWidgets import QWidget, QComboBox, QFormLayout, QLabel, QLineEdit, QHBoxLayout, QPushButton, QStackedWidget, QCheckBox
+from PyQt5.QtCore import QRegExp, Qt
 from PyQt5.QtGui import QRegExpValidator
+
 
 from numpy import array 
 
 from src.GUI.ParameterForms.InputDescription import *
 
+class MyLabel(QLabel):
+    def __init__ (self, s):
+        super().__init__(s)
+
 # Validator_floats = QRegExpValidator(QRegExp("[-+]?[0-9]*[\.,]?[0-9]*"))
 # Validator_ints = QRegExpValidator(QRegExp("[-+]?[0-9]*"))
 def makeLabelFromString(s):
-        return QLabel(s.replace("_"," ").capitalize())
+    return MyLabel(s.replace("_"," ").capitalize())
 
 class FormGenerator(QWidget):
     def __init__ (self, ElementData, readAction = None, addButtons=True):
@@ -25,6 +30,8 @@ class FormGenerator(QWidget):
         self.setupInputs()
         if addButtons:
             self.setupButtons()
+        
+        self.layout.setContentsMargins(0,0,0,0)
 
         self.setLayout(self.layout)
 
@@ -35,7 +42,9 @@ class FormGenerator(QWidget):
                 self.inputs.append(input)
                 self.layout.addRow(input)
             elif inp.inType.value == 4:
-                pass
+                input = BooleanInput(inp)
+                self.inputs.append(input)
+                self.layout.addRow(input)
             elif inp.inType.value == 5:
                 input = VariableInputWidget(inp)
                 self.inputs.append(input)
@@ -63,7 +72,8 @@ class SimpleInput(QWidget):
         super().__init__()
         self.inputDescription = inp
 
-        self.layout = QHBoxLayout()
+        self.layout = QFormLayout()
+        self.layout.setContentsMargins(0,0,0,0)
         self.setupUI()
         self.setLayout(self.layout)
 
@@ -74,6 +84,7 @@ class SimpleInput(QWidget):
         for edit in self.inputs:
             edit.setValidator(None)
         editLayout = QHBoxLayout()
+        editLayout.setContentsMargins(2,0,2,0)
         
         for i in range(inp.numFields):
             edit = self.inputs[i]
@@ -83,8 +94,7 @@ class SimpleInput(QWidget):
         self.editsWid.setLayout(editLayout)
 
         self.label = makeLabelFromString(self.inputDescription.label)
-        self.layout.addWidget(self.label)
-        self.layout.addWidget(self.editsWid)
+        self.layout.addRow(self.label, self.editsWid)
     
     def read(self):
         l =[] 
@@ -105,7 +115,19 @@ class SimpleInput(QWidget):
         if intype == inType.floats: return float
         if intype == inType.string: return str
 
-    
+class BooleanInput(QWidget):
+    def __init__ (self, inp:InputDescription):
+        super().__init__()
+        self.inputDescription = inp
+        layout = QHBoxLayout()
+        self.box = QCheckBox()
+        self.label = QLabel(self.inputDescription.label)
+        layout.addWidget(self.box)
+        layout.addWidget(self.label)
+        self.setLayout(layout)
+
+    def read(self):
+        return{self.inputDescription.outputName: self.box.isChecked()}
 
 class VariableInputWidget(QWidget):
     def __init__ (self, inp):
@@ -113,6 +135,7 @@ class VariableInputWidget(QWidget):
         self.inputDescription = inp
         
         self.layout = QFormLayout()
+        self.layout.setContentsMargins(0,0,0,0)
         self.hasChildren = self.inputDescription.subdict != None
 
         label = makeLabelFromString(self.inputDescription.label)
@@ -125,7 +148,7 @@ class VariableInputWidget(QWidget):
         self.layout.addRow(label, self.mode)
 
         if self.hasChildren:
-            self.childrenn = []
+            self.children = []
             self.makeCildren()
 
         self.layout.setContentsMargins(0,0,0,0)
@@ -133,17 +156,18 @@ class VariableInputWidget(QWidget):
         self.modeUpdate()
 
     def makeCildren(self):
+        self.stackedWidget = QStackedWidget()
+        self.layout.addRow(self.stackedWidget)
         for childInDesList in self.inputDescription.subdict.values():
             child = FormGenerator(childInDesList, addButtons=False, readAction=None)
-            self.childrenn.append(child)
-            self.layout.addRow(child)
+            child.setContentsMargins(0,0,0,0)
+            self.stackedWidget.addWidget(child)
+            self.children.append(child)
 
     def modeUpdate(self):
         if self.hasChildren:
-            for child in self.childrenn:
-                child.hide()
-            self.childrenn[self.mode.currentIndex()].show()
-            self.currentChild = self.childrenn[self.mode.currentIndex()]
+            self.stackedWidget.setCurrentIndex(self.mode.currentIndex())
+            self.currentChild = self.children[self.mode.currentIndex()]
 
     def read(self):
         ind = self.mode.currentIndex()

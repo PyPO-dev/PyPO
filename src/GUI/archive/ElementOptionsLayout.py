@@ -3,13 +3,13 @@ from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, 
 class ElementOptionsLayout(QVBoxLayout):
     def __init__ (self, cls):
         super().__init__()
-        self.setSpacing(0)
-        self.setContentsMargins(0,0,0,0)
+        # self.setSpacing(0)
+        # self.setContentsMargins(0,0,0,0)
 
         self.close = cls
 
         btn1 = QPushButton("Transform")
-        btn2 = QPushButton("Edit")
+        btn2 = QPushButton("Editttttt")
         btn3 = QPushButton("Plot")
 
         btn1.clicked.connect(cls)

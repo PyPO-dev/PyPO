@@ -1,6 +1,6 @@
 import sys
 
-from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSpacerItem, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction
+from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSpacerItem, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar
 from PyQt5.QtGui import QFont, QIcon
 from src.GUI.ElementsColumn import ElementsWindow
 from src.GUI.archive.SystemsColumn import SystemsWindow
@@ -43,7 +43,8 @@ class MainWidget(QWidget):
         self.grid = QGridLayout()
 
         self._mkElementsColumn()
-        self.plotSystem()
+        self._setupPlotScreen()
+        # self.plotSystem()
 
 
         self.setLayout(self.grid)
@@ -58,21 +59,55 @@ class MainWidget(QWidget):
         StmElements = []
         for e,_ in self.stm.system.items():
             StmElements.append(e)
-        self.ElementsColumn = ElementsWindow(StmElements, [self.setTransromationForm])
+        self.ElementsColumn = ElementsWindow(StmElements, [self.setTransromationForm, self.plotElement])
         self.ElementsColumn.setMaximumWidth(300)
         self.ElementsColumn.setMinimumWidth(300)
         self.addToWindowGrid(self.ElementsColumn, self.GPElementsColumn)
 
-    
+    # #####################
+    def _setupPlotScreen(self):
+        self.PlotScreen = QTabWidget()
+        self.PlotScreen.setTabsClosable(True)
+        self.PlotScreen.tabCloseRequested.connect(self.closeTab)
+        self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
+
+    def closeTab(self, i):
+        self.PlotScreen.removeTab(i)
+        
+    def plotElement(self, surface):
+        if self.stm.system:
+            figure = self.stm.plot3D(  surface,   returns= True, show=False, save=False, ret=True)
+        else :
+            figure = None
+        self.PlotScreen.addTab(PlotScreen(figure),"Plot1")
+        self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
+
+
     def plotSystem(self):
-        if hasattr(self, "PlotScreen"):
-            self.PlotScreen.setParent(None)
+        # if hasattr(self, "PlotScreen"):
+        #     self.PlotScreen.setParent(None)
 
         if self.stm.system:
             figure, _ = self.stm.plotSystem(ret = True, show=False, save=False)
         else :
             figure = None
-        self.PlotScreen= PlotScreen(figure)
+        self.PlotScreen.addTab(PlotScreen(figure),"Plot1")
+        self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
+
+    def plotRaytrace(self):
+        # if hasattr(self, "PlotScreen"):
+        #     self.PlotScreen.setParent(None)
+
+        framelist = []
+        if self.frameDict:
+            for key, item in self.frameDict.items():
+                framelist.append(item)
+
+        if self.stm.system:
+            figure, _ = self.stm.plotSystem(ret = True, show=False, save=False, RTframes=framelist)
+        else :
+            figure = None
+        self.PlotScreen.addTab(PlotScreen(figure),"Plot1")
         self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
 
     def addToWindowGrid(self, widget, param):
@@ -197,12 +232,13 @@ class MainWidget(QWidget):
         self.addToWindowGrid(self.ParameterWid, self.GPParameterForm)
 
     def addPlotFrameAction(self):
-        if hasattr(self, "PlotScreen"):
-            self.PlotScreen.setParent(None)
+        # if hasattr(self, "PlotScreen"):
+        #     self.PlotScreen.setParent(None)
         
         plotFrameDict = self.ParameterWid.read()
         fig = self.stm.plotRTframe(self.frameDict[plotFrameDict["frame"]], project=plotFrameDict["project"], returns=True)
-        self.PlotScreen = PlotScreen(fig)
+        self.PlotScreen.addTab(PlotScreen(fig),"Plot1")
+
         self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
 
     def setPropRaysForm(self):
@@ -284,6 +320,10 @@ class PyPOMainWindow(QMainWindow):
         plotSystem = QAction("Plot System", self)
         plotSystem.triggered.connect(self.mainWid.plotSystem)
         SystemsMenu.addAction(plotSystem)
+
+        plotRaytrace = QAction("Plot ray-trace", self)
+        plotRaytrace.triggered.connect(self.mainWid.plotRaytrace)
+        SystemsMenu.addAction(plotRaytrace)
 
         # NOTE Raytrace actions
         makeFrame = RaytraceMenu.addMenu("Make frame")

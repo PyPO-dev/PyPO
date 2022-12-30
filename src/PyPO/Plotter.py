@@ -182,14 +182,14 @@ def plotBeam2D(plotObject, field,
 
 def plot3D(plotObject, fine, cmap,
             returns, ax_append, norm,
-            show, foc1, foc2, save, savePath):
+            show, foc1, foc2, save, savePath, ret=False):
 
 
     skip = slice(None,None,fine)
     grids = generateGrid(plotObject, transform=True, spheric=True)
 
+    fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
     if not ax_append:
-        fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
         ax_append = ax
 
     reflector = ax_append.plot_surface(grids.x[skip], grids.y[skip], grids.z[skip],
@@ -227,6 +227,9 @@ def plot3D(plotObject, fine, cmap,
 
     del grids
 
+    if ret:
+        return fig
+
     if returns:
         return ax_append
 
@@ -236,7 +239,7 @@ def plot3D(plotObject, fine, cmap,
 def plotSystem(systemDict, fine, cmap,
             ax_append, norm,
             show, foc1, foc2, save, ret, RTframes, savePath):
-    print("ps1")
+    # print("ps1")
     fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
 
     #ax.set_xlim3d(-10,800)
@@ -252,7 +255,7 @@ def plotSystem(systemDict, fine, cmap,
         plot3D(refl, fine=fine, cmap=_cmap,
                     returns=True, ax_append=ax, norm=norm,
                     show=False, foc1=foc1, foc2=foc2, save=False, savePath=savePath)
-    print("ps2")
+    # print("ps2")
 
     ax.set_ylabel(r"$y$ / [mm]", labelpad=20)
     ax.set_xlabel(r"$x$ / [mm]", labelpad=10)

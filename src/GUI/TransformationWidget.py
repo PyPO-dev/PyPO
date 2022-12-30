@@ -9,15 +9,14 @@ import numpy as np
 class TransformationWidget(QWidget):
     def __init__ (self, elem, applyTransformation):
         super().__init__()
+
         self.element = elem
         self.applyTransformation = applyTransformation
         self.transformationType = None
 
         self.layout = QGridLayout()
         self.layout.setAlignment(Qt.AlignTop)
-
         self.makeStart()
-
         self.makeButtons()
 
         self.setLayout(self.layout)
@@ -38,7 +37,6 @@ class TransformationWidget(QWidget):
         placeholderForm = QWidget()
         placeholderForm.setFixedSize(300,150)
         self.layout.addWidget(placeholderForm,2,0)
-
         
     def transtypeChanged(self):
         if self.transtype.currentIndex() == 1:
@@ -52,8 +50,6 @@ class TransformationWidget(QWidget):
         if hasattr(self, "form"):
             self.form.setParent(None)
 
-        # print("remaking Form")
-        
         self.form = QWidget()
         formLayout = QFormLayout()
 

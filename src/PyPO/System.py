@@ -635,8 +635,8 @@ class System(object):
             out.append(sumd)
 
         return out
-    # Beam!
-            
+
+    # Beam!   
     def createGauss(self, gaussDict, name_source):
         gauss_in = makeGauss(gaussDict, self.system[name_source])
         return gauss_in
@@ -738,13 +738,15 @@ class System(object):
 
     def plot3D(self, name_surface, fine=2, cmap=cm.cool,
                 returns=False, ax_append=False, norm=False,
-                show=True, foc1=False, foc2=False, save=True):
+                show=True, foc1=False, foc2=False, save=True, ret=False):
 
         plotObject = self.system[name_surface]
 
-        plt.plot3D(plotObject, fine, cmap,
+        r = plt.plot3D(plotObject, fine, cmap,
                     returns, ax_append, norm,
-                    show, foc1, foc2, save, self.savePath)
+                    show, foc1, foc2, save, self.savePath, ret=ret)
+        if returns:
+            return r
 
     def plotSystem(self, fine=2, cmap=cm.cool,
                 ax_append=False, norm=False,

@@ -16,6 +16,7 @@ class ElementWidget(QWidget):
     def __init__ (self, element, actions , p=None ):
         super().__init__(parent=p)
         self.transformAction = actions[0]
+        self.plotElementAction = actions[1]
         self.element = element
         
         layout = QHBoxLayout()
@@ -25,9 +26,9 @@ class ElementWidget(QWidget):
 
         # self.setContentsMargins(1,0,0,0)
         # self.btn = HoverOpenBtn("btn",self._openOptionsMenu, self._closeOptionsMenu)
-        self.btn = QPushButton("btn")
+        self.btn = QPushButton("⋮")
         self.btn.clicked.connect(self._openOptionsMenu)
-        self.btn.setIcon(QIcon("src/GUI/Images/dots.png"))
+        # self.btn.setIcon(QIcon("src/GUI/Images/dots.png"))
         self.btn.setFixedSize(50,39)
         
         layout.addWidget(label)
@@ -41,6 +42,8 @@ class ElementWidget(QWidget):
         self.dlg = selfClosingDialog(self._closeOptionsMenu, parent = self)
 
         dlgLayout = QVBoxLayout()
+        dlgLayout.setContentsMargins(0,0,0,0)
+        dlgLayout.setSpacing(0)
 
         btn1 = QPushButton("Transform")
         btn2 = QPushButton("Edit")
@@ -48,7 +51,7 @@ class ElementWidget(QWidget):
 
         btn1.clicked.connect(self.transform)
         btn2.clicked.connect(self._closeOptionsMenu)
-        btn3.clicked.connect(self._closeOptionsMenu)
+        btn3.clicked.connect(self.plotElement)
 
         dlgLayout.addWidget(btn1)
         dlgLayout.addWidget(btn2)
@@ -65,6 +68,11 @@ class ElementWidget(QWidget):
 
     def transform(self):
         self.transformAction(self.element)
+        self._closeOptionsMenu()
+
+    def plotElement(self):
+        self.plotElementAction(self.element)
+        self._closeOptionsMenu()
 
    
 

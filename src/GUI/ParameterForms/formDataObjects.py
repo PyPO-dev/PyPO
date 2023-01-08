@@ -98,7 +98,7 @@ def plotFrameInp(frameDict):
     
     plotFrame = [
             InputDescription(inType.dropdown, "frame", label="Frame", sublist = sublist_frames),
-            InputDescription(inType.string, "project", label="Abscissa and ordinate", hints=["xy"], numFields=1)
+            InputDescription(inType.string, "project", label="Abscissa - ordinate", hints=["xy"], numFields=1)
             ]
 
     return plotFrame

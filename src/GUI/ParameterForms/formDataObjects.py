@@ -80,7 +80,8 @@ def makeTransformationForm(elementName):
 
 # NOTE
 def initFrameInp():
-    return [InputDescription(inType.integers, "nRays", label="# of rays", hints=[0], numFields=1),
+    return [InputDescription(inType.string, "name", label="Name of frame", numFields=1),
+            InputDescription(inType.integers, "nRays", label="# of rays", hints=[0], numFields=1),
             InputDescription(inType.integers, "nRing", label="# of rings", hints=[0], numFields=1),
             InputDescription(inType.floats, "angx", label="X-apex angle", hints=[0], numFields=1),
             InputDescription(inType.floats, "angy", label="Y-apex angle", hints=[0], numFields=1),

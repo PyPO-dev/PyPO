@@ -107,8 +107,8 @@ class MainWidget(QWidget):
 
     def plotRaytrace(self):
         framelist = []
-        if self.frameDict:
-            for val in self.frameDict.values():
+        if self.stm.frames:
+            for val in self.stm.frames.values():
                 framelist.append(val)
 
         if self.stm.system:
@@ -222,30 +222,27 @@ class MainWidget(QWidget):
 
     def addFrameAction(self):
         RTDict = self.ParameterWid.read()
-        _frame = self.stm.createFrame(RTDict)
-        name = f"frame_{len(self.frameDict)}"
-        self.frameDict[name] = _frame
+        self.stm.createFrame(RTDict)
     
     def setPlotFrameForm(self):
-        self.setForm(fDataObj.plotFrameInp(self.frameDict), readAction=self.addPlotFrameAction)
+        self.setForm(fDataObj.plotFrameInp(self.stm.frames), readAction=self.addPlotFrameAction)
 
     def addPlotFrameAction(self):
+        print(self.stm.frames)
         plotFrameDict = self.ParameterWid.read()
-        fig = self.stm.plotRTframe(self.frameDict[plotFrameDict["frame"]], project=plotFrameDict["project"], returns=True)
+        fig = self.stm.plotRTframe(plotFrameDict["frame"], project=plotFrameDict["project"], returns=True)
         self.PlotScreen.addTab(PlotScreen(fig),"Plot1")
 
         self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
 
     def setPropRaysForm(self):
-        self.setForm(fDataObj.propRaysInp(self.frameDict, self.stm.system), self.addPropRaysAction)
+        self.setForm(fDataObj.propRaysInp(self.stm.frames, self.stm.system), self.addPropRaysAction)
 
     def addPropRaysAction(self): 
         propRaysDict = self.ParameterWid.read()
-        frame_out = self.stm.runRayTracer(self.frameDict[propRaysDict["frame_in"]], 
-                                    propRaysDict["target"], propRaysDict["epsilon"], propRaysDict["nThreads"], 
-                                    propRaysDict["t0"], propRaysDict["device"], verbose=False)
-        name = f"frame_{len(self.frameDict)}"
-        self.frameDict[name] = frame_out
+        self.stm.runRayTracer(self.stm.frames[propRaysDict["frame_in"]], 
+                            propRaysDict["target"], propRaysDict["epsilon"], propRaysDict["nThreads"], 
+                            propRaysDict["t0"], propRaysDict["device"], verbose=False)
     #END NOTE
 
 class PyPOMainWindow(QMainWindow):

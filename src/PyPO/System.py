@@ -65,7 +65,11 @@ class System(object):
     def __init__(self):
         self.num_ref = 0
         self.num_cam = 0
+
+        # Internal dictionaries
         self.system = {}
+        self.frames = {}
+
         self.cl = 2.99792458e11 # mm / s
         #self.savePathElem = "./save/elements/"
 
@@ -142,7 +146,7 @@ class System(object):
         if not "flip" in reflDict:
             reflDict["flip"] = False
 
-        check_ElemDict(reflDict) 
+        check_ElemDict(reflDict, self.system.keys()) 
         if not "ecc_uv" in reflDict:
             reflDict["ecc_uv"] = 0
 
@@ -211,7 +215,7 @@ class System(object):
         reflDict["transf"] = np.eye(4)
         if not "flip" in reflDict:
             reflDict["flip"] = False
-        check_ElemDict(reflDict) 
+        check_ElemDict(reflDict, self.system.keys()) 
         if not "ecc_uv" in reflDict:
             reflDict["ecc_uv"] = 0
 
@@ -284,7 +288,7 @@ class System(object):
         if not "flip" in reflDict:
             reflDict["flip"] = False
 
-        check_ElemDict(reflDict) 
+        check_ElemDict(reflDict, self.system.keys()) 
         if not "ecc_uv" in reflDict:
             reflDict["ecc_uv"] = 0
 
@@ -352,7 +356,7 @@ class System(object):
         reflDict["transf"] = np.eye(4)
         if not "flip" in reflDict:
             reflDict["flip"] = False
-        check_ElemDict(reflDict) 
+        check_ElemDict(reflDict, self.system.keys()) 
 
         if not "ecc_uv" in reflDict:
             reflDict["ecc_uv"] = 0
@@ -573,9 +577,11 @@ class System(object):
         return out
 
     def createFrame(self, argDict):
-        check_RTDict(argDict)
-        frame_in = makeRTframe(argDict)
-        return frame_in
+        if not argDict["name"]:
+            argDict["name"] = f"Frame_{len(self.frames)}"
+        
+        check_RTDict(argDict, self.frames.keys())
+        self.frames[argDict["name"]] = makeRTframe(argDict)
 
     def loadFramePoynt(self, Poynting, name_source):
         grids = generateGrid(self.system[name_source])
@@ -588,7 +594,7 @@ class System(object):
 
     def calcRayLen(self, *args, start=0):
         if isinstance(start, np.ndarray):
-            frame0 = args[0]
+            frame0 = self.frames[args[0]]
 
             out = []
             sumd = np.zeros(len(frame0.x))
@@ -603,33 +609,33 @@ class System(object):
             sumd += lens
 
             for i in range(len(args) - 1):
-                diffx = args[i+1].x - frame0.x
-                diffy = args[i+1].y - frame0.y
-                diffz = args[i+1].z - frame0.z
+                diffx = self.frames[args[i+1]].x - frame0.x
+                diffy = self.frames[args[i+1]].y - frame0.y
+                diffz = self.frames[args[i+1]].z - frame0.z
 
                 lens = np.sqrt(diffx**2 + diffy**2 + diffz**2)
                 out.append(lens)
 
-                frame0 = args[i+1]
+                frame0 = self.frames[args[i+1]]
                 sumd += lens
 
             out.append(sumd)
 
         else:
-            frame0 = args[0]
+            frame0 = self.frames[args[0]]
 
             out = []
             sumd = np.zeros(len(frame0.x))
 
             for i in range(len(args) - 1):
-                diffx = args[i+1].x - frame0.x
-                diffy = args[i+1].y - frame0.y
-                diffz = args[i+1].z - frame0.z
+                diffx = self.frames[args[i+1]].x - frame0.x
+                diffy = self.frames[args[i+1]].y - frame0.y
+                diffz = self.frames[args[i+1]].z - frame0.z
 
                 lens = np.sqrt(diffx**2 + diffy**2 + diffz**2)
                 out.append(lens)
 
-                frame0 = args[i+1]
+                frame0 = self.frames[args[i+1]]
                 sumd += lens
 
             out.append(sumd)
@@ -641,28 +647,28 @@ class System(object):
         gauss_in = makeGauss(gaussDict, self.system[name_source])
         return gauss_in
 
-    def runRayTracer(self, fr_in, name_target, epsilon=1e-3, nThreads=1, t0=100, device="CPU", verbose=True):
+    def runRayTracer(self, fr_in, fr_out, name_target, epsilon=1e-3, nThreads=1, t0=100, device="CPU", verbose=True):
         if verbose:
             if device == "CPU":
-                fr_out = RT_CPUd(self.system[name_target], fr_in, epsilon, t0, nThreads)
+                frameObj = RT_CPUd(self.system[name_target], self.frames[fr_in], epsilon, t0, nThreads)
 
             elif device == "GPU":
-                fr_out = RT_GPUf(self.system[name_target], fr_in, epsilon, t0, nThreads)
+                frameObj = RT_GPUf(self.system[name_target], self.frames[fr_in], epsilon, t0, nThreads)
 
         else:
             with suppress_stdout():
                 if device == "CPU":
-                    fr_out = RT_CPUd(self.system[name_target], fr_in, epsilon, t0, nThreads)
+                    frameObj = RT_CPUd(self.system[name_target], self.frames[fr_in], epsilon, t0, nThreads)
 
                 elif device == "GPU":
-                    fr_out = RT_GPUf(self.system[name_target], fr_in, epsilon, t0, nThreads)
+                    frameObj = RT_GPUf(self.system[name_target], self.frames[fr_in], epsilon, t0, nThreads)
         
-        return fr_out
+        self.frames[fr_out] = frameObj
 
     def interpFrame(self, fr_in, field, name_target, method="nearest"):
         grids = generateGrid(self.system[name_target])
 
-        points = (fr_in.x, fr_in.y, fr_in.z)
+        points = (self.frames[fr_in].x, self.frames[fr_in].y, self.frames[fr_in].z)
 
         rfield = np.real(field)
         ifield = np.imag(field)
@@ -757,6 +763,10 @@ class System(object):
             for name in select:
                 plotDict[name] = self.system[name]
 
+        if RTframes:
+            for i in len(RTframes):
+                RTframes[i] = self.frames[RTframes[i]]
+
         else:
             plotDict = self.system
 
@@ -769,9 +779,9 @@ class System(object):
 
     def plotRTframe(self, frame, project="xy", returns=False):
         if returns:
-            return plt.plotRTframe(frame, project, self.savePath, returns)
+            return plt.plotRTframe(self.frames[frame], project, self.savePath, returns)
         else:
-            plt.plotRTframe(frame, project, self.savePath, returns)
+            plt.plotRTframe(self.frames[frame], project, self.savePath, returns)
 
     def copyObj(self, obj):
         return copy.deepcopy(obj)

@@ -142,7 +142,7 @@ class System(object):
         if not "flip" in reflDict:
             reflDict["flip"] = False
 
-        check_ElemDict(reflDict) 
+        check_ElemDict(reflDict, self.system.keys()) 
         if not "ecc_uv" in reflDict:
             reflDict["ecc_uv"] = 0
 
@@ -211,7 +211,7 @@ class System(object):
         reflDict["transf"] = np.eye(4)
         if not "flip" in reflDict:
             reflDict["flip"] = False
-        check_ElemDict(reflDict) 
+        check_ElemDict(reflDict, self.system.keys()) 
         if not "ecc_uv" in reflDict:
             reflDict["ecc_uv"] = 0
 
@@ -284,7 +284,7 @@ class System(object):
         if not "flip" in reflDict:
             reflDict["flip"] = False
 
-        check_ElemDict(reflDict) 
+        check_ElemDict(reflDict, self.system.keys()) 
         if not "ecc_uv" in reflDict:
             reflDict["ecc_uv"] = 0
 
@@ -352,7 +352,7 @@ class System(object):
         reflDict["transf"] = np.eye(4)
         if not "flip" in reflDict:
             reflDict["flip"] = False
-        check_ElemDict(reflDict) 
+        check_ElemDict(reflDict, self.system.keys()) 
 
         if not "ecc_uv" in reflDict:
             reflDict["ecc_uv"] = 0

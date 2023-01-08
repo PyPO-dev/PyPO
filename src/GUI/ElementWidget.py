@@ -93,7 +93,9 @@ class ElementWidget(QWidget):
             
 
    
-
+class FrameWidget(ElementWidget):
+    def __init__ (self, element, actions, p=None ):
+        super().__init__(element, actions,parent=p)
     
         
 

@@ -8,7 +8,6 @@ import src.GUI.MPLCanvas as mplc
 class PlotScreen(qtw.QWidget):
     def __init__(self, fig):
         super().__init__()
-        print(type(fig))
         self.canvas = mplc.MplCanvas(fig)
         NavTB = NavigationToolbar(self.canvas, self)
 
@@ -17,13 +16,6 @@ class PlotScreen(qtw.QWidget):
         layout.addWidget(self.canvas)
 
         self.setLayout(layout)
-
-    # def setFigure(self, figure):
-    #     print("setting figure!!!!!!!!!")
-    #     self.canvas.drawInCanvas(figure)
-
-
-
 
 if __name__ == "__main__":
 

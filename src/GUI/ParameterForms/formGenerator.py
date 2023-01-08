@@ -40,14 +40,13 @@ class FormGenerator(QWidget):
         self.layout.setContentsMargins(0,0,0,0)
 
         self.setLayout(self.layout)
-
+    
     def setupInputs(self):
         for inp in self.formData:
             if inp.inType.value == 0:
                 input = StaticInput(inp)
                 self.inputs.append(input)
                 self.layout.addRow(input)
-                
             elif inp.inType.value < 4:
                 input = SimpleInput(inp)
                 self.inputs.append(input)
@@ -74,9 +73,10 @@ class FormGenerator(QWidget):
 
     def read(self):
         paramDict = {}
+        # print(paramDict)
         for input in self.inputs:
+            # print("updating with: ", input.read())
             paramDict.update(input.read())
-        print(paramDict)
         return paramDict
     
 class StaticInput(QWidget):
@@ -88,7 +88,7 @@ class StaticInput(QWidget):
         layout.setContentsMargins(0,0,0,0)
         layout.addRow(MyLabel(inp.label), MyLabel(inp.staticValue))
     def read(self):
-        return {self.inputDescription.outputName, self.inputDescription.staticValue}
+        return {self.inputDescription.outputName: self.inputDescription.staticValue}
 
 
 class BooleanInput(QWidget):
@@ -138,7 +138,7 @@ class SimpleInput(QWidget):
     def read(self):
         l =[] 
         for i in self.inputs:
-            print(self.label.text())
+            # print(self.label.text())
             l.append(self.enumToType(self.inputDescription.inType)(i.text()))
         if len(l)>1:        
             if self.inputDescription.oArray:
@@ -185,7 +185,7 @@ class DynamicInputWidget(QWidget):
         self.layout.addRow(self.stackedWidget)
         for childInDesList in self.inputDescription.subdict.values():
             child = FormGenerator(childInDesList, addButtons=False, readAction=None)
-            child.setContentsMargins(0,0,0,0)
+            child.setContentsMargins(0,0,0,0) ###TODO: is this necessory??
             self.stackedWidget.addWidget(child)
             self.children.append(child)
 

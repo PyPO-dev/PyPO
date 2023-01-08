@@ -20,7 +20,7 @@ class InputDescription:
     staticValue : str = field(default=None)
     hints : list = Factory(list)
     numFields : int = 1
-    oArray: bool = False
+    oArray: bool = field(default=False)
     subdict: dict = field(default=None)
     sublist: list = field(default=None)
 

@@ -165,10 +165,22 @@ class MainWidget(QWidget):
         self.addToWindowGrid(self.ParameterWid,self.GPParameterForm)
 
     def setQuadricForm(self):
-        self.ParameterWid = self.setForm(fDataObj.makeQuadricSurfaceInp(), readAction=self.addParabolaAction)
+        self.setForm(fDataObj.makeQuadricSurfaceInp(), readAction=self.addQuadricAction)
     
     def setPlaneForm(self):
         self.setForm(fDataObj.makePlaneInp(), readAction=self.addPlaneAction)
+
+    def addQuadricAction(self):
+        elementDict = self.ParameterWid.read()
+        if elementDict["type"] == "Parabola":
+            self.stm.addParabola(elementDict)
+        elif elementDict["type"] == "Hyperbola":
+            self.stm.addHyperbola(elementDict)
+        elif elementDict["type"] == "Ellipse":
+            self.stm.addEllipse(elementDict)
+        else:
+            raise Exception("Quadric type incorrect")
+        
 
     def addHyperbolaAction(self):
         elementDict = self.ParameterWid.read()
@@ -193,13 +205,6 @@ class MainWidget(QWidget):
     
     def setTransromationForm(self, element):
         self.setForm(fDataObj.makeTransformationForm(element), self.applyTransformation)
-        # if hasattr(self, "ParameterWid"):
-        #     self.ParameterWid.setParent(None)
-        
-        # self.ParameterWid = TransformationWidget(element, self.applyTransformation)
-        # self.ParameterWid.setMaximumWidth(400)
-        # self.ParameterWid.setMinimumWidth(400)
-        # self.addToWindowGrid(self.ParameterWid,self.GPParameterForm)
 
     def applyTransformation(self, element):
         dd = self.ParameterWid.read()

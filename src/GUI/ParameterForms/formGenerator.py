@@ -77,6 +77,7 @@ class FormGenerator(QWidget):
         for input in self.inputs:
             # print("updating with: ", input.read())
             paramDict.update(input.read())
+        print(paramDict)
         return paramDict
     
 class StaticInput(QWidget):
@@ -138,7 +139,7 @@ class SimpleInput(QWidget):
     def read(self):
         l =[] 
         for i in self.inputs:
-            # print(self.label.text())
+            print(self.inputDescription.outputName)
             l.append(self.enumToType(self.inputDescription.inType)(i.text()))
         if len(l)>1:        
             if self.inputDescription.oArray:
@@ -195,6 +196,7 @@ class DynamicInputWidget(QWidget):
             self.currentChild = self.children[self.mode.currentIndex()]
 
     def read(self):
+        self.modeUpdate()
         ind = self.mode.currentIndex()
         if self.hasChildren:
             modeOut = list(self.inputDescription.subdict.keys())[ind]
@@ -202,8 +204,18 @@ class DynamicInputWidget(QWidget):
             modeOut = list(self.inputDescription.sublist)[ind]
         paramDict = {self.inputDescription.outputName: modeOut}
         if self.hasChildren:
-            for input in self.currentChild.findChildren(SimpleInput):
-                paramDict.update(input.read())
+            children = self.currentChild.findChildren(QWidget)
+            for c in children:
+                print(type(c))
+                try:
+                    print(c.inputDescription.outputName)
+                except:
+                    pass
+
+            # for input in self.currentChild.findChildren(SimpleInput):
+            #     print(input)
+            #     print(input.inputDescription.outputName)
+                # paramDict.update(input.read())
         return paramDict
 
 

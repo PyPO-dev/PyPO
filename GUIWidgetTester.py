@@ -31,7 +31,7 @@ Plane = [
         ] 
     })
 ]
-win = FormGenerator(Plane, lambda:1)
+win = FormGenerator(Plane, )
 
 
 with open('src/GUI/style.css') as f:

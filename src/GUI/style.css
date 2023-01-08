@@ -8,8 +8,8 @@ ElementWidget MyButton{
     border-bottom-left-radius : 0px; 
     border-bottom-right-radius : 15px
 }
-SystemsWidget QPushButton{
-    background:#a5a515;
+FrameWidget MyButton{
+    background:#a5156b;
     border-top-left-radius :0px;
     border-top-right-radius : 15px; 
     border-bottom-left-radius : 0px; 
@@ -29,8 +29,19 @@ ElementWidget QLabel{
     border-bottom-right-radius : 0px; */
     padding: 10px;
 }
-SystemWidget QLabel{
-    background: #a5a515;
+
+FrameWidget QLabel{
+    background: #a5156b;
+    font-weight: bold;
+    color:#f2c50f;
+    border-radius :15px 15px 15px 15px;
+    /* border-top-right-radius : 0px; 
+    border-bottom-left-radius : 15px; 
+    border-bottom-right-radius : 0px; */
+    padding: 10px;
+}
+FrameWidget QLabel{
+    background: #a5156b;
     border-radius :15px 0px 0px 0px;
     /* border-top-right-radius : 0px; 
     border-bottom-left-radius : 15px; 

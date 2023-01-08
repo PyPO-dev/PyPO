@@ -10,7 +10,7 @@ class InputRTError(Exception):
 
 # Error message definitions
 def errMsg_name(elemName):
-    return f"\nName \"{elemName}\" already in use. Choose different name for element."
+    return f"\nName \"{elemName}\" already in use. Choose different name."
 
 def errMsg_field(fieldName, elemName):
     return f"\nMissing field \"{fieldName}\", element {elemName}."
@@ -200,8 +200,10 @@ def check_ElemDict(elemDict, nameList):
     else:
         return 0
 
-def check_RTDict(RTDict):
+def check_RTDict(RTDict, nameList):
     errStr = ""
+    if RTDict["name"] in nameList:
+        errStr += errMsg_name(RTDict["name"])
 
     if "nRays" in RTDict:
         if not isinstance(RTDict["nRays"], int):
@@ -248,8 +250,6 @@ def check_RTDict(RTDict):
 
     else:
         errStr += errMsg_field("b", "RTDict")
-
-    RTDict["name"] = "RTDict"
 
     if "tChief" in RTDict:
         errStr += block_ndarray("tChief", RTDict, (3,))

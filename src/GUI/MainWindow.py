@@ -236,7 +236,7 @@ class MainWidget(QWidget):
 
     def addPropRaysAction(self): 
         propRaysDict = self.ParameterWid.read()
-        self.stm.runRayTracer(self.stm.frames[propRaysDict["frame_in"]], 
+        self.stm.runRayTracer(propRaysDict["frame_in"], propRaysDict["frame_out"], 
                             propRaysDict["target"], propRaysDict["epsilon"], propRaysDict["nThreads"], 
                             propRaysDict["t0"], propRaysDict["device"], verbose=False)
     #END NOTE

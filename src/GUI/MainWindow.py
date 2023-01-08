@@ -2,12 +2,12 @@ import sys
 
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSpacerItem, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar
 from PyQt5.QtGui import QFont, QIcon
-from src.GUI.ElementsColumn import ElementsWindow
-from src.GUI.archive.SystemsColumn import SystemsWindow
 from src.GUI.ParameterForms import formGenerator
 import src.GUI.ParameterForms.formDataObjects as fDataObj
 from src.GUI.PlotScreen import PlotScreen
 from src.GUI.TransformationWidget import TransformationWidget
+from src.GUI.Acccordion import Accordion
+from src.GUI.ElementWidget import ElementWidget
 import numpy as np
 
 sys.path.append('../')
@@ -29,22 +29,17 @@ class MainWidget(QWidget):
         self.GPParameterForm  = [0, 1, 4, 1]
         self.GPPlotScreen     = [0, 2, 4, 1]
 
-
         ### ElementConfigurations
         # self.elementConfigs = []
 
         # init System
         self.stm = st.System()
         
-
-
-
         # init layout
         self.grid = QGridLayout()
 
         self._mkElementsColumn()
         self._setupPlotScreen()
-        # self.plotSystem()
 
 
         self.setLayout(self.grid)
@@ -56,59 +51,71 @@ class MainWidget(QWidget):
     def _mkElementsColumn(self):
         if hasattr(self, "ElementsColumn"):
             self.ElementsColumn.setParent(None)
+
+        self.refletorActions = [self.setTransromationForm, self.plotElement, self.removeElement]
         StmElements = []
         for e,_ in self.stm.system.items():
             StmElements.append(e)
-        self.ElementsColumn = ElementsWindow(StmElements, [self.setTransromationForm, self.plotElement])
-        self.ElementsColumn.setMaximumWidth(300)
-        self.ElementsColumn.setMinimumWidth(300)
+        self.ElementsColumn = Accordion()
         self.addToWindowGrid(self.ElementsColumn, self.GPElementsColumn)
 
     # #####################
     def _setupPlotScreen(self):
         self.PlotScreen = QTabWidget()
         self.PlotScreen.setTabsClosable(True)
+        self.PlotScreen.setTabShape(QTabWidget.Rounded)
         self.PlotScreen.tabCloseRequested.connect(self.closeTab)
         self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
 
+    def addPlot(self, figure, label):
+        self.PlotScreen.addTab(PlotScreen(figure), label)
+        self.PlotScreen.setCurrentIndex(self.PlotScreen.count()-1)
+
+
     def closeTab(self, i):
         self.PlotScreen.removeTab(i)
+
+    def removeElement(self, element):
+        self.stm.removeElement(element)
         
     def plotElement(self, surface):
         if self.stm.system:
             figure = self.stm.plot3D(  surface,   returns= True, show=False, save=False, ret=True)
         else :
             figure = None
-        self.PlotScreen.addTab(PlotScreen(figure),"Plot1")
-        self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
-
+        self.addPlot(figure, surface)
 
     def plotSystem(self):
-        # if hasattr(self, "PlotScreen"):
-        #     self.PlotScreen.setParent(None)
-
         if self.stm.system:
             figure, _ = self.stm.plotSystem(ret = True, show=False, save=False)
         else :
             figure = None
-        self.PlotScreen.addTab(PlotScreen(figure),"Plot1")
-        self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
+        self.addPlot(figure, "System Plot %d" %self.getSysPlotNr())
+        
+    
+    def getSysPlotNr(self):
+        if not hasattr(self, "sysPlotNr"):
+            self.sysPlotNr = 0
+        self.sysPlotNr+=1
+        return self.sysPlotNr
+
+    def getRayPlotNr(self):
+        if not hasattr(self, "rayPlotNr"):
+            self.rayPlotNr = 0
+        self.rayPlotNr+=1
+        return self.rayPlotNr
 
     def plotRaytrace(self):
-        # if hasattr(self, "PlotScreen"):
-        #     self.PlotScreen.setParent(None)
-
         framelist = []
         if self.frameDict:
-            for key, item in self.frameDict.items():
-                framelist.append(item)
+            for val in self.frameDict.values():
+                framelist.append(val)
 
         if self.stm.system:
             figure, _ = self.stm.plotSystem(ret = True, show=False, save=False, RTframes=framelist)
         else :
             figure = None
-        self.PlotScreen.addTab(PlotScreen(figure),"Plot1")
-        self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
+        self.addPlot(figure,"Ray Trace Frame %d" %(self.getRayPlotNr()))
 
     def addToWindowGrid(self, widget, param):
         self.grid.addWidget(widget, param[0], param[1], param[2], param[3])
@@ -128,10 +135,11 @@ class MainWidget(QWidget):
             "gridsize"  : np.array([1501,1501])
             }
         self.stm.addParabola(d)
-        self._mkElementsColumn()
+        self.ElementsColumn.reflectors.addWidget(ElementWidget(d["name"],self.refletorActions))
 
     def addExampleHyperbola(self):
         hyperbola = {
+            'name': 'Hype',
             'type': 'Hyperbola', 
             'pmode': 'focus',
             'gmode': 'xy',
@@ -146,59 +154,57 @@ class MainWidget(QWidget):
             'gridsize': np.array([501, 501])
         }
         self.stm.addHyperbola(hyperbola)
-        self._mkElementsColumn()
+        self.ElementsColumn.reflectors.addWidget(ElementWidget(hyperbola["name"],self.refletorActions))
+
+    def setForm(self, formData, readAction):
+        if hasattr(self, "ParameterWid"):
+            self.ParameterWid.setParent(None)
+        self.ParameterWid = formGenerator.FormGenerator(formData, readAction)
+        self.ParameterWid.setMaximumWidth(400)
+        self.ParameterWid.setMinimumWidth(400)
+        self.addToWindowGrid(self.ParameterWid,self.GPParameterForm)
 
     def setQuadricForm(self):
-        if hasattr(self, "ParameterWid"):
-            self.ParameterWid.setParent(None)
-
-        self.ParameterWid = formGenerator.FormGenerator(fDataObj.makeQuadricSurfaceInp(), readAction=self.addParabolaAction)
-        self.ParameterWid.setMaximumWidth(400)
-        self.ParameterWid.setMinimumWidth(400)
-        self.addToWindowGrid(self.ParameterWid,self.GPParameterForm)
+        self.ParameterWid = self.setForm(fDataObj.makeQuadricSurfaceInp(), readAction=self.addParabolaAction)
     
     def setPlaneForm(self):
-        if hasattr(self, "ParameterWid"):
-            self.ParameterWid.setParent(None)
-
-        self.ParameterWid = formGenerator.FormGenerator(fDataObj.makePlaneInp(), readAction=self.addPlaneAction)        
-        self.ParameterWid.setMaximumWidth(400)
-        self.ParameterWid.setMinimumWidth(400)
-        self.addToWindowGrid(self.ParameterWid,self.GPParameterForm)
+        self.setForm(fDataObj.makePlaneInp(), readAction=self.addPlaneAction)
 
     def addHyperbolaAction(self):
         elementDict = self.ParameterWid.read()
         self.stm.addHyperbola(elementDict) 
-        self._mkElementsColumn()
-    
+        self.ElementsColumn.reflectors.addWidget(ElementWidget(elementDict["name"],self.refletorActions))
+
     def addEllipseAction(self):
         elementDict = self.ParameterWid.read()
         self.stm.addEllipse(elementDict) 
-        self._mkElementsColumn()
+        self.ElementsColumn.reflectors.addWidget(ElementWidget(elementDict["name"],self.refletorActions))
     
 
     def addParabolaAction(self):
         elementDict = self.ParameterWid.read()
         self.stm.addParabola(elementDict) 
-        self._mkElementsColumn()
+        self.ElementsColumn.reflectors.addWidget(ElementWidget(elementDict["name"],self.refletorActions))
     
     def addPlaneAction(self):
         elementDict = self.ParameterWid.read()
         self.stm.addPlane(elementDict) 
-        self._mkElementsColumn()
+        self.ElementsColumn.reflectors.addWidget(ElementWidget(elementDict["name"],self.refletorActions))
     
     def setTransromationForm(self, element):
-        if hasattr(self, "ParameterWid"):
-            self.ParameterWid.setParent(None)
+        self.setForm(fDataObj.makeTransformationForm(element), self.applyTransformation)
+        # if hasattr(self, "ParameterWid"):
+        #     self.ParameterWid.setParent(None)
         
-        self.ParameterWid = TransformationWidget(element, self.applyTransformation)
-        self.ParameterWid.setMaximumWidth(400)
-        self.ParameterWid.setMinimumWidth(400)
-        self.addToWindowGrid(self.ParameterWid,self.GPParameterForm)
+        # self.ParameterWid = TransformationWidget(element, self.applyTransformation)
+        # self.ParameterWid.setMaximumWidth(400)
+        # self.ParameterWid.setMinimumWidth(400)
+        # self.addToWindowGrid(self.ParameterWid,self.GPParameterForm)
 
     def applyTransformation(self, element, transformationType, transformation, rotationCenter=None):
+
         # for i in transformation:
-        #     print(i)
+        print("Transform")
         # print(transformation, type(transformation))
         # print(rotationCenter, type(rotationCenter))
         if transformationType == "trans":
@@ -208,13 +214,7 @@ class MainWidget(QWidget):
 
     #NOTE Raytrace widgets
     def setInitFrameForm(self):
-        if hasattr(self, "ParameterWid"):
-            self.ParameterWid.setParent(None)
-
-        self.ParameterWid = formGenerator.FormGenerator(fDataObj.initFrameInp(), readAction=self.addFrameAction)
-        self.ParameterWid.setMaximumWidth(400)
-        self.ParameterWid.setMinimumWidth(400)
-        self.addToWindowGrid(self.ParameterWid, self.GPParameterForm)
+        self.setForm(fDataObj.initFrameInp(), readAction=self.addFrameAction)
 
     def addFrameAction(self):
         RTDict = self.ParameterWid.read()
@@ -223,18 +223,9 @@ class MainWidget(QWidget):
         self.frameDict[name] = _frame
     
     def setPlotFrameForm(self):
-        if hasattr(self, "ParameterWid"):
-            self.ParameterWid.setParent(None)
-
-        self.ParameterWid = formGenerator.FormGenerator(fDataObj.plotFrameInp(self.frameDict), readAction=self.addPlotFrameAction)
-        self.ParameterWid.setMaximumWidth(400)
-        self.ParameterWid.setMinimumWidth(400)
-        self.addToWindowGrid(self.ParameterWid, self.GPParameterForm)
+        self.setForm(fDataObj.plotFrameInp(self.frameDict), readAction=self.addPlotFrameAction)
 
     def addPlotFrameAction(self):
-        # if hasattr(self, "PlotScreen"):
-        #     self.PlotScreen.setParent(None)
-        
         plotFrameDict = self.ParameterWid.read()
         fig = self.stm.plotRTframe(self.frameDict[plotFrameDict["frame"]], project=plotFrameDict["project"], returns=True)
         self.PlotScreen.addTab(PlotScreen(fig),"Plot1")
@@ -242,13 +233,7 @@ class MainWidget(QWidget):
         self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
 
     def setPropRaysForm(self):
-        if hasattr(self, "ParameterWid"):
-            self.ParameterWid.setParent(None)
-
-        self.ParameterWid = formGenerator.FormGenerator(fDataObj.propRaysInp(self.frameDict, self.stm.system), self.addPropRaysAction)
-        self.ParameterWid.setMaximumWidth(400)
-        self.ParameterWid.setMinimumWidth(400)
-        self.addToWindowGrid(self.ParameterWid, self.GPParameterForm)
+        self.setForm(fDataObj.propRaysInp(self.frameDict, self.stm.system), self.addPropRaysAction)
 
     def addPropRaysAction(self): 
         propRaysDict = self.ParameterWid.read()

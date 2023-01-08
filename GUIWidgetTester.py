@@ -18,7 +18,7 @@ app = QApplication(sys.argv)
 # win = ElementWidget_Systems.SystemWidget("System_1")
 # win = SystemsColumn.SystemsWindow(["System_1", "sys2"])
 Plane = [
-    InputDescription(inType.string, "name"),
+    InputDescription(inType.string, "nameeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"),
     InputDescription(inType.floats, "coeffs", label="Coefficients", hints=[2], numFields=2),
     InputDescription(inType.integers, "gridsize", label="Grid Size", hints=[101,101], numFields=2),
     InputDescription(inType.dropdown, "pmode", label="Parameter Mode", subdict={
@@ -31,7 +31,7 @@ Plane = [
         ] 
     })
 ]
-win = FormGenerator(Plane, None)
+win = FormGenerator(Plane, lambda:1)
 
 
 with open('src/GUI/style.css') as f:

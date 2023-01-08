@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QWidget, QGridLayout, QVBoxLayout, QPushButton, QApplication
-from ElementsColumn import ElementsWindow
+from GUI.archive.ElementsColumn import ElementsWindow
 from PyQt5 import QtCore
 from GUI.archive.ParabolaForm import ParabolaFormLayout
 import PlotScreen as PS

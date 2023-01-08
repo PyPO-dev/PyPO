@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QLabel, QApplication, QWidget, QHBoxLayout, QMainWindow, \
                                     QPushButton, QSpacerItem, QSizePolicy, QDialog, \
-                                    QAction,QVBoxLayout
+                                    QAction,QVBoxLayout, QGridLayout
                                         
 from PyQt5.QtGui import QFont, QIcon, QCursor 
 from PyQt5.QtCore import Qt
@@ -10,13 +10,16 @@ import sys
 sys.path.append('../')
 sys.path.append('../../')
 
-
+class MyButton(QPushButton):
+    def __init__(self, s):
+        super().__init__(s)
 
 class ElementWidget(QWidget):
-    def __init__ (self, element, actions , p=None ):
+    def __init__ (self, element, actions, p=None ):
         super().__init__(parent=p)
         self.transformAction = actions[0]
         self.plotElementAction = actions[1]
+        self.RemoveElementAction = actions[2]
         self.element = element
         
         layout = QHBoxLayout()
@@ -24,11 +27,9 @@ class ElementWidget(QWidget):
 
         label.setFixedSize(200,39)
 
-        # self.setContentsMargins(1,0,0,0)
-        # self.btn = HoverOpenBtn("btn",self._openOptionsMenu, self._closeOptionsMenu)
-        self.btn = QPushButton("⋮")
+        # layout.setContentsMargins(0,0,0,0)
+        self.btn = MyButton("⋮")
         self.btn.clicked.connect(self._openOptionsMenu)
-        # self.btn.setIcon(QIcon("src/GUI/Images/dots.png"))
         self.btn.setFixedSize(50,39)
         
         layout.addWidget(label)
@@ -43,14 +44,13 @@ class ElementWidget(QWidget):
 
         dlgLayout = QVBoxLayout()
         dlgLayout.setContentsMargins(0,0,0,0)
-        dlgLayout.setSpacing(0)
 
         btn1 = QPushButton("Transform")
-        btn2 = QPushButton("Edit")
+        btn2 = QPushButton("Remove")
         btn3 = QPushButton("Plot")
 
         btn1.clicked.connect(self.transform)
-        btn2.clicked.connect(self._closeOptionsMenu)
+        btn2.clicked.connect(self.removeElement)
         btn3.clicked.connect(self.plotElement)
 
         dlgLayout.addWidget(btn1)
@@ -60,7 +60,7 @@ class ElementWidget(QWidget):
         self.dlg.setLayout(dlgLayout)
         self.dlg.setWindowFlag(Qt.FramelessWindowHint)
         posi = self.mapToGlobal(self.btn.pos())
-        self.dlg.setGeometry(posi.x(), posi.y() ,100,100)
+        self.dlg.setGeometry(posi.x(), posi.y() ,100,80)
         self.dlg.show()
         
     def _closeOptionsMenu(self):
@@ -73,6 +73,24 @@ class ElementWidget(QWidget):
     def plotElement(self):
         self.plotElementAction(self.element)
         self._closeOptionsMenu()
+    
+    def removeElement(self):
+        self._closeOptionsMenu()
+        removeElementDialog = QDialog()
+        layout = QGridLayout()
+        okBtn = QPushButton("Ok")
+        okBtn.clicked.connect(removeElementDialog.accept)
+        cancelBtn = QPushButton("Cancel")
+        cancelBtn.clicked.connect(removeElementDialog.reject)
+        layout.addWidget(QLabel("Do you want to delete element %s?" %(self.element)), 0,0,1,2)
+        layout.addWidget(cancelBtn, 1,0)
+        layout.addWidget(okBtn, 1,1)
+        removeElementDialog.setLayout(layout)
+
+        if removeElementDialog.exec_():
+            self.RemoveElementAction(self.element)
+            self.setParent(None)
+            
 
    
 

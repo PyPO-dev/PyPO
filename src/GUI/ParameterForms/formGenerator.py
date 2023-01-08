@@ -10,6 +10,12 @@ from src.GUI.ParameterForms.InputDescription import *
 class MyLabel(QLabel):
     def __init__ (self, s):
         super().__init__(s)
+        self.setWordWrap(True)
+class MyEdit(QLineEdit):
+    def __init__ (self):
+        super().__init__()
+        self.setAlignment = Qt.AlignTop
+        
 
 # Validator_floats = QRegExpValidator(QRegExp("[-+]?[0-9]*[\.,]?[0-9]*"))
 # Validator_ints = QRegExpValidator(QRegExp("[-+]?[0-9]*"))
@@ -17,9 +23,9 @@ def makeLabelFromString(s):
     return MyLabel(s.replace("_"," ").capitalize())
 
 class FormGenerator(QWidget):
-    def __init__ (self, ElementData, readAction = None, addButtons=True):
+    def __init__ (self, ElementData, readAction = None, addButtons=True, test=False):
         super().__init__()
-        if addButtons and readAction == None:
+        if addButtons and readAction == None and not test:
             raise Exception("Trying to add buttons with no action provided!")
         self.formData = ElementData
         self.readme = readAction
@@ -37,7 +43,12 @@ class FormGenerator(QWidget):
 
     def setupInputs(self):
         for inp in self.formData:
-            if inp.inType.value < 4:
+            if inp.inType.value == 0:
+                input = StaticInput(inp)
+                self.inputs.append(input)
+                self.layout.addRow(input)
+                
+            elif inp.inType.value < 4:
                 input = SimpleInput(inp)
                 self.inputs.append(input)
                 self.layout.addRow(input)
@@ -46,9 +57,10 @@ class FormGenerator(QWidget):
                 self.inputs.append(input)
                 self.layout.addRow(input)
             elif inp.inType.value == 5:
-                input = VariableInputWidget(inp)
+                input = DynamicInputWidget(inp)
                 self.inputs.append(input)
                 self.layout.addRow(input)
+                
 
     def setupButtons(self):
         addBtn = QPushButton("Add")
@@ -66,6 +78,33 @@ class FormGenerator(QWidget):
             paramDict.update(input.read())
         print(paramDict)
         return paramDict
+    
+class StaticInput(QWidget):
+    def __init__ (self, inp:InputDescription):
+        super().__init__()
+        self.inputDescription = inp
+        layout = QFormLayout()
+        self.setLayout(layout)
+        layout.setContentsMargins(0,0,0,0)
+        layout.addRow(MyLabel(inp.label), MyLabel(inp.staticValue))
+    def read(self):
+        return {self.inputDescription.outputName, self.inputDescription.staticValue}
+
+
+class BooleanInput(QWidget):
+    def __init__ (self, inp:InputDescription):
+        super().__init__()
+        self.inputDescription = inp
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0,0,0,0)
+        self.box = QCheckBox()
+        self.label = MyLabel(self.inputDescription.label)
+        layout.addWidget(self.label)
+        layout.addWidget(self.box)
+        self.setLayout(layout)
+
+    def read(self):
+        return{self.inputDescription.outputName: self.box.isChecked()}
 
 class SimpleInput(QWidget):
     def __init__ (self, inp:InputDescription):
@@ -80,7 +119,7 @@ class SimpleInput(QWidget):
     def setupUI(self):
         inp = self.inputDescription
         
-        self.inputs = [QLineEdit() for k in range(inp.numFields)]
+        self.inputs = [MyEdit() for k in range(inp.numFields)]
         for edit in self.inputs:
             edit.setValidator(None)
         editLayout = QHBoxLayout()
@@ -115,21 +154,7 @@ class SimpleInput(QWidget):
         if intype == inType.floats: return float
         if intype == inType.string: return str
 
-class BooleanInput(QWidget):
-    def __init__ (self, inp:InputDescription):
-        super().__init__()
-        self.inputDescription = inp
-        layout = QHBoxLayout()
-        self.box = QCheckBox()
-        self.label = QLabel(self.inputDescription.label)
-        layout.addWidget(self.box)
-        layout.addWidget(self.label)
-        self.setLayout(layout)
-
-    def read(self):
-        return{self.inputDescription.outputName: self.box.isChecked()}
-
-class VariableInputWidget(QWidget):
+class DynamicInputWidget(QWidget):
     def __init__ (self, inp):
         super().__init__()
         self.inputDescription = inp

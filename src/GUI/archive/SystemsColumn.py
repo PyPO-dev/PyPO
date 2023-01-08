@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QWidget, QApplication
 # from PyQt5.QtGui import QFont, QIcon
 
 
-from src.GUI.ElementsColumn import ElementsWindow
+from GUI.archive.ElementsColumn import ElementsWindow
 from src.GUI.archive.ElementWidget_Systems import SystemWidget
 
 class SystemsWindow(QWidget):

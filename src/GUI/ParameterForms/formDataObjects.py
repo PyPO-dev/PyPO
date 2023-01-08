@@ -65,6 +65,19 @@ def makePlaneInp():
             })]
             #InputDescription(inType.integers, "flip", label="Flip normal vectors", numFields=1)]
 
+def makeTransformationForm(elementName):
+    return[
+        InputDescription(inType.static, "element", staticValue=elementName),
+        InputDescription(inType.dropdown, "type", subdict={
+            "Translation":[
+                InputDescription(inType.floats, "vector", label="Translation Vector", hints=["x","y","z"], numFields=3,oArray=True)],
+            "Rotation": [
+                InputDescription(inType.floats, "vector", label="Rotation Vector", hints=["x","y","z"], numFields=3,oArray=True),
+                InputDescription(inType.floats, "centerOfRotation", label="Center of Rotation", hints=["x","y","z"], numFields=3,oArray=True)
+                ]
+        })
+    ]
+
 # NOTE
 def initFrameInp():
     return [InputDescription(inType.integers, "nRays", label="# of rays", hints=[0], numFields=1),

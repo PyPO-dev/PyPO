@@ -4,6 +4,7 @@ from attrs import validators
 import operator
 
 class inType(Enum):
+    static = 0
     string = 1
     integers = 2
     floats = 3
@@ -16,6 +17,7 @@ class InputDescription:
     inType : inType
     outputName : str = field(validator=validators.instance_of(str))
     label : str = field(default=None)
+    staticValue : str = field(default=None)
     hints : list = Factory(list)
     numFields : int = 1
     oArray: bool = False
@@ -23,7 +25,6 @@ class InputDescription:
     sublist: list = field(default=None)
 
     def __attrs_post_init__(self):
-
         if self.label == None:
             self.label = self.outputName.capitalize()
 

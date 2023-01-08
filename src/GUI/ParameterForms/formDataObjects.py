@@ -98,7 +98,7 @@ def plotFrameInp(frameDict):
     
     plotFrame = [
             InputDescription(inType.dropdown, "frame", label="Frame", sublist = sublist_frames),
-            InputDescription(inType.string, "project", label="Abscissa and ordinate", hints=["xy"], numFields=1)
+            InputDescription(inType.string, "project", label="Abscissa - ordinate", hints=["xy"], numFields=1)
             ]
 
     return plotFrame
@@ -119,6 +119,7 @@ def propRaysInp(frameDict, elemDict):
     propRays = [
             InputDescription(inType.dropdown, "frame_in", label="Input frame", sublist = sublist_frames),
             InputDescription(inType.dropdown, "target", label="Target surface", sublist = sublist_target),
+            InputDescription(inType.string, "frame_out", label="Name of output frame", numFields=1),
             InputDescription(inType.floats, "epsilon", label="Accuracy", hints=[1e-3], numFields=1),
             InputDescription(inType.integers, "nThreads", label="# of threads", hints=[1], numFields=1),
             InputDescription(inType.floats, "t0", label="Initial guess", hints=[100], numFields=1),

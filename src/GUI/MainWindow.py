@@ -7,7 +7,7 @@ import src.GUI.ParameterForms.formDataObjects as fDataObj
 from src.GUI.PlotScreen import PlotScreen
 from src.GUI.TransformationWidget import TransformationWidget
 from src.GUI.Acccordion import Accordion
-from src.GUI.ElementWidget import ElementWidget, FrameWidget
+from src.GUI.ElementWidget import ElementWidget
 import numpy as np
 
 sys.path.append('../')
@@ -107,13 +107,15 @@ class MainWidget(QWidget):
 
     def plotRaytrace(self):
         framelist = []
-        if self.stm.frames:
-            for val in self.stm.frames.values():
-                framelist.append(val)
 
+        if self.stm.frames:
+            for key in self.stm.frames.keys():
+                framelist.append(key)
+        
         if self.stm.system:
             figure, _ = self.stm.plotSystem(ret = True, show=False, save=False, RTframes=framelist)
-        else :
+        
+        else:
             figure = None
         self.addPlot(figure,"Ray Trace Frame %d" %(self.getRayPlotNr()))
 
@@ -123,7 +125,7 @@ class MainWidget(QWidget):
 
     def addExampleParabola(self):
         d = {
-            # "name"      : "pri",
+            "name"      : "pri",
             "type"      : "Parabola",
             "pmode"     : "focus",
             "gmode"     : "uv",
@@ -139,7 +141,7 @@ class MainWidget(QWidget):
 
     def addExampleHyperbola(self):
         hyperbola = {
-            # 'name': 'Hype',
+            'name': 'Hype',
             'type': 'Hyperbola', 
             'pmode': 'focus',
             'gmode': 'xy',
@@ -206,20 +208,16 @@ class MainWidget(QWidget):
     def setTransromationForm(self, element):
         self.setForm(fDataObj.makeTransformationForm(element), self.applyTransformation)
 
-    def applyTransformation(self, element):
-        dd = self.ParameterWid.read()
-        print("Applying transrot: ", dd)
-        transformationType = dd["type"]
-        vector = dd["vector"]
-        print("vectorType: ",type(vector))
-        # print(self.stm.system[])
+    def applyTransformation(self, element, transformationType, transformation, rotationCenter=None):
 
-        if transformationType == "Translation":
-            self.stm.translateGrids(dd["element"], vector)
-        elif transformationType == "Rotation":
-            self.stm.rotateGrids(dd["element"], vector, cRot=dd["centerOfRotation"])
-        else:
-            raise Exception("Transformation type incorrect")
+        # for i in transformation:
+        print("Transform")
+        # print(transformation, type(transformation))
+        # print(rotationCenter, type(rotationCenter))
+        if transformationType == "trans":
+            self.stm.translateGrids(element, transformation)
+        elif transformationType == "rot":
+            self.stm.rotateGrids(element, transformation, cRot=rotationCenter)
 
     #NOTE Raytrace widgets
     def setInitFrameForm(self):
@@ -236,7 +234,7 @@ class MainWidget(QWidget):
         print(self.stm.frames)
         plotFrameDict = self.ParameterWid.read()
         fig = self.stm.plotRTframe(plotFrameDict["frame"], project=plotFrameDict["project"], returns=True)
-        self.PlotScreen.addTab(PlotScreen(fig),"Plot1")
+        self.PlotScreen.addTab(PlotScreen(fig),f'{plotFrameDict["frame"]} - {plotFrameDict["project"]}')
 
         self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
 
@@ -245,7 +243,7 @@ class MainWidget(QWidget):
 
     def addPropRaysAction(self): 
         propRaysDict = self.ParameterWid.read()
-        self.stm.runRayTracer(self.stm.frames[propRaysDict["frame_in"]], 
+        self.stm.runRayTracer(propRaysDict["frame_in"], propRaysDict["frame_out"], 
                             propRaysDict["target"], propRaysDict["epsilon"], propRaysDict["nThreads"], 
                             propRaysDict["t0"], propRaysDict["device"], verbose=False)
     #END NOTE
@@ -312,7 +310,7 @@ class PyPOMainWindow(QMainWindow):
         plotSystem.triggered.connect(self.mainWid.plotSystem)
         SystemsMenu.addAction(plotSystem)
 
-        plotRaytrace = QAction("Plot System (include ray-traces)", self)
+        plotRaytrace = QAction("Plot ray-trace", self)
         plotRaytrace.triggered.connect(self.mainWid.plotRaytrace)
         SystemsMenu.addAction(plotRaytrace)
 

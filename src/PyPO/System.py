@@ -762,17 +762,18 @@ class System(object):
         if select:
             for name in select:
                 plotDict[name] = self.system[name]
-
-        if RTframes:
-            for i in len(RTframes):
-                RTframes[i] = self.frames[RTframes[i]]
-
         else:
             plotDict = self.system
+        
+        _RTframes = []
+        if RTframes:
+            for name in RTframes:
+                _RTframes.append(self.frames[name])
+
 
         figax = plt.plotSystem(plotDict, fine, cmap,
                     ax_append, norm,
-                    show, foc1, foc2, save, ret, RTframes, self.savePath)
+                    show, foc1, foc2, save, ret, _RTframes, self.savePath)
 
         if ret:
             return figax

@@ -26,7 +26,6 @@ def plotBeam2D(plotObject, field,
             grid_x2 = grids.y
             ff_flag = False
 
-
         elif project == 'yz':
             grid_x1 = grids.y
             grid_x2 = grids.z
@@ -37,12 +36,10 @@ def plotBeam2D(plotObject, field,
             grid_x2 = grids.x
             ff_flag = False
 
-        # Transpose plots
-        if project == 'yx':
+        elif project == 'yx':
             grid_x1 = grids.y
             grid_x2 = grids.x
             ff_flag = False
-
 
         elif project == 'zy':
             grid_x1 = grids.z
@@ -365,11 +362,26 @@ def plotRTframe(frame, project, savePath, returns):
         ax.set_xlabel(r"$x$ / mm")
         ax.set_ylabel(r"$y$ / mm")
 
+    elif project == "xz":
+        ax.scatter(frame.x, frame.z, color="black")
+        ax.set_xlabel(r"$x$ / mm")
+        ax.set_ylabel(r"$z$ / mm")
+    
     elif project == "yz":
         ax.scatter(frame.y, frame.z, color="black")
         ax.set_xlabel(r"$y$ / mm")
         ax.set_ylabel(r"$z$ / mm")
+    
+    elif project == "yx":
+        ax.scatter(frame.y, frame.x, color="black")
+        ax.set_xlabel(r"$y$ / mm")
+        ax.set_ylabel(r"$x$ / mm")
 
+    elif project == "zy":
+        ax.scatter(frame.z, frame.y, color="black")
+        ax.set_xlabel(r"$z$ / mm")
+        ax.set_ylabel(r"$y$ / mm")
+    
     elif project == "zx":
         ax.scatter(frame.z, frame.x, color="black")
         ax.set_xlabel(r"$z$ / mm")

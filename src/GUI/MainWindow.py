@@ -7,7 +7,7 @@ import src.GUI.ParameterForms.formDataObjects as fDataObj
 from src.GUI.PlotScreen import PlotScreen
 from src.GUI.TransformationWidget import TransformationWidget
 from src.GUI.Acccordion import Accordion
-from src.GUI.ElementWidget import ElementWidget
+from src.GUI.ElementWidget import ElementWidget, FrameWidget
 import numpy as np
 
 sys.path.append('../')
@@ -182,8 +182,12 @@ class MainWidget(QWidget):
             self.stm.addEllipse(elementDict)
         else:
             raise Exception("Quadric type incorrect")
-        
+        self.ElementsColumn.reflectors.addWidget(ElementWidget(elementDict["name"],self.refletorActions))
 
+    def addParabolaAction(self):
+        elementDict = self.ParameterWid.read()
+        self.stm.addParabola(elementDict) 
+    
     def addHyperbolaAction(self):
         elementDict = self.ParameterWid.read()
         self.stm.addHyperbola(elementDict) 
@@ -194,12 +198,6 @@ class MainWidget(QWidget):
         self.stm.addEllipse(elementDict) 
         self.ElementsColumn.reflectors.addWidget(ElementWidget(elementDict["name"],self.refletorActions))
     
-
-    def addParabolaAction(self):
-        elementDict = self.ParameterWid.read()
-        self.stm.addParabola(elementDict) 
-        self.ElementsColumn.reflectors.addWidget(ElementWidget(elementDict["name"],self.refletorActions))
-    
     def addPlaneAction(self):
         elementDict = self.ParameterWid.read()
         self.stm.addPlane(elementDict) 
@@ -208,16 +206,20 @@ class MainWidget(QWidget):
     def setTransromationForm(self, element):
         self.setForm(fDataObj.makeTransformationForm(element), self.applyTransformation)
 
-    def applyTransformation(self, element, transformationType, transformation, rotationCenter=None):
+    def applyTransformation(self, element):
+        dd = self.ParameterWid.read()
+        print("Applying transrot: ", dd)
+        transformationType = dd["type"]
+        vector = dd["vector"]
+        print("vectorType: ",type(vector))
+        # print(self.stm.system[])
 
-        # for i in transformation:
-        print("Transform")
-        # print(transformation, type(transformation))
-        # print(rotationCenter, type(rotationCenter))
-        if transformationType == "trans":
-            self.stm.translateGrids(element, transformation)
-        elif transformationType == "rot":
-            self.stm.rotateGrids(element, transformation, cRot=rotationCenter)
+        if transformationType == "Translation":
+            self.stm.translateGrids(dd["element"], vector)
+        elif transformationType == "Rotation":
+            self.stm.rotateGrids(dd["element"], vector, cRot=dd["centerOfRotation"])
+        else:
+            raise Exception("Transformation type incorrect")
 
     #NOTE Raytrace widgets
     def setInitFrameForm(self):
@@ -226,6 +228,7 @@ class MainWidget(QWidget):
     def addFrameAction(self):
         RTDict = self.ParameterWid.read()
         self.stm.createFrame(RTDict)
+        self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(RTDict["name"], [lambda:1,lambda:1,lambda:1]))
     
     def setPlotFrameForm(self):
         self.setForm(fDataObj.plotFrameInp(self.stm.frames), readAction=self.addPlotFrameAction)

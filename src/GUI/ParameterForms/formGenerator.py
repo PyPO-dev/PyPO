@@ -159,6 +159,7 @@ class DynamicInputWidget(QWidget):
     def __init__ (self, inp):
         super().__init__()
         self.inputDescription = inp
+        # self.findChildren(QWidget,options=Qt.FindDirectChildrenOnly)
         
         self.layout = QFormLayout()
         self.layout.setContentsMargins(0,0,0,0)
@@ -204,7 +205,7 @@ class DynamicInputWidget(QWidget):
             modeOut = list(self.inputDescription.sublist)[ind]
         paramDict = {self.inputDescription.outputName: modeOut}
         if self.hasChildren:
-            children = self.currentChild.findChildren(QWidget)
+            children = self.currentChild.findChildren(QWidget,options=Qt.FindDirectChildrenOnly)
             for c in children:
                 print(type(c))
                 try:
@@ -212,10 +213,10 @@ class DynamicInputWidget(QWidget):
                 except:
                     pass
 
-            # for input in self.currentChild.findChildren(SimpleInput):
+        for input in self.currentChild.findChildren(QWidget,options=Qt.FindDirectChildrenOnly):
             #     print(input)
             #     print(input.inputDescription.outputName)
-                # paramDict.update(input.read())
+            paramDict.update(input.read())
         return paramDict
 
 

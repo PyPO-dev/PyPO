@@ -181,7 +181,6 @@ def plot3D(plotObject, fine, cmap,
             returns, ax_append, norm,
             show, foc1, foc2, save, savePath, ret=False):
 
-
     skip = slice(None,None,fine)
     grids = generateGrid(plotObject, transform=True, spheric=True)
 
@@ -220,7 +219,13 @@ def plot3D(plotObject, fine, cmap,
         pt.savefig(fname=savePath + '{}.jpg'.format(plotObject["name"]),bbox_inches='tight', dpi=300)
 
     if show:
-        pt.show()
+        pass
+        #pt.show()
+    
+    if save or show:
+        pt.close()
+        pt.cla()
+        pt.clf()
 
     del grids
 
@@ -228,9 +233,10 @@ def plot3D(plotObject, fine, cmap,
         return fig
 
     if returns:
+        pt.close()
+        pt.clf()
         return ax_append
 
-    pt.close()
 
 
 def plotSystem(systemDict, fine, cmap,
@@ -249,7 +255,7 @@ def plotSystem(systemDict, fine, cmap,
         else:
             _cmap = cmap
 
-        plot3D(refl, fine=fine, cmap=_cmap,
+        ax = plot3D(refl, fine=fine, cmap=_cmap,
                     returns=True, ax_append=ax, norm=norm,
                     show=False, foc1=foc1, foc2=foc2, save=False, savePath=savePath)
     # print("ps2")
@@ -287,11 +293,11 @@ def plotSystem(systemDict, fine, cmap,
     if show:
         pt.show()
 
+    if save or show:
+        pt.close()
+
     if ret:
         return fig, ax
-
-    pt.close()
-    return 0
 
 def beamCut(self, plotObject, field, cross='', units='', vmin=-50, vmax=0, frac=1, show=True, save=False, ret=False):
 

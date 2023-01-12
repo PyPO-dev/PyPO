@@ -103,6 +103,14 @@ def plotFrameInp(frameDict):
 
     return plotFrame
 
+def plotFrameOpt(frameName):
+    plotFrame = [
+            InputDescription(inType.static, "frame", label="Frame", staticValue=frameName),
+            InputDescription(inType.string, "project", label="Abscissa - ordinate", hints=["xy"], numFields=1)
+            ]
+
+    return plotFrame
+
 def propRaysInp(frameDict, elemDict):
     sublist_frames = []
     sublist_target = []

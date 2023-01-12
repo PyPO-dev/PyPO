@@ -444,6 +444,9 @@ class System(object):
 
     def removeElement(self, name):
         del self.system[name]
+    
+    def removeFrame(self, frameName):
+        del self.frames[frameName]
 
     def saveFields(self, fields, name_fields):
         saveDir = os.path.join(self.savePathFields, name_fields)

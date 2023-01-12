@@ -93,12 +93,74 @@ class ElementWidget(QWidget):
             
 
    
-class FrameWidget(ElementWidget):
-    def __init__ (self, element, actions, p=None ):
-        super().__init__(element, actions)
-    
+class FrameWidget(QWidget):
+    def __init__ (self, frame, actions, p=None ):
+        super().__init__(parent=p)
+        self.plotFrameAction = actions[0]
+        self.RemoveFrameAction = actions[1]
+        self.frame = frame
         
+        layout = QHBoxLayout()
+        label = QLabel(frame)
 
+        label.setFixedSize(200,39)
+
+        # layout.setContentsMargins(0,0,0,0)
+        self.btn = MyButton("⋮")
+        self.btn.clicked.connect(self._openOptionsMenu)
+        self.btn.setFixedSize(50,39)
+        
+        layout.addWidget(label)
+        layout.addWidget(self.btn)
+        layout.setSpacing(40)
+
+        self.setLayout(layout)
+        self.setFixedSize(250,60)
+
+    def _openOptionsMenu(self):
+        self.dlg = selfClosingDialog(self._closeOptionsMenu, parent = self)
+
+        dlgLayout = QVBoxLayout()
+        dlgLayout.setContentsMargins(0,0,0,0)
+
+        btn1 = QPushButton("Remove")
+        btn2 = QPushButton("Plot")
+
+        btn1.clicked.connect(self.removeFrame)
+        btn2.clicked.connect(self.plotFrame)
+
+        dlgLayout.addWidget(btn1)
+        dlgLayout.addWidget(btn2)
+
+        self.dlg.setLayout(dlgLayout)
+        self.dlg.setWindowFlag(Qt.FramelessWindowHint)
+        posi = self.mapToGlobal(self.btn.pos())
+        self.dlg.setGeometry(posi.x(), posi.y() ,100,80)
+        self.dlg.show()
+        
+    def _closeOptionsMenu(self):
+        self.dlg.close()
+
+    def plotFrame(self):
+        self.plotFrameAction(self.frame)
+        self._closeOptionsMenu()
+    
+    def removeFrame(self):
+        self._closeOptionsMenu()
+        removeFrameDialog = QDialog()
+        layout = QGridLayout()
+        okBtn = QPushButton("Ok")
+        okBtn.clicked.connect(removeFrameDialog.accept)
+        cancelBtn = QPushButton("Cancel")
+        cancelBtn.clicked.connect(removeFrameDialog.reject)
+        layout.addWidget(QLabel("Do you want to delete frame %s?" %(self.frame)), 0,0,1,2)
+        layout.addWidget(cancelBtn, 1,0)
+        layout.addWidget(okBtn, 1,1)
+        removeFrameDialog.setLayout(layout)
+
+        if removeFrameDialog.exec_():
+            self.RemoveFrameAction(self.frame)
+            self.setParent(None)
 
 if __name__ == "__main__":
     app = QApplication([])

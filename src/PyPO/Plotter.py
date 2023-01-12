@@ -177,76 +177,42 @@ def plotBeam2D(plotObject, field,
 
     pt.close()
 
-def plot3D(plotObject, fine, cmap,
-            returns, ax_append, norm,
-            show, foc1, foc2, save, savePath, ret=False):
+def plot3D(plotObject, ax, fine, cmap,
+            norm, foc1, foc2, plotSystem_f=False):
 
     skip = slice(None,None,fine)
     grids = generateGrid(plotObject, transform=True, spheric=True)
 
-    fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
-    if not ax_append:
-        ax_append = ax
-
-    reflector = ax_append.plot_surface(grids.x[skip], grids.y[skip], grids.z[skip],
+    ax.plot_surface(grids.x[skip], grids.y[skip], grids.z[skip],
                    linewidth=0, antialiased=False, alpha=1, cmap=cmap)
 
     if foc1:
-        ax_append.scatter(plotObject["focus_1"][0], plotObject["focus_1"][1], plotObject["focus_1"][2], color='black')
+        ax.scatter(plotObject["focus_1"][0], plotObject["focus_1"][1], plotObject["focus_1"][2], color='black')
 
     if foc2:
-        ax_append.scatter(plotObject["focus_2"][0], plotObject["focus_2"][1], plotObject["focus_2"][2], color='black')
+        ax.scatter(plotObject["focus_2"][0], plotObject["focus_2"][1], plotObject["focus_2"][2], color='black')
 
     if norm:
         length = 10# np.sqrt(np.dot(plotObject["focus_1"], plotObject["focus_1"])) / 5
         skipn = slice(None,None,10*fine)
-        ax_append.quiver(grids.x[skipn,skipn], grids.y[skipn,skipn], grids.z[skipn,skipn],
+        ax.quiver(grids.x[skipn,skipn], grids.y[skipn,skipn], grids.z[skipn,skipn],
                         grids.nx[skipn,skipn], grids.ny[skipn,skipn], grids.nz[skipn,skipn],
                         color='black', length=length, normalize=True)
 
-    if not returns:
-        ax_append.set_ylabel(r"$y$ / [mm]", labelpad=20)
-        ax_append.set_xlabel(r"$x$ / [mm]", labelpad=10)
-        ax_append.set_zlabel(r"$z$ / [mm]", labelpad=50)
-        ax_append.set_title(plotObject["name"], fontsize=20)
-        world_limits = ax_append.get_w_lims()
-        ax_append.set_box_aspect((world_limits[1]-world_limits[0],world_limits[3]-world_limits[2],world_limits[5]-world_limits[4]))
-        ax_append.tick_params(axis='x', which='major', pad=-3)
-        ax_append.minorticks_off()
-        #set_axes_equal(ax_append)
-
-    if save:
-        pt.savefig(fname=savePath + '{}.jpg'.format(plotObject["name"]),bbox_inches='tight', dpi=300)
-
-    if show:
-        pass
-        #pt.show()
-    
-    if save or show:
-        pt.close()
-        pt.cla()
-        pt.clf()
+    if not plotSystem_f:
+        ax.set_ylabel(r"$y$ / [mm]", labelpad=20)
+        ax.set_xlabel(r"$x$ / [mm]", labelpad=10)
+        ax.set_zlabel(r"$z$ / [mm]", labelpad=50)
+        ax.set_title(plotObject["name"], fontsize=20)
+        world_limits = ax.get_w_lims()
+        ax.set_box_aspect((world_limits[1]-world_limits[0],world_limits[3]-world_limits[2],world_limits[5]-world_limits[4]))
+        ax.tick_params(axis='x', which='major', pad=-3)
+        ax.minorticks_off()
 
     del grids
 
-    if ret:
-        return fig
-
-    if returns:
-        pt.close()
-        pt.clf()
-        return ax_append
-
-
-
-def plotSystem(systemDict, fine, cmap,
-            ax_append, norm,
-            show, foc1, foc2, save, ret, RTframes, savePath):
-    # print("ps1")
-    fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
-
-    #ax.set_xlim3d(-10,800)
-    #ax.set_ylim3d(-250,250)
+def plotSystem(systemDict, ax, fine, cmap,norm,
+            foc1, foc2, RTframes):
 
     for i, (key, refl) in enumerate(systemDict.items()):
         if isinstance(cmap, list):
@@ -255,11 +221,9 @@ def plotSystem(systemDict, fine, cmap,
         else:
             _cmap = cmap
 
-        ax = plot3D(refl, fine=fine, cmap=_cmap,
-                    returns=True, ax_append=ax, norm=norm,
-                    show=False, foc1=foc1, foc2=foc2, save=False, savePath=savePath)
-    # print("ps2")
-
+        plot3D(refl, ax, fine=fine, cmap=_cmap,
+                    norm=norm, foc1=foc1, foc2=foc2, plotSystem_f=True)
+    
     ax.set_ylabel(r"$y$ / [mm]", labelpad=20)
     ax.set_xlabel(r"$x$ / [mm]", labelpad=10)
     ax.set_zlabel(r"$z$ / [mm]", labelpad=20)
@@ -286,18 +250,6 @@ def plotSystem(systemDict, fine, cmap,
     #set_axes_equal(ax)
     ax.minorticks_off()
     ax.set_box_aspect((world_limits[1]-world_limits[0],world_limits[3]-world_limits[2],world_limits[5]-world_limits[4]))
-
-    if save:
-        pt.savefig(fname=savePath + 'system.jpg',bbox_inches='tight', dpi=300)
-
-    if show:
-        pt.show()
-
-    if save or show:
-        pt.close()
-
-    if ret:
-        return fig, ax
 
 def beamCut(self, plotObject, field, cross='', units='', vmin=-50, vmax=0, frac=1, show=True, save=False, ret=False):
 
@@ -360,8 +312,8 @@ def beamCut(self, plotObject, field, cross='', units='', vmin=-50, vmax=0, frac=
     if ret:
         return field[:,y_center], field[:,y_center]
 
-def plotRTframe(frame, project, savePath, returns):
-    fig, ax = pt.subplots(1,1)
+def plotRTframe(frame, project, savePath, returns, aspect):
+    fig, ax = pt.subplots(1,1, figsize=(5,5))
 
     if project == "xy":
         ax.scatter(frame.x, frame.y, color="black")
@@ -393,10 +345,9 @@ def plotRTframe(frame, project, savePath, returns):
         ax.set_xlabel(r"$z$ / mm")
         ax.set_ylabel(r"$x$ / mm")
 
-    ax.set_aspect(1)
+    ax.set_aspect(aspect)
     
     if returns:
         return fig
-
 
     pt.show()

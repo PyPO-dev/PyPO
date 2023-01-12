@@ -80,7 +80,7 @@ class MainWidget(QWidget):
         
     def plotElement(self, surface):
         if self.stm.system:
-            figure = self.stm.plot3D(  surface,   returns= True, show=False, save=False, ret=True)
+            figure, _ = self.stm.plot3D(surface, show=False, save=False, ret=True)
         else :
             figure = None
         self.addPlot(figure, surface)

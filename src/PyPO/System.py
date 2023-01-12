@@ -743,21 +743,34 @@ class System(object):
                         unitl, name, titleA, titleP, self.savePath, unwrap_phase)
 
     def plot3D(self, name_surface, fine=2, cmap=cm.cool,
-                returns=False, ax_append=False, norm=False,
-                show=True, foc1=False, foc2=False, save=True, ret=False):
+            norm=False, show=True, foc1=False, foc2=False, save=False, ret=False):
+        
+        #pt.rcParams['xtick.minor.visible'] = False
+        #pt.rcParams['ytick.minor.visible'] = False
 
+        fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
         plotObject = self.system[name_surface]
 
-        r = plt.plot3D(plotObject, fine, cmap,
-                    returns, ax_append, norm,
-                    show, foc1, foc2, save, self.savePath, ret=ret)
-        if returns:
-            return r
+        plt.plot3D(plotObject, ax, fine, cmap, norm, foc1, foc2)
+        if ret:
+            return fig, ax
+        
+        elif save:
+            pt.savefig(fname=savePath + '{}.jpg'.format(plotObject["name"]),bbox_inches='tight', dpi=300)
+            pt.close()
+
+        elif show:
+            pt.show()
+
+        #pt.rcParams['xtick.minor.visible'] = True
+        #pt.rcParams['ytick.minor.visible'] = True
 
     def plotSystem(self, fine=2, cmap=cm.cool,
-                ax_append=False, norm=False,
-                show=True, foc1=False, foc2=False, save=True, ret=False, select=[], RTframes=[]):
+                norm=False, show=True, foc1=False, foc2=False, save=False, ret=False, select=[], RTframes=[]):
 
+        #pt.rcParams['xtick.minor.visible'] = False
+        #pt.rcParams['ytick.minor.visible'] = False
+        
         plotDict = {}
         if select:
             for name in select:
@@ -771,18 +784,29 @@ class System(object):
                 _RTframes.append(self.frames[name])
 
 
-        figax = plt.plotSystem(plotDict, fine, cmap,
-                    ax_append, norm,
-                    show, foc1, foc2, save, ret, _RTframes, self.savePath)
+        fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
+        plt.plotSystem(plotDict, ax, fine, cmap,norm,
+                    foc1, foc2, _RTframes)
 
         if ret:
-            return figax
+            return fig, ax
+        
+        elif save:
+            pt.savefig(fname=self.savePath + 'system.jpg',bbox_inches='tight', dpi=300)
+            pt.close()
 
-    def plotRTframe(self, frame, project="xy", returns=False):
+        elif show:
+            pt.show()
+        
+        #pt.rcParams['xtick.minor.visible'] = True
+        #pt.rcParams['ytick.minor.visible'] = True
+        
+
+    def plotRTframe(self, frame, project="xy", returns=False, aspect=1):
         if returns:
-            return plt.plotRTframe(self.frames[frame], project, self.savePath, returns)
+            return plt.plotRTframe(self.frames[frame], project, self.savePath, returns, aspect)
         else:
-            plt.plotRTframe(self.frames[frame], project, self.savePath, returns)
+            plt.plotRTframe(self.frames[frame], project, self.savePath, returns, aspect)
 
     def copyObj(self, obj):
         return copy.deepcopy(obj)

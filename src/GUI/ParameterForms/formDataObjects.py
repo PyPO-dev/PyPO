@@ -136,5 +136,53 @@ def propRaysInp(frameDict, elemDict):
 
     return propRays
     
+def initGaussianInp(elemDict):
+    sublist_surf = []
+
+    if elemDict:
+        for key, item in elemDict.items():
+            if item["type"] == 3: # Only append plane types
+                sublist_surf.append(key)
+
+    initGauss = [
+            InputDescription(inType.dropdown, "surface", label="Gaussian beam surface", sublist = sublist_surf),
+            InputDescription(inType.string, "name", label="Beam name", numFields=1),
+            InputDescription(inType.floats, "lam", label="Wavelength of radiation", hints=[1], numFields=1),
+            InputDescription(inType.floats, "w0x", label="Beamwaist in X", hints=[5], numFields=1),
+            InputDescription(inType.floats, "w0y", label="Beamwaist in Y", hints=[5], numFields=1),
+            InputDescription(inType.floats, "n", label="Refractive index", hints=[1], numFields=1),
+            InputDescription(inType.floats, "E0", label="Peak value", hints=[1], numFields=1),
+            InputDescription(inType.floats, "z", label="Focal distance", hints=[0], numFields=1),
+            InputDescription(inType.floats, "pol", label="Polarization", hints=[1,0,0], numFields=3, oArray=True)
+            ]
+    
+    return initGauss
+
+def plotFieldOpt(fieldName, elemDict, fieldType):
+    sublist_surf = []
+
+    if fieldType == "EH":
+        complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
+    
+    elif fieldType == "JM":
+        complist = ["Jx", "Jy", "Jz", "Mx", "My", "Mz"]
+
+    if elemDict:
+        for key, item in elemDict.items():
+            if item["type"] == 3: # Only append plane types
+                sublist_surf.append(key)
+    
+    plotField = [
+            InputDescription(inType.static, "field", label="Field/current", staticValue=fieldName),
+            InputDescription(inType.dropdown, "surface", label="Beam surface", sublist = sublist_surf),
+            InputDescription(inType.dropdown, "comp", label="Component", sublist = complist),
+            InputDescription(inType.string, "project", label="Abscissa - ordinate", hints=["xy"], numFields=1)
+            ]
+
+    return plotField
+
+
+
+
 
 # END NOTE

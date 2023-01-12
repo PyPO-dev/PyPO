@@ -8,6 +8,8 @@ class currents(object):
         self.My = My
         self.Mz = Mz
 
+        self.type = "JM"
+
     def __getitem__(self, i):
         if i == 0:
             return self.Jx
@@ -34,6 +36,8 @@ class fields(object):
         self.Hx = Hx
         self.Hy = Hy
         self.Hz = Hz
+
+        self.type = "EH"
 
     def __getitem__(self, i):
         if i == 0:

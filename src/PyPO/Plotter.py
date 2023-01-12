@@ -168,14 +168,7 @@ def plotBeam2D(plotObject, field,
             ax.add_patch(circlei)
             ax.scatter(xc, yc, color='black', marker='x')
 
-    if save:
-        pt.savefig(fname=savePath + '{}_{}.jpg'.format(plotObject["name"], name),
-                    bbox_inches='tight', dpi=300)
-
-    if show:
-        pt.show()
-
-    pt.close()
+    return fig, ax
 
 def plot3D(plotObject, ax, fine, cmap,
             norm, foc1, foc2, plotSystem_f=False):

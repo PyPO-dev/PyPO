@@ -69,6 +69,11 @@ class System(object):
         # Internal dictionaries
         self.system = {}
         self.frames = {}
+        self.fields = {}
+        self.currents = {}
+
+        self.EHcomplist = np.array(["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"])
+        self.JMcomplist = np.array(["Jx", "Jy", "Jz", "Mx", "My", "Mz"])
 
         self.cl = 2.99792458e11 # mm / s
         #self.savePathElem = "./save/elements/"
@@ -447,6 +452,12 @@ class System(object):
     
     def removeFrame(self, frameName):
         del self.frames[frameName]
+    
+    def removeField(self, fieldName):
+        del self.fields[fieldName]
+    
+    def removeCurrent(self, currentName):
+        del self.currents[currentName]
 
     def saveFields(self, fields, name_fields):
         saveDir = os.path.join(self.savePathFields, name_fields)
@@ -648,6 +659,8 @@ class System(object):
     # Beam!   
     def createGauss(self, gaussDict, name_source):
         gauss_in = makeGauss(gaussDict, self.system[name_source])
+        self.fields["EH_" + gaussDict["name"]] = gauss_in[0]
+        self.currents["JM_" + gaussDict["name"]] = gauss_in[1]
         return gauss_in
 
     def runRayTracer(self, fr_in, fr_out, name_target, epsilon=1e-3, nThreads=1, t0=100, device="CPU", verbose=True):
@@ -724,26 +737,54 @@ class System(object):
 
         return out
 
-    def plotBeam2D(self, name_surface, field,
+    def plotBeam2D(self, name_surface, name_field, comp,
                     vmin=-30, vmax=0, show=True, amp_only=False,
                     save=False, polar=False, interpolation=None,
                     aperDict={"plot":False}, mode='dB', project='xy',
                     units="", name='', titleA="Amp", titleP="Phase",
-                    unwrap_phase=False):
+                    unwrap_phase=False, returns=False):
 
         plotObject = self.system[name_surface]
+
+        print(comp)
+        print(self.EHcomplist)
+        print(np.argwhere(self.EHcomplist == comp))
+
+        if name_field in self.fields.keys():
+            field = self.fields[name_field]
+        
+            if comp in self.EHcomplist:
+                field_comp = field[np.argwhere(self.EHcomplist == comp)[0]]
+
+
+        elif name_field in self.currents.keys():
+            field = self.currents[name_field] 
+            
+            if comp in self.JMcomplist:
+                field_comp = field[np.argwhere(self.JMcomplist == comp)[0]]
 
         default = "mm"
         if plotObject["gmode"] == 2 and not units:
             default = "deg"
 
         unitl = self._units(units, default)
-
-        plt.plotBeam2D(plotObject, field,
+        
+        fig, ax = plt.plotBeam2D(plotObject, field_comp,
                         vmin, vmax, show, amp_only,
                         save, polar, interpolation,
                         aperDict, mode, project,
                         unitl, name, titleA, titleP, self.savePath, unwrap_phase)
+
+        if returns:
+            return fig, ax
+
+        elif save:
+            pt.savefig(fname=savePath + '{}_{}.jpg'.format(plotObject["name"], name),
+                        bbox_inches='tight', dpi=300)
+            pt.close()
+
+        elif show:
+            pt.show()
 
     def plot3D(self, name_surface, fine=2, cmap=cm.cool,
             norm=False, show=True, foc1=False, foc2=False, save=False, ret=False):

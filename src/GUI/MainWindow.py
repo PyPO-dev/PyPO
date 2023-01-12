@@ -225,10 +225,19 @@ class MainWidget(QWidget):
     def setInitFrameForm(self):
         self.setForm(fDataObj.initFrameInp(), readAction=self.addFrameAction)
 
+    def setInitGaussianForm(self):
+        self.setForm(fDataObj.initGaussianInp(self.stm.system), readAction=self.addGaussianAction)
+    
     def addFrameAction(self):
         RTDict = self.ParameterWid.read()
         self.stm.createFrame(RTDict)
         self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(RTDict["name"], [self.setPlotFrameFormOpt, self.stm.removeFrame]))
+    
+    def addGaussianAction(self):
+        GDict = self.ParameterWid.read()
+        self.stm.createGauss(GDict, GDict["surface"])
+        self.ElementsColumn.POFields.addWidget(FrameWidget("EH_" + GDict["name"], [self.setPlotFieldFormOpt, self.stm.removeField]))
+        self.ElementsColumn.POCurrents.addWidget(FrameWidget("JM_" + GDict["name"], [self.setPlotFieldFormOpt, self.stm.removeCurrent]))
     
     def setPlotFrameForm(self):
         self.setForm(fDataObj.plotFrameInp(self.stm.frames), readAction=self.addPlotFrameAction)
@@ -236,6 +245,13 @@ class MainWidget(QWidget):
     def setPlotFrameFormOpt(self, frame):
         self.setForm(fDataObj.plotFrameOpt(frame), readAction=self.addPlotFrameAction)
 
+    def setPlotFieldFormOpt(self, field):
+        if field in self.stm.fields.keys():
+            self.setForm(fDataObj.plotFieldOpt(field, self.stm.system, self.stm.fields[field].type), readAction=self.addPlotFieldAction)
+        
+        elif field in self.stm.currents.keys():
+            self.setForm(fDataObj.plotFieldOpt(field, self.stm.system, self.stm.currents[field].type), readAction=self.addPlotFieldAction)
+    
     def addPlotFrameAction(self):
         plotFrameDict = self.ParameterWid.read()
         fig = self.stm.plotRTframe(plotFrameDict["frame"], project=plotFrameDict["project"], returns=True)
@@ -243,6 +259,14 @@ class MainWidget(QWidget):
 
         self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
 
+    def addPlotFieldAction(self):
+        plotFieldDict = self.ParameterWid.read()
+        fig, _ = self.stm.plotBeam2D(plotFieldDict["surface"], plotFieldDict["field"], 
+                                    plotFieldDict["comp"], project=plotFieldDict["project"], returns=True)
+        self.PlotScreen.addTab(PlotScreen(fig),f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
+
+        self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
+    
     def setPropRaysForm(self):
         self.setForm(fDataObj.propRaysInp(self.stm.frames, self.stm.system), self.addPropRaysAction)
 
@@ -344,8 +368,11 @@ class PyPOMainWindow(QMainWindow):
         makeBeam = PhysOptMenu.addMenu("Initialize beam")
         initPointAction = QAction("Point source", self)
         makeBeam.addAction(initPointAction)
+    
         initGaussAction = QAction("Gaussian beam", self)
+        initGaussAction.triggered.connect(self.mainWid.setInitGaussianForm)
         makeBeam.addAction(initGaussAction)
+
 
         # END NOTE
 if __name__ == "__main__":

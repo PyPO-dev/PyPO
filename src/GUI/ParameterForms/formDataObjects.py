@@ -93,7 +93,7 @@ def initFrameInp():
 def plotFrameInp(frameDict):
     sublist_frames = []
     if frameDict:
-        for key, item in frameDict.items():
+        for key in frameDict.keys():
             sublist_frames.append(key)
     
     plotFrame = [

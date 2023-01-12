@@ -228,13 +228,15 @@ class MainWidget(QWidget):
     def addFrameAction(self):
         RTDict = self.ParameterWid.read()
         self.stm.createFrame(RTDict)
-        self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(RTDict["name"], [lambda:1,lambda:1,lambda:1]))
+        self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(RTDict["name"], [self.setPlotFrameFormOpt, self.stm.removeFrame]))
     
     def setPlotFrameForm(self):
         self.setForm(fDataObj.plotFrameInp(self.stm.frames), readAction=self.addPlotFrameAction)
+    
+    def setPlotFrameFormOpt(self, frame):
+        self.setForm(fDataObj.plotFrameOpt(frame), readAction=self.addPlotFrameAction)
 
     def addPlotFrameAction(self):
-        print(self.stm.frames)
         plotFrameDict = self.ParameterWid.read()
         fig = self.stm.plotRTframe(plotFrameDict["frame"], project=plotFrameDict["project"], returns=True)
         self.PlotScreen.addTab(PlotScreen(fig),f'{plotFrameDict["frame"]} - {plotFrameDict["project"]}')
@@ -249,6 +251,8 @@ class MainWidget(QWidget):
         self.stm.runRayTracer(propRaysDict["frame_in"], propRaysDict["frame_out"], 
                             propRaysDict["target"], propRaysDict["epsilon"], propRaysDict["nThreads"], 
                             propRaysDict["t0"], propRaysDict["device"], verbose=False)
+        self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(propRaysDict["frame_out"], [self.setPlotFrameFormOpt, self.stm.removeFrame]))
+    
     #END NOTE
 
 class PyPOMainWindow(QMainWindow):
@@ -271,7 +275,7 @@ class PyPOMainWindow(QMainWindow):
         ElementsMenu = menuBar.addMenu("Elements")
         SystemsMenu = menuBar.addMenu("Systems")
         RaytraceMenu = menuBar.addMenu("Ray-tracer")
-        PhysOptMenu = menuBar.addMenu("Physical optics")
+        PhysOptMenu = menuBar.addMenu("Physical-optics")
 
         ### Generate test parabola
         AddTestParabola = QAction('Add Test Parabola', self)
@@ -340,6 +344,8 @@ class PyPOMainWindow(QMainWindow):
         makeBeam = PhysOptMenu.addMenu("Initialize beam")
         initPointAction = QAction("Point source", self)
         makeBeam.addAction(initPointAction)
+        initGaussAction = QAction("Gaussian beam", self)
+        makeBeam.addAction(initGaussAction)
 
         # END NOTE
 if __name__ == "__main__":

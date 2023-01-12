@@ -10,6 +10,7 @@ ElementWidget MyButton{
 }
 FrameWidget MyButton{
     background:#a5156b;
+    color:#f2c50f;
     border-top-left-radius :0px;
     border-top-right-radius : 15px; 
     border-bottom-left-radius : 0px; 
@@ -40,13 +41,14 @@ FrameWidget QLabel{
     border-bottom-right-radius : 0px; */
     padding: 10px;
 }
-FrameWidget QLabel{
+/* FrameWidget QLabel{
     background: #a5156b;
     border-radius :15px 0px 0px 0px;
     /* border-top-right-radius : 0px; 
     border-bottom-left-radius : 15px; 
-    border-bottom-right-radius : 0px */
-}
+    border-bottom-right-radius : 0px
+} */
+ 
 /* QWidget[class="parameterForm"]{
     background: #6715a5;
 } */
@@ -65,3 +67,8 @@ MyLabel {
     max-width: 100%;
     color: #a51554;
 } */
+
+QPlainTextEdit{
+    background: #333333;
+    color: white;
+}

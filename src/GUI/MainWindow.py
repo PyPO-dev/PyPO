@@ -1,6 +1,6 @@
 import sys
 
-from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSpacerItem, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar
+from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSpacerItem, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar, QPlainTextEdit, QScrollBar
 from PyQt5.QtGui import QFont, QIcon
 from src.GUI.ParameterForms import formGenerator
 import src.GUI.ParameterForms.formDataObjects as fDataObj
@@ -23,11 +23,12 @@ class MainWidget(QWidget):
         self.setWindowTitle("PyPO")
 
         # GridParameters
+        # self.GPSystemsColumn  = [2, 0, 2, 1]
+        # self.GPButtons        = [2, 0, 1, 1]
         self.GPElementsColumn = [0, 0, 2, 1]
-        self.GPSystemsColumn  = [2, 0, 2, 1]
-        self.GPButtons        = [2, 0, 1, 1]
-        self.GPParameterForm  = [0, 1, 4, 1]
-        self.GPPlotScreen     = [0, 2, 4, 1]
+        self.GPParameterForm  = [0, 1, 3, 1]
+        self.GPPlotScreen     = [0, 2, 3, 1]
+        self.GPConsole        = [3, 2, 1, 1]
 
         ### ElementConfigurations
         # self.elementConfigs = []
@@ -40,6 +41,7 @@ class MainWidget(QWidget):
 
         self._mkElementsColumn()
         self._setupPlotScreen()
+        self._mkConsole()
 
 
         self.setLayout(self.grid)
@@ -47,6 +49,12 @@ class MainWidget(QWidget):
         # NOTE Raytrace stuff
         self.frameDict = {}
         # end NOTE
+
+    def _mkConsole(self):
+        self.console = QPlainTextEdit()
+        self.console.setMaximumHeight(300)
+        self.addToWindowGrid(self.console, self.GPConsole)
+
     
     def _mkElementsColumn(self):
         if hasattr(self, "ElementsColumn"):
@@ -246,9 +254,13 @@ class MainWidget(QWidget):
 
     def addPropRaysAction(self): 
         propRaysDict = self.ParameterWid.read()
-        self.stm.runRayTracer(propRaysDict["frame_in"], propRaysDict["frame_out"], 
-                            propRaysDict["target"], propRaysDict["epsilon"], propRaysDict["nThreads"], 
-                            propRaysDict["t0"], propRaysDict["device"], verbose=False)
+        try:
+            print("propRays")
+            self.stm.runRayTracer(propRaysDict["frame_in"], propRaysDict["frame_out"], 
+                                propRaysDict["target"], propRaysDict["epsilon"], propRaysDict["nThreads"], 
+                                propRaysDict["t0"], propRaysDict["device"], verbose=False)
+        except:
+            print("potential devision by zero")
     #END NOTE
 
 class PyPOMainWindow(QMainWindow):

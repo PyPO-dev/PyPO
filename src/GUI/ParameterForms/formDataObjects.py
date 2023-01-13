@@ -180,9 +180,52 @@ def plotFieldOpt(fieldName, elemDict, fieldType):
             ]
 
     return plotField
+"""
+def propPOInp(currentDict, elemDict):
+    sublist_currents = []
+    sublist_target = []
+    if currentDict:
+        for key, item in currentDict.items():
+            sublist_currents.append(key)
+    
+    if elemDict:
+        for key, item in elemDict.items():
+            sublist_target.append(key)
+    
+    sublist_dev = ["CPU", "GPU"]
 
+    EHDict = {
+            
+            }
 
+    propFields = [
+            InputDescription(inType.dropdown, "currents", label="Source currents", sublist = sublist_currents),
+            InputDescription(inType.dropdown, "target", label="Target surface", sublist = sublist_target),
+            InputDescription(inType.dropdown, "return", subdict={
+                "JM":[
+                    InputDescription(inType.string, "name_JM", label="Output currents", numFields=1)],
+                "EH":[
+                    InputDescription(inType.string, "name_EH", label="Output fields", numFields=1)],
+                "JM": [
+                    InputDescription(inType.string, "name_JM", label="Output currents", numFields=1),
+                    InputDescription(inType.string, "name_EH", label="Output fields", numFields=1)
+                    ]
+            InputDescription(inType.string, "", label="Name of output frame", numFields=1),
+            InputDescription(inType.floats, "epsilon", label="Accuracy", hints=[1e-3], numFields=1),
+            InputDescription(inType.integers, "nThreads", label="# of threads", hints=[1], numFields=1),
+            InputDescription(inType.floats, "t0", label="Initial guess", hints=[100], numFields=1),
+            InputDescription(inType.dropdown, "device", label="Hardware to use", sublist = sublist_dev)
+            ]
 
+    return propRays
+"""
+
+def saveSystemForm():
+    return [InputDescription(inType.string, "name", label="Name of system", numFields=1)]
+
+def loadSystemForm():
+    
+    return [InputDescription(inType.dropdown, "name", label="Name of system", numFields=1)]
 
 
 # END NOTE

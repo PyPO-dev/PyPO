@@ -1,6 +1,6 @@
 import sys
 
-from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSpacerItem, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar, QPlainTextEdit, QScrollBar
+from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSpacerItem, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar
 from PyQt5.QtGui import QFont, QIcon
 from src.GUI.ParameterForms import formGenerator
 import src.GUI.ParameterForms.formDataObjects as fDataObj
@@ -23,12 +23,11 @@ class MainWidget(QWidget):
         self.setWindowTitle("PyPO")
 
         # GridParameters
-        # self.GPSystemsColumn  = [2, 0, 2, 1]
-        # self.GPButtons        = [2, 0, 1, 1]
         self.GPElementsColumn = [0, 0, 2, 1]
-        self.GPParameterForm  = [0, 1, 3, 1]
-        self.GPPlotScreen     = [0, 2, 3, 1]
-        self.GPConsole        = [3, 2, 1, 1]
+        self.GPSystemsColumn  = [2, 0, 2, 1]
+        self.GPButtons        = [2, 0, 1, 1]
+        self.GPParameterForm  = [0, 1, 4, 1]
+        self.GPPlotScreen     = [0, 2, 4, 1]
 
         ### ElementConfigurations
         # self.elementConfigs = []
@@ -41,7 +40,6 @@ class MainWidget(QWidget):
 
         self._mkElementsColumn()
         self._setupPlotScreen()
-        self._mkConsole()
 
 
         self.setLayout(self.grid)
@@ -49,12 +47,6 @@ class MainWidget(QWidget):
         # NOTE Raytrace stuff
         self.frameDict = {}
         # end NOTE
-
-    def _mkConsole(self):
-        self.console = QPlainTextEdit()
-        self.console.setMaximumHeight(300)
-        self.addToWindowGrid(self.console, self.GPConsole)
-
     
     def _mkElementsColumn(self):
         if hasattr(self, "ElementsColumn"):
@@ -127,6 +119,13 @@ class MainWidget(QWidget):
             figure = None
         self.addPlot(figure,"Ray Trace Frame %d" %(self.getRayPlotNr()))
 
+    def saveSystemAction(self):
+        self.setForm(fDataObj.saveSystemForm(), readAction=self.saveSystemCall)
+    
+    def saveSystemCall(self):
+        saveDict = self.ParameterWid.read()
+        self.stm.saveSystem(saveDict["name"]) 
+    
     def addToWindowGrid(self, widget, param):
         self.grid.addWidget(widget, param[0], param[1], param[2], param[3])
 
@@ -280,15 +279,11 @@ class MainWidget(QWidget):
 
     def addPropRaysAction(self): 
         propRaysDict = self.ParameterWid.read()
-        try:
-            print("propRays")
-            self.stm.runRayTracer(propRaysDict["frame_in"], propRaysDict["frame_out"], 
-                    propRaysDict["target"], propRaysDict["epsilon"], propRaysDict["nThreads"], 
-                    propRaysDict["t0"], propRaysDict["device"], verbose=False)
-            self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(propRaysDict["frame_out"], [self.setPlotFrameFormOpt, self.stm.removeFrame]))
-
-        except:
-            print("potential devision by zero")
+        self.stm.runRayTracer(propRaysDict["frame_in"], propRaysDict["frame_out"], 
+                            propRaysDict["target"], propRaysDict["epsilon"], propRaysDict["nThreads"], 
+                            propRaysDict["t0"], propRaysDict["device"], verbose=False)
+        self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(propRaysDict["frame_out"], [self.setPlotFrameFormOpt, self.stm.removeFrame]))
+    
     #END NOTE
 
 class PyPOMainWindow(QMainWindow):
@@ -356,7 +351,15 @@ class PyPOMainWindow(QMainWindow):
         plotRaytrace = QAction("Plot ray-trace", self)
         plotRaytrace.triggered.connect(self.mainWid.plotRaytrace)
         SystemsMenu.addAction(plotRaytrace)
+        
+        saveSystem = QAction("Save system", self)
+        saveSystem.triggered.connect(self.mainWid.saveSystemAction)
+        SystemsMenu.addAction(saveSystem)
 
+        loadSystem = QAction("Load system", self)
+        #saveSystem.triggered.connect(self.mainWid.saveSystemAction)
+        SystemsMenu.addAction(loadSystem)
+        
         # NOTE Raytrace actions
         makeFrame = RaytraceMenu.addMenu("Make frame")
         initFrameAction = QAction("Initialize", self)

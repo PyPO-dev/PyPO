@@ -11,6 +11,7 @@ import json
 from pathlib import Path
 from contextlib import contextmanager
 from scipy.interpolate import griddata
+import pickle 
 
 # PyPO-specific modules
 from src.PyPO.BindRefl import *
@@ -61,6 +62,7 @@ class System(object):
     savePathElem = os.path.join(sysPath, "save", "elements")
     savePathFields = os.path.join(sysPath, "save", "fields")
     savePathCurrents = os.path.join(sysPath, "save", "currents")
+    savePathSystems = os.path.join(sysPath, "save", "systems")
 
     def __init__(self):
         self.num_ref = 0
@@ -81,6 +83,7 @@ class System(object):
         saveElemExist = os.path.isdir(self.savePathElem)
         saveFieldsExist = os.path.isdir(self.savePathFields)
         saveCurrentsExist = os.path.isdir(self.savePathCurrents)
+        saveSystemsExist = os.path.isdir(self.savePathSystems)
 
         if not saveElemExist:
             os.makedirs(self.savePathElem)
@@ -91,6 +94,9 @@ class System(object):
         elif not saveCurrentsExist:
             os.makedirs(self.savePathCurrents)
 
+        elif not saveSystemsExist:
+            os.makedirs(self.savePathSystems)
+        
         self.savePath = os.path.join(sysPath, "images")
 
         existSave = os.path.isdir(self.savePath)
@@ -447,6 +453,50 @@ class System(object):
         with open('{}.json'.format(os.path.join(self.savePathElem, name)), 'w') as f:
             json.dump(jsonDict, f, cls=NpEncoder)
 
+    def saveSystem(self, name):
+        path = os.path.join(self.savePathSystems, name)
+        saveExist = os.path.isdir(path)
+
+        if not saveExist:
+            os.makedirs(path)
+        
+        with open(os.path.join(path, "system"), 'wb') as file: 
+            pickle.dump(self.system, file)
+        
+       # for key, item in self.frames.items():
+        with open(os.path.join(path, "frames"), 'wb') as file: 
+            pickle.dump(self.frames, file)
+        
+        #for key, item in self.fields.items():
+        with open(os.path.join(path, "fields"), 'wb') as file: 
+            pickle.dump(self.fields, file)
+        
+        #for key, item in self.currents.items():
+        with open(os.path.join(path, "currents"), 'wb') as file: 
+            pickle.dump(currents, file)
+
+    def loadSystem(self, name):
+        path = os.path.join(self.savePathSystems, name)
+        loadExist = os.path.isdir(path)
+
+        if not loadExist:
+            print("Not here...")
+        
+        with open(os.path.join(path, "system"), 'rb') as file: 
+            self.system = pickle.load(file)
+        
+       # for key, item in self.frames.items():
+        with open(os.path.join(path, "frames"), 'rb') as file: 
+            self.frames = pickle.load(file)
+        
+        #for key, item in self.fields.items():
+        with open(os.path.join(path, "fields"), 'rb') as file: 
+            self.fields = pickle.load(file)
+        
+        #for key, item in self.currents.items():
+        with open(os.path.join(path, "currents"), 'rb') as file: 
+            self.currents = pickle.load(file)
+    
     def removeElement(self, name):
         del self.system[name]
     

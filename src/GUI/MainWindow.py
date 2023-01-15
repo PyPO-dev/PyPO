@@ -1,4 +1,6 @@
+import os
 import sys
+import shutil
 
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSpacerItem, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar
 from PyQt5.QtGui import QFont, QIcon
@@ -7,7 +9,7 @@ import src.GUI.ParameterForms.formDataObjects as fDataObj
 from src.GUI.PlotScreen import PlotScreen
 from src.GUI.TransformationWidget import TransformationWidget
 from src.GUI.Acccordion import Accordion
-from src.GUI.ElementWidget import ElementWidget, FrameWidget
+from src.GUI.ElementWidget import ElementWidget, FrameWidget, FieldsWidget, CurrentWidget
 import numpy as np
 
 sys.path.append('../')
@@ -54,7 +56,7 @@ class MainWidget(QWidget):
 
         self.refletorActions = [self.setTransromationForm, self.plotElement, self.removeElement]
         StmElements = []
-        for e,_ in self.stm.system.items():
+        for e in self.stm.system.keys():
             StmElements.append(e)
         self.ElementsColumn = Accordion()
         self.addToWindowGrid(self.ElementsColumn, self.GPElementsColumn)
@@ -122,13 +124,47 @@ class MainWidget(QWidget):
     def saveSystemAction(self):
         self.setForm(fDataObj.saveSystemForm(), readAction=self.saveSystemCall)
     
+    def loadSystemAction(self):
+        systemList = [os.path.split(x[0])[-1] for x in os.walk(self.stm.savePathSystems) if os.path.split(x[0])[-1] != "systems"]
+        self.setForm(fDataObj.loadSystemForm(systemList), readAction=self.loadSystemCall)
+    
+    def removeSystemAction(self):
+        systemList = [os.path.split(x[0])[-1] for x in os.walk(self.stm.savePathSystems) if os.path.split(x[0])[-1] != "systems"]
+        self.setForm(fDataObj.loadSystemForm(systemList), readAction=self.removeSystemCall)
+    
     def saveSystemCall(self):
         saveDict = self.ParameterWid.read()
         self.stm.saveSystem(saveDict["name"]) 
     
+    def loadSystemCall(self):
+        loadDict = self.ParameterWid.read()
+        self._mkElementsColumn()
+        self.stm.loadSystem(loadDict["name"]) 
+        self.refreshColumn(self.stm.system, "elements")
+        self.refreshColumn(self.stm.frames, "frames")
+        self.refreshColumn(self.stm.fields, "fields")
+        self.refreshColumn(self.stm.currents, "currents")
+   
+    def removeSystemCall(self):
+        removeDict = self.ParameterWid.read()
+        shutil.rmtree(os.path.join(self.stm.savePathSystems, removeDict["name"]))
+
     def addToWindowGrid(self, widget, param):
         self.grid.addWidget(widget, param[0], param[1], param[2], param[3])
 
+    def refreshColumn(self, columnDict, columnType):
+        for key, item in columnDict.items():
+            if columnType == "elements":
+                self.ElementsColumn.reflectors.addWidget(ElementWidget(key, self.refletorActions))
+            
+            elif columnType == "frames":
+                self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(key, [self.setPlotFrameFormOpt, self.stm.removeFrame]))
+            
+            elif columnType == "fields":
+                self.ElementsColumn.POFields.addWidget(FieldsWidget(key, [self.setPlotFieldFormOpt, self.stm.removeField]))
+            
+            elif columnType == "currents":
+                self.ElementsColumn.POCurrents.addWidget(CurrentWidget(key, [self.setPlotFieldFormOpt, self.stm.removeCurrent]))
 
     def addExampleParabola(self):
         d = {
@@ -141,7 +177,7 @@ class MainWidget(QWidget):
             "focus_1"   : np.array([0,0,3.5e3]),
             "lims_u"    : np.array([200,5e3]),
             "lims_v"    : np.array([0,360]),
-            "gridsize"  : np.array([1501,1501])
+            "gridsize"  : np.array([501,501])
             }
         self.stm.addParabola(d)
         self.ElementsColumn.reflectors.addWidget(ElementWidget(d["name"],self.refletorActions))
@@ -235,6 +271,9 @@ class MainWidget(QWidget):
     def setInitGaussianForm(self):
         self.setForm(fDataObj.initGaussianInp(self.stm.system), readAction=self.addGaussianAction)
     
+    def setInitPSForm(self):
+        self.setForm(fDataObj.initPSInp(self.stm.system), readAction=self.addPSAction)
+    
     def addFrameAction(self):
         RTDict = self.ParameterWid.read()
         self.stm.createFrame(RTDict)
@@ -243,8 +282,14 @@ class MainWidget(QWidget):
     def addGaussianAction(self):
         GDict = self.ParameterWid.read()
         self.stm.createGauss(GDict, GDict["surface"])
-        self.ElementsColumn.POFields.addWidget(FrameWidget("EH_" + GDict["name"], [self.setPlotFieldFormOpt, self.stm.removeField]))
-        self.ElementsColumn.POCurrents.addWidget(FrameWidget("JM_" + GDict["name"], [self.setPlotFieldFormOpt, self.stm.removeCurrent]))
+        self.ElementsColumn.POFields.addWidget(FieldsWidget(GDict["name"], [self.setPlotFieldFormOpt, self.stm.removeField]))
+        self.ElementsColumn.POCurrents.addWidget(CurrentWidget(GDict["name"], [self.setPlotCurrentFormOpt, self.stm.removeCurrent]))
+    
+    def addPSAction(self):
+        PSDict = self.ParameterWid.read()
+        self.stm.generatePointSource(PSDict, PSDict["surface"])
+        self.ElementsColumn.POFields.addWidget(FieldsWidget(PSDict["name"], [self.setPlotFieldFormOpt, self.stm.removeField]))
+        self.ElementsColumn.POCurrents.addWidget(CurrentWidget(PSDict["name"], [self.setPlotCurrentFormOpt, self.stm.removeCurrent]))
     
     def setPlotFrameForm(self):
         self.setForm(fDataObj.plotFrameInp(self.stm.frames), readAction=self.addPlotFrameAction)
@@ -253,11 +298,10 @@ class MainWidget(QWidget):
         self.setForm(fDataObj.plotFrameOpt(frame), readAction=self.addPlotFrameAction)
 
     def setPlotFieldFormOpt(self, field):
-        if field in self.stm.fields.keys():
-            self.setForm(fDataObj.plotFieldOpt(field, self.stm.system, self.stm.fields[field].type), readAction=self.addPlotFieldAction)
+        self.setForm(fDataObj.plotFieldOpt(field), readAction=self.addPlotFieldAction)
         
-        elif field in self.stm.currents.keys():
-            self.setForm(fDataObj.plotFieldOpt(field, self.stm.system, self.stm.currents[field].type), readAction=self.addPlotFieldAction)
+    def setPlotCurrentFormOpt(self, current):
+        self.setForm(fDataObj.plotCurrentOpt(current), readAction=self.addPlotCurrentAction)
     
     def addPlotFrameAction(self):
         plotFrameDict = self.ParameterWid.read()
@@ -268,8 +312,16 @@ class MainWidget(QWidget):
 
     def addPlotFieldAction(self):
         plotFieldDict = self.ParameterWid.read()
-        fig, _ = self.stm.plotBeam2D(plotFieldDict["surface"], plotFieldDict["field"], 
-                                    plotFieldDict["comp"], project=plotFieldDict["project"], returns=True)
+        fig, _ = self.stm.plotBeam2D(self.stm.fields[plotFieldDict["field"]].surf, plotFieldDict["field"], 
+                                    plotFieldDict["comp"], ptype="field", project=plotFieldDict["project"], returns=True)
+        self.PlotScreen.addTab(PlotScreen(fig),f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
+
+        self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
+    
+    def addPlotCurrentAction(self):
+        plotFieldDict = self.ParameterWid.read()
+        fig, _ = self.stm.plotBeam2D(self.stm.currents[plotFieldDict["field"]].surf, plotFieldDict["field"], 
+                                    plotFieldDict["comp"], ptype="current", project=plotFieldDict["project"], returns=True)
         self.PlotScreen.addTab(PlotScreen(fig),f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
 
         self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
@@ -284,6 +336,25 @@ class MainWidget(QWidget):
                             propRaysDict["t0"], propRaysDict["device"], verbose=False)
         self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(propRaysDict["frame_out"], [self.setPlotFrameFormOpt, self.stm.removeFrame]))
     
+    def setPOInitForm(self):
+        self.setForm(fDataObj.propPOInp(self.stm.currents, self.stm.system), self.addPropBeamAction)
+    
+    def setPOFFInitForm(self):
+        self.setForm(fDataObj.propPOFFInp(self.stm.currents, self.stm.system), self.addPropBeamAction)
+
+    def addPropBeamAction(self):
+        propBeamDict = self.ParameterWid.read()
+        self.stm.runPO(propBeamDict)
+
+        if propBeamDict["mode"] == "JM":
+            self.ElementsColumn.POCurrents.addWidget(CurrentWidget(propBeamDict["name_JM"], [self.setPlotCurrentFormOpt, self.stm.removeCurrent]))
+        
+        elif propBeamDict["mode"] == "EH" or propBeamDict["mode"] == "FF":
+            self.ElementsColumn.POFields.addWidget(FieldsWidget(propBeamDict["name_EH"], [self.setPlotFieldFormOpt, self.stm.removeField]))
+        
+        elif propBeamDict["mode"] == "JMEH":
+            self.ElementsColumn.POCurrents.addWidget(CurrentWidget(propBeamDict["name_JM"], [self.setPlotCurrentFormOpt, self.stm.removeCurrent]))
+            self.ElementsColumn.POFields.addWidget(FieldsWidget(propBeamDict["name_EH"], [self.setPlotFieldFormOpt, self.stm.removeField]))
     #END NOTE
 
 class PyPOMainWindow(QMainWindow):
@@ -357,8 +428,12 @@ class PyPOMainWindow(QMainWindow):
         SystemsMenu.addAction(saveSystem)
 
         loadSystem = QAction("Load system", self)
-        #saveSystem.triggered.connect(self.mainWid.saveSystemAction)
+        loadSystem.triggered.connect(self.mainWid.loadSystemAction)
         SystemsMenu.addAction(loadSystem)
+        
+        removeSystem = QAction("Remove system", self)
+        removeSystem.triggered.connect(self.mainWid.removeSystemAction)
+        SystemsMenu.addAction(removeSystem)
         
         # NOTE Raytrace actions
         makeFrame = RaytraceMenu.addMenu("Make frame")
@@ -382,12 +457,21 @@ class PyPOMainWindow(QMainWindow):
         # PO actions
         makeBeam = PhysOptMenu.addMenu("Initialize beam")
         initPointAction = QAction("Point source", self)
+        initPointAction.triggered.connect(self.mainWid.setInitPSForm)
         makeBeam.addAction(initPointAction)
     
         initGaussAction = QAction("Gaussian beam", self)
         initGaussAction.triggered.connect(self.mainWid.setInitGaussianForm)
         makeBeam.addAction(initGaussAction)
 
+        propBeam = PhysOptMenu.addMenu("Propagate beam") 
+        initPropSurfAction = QAction("To surface", self)
+        initPropSurfAction.triggered.connect(self.mainWid.setPOInitForm)
+        propBeam.addAction(initPropSurfAction)
+        
+        initPropFFAction = QAction("To far-field", self)
+        initPropFFAction.triggered.connect(self.mainWid.setPOFFInitForm)
+        propBeam.addAction(initPropFFAction)
 
         # END NOTE
 if __name__ == "__main__":

@@ -9,6 +9,10 @@ class currents(object):
         self.Mz = Mz
 
         self.type = "JM"
+    
+    def setMeta(self, surf, k):
+        self.surf = surf 
+        self.k = k
 
     def __getitem__(self, i):
         if i == 0:
@@ -38,6 +42,10 @@ class fields(object):
         self.Hz = Hz
 
         self.type = "EH"
+
+    def setMeta(self, surf, k):
+        self.surf = surf
+        self.k = k
 
     def __getitem__(self, i):
         if i == 0:

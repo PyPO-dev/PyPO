@@ -136,6 +136,25 @@ def propRaysInp(frameDict, elemDict):
 
     return propRays
     
+def initPSInp(elemDict):
+    sublist_surf = []
+
+    if elemDict:
+        for key, item in elemDict.items():
+            if item["type"] == 3: # Only append plane types
+                sublist_surf.append(key)
+
+    initPS = [
+            InputDescription(inType.dropdown, "surface", label="Point source surface", sublist = sublist_surf),
+            InputDescription(inType.string, "name", label="Beam name", numFields=1),
+            InputDescription(inType.floats, "lam", label="Wavelength of radiation", hints=[1], numFields=1),
+            InputDescription(inType.floats, "E0", label="Peak value", hints=[1], numFields=1),
+            InputDescription(inType.floats, "phase", label="Phase", hints=[0], numFields=1),
+            InputDescription(inType.floats, "pol", label="Polarization", hints=[1,0,0], numFields=3, oArray=True)
+            ]
+    
+    return initPS
+
 def initGaussianInp(elemDict):
     sublist_surf = []
 
@@ -158,29 +177,28 @@ def initGaussianInp(elemDict):
     
     return initGauss
 
-def plotFieldOpt(fieldName, elemDict, fieldType):
-    sublist_surf = []
-
-    if fieldType == "EH":
-        complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
-    
-    elif fieldType == "JM":
-        complist = ["Jx", "Jy", "Jz", "Mx", "My", "Mz"]
-
-    if elemDict:
-        for key, item in elemDict.items():
-            if item["type"] == 3: # Only append plane types
-                sublist_surf.append(key)
+def plotFieldOpt(fieldName):
+    complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
     
     plotField = [
-            InputDescription(inType.static, "field", label="Field/current", staticValue=fieldName),
-            InputDescription(inType.dropdown, "surface", label="Beam surface", sublist = sublist_surf),
+            InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
             InputDescription(inType.dropdown, "comp", label="Component", sublist = complist),
             InputDescription(inType.string, "project", label="Abscissa - ordinate", hints=["xy"], numFields=1)
             ]
 
     return plotField
-"""
+
+def plotCurrentOpt(fieldName):
+    complist = ["Jx", "Jy", "Jz", "Mx", "My", "Mz"]
+    
+    plotCurrent = [
+            InputDescription(inType.static, "field", label="Current", staticValue=fieldName),
+            InputDescription(inType.dropdown, "comp", label="Component", sublist = complist),
+            InputDescription(inType.string, "project", label="Abscissa - ordinate", hints=["xy"], numFields=1)
+            ]
+
+    return plotCurrent
+
 def propPOInp(currentDict, elemDict):
     sublist_currents = []
     sublist_target = []
@@ -190,42 +208,62 @@ def propPOInp(currentDict, elemDict):
     
     if elemDict:
         for key, item in elemDict.items():
-            sublist_target.append(key)
+            if item["gmode"] != 2:
+                sublist_target.append(key)
     
     sublist_dev = ["CPU", "GPU"]
 
-    EHDict = {
-            
-            }
 
     propFields = [
-            InputDescription(inType.dropdown, "currents", label="Source currents", sublist = sublist_currents),
-            InputDescription(inType.dropdown, "target", label="Target surface", sublist = sublist_target),
-            InputDescription(inType.dropdown, "return", subdict={
+            InputDescription(inType.dropdown, "s_current", label="Source currents", sublist = sublist_currents),
+            InputDescription(inType.dropdown, "t_name", label="Target surface", sublist = sublist_target),
+            InputDescription(inType.dropdown, "mode", label="Propagation mode", subdict={
                 "JM":[
                     InputDescription(inType.string, "name_JM", label="Output currents", numFields=1)],
                 "EH":[
                     InputDescription(inType.string, "name_EH", label="Output fields", numFields=1)],
-                "JM": [
+                "JMEH": [
                     InputDescription(inType.string, "name_JM", label="Output currents", numFields=1),
                     InputDescription(inType.string, "name_EH", label="Output fields", numFields=1)
                     ]
-            InputDescription(inType.string, "", label="Name of output frame", numFields=1),
-            InputDescription(inType.floats, "epsilon", label="Accuracy", hints=[1e-3], numFields=1),
+                }),
+            InputDescription(inType.floats, "epsilon", label="Relative permittivity", hints=[1], numFields=1),
             InputDescription(inType.integers, "nThreads", label="# of threads", hints=[1], numFields=1),
-            InputDescription(inType.floats, "t0", label="Initial guess", hints=[100], numFields=1),
             InputDescription(inType.dropdown, "device", label="Hardware to use", sublist = sublist_dev)
             ]
 
-    return propRays
-"""
+    return propFields
+
+def propPOFFInp(currentDict, elemDict):
+    sublist_currents = []
+    sublist_target = []
+    if currentDict:
+        for key, item in currentDict.items():
+            sublist_currents.append(key)
+    
+    if elemDict:
+        for key, item in elemDict.items():
+            if item["gmode"] == 2:
+                sublist_target.append(key)
+    
+    sublist_dev = ["CPU", "GPU"]
+
+
+    propFields = [
+            InputDescription(inType.dropdown, "s_current", label="Source currents", sublist = sublist_currents),
+            InputDescription(inType.dropdown, "t_name", label="Target surface", sublist = sublist_target),
+            InputDescription(inType.static, "mode", label="Propagation mode", staticValue="FF"),
+            InputDescription(inType.string, "name_EH", label="Output fields"),
+            InputDescription(inType.floats, "epsilon", label="Relative permittivity", hints=[1], numFields=1),
+            InputDescription(inType.integers, "nThreads", label="# of threads", hints=[1], numFields=1),
+            InputDescription(inType.dropdown, "device", label="Hardware to use", sublist = sublist_dev)
+            ]
+
+    return propFields
 
 def saveSystemForm():
     return [InputDescription(inType.string, "name", label="Name of system", numFields=1)]
 
-def loadSystemForm():
-    
-    return [InputDescription(inType.dropdown, "name", label="Name of system", numFields=1)]
+def loadSystemForm(systemList):
+    return [InputDescription(inType.dropdown, "name", label="Name of system", sublist=systemList)]
 
-
-# END NOTE

@@ -473,7 +473,7 @@ class System(object):
         
         #for key, item in self.currents.items():
         with open(os.path.join(path, "currents"), 'wb') as file: 
-            pickle.dump(currents, file)
+            pickle.dump(self.currents, file)
 
     def loadSystem(self, name):
         path = os.path.join(self.savePathSystems, name)
@@ -616,10 +616,11 @@ class System(object):
         return currents
 
     def runPO(self, PODict):
-
-        source = self.system[PODict["s_name"]]
+        PODict["s_current"] = self.currents[PODict["s_current"]]
+        
+        source = self.system[PODict["s_current"].surf]
         target = self.system[PODict["t_name"]]
-
+        PODict["k"] = PODict["s_current"].k
         # Default exponent to -1
         if not "exp" in PODict:
             PODict["exp"] = "fwd"
@@ -637,6 +638,20 @@ class System(object):
 
         elif PODict["device"] == "GPU":
             out = PyPO_GPUf(source, target, PODict)
+
+        if PODict["mode"] == "JM":
+            out.setMeta(PODict["t_name"], PODict["k"])
+            self.currents[PODict["name_JM"]] = out
+        
+        elif PODict["mode"] == "EH" or PODict["mode"] == "FF":
+            out.setMeta(PODict["t_name"], PODict["k"])
+            self.fields[PODict["name_EH"]] = out
+        
+        elif PODict["mode"] == "JMEH":
+            out[0].setMeta(PODict["t_name"], PODict["k"])
+            out[1].setMeta(PODict["t_name"], PODict["k"])
+            self.currents[PODict["name_JM"]] = out[0]
+            self.fields[PODict["name_EH"]] = out[1]
 
         return out
 
@@ -709,8 +724,13 @@ class System(object):
     # Beam!   
     def createGauss(self, gaussDict, name_source):
         gauss_in = makeGauss(gaussDict, self.system[name_source])
-        self.fields["EH_" + gaussDict["name"]] = gauss_in[0]
-        self.currents["JM_" + gaussDict["name"]] = gauss_in[1]
+
+        k = 2 * np.pi / gaussDict["lam"]
+        gauss_in[0].setMeta(name_source, k)
+        gauss_in[1].setMeta(name_source, k)
+
+        self.fields[gaussDict["name"]] = gauss_in[0]
+        self.currents[gaussDict["name"]] = gauss_in[1]
         return gauss_in
 
     def runRayTracer(self, fr_in, fr_out, name_target, epsilon=1e-3, nThreads=1, t0=100, device="CPU", verbose=True):
@@ -774,20 +794,35 @@ class System(object):
         Psi = fgs.generateGauss(fgs_out, surfaceObj, mode)
         return Psi
 
-    def generatePointSource(self, name_surface, comp="Ex"):
+    def generatePointSource(self, PSDict, name_surface):
         surfaceObj = self.system[name_surface]
         ps = np.zeros(surfaceObj["gridsize"], dtype=complex)
 
         xs_idx = int((surfaceObj["gridsize"][0] - 1) / 2)
         ys_idx = int((surfaceObj["gridsize"][1] - 1) / 2)
 
-        ps[xs_idx, ys_idx] = 1 + 1j * 0
+        ps[xs_idx, ys_idx] = PSDict["E0"] * np.exp(1j * PSDict["phase"])
 
-        out = self._compToFields(comp, ps)
+        Ex = ps * PSDict["pol"][0]
+        Ey = ps * PSDict["pol"][1]
+        Ez = ps * PSDict["pol"][2]
 
-        return out
+        Hx = ps * 0
+        Hy = ps * 0
+        Hz = ps * 0
 
-    def plotBeam2D(self, name_surface, name_field, comp,
+        field = fields(Ex, Ey, Ez, Hx, Hy, Hz) 
+        current = self.calcCurrents(name_surface, field)
+
+        k =  2 * np.pi / PSDict["lam"]
+
+        field.setMeta(name_surface, k)
+        current.setMeta(name_surface, k)
+
+        self.fields[PSDict["name"]] = field
+        self.currents[PSDict["name"]] = current
+
+    def plotBeam2D(self, name_surface, name_field, comp, ptype="field",
                     vmin=-30, vmax=0, show=True, amp_only=False,
                     save=False, polar=False, interpolation=None,
                     aperDict={"plot":False}, mode='dB', project='xy',
@@ -800,14 +835,14 @@ class System(object):
         print(self.EHcomplist)
         print(np.argwhere(self.EHcomplist == comp))
 
-        if name_field in self.fields.keys():
+        if ptype == "field":
             field = self.fields[name_field]
         
             if comp in self.EHcomplist:
                 field_comp = field[np.argwhere(self.EHcomplist == comp)[0]]
 
 
-        elif name_field in self.currents.keys():
+        elif ptype == "current":
             field = self.currents[name_field] 
             
             if comp in self.JMcomplist:

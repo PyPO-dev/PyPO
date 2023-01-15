@@ -163,10 +163,10 @@ class FrameWidget(QWidget):
             self.setParent(None)
 
 class FieldsWidget(QWidget):
-    def __init__ (self, frame, actions, p=None ):
+    def __init__ (self, field, actions, p=None ):
         super().__init__(parent=p)
         self.plotFieldsAction = actions[0]
-        self.RemoveFieldsAction = actions[1]
+        self.RemoveFieldAction = actions[1]
         self.field = field
         
         layout = QHBoxLayout()
@@ -210,11 +210,11 @@ class FieldsWidget(QWidget):
     def _closeOptionsMenu(self):
         self.dlg.close()
 
-    def plotFrame(self):
-        self.plotFieldAction(self.field)
+    def plotField(self):
+        self.plotFieldsAction(self.field)
         self._closeOptionsMenu()
     
-    def removeFrame(self):
+    def removeField(self):
         self._closeOptionsMenu()
         removeFieldDialog = QDialog()
         layout = QGridLayout()
@@ -271,7 +271,7 @@ class CurrentWidget(QWidget):
         dlgLayout.addWidget(btn2)
 
         self.dlg.setLayout(dlgLayout)
-        self.dlg.setWindowFlag(Qt.CurrentlessWindowHint)
+        self.dlg.setWindowFlag(Qt.FramelessWindowHint)
         posi = self.mapToGlobal(self.btn.pos())
         self.dlg.setGeometry(posi.x(), posi.y() ,100,80)
         self.dlg.show()

@@ -8,11 +8,22 @@ from src.GUI.PlotScreen import PlotScreen
 from src.GUI.TransformationWidget import TransformationWidget
 from src.GUI.Acccordion import Accordion
 from src.GUI.ElementWidget import ElementWidget, FrameWidget
+from src.GUI.Console import Console
 import numpy as np
+from src.PyPO.Checks import InputReflError, InputRTError
 
 sys.path.append('../')
 sys.path.append('../../')
 import src.PyPO.System as st
+
+
+if __name__ == "__main__":
+
+    app = QApplication(sys.argv)
+    cons = Console()
+    def print(s):
+        cons.appendPlainText(s)
+
 
 class MainWidget(QWidget):
     """Main Window."""
@@ -42,7 +53,7 @@ class MainWidget(QWidget):
         self._mkElementsColumn()
         self._setupPlotScreen()
         self._mkConsole()
-
+        print("hoi")
 
         self.setLayout(self.grid)
 
@@ -51,10 +62,12 @@ class MainWidget(QWidget):
         # end NOTE
 
     def _mkConsole(self):
-        self.console = QPlainTextEdit()
-        self.console.setMaximumHeight(300)
+        cons = Console()
+        global print
+        def print(s):
+            cons.appendPlainText(s)
+        self.console = cons
         self.addToWindowGrid(self.console, self.GPConsole)
-
     
     def _mkElementsColumn(self):
         if hasattr(self, "ElementsColumn"):
@@ -181,16 +194,18 @@ class MainWidget(QWidget):
         self.setForm(fDataObj.makePlaneInp(), readAction=self.addPlaneAction)
 
     def addQuadricAction(self):
-        elementDict = self.ParameterWid.read()
-        if elementDict["type"] == "Parabola":
-            self.stm.addParabola(elementDict)
-        elif elementDict["type"] == "Hyperbola":
-            self.stm.addHyperbola(elementDict)
-        elif elementDict["type"] == "Ellipse":
-            self.stm.addEllipse(elementDict)
-        else:
-            raise Exception("Quadric type incorrect")
-        self.ElementsColumn.reflectors.addWidget(ElementWidget(elementDict["name"],self.refletorActions))
+        try:
+            elementDict = self.ParameterWid.read()
+            if elementDict["type"] == "Parabola":
+                self.stm.addParabola(elementDict)
+            elif elementDict["type"] == "Hyperbola":
+                self.stm.addHyperbola(elementDict)
+            elif elementDict["type"] == "Ellipse":
+                self.stm.addEllipse(elementDict)
+            self.ElementsColumn.reflectors.addWidget(ElementWidget(elementDict["name"],self.refletorActions))
+        except InputReflError as e:
+            self.console.appendPlainText("FormInput Incorrect:")
+            self.console.appendPlainText(e.__str__())
 
     def addParabolaAction(self):
         elementDict = self.ParameterWid.read()
@@ -362,7 +377,10 @@ class PyPOMainWindow(QMainWindow):
         # END NOTE
 if __name__ == "__main__":
 
+    print("lala")
     app = QApplication(sys.argv)
     win = PyPOMainWindow(parent=None)
+    # def print(s):
+    #     cons.appendPlainText(s)
     win.show()
     app.exec_()

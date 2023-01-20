@@ -3,7 +3,7 @@ import sys
 import shutil
 
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar
-from PyQt5.QtGui import QFont, QIcon
+from PyQt5.QtGui import QFont, QIcon, QTextCursor
 from src.GUI.ParameterForms import formGenerator
 import src.GUI.ParameterForms.formDataObjects as fDataObj
 from src.GUI.PlotScreen import PlotScreen
@@ -26,7 +26,6 @@ if __name__ == "__main__":
     def print(s):
         cons.appendPlainText(s)
 
-
 class MainWidget(QWidget):
     """Main Window."""
     def __init__(self, parent=None):
@@ -39,7 +38,7 @@ class MainWidget(QWidget):
         self.GPElementsColumn = [0, 0, 2, 1]
         self.GPParameterForm  = [0, 1, 3, 1]
         self.GPPlotScreen     = [0, 2, 3, 1]
-        self.GPConsole        = [3, 2, 1, 1]
+        self.GPConsole        = [2, 2, 1, 1]
 
         ### ElementConfigurations
         # self.elementConfigs = []
@@ -49,10 +48,15 @@ class MainWidget(QWidget):
         # init layout
         self.grid = QGridLayout()
 
+        self.pyprint = print
+
         self._setupPlotScreen()
         self._mkConsole()
 
-        self.stm = st.System()
+        self.pyprint(self.pyprint)
+        
+
+        self.stm = st.System(redirect=print)
         self._mkElementsColumn()
 
         self.setLayout(self.grid)
@@ -62,11 +66,20 @@ class MainWidget(QWidget):
         # end NOTE
 
     def _mkConsole(self):
-        cons = Console()
+        self.console = Console()
+        self.cursor = QTextCursor(self.console.document())
+        
         global print
-        def print(s):
-            cons.appendPlainText(s)
-        self.console = cons
+        def print(s, end=''):
+            #s += end
+            if end == '\r':
+                self.cursor.setPosition(QTextCursor.End)
+                self.cursor.select(QTextCursor.LineUnderCursor)
+                self.cursor.removeSelectedText()
+                self.console.insertPlainText(s)
+            else:
+                self.console.appendPlainText(s)
+            self.console.repaint()
         self.addToWindowGrid(self.console, self.GPConsole)
     
     def _mkElementsColumn(self):

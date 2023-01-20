@@ -343,3 +343,20 @@ def frameToObj(res, np_t, shape):
     dz = np.ctypeslib.as_array(res.dz, shape=shape).astype(np_t)
 
     return frame(shape[0], x, y, z, dx, dy, dz)
+
+class WaitSymbol(object):
+    def __init__(self):
+        self.symList = ["|", "/", "-", "\\"]
+        self.period = len(self.symList)
+        self.n = 0
+
+    def getSymbol(self):
+        out = self.symList[self.n]
+        self.n += 1
+
+        if self.n == self.period:
+            self.n = 0
+
+        return out
+
+

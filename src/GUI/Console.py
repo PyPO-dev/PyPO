@@ -23,8 +23,7 @@ class Console(QPlainTextEdit):
 
         self.setMaximumHeight(300)
         self.setReadOnly(True)
-        self.appendPlainText("********** PyPO Console **********")
-        self.log(msgTypes.RTError,"Test")
+        self.appendPlainText("********** PyPO Console **********\n\n")
 
     def log(self, msgType, text):
         # msgType = msgTypes.FormInput_Incorrect

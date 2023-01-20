@@ -140,8 +140,10 @@ def check_ElemDict(elemDict, nameList):
                 errStr += block_ndarray("lims_u", elemDict, (2,))
 
                 if elemDict["lims_u"][0] < 0:
-                    errStr += errMsg_value("lims_u", elemDict["lims_u"], elemDict["name"])
+                    errStr += errMsg_value("lims_u", elemDict["lims_u"][0], elemDict["name"])
 
+                if elemDict["lims_u"][1] < 0:
+                    errStr += errMsg_value("lims_u", elemDict["lims_u"][1], elemDict["name"])
             else:
                 errStr += errMsg_field("lims_u", elemDict["name"])
 

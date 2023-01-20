@@ -162,6 +162,144 @@ class FrameWidget(QWidget):
             self.RemoveFrameAction(self.frame)
             self.setParent(None)
 
+class FieldsWidget(QWidget):
+    def __init__ (self, field, actions, p=None ):
+        super().__init__(parent=p)
+        self.plotFieldsAction = actions[0]
+        self.RemoveFieldAction = actions[1]
+        self.field = field
+        
+        layout = QHBoxLayout()
+        label = QLabel(field)
+
+        label.setFixedSize(200,39)
+
+        # layout.setContentsMargins(0,0,0,0)
+        self.btn = MyButton("⋮")
+        self.btn.clicked.connect(self._openOptionsMenu)
+        self.btn.setFixedSize(50,39)
+        
+        layout.addWidget(label)
+        layout.addWidget(self.btn)
+        layout.setSpacing(40)
+
+        self.setLayout(layout)
+        self.setFixedSize(250,60)
+
+    def _openOptionsMenu(self):
+        self.dlg = selfClosingDialog(self._closeOptionsMenu, parent = self)
+
+        dlgLayout = QVBoxLayout()
+        dlgLayout.setContentsMargins(0,0,0,0)
+
+        btn1 = QPushButton("Remove")
+        btn2 = QPushButton("Plot")
+
+        btn1.clicked.connect(self.removeField)
+        btn2.clicked.connect(self.plotField)
+
+        dlgLayout.addWidget(btn1)
+        dlgLayout.addWidget(btn2)
+
+        self.dlg.setLayout(dlgLayout)
+        self.dlg.setWindowFlag(Qt.FramelessWindowHint)
+        posi = self.mapToGlobal(self.btn.pos())
+        self.dlg.setGeometry(posi.x(), posi.y() ,100,80)
+        self.dlg.show()
+        
+    def _closeOptionsMenu(self):
+        self.dlg.close()
+
+    def plotField(self):
+        self.plotFieldsAction(self.field)
+        self._closeOptionsMenu()
+    
+    def removeField(self):
+        self._closeOptionsMenu()
+        removeFieldDialog = QDialog()
+        layout = QGridLayout()
+        okBtn = QPushButton("Ok")
+        okBtn.clicked.connect(removeFieldDialog.accept)
+        cancelBtn = QPushButton("Cancel")
+        cancelBtn.clicked.connect(removeFieldDialog.reject)
+        layout.addWidget(QLabel("Do you want to delete field %s?" %(self.field)), 0,0,1,2)
+        layout.addWidget(cancelBtn, 1,0)
+        layout.addWidget(okBtn, 1,1)
+        removeFieldDialog.setLayout(layout)
+
+        if removeFieldDialog.exec_():
+            self.RemoveFieldAction(self.field)
+            self.setParent(None)
+
+class CurrentWidget(QWidget):
+    def __init__ (self, current, actions, p=None ):
+        super().__init__(parent=p)
+        self.plotCurrentAction = actions[0]
+        self.RemoveCurrentAction = actions[1]
+        self.current = current
+        
+        layout = QHBoxLayout()
+        label = QLabel(current)
+
+        label.setFixedSize(200,39)
+
+        # layout.setContentsMargins(0,0,0,0)
+        self.btn = MyButton("⋮")
+        self.btn.clicked.connect(self._openOptionsMenu)
+        self.btn.setFixedSize(50,39)
+        
+        layout.addWidget(label)
+        layout.addWidget(self.btn)
+        layout.setSpacing(40)
+
+        self.setLayout(layout)
+        self.setFixedSize(250,60)
+
+    def _openOptionsMenu(self):
+        self.dlg = selfClosingDialog(self._closeOptionsMenu, parent = self)
+
+        dlgLayout = QVBoxLayout()
+        dlgLayout.setContentsMargins(0,0,0,0)
+
+        btn1 = QPushButton("Remove")
+        btn2 = QPushButton("Plot")
+
+        btn1.clicked.connect(self.removeCurrent)
+        btn2.clicked.connect(self.plotCurrent)
+
+        dlgLayout.addWidget(btn1)
+        dlgLayout.addWidget(btn2)
+
+        self.dlg.setLayout(dlgLayout)
+        self.dlg.setWindowFlag(Qt.FramelessWindowHint)
+        posi = self.mapToGlobal(self.btn.pos())
+        self.dlg.setGeometry(posi.x(), posi.y() ,100,80)
+        self.dlg.show()
+        
+    def _closeOptionsMenu(self):
+        self.dlg.close()
+
+    def plotCurrent(self):
+        self.plotCurrentAction(self.current)
+        self._closeOptionsMenu()
+    
+    def removeCurrent(self):
+        self._closeOptionsMenu()
+        removeCurrentDialog = QDialog()
+        layout = QGridLayout()
+        okBtn = QPushButton("Ok")
+        okBtn.clicked.connect(removeCurrentDialog.accept)
+        cancelBtn = QPushButton("Cancel")
+        cancelBtn.clicked.connect(removeCurrentDialog.reject)
+        layout.addWidget(QLabel("Do you want to delete current %s?" %(self.current)), 0,0,1,2)
+        layout.addWidget(cancelBtn, 1,0)
+        layout.addWidget(okBtn, 1,1)
+        removeCurrentDialog.setLayout(layout)
+
+        if removeCurrentDialog.exec_():
+            self.RemoveCurrentAction(self.current)
+            self.setParent(None)
+
 if __name__ == "__main__":
     app = QApplication([])
     window = QMainWindow()

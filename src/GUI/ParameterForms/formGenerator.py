@@ -15,7 +15,6 @@ class MyEdit(QLineEdit):
     def __init__ (self):
         super().__init__()
         self.setAlignment = Qt.AlignTop
-        
 
 # Validator_floats = QRegExpValidator(QRegExp("[-+]?[0-9]*[\.,]?[0-9]*"))
 # Validator_ints = QRegExpValidator(QRegExp("[-+]?[0-9]*"))
@@ -73,11 +72,8 @@ class FormGenerator(QWidget):
 
     def read(self):
         paramDict = {}
-        # print(paramDict)
         for input in self.inputs:
-            # print("updating with: ", input.read())
             paramDict.update(input.read())
-        print(paramDict)
         return paramDict
     
 class StaticInput(QWidget):
@@ -90,7 +86,6 @@ class StaticInput(QWidget):
         layout.addRow(MyLabel(inp.label), MyLabel(inp.staticValue))
     def read(self):
         return {self.inputDescription.outputName: self.inputDescription.staticValue}
-
 
 class BooleanInput(QWidget):
     def __init__ (self, inp:InputDescription):
@@ -139,7 +134,6 @@ class SimpleInput(QWidget):
     def read(self):
         l =[] 
         for i in self.inputs:
-            print(self.inputDescription.outputName)
             l.append(self.enumToType(self.inputDescription.inType)(i.text()))
         if len(l)>1:        
             if self.inputDescription.oArray:
@@ -205,12 +199,12 @@ class DynamicInputWidget(QWidget):
         paramDict = {self.inputDescription.outputName: modeOut}
         if self.hasChildren:
             children = self.currentChild.findChildren(QWidget,options=Qt.FindDirectChildrenOnly)
-            for c in children:
-                print(type(c))
-                try:
-                    print(c.inputDescription.outputName)
-                except:
-                    pass
+            # for c in children:
+            #     print(type(c))
+            #     try:
+            #         print(c.inputDescription.outputName)
+            #     except:
+            #         pass
         if self.hasChildren:
             for input in self.currentChild.findChildren(QWidget,options=Qt.FindDirectChildrenOnly):
                paramDict.update(input.read())

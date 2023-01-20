@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QLabel, QApplication, QWidget, QHBoxLayout, QMainWindow, \
-                                    QPushButton, QSpacerItem, QSizePolicy, QDialog, \
+                                    QPushButton, QSizePolicy, QDialog, \
                                     QAction,QVBoxLayout, QGridLayout
                                         
 from PyQt5.QtGui import QFont, QIcon, QCursor 
@@ -90,8 +90,6 @@ class ElementWidget(QWidget):
         if removeElementDialog.exec_():
             self.RemoveElementAction(self.element)
             self.setParent(None)
-            
-
    
 class FrameWidget(QWidget):
     def __init__ (self, frame, actions, p=None ):

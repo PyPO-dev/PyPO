@@ -88,6 +88,9 @@ class MainWidget(QWidget):
         self.PlotScreen.tabCloseRequested.connect(self.closeTab)
         self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
 
+    def _formatVector(self, vector):
+        return f"[{vector[0]}, {vector[1]}, {vector[2]}]"
+
     def addPlot(self, figure, label):
         self.PlotScreen.addTab(PlotScreen(figure), label)
         self.PlotScreen.setCurrentIndex(self.PlotScreen.count()-1)
@@ -273,16 +276,15 @@ class MainWidget(QWidget):
 
     def applyTransformation(self, element):
         dd = self.ParameterWid.read()
-        print("Applying transrot: ", dd)
         transformationType = dd["type"]
         vector = dd["vector"]
-        print("vectorType: ",type(vector))
-        # print(self.stm.system[])
 
         if transformationType == "Translation":
             self.stm.translateGrids(dd["element"], vector)
+            print(f'Translated {dd["element"]} by {self._formatVector(vector)} mm')
         elif transformationType == "Rotation":
             self.stm.rotateGrids(dd["element"], vector, cRot=dd["centerOfRotation"])
+            print(f'Rotated {dd["element"]} by {self._formatVector(vector)} deg around {self._formatVector(dd["centerOfRotation"])}')
         else:
             raise Exception("Transformation type incorrect")
 
@@ -385,11 +387,11 @@ class MainWidget(QWidget):
 
         aperDict = {
                 "center"    : SpillDict["center"],
-                "r_in"      : SpillDict["r_in"],
-                "r_out"     : SpillDict["r_out"]
+                "inner"      : SpillDict["inner"],
+                "outer"      : SpillDict["outer"]
                 }
 
-        eff_spill = self.stm.calcSpill(SpillDict["f_name"], SpillDict["comp"], aperDict)
+        eff_spill = self.stm.calcSpillover(SpillDict["f_name"], SpillDict["comp"], aperDict)
         print(f'Spillover efficiency of {SpillDict["f_name"]}, component {SpillDict["comp"]} = {eff_spill}')
     
     def calcXpolAction(self):

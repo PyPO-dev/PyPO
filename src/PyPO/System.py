@@ -786,7 +786,7 @@ class System(object):
         field_comp = getattr(field, comp)
         surfaceObj = self.system[field.surf]
 
-        return effs.calcSpillover(field, surfaceObj, aperDict)
+        return effs.calcSpillover(field_comp, surfaceObj, aperDict)
 
     def calcTaper(self, name_field, comp, aperDict={}):
         field = self.fields[name_field]

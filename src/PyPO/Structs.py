@@ -112,6 +112,15 @@ class RTDict(ctypes.Structure):
                 ("tChief", ctypes.POINTER(ctypes.c_double)),
                 ("oChief", ctypes.POINTER(ctypes.c_double))]
 
+class GRTDict(ctypes.Structure):
+    _fields_ = [("nRays", ctypes.c_int),
+                ("angx", ctypes.c_double),
+                ("angy", ctypes.c_double),
+                ("a", ctypes.c_double),
+                ("b", ctypes.c_double),
+                ("tChief", ctypes.POINTER(ctypes.c_double)),
+                ("oChief", ctypes.POINTER(ctypes.c_double))]
+
 class GDict(ctypes.Structure):
     _fields_ = [("lam", ctypes.c_double),
                 ("w0x", ctypes.c_double),
@@ -224,6 +233,15 @@ class cframef(ctypes.Structure):
 class RTDictf(ctypes.Structure):
     _fields_ = [("nRays", ctypes.c_int),
                 ("nRing", ctypes.c_int),
+                ("angx", ctypes.c_float),
+                ("angy", ctypes.c_float),
+                ("a", ctypes.c_float),
+                ("b", ctypes.c_float),
+                ("tChief", ctypes.POINTER(ctypes.c_float)),
+                ("oChief", ctypes.POINTER(ctypes.c_float))]
+
+class GRTDictf(ctypes.Structure):
+    _fields_ = [("nRays", ctypes.c_int),
                 ("angx", ctypes.c_float),
                 ("angy", ctypes.c_float),
                 ("a", ctypes.c_float),

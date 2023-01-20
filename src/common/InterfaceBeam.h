@@ -19,6 +19,8 @@
 extern "C"
 {
     PYPO_DLL void makeRTframe(RTDict rdict, cframe *fr);
+    
+    PYPO_DLL void makeGRTframe(GRTDict grdict, cframe *fr);
 
     PYPO_DLL void makeGauss(GDict gdict, reflparams plane, c2Bundle *res_field, c2Bundle *res_current);
 

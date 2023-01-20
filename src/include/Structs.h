@@ -21,6 +21,7 @@ struct reflparams;
 struct reflcontainer;
 struct cframe;
 struct RTDict;
+struct GRTDict;
 struct GDict;
 
 /** 1D array of complex numbers.*/
@@ -168,6 +169,17 @@ struct RTDict {
     double *oChief; /**<array of 3 double. Co-ordinate of chief ray origin.*/
 };
 
+/** Object for initializing a Gaussian ray-trace frame object.*/
+struct GRTDict {
+    int nRays;      /**<Number of rays to place in cframe.*/
+    double angx;    /**<Gaussian beam opening angle in x-direction, in degrees.*/
+    double angy;    /**<Gaussian beam opening angle in y-direction, in degrees.*/
+    double a;       /**<Beam waist along x-direction, in millimeters.*/
+    double b;       /**<Beam waist along x-direction, in millimeters.*/
+    double *tChief; /**<array of 3 double. Tilt of chief, ray, along x, y or z axis, in degrees.*/
+    double *oChief; /**<array of 3 double. Co-ordinate of chief ray origin.*/
+};
+
 /** Object for initializing a Gaussian beam.*/
 struct GDict {
     double lam;     /**<Wavelength of beam, in millimeters.*/
@@ -189,6 +201,7 @@ struct reflparamsf;
 struct reflcontainerf;
 struct cframef;
 struct RTDictf;
+struct GRTDictf;
 struct GDictf;
 
 /** 1D array of complex numbers.*/
@@ -334,6 +347,17 @@ struct RTDictf {
     float b;       /**<Semi-minor axis of outer ring, in millimeters.*/
     float *tChief; /**<array of 3 float. Tilt of chief, ray, along x, y or z axis, in degrees.*/
     float *oChief; /**<array of 3 float. Co-ordinate of chief ray origin.*/
+};
+
+/** Object for initializing a ray-trace frame object.*/
+struct GRTDictf {
+    int nRays;     /**<Number of rays to place in cframe.*/
+    float angx;    /**<Gaussian beam opening angle in x-direction, in degrees.*/
+    float angy;    /**<Gaussian beam opening angle in y-direction, in degrees.*/
+    float a;       /**<Beam waist along x-direction, in millimeters.*/
+    float b;       /**<Beam waist along x-direction, in millimeters.*/
+    float *tChief; /**<array of 3 double. Tilt of chief, ray, along x, y or z axis, in degrees.*/
+    float *oChief; /**<array of 3 double. Co-ordinate of chief ray origin.*/
 };
 
 /** Object for initializing a Gaussian beam.*/

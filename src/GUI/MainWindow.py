@@ -158,7 +158,8 @@ class MainWidget(QWidget):
                 self.ElementsColumn.reflectors.addWidget(ElementWidget(key, self.refletorActions))
             
             elif columnType == "frames":
-                self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(key, [self.setPlotFrameFormOpt, self.stm.removeFrame]))
+                self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(key, 
+                        [self.setPlotFrameFormOpt, self.stm.removeFrame, self.calcRMSfromFrame]))
             
             elif columnType == "fields":
                 self.ElementsColumn.POFields.addWidget(FieldsWidget(key, [self.setPlotFieldFormOpt, self.stm.removeField]))
@@ -277,7 +278,8 @@ class MainWidget(QWidget):
     def addFrameAction(self):
         RTDict = self.ParameterWid.read()
         self.stm.createFrame(RTDict)
-        self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(RTDict["name"], [self.setPlotFrameFormOpt, self.stm.removeFrame]))
+        self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(RTDict["name"],
+                            [self.setPlotFrameFormOpt, self.stm.removeFrame, self.calcRMSfromFrame]))    
     
     def addGaussianAction(self):
         GDict = self.ParameterWid.read()
@@ -334,7 +336,8 @@ class MainWidget(QWidget):
         self.stm.runRayTracer(propRaysDict["frame_in"], propRaysDict["frame_out"], 
                             propRaysDict["target"], propRaysDict["epsilon"], propRaysDict["nThreads"], 
                             propRaysDict["t0"], propRaysDict["device"], verbose=False)
-        self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(propRaysDict["frame_out"], [self.setPlotFrameFormOpt, self.stm.removeFrame]))
+        self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(propRaysDict["frame_out"], 
+                                [self.setPlotFrameFormOpt, self.stm.removeFrame, self.calcRMSfromFrame]))
     
     def setPOInitForm(self):
         self.setForm(fDataObj.propPOInp(self.stm.currents, self.stm.system), self.addPropBeamAction)
@@ -355,7 +358,16 @@ class MainWidget(QWidget):
         elif propBeamDict["mode"] == "JMEH":
             self.ElementsColumn.POCurrents.addWidget(CurrentWidget(propBeamDict["name_JM"], [self.setPlotCurrentFormOpt, self.stm.removeCurrent]))
             self.ElementsColumn.POFields.addWidget(FieldsWidget(propBeamDict["name_EH"], [self.setPlotFieldFormOpt, self.stm.removeField]))
+        
+        elif propBeamDict["mode"] == "EHP":
+            self.ElementsColumn.POFields.addWidget(CurrentWidget(propBeamDict["name_EH"], [self.setPlotCurrentFormOpt, self.stm.removeCurrent]))
+            self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(propBeamDict["name_P"], 
+                                [self.setPlotFrameFormOpt, self.stm.removeFrame, self.calcRMSfromFrame]))
     #END NOTE
+    
+    def calcRMSfromFrame(self, frame):
+        rms = self.stm.calcSpotRMS(frame)
+        print(f"RMS value of {frame} = {rms} mm")
 
 class PyPOMainWindow(QMainWindow):
     def __init__(self, parent=None):

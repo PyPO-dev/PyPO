@@ -21,6 +21,7 @@ from src.PyPO.BindBeam import *
 from src.PyPO.MatTransform import *
 from src.PyPO.PyPOTypes import *
 from src.PyPO.Checks import *
+import src.PyPO.Config as Config
 
 import src.PyPO.Plotter as plt
 import src.PyPO.Efficiencies as effs
@@ -64,10 +65,10 @@ class System(object):
     savePathCurrents = os.path.join(sysPath, "save", "currents")
     savePathSystems = os.path.join(sysPath, "save", "systems")
 
-    def __init__(self):
+    def __init__(self, redirect=None):
         self.num_ref = 0
         self.num_cam = 0
-
+        Config.initPrint(redirect)
         # Internal dictionaries
         self.system = {}
         self.frames = {}
@@ -786,7 +787,7 @@ class System(object):
         field_comp = getattr(field, comp)
         surfaceObj = self.system[field.surf]
 
-        return effs.calcSpillover(field, surfaceObj, aperDict)
+        return effs.calcSpillover(field_comp, surfaceObj, aperDict)
 
     def calcTaper(self, name_field, comp, aperDict={}):
         field = self.fields[name_field]

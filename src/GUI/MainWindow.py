@@ -3,7 +3,7 @@ import sys
 import shutil
 
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar
-from PyQt5.QtGui import QFont, QIcon
+from PyQt5.QtGui import QFont, QIcon, QTextCursor
 from src.GUI.ParameterForms import formGenerator
 import src.GUI.ParameterForms.formDataObjects as fDataObj
 from src.GUI.PlotScreen import PlotScreen
@@ -41,11 +41,15 @@ class MainWidget(QWidget):
         # init layout
         self.grid = QGridLayout()
 
+        self.pyprint = print
+
         self._setupPlotScreen()
         self._mkConsole()
-        print("HOOOOI")
 
-        self.stm = st.System()
+        self.pyprint(self.pyprint)
+        
+
+        self.stm = st.System(redirect=print)
         self._mkElementsColumn()
         # self.ElementsColumn.reflectors.addWidget(ElementWidget("refl",[lambda:0,lambda:0,lambda:0]))
         # self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget("refl",[lambda:0,lambda:0,lambda:0]))
@@ -65,6 +69,21 @@ class MainWidget(QWidget):
         #     cons.appendPlainText(s)
         # self.console = cons
         self.addToWindowGrid(ConsoleGenerator.get(), self.GPConsole)
+        self.console = Console()
+        self.cursor = QTextCursor(self.console.document())
+        
+        global print
+        def print(s, end=''):
+            #s += end
+            if end == '\r':
+                self.cursor.setPosition(QTextCursor.End)
+                self.cursor.select(QTextCursor.LineUnderCursor)
+                self.cursor.removeSelectedText()
+                self.console.insertPlainText(s)
+            else:
+                self.console.appendPlainText(s)
+            self.console.repaint()
+        self.addToWindowGrid(self.console, self.GPConsole)
     
     def _mkElementsColumn(self):
         if hasattr(self, "ElementsColumn"):
@@ -84,6 +103,9 @@ class MainWidget(QWidget):
         self.PlotScreen.setTabShape(QTabWidget.Rounded)
         self.PlotScreen.tabCloseRequested.connect(self.closeTab)
         self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
+
+    def _formatVector(self, vector):
+        return f"[{vector[0]}, {vector[1]}, {vector[2]}]"
 
     def addPlot(self, figure, label):
         self.PlotScreen.addTab(PlotScreen(figure), label)
@@ -270,16 +292,15 @@ class MainWidget(QWidget):
 
     def applyTransformation(self, element):
         dd = self.ParameterWid.read()
-        print(f"Applying transrot: {dd}")
         transformationType = dd["type"]
         vector = dd["vector"]
-        print("vectorType: ",type(vector))
-        # print(self.stm.system[])
 
         if transformationType == "Translation":
             self.stm.translateGrids(dd["element"], vector)
+            print(f'Translated {dd["element"]} by {self._formatVector(vector)} mm')
         elif transformationType == "Rotation":
             self.stm.rotateGrids(dd["element"], vector, cRot=dd["centerOfRotation"])
+            print(f'Rotated {dd["element"]} by {self._formatVector(vector)} deg around {self._formatVector(dd["centerOfRotation"])}')
         else:
             raise Exception("Transformation type incorrect")
 
@@ -382,11 +403,11 @@ class MainWidget(QWidget):
 
         aperDict = {
                 "center"    : SpillDict["center"],
-                "r_in"      : SpillDict["r_in"],
-                "r_out"     : SpillDict["r_out"]
+                "inner"      : SpillDict["inner"],
+                "outer"      : SpillDict["outer"]
                 }
 
-        eff_spill = self.stm.calcSpill(SpillDict["f_name"], SpillDict["comp"], aperDict)
+        eff_spill = self.stm.calcSpillover(SpillDict["f_name"], SpillDict["comp"], aperDict)
         print(f'Spillover efficiency of {SpillDict["f_name"]}, component {SpillDict["comp"]} = {eff_spill}')
     
     def calcXpolAction(self):

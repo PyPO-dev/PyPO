@@ -278,8 +278,8 @@ def calcSpillEff(fieldDict, elemDict):
         InputDescription(inType.dropdown, "f_name", label="Field", sublist = sublist_fields),
         InputDescription(inType.dropdown, "comp", label="Component", sublist = complist),
         InputDescription(inType.floats, "center", label="Center", numFields=2, oArray=True),
-        InputDescription(inType.floats, "r_in", label="Inner radius", numFields=1),
-        InputDescription(inType.floats, "r_out", label="Outer radius", numFields=1)
+        InputDescription(inType.floats, "inner", label="Inner axes", numFields=2),
+        InputDescription(inType.floats, "outer", label="Outer axes", numFields=2)
         ]
 
     return formTaper

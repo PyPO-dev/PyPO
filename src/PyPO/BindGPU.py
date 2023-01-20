@@ -7,6 +7,7 @@ import pathlib
 from src.PyPO.BindUtils import *
 from src.PyPO.Structs import *
 from src.PyPO.PyPOTypes import *
+import src.PyPO.Config as Config
 
 import threading
 
@@ -68,13 +69,15 @@ def loadGPUlib():
 
     lib.callRTKernel.restype = None
 
-    return lib
+    ws = WaitSymbol()
+
+    return lib, ws
 
 # WRAPPER FUNCTIONS DOUBLE PREC
 
 #### SINGLE PRECISION
 def PyPO_GPUf(source, target, PODict):
-    lib = loadGPUlib()
+    lib, ws = loadGPUlib()
 
     # Create structs with pointers for source and target
     csp = reflparamsf()
@@ -131,6 +134,8 @@ def PyPO_GPUf(source, target, PODict):
         t.daemon = True
         t.start()
         while t.is_alive(): # wait for the thread to exit
+            #Config.print(np.array([1,0,0]))
+            Config.print(f'Calculating J, M on {target["name"]} {ws.getSymbol()}', end='\r')
             t.join(.1)
 
         # Unpack filled struct

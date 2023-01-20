@@ -7,10 +7,11 @@ def _generateMask(x, y, aperDict):
     
     t = np.arctan2(y, x) + np.pi
 
-    outer = (aperDict["r_out"] * np.cos(t))**2 + (aperDict["b_out"] * np.sin(t))**2
+    outer = (aperDict["outer"][0] * np.cos(t))**2 + (aperDict["outer"][1] * np.sin(t))**2
+    inner = (aperDict["inner"][0] * np.cos(t))**2 + (aperDict["inner"][1] * np.sin(t))**2
 
     cond1 = (x - aperDict["center"][0])**2 + (y - aperDict["center"][1])**2 < outer
-    cond2 = np.sqrt((x - aperDict["center"][0])**2 + (y - aperDict["center"][1])**2) > aperDict["r_in"]
+    cond2 = (x - aperDict["center"][0])**2 + (y - aperDict["center"][1])**2 > inner
  
     return cond1 & cond2
 

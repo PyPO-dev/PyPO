@@ -7,6 +7,11 @@ from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, 
 
 from datetime import datetime
 
+global print
+def print(s):
+    ConsoleGenerator.get().appendPlainText(s)
+    ConsoleGenerator.get().repaint()
+
 class msgTypes(Enum):
     FormInput_Incorrect = 0,
     RTError = 1
@@ -15,7 +20,17 @@ class msgTypes(Enum):
     # bla = 4
     # bla = 5
 
-
+class ConsoleGenerator():
+    _console = None
+    
+    @classmethod
+    def get(cls):
+        if not hasattr(cls, "_console") and cls._console != None:
+            # print(cls._console, "$$")
+            pass
+        else:
+            cls._console = Console()
+        return cls._console
 
 class Console(QPlainTextEdit):
     def __init__(self, parent=None):
@@ -25,6 +40,8 @@ class Console(QPlainTextEdit):
         self.setReadOnly(True)
         self.appendPlainText("********** PyPO Console **********")
         self.log(msgTypes.RTError,"Test")
+
+        # self.textCursor().insertText()
 
     def log(self, msgType, text):
         # msgType = msgTypes.FormInput_Incorrect

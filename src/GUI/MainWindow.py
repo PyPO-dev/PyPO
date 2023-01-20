@@ -10,22 +10,14 @@ from src.GUI.PlotScreen import PlotScreen
 from src.GUI.TransformationWidget import TransformationWidget
 from src.GUI.Acccordion import Accordion
 from src.GUI.ElementWidget import ElementWidget, FrameWidget, FieldsWidget, CurrentWidget
-from src.GUI.Console import Console
+from src.GUI.Console import ConsoleGenerator
+from src.GUI.Console import print
 import numpy as np
 from src.PyPO.Checks import InputReflError, InputRTError
 
 sys.path.append('../')
 sys.path.append('../../')
 import src.PyPO.System as st
-
-
-if __name__ == "__main__":
-
-    app = QApplication(sys.argv)
-    cons = Console()
-    def print(s):
-        cons.appendPlainText(s)
-
 
 class MainWidget(QWidget):
     """Main Window."""
@@ -37,9 +29,9 @@ class MainWidget(QWidget):
 
         # GridParameters
         self.GPElementsColumn = [0, 0, 2, 1]
-        self.GPParameterForm  = [0, 1, 3, 1]
-        self.GPPlotScreen     = [0, 2, 3, 1]
-        self.GPConsole        = [3, 2, 1, 1]
+        self.GPParameterForm  = [0, 1, 2, 1]
+        self.GPPlotScreen     = [0, 2, 1, 1]
+        self.GPConsole        = [1, 2, 1, 1]
 
         ### ElementConfigurations
         # self.elementConfigs = []
@@ -51,9 +43,14 @@ class MainWidget(QWidget):
 
         self._setupPlotScreen()
         self._mkConsole()
+        print("HOOOOI")
 
         self.stm = st.System()
         self._mkElementsColumn()
+        # self.ElementsColumn.reflectors.addWidget(ElementWidget("refl",[lambda:0,lambda:0,lambda:0]))
+        # self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget("refl",[lambda:0,lambda:0,lambda:0]))
+        # self.ElementsColumn.POFields.addWidget(FieldsWidget("refl",[lambda:0,lambda:0,lambda:0]))
+        # self.ElementsColumn.POCurrents.addWidget(CurrentWidget("refl",[lambda:0,lambda:0,lambda:0]))
 
         self.setLayout(self.grid)
 
@@ -62,12 +59,12 @@ class MainWidget(QWidget):
         # end NOTE
 
     def _mkConsole(self):
-        cons = Console()
-        global print
-        def print(s):
-            cons.appendPlainText(s)
-        self.console = cons
-        self.addToWindowGrid(self.console, self.GPConsole)
+        # cons = Console()
+        # global print
+        # def print(s):
+        #     cons.appendPlainText(s)
+        # self.console = cons
+        self.addToWindowGrid(ConsoleGenerator.get(), self.GPConsole)
     
     def _mkElementsColumn(self):
         if hasattr(self, "ElementsColumn"):
@@ -273,7 +270,7 @@ class MainWidget(QWidget):
 
     def applyTransformation(self, element):
         dd = self.ParameterWid.read()
-        print("Applying transrot: ", dd)
+        print(f"Applying transrot: {dd}")
         transformationType = dd["type"]
         vector = dd["vector"]
         print("vectorType: ",type(vector))

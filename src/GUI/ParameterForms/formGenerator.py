@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QComboBox, QFormLayout, QLabel, QLineEdit, QHBoxLayout, QPushButton, QStackedWidget, QCheckBox
+from PyQt5.QtWidgets import QWidget, QComboBox, QFormLayout, QLabel, QLineEdit, QHBoxLayout, QPushButton, QStackedWidget, QCheckBox, QRadioButton, QButtonGroup, QGridLayout
 from PyQt5.QtCore import QRegExp, Qt
 from PyQt5.QtGui import QRegExpValidator
 
@@ -56,6 +56,14 @@ class FormGenerator(QWidget):
                 self.layout.addRow(input)
             elif inp.inType.value == 5:
                 input = DynamicInputWidget(inp)
+                self.inputs.append(input)
+                self.layout.addRow(input)
+            elif inp.inType.value == 6:
+                input = SimpleRadio(inp)
+                self.inputs.append(input)
+                self.layout.addRow(input)
+            elif inp.inType.value == 7:
+                input = XYZRadio(inp)
                 self.inputs.append(input)
                 self.layout.addRow(input)
                 
@@ -210,4 +218,94 @@ class DynamicInputWidget(QWidget):
                paramDict.update(input.read())
         return paramDict
 
+class SimpleRadio(QWidget):
+    def __init__ (self, inp:InputDescription):
+        super().__init__()
+        self.inputDescription = inp
 
+        layout = QFormLayout(self)
+        layout.setContentsMargins(0,0,0,0)
+
+        radioWidget = QWidget()
+        radiolayout = QHBoxLayout(radioWidget)
+
+        self.group = QButtonGroup()
+        for i in self.inputDescription.sublist:
+            rb = QRadioButton(i)
+            self.group.addButton(rb)
+            radiolayout.addWidget(rb)
+        layout.addRow(MyLabel(self.inputDescription.label) ,radioWidget)
+
+    def read(self):
+        d = {self.inputDescription.outputName:self.group.checkedButton().text()}
+        print(d)
+        return d
+
+
+
+
+
+class XYZRadio(QWidget):
+
+
+    class RadioSubWidget(QWidget):
+        def __init__(self, options, name, parent=None):
+            super().__init__(parent)
+            layout = QGridLayout(self)
+            layout.setContentsMargins(0,0,0,0)
+            self.buttons = []
+            self.name = name
+
+            self.group = QButtonGroup()
+            self.group.setExclusive(False)
+            self.group.buttonClicked.connect(self.uncheckOthers)
+            
+            x = 1
+            for o in options:
+                btn = QRadioButton(o)
+                self.group.addButton(btn)            
+                self.buttons.append(btn)
+                layout.addWidget(btn, 0, x)
+                x += 1
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        layout = QFormLayout(self)
+        layout.setContentsMargins(0,0,0,0)
+        self.r1 = self.RadioSubWidget(["x", "y", "z"],"r1")
+        self.r2 = self.RadioSubWidget(["x", "y", "z"],"r2")
+        self.r1.setCompanion(self.r2)
+        self.r2.setCompanion(self.r1)
+        layout.addRow(QLabel("Horizontal axis"), self.r1)
+        layout.addRow(QLabel("Vertical axis"), self.r2)
+        btn = QPushButton("Read")
+        btn.clicked.connect(self.read)
+        layout.addRow(btn)
+
+    def read(self):
+        if self.r1.group.checkedButton()==None or self.r2.group.checkedButton()==None:
+            raise Exception("RadioButton no option selected") 
+        print(self.r1.group.checkedButton().text()+self.r2.group.checkedButton().text())
+
+        def uncheckOthers(self, caller):
+            for btn in self.buttons:
+                if btn is not caller:
+                    btn.setChecked(False)
+
+        def toggled(self, b):
+            btn = self.group.checkedButton()
+            print(type(btn))
+            self.companion.uncheckOption(btn.text())
+            return
+        
+        def setCompanion(self, c):
+            self.companion = c
+            for btn in self.buttons:
+                btn.toggled.connect(self.toggled)
+
+        def uncheckOption(self, s):
+            for btn in self.buttons:
+                if btn.text() == s and btn.isChecked(): 
+                    btn.toggle()
+                    print("@uncheckOption %s btn = %s, s = %s, " %(self.name,btn.text(), s))
+                    return
+    

@@ -54,10 +54,6 @@ class MainWidget(QWidget):
 
         self.stm = st.System()
         self._mkElementsColumn()
-        self.ElementsColumn.reflectors.addWidget(ElementWidget("refl",[lambda:0,lambda:0,lambda:0]))
-        self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget("refl",[lambda:0,lambda:0,lambda:0]))
-        self.ElementsColumn.POFields.addWidget(FieldsWidget("refl",[lambda:0,lambda:0,lambda:0]))
-        self.ElementsColumn.POCurrents.addWidget(CurrentWidget("refl",[lambda:0,lambda:0,lambda:0]))
 
         self.setLayout(self.grid)
 

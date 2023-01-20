@@ -13,11 +13,13 @@ class Accordion(QWidget):
 
         self.reflectors = AccordionSection("Reflectors")
         self.RayTraceFrames = AccordionSection("Ray Trace Frames")
+        self.POFields = AccordionSection("PO Fields")
+        self.POCurrents = AccordionSection("PO Currents")
         layout.addWidget(self.reflectors)
         layout.addWidget(self.RayTraceFrames)
+        layout.addWidget(self.POFields)
+        layout.addWidget(self.POCurrents)
         
-
-
 class AccordionSection(QWidget):
     def __init__(self, text, parent=None):
         super().__init__(parent)

@@ -159,7 +159,6 @@ class DynamicInputWidget(QWidget):
     def __init__ (self, inp):
         super().__init__()
         self.inputDescription = inp
-        # self.findChildren(QWidget,options=Qt.FindDirectChildrenOnly)
         
         self.layout = QFormLayout()
         self.layout.setContentsMargins(0,0,0,0)
@@ -212,11 +211,9 @@ class DynamicInputWidget(QWidget):
                     print(c.inputDescription.outputName)
                 except:
                     pass
-
-        for input in self.currentChild.findChildren(QWidget,options=Qt.FindDirectChildrenOnly):
-            #     print(input)
-            #     print(input.inputDescription.outputName)
-            paramDict.update(input.read())
+        if self.hasChildren:
+            for input in self.currentChild.findChildren(QWidget,options=Qt.FindDirectChildrenOnly):
+               paramDict.update(input.read())
         return paramDict
 
 

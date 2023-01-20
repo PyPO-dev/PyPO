@@ -7,9 +7,11 @@
 */
 
 /**
- * Generate ray-trace frame.
+ * Generate concentric ellipse ray-trace frame.
  *
- * Generate a ray-trace frame from an RTDict or RTDictf. Wrapper for initFrame.
+ * Generate a ray-trace frame from an RTDict or RTDictf. The frame consists of concentring ellipses.
+ * Wrapper for initFrame.
+ *
  * @param rdict RTDict or RTDictf object.
  * @param fr Pointer to cframe or cframef object.
  *
@@ -22,6 +24,26 @@
 void makeRTframe(RTDict rdict, cframe *fr)
 {
     initFrame<RTDict, cframe, double>(rdict, fr);
+}
+
+/**
+ * Generate Gaussian ray-trace frame.
+ *
+ * Generate a ray-trace frame from an RTDict or RTDictf. Generates xy points and directions from Gaussian distribution.
+ * Wrapper for initRTGauss.
+ *
+ * @param grdict GRTDict or GRTDictf object.
+ * @param fr Pointer to cframe or cframef object.
+ *
+ * @see initFrame()
+ * @see GRTDict
+ * @see GRTDictf
+ * @see cframe
+ * @see cframef
+ */
+void makeGRTframe(GRTDict grdict, cframe *fr)
+{
+    initRTGauss<GRTDict, cframe, double>(grdict, fr);
 }
 
 /** 

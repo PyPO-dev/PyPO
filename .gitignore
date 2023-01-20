@@ -157,7 +157,7 @@ datadir/
 
 # vim stuff
 *.swp
-
+*.swo
 #vscode specific
 .vscode/settings.json
 .idea/misc.xml

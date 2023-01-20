@@ -11,6 +11,7 @@ import json
 from pathlib import Path
 from contextlib import contextmanager
 from scipy.interpolate import griddata
+import pickle 
 
 # PyPO-specific modules
 from src.PyPO.BindRefl import *
@@ -61,6 +62,7 @@ class System(object):
     savePathElem = os.path.join(sysPath, "save", "elements")
     savePathFields = os.path.join(sysPath, "save", "fields")
     savePathCurrents = os.path.join(sysPath, "save", "currents")
+    savePathSystems = os.path.join(sysPath, "save", "systems")
 
     def __init__(self):
         self.num_ref = 0
@@ -69,6 +71,11 @@ class System(object):
         # Internal dictionaries
         self.system = {}
         self.frames = {}
+        self.fields = {}
+        self.currents = {}
+
+        self.EHcomplist = np.array(["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"])
+        self.JMcomplist = np.array(["Jx", "Jy", "Jz", "Mx", "My", "Mz"])
 
         self.cl = 2.99792458e11 # mm / s
         #self.savePathElem = "./save/elements/"
@@ -76,6 +83,7 @@ class System(object):
         saveElemExist = os.path.isdir(self.savePathElem)
         saveFieldsExist = os.path.isdir(self.savePathFields)
         saveCurrentsExist = os.path.isdir(self.savePathCurrents)
+        saveSystemsExist = os.path.isdir(self.savePathSystems)
 
         if not saveElemExist:
             os.makedirs(self.savePathElem)
@@ -86,6 +94,9 @@ class System(object):
         elif not saveCurrentsExist:
             os.makedirs(self.savePathCurrents)
 
+        elif not saveSystemsExist:
+            os.makedirs(self.savePathSystems)
+        
         self.savePath = os.path.join(sysPath, "images")
 
         existSave = os.path.isdir(self.savePath)
@@ -442,8 +453,61 @@ class System(object):
         with open('{}.json'.format(os.path.join(self.savePathElem, name)), 'w') as f:
             json.dump(jsonDict, f, cls=NpEncoder)
 
+    def saveSystem(self, name):
+        path = os.path.join(self.savePathSystems, name)
+        saveExist = os.path.isdir(path)
+
+        if not saveExist:
+            os.makedirs(path)
+        
+        with open(os.path.join(path, "system"), 'wb') as file: 
+            pickle.dump(self.system, file)
+        
+       # for key, item in self.frames.items():
+        with open(os.path.join(path, "frames"), 'wb') as file: 
+            pickle.dump(self.frames, file)
+        
+        #for key, item in self.fields.items():
+        with open(os.path.join(path, "fields"), 'wb') as file: 
+            pickle.dump(self.fields, file)
+        
+        #for key, item in self.currents.items():
+        with open(os.path.join(path, "currents"), 'wb') as file: 
+            pickle.dump(self.currents, file)
+
+    def loadSystem(self, name):
+        path = os.path.join(self.savePathSystems, name)
+        loadExist = os.path.isdir(path)
+
+        if not loadExist:
+            print("Not here...")
+        
+        with open(os.path.join(path, "system"), 'rb') as file: 
+            self.system = pickle.load(file)
+        
+       # for key, item in self.frames.items():
+        with open(os.path.join(path, "frames"), 'rb') as file: 
+            self.frames = pickle.load(file)
+        
+        #for key, item in self.fields.items():
+        with open(os.path.join(path, "fields"), 'rb') as file: 
+            self.fields = pickle.load(file)
+        
+        #for key, item in self.currents.items():
+        with open(os.path.join(path, "currents"), 'rb') as file: 
+            self.currents = pickle.load(file)
+    
     def removeElement(self, name):
         del self.system[name]
+    
+    def removeFrame(self, frameName):
+        del self.frames[frameName]
+    
+    def removeField(self, fieldName):
+        del self.fields[fieldName]
+    
+    def removeCurrent(self, currentName):
+        del self.currents[currentName]
 
     def saveFields(self, fields, name_fields):
         saveDir = os.path.join(self.savePathFields, name_fields)
@@ -552,10 +616,11 @@ class System(object):
         return currents
 
     def runPO(self, PODict):
-
-        source = self.system[PODict["s_name"]]
+        PODict["s_current"] = self.currents[PODict["s_current"]]
+        
+        source = self.system[PODict["s_current"].surf]
         target = self.system[PODict["t_name"]]
-
+        PODict["k"] = PODict["s_current"].k
         # Default exponent to -1
         if not "exp" in PODict:
             PODict["exp"] = "fwd"
@@ -573,6 +638,28 @@ class System(object):
 
         elif PODict["device"] == "GPU":
             out = PyPO_GPUf(source, target, PODict)
+
+        if PODict["mode"] == "JM":
+            out.setMeta(PODict["t_name"], PODict["k"])
+            self.currents[PODict["name_JM"]] = out
+        
+        elif PODict["mode"] == "EH" or PODict["mode"] == "FF":
+            out.setMeta(PODict["t_name"], PODict["k"])
+            self.fields[PODict["name_EH"]] = out
+        
+        elif PODict["mode"] == "JMEH":
+            out[0].setMeta(PODict["t_name"], PODict["k"])
+            out[1].setMeta(PODict["t_name"], PODict["k"])
+            self.currents[PODict["name_JM"]] = out[0]
+            self.fields[PODict["name_EH"]] = out[1]
+        
+        elif PODict["mode"] == "EHP":
+            out[0].setMeta(PODict["t_name"], PODict["k"])
+            self.fields[PODict["name_EH"]] = out[0]
+
+            frame = self.loadFramePoynt(out[1], PODict["t_name"])
+            self.frames[PODict["name_P"]] = frame
+
 
         return out
 
@@ -645,6 +732,13 @@ class System(object):
     # Beam!   
     def createGauss(self, gaussDict, name_source):
         gauss_in = makeGauss(gaussDict, self.system[name_source])
+
+        k = 2 * np.pi / gaussDict["lam"]
+        gauss_in[0].setMeta(name_source, k)
+        gauss_in[1].setMeta(name_source, k)
+
+        self.fields[gaussDict["name"]] = gauss_in[0]
+        self.currents[gaussDict["name"]] = gauss_in[1]
         return gauss_in
 
     def runRayTracer(self, fr_in, fr_out, name_target, epsilon=1e-3, nThreads=1, t0=100, device="CPU", verbose=True):
@@ -682,6 +776,11 @@ class System(object):
 
         return out
 
+    def calcSpotRMS(self, name_frame):
+        frame = self.frames[name_frame]
+        rms = effs.calcRMS(frame)
+        return rms
+
     def calcSpillover(self, field, name_target, aperDict):
         surfaceObj = self.system[name_target]
         return effs.calcSpillover(field, surfaceObj, aperDict)
@@ -708,56 +807,108 @@ class System(object):
         Psi = fgs.generateGauss(fgs_out, surfaceObj, mode)
         return Psi
 
-    def generatePointSource(self, name_surface, comp="Ex"):
+    def generatePointSource(self, PSDict, name_surface):
         surfaceObj = self.system[name_surface]
         ps = np.zeros(surfaceObj["gridsize"], dtype=complex)
 
         xs_idx = int((surfaceObj["gridsize"][0] - 1) / 2)
         ys_idx = int((surfaceObj["gridsize"][1] - 1) / 2)
 
-        ps[xs_idx, ys_idx] = 1 + 1j * 0
+        ps[xs_idx, ys_idx] = PSDict["E0"] * np.exp(1j * PSDict["phase"])
 
-        out = self._compToFields(comp, ps)
+        Ex = ps * PSDict["pol"][0]
+        Ey = ps * PSDict["pol"][1]
+        Ez = ps * PSDict["pol"][2]
 
-        return out
+        Hx = ps * 0
+        Hy = ps * 0
+        Hz = ps * 0
 
-    def plotBeam2D(self, name_surface, field,
+        field = fields(Ex, Ey, Ez, Hx, Hy, Hz) 
+        current = self.calcCurrents(name_surface, field)
+
+        k =  2 * np.pi / PSDict["lam"]
+
+        field.setMeta(name_surface, k)
+        current.setMeta(name_surface, k)
+
+        self.fields[PSDict["name"]] = field
+        self.currents[PSDict["name"]] = current
+
+    def plotBeam2D(self, name_surface, name_field, comp, ptype="field",
                     vmin=-30, vmax=0, show=True, amp_only=False,
                     save=False, polar=False, interpolation=None,
                     aperDict={"plot":False}, mode='dB', project='xy',
                     units="", name='', titleA="Amp", titleP="Phase",
-                    unwrap_phase=False):
+                    unwrap_phase=False, returns=False):
 
         plotObject = self.system[name_surface]
+
+        if ptype == "field":
+            field = self.fields[name_field]
+        
+            if comp in self.EHcomplist:
+                field_comp = field[np.argwhere(self.EHcomplist == comp)[0]]
+
+
+        elif ptype == "current":
+            field = self.currents[name_field] 
+            
+            if comp in self.JMcomplist:
+                field_comp = field[np.argwhere(self.JMcomplist == comp)[0]]
 
         default = "mm"
         if plotObject["gmode"] == 2 and not units:
             default = "deg"
 
         unitl = self._units(units, default)
-
-        plt.plotBeam2D(plotObject, field,
+        
+        fig, ax = plt.plotBeam2D(plotObject, field_comp,
                         vmin, vmax, show, amp_only,
                         save, polar, interpolation,
                         aperDict, mode, project,
                         unitl, name, titleA, titleP, self.savePath, unwrap_phase)
 
-    def plot3D(self, name_surface, fine=2, cmap=cm.cool,
-                returns=False, ax_append=False, norm=False,
-                show=True, foc1=False, foc2=False, save=True, ret=False):
+        if returns:
+            return fig, ax
 
+        elif save:
+            pt.savefig(fname=savePath + '{}_{}.jpg'.format(plotObject["name"], name),
+                        bbox_inches='tight', dpi=300)
+            pt.close()
+
+        elif show:
+            pt.show()
+
+    def plot3D(self, name_surface, fine=2, cmap=cm.cool,
+            norm=False, show=True, foc1=False, foc2=False, save=False, ret=False):
+        
+        #pt.rcParams['xtick.minor.visible'] = False
+        #pt.rcParams['ytick.minor.visible'] = False
+
+        fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
         plotObject = self.system[name_surface]
 
-        r = plt.plot3D(plotObject, fine, cmap,
-                    returns, ax_append, norm,
-                    show, foc1, foc2, save, self.savePath, ret=ret)
-        if returns:
-            return r
+        plt.plot3D(plotObject, ax, fine, cmap, norm, foc1, foc2)
+        if ret:
+            return fig, ax
+        
+        elif save:
+            pt.savefig(fname=savePath + '{}.jpg'.format(plotObject["name"]),bbox_inches='tight', dpi=300)
+            pt.close()
+
+        elif show:
+            pt.show()
+
+        #pt.rcParams['xtick.minor.visible'] = True
+        #pt.rcParams['ytick.minor.visible'] = True
 
     def plotSystem(self, fine=2, cmap=cm.cool,
-                ax_append=False, norm=False,
-                show=True, foc1=False, foc2=False, save=True, ret=False, select=[], RTframes=[]):
+                norm=False, show=True, foc1=False, foc2=False, save=False, ret=False, select=[], RTframes=[]):
 
+        #pt.rcParams['xtick.minor.visible'] = False
+        #pt.rcParams['ytick.minor.visible'] = False
+        
         plotDict = {}
         if select:
             for name in select:
@@ -771,18 +922,29 @@ class System(object):
                 _RTframes.append(self.frames[name])
 
 
-        figax = plt.plotSystem(plotDict, fine, cmap,
-                    ax_append, norm,
-                    show, foc1, foc2, save, ret, _RTframes, self.savePath)
+        fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
+        plt.plotSystem(plotDict, ax, fine, cmap,norm,
+                    foc1, foc2, _RTframes)
 
         if ret:
-            return figax
+            return fig, ax
+        
+        elif save:
+            pt.savefig(fname=self.savePath + 'system.jpg',bbox_inches='tight', dpi=300)
+            pt.close()
 
-    def plotRTframe(self, frame, project="xy", returns=False):
+        elif show:
+            pt.show()
+        
+        #pt.rcParams['xtick.minor.visible'] = True
+        #pt.rcParams['ytick.minor.visible'] = True
+        
+
+    def plotRTframe(self, frame, project="xy", returns=False, aspect=1):
         if returns:
-            return plt.plotRTframe(self.frames[frame], project, self.savePath, returns)
+            return plt.plotRTframe(self.frames[frame], project, self.savePath, returns, aspect)
         else:
-            plt.plotRTframe(self.frames[frame], project, self.savePath, returns)
+            plt.plotRTframe(self.frames[frame], project, self.savePath, returns, aspect)
 
     def copyObj(self, obj):
         return copy.deepcopy(obj)

@@ -194,7 +194,6 @@ def PyPO_GPUf(source, target, PODict):
 
     elif PODict["mode"] == "FF":
         res = c2Bundlef()
-
         args.insert(0, res)
 
         allocate_c2Bundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)

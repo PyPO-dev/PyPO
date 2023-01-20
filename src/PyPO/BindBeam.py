@@ -27,6 +27,9 @@ def loadBeamlib():
 
     lib.makeRTframe.argtypes = [RTDict, ctypes.POINTER(cframe)]
     lib.makeRTframe.restype = None
+    
+    lib.makeGRTframe.argtypes = [GRTDict, ctypes.POINTER(cframe)]
+    lib.makeGRTframe.restype = None
 
     lib.makeGauss.argtypes = [GDict, reflparams, ctypes.POINTER(c2Bundle), ctypes.POINTER(c2Bundle)]
     lib.makeGauss.restype = None
@@ -49,6 +52,24 @@ def makeRTframe(rdict_py):
     allfill_RTDict(c_rdict, rdict_py, ctypes.c_double)
 
     lib.makeRTframe(c_rdict, ctypes.byref(res))
+
+    shape = (nTot,)
+    out = frameToObj(res, np_t=np.float64, shape=shape)
+
+    return out
+
+def makeGRTframe(grdict_py):
+    lib = loadBeamlib()
+
+    nTot = rdict_py["nRays"]
+
+    c_grdict = GRTDict()
+    res = cframe()
+
+    allocate_cframe(res, nTot, ctypes.c_double)
+    allfill_RTDict(c_grdict, grdict_py, ctypes.c_double)
+
+    lib.makeGRTframe(c_grdict, ctypes.byref(res))
 
     shape = (nTot,)
     out = frameToObj(res, np_t=np.float64, shape=shape)

@@ -64,6 +64,7 @@ def ex_DRO_RT(device):
         s.runRayTracer("start", "pri", "p1", nThreads=256, t0=1e4, device=device)
         s.runRayTracer("pri", "focus", "plane1", nThreads=256, t0=1e4, device=device)
 
+    pt.show()
     s.plotRTframe("focus")
     s.plotSystem(RTframes=["start", "pri", "focus"])
 

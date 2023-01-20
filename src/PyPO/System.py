@@ -652,6 +652,14 @@ class System(object):
             out[1].setMeta(PODict["t_name"], PODict["k"])
             self.currents[PODict["name_JM"]] = out[0]
             self.fields[PODict["name_EH"]] = out[1]
+        
+        elif PODict["mode"] == "EHP":
+            out[0].setMeta(PODict["t_name"], PODict["k"])
+            self.fields[PODict["name_EH"]] = out[0]
+
+            frame = self.loadFramePoynt(out[1], PODict["t_name"])
+            self.frames[PODict["name_P"]] = frame
+
 
         return out
 
@@ -768,6 +776,11 @@ class System(object):
 
         return out
 
+    def calcSpotRMS(self, name_frame):
+        frame = self.frames[name_frame]
+        rms = effs.calcRMS(frame)
+        return rms
+
     def calcSpillover(self, field, name_target, aperDict):
         surfaceObj = self.system[name_target]
         return effs.calcSpillover(field, surfaceObj, aperDict)
@@ -830,10 +843,6 @@ class System(object):
                     unwrap_phase=False, returns=False):
 
         plotObject = self.system[name_surface]
-
-        print(comp)
-        print(self.EHcomplist)
-        print(np.argwhere(self.EHcomplist == comp))
 
         if ptype == "field":
             field = self.fields[name_field]

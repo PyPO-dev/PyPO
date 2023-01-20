@@ -14,6 +14,14 @@ def _generateMask(x, y, aperDict):
  
     return cond1 & cond2
 
+def calcRMS(frame):
+    c_x = np.sum(frame.x) / len(frame.x)
+    c_y = np.sum(frame.y) / len(frame.y)
+    c_z = np.sum(frame.z) / len(frame.z)
+    rms = np.sqrt(np.sum((frame.x - c_x)**2 + (frame.y - c_y)**2 + (frame.z - c_z)**2) / len(frame.x))
+
+    return rms
+
 def calcSpillover(field, surfaceObject, aperDict):
     # Generate the grid in restframe
     grids = generateGrid(surfaceObject, transform=False, spheric=True)

@@ -37,6 +37,23 @@ template<typename T, typename U, typename V>
 void initFrame(T rdict, U *fr);
 
 /** 
+ * Initialize Gaussian ray-trace frame from RTDict or RTDictf.
+ *
+ * Takes an RTDict or RTDictf and generates a frame object, which can be used 
+ *      to initialize a Gaussian ray-trace.
+ *
+ * @param rdict RTDict or RTDictf object from which to generate a frame.
+ * @param fr Pointer to cframe or cframef object.
+ * 
+ * @see RTDict
+ * @see RTDictf
+ * @see cframe
+ * @see cframef
+ */
+template<typename T, typename U, typename V>
+void initRTGauss(T grdict, U *fr);
+
+/** 
  * Initialize Gaussian beam from GDict or GDictf.
  *
  * Takes a GDict or GDictf and generates two c2Bundle or c2Bundlef objects, which contain the field and 
@@ -151,6 +168,40 @@ void initFrame(T rdict, U *fr)
         }
     }
 }
+
+template<typename T, typename U, typename V>
+void initRTGauss(T grdict, U *fr)
+{
+    std::array<V, 3> nomChief = {0, 0, 1};
+    std::array<V, 3> zero = {0, 0, 0};
+
+    Utils<V> ut;
+
+    fr->size = grdict.nRays;
+
+    std::array<V, 3> tChief;
+    std::array<V, 3> oChief;
+    std::array<V, 3> rotation;
+    std::array<V, 3> _direction;
+    std::array<V, 3> direction;
+
+    for (int n=0; n<3; n++) {tChief[n] = grdict.tChief[n];}
+    for (int n=0; n<3; n++) {oChief[n] = grdict.oChief[n];}
+
+    ut.matRot(tChief, nomChief, zero, direction);
+
+    fr->x[0] = oChief[0];
+    fr->y[0] = oChief[1];
+    fr->z[0] = oChief[2];
+
+    fr->dx[0] = direction[0];
+    fr->dy[0] = direction[1];
+    fr->dz[0] = direction[2];
+
+    std::array<V, 3> _pos;
+    std::array<V, 3> pos;
+}
+
 
 template<typename T, typename U, typename V, typename W, typename G>
 void initGauss(T gdict, U refldict, V *res_field, V *res_current)

@@ -224,8 +224,10 @@ def propPOInp(currentDict, elemDict):
                     InputDescription(inType.string, "name_EH", label="Output fields", numFields=1)],
                 "JMEH": [
                     InputDescription(inType.string, "name_JM", label="Output currents", numFields=1),
-                    InputDescription(inType.string, "name_EH", label="Output fields", numFields=1)
-                    ]
+                    InputDescription(inType.string, "name_EH", label="Output fields", numFields=1)],
+                "EHP": [ 
+                    InputDescription(inType.string, "name_EH", label="Output fields", numFields=1),
+                    InputDescription(inType.string, "name_P", label="Output frame", numFields=1)]
                 }),
             InputDescription(inType.floats, "epsilon", label="Relative permittivity", hints=[1], numFields=1),
             InputDescription(inType.integers, "nThreads", label="# of threads", hints=[1], numFields=1),

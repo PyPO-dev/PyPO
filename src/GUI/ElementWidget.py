@@ -98,6 +98,7 @@ class FrameWidget(QWidget):
         super().__init__(parent=p)
         self.plotFrameAction = actions[0]
         self.RemoveFrameAction = actions[1]
+        self.RMSFrameAction = actions[2]
         self.frame = frame
         
         layout = QHBoxLayout()
@@ -125,12 +126,15 @@ class FrameWidget(QWidget):
 
         btn1 = QPushButton("Remove")
         btn2 = QPushButton("Plot")
+        btn3 = QPushButton("RMS")
 
         btn1.clicked.connect(self.removeFrame)
         btn2.clicked.connect(self.plotFrame)
+        btn3.clicked.connect(self.RMSFrame)
 
         dlgLayout.addWidget(btn1)
         dlgLayout.addWidget(btn2)
+        dlgLayout.addWidget(btn3)
 
         self.dlg.setLayout(dlgLayout)
         self.dlg.setWindowFlag(Qt.FramelessWindowHint)
@@ -143,6 +147,10 @@ class FrameWidget(QWidget):
 
     def plotFrame(self):
         self.plotFrameAction(self.frame)
+        self._closeOptionsMenu()
+    
+    def RMSFrame(self):
+        self.RMSFrameAction(self.frame)
         self._closeOptionsMenu()
     
     def removeFrame(self):

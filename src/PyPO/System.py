@@ -781,16 +781,27 @@ class System(object):
         rms = effs.calcRMS(frame)
         return rms
 
-    def calcSpillover(self, field, name_target, aperDict):
-        surfaceObj = self.system[name_target]
+    def calcSpillover(self, name_field, comp, aperDict):
+        field = self.fields[name_field]
+        field_comp = getattr(field, comp)
+        surfaceObj = self.system[field.surf]
+
         return effs.calcSpillover(field, surfaceObj, aperDict)
 
-    def calcTaper(self, field, name_target, aperDict):
-        surfaceObj = self.system[name_target]
-        return effs.calcTaper(field, surfaceObj, aperDict)
+    def calcTaper(self, name_field, comp, aperDict={}):
+        field = self.fields[name_field]
+        field_comp = getattr(field, comp)
+        surfaceObj = self.system[field.surf]
 
-    def calcXpol(self, Cofield, Xfield):
-        return effs.calcXpol(Cofield, Xfield)
+        return effs.calcTaper(field_comp, surfaceObj, aperDict)
+
+    def calcXpol(self, name_field, comp_co, comp_X):
+        field = self.fields[name_field]
+        field_co = getattr(field, comp_co)
+        
+        field_X = getattr(field, comp_X)
+        
+        return effs.calcXpol(field_co, field_X)
 
     def calcDirectivity(self, eta_t, name_target, k):
         surfaceObj = self.system[name_target]

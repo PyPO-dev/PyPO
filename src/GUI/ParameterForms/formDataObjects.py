@@ -263,6 +263,58 @@ def propPOFFInp(currentDict, elemDict):
 
     return propFields
 
+def calcSpillEff(fieldDict, elemDict):
+    complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
+   
+    sublist_fields = []
+    if fieldDict:
+        for key, item in fieldDict.items():
+            if elemDict[item.surf]["type"] == 3:
+                sublist_fields.append(key)
+    
+    formTaper = [
+        InputDescription(inType.dropdown, "f_name", label="Field", sublist = sublist_fields),
+        InputDescription(inType.dropdown, "comp", label="Component", sublist = complist),
+        InputDescription(inType.floats, "center", label="Center", numFields=2, oArray=True),
+        InputDescription(inType.floats, "r_in", label="Inner radius", numFields=1),
+        InputDescription(inType.floats, "r_out", label="Outer radius", numFields=1)
+        ]
+
+    return formTaper
+
+def calcTaperEff(fieldDict, elemDict):
+    complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
+    
+    sublist_fields = []
+    if fieldDict:
+        for key, item in fieldDict.items():
+            if elemDict[item.surf]["type"] == 3:
+                sublist_fields.append(key)
+    
+    formTaper = [
+        InputDescription(inType.dropdown, "f_name", label="Field", sublist = sublist_fields),
+        InputDescription(inType.dropdown, "comp", label="Component", sublist = complist),
+        ]
+
+    return formTaper
+
+def calcXpolEff(fieldDict, elemDict):
+    complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
+    
+    sublist_fields = []
+    if fieldDict:
+        for key, item in fieldDict.items():
+            if elemDict[item.surf]["gmode"] == 2:
+                sublist_fields.append(key)
+    
+    formXpol = [
+        InputDescription(inType.dropdown, "f_name", label="Field", sublist = sublist_fields),
+        InputDescription(inType.dropdown, "co_comp", label="Co-component", sublist = complist),
+        InputDescription(inType.dropdown, "cr_comp", label="X-component", sublist = complist),
+        ]
+
+    return formXpol
+
 def saveSystemForm():
     return [InputDescription(inType.string, "name", label="Name of system", numFields=1)]
 

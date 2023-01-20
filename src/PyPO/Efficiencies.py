@@ -38,20 +38,20 @@ def calcSpillover(field, surfaceObject, aperDict):
 
 def calcTaper(field, surfaceObject, aperDict):
     grids = generateGrid(surfaceObject, transform=False, spheric=True)
-
-    x = grids.x
-    y = grids.y
     area = grids.area
+    
+    if aperDict:
+        x = grids.x
+        y = grids.y
+        cond1 = np.sqrt((x - aperDict["center"][0])**2 + (y - aperDict["center"][1])**2) < aperDict["r_out"]
+        cond2 = np.sqrt((x - aperDict["center"][0])**2 + (y - aperDict["center"][1])**2) > aperDict["r_in"]
+        mask = cond1 & cond2
 
-    cond1 = np.sqrt((x - aperDict["center"][0])**2 + (y - aperDict["center"][1])**2) < aperDict["r_out"]
-    cond2 = np.sqrt((x - aperDict["center"][0])**2 + (y - aperDict["center"][1])**2) > aperDict["r_in"]
-    mask = cond1 & cond2
 
+        field = field[mask]
+        area = area[mask]
 
-    field_ap = field[mask]
-    area_m = area[mask]
-
-    eff_t = np.absolute(np.sum(field_ap * area_m))**2 / np.sum(np.absolute(field_ap)**2 * area_m) / np.sum(area_m)
+    eff_t = np.absolute(np.sum(field * area))**2 / np.sum(np.absolute(field)**2 * area) / np.sum(area)
 
     return eff_t
 

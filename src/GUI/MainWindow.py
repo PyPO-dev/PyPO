@@ -344,6 +344,37 @@ class MainWidget(QWidget):
     
     def setPOFFInitForm(self):
         self.setForm(fDataObj.propPOFFInp(self.stm.currents, self.stm.system), self.addPropBeamAction)
+    
+    def setTaperEffsForm(self):
+        self.setForm(fDataObj.calcTaperEff(self.stm.fields, self.stm.system), self.calcTaperAction)
+    
+    def setSpillEffsForm(self):
+        self.setForm(fDataObj.calcSpillEff(self.stm.fields, self.stm.system), self.calcSpillAction)
+
+    def setXpolEffsForm(self):
+        self.setForm(fDataObj.calcXpolEff(self.stm.fields, self.stm.system), self.calcXpolAction)
+
+    def calcTaperAction(self):
+        TaperDict = self.ParameterWid.read()
+        eff_taper = self.stm.calcTaper(TaperDict["f_name"], TaperDict["comp"])
+        print(f'Taper efficiency of {TaperDict["f_name"]}, component {TaperDict["comp"]} = {eff_taper}')
+    
+    def calcSpillAction(self):
+        SpillDict = self.ParameterWid.read()
+
+        aperDict = {
+                "center"    : SpillDict["center"],
+                "r_in"      : SpillDict["r_in"],
+                "r_out"     : SpillDict["r_out"]
+                }
+
+        eff_spill = self.stm.calcSpill(SpillDict["f_name"], SpillDict["comp"], aperDict)
+        print(f'Spillover efficiency of {SpillDict["f_name"]}, component {SpillDict["comp"]} = {eff_spill}')
+    
+    def calcXpolAction(self):
+        XpolDict = self.ParameterWid.read()
+        eff_Xpol = self.stm.calcXpol(XpolDict["f_name"], XpolDict["co_comp"], XpolDict["cr_comp"])
+        print(f'X-polarization efficiency of {XpolDict["f_name"]}, co-component {XpolDict["co_comp"]} and X-component {XpolDict["cr_comp"]} = {eff_Xpol}')
 
     def addPropBeamAction(self):
         propBeamDict = self.ParameterWid.read()
@@ -484,6 +515,19 @@ class PyPOMainWindow(QMainWindow):
         initPropFFAction = QAction("To far-field", self)
         initPropFFAction.triggered.connect(self.mainWid.setPOFFInitForm)
         propBeam.addAction(initPropFFAction)
+
+        calcEffs = PhysOptMenu.addMenu("Efficiencies")
+        calcSpillEffsAction = QAction("Spillover", self)
+        calcSpillEffsAction.triggered.connect(self.mainWid.setSpillEffsForm)
+        calcEffs.addAction(calcSpillEffsAction)
+        
+        calcTaperEffsAction = QAction("Taper", self)
+        calcTaperEffsAction.triggered.connect(self.mainWid.setTaperEffsForm)
+        calcEffs.addAction(calcTaperEffsAction)
+        
+        calcXpolEffsAction = QAction("X-pol", self)
+        calcXpolEffsAction.triggered.connect(self.mainWid.setXpolEffsForm)
+        calcEffs.addAction(calcXpolEffsAction)
 
         # END NOTE
 if __name__ == "__main__":

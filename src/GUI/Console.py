@@ -23,13 +23,13 @@ class Console(QPlainTextEdit):
 
         self.setMaximumHeight(300)
         self.setReadOnly(True)
-        self.appendPlainText("********** PyPO Console **********\n\n")
 
-    def log(self, msgType, text):
+    def log(self, msgType='', text=''):
         # msgType = msgTypes.FormInput_Incorrect
         now = datetime.now().strftime("[%Y/%m/%d - %H:%M:%S]   ")
         logitem = now
-        logitem += msgType.name
+        if msgType:
+            logitem += msgType.name
         logitem += "\n"
         logitem += text
         logitem += "\n"

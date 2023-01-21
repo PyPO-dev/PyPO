@@ -1,6 +1,7 @@
 import os
 import sys
 import shutil
+import asyncio
 
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar
 from PyQt5.QtGui import QFont, QIcon, QTextCursor
@@ -36,9 +37,9 @@ class MainWidget(QWidget):
 
         # GridParameters
         self.GPElementsColumn = [0, 0, 2, 1]
-        self.GPParameterForm  = [0, 1, 3, 1]
-        self.GPPlotScreen     = [0, 2, 3, 1]
-        self.GPConsole        = [2, 2, 1, 1]
+        self.GPParameterForm  = [0, 1, 2, 1]
+        self.GPPlotScreen     = [0, 2, 2, 1]
+        self.GPConsole        = [1, 2, 1, 1]
 
         ### ElementConfigurations
         # self.elementConfigs = []
@@ -71,15 +72,17 @@ class MainWidget(QWidget):
         
         global print
         def print(s, end=''):
-            #s += end
             if end == '\r':
-                self.cursor.setPosition(QTextCursor.End)
                 self.cursor.select(QTextCursor.LineUnderCursor)
                 self.cursor.removeSelectedText()
                 self.console.insertPlainText(s)
             else:
                 self.console.appendPlainText(s)
             self.console.repaint()
+        
+        self.console.appendPlainText("********** PyPO Console **********")
+        self.console.log()
+        
         self.addToWindowGrid(self.console, self.GPConsole)
     
     def _mkElementsColumn(self):
@@ -393,7 +396,7 @@ class MainWidget(QWidget):
     def calcTaperAction(self):
         TaperDict = self.ParameterWid.read()
         eff_taper = self.stm.calcTaper(TaperDict["f_name"], TaperDict["comp"])
-        print(f'Taper efficiency of {TaperDict["f_name"]}, component {TaperDict["comp"]} = {eff_taper}')
+        print(f'Taper efficiency of {TaperDict["f_name"]}, component {TaperDict["comp"]} = {eff_taper}\n')
     
     def calcSpillAction(self):
         SpillDict = self.ParameterWid.read()
@@ -405,12 +408,12 @@ class MainWidget(QWidget):
                 }
 
         eff_spill = self.stm.calcSpillover(SpillDict["f_name"], SpillDict["comp"], aperDict)
-        print(f'Spillover efficiency of {SpillDict["f_name"]}, component {SpillDict["comp"]} = {eff_spill}')
+        print(f'Spillover efficiency of {SpillDict["f_name"]}, component {SpillDict["comp"]} = {eff_spill}\n')
     
     def calcXpolAction(self):
         XpolDict = self.ParameterWid.read()
         eff_Xpol = self.stm.calcXpol(XpolDict["f_name"], XpolDict["co_comp"], XpolDict["cr_comp"])
-        print(f'X-polarization efficiency of {XpolDict["f_name"]}, co-component {XpolDict["co_comp"]} and X-component {XpolDict["cr_comp"]} = {eff_Xpol}')
+        print(f'X-pol efficiency of {XpolDict["f_name"]}, co-component {XpolDict["co_comp"]} and X-component {XpolDict["cr_comp"]} = {eff_Xpol}\n')
 
     def addPropBeamAction(self):
         propBeamDict = self.ParameterWid.read()
@@ -434,7 +437,7 @@ class MainWidget(QWidget):
     
     def calcRMSfromFrame(self, frame):
         rms = self.stm.calcSpotRMS(frame)
-        print(f"RMS value of {frame} = {rms} mm")
+        print(f"RMS value of {frame} = {rms} mm\n")
 
 class PyPOMainWindow(QMainWindow):
     def __init__(self, parent=None):
@@ -523,10 +526,6 @@ class PyPOMainWindow(QMainWindow):
         
         poyntingFrameAction = QAction("Poynting", self)
 
-        # Plot frames
-        plotFrameAction = QAction("Plot frame", self)
-        plotFrameAction.triggered.connect(self.mainWid.setPlotFrameForm)
-        RaytraceMenu.addAction(plotFrameAction)
 
         # Propagate rays
         propRaysAction = QAction("Propagate rays", self)

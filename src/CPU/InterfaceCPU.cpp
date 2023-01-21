@@ -38,19 +38,7 @@ void propagateToGrid_JM(c2Bundle *res, reflparams source, reflparams target,
     generateGrid(source, cs);
     generateGrid(target, ct);
 
-    std::chrono::steady_clock::time_point begin;
-    std::chrono::steady_clock::time_point end;
-
-    printf("Calculating J and M...\n");
-    begin = std::chrono::steady_clock::now();
-
     prop.parallelProp_JM(cs, ct, currents, res);
-
-    end = std::chrono::steady_clock::now();
-
-    std::cout << "Elapsed time : "
-              << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-              << " [s]\n" << std::endl;
 }
 
 /**
@@ -85,19 +73,7 @@ void propagateToGrid_EH(c2Bundle *res, reflparams source, reflparams target,
     generateGrid(source, cs);
     generateGrid(target, ct);
 
-    std::chrono::steady_clock::time_point begin;
-    std::chrono::steady_clock::time_point end;
-
-    printf("Calculating E and H...\n");
-    begin = std::chrono::steady_clock::now();
-
     prop.parallelProp_EH(cs, ct, currents, res);
-
-    end = std::chrono::steady_clock::now();
-
-    std::cout << "Elapsed time : "
-              << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-              << " [s]\n" << std::endl;
 }
 
 /**
@@ -133,18 +109,7 @@ void propagateToGrid_JMEH(c4Bundle *res, reflparams source, reflparams target,
     generateGrid(source, cs);
     generateGrid(target, ct);
 
-    std::chrono::steady_clock::time_point begin;
-    std::chrono::steady_clock::time_point end;
-
-    printf("Calculating J, M, E and H...\n");
-    begin = std::chrono::steady_clock::now();
-
     prop.parallelProp_JMEH(cs, ct, currents, res);
-
-    end = std::chrono::steady_clock::now();
-    std::cout << "Elapsed time : "
-              << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-              << " [s]\n" << std::endl;
 }
 
 /**
@@ -180,18 +145,7 @@ void propagateToGrid_EHP(c2rBundle *res, reflparams source, reflparams target,
     generateGrid(source, cs);
     generateGrid(target, ct);
 
-    std::chrono::steady_clock::time_point begin;
-    std::chrono::steady_clock::time_point end;
-
-    printf("Calculating E, H and Pr...\n");
-    begin = std::chrono::steady_clock::now();
-
     prop.parallelProp_EHP(cs, ct, currents, res);
-
-    end = std::chrono::steady_clock::now();
-    std::cout << "Elapsed time : "
-              << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-              << " [s]\n" << std::endl;
 }
 
 /**
@@ -226,18 +180,7 @@ void propagateToGrid_scalar(arrC1 *res, reflparams source, reflparams target,
     generateGrid(source, cs);
     generateGrid(target, ct);
 
-    std::chrono::steady_clock::time_point begin;
-    std::chrono::steady_clock::time_point end;
-
-    printf("Calculating scalar field...\n");
-    begin = std::chrono::steady_clock::now();
-
     prop.parallelPropScalar(cs, ct, field, res);
-
-    end = std::chrono::steady_clock::now();
-    std::cout << "Elapsed time : "
-              << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-              << " [s]\n" << std::endl;
 }
 
 /**
@@ -272,18 +215,7 @@ void propagateToFarField(c2Bundle *res, reflparams source, reflparams target,
     generateGrid(source, cs);
     generateGrid(target, ct);
 
-    std::chrono::steady_clock::time_point begin;
-    std::chrono::steady_clock::time_point end;
-
-    printf("Calculating far-field...\n");
-    begin = std::chrono::steady_clock::now();
-
     prop.parallelFarField(cs, ct, currents, res);
-
-    end = std::chrono::steady_clock::now();
-    std::cout << "Elapsed time : "
-              << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-              << " [s]\n" << std::endl;
 }
 
 /**
@@ -310,14 +242,7 @@ void propagateRays(reflparams ctp, cframe *fr_in, cframe *fr_out,
     std::chrono::steady_clock::time_point begin;
     std::chrono::steady_clock::time_point end;
 
-    //printf("Calculating ray-trace...\n");
-    begin = std::chrono::steady_clock::now();
     RT.parallelRays(ctp, fr_in, fr_out, t0);
-
-    end = std::chrono::steady_clock::now();
-    //std::cout << "Elapsed time : "
-    //          << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count()
-    //          << " [ms]\n" << std::endl;
 }
 
 /**
@@ -351,19 +276,8 @@ void propagateToGridf_JM(c2Bundlef *res, reflparamsf source, reflparamsf target,
     // Generate source and target grids
     generateGridf(source, cs);
     generateGridf(target, ct);
-
-    std::chrono::steady_clock::time_point begin;
-    std::chrono::steady_clock::time_point end;
-
-    printf("Calculating J and M...\n");
-    begin = std::chrono::steady_clock::now();
+    
     prop.parallelProp_JM(cs, ct, currents, res);
-
-    end = std::chrono::steady_clock::now();
-
-    std::cout << "Elapsed time : "
-              << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-              << " [s]\n" << std::endl;
 }
 
 /**
@@ -398,18 +312,7 @@ void propagateToGridf_EH(c2Bundlef *res, reflparamsf source, reflparamsf target,
     generateGridf(source, cs);
     generateGridf(target, ct);
 
-    std::chrono::steady_clock::time_point begin;
-    std::chrono::steady_clock::time_point end;
-
-    printf("Calculating E and H...\n");
-    begin = std::chrono::steady_clock::now();
     prop.parallelProp_EH(cs, ct, currents, res);
-
-    end = std::chrono::steady_clock::now();
-
-    std::cout << "Elapsed time : "
-              << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-              << " [s]\n" << std::endl;
 }
 
 /**
@@ -445,18 +348,7 @@ void propagateToGridf_JMEH(c4Bundlef *res, reflparamsf source, reflparamsf targe
     generateGridf(source, cs);
     generateGridf(target, ct);
 
-    std::chrono::steady_clock::time_point begin;
-    std::chrono::steady_clock::time_point end;
-
-    printf("Calculating J, M, E and H...\n");
-    begin = std::chrono::steady_clock::now();
-
     prop.parallelProp_JMEH(cs, ct, currents, res);
-
-    end = std::chrono::steady_clock::now();
-    std::cout << "Elapsed time : "
-              << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-              << " [s]\n" << std::endl;
 }
 
 /**
@@ -492,18 +384,7 @@ void propagateToGridf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf targe
     generateGridf(source, cs);
     generateGridf(target, ct);
 
-    std::chrono::steady_clock::time_point begin;
-    std::chrono::steady_clock::time_point end;
-
-    printf("Calculating E, H and Pr...\n");
-    begin = std::chrono::steady_clock::now();
-
     prop.parallelProp_EHP(cs, ct, currents, res);
-
-    end = std::chrono::steady_clock::now();
-    std::cout << "Elapsed time : "
-              << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-              << " [s]\n" << std::endl;
 }
 
 /**
@@ -538,18 +419,7 @@ void propagateToGridf_scalar(arrC1f *res, reflparamsf source, reflparamsf target
     generateGridf(source, cs);
     generateGridf(target, ct);
 
-    std::chrono::steady_clock::time_point begin;
-    std::chrono::steady_clock::time_point end;
-
-    printf("Calculating scalar field...\n");
-    begin = std::chrono::steady_clock::now();
-
     prop.parallelPropScalar(cs, ct, field, res);
-
-    end = std::chrono::steady_clock::now();
-    std::cout << "Elapsed time : "
-              << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-              << " [s]\n" << std::endl;
 }
 
 /**
@@ -584,16 +454,5 @@ void propagateToFarFieldf(c2Bundlef *res, reflparamsf source, reflparamsf target
     generateGridf(source, cs);
     generateGridf(target, ct);
 
-    std::chrono::steady_clock::time_point begin;
-    std::chrono::steady_clock::time_point end;
-
-    printf("Calculating scalar field...\n");
-    begin = std::chrono::steady_clock::now();
-
     prop.parallelFarField(cs, ct, currents, res);
-
-    end = std::chrono::steady_clock::now();
-    std::cout << "Elapsed time : "
-              << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-              << " [s]\n" << std::endl;
 }

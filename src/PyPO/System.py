@@ -627,13 +627,6 @@ class System(object):
             PODict["exp"] = "fwd"
 
         # TODO: insert check for PODict
-
-        if "lam" and not "k" in PODict:
-            PODict["k"] = 2 * np.pi / PODict["lam"]
-
-        if "freq" and not "k" in PODict:
-            PODict["k"] = 2 * np.pi / (self.cl / PODict["freq"] *1e-9)
-
         if PODict["device"] == "CPU":
             out = PyPO_CPUd(source, target, PODict)
 

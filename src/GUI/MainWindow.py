@@ -2,8 +2,10 @@ import os
 import sys
 import shutil
 
-from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar
+from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar, QScrollArea
 from PyQt5.QtGui import QFont, QIcon, QTextCursor
+from PyQt5.QtCore import Qt
+
 from src.GUI.ParameterForms import formGenerator
 import src.GUI.ParameterForms.formDataObjects as fDataObj
 from src.GUI.PlotScreen import PlotScreen
@@ -46,7 +48,7 @@ class MainWidget(QWidget):
         self._setupPlotScreen()
         self._mkConsole()
 
-        self.pyprint(self.pyprint)
+        # self.pyprint(self.pyprint)
         
 
         self.stm = st.System(redirect=print)
@@ -69,20 +71,20 @@ class MainWidget(QWidget):
         #     cons.appendPlainText(s)
         # self.console = cons
         self.addToWindowGrid(ConsoleGenerator.get(), self.GPConsole)
-        self.console = Console()
+        self.console = ConsoleGenerator.get()
         self.cursor = QTextCursor(self.console.document())
         
-        global print
-        def print(s, end=''):
-            #s += end
-            if end == '\r':
-                self.cursor.setPosition(QTextCursor.End)
-                self.cursor.select(QTextCursor.LineUnderCursor)
-                self.cursor.removeSelectedText()
-                self.console.insertPlainText(s)
-            else:
-                self.console.appendPlainText(s)
-            self.console.repaint()
+        # global print
+        # def print(s, end=''):
+        #     #s += end
+        #     if end == '\r':
+        #         self.cursor.setPosition(QTextCursor.End)
+        #         self.cursor.select(QTextCursor.LineUnderCursor)
+        #         self.cursor.removeSelectedText()
+        #         self.console.insertPlainText(s)
+        #     else:
+        #         self.console.appendPlainText(s)
+        #     self.console.repaint()
         self.addToWindowGrid(self.console, self.GPConsole)
     
     def _mkElementsColumn(self):
@@ -94,21 +96,29 @@ class MainWidget(QWidget):
         for e in self.stm.system.keys():
             StmElements.append(e)
         self.ElementsColumn = Accordion()
-        self.addToWindowGrid(self.ElementsColumn, self.GPElementsColumn)
 
-    # #####################
+        scroll = QScrollArea()
+        scroll.setWidget(self.ElementsColumn)
+        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll.setWidgetResizable(True)
+        scroll.setContentsMargins(0,0,0,0)
+        scroll.setMinimumWidth(300)
+        scroll.setMaximumWidth(300)
+        self.addToWindowGrid(scroll, self.GPElementsColumn)
+
     def _setupPlotScreen(self):
         self.PlotScreen = QTabWidget()
         self.PlotScreen.setTabsClosable(True)
         self.PlotScreen.setTabShape(QTabWidget.Rounded)
         self.PlotScreen.tabCloseRequested.connect(self.closeTab)
+        self.PlotScreen.setMaximumHeight(550)
         self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
 
     def _formatVector(self, vector):
         return f"[{vector[0]}, {vector[1]}, {vector[2]}]"
 
     def addPlot(self, figure, label):
-        self.PlotScreen.addTab(PlotScreen(figure), label)
+        self.PlotScreen.addTab(PlotScreen(figure, parent=self), label)
         self.PlotScreen.setCurrentIndex(self.PlotScreen.count()-1)
 
 
@@ -246,7 +256,17 @@ class MainWidget(QWidget):
         self.ParameterWid = formGenerator.FormGenerator(formData, readAction)
         self.ParameterWid.setMaximumWidth(400)
         self.ParameterWid.setMinimumWidth(400)
-        self.addToWindowGrid(self.ParameterWid,self.GPParameterForm)
+        # self.ParameterWid.setContentsMargins(5,5,5,5)
+        scroll = QScrollArea()
+        scroll.setWidget(self.ParameterWid)
+        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        # scroll.border
+        scroll.setWidgetResizable(True)
+        scroll.setContentsMargins(0,0,0,0)
+        scroll.setMinimumWidth(300)
+        scroll.setMaximumWidth(400)
+        self.addToWindowGrid(scroll,self.GPParameterForm)
 
     def setQuadricForm(self):
         self.setForm(fDataObj.makeQuadricSurfaceInp(), readAction=self.addQuadricAction)
@@ -347,7 +367,7 @@ class MainWidget(QWidget):
     def addPlotFrameAction(self):
         plotFrameDict = self.ParameterWid.read()
         fig = self.stm.plotRTframe(plotFrameDict["frame"], project=plotFrameDict["project"], returns=True)
-        self.PlotScreen.addTab(PlotScreen(fig),f'{plotFrameDict["frame"]} - {plotFrameDict["project"]}')
+        self.PlotScreen.addTab(PlotScreen(fig, parent=self),f'{plotFrameDict["frame"]} - {plotFrameDict["project"]}')
 
         self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
 
@@ -355,7 +375,7 @@ class MainWidget(QWidget):
         plotFieldDict = self.ParameterWid.read()
         fig, _ = self.stm.plotBeam2D(self.stm.fields[plotFieldDict["field"]].surf, plotFieldDict["field"], 
                                     plotFieldDict["comp"], ptype="field", project=plotFieldDict["project"], returns=True)
-        self.PlotScreen.addTab(PlotScreen(fig),f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
+        self.PlotScreen.addTab(PlotScreen(fig, parent=self),f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
 
         self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
     
@@ -363,7 +383,7 @@ class MainWidget(QWidget):
         plotFieldDict = self.ParameterWid.read()
         fig, _ = self.stm.plotBeam2D(self.stm.currents[plotFieldDict["field"]].surf, plotFieldDict["field"], 
                                     plotFieldDict["comp"], ptype="current", project=plotFieldDict["project"], returns=True)
-        self.PlotScreen.addTab(PlotScreen(fig),f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
+        self.PlotScreen.addTab(PlotScreen(fig,parent=self),f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
 
         self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
     
@@ -444,6 +464,8 @@ class PyPOMainWindow(QMainWindow):
         """Initializer."""
         super().__init__(parent)
         self.mainWid = MainWidget()
+        self.mainWid.setContentsMargins(0,0,0,0)
+        self.setContentsMargins(0,0,0,0)
         self.setAutoFillBackground(True)
         self._createMenuBar()
         self.setCentralWidget(self.mainWid)

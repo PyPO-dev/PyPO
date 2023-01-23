@@ -16,25 +16,27 @@ def AoE_opts():
             InputDescription(inType.floats, "lims_El", label="Elevation limits", oArray=True, numFields=2)]
 
 def focus_opts_hyp_ell():
-    return [InputDescription(inType.floats, "focus_1", label="Upper focus xyz", oArray=True, numFields=3),
+    return [
+        InputDescription(inType.floats, "focus_1", label="Upper focus xyz", oArray=True, numFields=3),
             InputDescription(inType.floats, "focus_2", label="Lower focus xyz", oArray=True, numFields=3),
-            InputDescription(inType.floats, "ecc", label="Eccentricity", numFields=1)]
+            InputDescription(inType.floats, "ecc", label="Eccentricity", numFields=1)
+    ]
 
 def makeParabolaInp():
-    return [InputDescription(inType.string, "name"),
-            # InputDescription(inType.dropdown, "pmode", label="Parameter mode", subdict={
-            #     "focus"     : [InputDescription(inType.floats, "focus_1", label="Focus xyz", oArray=True, numFields=3),
-            #                     InputDescription(inType.floats, "vertex", label="Vertex xyz", oArray=True, numFields=3)],
-            #     "manual"    : [InputDescription(inType.floats, "coeffs", label="AB coefficients", oArray=True, numFields=2)]
-            #     }),
-            # InputDescription(inType.integers, "gridsize", label="Grid size", hints=[101,101], numFields=2, oArray=True),
-            InputDescription(inType.radio, "TEST", label="tEST", sublist=["a", "b", "c", "d"])
-            # InputDescription(inType.boolean, "flip", label="Flip Normal Vectors"),
-            # InputDescription(inType.dropdown, "gmode", label="Grid mode", subdict={
-                # "xy" : xy_opts(),
-                # "uv" : uv_opts()
-            # })
-            ]
+    return [
+        InputDescription(inType.string, "name"),
+        InputDescription(inType.dropdown, "pmode", label="Parameter mode", subdict={
+            "focus"     : [InputDescription(inType.floats, "focus_1", label="Focus xyz", oArray=True, numFields=3),
+                            InputDescription(inType.floats, "vertex", label="Vertex xyz", oArray=True, numFields=3)],
+            "manual"    : [InputDescription(inType.floats, "coeffs", label="AB coefficients", oArray=True, numFields=2)]
+            }),
+        InputDescription(inType.integers, "gridsize", label="Grid size", hints=[101,101], numFields=2, oArray=True),
+        InputDescription(inType.boolean, "flip", label="Flip Normal Vectors"),
+        InputDescription(inType.dropdown, "gmode", label="Grid mode", subdict={
+            "xy" : xy_opts(),
+            "uv" : uv_opts()
+        })
+    ]
 
 def makeHyperbolaEllipseInp():
     return [InputDescription(inType.string, "name"),

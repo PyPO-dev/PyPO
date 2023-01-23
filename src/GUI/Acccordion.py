@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QApplication, QVBoxLayout, QLabel, QHBoxLayout
+from PyQt5.QtWidgets import QWidget, QScrollArea, QApplication, QVBoxLayout, QLabel, QHBoxLayout
 from PyQt5.QtCore import Qt
 import sys
 
@@ -9,7 +9,6 @@ class Accordion(QWidget):
         self.setLayout(layout)
         layout.setContentsMargins(0,0,0,0)
         layout.setAlignment(Qt.AlignTop)
-        self.setMinimumWidth(300)
 
         self.reflectors = AccordionSection("Reflectors")
         self.RayTraceFrames = AccordionSection("Ray Trace Frames")

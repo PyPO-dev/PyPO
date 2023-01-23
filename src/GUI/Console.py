@@ -15,7 +15,7 @@ def print(s):
 class msgTypes(Enum):
     FormInput_Incorrect = 0,
     RTError = 1
-    # bla = 2
+    Calculation_result = 2
     # bla = 3
     # bla = 4
     # bla = 5

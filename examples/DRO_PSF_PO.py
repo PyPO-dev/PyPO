@@ -45,6 +45,14 @@ def ex_DRO_PO(device):
             "gridsize"  : np.array([201, 201])
             }
 
+    PSDict = {
+            "name"      : "ps1",
+            "lam"       : lam,
+            "E0"        : 1,
+            "phase"     : 0,
+            "pol"       : np.array([1,0,0])
+            }
+
     s = System()
     s.addParabola(parabola)
     s.addPlane(plane)
@@ -52,14 +60,13 @@ def ex_DRO_PO(device):
 
     s.plotSystem()
 
-    ps = s.generatePointSource("plane1") 
-    JM = s.calcCurrents("plane1", ps, mode="PMC")
+    s.generatePointSource(PSDict, "plane1") 
 
     translation = np.array([0, 0, 12e3])# + np.array([210, 210, -210])
     rotation_plane = np.array([180, 0, 0])
     s.rotateGrids("plane1", rotation_plane)
     s.translateGrids("plane1", translation)
-    s.rotateGrids(["p1", "plane1"], np.array([1, 0, 0]))
+    #s.rotateGrids(["p1", "plane1"], np.array([1, 0, 0]))
 
     if device == "GPU":
         nThreads = 256
@@ -70,8 +77,8 @@ def ex_DRO_PO(device):
     plane1_to_p1 = {
             "s_name"    : "plane1",
             "t_name"    : "p1",
-            "s_current" : JM,
-            "lam"       : lam,
+            "s_current" : "ps1",
+            "name_JM"   : "JM",
             "epsilon"   : 10,
             "exp"       : "fwd",
             "nThreads"  : nThreads,
@@ -79,13 +86,13 @@ def ex_DRO_PO(device):
             "mode"      : "JM"
             }
 
-    JM1 = s.runPO(plane1_to_p1)
+    s.runPO(plane1_to_p1)
 
     p1_to_planeff = {
             "s_name"    : "p1",
             "t_name"    : "planeff",
-            "s_current" : JM1,
-            "lam"       : lam,
+            "name_EH"   : "ff",
+            "s_current" : "JM",
             "epsilon"   : 10,
             "exp"       : "fwd",
             "nThreads"  : nThreads,
@@ -93,8 +100,8 @@ def ex_DRO_PO(device):
             "mode"      : "FF"
             }
 
-    EH = s.runPO(p1_to_planeff)
+    s.runPO(p1_to_planeff)
     
-    s.plotBeam2D("planeff", EH.Ex, units="deg")
+    s.plotBeam2D("planeff", "ff", "Ex", units="deg")
 if __name__ == "__main__":
     ex_DRO()

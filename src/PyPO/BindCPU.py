@@ -2,10 +2,12 @@ import ctypes
 import numpy as np
 import os
 import sys
+import time
 import pathlib
 from src.PyPO.BindUtils import *
 from src.PyPO.Structs import *
 from src.PyPO.PyPOTypes import *
+import src.PyPO.Config as Config
 
 import threading
 
@@ -73,11 +75,13 @@ def loadCPUlib():
 
     lib.propagateRays.restype = None
 
-    return lib
+    ws = WaitSymbol()
+
+    return lib, ws
 
 # WRAPPER FUNCTIONS DOUBLE PREC
 def PyPO_CPUd(source, target, PODict):
-    lib = loadCPUlib()
+    lib, ws = loadCPUlib()
 
     # Create structs with pointers for source and target
     csp = reflparams()
@@ -119,6 +123,7 @@ def PyPO_CPUd(source, target, PODict):
     args = [csp, ctp, ctypes.byref(cs), ctypes.byref(ct),
             ctypes.byref(c_currents), k, nThreads, epsilon,
             t_direction]
+    start_time = time.time()
 
     if PODict["mode"] == "JM":
         res = c2Bundle()
@@ -130,7 +135,11 @@ def PyPO_CPUd(source, target, PODict):
         t.daemon = True
         t.start()
         while t.is_alive(): # wait for the thread to exit
+            Config.print(f'Calculating J, M on {target["name"]} {ws.getSymbol()}', end='\r')
             t.join(.1)
+        dtime = time.time() - start_time
+        Config.print(f'Calculated J, M on {target["name"]} in {dtime:.3f} seconds', end='\r')
+        Config.print(f'\n')
 
         # Unpack filled struct
         JM = c2BundleToObj(res, shape=target_shape, obj_t='currents', np_t=np.float64)
@@ -147,7 +156,11 @@ def PyPO_CPUd(source, target, PODict):
         t.daemon = True
         t.start()
         while t.is_alive(): # wait for the thread to exit
+            Config.print(f'Calculating E, H on {target["name"]} {ws.getSymbol()}', end='\r')
             t.join(.1)
+        dtime = time.time() - start_time
+        Config.print(f'Calculated E, H on {target["name"]} in {dtime:.3f} seconds', end='\r')
+        Config.print(f'\n')
 
         # Unpack filled struct
         EH = c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
@@ -164,7 +177,11 @@ def PyPO_CPUd(source, target, PODict):
         t.daemon = True
         t.start()
         while t.is_alive(): # wait for the thread to exit
+            Config.print(f'Calculating J, M, E, H on {target["name"]} {ws.getSymbol()}', end='\r')
             t.join(.1)
+        dtime = time.time() - start_time
+        Config.print(f'Calculated J, M, E, H on {target["name"]} in {dtime:.3f} seconds', end='\r')
+        Config.print(f'\n')
 
         # Unpack filled struct
         JM, EH = c4BundleToObj(res, shape=target_shape, np_t=np.float64)
@@ -181,7 +198,11 @@ def PyPO_CPUd(source, target, PODict):
         t.daemon = True
         t.start()
         while t.is_alive(): # wait for the thread to exit
+            Config.print(f'Calculating reflected E, H, P on {target["name"]} {ws.getSymbol()}', end='\r')
             t.join(.1)
+        dtime = time.time() - start_time
+        Config.print(f'Calculated reflected E, H, P on {target["name"]} in {dtime:.3f} seconds', end='\r')
+        Config.print(f'\n')
 
         # Unpack filled struct
         EH, Pr = c2rBundleToObj(res, shape=target_shape, np_t=np.float64)
@@ -198,7 +219,11 @@ def PyPO_CPUd(source, target, PODict):
         t.daemon = True
         t.start()
         while t.is_alive(): # wait for the thread to exit
+            Config.print(f'Calculating scalar field on {target["name"]} {ws.getSymbol()}', end='\r')
             t.join(.1)
+        dtime = time.time() - start_time
+        Config.print(f'Calculated scalar field on {target["name"]} in {dtime:.3f} seconds', end='\r')
+        Config.print(f'\n')
 
         # Unpack filled struct
         E = arrC1ToObj(res, shape=target_shape)
@@ -215,7 +240,11 @@ def PyPO_CPUd(source, target, PODict):
         t.daemon = True
         t.start()
         while t.is_alive(): # wait for the thread to exit
+            Config.print(f'Calculating far-field E, H on {target["name"]} {ws.getSymbol()}', end='\r')
             t.join(.1)
+        dtime = time.time() - start_time
+        Config.print(f'Calculated far-field E, H on {target["name"]} in {dtime:.3f} seconds', end='\r')
+        Config.print(f'\n')
 
         # Unpack filled struct
         EH = c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
@@ -223,7 +252,7 @@ def PyPO_CPUd(source, target, PODict):
         return EH
 
 def RT_CPUd(target, fr_in, epsilon, t0, nThreads):
-    lib = loadCPUlib()
+    lib, ws = loadCPUlib()
 
     inp = cframe()
     res = cframe()
@@ -240,12 +269,16 @@ def RT_CPUd(target, fr_in, epsilon, t0, nThreads):
 
     args = [ctp, ctypes.byref(inp), ctypes.byref(res),
                         nThreads, epsilon, t0]
-
+    start_time = time.time()
     t = threading.Thread(target=lib.propagateRays, args=args)
     t.daemon = True
     t.start()
     while t.is_alive(): # wait for the thread to exit
+        Config.print(f'Calculating ray-trace to {target["name"]} {ws.getSymbol()}', end='\r')
         t.join(.1)
+    dtime = time.time() - start_time
+    Config.print(f'Calculated ray-trace to {target["name"]} in {dtime:.3f} seconds', end='\r')
+    Config.print(f'\n')
 
     shape = (fr_in.size,)
     fr_out = frameToObj(res, np_t=np.float64, shape=shape)

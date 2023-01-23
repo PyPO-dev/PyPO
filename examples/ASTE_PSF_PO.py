@@ -58,6 +58,14 @@ def ex_ASTE_PO(device):
             "lims_El"   : np.array([-0.03,0.03]),
             "gridsize"  : np.array([201, 201])
             }
+    
+    PSDict = {
+            "name"      : "ps1",
+            "lam"       : lam,
+            "E0"        : 1,
+            "phase"     : 0,
+            "pol"       : np.array([1,0,0])
+            }
 
     s = System()
     s.addParabola(parabola)
@@ -65,22 +73,10 @@ def ex_ASTE_PO(device):
     s.addPlane(plane)
     s.addPlane(planeff)
 
-    ps = s.generatePointSource("plane1") 
-    JM = s.calcCurrents("plane1", ps, mode="PMC")
+    s.generatePointSource(PSDict, "plane1") 
 
     translation = np.array([0,0,3.5e3 - d_foc_h])
     s.translateGrids("plane1", translation)
-
-    grids_p = s.generateGrids("pri")
-    grids_s = s.generateGrids("sec")
-    
-    fig, ax = pt.subplots(1,1, figsize=(5,5))
-    ax.plot(grids_p.x[:,0], grids_p.z[:,0], color="dimgrey", lw=10)
-    ax.plot(grids_p.x[:,750], grids_p.z[:,750], color="dimgrey", lw=10)
-    ax.plot(grids_s.x[:,0], grids_s.z[:,0], color="dimgrey", lw=10)
-    ax.plot(grids_s.x[:,750], grids_s.z[:,750], color="dimgrey", lw=10)
-    ax.set_aspect('equal', adjustable='box')
-    pt.show()
 
     if device == "GPU":
         nThreads = 256
@@ -91,8 +87,8 @@ def ex_ASTE_PO(device):
     plane1_to_sec = {
             "s_name"    : "plane1",
             "t_name"    : "sec",
-            "s_current" : JM,
-            "lam"       : lam,
+            "s_current" : "ps1",
+            "name_JM"   : "JM",
             "epsilon"   : 10,
             "exp"       : "fwd",
             "nThreads"  : nThreads,
@@ -100,13 +96,13 @@ def ex_ASTE_PO(device):
             "mode"      : "JM"
             }
 
-    JM1 = s.runPO(plane1_to_sec)
+    s.runPO(plane1_to_sec)
 
     sec_to_pri = {
             "s_name"    : "sec",
             "t_name"    : "pri",
-            "s_current" : JM1,
-            "lam"       : lam,
+            "s_current" : "JM",
+            "name_JM"   : "JM1",
             "epsilon"   : 10,
             "exp"       : "fwd",
             "nThreads"  : nThreads,
@@ -114,13 +110,13 @@ def ex_ASTE_PO(device):
             "mode"      : "JM"
             }
 
-    JM2 = s.runPO(sec_to_pri)
+    s.runPO(sec_to_pri)
 
     pri_to_planeff = {
             "s_name"    : "pri",
             "t_name"    : "planeff",
-            "s_current" : JM2,
-            "lam"       : lam,
+            "s_current" : "JM1",
+            "name_EH"   : "ff",
             "epsilon"   : 10,
             "exp"       : "fwd",
             "nThreads"  : nThreads,
@@ -128,9 +124,9 @@ def ex_ASTE_PO(device):
             "mode"      : "FF"
             }
 
-    EH = s.runPO(pri_to_planeff)
+    s.runPO(pri_to_planeff)
     
-    s.plotBeam2D("planeff", EH.Ex, units="as")
+    s.plotBeam2D("planeff", "ff", "Ex", units="as")
 
 if __name__ == "__main__":
     ex_DRO()

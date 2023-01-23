@@ -1109,12 +1109,7 @@ void callKernelf_JM(c2Bundlef *res, reflparamsf source, reflparamsf target,
     cudaEvent_t event;
     gpuErrchk( cudaEventCreateWithFlags(&event, cudaEventDisableTiming) );
 
-    std::chrono::steady_clock::time_point begin;
-    std::chrono::steady_clock::time_point end;
-
     // Call to KERNEL 0
-    printf("Calculating J and M...\n");
-    begin = std::chrono::steady_clock::now();
     GpropagateBeam_0<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs,
                                 d_A, d_xt, d_yt, d_zt,
                                 d_nxt, d_nyt, d_nzt,
@@ -1133,12 +1128,6 @@ void callKernelf_JM(c2Bundlef *res, reflparamsf source, reflparamsf target,
     */
 
     gpuErrchk( cudaDeviceSynchronize() );
-
-    end = std::chrono::steady_clock::now();
-
-    std::cout << "Elapsed time : "
-            << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-            << " [s]\n" << std::endl;
 
     // Allocate Host arrays for J and M
     cuFloatComplex *h_Jxt = new cuFloatComplex[ct->size];
@@ -1292,12 +1281,7 @@ void callKernelf_EH(c2Bundlef *res, reflparamsf source, reflparamsf target,
     cudaEvent_t event;
     gpuErrchk( cudaEventCreateWithFlags(&event, cudaEventDisableTiming) );
 
-    std::chrono::steady_clock::time_point begin;
-    std::chrono::steady_clock::time_point end;
-
     // Call to KERNEL 1
-    printf("Calculating E and H...\n");
-    begin = std::chrono::steady_clock::now();
     GpropagateBeam_1<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs,
                                 d_A, d_xt, d_yt, d_zt,
                                 d_Jx, d_Jy, d_Jz,
@@ -1306,12 +1290,6 @@ void callKernelf_EH(c2Bundlef *res, reflparamsf source, reflparamsf target,
                                 d_Hxt, d_Hyt, d_Hzt);
 
     gpuErrchk( cudaDeviceSynchronize() );
-
-    end = std::chrono::steady_clock::now();
-
-    std::cout << "Elapsed time : "
-            << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-            << " [s]\n" << std::endl;
 
     // Allocate Host arrays for E and H
     cuFloatComplex *h_Ext = new cuFloatComplex[ct->size];
@@ -1486,12 +1464,7 @@ void callKernelf_JMEH(c4Bundlef *res, reflparamsf source, reflparamsf target,
     cudaEvent_t event;
     gpuErrchk( cudaEventCreateWithFlags(&event, cudaEventDisableTiming) );
 
-    std::chrono::steady_clock::time_point begin;
-    std::chrono::steady_clock::time_point end;
-
     // Call to KERNEL 2
-    printf("Calculating J, M, E and H...\n");
-    begin = std::chrono::steady_clock::now();
     GpropagateBeam_2<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs,
                                    d_A, d_xt, d_yt, d_zt,
                                    d_nxt, d_nyt, d_nzt,
@@ -1503,12 +1476,6 @@ void callKernelf_JMEH(c4Bundlef *res, reflparamsf source, reflparamsf target,
                                    d_Hxt, d_Hyt, d_Hzt);
 
     gpuErrchk( cudaDeviceSynchronize() );
-
-    end = std::chrono::steady_clock::now();
-
-    std::cout << "Elapsed time : "
-            << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-            << " [s]\n" << std::endl;
 
     // Allocate Host arrays for J and M
     cuFloatComplex *h_Jxt = new cuFloatComplex[ct->size];
@@ -1704,12 +1671,7 @@ void callKernelf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf target,
     cudaEvent_t event;
     gpuErrchk( cudaEventCreateWithFlags(&event, cudaEventDisableTiming) );
 
-    std::chrono::steady_clock::time_point begin;
-    std::chrono::steady_clock::time_point end;
-
     // Call to KERNEL 3
-    printf("Calculating E, H and Pr...\n");
-    begin = std::chrono::steady_clock::now();
     GpropagateBeam_3<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs,
                                 d_A, d_xt, d_yt, d_zt,
                                 d_nxt, d_nyt, d_nzt,
@@ -1720,12 +1682,6 @@ void callKernelf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf target,
                                 d_Prxt, d_Pryt, d_Przt);
 
     gpuErrchk( cudaDeviceSynchronize() );
-
-    end = std::chrono::steady_clock::now();
-
-    std::cout << "Elapsed time : "
-            << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-            << " [s]\n" << std::endl;
 
     // Allocate Host arrays for E, H and P
     cuFloatComplex *h_Ext = new cuFloatComplex[ct->size];
@@ -1896,12 +1852,7 @@ void callKernelf_FF(c2Bundlef *res, reflparamsf source, reflparamsf target,
     cudaEvent_t event;
     gpuErrchk( cudaEventCreateWithFlags(&event, cudaEventDisableTiming) );
 
-    std::chrono::steady_clock::time_point begin;
-    std::chrono::steady_clock::time_point end;
-
     // Call to KERNEL 1
-    printf("Calculating E and H, far-field...\n");
-    begin = std::chrono::steady_clock::now();
     GpropagateBeam_4<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs,
                                 d_A, d_xt, d_yt,
                                 d_Jx, d_Jy, d_Jz,
@@ -1910,12 +1861,6 @@ void callKernelf_FF(c2Bundlef *res, reflparamsf source, reflparamsf target,
                                 d_Hxt, d_Hyt, d_Hzt);
 
     gpuErrchk( cudaDeviceSynchronize() );
-
-    end = std::chrono::steady_clock::now();
-
-    std::cout << "Elapsed time : "
-            << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-            << " [s]\n" << std::endl;
 
     // Allocate Host arrays for E and H
     cuFloatComplex *h_Ext = new cuFloatComplex[ct->size];

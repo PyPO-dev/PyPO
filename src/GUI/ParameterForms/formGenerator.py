@@ -66,7 +66,6 @@ class FormGenerator(QWidget):
                 input = XYZRadio(inp)
                 self.inputs.append(input)
                 self.layout.addRow(input)
-                
 
     def setupButtons(self):
         addBtn = QPushButton("Add")
@@ -241,13 +240,7 @@ class SimpleRadio(QWidget):
         print(d)
         return d
 
-
-
-
-
 class XYZRadio(QWidget):
-
-
     class RadioSubWidget(QWidget):
         def __init__(self, options, name, parent=None):
             super().__init__(parent)
@@ -267,24 +260,6 @@ class XYZRadio(QWidget):
                 self.buttons.append(btn)
                 layout.addWidget(btn, 0, x)
                 x += 1
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        layout = QFormLayout(self)
-        layout.setContentsMargins(0,0,0,0)
-        self.r1 = self.RadioSubWidget(["x", "y", "z"],"r1")
-        self.r2 = self.RadioSubWidget(["x", "y", "z"],"r2")
-        self.r1.setCompanion(self.r2)
-        self.r2.setCompanion(self.r1)
-        layout.addRow(QLabel("Horizontal axis"), self.r1)
-        layout.addRow(QLabel("Vertical axis"), self.r2)
-        btn = QPushButton("Read")
-        btn.clicked.connect(self.read)
-        layout.addRow(btn)
-
-    def read(self):
-        if self.r1.group.checkedButton()==None or self.r2.group.checkedButton()==None:
-            raise Exception("RadioButton no option selected") 
-        print(self.r1.group.checkedButton().text()+self.r2.group.checkedButton().text())
 
         def uncheckOthers(self, caller):
             for btn in self.buttons:
@@ -308,4 +283,21 @@ class XYZRadio(QWidget):
                     btn.toggle()
                     print("@uncheckOption %s btn = %s, s = %s, " %(self.name,btn.text(), s))
                     return
-    
+        
+    def __init__(self, inp, parent=None):
+        super().__init__(parent)
+        self.inputDescription = inp
+
+        layout = QFormLayout(self)
+        layout.setContentsMargins(0,0,0,0)
+        self.r1 = self.RadioSubWidget(["x", "y", "z"],"r1")
+        self.r2 = self.RadioSubWidget(["x", "y", "z"],"r2")
+        self.r1.setCompanion(self.r2)
+        self.r2.setCompanion(self.r1)
+        layout.addRow(QLabel("Horizontal axis"), self.r1)
+        layout.addRow(QLabel("Vertical axis"), self.r2)
+
+    def read(self):
+        if self.r1.group.checkedButton()==None or self.r2.group.checkedButton()==None:
+            raise Exception("RadioButton no option selected") 
+        return {self.inputDescription.outputName:self.r1.group.checkedButton().text() + self.r2.group.checkedButton().text()}

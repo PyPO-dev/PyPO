@@ -7,7 +7,7 @@ class Accordion(QWidget):
         super().__init__(parent)
         layout = QVBoxLayout()
         self.setLayout(layout)
-        layout.setContentsMargins(0,0,0,0)
+        # layout.setContentsMargins(0,0,0,0)
         layout.setAlignment(Qt.AlignTop)
 
         self.reflectors = AccordionSection("Reflectors")
@@ -46,7 +46,7 @@ class AccordionSection(QWidget):
         ### Content ###
         self.content = QWidget()
         self.contentLayout = QVBoxLayout()
-        # self.contentLayout.setContentsMargins(0,0,0,0)
+        self.contentLayout.setContentsMargins(0,0,0,0)
         self.content.setLayout(self.contentLayout)
         layout.addWidget(self.content)
 

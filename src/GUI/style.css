@@ -1,3 +1,8 @@
+ElementWidget{
+    padding: 0px;
+    margin: 0px;
+}
+
 ElementWidget MyButton{
     background:#151ca5;
     color:#f2c50f;

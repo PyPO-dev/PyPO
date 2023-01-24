@@ -102,7 +102,7 @@ def plotFrameInp(frameDict):
     
     plotFrame = [
             InputDescription(inType.dropdown, "frame", label="Frame", sublist = sublist_frames),
-            InputDescription(inType.string, "project", label="Abscissa - ordinate", hints=["xy"], numFields=1)
+            InputDescription(inType.xyzradio, "project", label="Abscissa - ordinate")
             ]
 
     return plotFrame
@@ -110,7 +110,7 @@ def plotFrameInp(frameDict):
 def plotFrameOpt(frameName):
     plotFrame = [
             InputDescription(inType.static, "frame", label="Frame", staticValue=frameName),
-            InputDescription(inType.string, "project", label="Abscissa - ordinate", hints=["xy"], numFields=1)
+            InputDescription(inType.xyzradio, "project", label="Abscissa - ordinate")
             ]
 
     return plotFrame
@@ -187,7 +187,7 @@ def plotFieldOpt(fieldName):
     plotField = [
             InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
             InputDescription(inType.dropdown, "comp", label="Component", sublist = complist),
-            InputDescription(inType.string, "project", label="Abscissa - ordinate", hints=["xy"], numFields=1)
+            InputDescription(inType.xyzradio, "project", label="Abscissa - ordinate")
             ]
 
     return plotField
@@ -198,7 +198,7 @@ def plotCurrentOpt(fieldName):
     plotCurrent = [
             InputDescription(inType.static, "field", label="Current", staticValue=fieldName),
             InputDescription(inType.dropdown, "comp", label="Component", sublist = complist),
-            InputDescription(inType.string, "project", label="Abscissa - ordinate", hints=["xy"], numFields=1)
+            InputDescription(inType.xyzradio, "project", label="Abscissa - ordinate")
             ]
 
     return plotCurrent

@@ -40,6 +40,7 @@ class MainWidget(QWidget):
         # self.elementConfigs = []
 
         # init System
+
         
         # init layout
         self.grid = QGridLayout()
@@ -49,15 +50,8 @@ class MainWidget(QWidget):
         self._setupPlotScreen()
         self._mkConsole()
 
-        # self.pyprint(self.pyprint)
-        
-
         self.stm = st.System(redirect=print)
         self._mkElementsColumn()
-        # self.ElementsColumn.reflectors.addWidget(ElementWidget("refl",[lambda:0,lambda:0,lambda:0]))
-        # self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget("refl",[lambda:0,lambda:0,lambda:0]))
-        # self.ElementsColumn.POFields.addWidget(FieldsWidget("refl",[lambda:0,lambda:0,lambda:0]))
-        # self.ElementsColumn.POCurrents.addWidget(CurrentWidget("refl",[lambda:0,lambda:0,lambda:0]))
 
         self.setLayout(self.grid)
 
@@ -80,9 +74,9 @@ class MainWidget(QWidget):
             if end == '\r':
                 self.cursor.select(QTextCursor.LineUnderCursor)
                 self.cursor.removeSelectedText()
-                self.console.insertPlainText(s)
+                self.console.insertPlainText(str(s))
             else:
-                self.console.appendPlainText(s)
+                self.console.appendPlainText(str(s))
             self.console.repaint()
         
         self.console.appendPlainText("********** PyPO Console **********")
@@ -114,6 +108,7 @@ class MainWidget(QWidget):
         scroll = QScrollArea()
         scroll.setWidget(self.ElementsColumn)
         scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         scroll.setWidgetResizable(True)
         scroll.setContentsMargins(0,0,0,0)
         scroll.setMinimumWidth(300)
@@ -381,7 +376,7 @@ class MainWidget(QWidget):
     def addPlotFrameAction(self):
         plotFrameDict = self.ParameterWid.read()
         fig = self.stm.plotRTframe(plotFrameDict["frame"], project=plotFrameDict["project"], returns=True)
-        self.PlotScreen.addTab(PlotScreen(fig, parent=self),f'{plotFrameDict["frame"]} - {plotFrameDict["project"]}')
+        self.addPlot(fig, f'{plotFrameDict["frame"]} - {plotFrameDict["project"]}')
 
         self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
 
@@ -389,7 +384,7 @@ class MainWidget(QWidget):
         plotFieldDict = self.ParameterWid.read()
         fig, _ = self.stm.plotBeam2D(self.stm.fields[plotFieldDict["field"]].surf, plotFieldDict["field"], 
                                     plotFieldDict["comp"], ptype="field", project=plotFieldDict["project"], returns=True)
-        self.PlotScreen.addTab(PlotScreen(fig, parent=self),f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
+        self.addPlot(fig, f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
 
         self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
     
@@ -397,7 +392,7 @@ class MainWidget(QWidget):
         plotFieldDict = self.ParameterWid.read()
         fig, _ = self.stm.plotBeam2D(self.stm.currents[plotFieldDict["field"]].surf, plotFieldDict["field"], 
                                     plotFieldDict["comp"], ptype="current", project=plotFieldDict["project"], returns=True)
-        self.PlotScreen.addTab(PlotScreen(fig,parent=self),f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
+        self.addPlot(fig, f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
 
         self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
     

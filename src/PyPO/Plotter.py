@@ -117,14 +117,14 @@ def plotBeam2D(plotObject, field,
         if aperDict["plot"]:
             xc = aperDict["center"][0]
             yc = aperDict["center"][1]
-            Ro = aperDict["r_out"]
-            Ri = aperDict["r_in"]
+            Ro = aperDict["outer"] * 2
+            Ri = aperDict["inner"] * 2
 
-            circleo=mpl.patches.Circle((xc,yc),Ro, color='black', fill=False)
-            circlei=mpl.patches.Circle((xc,yc),Ri, color='black', fill=False)
+            circleo=mpl.patches.Ellipse((xc,yc),Ro[0], Ro[1], color='black', fill=False)
+            circlei=mpl.patches.Ellipse((xc,yc),Ri[0], Ri[1], color='black', fill=False)
 
             ax[0].add_patch(circleo)
-            ax[0].add_patch(circlei)
+            #ax[0].add_patch(circlei)
             ax[0].scatter(xc, yc, color='black', marker='x')
 
     else:

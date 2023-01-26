@@ -610,7 +610,8 @@ class System(object):
         fields_c = self._compToFields(comp, field)
         currents_c = calcCurrents(fields_c, self.system[name_source], mode)
 
-        return currents_c, fields_c
+        self.fields[name_beam] = fields_c
+        self.currents[name_beam] = currents_c
 
     def calcCurrents(self, name_source, fields, mode="PMC"):
         currents = calcCurrents(fields, self.system[name_source], mode)
@@ -753,13 +754,13 @@ class System(object):
         
         self.frames[fr_out] = frameObj
 
-    def interpFrame(self, fr_in, field, name_target, method="nearest"):
+    def interpFrame(self, name_fr_in, name_field, name_target, name_out, comp, method="nearest"):
         grids = generateGrid(self.system[name_target])
 
-        points = (self.frames[fr_in].x, self.frames[fr_in].y, self.frames[fr_in].z)
+        points = (self.frames[name_fr_in].x, self.frames[name_fr_in].y, self.frames[name_fr_in].z)
 
-        rfield = np.real(field)
-        ifield = np.imag(field)
+        rfield = np.real(getattr(self.fields[name_field], comp))
+        ifield = np.imag(getattr(self.fields[name_field], comp))
 
         grid_interp = (grids.x, grids.y, grids.z)
 
@@ -767,6 +768,11 @@ class System(object):
         iout = griddata(points, ifield, grid_interp, method=method)
 
         out = rout.reshape(self.system[name_target]["gridsize"]) + 1j * iout.reshape(self.system[name_target]["gridsize"])
+
+        field = self._compToFields(comp, out)
+        field.setMeta(name_target, self.fields[name_field].k)
+
+        self.fields[name_out] = field 
 
         return out
 
@@ -840,14 +846,13 @@ class System(object):
         self.fields[PSDict["name"]] = field
         self.currents[PSDict["name"]] = current
 
-    def plotBeam2D(self, name_surface, name_field, comp, ptype="field",
+    def plotBeam2D(self, name_field, comp, ptype="field",
                     vmin=-30, vmax=0, show=True, amp_only=False,
                     save=False, polar=False, interpolation=None,
                     aperDict={"plot":False}, mode='dB', project='xy',
                     units="", name='', titleA="Amp", titleP="Phase",
                     unwrap_phase=False, returns=False):
 
-        plotObject = self.system[name_surface]
 
         if ptype == "field":
             field = self.fields[name_field]
@@ -862,6 +867,9 @@ class System(object):
             if comp in self.JMcomplist:
                 field_comp = field[np.argwhere(self.JMcomplist == comp)[0]]
 
+        name_surface = field.surf
+        plotObject = self.system[name_surface]
+        
         default = "mm"
         if plotObject["gmode"] == 2 and not units:
             default = "deg"
@@ -878,7 +886,7 @@ class System(object):
             return fig, ax
 
         elif save:
-            pt.savefig(fname=savePath + '{}_{}.jpg'.format(plotObject["name"], name),
+            pt.savefig(fname=self.savePath + '{}_{}.jpg'.format(plotObject["name"], name),
                         bbox_inches='tight', dpi=300)
             pt.close()
 

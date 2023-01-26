@@ -81,16 +81,18 @@ class FormGenerator(QWidget):
         paramDict = {}
         for input in self.inputs:
             paramDict.update(input.read())
+        # print(paramDict)
         return paramDict
     
 class StaticInput(QWidget):
     def __init__ (self, inp:InputDescription):
         super().__init__()
         self.inputDescription = inp
-        layout = QFormLayout()
-        self.setLayout(layout)
-        layout.setContentsMargins(0,0,0,0)
-        layout.addRow(MyLabel(inp.label), MyLabel(inp.staticValue))
+        if not inp.hidden:
+            layout = QFormLayout()
+            self.setLayout(layout)
+            layout.setContentsMargins(0,0,0,0)
+            layout.addRow(MyLabel(inp.label), MyLabel(inp.staticValue))
     def read(self):
         return {self.inputDescription.outputName: self.inputDescription.staticValue}
 
@@ -228,15 +230,21 @@ class SimpleRadio(QWidget):
         radioWidget = QWidget()
         radiolayout = QHBoxLayout(radioWidget)
 
+        if self.inputDescription.hints:
+            options = self.inputDescription.hints
+        else:
+            options = self.inputDescription.sublist
+
         self.group = QButtonGroup()
-        for i in self.inputDescription.sublist:
-            rb = QRadioButton(i)
+        for i in range(len(options)):
+            rb = QRadioButton(options[i])
             self.group.addButton(rb)
+            self.group.setId(rb,i)
             radiolayout.addWidget(rb)
-        layout.addRow(MyLabel(self.inputDescription.label) ,radioWidget)
+        layout.addRow(MyLabel(self.inputDescription.label), radioWidget)
 
     def read(self):
-        d = {self.inputDescription.outputName:self.group.checkedButton().text()}
+        d = {self.inputDescription.outputName : self.inputDescription.sublist[self.group.checkedId()]}
         print(d)
         return d
 

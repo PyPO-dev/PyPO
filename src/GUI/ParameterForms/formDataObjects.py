@@ -181,7 +181,7 @@ def initGaussianInp(elemDict):
     
     return initGauss
 
-def plotFieldOpt(fieldName):
+def plotField(fieldName):
     complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
     
     plotField = [
@@ -190,6 +190,16 @@ def plotFieldOpt(fieldName):
             InputDescription(inType.xyzradio, "project", label="Abscissa - ordinate")
             ]
 
+    return plotField
+
+def plotFarField(fieldName):
+    complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
+    
+    plotField = [
+            InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
+            InputDescription(inType.dropdown, "comp", label="Component", sublist = complist),
+            InputDescription(inType.static, "project", staticValue="xy", hidden=True)
+            ]
     return plotField
 
 def plotCurrentOpt(fieldName):

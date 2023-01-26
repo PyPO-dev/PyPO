@@ -25,6 +25,7 @@ class InputDescription:
     oArray: bool = field(default=False)
     subdict: dict = field(default=None)
     sublist: list = field(default=None)
+    hidden: bool = field(default=False)
 
     def __attrs_post_init__(self):
         if self.label == None:

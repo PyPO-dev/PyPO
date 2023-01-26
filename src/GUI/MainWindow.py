@@ -368,7 +368,11 @@ class MainWidget(QWidget):
         self.setForm(fDataObj.plotFrameOpt(frame), readAction=self.addPlotFrameAction)
 
     def setPlotFieldFormOpt(self, field):
-        self.setForm(fDataObj.plotFieldOpt(field), readAction=self.addPlotFieldAction)
+        if self.stm.system[self.stm.fields[field].surf]["gmode"] == 2:
+            self.setForm(fDataObj.plotFarField(field), readAction=self.addPlotFieldAction)
+        else:
+            self.setForm(fDataObj.plotField(field), readAction=self.addPlotFieldAction)
+            
         
     def setPlotCurrentFormOpt(self, current):
         self.setForm(fDataObj.plotCurrentOpt(current), readAction=self.addPlotCurrentAction)
@@ -382,8 +386,8 @@ class MainWidget(QWidget):
 
     def addPlotFieldAction(self):
         plotFieldDict = self.ParameterWid.read()
-        fig, _ = self.stm.plotBeam2D(self.stm.fields[plotFieldDict["field"]].surf, plotFieldDict["field"], 
-                                    plotFieldDict["comp"], ptype="field", project=plotFieldDict["project"], returns=True)
+        fig, _ = self.stm.plotBeam2D(plotFieldDict["field"], plotFieldDict["comp"], 
+                                    ptype="field", project=plotFieldDict["project"], returns=True)
         self.addPlot(fig, f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
 
         self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)

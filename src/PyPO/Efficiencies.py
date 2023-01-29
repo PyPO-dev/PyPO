@@ -44,9 +44,7 @@ def calcTaper(field, surfaceObject, aperDict):
     if aperDict:
         x = grids.x
         y = grids.y
-        cond1 = np.sqrt((x - aperDict["center"][0])**2 + (y - aperDict["center"][1])**2) < aperDict["r_out"]
-        cond2 = np.sqrt((x - aperDict["center"][0])**2 + (y - aperDict["center"][1])**2) > aperDict["r_in"]
-        mask = cond1 & cond2
+        mask = _generateMask(x, y, aperDict) 
 
 
         field = field[mask]

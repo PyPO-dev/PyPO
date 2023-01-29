@@ -510,13 +510,15 @@ class System(object):
     def removeCurrent(self, currentName):
         del self.currents[currentName]
 
-    def saveFields(self, fields, name_fields):
+    def saveFields(self, name_fields):
         saveDir = os.path.join(self.savePathFields, name_fields)
 
         saveDirExist = os.path.isdir(saveDir)
 
         if not saveDirExist:
             os.makedirs(saveDir)
+
+        fields = self.fields[name_fields]
 
         np.save(os.path.join(saveDir, "Ex.npy"), fields.Ex)
         np.save(os.path.join(saveDir, "Ey.npy"), fields.Ey)

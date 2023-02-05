@@ -91,6 +91,8 @@ $(function() {
 Functions</h2></td></tr>
 <tr class="memitem:a3ddc8706a00ba88a951e11e3db95985d"><td class="memItemLeft" align="right" valign="top">PYPO_DLL void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="InterfaceBeam_8h.html#a3ddc8706a00ba88a951e11e3db95985d">makeRTframe</a> (<a class="el" href="structRTDict.html">RTDict</a> rdict, <a class="el" href="structcframe.html">cframe</a> *fr)</td></tr>
 <tr class="separator:a3ddc8706a00ba88a951e11e3db95985d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf7e19e3b1ee7b97a64725fec12e0e35"><td class="memItemLeft" align="right" valign="top">PYPO_DLL void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="InterfaceBeam_8h.html#aaf7e19e3b1ee7b97a64725fec12e0e35">makeGRTframe</a> (<a class="el" href="structGRTDict.html">GRTDict</a> grdict, <a class="el" href="structcframe.html">cframe</a> *fr)</td></tr>
+<tr class="separator:aaf7e19e3b1ee7b97a64725fec12e0e35"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4f65bf6bc7ac685aa610938a10842086"><td class="memItemLeft" align="right" valign="top">PYPO_DLL void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="InterfaceBeam_8h.html#a4f65bf6bc7ac685aa610938a10842086">makeGauss</a> (<a class="el" href="structGDict.html">GDict</a> gdict, <a class="el" href="structreflparams.html">reflparams</a> plane, <a class="el" href="structc2Bundle.html">c2Bundle</a> *res_field, <a class="el" href="structc2Bundle.html">c2Bundle</a> *res_current)</td></tr>
 <tr class="separator:a4f65bf6bc7ac685aa610938a10842086"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3482394fcfe3386ba0852d7bc0662d01"><td class="memItemLeft" align="right" valign="top">PYPO_DLL void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="InterfaceBeam_8h.html#a3482394fcfe3386ba0852d7bc0662d01">calcCurrents</a> (<a class="el" href="structc2Bundle.html">c2Bundle</a> *res_field, <a class="el" href="structc2Bundle.html">c2Bundle</a> *res_current, <a class="el" href="structreflparams.html">reflparams</a> rdict, int mode)</td></tr>
@@ -224,6 +226,52 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="aaf7e19e3b1ee7b97a64725fec12e0e35" name="aaf7e19e3b1ee7b97a64725fec12e0e35"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaf7e19e3b1ee7b97a64725fec12e0e35">&#9670;&#160;</a></span>makeGRTframe()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">PYPO_DLL void makeGRTframe </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structGRTDict.html">GRTDict</a>&#160;</td>
+          <td class="paramname"><em>grdict</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structcframe.html">cframe</a> *&#160;</td>
+          <td class="paramname"><em>fr</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Generate Gaussian ray-trace frame.</p>
+<p>Generate a ray-trace frame from an <a class="el" href="structRTDict.html">RTDict</a> or <a class="el" href="structRTDictf.html">RTDictf</a>. Generates xy points and directions from Gaussian distribution. Wrapper for initRTGauss.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">grdict</td><td><a class="el" href="structGRTDict.html">GRTDict</a> or <a class="el" href="structGRTDictf.html">GRTDictf</a> object. </td></tr>
+    <tr><td class="paramname">fr</td><td>Pointer to cframe or cframef object.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="BeamInit_8h.html#aa1ee8f6478af52fd972fc68bb5a5c6a6">initFrame()</a> </dd>
+<dd>
+<a class="el" href="structGRTDict.html">GRTDict</a> </dd>
+<dd>
+<a class="el" href="structGRTDictf.html">GRTDictf</a> </dd>
+<dd>
+<a class="el" href="structcframe.html">cframe</a> </dd>
+<dd>
+<a class="el" href="structcframef.html">cframef</a> </dd></dl>
+
+</div>
+</div>
 <a id="a3ddc8706a00ba88a951e11e3db95985d" name="a3ddc8706a00ba88a951e11e3db95985d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3ddc8706a00ba88a951e11e3db95985d">&#9670;&#160;</a></span>makeRTframe()</h2>
 
@@ -249,8 +297,9 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Generate ray-trace frame.</p>
-<p>Generate a ray-trace frame from an <a class="el" href="structRTDict.html">RTDict</a> or <a class="el" href="structRTDictf.html">RTDictf</a>. Wrapper for initFrame. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Generate concentric ellipse ray-trace frame.</p>
+<p>Generate a ray-trace frame from an <a class="el" href="structRTDict.html">RTDict</a> or <a class="el" href="structRTDictf.html">RTDictf</a>. The frame consists of concentring ellipses. Wrapper for initFrame.</p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">rdict</td><td><a class="el" href="structRTDict.html">RTDict</a> or <a class="el" href="structRTDictf.html">RTDictf</a> object. </td></tr>
     <tr><td class="paramname">fr</td><td>Pointer to cframe or cframef object.</td></tr>

@@ -134,10 +134,13 @@ class System(object):
             sys_copy = self.copyObj(sysObject.system)
             self.system.update(sys_copy)
 
-    #### ADD REFLECTOR METHODS
-    # Parabola takes as input the reflectordict from now on.
-    # Should build correctness test!
-    #def addParabola(self, coef, lims_x, lims_y, gridsize, cRot=np.zeros(3), pmode='man', gmode='xy', name="Parabola", axis='a', units='mm', trunc=False, flip=False):
+    ##
+    # Add a paraboloid reflector to the System.
+    #
+    # Take a reflectordictionary and append to self.system list.
+    # If "pmode" == "focus", convert focus and vertex to a, b, c coefficients.
+    #
+    # @param reflDict A reflectordictionary.
     def addParabola(self, reflDict):
         """
         Function for adding paraboloid reflector to system. If gmode='uv', lims_x should contain the smallest and largest radius and lims_y
@@ -214,6 +217,13 @@ class System(object):
 
         self.num_ref += 1
 
+    ##
+    # Add a hyperboloid reflector to the System.
+    #
+    # Take a reflectordictionary and append to self.system list.
+    # If "pmode" == "focus", convert focus_1 and focus_2 to a, b, c coefficients.
+    #
+    # @param reflDict A reflectordictionary.
     def addHyperbola(self, reflDict):
 
         if not "name" in reflDict:
@@ -286,6 +296,13 @@ class System(object):
 
         self.num_ref += 1
 
+    ##
+    # Add an ellipsoid reflector to the System.
+    #
+    # Take a reflectordictionary and append to self.system list.
+    # If "pmode" == "focus", convert focus_1 and focus_2 to a, b, c coefficients.
+    #
+    # @param reflDict A reflectordictionary.
     def addEllipse(self, reflDict):
         if not "name" in reflDict:
             reflDict["name"] = "Ellipse"
@@ -354,6 +371,13 @@ class System(object):
 
         self.num_ref += 1
 
+    ##
+    # Add a planar surface to the System.
+    #
+    # Take a reflectordictionary and append to self.system list.
+    # If "gmode" == "AoE", the surface is evaluated as an angular far-field grid.
+    #
+    # @param reflDict A reflectordictionary.
     def addPlane(self, reflDict):
         if not "name" in reflDict:
             reflDict["name"] = "plane"
@@ -411,8 +435,8 @@ class System(object):
     # Apply a rotation, around a center of rotation, to a (selection of) reflector(s).
     #
     # @param name Reflector name or list of reflector names.
-    # @param rotation Numpy ndarray of length 3, containing rotation angles around x,y and z axes, in degrees.
-    # @param cRot Numpy ndarray of length 3, containing center of rotation x,y and z co-ordinates, in mm.
+    # @param rotation Numpy ndarray of length 3, containing rotation angles around x, y and z axes, in degrees.
+    # @param cRot Numpy ndarray of length 3, containing center of rotation x, y and z co-ordinates, in mm.
     
     def rotateGrids(self, name, rotation, cRot=np.zeros(3)):
         if isinstance(name, list):
@@ -428,7 +452,7 @@ class System(object):
     # Apply a translation to a (selection of) reflector(s).
     #
     # @param name Reflector name or list of reflector names.
-    # @param translation Numpy ndarray of length 3, containing translation x,y and z co-ordinates, in mm.
+    # @param translation Numpy ndarray of length 3, containing translation x, y and z co-ordinates, in mm.
     
     def translateGrids(self, name, translation):
         if isinstance(name, list):
@@ -437,6 +461,12 @@ class System(object):
         else:
             self.system[name]["transf"] = MatTranslate(translation, self.system[name]["transf"])
 
+    ##
+    # Home a reflector back into default configuration.
+    #
+    # Set internal transformation matrix of a (selection of) reflector(s) to identity.
+    #
+    # @param name Reflector name or list of reflector names to be homed.
     def homeReflector(self, name):
         if isinstance(name, list):
             for _name in name:
@@ -444,6 +474,18 @@ class System(object):
         else:
             self.system[name]["transf"] = np.eye(4)
 
+    ##
+    # Generate reflector grids and normals.
+    # 
+    # Evaluate a stored reflDict and return the x, y, z grids and normals.
+    #
+    # @param name Name of reflector to be gridded.
+    # @param transform Apply internal transformation matrix to reflector.
+    # @param spheric Return spheric or square far-field grid (far-field only).
+    #
+    # @return grids A reflGrids object containing the grids, area and normals.
+    #
+    # @see reflGrids
     def generateGrids(self, name, transform=True, spheric=True):
         grids = generateGrid(self.system[name], transform, spheric)
         return grids
@@ -666,6 +708,16 @@ class System(object):
         
         check_RTDict(argDict, self.frames.keys())
         self.frames[argDict["name"]] = makeRTframe(argDict)
+    
+    def createGRTFrame(self, argDict):
+        if not argDict["name"]:
+            argDict["name"] = f"Frame_{len(self.frames)}"
+       
+        argDict["angx0"] = np.degrees(argDict["lam"] / (np.pi * argDict["n"] * argDict["x0"]))
+        argDict["angy0"] = np.degrees(argDict["lam"] / (np.pi * argDict["n"] * argDict["y0"]))
+
+        #check_RTDict(argDict, self.frames.keys())
+        self.frames[argDict["name"]] = makeGRTframe(argDict)
 
     def loadFramePoynt(self, Poynting, name_source):
         grids = generateGrid(self.system[name_source])

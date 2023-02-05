@@ -172,10 +172,11 @@ struct RTDict {
 /** Object for initializing a Gaussian ray-trace frame object.*/
 struct GRTDict {
     int nRays;      /**<Number of rays to place in cframe.*/
-    double angx;    /**<Gaussian beam opening angle in x-direction, in degrees.*/
-    double angy;    /**<Gaussian beam opening angle in y-direction, in degrees.*/
-    double a;       /**<Beam waist along x-direction, in millimeters.*/
-    double b;       /**<Beam waist along x-direction, in millimeters.*/
+    double angx0;       /**<Beam waist along x-direction, in millimeters.*/
+    double angy0;       /**<Beam waist along x-direction, in millimeters.*/
+    double x0;       /**<Beam waist along x-direction, in millimeters.*/
+    double y0;       /**<Beam waist along x-direction, in millimeters.*/
+    int seed;
     double *tChief; /**<array of 3 double. Tilt of chief, ray, along x, y or z axis, in degrees.*/
     double *oChief; /**<array of 3 double. Co-ordinate of chief ray origin.*/
 };
@@ -351,13 +352,14 @@ struct RTDictf {
 
 /** Object for initializing a ray-trace frame object.*/
 struct GRTDictf {
-    int nRays;     /**<Number of rays to place in cframe.*/
-    float angx;    /**<Gaussian beam opening angle in x-direction, in degrees.*/
-    float angy;    /**<Gaussian beam opening angle in y-direction, in degrees.*/
-    float a;       /**<Beam waist along x-direction, in millimeters.*/
-    float b;       /**<Beam waist along x-direction, in millimeters.*/
-    float *tChief; /**<array of 3 double. Tilt of chief, ray, along x, y or z axis, in degrees.*/
-    float *oChief; /**<array of 3 double. Co-ordinate of chief ray origin.*/
+    int nRays;      /**<Number of rays to place in cframe.*/
+    float angx0;       /**<Beam waist along x-direction, in millimeters.*/
+    float angy0;       /**<Beam waist along x-direction, in millimeters.*/
+    float x0;       /**<Beam waist along x-direction, in millimeters.*/
+    float y0;       /**<Beam waist along x-direction, in millimeters.*/
+    int seed;
+    float *tChief; /**<array of 3 float. Tilt of chief, ray, along x, y or z axis, in degrees.*/
+    float *oChief; /**<array of 3 float. Co-ordinate of chief ray origin.*/
 };
 
 /** Object for initializing a Gaussian beam.*/

@@ -1,13 +1,15 @@
 import ctypes
-import math
 import numpy as np
 import os
 import sys
-import pathlib 
+import time
+import pathlib
 from src.PyPO.BindUtils import *
 from src.PyPO.Structs import *
 from src.PyPO.PyPOTypes import *
+import src.PyPO.Config as Config
 
+import threading
 #############################################################################
 #                                                                           #
 #           List of bindings for the beam init interface of PyPO.          #
@@ -38,10 +40,12 @@ def loadBeamlib():
                                 reflparams, ctypes.c_int]
     lib.calcCurrents.restype = None
 
-    return lib
+    ws = WaitSymbol()
+
+    return lib, ws
 
 def makeRTframe(rdict_py):
-    lib = loadBeamlib()
+    lib, ws = loadBeamlib()
 
     nTot = 1 + rdict_py["nRays"] * 4 * rdict_py["nRing"]
 
@@ -59,25 +63,36 @@ def makeRTframe(rdict_py):
     return out
 
 def makeGRTframe(grdict_py):
-    lib = loadBeamlib()
+    lib, ws = loadBeamlib()
 
-    nTot = rdict_py["nRays"]
+    nTot = grdict_py["nRays"]
 
     c_grdict = GRTDict()
     res = cframe()
-
+    
     allocate_cframe(res, nTot, ctypes.c_double)
-    allfill_RTDict(c_grdict, grdict_py, ctypes.c_double)
-
-    lib.makeGRTframe(c_grdict, ctypes.byref(res))
-
+    allfill_GRTDict(c_grdict, grdict_py, ctypes.c_double)
+    
+    args = [c_grdict, ctypes.byref(res)]
+    
+    start_time = time.time()
+    t = threading.Thread(target=lib.makeGRTframe, args=args)
+    t.daemon = True
+    t.start()
+    while t.is_alive(): # wait for the thread to exit
+        Config.print(f'Sampling {nTot} Gaussian beam rays {ws.getSymbol()}', end='\r')
+        t.join(.1)
+    dtime = time.time() - start_time
+    Config.print(f'Sampled {nTot} Gaussian beam rays in {dtime:.3f} seconds', end='\r')
+    Config.print(f'\n')
+    
     shape = (nTot,)
     out = frameToObj(res, np_t=np.float64, shape=shape)
 
     return out
 
 def makeGauss(gdict_py, source):
-    lib = loadBeamlib()
+    lib, ws = loadBeamlib()
 
     source_shape = (source["gridsize"][0], source["gridsize"][1])
     source_size = source["gridsize"][0] * source["gridsize"][1]
@@ -101,7 +116,7 @@ def makeGauss(gdict_py, source):
     return out_field, out_current
 
 def calcCurrents(fields, source, mode):
-    lib = loadBeamlib()
+    lib, ws = loadBeamlib()
 
     source_shape = (source["gridsize"][0], source["gridsize"][1])
     source_size = source["gridsize"][0] * source["gridsize"][1]

@@ -300,15 +300,16 @@ def allfill_RTDict(res, rdict_py, ct_t):
     res.oChief = (ct_t * 3)(*rdict_py["oChief"].tolist())
 
 def allfill_GRTDict(res, grdict_py, ct_t):
-    res.nRays = ctypes.c_int(rdict_py["nRays"])
+    res.nRays = ctypes.c_int(grdict_py["nRays"])
 
-    res.angx = ct_t(np.radians(rdict_py["angx"]))
-    res.angy = ct_t(np.radians(rdict_py["angy"]))
-    res.a = ct_t(rdict_py["a"])
-    res.b = ct_t(rdict_py["b"])
+    res.angx0 = ct_t(np.radians(grdict_py["angx0"]))
+    res.angy0 = ct_t(np.radians(grdict_py["angy0"]))
+    res.x0 = ct_t(grdict_py["x0"])
+    res.y0 = ct_t(grdict_py["y0"])
+    res.seed = ctypes.c_int(grdict_py["seed"])
 
-    res.tChief = (ct_t * 3)(*np.radians(rdict_py["tChief"]).tolist())
-    res.oChief = (ct_t * 3)(*rdict_py["oChief"].tolist())
+    res.tChief = (ct_t * 3)(*np.radians(grdict_py["tChief"]).tolist())
+    res.oChief = (ct_t * 3)(*grdict_py["oChief"].tolist())
 
 def allfill_GDict(res, gdict_py, ct_t):
     res.lam = ct_t(gdict_py["lam"])

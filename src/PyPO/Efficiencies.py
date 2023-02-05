@@ -7,12 +7,21 @@ def _generateMask(x, y, aperDict):
     
     t = np.arctan2(y, x) + np.pi
 
-    outer = (aperDict["r_out"] * np.cos(t))**2 + (aperDict["b_out"] * np.sin(t))**2
+    outer = (aperDict["outer"][0] * np.cos(t))**2 + (aperDict["outer"][1] * np.sin(t))**2
+    inner = (aperDict["inner"][0] * np.cos(t))**2 + (aperDict["inner"][1] * np.sin(t))**2
 
     cond1 = (x - aperDict["center"][0])**2 + (y - aperDict["center"][1])**2 < outer
-    cond2 = np.sqrt((x - aperDict["center"][0])**2 + (y - aperDict["center"][1])**2) > aperDict["r_in"]
+    cond2 = (x - aperDict["center"][0])**2 + (y - aperDict["center"][1])**2 > inner
  
     return cond1 & cond2
+
+def calcRMS(frame):
+    c_x = np.sum(frame.x) / len(frame.x)
+    c_y = np.sum(frame.y) / len(frame.y)
+    c_z = np.sum(frame.z) / len(frame.z)
+    rms = np.sqrt(np.sum((frame.x - c_x)**2 + (frame.y - c_y)**2 + (frame.z - c_z)**2) / len(frame.x))
+
+    return rms
 
 def calcSpillover(field, surfaceObject, aperDict):
     # Generate the grid in restframe
@@ -30,20 +39,18 @@ def calcSpillover(field, surfaceObject, aperDict):
 
 def calcTaper(field, surfaceObject, aperDict):
     grids = generateGrid(surfaceObject, transform=False, spheric=True)
-
-    x = grids.x
-    y = grids.y
     area = grids.area
+    
+    if aperDict:
+        x = grids.x
+        y = grids.y
+        mask = _generateMask(x, y, aperDict) 
 
-    cond1 = np.sqrt((x - aperDict["center"][0])**2 + (y - aperDict["center"][1])**2) < aperDict["r_out"]
-    cond2 = np.sqrt((x - aperDict["center"][0])**2 + (y - aperDict["center"][1])**2) > aperDict["r_in"]
-    mask = cond1 & cond2
 
+        field = field[mask]
+        area = area[mask]
 
-    field_ap = field[mask]
-    area_m = area[mask]
-
-    eff_t = np.absolute(np.sum(field_ap * area_m))**2 / np.sum(np.absolute(field_ap)**2 * area_m) / np.sum(area_m)
+    eff_t = np.absolute(np.sum(field * area))**2 / np.sum(np.absolute(field)**2 * area) / np.sum(area)
 
     return eff_t
 

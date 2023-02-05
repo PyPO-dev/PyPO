@@ -47,6 +47,7 @@ def ex_ASTE_RT(device):
             }
 
     RTpar = {
+            "name"          : "start",
             "nRays"         : 10,
             "nRing"         : 10,
             "angx"          : 0,
@@ -66,23 +67,23 @@ def ex_ASTE_RT(device):
     s.addHyperbola(hyperbola)
     s.translateGrids("plane1", np.array([0,0,3.5e3 - d_foc_h]))
  
-    s.translateGrids("sec", np.array([1064e-6, 1064e-6, 1064e-6]))
-    s.rotateGrids("sec", np.array([1,0,0]), np.array([0,0,3.5e3]))
+    #s.translateGrids("sec", np.array([1064e-6, 1064e-6, 1064e-6]))
+    #s.rotateGrids("sec", np.array([1,0,0]), np.array([0,0,3.5e3]))
 
-    frame_in = s.createFrame(argDict=RTpar)
+    s.createFrame(argDict=RTpar)
 
     if device == "CPU":
-        frame_out = s.runRayTracer(frame_in, "pri", nThreads=11)
-        frame_out1 = s.runRayTracer(frame_out, "sec", nThreads=11)
-        frame_out2 = s.runRayTracer(frame_out1, "plane1", nThreads=11)
+        s.runRayTracer("start", "pri", "pri", nThreads=11)
+        s.runRayTracer("pri", "sec", "sec", nThreads=11)
+        s.runRayTracer("sec", "focus", "plane1", nThreads=11)
 
     if device == "GPU":
-        frame_out = s.runRayTracer(frame_in, "pri", nThreads=256, device=device)
-        frame_out1 = s.runRayTracer(frame_out, "sec", nThreads=256, device=device)
-        frame_out2 = s.runRayTracer(frame_out1, "plane1", nThreads=256, device=device)
+        s.runRayTracer("start", "pri", "pri", nThreads=256, device=device)
+        s.runRayTracer("pri", "sec", "sec", nThreads=256, device=device)
+        s.runRayTracer("sec", "focus", "plane1", nThreads=256, device=device)
 
-    s.plotRTframe(frame_out2, project="xy")
-    s.plotSystem(RTframes=[frame_in, frame_out, frame_out1, frame_out2])
+    s.plotRTframe("focus", project="xy")
+    s.plotSystem(RTframes=["start", "pri", "sec", "focus"])
 
 if __name__ == "__main__":
     ex_ASTE()

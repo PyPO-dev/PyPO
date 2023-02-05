@@ -3,10 +3,12 @@ import math
 import numpy as np
 import os
 import sys
+import time
 import pathlib
 from src.PyPO.BindUtils import *
 from src.PyPO.Structs import *
 from src.PyPO.PyPOTypes import *
+import src.PyPO.Config as Config
 
 import threading
 
@@ -68,13 +70,15 @@ def loadGPUlib():
 
     lib.callRTKernel.restype = None
 
-    return lib
+    ws = WaitSymbol()
+
+    return lib, ws
 
 # WRAPPER FUNCTIONS DOUBLE PREC
 
 #### SINGLE PRECISION
 def PyPO_GPUf(source, target, PODict):
-    lib = loadGPUlib()
+    lib, ws = loadGPUlib()
 
     # Create structs with pointers for source and target
     csp = reflparamsf()
@@ -120,6 +124,8 @@ def PyPO_GPUf(source, target, PODict):
             ctypes.byref(c_currents), k, epsilon,
             t_direction, nBlocks, nThreads]
 
+    start_time = time.time()
+
     if PODict["mode"] == "JM":
         res = c2Bundlef()
 
@@ -131,7 +137,12 @@ def PyPO_GPUf(source, target, PODict):
         t.daemon = True
         t.start()
         while t.is_alive(): # wait for the thread to exit
+            #Config.print(np.array([1,0,0]))
+            Config.print(f'Calculating J, M on {target["name"]} {ws.getSymbol()}', end='\r')
             t.join(.1)
+        dtime = time.time() - start_time
+        Config.print(f'Calculated J, M on {target["name"]} in {dtime:.3f} seconds', end='\r')
+        Config.print(f'\n')
 
         # Unpack filled struct
         JM = c2BundleToObj(res, shape=target_shape, obj_t='currents', np_t=np.float64)
@@ -149,7 +160,11 @@ def PyPO_GPUf(source, target, PODict):
         t.daemon = True
         t.start()
         while t.is_alive(): # wait for the thread to exit
+            Config.print(f'Calculating E, H on {target["name"]} {ws.getSymbol()}', end='\r')
             t.join(.1)
+        dtime = time.time() - start_time
+        Config.print(f'Calculated E, H on {target["name"]} in {dtime:.3f} seconds', end='\r')
+        Config.print(f'\n')
 
         # Unpack filled struct
         EH = c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
@@ -167,7 +182,11 @@ def PyPO_GPUf(source, target, PODict):
         t.daemon = True
         t.start()
         while t.is_alive(): # wait for the thread to exit
+            Config.print(f'Calculating J, M, E, H on {target["name"]} {ws.getSymbol()}', end='\r')
             t.join(.1)
+        dtime = time.time() - start_time
+        Config.print(f'Calculated J, M, E, H on {target["name"]} in {dtime:.3f} seconds', end='\r')
+        Config.print(f'\n')
 
         # Unpack filled struct
         JM, EH = c4BundleToObj(res, shape=target_shape, np_t=np.float64)
@@ -185,7 +204,11 @@ def PyPO_GPUf(source, target, PODict):
         t.daemon = True
         t.start()
         while t.is_alive(): # wait for the thread to exit
+            Config.print(f'Calculating reflected E, H, P on {target["name"]} {ws.getSymbol()}', end='\r')
             t.join(.1)
+        dtime = time.time() - start_time
+        Config.print(f'Calculated reflected E, H, P on {target["name"]} in {dtime:.3f} seconds', end='\r')
+        Config.print(f'\n')
 
         # Unpack filled struct
         EH, Pr = c2rBundleToObj(res, shape=target_shape, np_t=np.float64)
@@ -194,7 +217,6 @@ def PyPO_GPUf(source, target, PODict):
 
     elif PODict["mode"] == "FF":
         res = c2Bundlef()
-
         args.insert(0, res)
 
         allocate_c2Bundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
@@ -203,7 +225,11 @@ def PyPO_GPUf(source, target, PODict):
         t.daemon = True
         t.start()
         while t.is_alive(): # wait for the thread to exit
+            Config.print(f'Calculating far-field E, H on {target["name"]} {ws.getSymbol()}', end='\r')
             t.join(.1)
+        dtime = time.time() - start_time
+        Config.print(f'Calculated far-field E, H on {target["name"]} in {dtime:.3f} seconds', end='\r')
+        Config.print(f'\n')
 
         # Unpack filled struct
         EH = c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
@@ -211,7 +237,7 @@ def PyPO_GPUf(source, target, PODict):
         return EH
 
 def RT_GPUf(target, fr_in, epsilon, t0, nThreads):
-    lib = loadGPUlib()
+    lib, ws = loadGPUlib()
 
     ctp = reflparamsf()
     allfill_reflparams(ctp, target, ctypes.c_float)
@@ -232,11 +258,17 @@ def RT_GPUf(target, fr_in, epsilon, t0, nThreads):
     args = [ctp, ctypes.byref(inp), ctypes.byref(res),
             epsilon, t0, nBlocks, nThreads]
 
+    start_time = time.time()
+    
     t = threading.Thread(target=lib.callRTKernel, args=args)
     t.daemon = True
     t.start()
-    while t.is_alive(): # wait for the thread to exit
+    while t.is_alive(): # wait for the thread to exitp
+        Config.print(f'Calculating ray-trace to {target["name"]} {ws.getSymbol()}', end='\r')
         t.join(.1)
+    dtime = time.time() - start_time
+    Config.print(f'Calculated ray-trace to {target["name"]} in {dtime:.3f} seconds', end='\r')
+    Config.print(f'\n')
 
     shape = (fr_in.size,)
     fr_out = frameToObj(res, np_t=np.float32, shape=shape)

@@ -97,6 +97,9 @@ Functions</h2></td></tr>
 <tr class="memitem:aa1ee8f6478af52fd972fc68bb5a5c6a6"><td class="memTemplParams" colspan="2">template&lt;typename T , typename U , typename V &gt; </td></tr>
 <tr class="memitem:aa1ee8f6478af52fd972fc68bb5a5c6a6"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="BeamInit_8h.html#aa1ee8f6478af52fd972fc68bb5a5c6a6">initFrame</a> (T rdict, U *fr)</td></tr>
 <tr class="separator:aa1ee8f6478af52fd972fc68bb5a5c6a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff1a3644f9fba1d9bd64c9fb4b91fe6d"><td class="memTemplParams" colspan="2">template&lt;typename T , typename U , typename V &gt; </td></tr>
+<tr class="memitem:aff1a3644f9fba1d9bd64c9fb4b91fe6d"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="BeamInit_8h.html#aff1a3644f9fba1d9bd64c9fb4b91fe6d">initRTGauss</a> (T grdict, U *fr)</td></tr>
+<tr class="separator:aff1a3644f9fba1d9bd64c9fb4b91fe6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aebee209858ba31b61058c5691e9a7cba"><td class="memTemplParams" colspan="2">template&lt;typename T , typename U , typename V , typename W , typename G &gt; </td></tr>
 <tr class="memitem:aebee209858ba31b61058c5691e9a7cba"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="BeamInit_8h.html#aebee209858ba31b61058c5691e9a7cba">initGauss</a> (T gdict, U refldict, V *res_field, V *res_current)</td></tr>
 <tr class="separator:aebee209858ba31b61058c5691e9a7cba"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -275,6 +278,52 @@ template&lt;typename T , typename U , typename V , typename W , typename G &gt; 
 <a class="el" href="structc2Bundle.html">c2Bundle</a> </dd>
 <dd>
 <a class="el" href="structc2Bundlef.html">c2Bundlef</a> </dd></dl>
+
+</div>
+</div>
+<a id="aff1a3644f9fba1d9bd64c9fb4b91fe6d" name="aff1a3644f9fba1d9bd64c9fb4b91fe6d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff1a3644f9fba1d9bd64c9fb4b91fe6d">&#9670;&#160;</a></span>initRTGauss()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T , typename U , typename V &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void initRTGauss </td>
+          <td>(</td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>grdict</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">U *&#160;</td>
+          <td class="paramname"><em>fr</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Initialize Gaussian ray-trace frame from <a class="el" href="structRTDict.html">RTDict</a> or <a class="el" href="structRTDictf.html">RTDictf</a>.</p>
+<p>Takes an <a class="el" href="structRTDict.html">RTDict</a> or <a class="el" href="structRTDictf.html">RTDictf</a> and generates a frame object, which can be used to initialize a Gaussian ray-trace.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">rdict</td><td><a class="el" href="structRTDict.html">RTDict</a> or <a class="el" href="structRTDictf.html">RTDictf</a> object from which to generate a frame. </td></tr>
+    <tr><td class="paramname">fr</td><td>Pointer to cframe or cframef object.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="structRTDict.html">RTDict</a> </dd>
+<dd>
+<a class="el" href="structRTDictf.html">RTDictf</a> </dd>
+<dd>
+<a class="el" href="structcframe.html">cframe</a> </dd>
+<dd>
+<a class="el" href="structcframef.html">cframef</a> </dd></dl>
 
 </div>
 </div>

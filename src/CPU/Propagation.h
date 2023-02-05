@@ -323,14 +323,6 @@ void Propagation<T,U, V, W>::propagateBeam_JM(int start, int stop,
         res->i2x[i] = mt[0].imag();
         res->i2y[i] = mt[1].imag();
         res->i2z[i] = mt[2].imag();
-
-        if((i * 100 / this->step) > jc && start == 0 * this->step)
-        {
-            std::cout << jc << " / 100" << '\r';
-            std::cout.flush();
-            jc++;
-        }
-
     }
 }
 
@@ -389,13 +381,6 @@ void Propagation<T, U, V, W>::propagateBeam_EH(int start, int stop,
         res->i2x[i] = beam_e_h[1][0].imag();
         res->i2y[i] = beam_e_h[1][1].imag();
         res->i2z[i] = beam_e_h[1][2].imag();
-
-        if((i * 100 / this->step) > jc && start == 0 * this->step)
-        {
-            std::cout << jc << " / 100" << '\r';
-            std::cout.flush();
-            jc++;
-        }
     }
 }
 
@@ -559,15 +544,6 @@ void Propagation<T, U, V, W>::propagateBeam_JMEH(int start, int stop,
         res->i2x[i] = mt[0].imag();
         res->i2y[i] = mt[1].imag();
         res->i2z[i] = mt[2].imag();
-
-
-
-        if((i * 100 / this->step) > jc && start == 0 * this->step)
-        {
-            std::cout << jc << " / 100" << '\r';
-            std::cout.flush();
-            jc++;
-        }
     }
 }
 
@@ -695,13 +671,6 @@ void Propagation<T, U, V, W>::propagateBeam_EHP(int start, int stop,
         res->r3x[i] = S_r_norm[0];
         res->r3y[i] = S_r_norm[1];
         res->r3z[i] = S_r_norm[2];
-
-        if((i * 100 / this->step) > jc && start == 0 * this->step)
-        {
-            std::cout << jc << " / 100" << '\r';
-            std::cout.flush();
-            jc++;
-        }
     }
 }
 
@@ -742,13 +711,6 @@ void Propagation<T, U, V, W>::propagateScalarBeam(int start, int stop,
 
         res->rx[i] = ets.real();
         res->ix[i] = ets.imag();
-
-        if((i * 100 / this->step) > jc && start == 0 * this->step)
-        {
-            std::cout << jc << " / 100" << '\r';
-            std::cout.flush();
-            jc++;
-        }
     }
 }
 
@@ -1183,13 +1145,6 @@ void Propagation<T, U, V, W>::propagateToFarField(int start, int stop,
         res->i2x[i] = 0.;
         res->i2y[i] = 0.;
         res->i2z[i] = 0.;
-
-        if((i * 100 / this->step) > jc && start == 0 * this->step)
-        {
-            std::cout << jc << " / 100" << '\r';
-            std::cout.flush();
-            jc++;
-        }
     }
 }
 

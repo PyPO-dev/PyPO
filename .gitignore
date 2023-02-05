@@ -157,7 +157,7 @@ datadir/
 
 # vim stuff
 *.swp
-
+*.swo
 #vscode specific
 .vscode/settings.json
 .idea/misc.xml
@@ -168,3 +168,4 @@ datadir/
 .idea/inspectionProfiles/profiles_settings.xml
 fromDesigner.py
 src/GUI/fromDesigner.ui
+src/GUI/Tests

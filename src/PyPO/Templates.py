@@ -1,10 +1,11 @@
 # Refl params template. Import or just copy-paste into your script
+import numpy as np
 Refl = {
         "name"      : "Reflector name (string)",
         "pmode"     : "Direct abc definition, or vertex & foc(ii) (string)",
         "gmode"     : "xy gridding or polar uv gridding (string)",
         "flip"      : "Flip reflector normal surfaces (bool)",
-        "coeffs"    : "a, b and c parameters (list of 3 reals)"
+        "coeffs"    : "a, b and c parameters (list of 3 reals)",
         "vertex"    : "Vertex co-ordinate (parabola only, len-3 np array)",
         "focus_1"   : "First focal point co-ordinate (len-3 np array)",
         "focus_2"   : "Second focal point co-ordinate (len-3 np array)",

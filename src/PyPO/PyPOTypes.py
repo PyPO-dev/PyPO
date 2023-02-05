@@ -1,3 +1,7 @@
+## 
+# @file
+# Definitions of internal PyPO data structures.
+
 class currents(object):
     def __init__(self, Jx, Jy, Jz, Mx, My, Mz):
         self.Jx = Jx
@@ -7,6 +11,12 @@ class currents(object):
         self.Mx = Mx
         self.My = My
         self.Mz = Mz
+
+        self.type = "JM"
+    
+    def setMeta(self, surf, k):
+        self.surf = surf 
+        self.k = k
 
     def __getitem__(self, i):
         if i == 0:
@@ -35,6 +45,12 @@ class fields(object):
         self.Hy = Hy
         self.Hz = Hz
 
+        self.type = "EH"
+
+    def setMeta(self, surf, k):
+        self.surf = surf
+        self.k = k
+
     def __getitem__(self, i):
         if i == 0:
             return self.Ex
@@ -58,6 +74,8 @@ class rfield(object):
         self.y = Pry
         self.z = Prz
 
+##
+# Structure for storing reflector grids, area and normals
 class reflGrids(object):
     def __init__(self, x, y, z, nx, ny, nz, area):
         self.x = x

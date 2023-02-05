@@ -1,12 +1,12 @@
 #include <iostream>
 #include <array>
-
 #include <cmath>
 #include <complex>
 
 #include "Utils.h"
 #include "Structs.h"
 #include "InterfaceReflector.h"
+#include "Random.h"
 
 #define _USE_MATH_DEFINES
 
@@ -37,6 +37,23 @@ template<typename T, typename U, typename V>
 void initFrame(T rdict, U *fr);
 
 /** 
+ * Initialize Gaussian ray-trace frame from RTDict or RTDictf.
+ *
+ * Takes an RTDict or RTDictf and generates a frame object, which can be used 
+ *      to initialize a Gaussian ray-trace.
+ *
+ * @param rdict RTDict or RTDictf object from which to generate a frame.
+ * @param fr Pointer to cframe or cframef object.
+ * 
+ * @see RTDict
+ * @see RTDictf
+ * @see cframe
+ * @see cframef
+ */
+template<typename T, typename U, typename V>
+void initRTGauss(T grdict, U *fr);
+
+/** 
  * Initialize Gaussian beam from GDict or GDictf.
  *
  * Takes a GDict or GDictf and generates two c2Bundle or c2Bundlef objects, which contain the field and 
@@ -55,6 +72,9 @@ void initFrame(T rdict, U *fr);
  * @see c2Bundle
  * @see c2Bundlef
  */
+template<typename T>
+T pdfGauss(std::vector<T> vars, std::vector<T> scales);
+
 template<typename T, typename U, typename V, typename W, typename G>
 void initGauss(T gdict, U refldict, V *res_field, V *res_current);
 
@@ -150,6 +170,90 @@ void initFrame(T rdict, U *fr)
             alpha = 0;
         }
     }
+}
+
+template<typename T, typename U, typename V>
+void initRTGauss(T grdict, U *fr)
+{
+    V thres = 3.; // Choose 3-sigma point
+    std::array<V, 3> nomChief = {0, 0, 1};
+    std::array<V, 3> zero = {0, 0, 0};
+
+    Utils<V> ut;
+    Random<V> rando;
+    if (grdict.seed != -1) {Random<V> rando(grdict.seed);}
+
+    fr->size = grdict.nRays;
+
+    std::array<V, 3> tChief;
+    std::array<V, 3> oChief;
+    std::array<V, 3> rotation;
+    std::array<V, 3> direction;
+    std::array<V, 3> ddirection;
+    std::array<V, 3> pos;
+    std::array<V, 3> ppos;
+
+    for (int n=0; n<3; n++) {tChief[n] = grdict.tChief[n];}
+    for (int n=0; n<3; n++) {oChief[n] = grdict.oChief[n];}
+
+    // Initialize scale vector
+    std::vector<V> scales{grdict.x0, grdict.y0, grdict.angx0, grdict.angy0};
+
+    // Initialize first entry in frame: chief ray
+    ut.matRot(tChief, nomChief, zero, direction);
+
+    fr->x[0] = oChief[0];
+    fr->y[0] = oChief[1];
+    fr->z[0] = oChief[2];
+
+    fr->dx[0] = direction[0];
+    fr->dy[0] = direction[1];
+    fr->dz[0] = direction[2];
+
+    // Start rejection sampling. Use n_suc as succes counter
+    int n_suc = 1;
+    V yi;
+    std::vector<V> xi(4, 0);
+    V lower = 0.0;
+
+    while (n_suc < grdict.nRays)
+    {
+       // First, generate y-value between 0 and 1.
+       yi = rando.generateUniform(lower);
+       
+       // Now, generate vector of xi
+       xi = rando.generateUniform(grdict.nRays);
+
+       for (int k = 0; k<4; k++) {xi[k] = xi[k] * thres * scales[k];}
+       if (pdfGauss<V>(xi, scales) > yi) 
+       {
+           // Rotate chief ray by tilt angles found
+           rotation  = {-xi[3], xi[2], 0};
+           ut.matRot(rotation, nomChief, zero, ddirection);
+           ut.matRot(tChief, ddirection, zero, direction);
+
+           ppos = {xi[0] + oChief[0], xi[1] + oChief[1], oChief[2]};
+           ut.matRot(tChief, ppos, oChief, pos);
+
+           fr->x[n_suc] = pos[0];
+           fr->y[n_suc] = pos[1];
+           fr->z[n_suc] = pos[2];
+
+           fr->dx[n_suc] = direction[0];
+           fr->dy[n_suc] = direction[1];
+           fr->dz[n_suc] = direction[2];
+           n_suc++;
+       }
+    }
+}
+
+template<typename T>
+T pdfGauss(std::vector<T> vars, std::vector<T> scales)
+{
+    T norm = 1 / (M_PI*M_PI * scales[0] * scales[1] * scales[2] * scales[3]);
+
+    return norm * exp(-vars[0]*vars[0] / (scales[0]*scales[0])) * exp(-vars[1]*vars[1] / (scales[1]*scales[1])) * 
+                    exp(-vars[2]*vars[2] / (scales[2]*scales[2])) * exp(-vars[3]*vars[3] / (scales[3]*scales[3]));
 }
 
 template<typename T, typename U, typename V, typename W, typename G>

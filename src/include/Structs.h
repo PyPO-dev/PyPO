@@ -21,6 +21,7 @@ struct reflparams;
 struct reflcontainer;
 struct cframe;
 struct RTDict;
+struct GRTDict;
 struct GDict;
 
 /** 1D array of complex numbers.*/
@@ -168,6 +169,18 @@ struct RTDict {
     double *oChief; /**<array of 3 double. Co-ordinate of chief ray origin.*/
 };
 
+/** Object for initializing a Gaussian ray-trace frame object.*/
+struct GRTDict {
+    int nRays;      /**<Number of rays to place in cframe.*/
+    double angx0;       /**<Beam waist along x-direction, in millimeters.*/
+    double angy0;       /**<Beam waist along x-direction, in millimeters.*/
+    double x0;       /**<Beam waist along x-direction, in millimeters.*/
+    double y0;       /**<Beam waist along x-direction, in millimeters.*/
+    int seed;
+    double *tChief; /**<array of 3 double. Tilt of chief, ray, along x, y or z axis, in degrees.*/
+    double *oChief; /**<array of 3 double. Co-ordinate of chief ray origin.*/
+};
+
 /** Object for initializing a Gaussian beam.*/
 struct GDict {
     double lam;     /**<Wavelength of beam, in millimeters.*/
@@ -189,6 +202,7 @@ struct reflparamsf;
 struct reflcontainerf;
 struct cframef;
 struct RTDictf;
+struct GRTDictf;
 struct GDictf;
 
 /** 1D array of complex numbers.*/
@@ -332,6 +346,18 @@ struct RTDictf {
     float angy;    /**<Apex angle of beam at focus in y-direction, in degrees.*/
     float a;       /**<Semi-major axis of outer ring, in millimeters.*/
     float b;       /**<Semi-minor axis of outer ring, in millimeters.*/
+    float *tChief; /**<array of 3 float. Tilt of chief, ray, along x, y or z axis, in degrees.*/
+    float *oChief; /**<array of 3 float. Co-ordinate of chief ray origin.*/
+};
+
+/** Object for initializing a ray-trace frame object.*/
+struct GRTDictf {
+    int nRays;      /**<Number of rays to place in cframe.*/
+    float angx0;       /**<Beam waist along x-direction, in millimeters.*/
+    float angy0;       /**<Beam waist along x-direction, in millimeters.*/
+    float x0;       /**<Beam waist along x-direction, in millimeters.*/
+    float y0;       /**<Beam waist along x-direction, in millimeters.*/
+    int seed;
     float *tChief; /**<array of 3 float. Tilt of chief, ray, along x, y or z axis, in degrees.*/
     float *oChief; /**<array of 3 float. Co-ordinate of chief ray origin.*/
 };

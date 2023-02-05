@@ -9,6 +9,9 @@ class InputRTError(Exception):
     pass
 
 # Error message definitions
+def errMsg_name(elemName):
+    return f"\nName \"{elemName}\" already in use. Choose different name."
+
 def errMsg_field(fieldName, elemName):
     return f"\nMissing field \"{fieldName}\", element {elemName}."
 
@@ -39,14 +42,20 @@ def block_ndarray(fieldName, elemDict, shape):
     
     return _errStr
 
-
-def check_ElemDict(elemDict):
-    """
-    Check if the element dictionary has been properly filled.
-    """
+##
+# Check element input dictionary.
+#
+# Checks the input dictionary for errors. Raises exceptions when encountered.
+#
+# @param elemName Name of element, string.
+# @param nameList List of names in system dictionary.
+def check_ElemDict(elemDict, nameList):
 
     errStr = ""
-    
+   
+    if elemDict["name"] in nameList:
+        errStr += errMsg_name(elemDict["name"])
+
     if elemDict["type"] == 0:
 
         if "pmode" in elemDict:
@@ -131,8 +140,10 @@ def check_ElemDict(elemDict):
                 errStr += block_ndarray("lims_u", elemDict, (2,))
 
                 if elemDict["lims_u"][0] < 0:
-                    errStr += errMsg_value("lims_u", elemDict["lims_u"], elemDict["name"])
+                    errStr += errMsg_value("lims_u", elemDict["lims_u"][0], elemDict["name"])
 
+                if elemDict["lims_u"][1] < 0:
+                    errStr += errMsg_value("lims_u", elemDict["lims_u"][1], elemDict["name"])
             else:
                 errStr += errMsg_field("lims_u", elemDict["name"])
 
@@ -191,8 +202,10 @@ def check_ElemDict(elemDict):
     else:
         return 0
 
-def check_RTDict(RTDict):
+def check_RTDict(RTDict, nameList):
     errStr = ""
+    if RTDict["name"] in nameList:
+        errStr += errMsg_name(RTDict["name"])
 
     if "nRays" in RTDict:
         if not isinstance(RTDict["nRays"], int):
@@ -239,8 +252,6 @@ def check_RTDict(RTDict):
 
     else:
         errStr += errMsg_field("b", "RTDict")
-
-    RTDict["name"] = "RTDict"
 
     if "tChief" in RTDict:
         errStr += block_ndarray("tChief", RTDict, (3,))

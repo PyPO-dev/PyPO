@@ -11,6 +11,7 @@ import json
 from pathlib import Path
 from contextlib import contextmanager
 from scipy.interpolate import griddata
+import pickle 
 
 # PyPO-specific modules
 from src.PyPO.BindRefl import *
@@ -20,6 +21,7 @@ from src.PyPO.BindBeam import *
 from src.PyPO.MatTransform import *
 from src.PyPO.PyPOTypes import *
 from src.PyPO.Checks import *
+import src.PyPO.Config as Config
 
 import src.PyPO.Plotter as plt
 import src.PyPO.Efficiencies as effs
@@ -61,17 +63,28 @@ class System(object):
     savePathElem = os.path.join(sysPath, "save", "elements")
     savePathFields = os.path.join(sysPath, "save", "fields")
     savePathCurrents = os.path.join(sysPath, "save", "currents")
+    savePathSystems = os.path.join(sysPath, "save", "systems")
 
-    def __init__(self):
+    def __init__(self, redirect=None):
         self.num_ref = 0
         self.num_cam = 0
+        Config.initPrint(redirect)
+        # Internal dictionaries
         self.system = {}
+        self.frames = {}
+        self.fields = {}
+        self.currents = {}
+
+        self.EHcomplist = np.array(["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"])
+        self.JMcomplist = np.array(["Jx", "Jy", "Jz", "Mx", "My", "Mz"])
+
         self.cl = 2.99792458e11 # mm / s
         #self.savePathElem = "./save/elements/"
 
         saveElemExist = os.path.isdir(self.savePathElem)
         saveFieldsExist = os.path.isdir(self.savePathFields)
         saveCurrentsExist = os.path.isdir(self.savePathCurrents)
+        saveSystemsExist = os.path.isdir(self.savePathSystems)
 
         if not saveElemExist:
             os.makedirs(self.savePathElem)
@@ -82,6 +95,9 @@ class System(object):
         elif not saveCurrentsExist:
             os.makedirs(self.savePathCurrents)
 
+        elif not saveSystemsExist:
+            os.makedirs(self.savePathSystems)
+        
         self.savePath = os.path.join(sysPath, "images")
 
         existSave = os.path.isdir(self.savePath)
@@ -118,10 +134,13 @@ class System(object):
             sys_copy = self.copyObj(sysObject.system)
             self.system.update(sys_copy)
 
-    #### ADD REFLECTOR METHODS
-    # Parabola takes as input the reflectordict from now on.
-    # Should build correctness test!
-    #def addParabola(self, coef, lims_x, lims_y, gridsize, cRot=np.zeros(3), pmode='man', gmode='xy', name="Parabola", axis='a', units='mm', trunc=False, flip=False):
+    ##
+    # Add a paraboloid reflector to the System.
+    #
+    # Take a reflectordictionary and append to self.system list.
+    # If "pmode" == "focus", convert focus and vertex to a, b, c coefficients.
+    #
+    # @param reflDict A reflectordictionary.
     def addParabola(self, reflDict):
         """
         Function for adding paraboloid reflector to system. If gmode='uv', lims_x should contain the smallest and largest radius and lims_y
@@ -139,7 +158,10 @@ class System(object):
         reflDict["type"] = 0
         reflDict["transf"] = np.eye(4)
 
-        check_ElemDict(reflDict) 
+        if not "flip" in reflDict:
+            reflDict["flip"] = False
+
+        check_ElemDict(reflDict, self.system.keys()) 
         if not "ecc_uv" in reflDict:
             reflDict["ecc_uv"] = 0
 
@@ -195,6 +217,13 @@ class System(object):
 
         self.num_ref += 1
 
+    ##
+    # Add a hyperboloid reflector to the System.
+    #
+    # Take a reflectordictionary and append to self.system list.
+    # If "pmode" == "focus", convert focus_1 and focus_2 to a, b, c coefficients.
+    #
+    # @param reflDict A reflectordictionary.
     def addHyperbola(self, reflDict):
 
         if not "name" in reflDict:
@@ -206,7 +235,9 @@ class System(object):
 
         reflDict["type"] = 1
         reflDict["transf"] = np.eye(4)
-        check_ElemDict(reflDict) 
+        if not "flip" in reflDict:
+            reflDict["flip"] = False
+        check_ElemDict(reflDict, self.system.keys()) 
         if not "ecc_uv" in reflDict:
             reflDict["ecc_uv"] = 0
 
@@ -244,10 +275,9 @@ class System(object):
             rz = 0
 
             offRot = np.array([rx, ry, rz])
-            cRot = offTrans
 
-            self.system[reflDict["name"]]["transf"] = MatRotate(offRot, reflDict["transf"], cRot)
-            self.system[reflDict["name"]]["transf"] = MatTranslate(offTrans, reflDict["transf"])
+            _transf = MatRotate(offRot, reflDict["transf"])
+            self.system[reflDict["name"]]["transf"] = MatTranslate(offTrans, _transf)
 
             self.system[reflDict["name"]]["coeffs"][0] = a3
             self.system[reflDict["name"]]["coeffs"][1] = b3
@@ -266,6 +296,13 @@ class System(object):
 
         self.num_ref += 1
 
+    ##
+    # Add an ellipsoid reflector to the System.
+    #
+    # Take a reflectordictionary and append to self.system list.
+    # If "pmode" == "focus", convert focus_1 and focus_2 to a, b, c coefficients.
+    #
+    # @param reflDict A reflectordictionary.
     def addEllipse(self, reflDict):
         if not "name" in reflDict:
             reflDict["name"] = "Ellipse"
@@ -277,8 +314,10 @@ class System(object):
             reflDict["gcenter"] = np.zeros(2)
         reflDict["type"] = 2
         reflDict["transf"] = np.eye(4)
+        if not "flip" in reflDict:
+            reflDict["flip"] = False
 
-        check_ElemDict(reflDict) 
+        check_ElemDict(reflDict, self.system.keys()) 
         if not "ecc_uv" in reflDict:
             reflDict["ecc_uv"] = 0
 
@@ -287,7 +326,37 @@ class System(object):
         self.system[reflDict["name"]] = self.copyObj(reflDict)
 
         if reflDict["pmode"] == "focus":
-            pass
+            self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
+            f1 = reflDict["focus_1"]
+            f2 = reflDict["focus_2"]
+            ecc = reflDict["ecc"]
+
+            diff = f1 - f2
+
+            trans = (f1 + f2) / 2
+
+            f_norm = diff / np.sqrt(np.dot(diff, diff))
+            fxy = np.array([f_norm[0], f_norm[1], 0])
+            fxy /= np.sqrt(np.dot(fxy, fxy))
+
+            rot_z = np.degrees(np.arccos(np.dot(fxy, np.array([1, 0, 0]))))
+            fxz = np.array([f_norm[0], 0, f_norm[2]])
+            fxz /= np.sqrt(np.dot(fxz, fxz))
+
+            rot_y = np.degrees(np.arccos(np.dot(fxz, np.array([1, 0, 0]))))
+            print(trans)
+            rotation = np.array([0, rot_y, rot_z])
+
+            a = np.sqrt(np.dot(diff, diff)) / (2 * ecc)
+            b = a * np.sqrt(1 - ecc**2)
+            
+            _transf = MatRotate(rotation, reflDict["transf"])
+            self.system[reflDict["name"]]["transf"] = MatTranslate(trans, _transf)
+
+            self.system[reflDict["name"]]["coeffs"][0] = a
+            self.system[reflDict["name"]]["coeffs"][1] = b
+            self.system[reflDict["name"]]["coeffs"][2] = b
+
 
         if reflDict["gmode"] == "xy":
             self.system[reflDict["name"]]["ecc_uv"] = 0
@@ -302,6 +371,13 @@ class System(object):
 
         self.num_ref += 1
 
+    ##
+    # Add a planar surface to the System.
+    #
+    # Take a reflectordictionary and append to self.system list.
+    # If "gmode" == "AoE", the surface is evaluated as an angular far-field grid.
+    #
+    # @param reflDict A reflectordictionary.
     def addPlane(self, reflDict):
         if not "name" in reflDict:
             reflDict["name"] = "plane"
@@ -314,7 +390,9 @@ class System(object):
 
         reflDict["type"] = 3
         reflDict["transf"] = np.eye(4)
-        check_ElemDict(reflDict) 
+        if not "flip" in reflDict:
+            reflDict["flip"] = False
+        check_ElemDict(reflDict, self.system.keys()) 
 
         if not "ecc_uv" in reflDict:
             reflDict["ecc_uv"] = 0
@@ -357,8 +435,8 @@ class System(object):
     # Apply a rotation, around a center of rotation, to a (selection of) reflector(s).
     #
     # @param name Reflector name or list of reflector names.
-    # @param rotation Numpy ndarray of length 3, containing rotation angles around x,y and z axes, in degrees.
-    # @param cRot Numpy ndarray of length 3, containing center of rotation x,y and z co-ordinates, in mm.
+    # @param rotation Numpy ndarray of length 3, containing rotation angles around x, y and z axes, in degrees.
+    # @param cRot Numpy ndarray of length 3, containing center of rotation x, y and z co-ordinates, in mm.
     
     def rotateGrids(self, name, rotation, cRot=np.zeros(3)):
         if isinstance(name, list):
@@ -374,7 +452,7 @@ class System(object):
     # Apply a translation to a (selection of) reflector(s).
     #
     # @param name Reflector name or list of reflector names.
-    # @param translation Numpy ndarray of length 3, containing translation x,y and z co-ordinates, in mm.
+    # @param translation Numpy ndarray of length 3, containing translation x, y and z co-ordinates, in mm.
     
     def translateGrids(self, name, translation):
         if isinstance(name, list):
@@ -383,6 +461,12 @@ class System(object):
         else:
             self.system[name]["transf"] = MatTranslate(translation, self.system[name]["transf"])
 
+    ##
+    # Home a reflector back into default configuration.
+    #
+    # Set internal transformation matrix of a (selection of) reflector(s) to identity.
+    #
+    # @param name Reflector name or list of reflector names to be homed.
     def homeReflector(self, name):
         if isinstance(name, list):
             for _name in name:
@@ -390,6 +474,18 @@ class System(object):
         else:
             self.system[name]["transf"] = np.eye(4)
 
+    ##
+    # Generate reflector grids and normals.
+    # 
+    # Evaluate a stored reflDict and return the x, y, z grids and normals.
+    #
+    # @param name Name of reflector to be gridded.
+    # @param transform Apply internal transformation matrix to reflector.
+    # @param spheric Return spheric or square far-field grid (far-field only).
+    #
+    # @return grids A reflGrids object containing the grids, area and normals.
+    #
+    # @see reflGrids
     def generateGrids(self, name, transform=True, spheric=True):
         grids = generateGrid(self.system[name], transform, spheric)
         return grids
@@ -400,13 +496,71 @@ class System(object):
         with open('{}.json'.format(os.path.join(self.savePathElem, name)), 'w') as f:
             json.dump(jsonDict, f, cls=NpEncoder)
 
-    def saveFields(self, fields, name_fields):
+    def saveSystem(self, name):
+        path = os.path.join(self.savePathSystems, name)
+        saveExist = os.path.isdir(path)
+
+        if not saveExist:
+            os.makedirs(path)
+        
+        with open(os.path.join(path, "system"), 'wb') as file: 
+            pickle.dump(self.system, file)
+        
+       # for key, item in self.frames.items():
+        with open(os.path.join(path, "frames"), 'wb') as file: 
+            pickle.dump(self.frames, file)
+        
+        #for key, item in self.fields.items():
+        with open(os.path.join(path, "fields"), 'wb') as file: 
+            pickle.dump(self.fields, file)
+        
+        #for key, item in self.currents.items():
+        with open(os.path.join(path, "currents"), 'wb') as file: 
+            pickle.dump(self.currents, file)
+
+    def loadSystem(self, name):
+        path = os.path.join(self.savePathSystems, name)
+        loadExist = os.path.isdir(path)
+
+        if not loadExist:
+            print("Not here...")
+        
+        with open(os.path.join(path, "system"), 'rb') as file: 
+            self.system = pickle.load(file)
+        
+       # for key, item in self.frames.items():
+        with open(os.path.join(path, "frames"), 'rb') as file: 
+            self.frames = pickle.load(file)
+        
+        #for key, item in self.fields.items():
+        with open(os.path.join(path, "fields"), 'rb') as file: 
+            self.fields = pickle.load(file)
+        
+        #for key, item in self.currents.items():
+        with open(os.path.join(path, "currents"), 'rb') as file: 
+            self.currents = pickle.load(file)
+    
+    def removeElement(self, name):
+        del self.system[name]
+    
+    def removeFrame(self, frameName):
+        del self.frames[frameName]
+    
+    def removeField(self, fieldName):
+        del self.fields[fieldName]
+    
+    def removeCurrent(self, currentName):
+        del self.currents[currentName]
+
+    def saveFields(self, name_fields):
         saveDir = os.path.join(self.savePathFields, name_fields)
 
         saveDirExist = os.path.isdir(saveDir)
 
         if not saveDirExist:
             os.makedirs(saveDir)
+
+        fields = self.fields[name_fields]
 
         np.save(os.path.join(saveDir, "Ex.npy"), fields.Ex)
         np.save(os.path.join(saveDir, "Ey.npy"), fields.Ey)
@@ -500,41 +654,70 @@ class System(object):
         fields_c = self._compToFields(comp, field)
         currents_c = calcCurrents(fields_c, self.system[name_source], mode)
 
-        return currents_c, fields_c
+        self.fields[name_beam] = fields_c
+        self.currents[name_beam] = currents_c
 
     def calcCurrents(self, name_source, fields, mode="PMC"):
         currents = calcCurrents(fields, self.system[name_source], mode)
         return currents
 
     def runPO(self, PODict):
-
-        source = self.system[PODict["s_name"]]
+        PODict["s_current"] = self.currents[PODict["s_current"]]
+        
+        source = self.system[PODict["s_current"].surf]
         target = self.system[PODict["t_name"]]
-
+        PODict["k"] = PODict["s_current"].k
         # Default exponent to -1
         if not "exp" in PODict:
             PODict["exp"] = "fwd"
 
         # TODO: insert check for PODict
-
-        if "lam" and not "k" in PODict:
-            PODict["k"] = 2 * np.pi / PODict["lam"]
-
-        if "freq" and not "k" in PODict:
-            PODict["k"] = 2 * np.pi / (self.cl / PODict["freq"] *1e-9)
-
         if PODict["device"] == "CPU":
             out = PyPO_CPUd(source, target, PODict)
 
         elif PODict["device"] == "GPU":
             out = PyPO_GPUf(source, target, PODict)
 
+        if PODict["mode"] == "JM":
+            out.setMeta(PODict["t_name"], PODict["k"])
+            self.currents[PODict["name_JM"]] = out
+        
+        elif PODict["mode"] == "EH" or PODict["mode"] == "FF":
+            out.setMeta(PODict["t_name"], PODict["k"])
+            self.fields[PODict["name_EH"]] = out
+        
+        elif PODict["mode"] == "JMEH":
+            out[0].setMeta(PODict["t_name"], PODict["k"])
+            out[1].setMeta(PODict["t_name"], PODict["k"])
+            self.currents[PODict["name_JM"]] = out[0]
+            self.fields[PODict["name_EH"]] = out[1]
+        
+        elif PODict["mode"] == "EHP":
+            out[0].setMeta(PODict["t_name"], PODict["k"])
+            self.fields[PODict["name_EH"]] = out[0]
+
+            frame = self.loadFramePoynt(out[1], PODict["t_name"])
+            self.frames[PODict["name_P"]] = frame
+
+
         return out
 
     def createFrame(self, argDict):
-        check_RTDict(argDict)
-        frame_in = makeRTframe(argDict)
-        return frame_in
+        if not argDict["name"]:
+            argDict["name"] = f"Frame_{len(self.frames)}"
+        
+        check_RTDict(argDict, self.frames.keys())
+        self.frames[argDict["name"]] = makeRTframe(argDict)
+    
+    def createGRTFrame(self, argDict):
+        if not argDict["name"]:
+            argDict["name"] = f"Frame_{len(self.frames)}"
+       
+        argDict["angx0"] = np.degrees(argDict["lam"] / (np.pi * argDict["n"] * argDict["x0"]))
+        argDict["angy0"] = np.degrees(argDict["lam"] / (np.pi * argDict["n"] * argDict["y0"]))
+
+        #check_RTDict(argDict, self.frames.keys())
+        self.frames[argDict["name"]] = makeGRTframe(argDict)
 
     def loadFramePoynt(self, Poynting, name_source):
         grids = generateGrid(self.system[name_source])
@@ -547,7 +730,7 @@ class System(object):
 
     def calcRayLen(self, *args, start=0):
         if isinstance(start, np.ndarray):
-            frame0 = args[0]
+            frame0 = self.frames[args[0]]
 
             out = []
             sumd = np.zeros(len(frame0.x))
@@ -562,69 +745,76 @@ class System(object):
             sumd += lens
 
             for i in range(len(args) - 1):
-                diffx = args[i+1].x - frame0.x
-                diffy = args[i+1].y - frame0.y
-                diffz = args[i+1].z - frame0.z
+                diffx = self.frames[args[i+1]].x - frame0.x
+                diffy = self.frames[args[i+1]].y - frame0.y
+                diffz = self.frames[args[i+1]].z - frame0.z
 
                 lens = np.sqrt(diffx**2 + diffy**2 + diffz**2)
                 out.append(lens)
 
-                frame0 = args[i+1]
+                frame0 = self.frames[args[i+1]]
                 sumd += lens
 
             out.append(sumd)
 
         else:
-            frame0 = args[0]
+            frame0 = self.frames[args[0]]
 
             out = []
             sumd = np.zeros(len(frame0.x))
 
             for i in range(len(args) - 1):
-                diffx = args[i+1].x - frame0.x
-                diffy = args[i+1].y - frame0.y
-                diffz = args[i+1].z - frame0.z
+                diffx = self.frames[args[i+1]].x - frame0.x
+                diffy = self.frames[args[i+1]].y - frame0.y
+                diffz = self.frames[args[i+1]].z - frame0.z
 
                 lens = np.sqrt(diffx**2 + diffy**2 + diffz**2)
                 out.append(lens)
 
-                frame0 = args[i+1]
+                frame0 = self.frames[args[i+1]]
                 sumd += lens
 
             out.append(sumd)
 
         return out
-    # Beam!
-            
+
+    # Beam!   
     def createGauss(self, gaussDict, name_source):
         gauss_in = makeGauss(gaussDict, self.system[name_source])
+
+        k = 2 * np.pi / gaussDict["lam"]
+        gauss_in[0].setMeta(name_source, k)
+        gauss_in[1].setMeta(name_source, k)
+
+        self.fields[gaussDict["name"]] = gauss_in[0]
+        self.currents[gaussDict["name"]] = gauss_in[1]
         return gauss_in
 
-    def runRayTracer(self, fr_in, name_target, epsilon=1e-3, nThreads=1, t0=100, device="CPU", verbose=True):
+    def runRayTracer(self, fr_in, fr_out, name_target, epsilon=1e-3, nThreads=1, t0=100, device="CPU", verbose=True):
         if verbose:
             if device == "CPU":
-                fr_out = RT_CPUd(self.system[name_target], fr_in, epsilon, t0, nThreads)
+                frameObj = RT_CPUd(self.system[name_target], self.frames[fr_in], epsilon, t0, nThreads)
 
             elif device == "GPU":
-                fr_out = RT_GPUf(self.system[name_target], fr_in, epsilon, t0, nThreads)
+                frameObj = RT_GPUf(self.system[name_target], self.frames[fr_in], epsilon, t0, nThreads)
 
         else:
             with suppress_stdout():
                 if device == "CPU":
-                    fr_out = RT_CPUd(self.system[name_target], fr_in, epsilon, t0, nThreads)
+                    frameObj = RT_CPUd(self.system[name_target], self.frames[fr_in], epsilon, t0, nThreads)
 
                 elif device == "GPU":
-                    fr_out = RT_GPUf(self.system[name_target], fr_in, epsilon, t0, nThreads)
+                    frameObj = RT_GPUf(self.system[name_target], self.frames[fr_in], epsilon, t0, nThreads)
         
-        return fr_out
+        self.frames[fr_out] = frameObj
 
-    def interpFrame(self, fr_in, field, name_target, method="nearest"):
+    def interpFrame(self, name_fr_in, name_field, name_target, name_out, comp, method="nearest"):
         grids = generateGrid(self.system[name_target])
 
-        points = (fr_in.x, fr_in.y, fr_in.z)
+        points = (self.frames[name_fr_in].x, self.frames[name_fr_in].y, self.frames[name_fr_in].z)
 
-        rfield = np.real(field)
-        ifield = np.imag(field)
+        rfield = np.real(getattr(self.fields[name_field], comp))
+        ifield = np.imag(getattr(self.fields[name_field], comp))
 
         grid_interp = (grids.x, grids.y, grids.z)
 
@@ -633,18 +823,39 @@ class System(object):
 
         out = rout.reshape(self.system[name_target]["gridsize"]) + 1j * iout.reshape(self.system[name_target]["gridsize"])
 
+        field = self._compToFields(comp, out)
+        field.setMeta(name_target, self.fields[name_field].k)
+
+        self.fields[name_out] = field 
+
         return out
 
-    def calcSpillover(self, field, name_target, aperDict):
-        surfaceObj = self.system[name_target]
-        return effs.calcSpillover(field, surfaceObj, aperDict)
+    def calcSpotRMS(self, name_frame):
+        frame = self.frames[name_frame]
+        rms = effs.calcRMS(frame)
+        return rms
 
-    def calcTaper(self, field, name_target, aperDict):
-        surfaceObj = self.system[name_target]
-        return effs.calcTaper(field, surfaceObj, aperDict)
+    def calcSpillover(self, name_field, comp, aperDict):
+        field = self.fields[name_field]
+        field_comp = getattr(field, comp)
+        surfaceObj = self.system[field.surf]
 
-    def calcXpol(self, Cofield, Xfield):
-        return effs.calcXpol(Cofield, Xfield)
+        return effs.calcSpillover(field_comp, surfaceObj, aperDict)
+
+    def calcTaper(self, name_field, comp, aperDict={}):
+        field = self.fields[name_field]
+        field_comp = getattr(field, comp)
+        surfaceObj = self.system[field.surf]
+
+        return effs.calcTaper(field_comp, surfaceObj, aperDict)
+
+    def calcXpol(self, name_field, comp_co, comp_X):
+        field = self.fields[name_field]
+        field_co = getattr(field, comp_co)
+        
+        field_X = getattr(field, comp_X)
+        
+        return effs.calcXpol(field_co, field_X)
 
     def calcDirectivity(self, eta_t, name_target, k):
         surfaceObj = self.system[name_target]
@@ -661,71 +872,146 @@ class System(object):
         Psi = fgs.generateGauss(fgs_out, surfaceObj, mode)
         return Psi
 
-    def generatePointSource(self, name_surface, comp="Ex"):
+    def generatePointSource(self, PSDict, name_surface):
         surfaceObj = self.system[name_surface]
         ps = np.zeros(surfaceObj["gridsize"], dtype=complex)
 
         xs_idx = int((surfaceObj["gridsize"][0] - 1) / 2)
         ys_idx = int((surfaceObj["gridsize"][1] - 1) / 2)
 
-        ps[xs_idx, ys_idx] = 1 + 1j * 0
+        ps[xs_idx, ys_idx] = PSDict["E0"] * np.exp(1j * PSDict["phase"])
 
-        out = self._compToFields(comp, ps)
+        Ex = ps * PSDict["pol"][0]
+        Ey = ps * PSDict["pol"][1]
+        Ez = ps * PSDict["pol"][2]
 
-        return out
+        Hx = ps * 0
+        Hy = ps * 0
+        Hz = ps * 0
 
-    def plotBeam2D(self, name_surface, field,
+        field = fields(Ex, Ey, Ez, Hx, Hy, Hz) 
+        current = self.calcCurrents(name_surface, field)
+
+        k =  2 * np.pi / PSDict["lam"]
+
+        field.setMeta(name_surface, k)
+        current.setMeta(name_surface, k)
+
+        self.fields[PSDict["name"]] = field
+        self.currents[PSDict["name"]] = current
+
+    def plotBeam2D(self, name_field, comp, ptype="field",
                     vmin=-30, vmax=0, show=True, amp_only=False,
                     save=False, polar=False, interpolation=None,
                     aperDict={"plot":False}, mode='dB', project='xy',
                     units="", name='', titleA="Amp", titleP="Phase",
-                    unwrap_phase=False):
+                    unwrap_phase=False, returns=False):
 
+
+        if ptype == "field":
+            field = self.fields[name_field]
+        
+            if comp in self.EHcomplist:
+                field_comp = field[np.argwhere(self.EHcomplist == comp)[0]]
+
+
+        elif ptype == "current":
+            field = self.currents[name_field] 
+            
+            if comp in self.JMcomplist:
+                field_comp = field[np.argwhere(self.JMcomplist == comp)[0]]
+
+        name_surface = field.surf
         plotObject = self.system[name_surface]
-
+        
         default = "mm"
         if plotObject["gmode"] == 2 and not units:
             default = "deg"
 
         unitl = self._units(units, default)
-
-        plt.plotBeam2D(plotObject, field,
+        
+        fig, ax = plt.plotBeam2D(plotObject, field_comp,
                         vmin, vmax, show, amp_only,
                         save, polar, interpolation,
                         aperDict, mode, project,
                         unitl, name, titleA, titleP, self.savePath, unwrap_phase)
 
-    def plot3D(self, name_surface, fine=2, cmap=cm.cool,
-                returns=False, ax_append=False, norm=False,
-                show=True, foc1=False, foc2=False, save=True):
+        if returns:
+            return fig, ax
 
+        elif save:
+            pt.savefig(fname=self.savePath + '{}_{}.jpg'.format(plotObject["name"], name),
+                        bbox_inches='tight', dpi=300)
+            pt.close()
+
+        elif show:
+            pt.show()
+
+    def plot3D(self, name_surface, fine=2, cmap=cm.cool,
+            norm=False, show=True, foc1=False, foc2=False, save=False, ret=False):
+        
+        #pt.rcParams['xtick.minor.visible'] = False
+        #pt.rcParams['ytick.minor.visible'] = False
+
+        fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
         plotObject = self.system[name_surface]
 
-        plt.plot3D(plotObject, fine, cmap,
-                    returns, ax_append, norm,
-                    show, foc1, foc2, save, self.savePath)
+        plt.plot3D(plotObject, ax, fine, cmap, norm, foc1, foc2)
+        if ret:
+            return fig, ax
+        
+        elif save:
+            pt.savefig(fname=savePath + '{}.jpg'.format(plotObject["name"]),bbox_inches='tight', dpi=300)
+            pt.close()
+
+        elif show:
+            pt.show()
+
+        #pt.rcParams['xtick.minor.visible'] = True
+        #pt.rcParams['ytick.minor.visible'] = True
 
     def plotSystem(self, fine=2, cmap=cm.cool,
-                ax_append=False, norm=False,
-                show=True, foc1=False, foc2=False, save=True, ret=False, select=[], RTframes=[]):
+                norm=False, show=True, foc1=False, foc2=False, save=False, ret=False, select=[], RTframes=[]):
 
+        #pt.rcParams['xtick.minor.visible'] = False
+        #pt.rcParams['ytick.minor.visible'] = False
+        
         plotDict = {}
         if select:
             for name in select:
                 plotDict[name] = self.system[name]
-
         else:
             plotDict = self.system
+        
+        _RTframes = []
+        if RTframes:
+            for name in RTframes:
+                _RTframes.append(self.frames[name])
 
-        figax = plt.plotSystem(plotDict, fine, cmap,
-                    ax_append, norm,
-                    show, foc1, foc2, save, ret, RTframes, self.savePath)
+
+        fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
+        plt.plotSystem(plotDict, ax, fine, cmap,norm,
+                    foc1, foc2, _RTframes)
 
         if ret:
-            return figax
+            return fig, ax
+        
+        elif save:
+            pt.savefig(fname=self.savePath + 'system.jpg',bbox_inches='tight', dpi=300)
+            pt.close()
 
-    def plotRTframe(self, frame, project="xy"):
-        plt.plotRTframe(frame, project, self.savePath)
+        elif show:
+            pt.show()
+        
+        #pt.rcParams['xtick.minor.visible'] = True
+        #pt.rcParams['ytick.minor.visible'] = True
+        
+
+    def plotRTframe(self, frame, project="xy", returns=False, aspect=1):
+        if returns:
+            return plt.plotRTframe(self.frames[frame], project, self.savePath, returns, aspect)
+        else:
+            plt.plotRTframe(self.frames[frame], project, self.savePath, returns, aspect)
 
     def copyObj(self, obj):
         return copy.deepcopy(obj)

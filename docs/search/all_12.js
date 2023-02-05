@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['tchief_0',['tChief',['../structRTDict.html#a73419cb6acbe5ee511010d2ea3736c47',1,'RTDict::tChief()'],['../structRTDictf.html#ae9e47b54717ddc25848d8f5b2b3186f3',1,'RTDictf::tChief()']]],
+  ['tchief_0',['tChief',['../structRTDict.html#a73419cb6acbe5ee511010d2ea3736c47',1,'RTDict::tChief()'],['../structGRTDict.html#a8a3da355eb71bc6888ce78fc04eaaf75',1,'GRTDict::tChief()'],['../structRTDictf.html#ae9e47b54717ddc25848d8f5b2b3186f3',1,'RTDictf::tChief()'],['../structGRTDictf.html#aa005f4727eceb7d21e7d0e8902959db7',1,'GRTDictf::tChief()']]],
   ['threadpool_1',['threadPool',['../classPropagation.html#a2a5c3d3e2dfef55d84e3c561db8e5610',1,'Propagation::threadPool()'],['../classRayTracer.html#a20d7d1fcca98cb681c8436a024b2092b',1,'RayTracer::threadPool()']]],
   ['transf_2',['transf',['../structreflparams.html#a8434d4e674be3ec03170fb0088e2c760',1,'reflparams::transf()'],['../structreflparamsf.html#a15b792a2a65a1834a09990a17ed649dd',1,'reflparamsf::transf()']]],
   ['transformgrids_3',['transformGrids',['../InterfaceReflector_8cpp.html#ac12e89b8d533f7b60f638452323be9a3',1,'InterfaceReflector.cpp']]],

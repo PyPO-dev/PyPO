@@ -15,11 +15,26 @@ def _generateMask(x, y, aperDict):
  
     return cond1 & cond2
 
+def calcRTcenter(frame):
+    idx_good = np.argwhere((frame.dx**2 + frame.dy**2 + frame.dz**2) > 0.8)
+    c_x = np.sum(frame.x[idx_good]) / len(frame.x[idx_good])
+    c_y = np.sum(frame.y[idx_good]) / len(frame.y[idx_good])
+    c_z = np.sum(frame.z[idx_good]) / len(frame.z[idx_good])
+    
+    return np.array([c_x, c_y, c_z])
+
+def calcRTtilt(frame):
+    idx_good = np.argwhere((frame.dx**2 + frame.dy**2 + frame.dz**2) > 0.8)
+    t_x = np.sum(frame.dx[idx_good]) / len(frame.dx[idx_good])
+    t_y = np.sum(frame.dy[idx_good]) / len(frame.dy[idx_good])
+    t_z = np.sum(frame.dz[idx_good]) / len(frame.dz[idx_good])
+    
+    return np.array([t_x, t_y, t_z])
+
 def calcRMS(frame):
-    c_x = np.sum(frame.x) / len(frame.x)
-    c_y = np.sum(frame.y) / len(frame.y)
-    c_z = np.sum(frame.z) / len(frame.z)
-    rms = np.sqrt(np.sum((frame.x - c_x)**2 + (frame.y - c_y)**2 + (frame.z - c_z)**2) / len(frame.x))
+    idx_good = np.argwhere((frame.dx**2 + frame.dy**2 + frame.dz**2) > 0.8)
+    c_f = calcRTcenter(frame) 
+    rms = np.sqrt(np.sum((frame.x[idx_good] - c_f[0])**2 + (frame.y[idx_good] - c_f[1])**2 + (frame.z[idx_good] - c_f[2])**2) / len(frame.x[idx_good]))
 
     return rms
 

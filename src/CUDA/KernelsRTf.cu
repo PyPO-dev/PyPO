@@ -422,18 +422,31 @@ __global__ void propagateRaysToP(float *xs, float *ys, float *zs,
 
             _t = t1;
         }
+        
+        if ((abs(round(dx)) == 0 && abs(round(dy)) == 0 && abs(round(dz)) == 0) || std::isnan(_t)) 
+        {
+            xt[idx] = x;
+            yt[idx] = y;
+            zt[idx] = z;
+        
+            dxt[idx] = 0; // Set at 2: since beta should be normalized, can select on 2
+            dyt[idx] = 0;
+            dzt[idx] = 0;
+        } 
+       
+        else
+        {
+            xt[idx] = x + _t*dx;
+            yt[idx] = y + _t*dy;
+            zt[idx] = z + _t*dz;
 
-        xt[idx] = x + _t*dx;
-        yt[idx] = y + _t*dy;
-        zt[idx] = z + _t*dz;
+            np(xt[idx], yt[idx], zt[idx], norms);
+            check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
 
-        np(xt[idx], yt[idx], zt[idx], norms);
-        check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
-
-        dxt[idx] = dx - 2*check*norms[0];
-        dyt[idx] = dy - 2*check*norms[1];
-        dzt[idx] = dz - 2*check*norms[2];
-
+            dxt[idx] = dx - 2*check*norms[0];
+            dyt[idx] = dy - 2*check*norms[1];
+            dzt[idx] = dz - 2*check*norms[2];
+        }
         transfRays(xs, ys, zs, dxs, dys, dzs, idx);
         transfRays(xt, yt, zt, dxt, dyt, dzt, idx);
     }
@@ -491,17 +504,31 @@ __global__ void propagateRaysToH(float *xs, float *ys, float *zs,
 
             _t = t1;
         }
-        xt[idx] = x + _t*dx;
-        yt[idx] = y + _t*dy;
-        zt[idx] = z + _t*dz;
+        
+        if ((abs(round(dx)) == 0 && abs(round(dy)) == 0 && abs(round(dz)) == 0) || std::isnan(_t)) 
+        {
+            xt[idx] = x;
+            yt[idx] = y;
+            zt[idx] = z;
+        
+            dxt[idx] = 0; // Set at 2: since beta should be normalized, can select on 2
+            dyt[idx] = 0;
+            dzt[idx] = 0;
+        } 
+        
+        else
+        {
+            xt[idx] = x + _t*dx;
+            yt[idx] = y + _t*dy;
+            zt[idx] = z + _t*dz;
 
-        nh(xt[idx], yt[idx], zt[idx], norms);
-        check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
+            nh(xt[idx], yt[idx], zt[idx], norms);
+            check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
 
-        dxt[idx] = dx - 2*check*norms[0];
-        dyt[idx] = dy - 2*check*norms[1];
-        dzt[idx] = dz - 2*check*norms[2];
-
+            dxt[idx] = dx - 2*check*norms[0];
+            dyt[idx] = dy - 2*check*norms[1];
+            dzt[idx] = dz - 2*check*norms[2];
+        }
         transfRays(xs, ys, zs, dxs, dys, dzs, idx);
         transfRays(xt, yt, zt, dxt, dyt, dzt, idx);
     }
@@ -559,17 +586,30 @@ __global__ void propagateRaysToE(float *xs, float *ys, float *zs,
 
             _t = t1;
         }
-        xt[idx] = x + _t*dx;
-        yt[idx] = y + _t*dy;
-        zt[idx] = z + _t*dz;
 
-        ne(xt[idx], yt[idx], zt[idx], norms);
-        check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
+        if ((abs(round(dx)) == 0 && abs(round(dy)) == 0 && abs(round(dz)) == 0) || std::isnan(_t)) 
+        {
+            xt[idx] = x;
+            yt[idx] = y;
+            zt[idx] = z;
+        
+            dxt[idx] = 0; // Set at 2: since beta should be normalized, can select on 2
+            dyt[idx] = 0;
+            dzt[idx] = 0;
+        } 
+        else
+        {
+            xt[idx] = x + _t*dx;
+            yt[idx] = y + _t*dy;
+            zt[idx] = z + _t*dz;
 
-        dxt[idx] = dx - 2*check*norms[0];
-        dyt[idx] = dy - 2*check*norms[1];
-        dzt[idx] = dz - 2*check*norms[2];
+            ne(xt[idx], yt[idx], zt[idx], norms);
+            check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
 
+            dxt[idx] = dx - 2*check*norms[0];
+            dyt[idx] = dy - 2*check*norms[1];
+            dzt[idx] = dz - 2*check*norms[2];
+        }
         transfRays(xs, ys, zs, dxs, dys, dzs, idx);
         transfRays(xt, yt, zt, dxt, dyt, dzt, idx);
     }
@@ -628,19 +668,30 @@ __global__ void propagateRaysToPl(float *xs, float *ys, float *zs,
 
             _t = t1;
         }
-        //printf("%.14f\n", check);
+        if ((abs(round(dx)) == 0 && abs(round(dy)) == 0 && abs(round(dz)) == 0) || std::isnan(_t)) 
+        {
+            xt[idx] = x;
+            yt[idx] = y;
+            zt[idx] = z;
+        
+            dxt[idx] = 0; // Set at 2: since beta should be normalized, can select on 2
+            dyt[idx] = 0;
+            dzt[idx] = 0;
+        } 
+       
+        else
+        {
+            xt[idx] = x + _t*dx;
+            yt[idx] = y + _t*dy;
+            zt[idx] = z + _t*dz;
 
-        xt[idx] = x + _t*dx;
-        yt[idx] = y + _t*dy;
-        zt[idx] = z + _t*dz;
+            npl(xt[idx], yt[idx], zt[idx], norms);
+            check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
 
-        npl(xt[idx], yt[idx], zt[idx], norms);
-        check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
-
-        dxt[idx] = dx - 2*check*norms[0];
-        dyt[idx] = dy - 2*check*norms[1];
-        dzt[idx] = dz - 2*check*norms[2];
-
+            dxt[idx] = dx - 2*check*norms[0];
+            dyt[idx] = dy - 2*check*norms[1];
+            dzt[idx] = dz - 2*check*norms[2];
+        }
         transfRays(xs, ys, zs, dxs, dys, dzs, idx);
         transfRays(xt, yt, zt, dxt, dyt, dzt, idx);
     }

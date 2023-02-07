@@ -74,7 +74,6 @@ def makeGRTframe(grdict_py):
     allfill_GRTDict(c_grdict, grdict_py, ctypes.c_double)
     
     args = [c_grdict, ctypes.byref(res)]
-    
     start_time = time.time()
     t = threading.Thread(target=lib.makeGRTframe, args=args)
     t.daemon = True

@@ -1,8 +1,10 @@
 import ctypes
 import numpy as np
 
-from src.PyPO.PyPOTypes import *
+import matplotlib.pyplot as pt
 
+from src.PyPO.PyPOTypes import *
+import src.PyPO.Config as Config
 # UTILITY FUNCTIONS
 
 def currentConv(currents, c_currents, size, ct_t):
@@ -279,6 +281,8 @@ def allocate_cframe(res, size, ct_t):
 def allfill_cframe(res, frame_py, size, ct_t):
     res.size = size
 
+    print("size is: ", frame_py.size)
+    print("size x is:", len(frame_py.x))
     res.x = (ct_t * size)(*(frame_py.x.tolist()))
     res.y = (ct_t * size)(*(frame_py.y.tolist()))
     res.z = (ct_t * size)(*(frame_py.z.tolist()))
@@ -342,8 +346,10 @@ def frameToObj(res, np_t, shape):
     dx = np.ctypeslib.as_array(res.dx, shape=shape).astype(np_t)
     dy = np.ctypeslib.as_array(res.dy, shape=shape).astype(np_t)
     dz = np.ctypeslib.as_array(res.dz, shape=shape).astype(np_t)
+    
+    out = frame(shape[0], x, y, z, dx, dy, dz)
 
-    return frame(shape[0], x, y, z, dx, dy, dz)
+    return out 
 
 class WaitSymbol(object):
     def __init__(self):

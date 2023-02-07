@@ -830,6 +830,16 @@ class System(object):
 
         return out
 
+    def calcRTcenter(self, name_frame):
+        frame = self.frames[name_frame]
+        c_f = effs.calcRTcenter(frame)
+        return c_f
+
+    def calcRTtilt(self, name_frame):
+        frame = self.frames[name_frame]
+        t_f = effs.calcRTtilt(frame)
+        return t_f
+    
     def calcSpotRMS(self, name_frame):
         frame = self.frames[name_frame]
         rms = effs.calcRMS(frame)
@@ -954,9 +964,16 @@ class System(object):
         #pt.rcParams['ytick.minor.visible'] = False
 
         fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
-        plotObject = self.system[name_surface]
+        
+        if isinstance(name_surface, list) or isinstance(name_surface, np.ndarray):
+            for n_s in name_surface:
+                plotObject = self.system[n_s]
+                plt.plot3D(plotObject, ax, fine, cmap, norm, foc1, foc2)
+        
+        else:
+            plotObject = self.system[name_surface]
+            plt.plot3D(plotObject, ax, fine, cmap, norm, foc1, foc2)
 
-        plt.plot3D(plotObject, ax, fine, cmap, norm, foc1, foc2)
         if ret:
             return fig, ax
         

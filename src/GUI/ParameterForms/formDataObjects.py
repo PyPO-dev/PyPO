@@ -83,7 +83,7 @@ def makeTransformationForm(elementName):
     ]
 
 # NOTE
-def initFrameInp():
+def initTubeFrameInp():
     return [InputDescription(inType.string, "name", label="Name of frame", numFields=1),
             InputDescription(inType.integers, "nRays", label="# of rays", hints=[0], numFields=1),
             InputDescription(inType.integers, "nRing", label="# of rings", hints=[0], numFields=1),
@@ -92,7 +92,23 @@ def initFrameInp():
             InputDescription(inType.floats, "a", label="X radius of outer ring", hints=[0], numFields=1),
             InputDescription(inType.floats, "b", label="Y radius of outer ring", hints=[0], numFields=1),
             InputDescription(inType.floats, "tChief", label="Chief ray tilt", hints=[0,0,1], numFields=3, oArray=True),
-            InputDescription(inType.floats, "oChief", label="Chief ray origin", hints=[0,0,0], numFields=3, oArray=True)]
+            InputDescription(inType.floats, "oChief", label="Chief ray origin", hints=[0,0,0], numFields=3, oArray=True)
+            ]
+
+def initGaussianFrameInp():
+
+    return [InputDescription(inType.string, "name", label="Name of frame", numFields=1),
+            InputDescription(inType.integers, "nRays", label="# of rays", hints=[0], numFields=1),
+            InputDescription(inType.floats, "n", label="Refractive index of medium", hints=[1], numFields=1),
+            InputDescription(inType.floats, "lam", label="Wavelength", hints=[1], numFields=1),
+            InputDescription(inType.floats, "x0", label="X beamwaist", hints=[5], numFields=1),
+            InputDescription(inType.floats, "y0", label="Y beamwaist", hints=[5], numFields=1),
+            InputDescription(inType.floats, "tChief", label="Chief ray tilt", hints=[0,0,1], numFields=3, oArray=True),
+            InputDescription(inType.floats, "oChief", label="Chief ray origin", hints=[0,0,0], numFields=3, oArray=True),
+            InputDescription(inType.dropdown, "setseed", label="Set seed", subdict={
+                "random" : [],
+                "set" : [InputDescription(inType.integers, "seed", label="", hints=[0], numFields=1)]
+            })]
 
 def plotFrameInp(frameDict):
     sublist_frames = []

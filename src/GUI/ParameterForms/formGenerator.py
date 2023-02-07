@@ -276,8 +276,9 @@ class XYZRadio(QWidget):
 
         def toggled(self, b):
             btn = self.group.checkedButton()
-            print(type(btn))
-            self.companion.uncheckOption(btn.text())
+
+            if not btn is None:
+                self.companion.uncheckOption(btn.text())
             return
         
         def setCompanion(self, c):

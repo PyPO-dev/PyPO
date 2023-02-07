@@ -334,8 +334,11 @@ class MainWidget(QWidget):
             raise Exception("Transformation type incorrect")
 
     #NOTE Raytrace widgets
-    def setInitFrameForm(self):
-        self.setForm(fDataObj.initFrameInp(), readAction=self.addFrameAction)
+    def setInitTubeFrameForm(self):
+        self.setForm(fDataObj.initTubeFrameInp(), readAction=self.addTubeFrameAction)
+    
+    def setInitGaussianFrameForm(self):
+        self.setForm(fDataObj.initGaussianFrameInp(), readAction=self.addGaussianFrameAction)
 
     def setInitGaussianForm(self):
         self.setForm(fDataObj.initGaussianInp(self.stm.system), readAction=self.addGaussianAction)
@@ -343,10 +346,20 @@ class MainWidget(QWidget):
     def setInitPSForm(self):
         self.setForm(fDataObj.initPSInp(self.stm.system), readAction=self.addPSAction)
     
-    def addFrameAction(self):
+    def addTubeFrameAction(self):
         RTDict = self.ParameterWid.read()
         self.stm.createFrame(RTDict)
         self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(RTDict["name"],
+                            [self.setPlotFrameFormOpt, self.stm.removeFrame, self.calcRMSfromFrame]))    
+    
+    def addGaussianFrameAction(self):
+        GRTDict = self.ParameterWid.read()
+
+        if not "seed" in GRTDict.keys():
+            GRTDict["seed"] = -1
+
+        self.stm.createGRTFrame(GRTDict)
+        self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(GRTDict["name"],
                             [self.setPlotFrameFormOpt, self.stm.removeFrame, self.calcRMSfromFrame]))    
     
     def addGaussianAction(self):
@@ -554,14 +567,16 @@ class PyPOMainWindow(QMainWindow):
         
         # NOTE Raytrace actions
         makeFrame = RaytraceMenu.addMenu("Make frame")
-        initFrameAction = QAction("Initialize", self)
-        initFrameAction.setStatusTip("Initialize ray-trace frame from input form")
-        initFrameAction.triggered.connect(self.mainWid.setInitFrameForm)
-        makeFrame.addAction(initFrameAction)
+        initTubeFrameAction = QAction("Tube", self)
+        initTubeFrameAction.setStatusTip("Initialize ray-trace tube from input form")
+        initTubeFrameAction.triggered.connect(self.mainWid.setInitTubeFrameForm)
+        makeFrame.addAction(initTubeFrameAction)
+
+        initGaussianFrameAction = QAction("Gaussian", self)
+        initGaussianFrameAction.setStatusTip("Initialize ray-trace Gaussian from input form")
+        initGaussianFrameAction.triggered.connect(self.mainWid.setInitGaussianFrameForm)
+        makeFrame.addAction(initGaussianFrameAction)
         
-        poyntingFrameAction = QAction("Poynting", self)
-
-
         # Propagate rays
         propRaysAction = QAction("Propagate rays", self)
         propRaysAction.triggered.connect(self.mainWid.setPropRaysForm)

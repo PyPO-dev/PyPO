@@ -270,6 +270,7 @@ def RT_CPUd(target, fr_in, epsilon, t0, nThreads):
     args = [ctp, ctypes.byref(inp), ctypes.byref(res),
                         nThreads, epsilon, t0]
     start_time = time.time()
+    
     t = threading.Thread(target=lib.propagateRays, args=args)
     t.daemon = True
     t.start()
@@ -282,7 +283,6 @@ def RT_CPUd(target, fr_in, epsilon, t0, nThreads):
 
     shape = (fr_in.size,)
     fr_out = frameToObj(res, np_t=np.float64, shape=shape)
-
     return fr_out
 
 if __name__ == "__main__":

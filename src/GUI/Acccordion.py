@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QScrollArea, QApplication, QVBoxLayout, QLabel, QHBoxLayout
 from PyQt5.QtCore import Qt
+from src.GUI.ElementWidget import ReflectorWidget
 import sys
 
 class Accordion(QWidget):
@@ -30,8 +31,7 @@ class AccordionSection(QWidget):
 
         ### Header ###
         Header = QWidget()
-        headerLayout = QHBoxLayout()
-        Header.setLayout(headerLayout)
+        headerLayout = QHBoxLayout(Header)
 
         textLabel = QLabel(text)
         textLabel.setAlignment(Qt.AlignLeft)
@@ -45,9 +45,9 @@ class AccordionSection(QWidget):
 
         ### Content ###
         self.content = QWidget()
-        self.contentLayout = QVBoxLayout()
-        self.contentLayout.setContentsMargins(0,0,0,0)
-        self.content.setLayout(self.contentLayout)
+        self.contentLayout = QVBoxLayout(self.content)
+        # self.contentLayout.setSpacing(0)
+        # self.contentLayout.setContentsMargins(0,0,0,0)
         layout.addWidget(self.content)
 
         # self.hideContent()

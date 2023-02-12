@@ -844,6 +844,7 @@ class System(object):
         return t_f
     
     def calcSpotRMS(self, name_frame):
+        print(name_frame)
         frame = self.frames[name_frame]
         rms = effs.calcRMS(frame)
         return rms

@@ -12,7 +12,7 @@ import src.GUI.ParameterForms.formDataObjects as fDataObj
 from src.GUI.PlotScreen import PlotScreen
 from src.GUI.TransformationWidget import TransformationWidget
 from src.GUI.Acccordion import Accordion
-from src.GUI.ElementWidget import ElementWidget, FrameWidget, FieldsWidget, CurrentWidget, SymDialog
+from src.GUI.ElementWidget import ReflectorWidget, FrameWidget, FieldsWidget, CurrentWidget, SymDialog
 from src.GUI.Console import ConsoleGenerator
 from src.GUI.Console import print
 import numpy as np
@@ -45,6 +45,8 @@ class MainWidget(QWidget):
         
         # init layout
         self.grid = QGridLayout()
+        self.grid.setContentsMargins(0,0,0,0)
+        self.grid.setSpacing(0)
 
         self.pyprint = print
 
@@ -97,13 +99,18 @@ class MainWidget(QWidget):
         self.addToWindowGrid(self.console, self.GPConsole)
     
     def _mkElementsColumn(self):
+        # delete if exists
         if hasattr(self, "ElementsColumn"):
             self.ElementsColumn.setParent(None)
 
-        self.reflectorActions = [self.setTransformationForm, self.plotElement, self.removeElement]
-        StmElements = []
-        for e in self.stm.system.keys():
-            StmElements.append(e)
+        self.refletorActions = {
+            "transform" : self.setTransromationForm,
+            "plot" : self.plotElement,
+            "remove" : self.removeElement,
+        } 
+       
+        # rebuild 
+        
         self.ElementsColumn = Accordion()
 
         scroll = QScrollArea()
@@ -136,6 +143,7 @@ class MainWidget(QWidget):
         self.PlotScreen.removeTab(i)
 
     def removeElement(self, element):
+        print(f"removed: {element}")
         self.stm.removeElement(element)
         
     def plotElement(self, surface):
@@ -213,52 +221,18 @@ class MainWidget(QWidget):
     def refreshColumn(self, columnDict, columnType):
         for key, item in columnDict.items():
             if columnType == "elements":
-                self.ElementsColumn.reflectors.addWidget(ElementWidget(key, self.reflectorActions))
+                self.ElementsColumn.reflectors.addWidget(ReflectorWidget(key, self.removeElement, self.setTransromationForm, self.plotElement))
             
             elif columnType == "frames":
-                self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(key, 
-                        [self.setPlotFrameFormOpt, self.stm.removeFrame, self.calcRMSfromFrame]))
+                self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(key, self.stm.removeFrame, self.setPlotFrameFormOpt,  self.calcRMSfromFrame))
             
             elif columnType == "fields":
-                self.ElementsColumn.POFields.addWidget(FieldsWidget(key, [self.setPlotFieldFormOpt, self.stm.removeField]))
+                self.ElementsColumn.POFields.addWidget(FieldsWidget(key,self.stm.removeField, self.setPlotFieldFormOpt))
             
             elif columnType == "currents":
-                self.ElementsColumn.POCurrents.addWidget(CurrentWidget(key, [self.setPlotFieldFormOpt, self.stm.removeCurrent]))
+                self.ElementsColumn.POCurrents.addWidget(CurrentWidget(key, self.stm.removeCurrent, self.setPlotFieldFormOpt))
 
-    def addExampleParabola(self):
-        d = {
-            "name"      : "pri",
-            "type"      : "Parabola",
-            "pmode"     : "focus",
-            "gmode"     : "uv",
-            "flip"      : False,
-            "vertex"    : np.zeros(3),
-            "focus_1"   : np.array([0,0,3.5e3]),
-            "lims_u"    : np.array([200,5e3]),
-            "lims_v"    : np.array([0,360]),
-            "gridsize"  : np.array([501,501])
-            }
-        self.stm.addParabola(d)
-        self.ElementsColumn.reflectors.addWidget(ElementWidget(d["name"],self.reflectorActions))
 
-    def addExampleHyperbola(self):
-        hyperbola = {
-            'name': 'Hype',
-            'type': 'Hyperbola', 
-            'pmode': 'focus',
-            'gmode': 'xy',
-            'flip': False,
-            'focus_1': np.array([   0.,    0., 3500.]),
-            'focus_2': np.array([    0.,     0., -2106.]),
-            'ecc': 1.08208248, 
-            'lims_x': np.array([-310, 310]),
-            'lims_y': np.array([-310, 310]), 
-            'lims_u': np.array([0, 310]), 
-            'lims_v': np.array([0, 6.283185307179586]),
-            'gridsize': np.array([501, 501])
-        }
-        self.stm.addHyperbola(hyperbola)
-        self.ElementsColumn.reflectors.addWidget(ElementWidget(hyperbola["name"],self.reflectorActions))
 
     def setForm(self, formData, readAction):
         if hasattr(self, "ParameterWid"):
@@ -293,7 +267,7 @@ class MainWidget(QWidget):
                 self.stm.addHyperbola(elementDict)
             elif elementDict["type"] == "Ellipse":
                 self.stm.addEllipse(elementDict)
-            self.ElementsColumn.reflectors.addWidget(ElementWidget(elementDict["name"],self.reflectorActions))
+            self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"],self.reflectorActions))
         except InputReflError as e:
             self.console.appendPlainText("FormInput Incorrect:")
             self.console.appendPlainText(e.__str__())
@@ -305,17 +279,17 @@ class MainWidget(QWidget):
     def addHyperbolaAction(self):
         elementDict = self.ParameterWid.read()
         self.stm.addHyperbola(elementDict) 
-        self.ElementsColumn.reflectors.addWidget(ElementWidget(elementDict["name"],self.reflectorActions))
+        self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"],self.refletorActions))
 
     def addEllipseAction(self):
         elementDict = self.ParameterWid.read()
         self.stm.addEllipse(elementDict) 
-        self.ElementsColumn.reflectors.addWidget(ElementWidget(elementDict["name"],self.reflectorActions))
+        self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"],self.refletorActions))
     
     def addPlaneAction(self):
         elementDict = self.ParameterWid.read()
         self.stm.addPlane(elementDict) 
-        self.ElementsColumn.reflectors.addWidget(ElementWidget(elementDict["name"],self.reflectorActions))
+        self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"],self.refletorActions))
     
     def setTransformationForm(self, element):
         self.setForm(fDataObj.makeTransformationForm(element), self.applyTransformation)
@@ -342,11 +316,11 @@ class MainWidget(QWidget):
 
         if transfDict["type"] == "Translation":
             self.stm.translateGrids(transfDict["elements"], transfDict["vector"])
-            print(f'Translated {dd["elements"]} by {self._formatVector(vector)} mm')
+            print(f'Translated {transfDict["elements"]} by {self._formatVector(transfDict["vector"])} mm')
 
         if transfDict["type"] == "Rotation":
             self.stm.rotateGrids(transfDict["elements"], transfDict["vector"], transfDict["pivot"])
-            print(f'Translated {dd["elements"]} by {self._formatVector(vector)} mm')
+            print(f'Translated {transfDict["elements"]} by {self._formatVector(transfDict["vector"])} mm')
     
     #NOTE Raytrace widgets
     def setInitTubeFrameForm(self):
@@ -365,7 +339,7 @@ class MainWidget(QWidget):
         RTDict = self.ParameterWid.read()
         self.stm.createFrame(RTDict)
         self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(RTDict["name"],
-                            [self.setPlotFrameFormOpt, self.stm.removeFrame, self.calcRMSfromFrame]))    
+                           self.stm.removeFrame,  self.setPlotFrameFormOpt, self.calcRMSfromFrame))    
     
     def addGaussianFrameAction(self):
         GRTDict = self.ParameterWid.read()
@@ -375,7 +349,7 @@ class MainWidget(QWidget):
 
         self.stm.createGRTFrame(GRTDict)
         self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(GRTDict["name"],
-                            [self.setPlotFrameFormOpt, self.stm.removeFrame, self.calcRMSfromFrame]))    
+                             self.stm.removeFrame,self.setPlotFrameFormOpt, self.calcRMSfromFrame,))    
     
     def addGaussianAction(self):
         GDict = self.ParameterWid.read()
@@ -530,19 +504,19 @@ class PyPOMainWindow(QMainWindow):
         RaytraceMenu = menuBar.addMenu("Ray-tracer")
         PhysOptMenu = menuBar.addMenu("Physical-optics")
 
-        ### Generate test parabola
-        AddTestParabola = QAction('Add Test Parabola', self)
-        AddTestParabola.setShortcut('Ctrl+Shift+P')
-        AddTestParabola.setStatusTip('Generates a Parabolic reflector and plots it')
-        AddTestParabola.triggered.connect(self.mainWid.addExampleParabola)
-        ElementsMenu.addAction(AddTestParabola)
+        # ### Generate test parabola
+        # AddTestParabola = QAction('Add Test Parabola', self)
+        # AddTestParabola.setShortcut('Ctrl+Shift+P')
+        # AddTestParabola.setStatusTip('Generates a Parabolic reflector and plots it')
+        # AddTestParabola.triggered.connect(self.mainWid.addExampleParabola)
+        # ElementsMenu.addAction(AddTestParabola)
 
-        ### Generate test hyperbola
-        AddTestHyperbola = QAction('Add Test Hyperbola', self)
-        AddTestHyperbola.setShortcut('Ctrl+Shift+H')
-        AddTestHyperbola.setStatusTip('Generates a Parabolic reflector and plots it')
-        AddTestHyperbola.triggered.connect(self.mainWid.addExampleHyperbola)
-        ElementsMenu.addAction(AddTestHyperbola)
+        # ### Generate test hyperbola
+        # AddTestHyperbola = QAction('Add Test Hyperbola', self)
+        # AddTestHyperbola.setShortcut('Ctrl+Shift+H')
+        # AddTestHyperbola.setStatusTip('Generates a Parabolic reflector and plots it')
+        # AddTestHyperbola.triggered.connect(self.mainWid.addExampleHyperbola)
+        # ElementsMenu.addAction(AddTestHyperbola)
 
         ### Add Element
         reflectorSelector = ElementsMenu.addMenu("Reflector")

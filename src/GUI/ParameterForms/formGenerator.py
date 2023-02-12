@@ -29,17 +29,14 @@ class FormGenerator(QWidget):
         self.formData = ElementData
         self.readme = readAction
 
-        self.layout = QFormLayout()
+        self.layout = QFormLayout(self)
+        self.layout.setContentsMargins(0,0,0,0)
 
         self.inputs = []
         self.setupInputs()
         if addButtons:
             self.setupButtons()
-        
-        self.layout.setContentsMargins(0,0,0,0)
-
-        self.setLayout(self.layout)
-    
+            
     def setupInputs(self):
         for inp in self.formData:
             if inp.inType.value == 0:
@@ -290,7 +287,6 @@ class XYZRadio(QWidget):
             for btn in self.buttons:
                 if btn.text() == s and btn.isChecked(): 
                     btn.toggle()
-                    print("@uncheckOption %s btn = %s, s = %s, " %(self.name,btn.text(), s))
                     return
         
     def __init__(self, inp, parent=None):

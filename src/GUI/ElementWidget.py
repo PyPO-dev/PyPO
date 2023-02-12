@@ -14,6 +14,18 @@ class MyButton(QPushButton):
     def __init__(self, s):
         super().__init__(s)
 
+class SymDialog(QDialog):
+    def __init__(self, msg=None):
+        self.msg = "" if msg is None else msg
+        super().__init__()
+
+        layout = QGridLayout()
+        abortBtn = QPushButton(self.msg)
+        abortBtn.clicked.connect(self.accept)
+        layout.addWidget(QLabel(""), 0,0,1,2)
+        layout.addWidget(abortBtn, 1,1)
+        self.setLayout(layout)
+
 class ElementWidget(QWidget):
     def __init__ (self, element, actions, p=None ):
         super().__init__(parent=p)

@@ -9,6 +9,7 @@ from src.PyPO.BindUtils import *
 from src.PyPO.Structs import *
 from src.PyPO.PyPOTypes import *
 import src.PyPO.Config as Config
+import src.PyPO.Threadmgr as TManager
 
 import threading
 
@@ -79,6 +80,7 @@ def loadGPUlib():
 #### SINGLE PRECISION
 def PyPO_GPUf(source, target, PODict):
     lib, ws = loadGPUlib()
+    mgr = TManager.Manager(Config.context)
 
     # Create structs with pointers for source and target
     csp = reflparamsf()
@@ -124,7 +126,6 @@ def PyPO_GPUf(source, target, PODict):
             ctypes.byref(c_currents), k, epsilon,
             t_direction, nBlocks, nThreads]
 
-    start_time = time.time()
 
     if PODict["mode"] == "JM":
         res = c2Bundlef()
@@ -133,17 +134,9 @@ def PyPO_GPUf(source, target, PODict):
 
         allocate_c2Bundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
 
-        t = threading.Thread(target=lib.callKernelf_JM, args=args)
-        t.daemon = True
-        t.start()
-        while t.is_alive(): # wait for the thread to exit
-            #Config.print(np.array([1,0,0]))
-            Config.print(f'Calculating J, M on {target["name"]} {ws.getSymbol()}', end='\r')
-            t.join(.1)
-        dtime = time.time() - start_time
-        Config.print(f'Calculated J, M on {target["name"]} in {dtime:.3f} seconds', end='\r')
-        Config.print(f'\n')
-
+        #t = mgr.new_sthread(target=lib.callKernelf_JM, args=args)
+        mgr.new_sthread(target=lib.callKernelf_JM, args=args, calc_type="currents")
+        
         # Unpack filled struct
         JM = c2BundleToObj(res, shape=target_shape, obj_t='currents', np_t=np.float64)
 
@@ -156,16 +149,7 @@ def PyPO_GPUf(source, target, PODict):
 
         allocate_c2Bundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
 
-        t = threading.Thread(target=lib.callKernelf_EH, args=args)
-        t.daemon = True
-        t.start()
-        while t.is_alive(): # wait for the thread to exit
-            Config.print(f'Calculating E, H on {target["name"]} {ws.getSymbol()}', end='\r')
-            t.join(.1)
-        dtime = time.time() - start_time
-        Config.print(f'Calculated E, H on {target["name"]} in {dtime:.3f} seconds', end='\r')
-        Config.print(f'\n')
-
+        mgr.new_sthread(target=lib.callKernelf_EH, args=args, calc_type="fields")
         # Unpack filled struct
         EH = c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
 
@@ -178,7 +162,8 @@ def PyPO_GPUf(source, target, PODict):
 
         allocate_c4Bundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
 
-        t = threading.Thread(target=lib.callKernelf_JMEH, args=args)
+        mgr.new_sthread(target=lib.callKernelf_JMEH, args=args, calc_type="currents & fields")
+        """
         t.daemon = True
         t.start()
         while t.is_alive(): # wait for the thread to exit
@@ -187,7 +172,7 @@ def PyPO_GPUf(source, target, PODict):
         dtime = time.time() - start_time
         Config.print(f'Calculated J, M, E, H on {target["name"]} in {dtime:.3f} seconds', end='\r')
         Config.print(f'\n')
-
+        """
         # Unpack filled struct
         JM, EH = c4BundleToObj(res, shape=target_shape, np_t=np.float64)
 
@@ -221,16 +206,7 @@ def PyPO_GPUf(source, target, PODict):
 
         allocate_c2Bundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
 
-        t = threading.Thread(target=lib.callKernelf_FF, args=args)
-        t.daemon = True
-        t.start()
-        while t.is_alive(): # wait for the thread to exit
-            Config.print(f'Calculating far-field E, H on {target["name"]} {ws.getSymbol()}', end='\r')
-            t.join(.1)
-        dtime = time.time() - start_time
-        Config.print(f'Calculated far-field E, H on {target["name"]} in {dtime:.3f} seconds', end='\r')
-        Config.print(f'\n')
-
+        mgr.new_sthread(target=lib.callKernelf_FF, args=args, calc_type="far-field")
         # Unpack filled struct
         EH = c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
 

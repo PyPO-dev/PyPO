@@ -66,8 +66,7 @@ __host__ __device__ void _debugArray(float arr[3])
  *
  * Take complex exponential by decomposing into sine and cosine.
  *
- * @param z cuFloatComplex number.
- *
+
  * @return res cuFloatComplex number.
  */
 __device__ __inline__ cuFloatComplex expCo(cuFloatComplex z)

@@ -303,8 +303,8 @@ class XYZRadio(QWidget):
         self.r2 = self.RadioSubWidget(["x", "y", "z"],"r2")
         self.r1.setCompanion(self.r2)
         self.r2.setCompanion(self.r1)
-        layout.addRow(QLabel("Horizontal axis"), self.r1)
-        layout.addRow(QLabel("Vertical axis"), self.r2)
+        layout.addRow(QLabel("Abscissa"), self.r1)
+        layout.addRow(QLabel("Ordinate"), self.r2)
 
     def read(self):
         if self.r1.group.checkedButton()==None or self.r2.group.checkedButton()==None:

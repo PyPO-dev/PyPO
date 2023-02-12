@@ -102,6 +102,6 @@ def ex_DRO_PO(device):
 
     s.runPO(p1_to_planeff)
     
-    s.plotBeam2D("planeff", "ff", "Ex", units="deg")
+    s.plotBeam2D("ff", "Ex", units="deg")
 if __name__ == "__main__":
     ex_DRO()

@@ -7,6 +7,7 @@ import time
 import os
 import sys
 import copy
+import logging
 import json
 from pathlib import Path
 from contextlib import contextmanager
@@ -29,6 +30,7 @@ import src.PyPO.FitGauss as fgs
 
 # Set PyPO absolute root path
 sysPath = Path(__file__).parents[2]
+logging.getLogger(__name__)
 
 @contextmanager
 def suppress_stdout():
@@ -65,10 +67,11 @@ class System(object):
     savePathCurrents = os.path.join(sysPath, "save", "currents")
     savePathSystems = os.path.join(sysPath, "save", "systems")
 
-    def __init__(self, redirect=None):
+    def __init__(self, redirect=None, context=None):
         self.num_ref = 0
         self.num_cam = 0
         Config.initPrint(redirect)
+        Config.setContext(context)
         # Internal dictionaries
         self.system = {}
         self.frames = {}

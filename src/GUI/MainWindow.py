@@ -12,7 +12,7 @@ import src.GUI.ParameterForms.formDataObjects as fDataObj
 from src.GUI.PlotScreen import PlotScreen
 from src.GUI.TransformationWidget import TransformationWidget
 from src.GUI.Acccordion import Accordion
-from src.GUI.ElementWidget import ElementWidget, FrameWidget, FieldsWidget, CurrentWidget
+from src.GUI.ElementWidget import ElementWidget, FrameWidget, FieldsWidget, CurrentWidget, SymDialog
 from src.GUI.Console import ConsoleGenerator
 from src.GUI.Console import print
 import numpy as np
@@ -21,6 +21,7 @@ from src.PyPO.Checks import InputReflError, InputRTError
 sys.path.append('../')
 sys.path.append('../../')
 import src.PyPO.System as st
+import src.PyPO.Threadmgr as TManager
 
 class MainWidget(QWidget):
     """Main Window."""
@@ -50,7 +51,7 @@ class MainWidget(QWidget):
         self._setupPlotScreen()
         self._mkConsole()
 
-        self.stm = st.System(redirect=print)
+        self.stm = st.System(redirect=print, context="G")
         self._mkElementsColumn()
 
         self.setLayout(self.grid)
@@ -99,7 +100,7 @@ class MainWidget(QWidget):
         if hasattr(self, "ElementsColumn"):
             self.ElementsColumn.setParent(None)
 
-        self.refletorActions = [self.setTransromationForm, self.plotElement, self.removeElement]
+        self.reflectorActions = [self.setTransformationForm, self.plotElement, self.removeElement]
         StmElements = []
         for e in self.stm.system.keys():
             StmElements.append(e)
@@ -212,7 +213,7 @@ class MainWidget(QWidget):
     def refreshColumn(self, columnDict, columnType):
         for key, item in columnDict.items():
             if columnType == "elements":
-                self.ElementsColumn.reflectors.addWidget(ElementWidget(key, self.refletorActions))
+                self.ElementsColumn.reflectors.addWidget(ElementWidget(key, self.reflectorActions))
             
             elif columnType == "frames":
                 self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(key, 
@@ -238,7 +239,7 @@ class MainWidget(QWidget):
             "gridsize"  : np.array([501,501])
             }
         self.stm.addParabola(d)
-        self.ElementsColumn.reflectors.addWidget(ElementWidget(d["name"],self.refletorActions))
+        self.ElementsColumn.reflectors.addWidget(ElementWidget(d["name"],self.reflectorActions))
 
     def addExampleHyperbola(self):
         hyperbola = {
@@ -257,7 +258,7 @@ class MainWidget(QWidget):
             'gridsize': np.array([501, 501])
         }
         self.stm.addHyperbola(hyperbola)
-        self.ElementsColumn.reflectors.addWidget(ElementWidget(hyperbola["name"],self.refletorActions))
+        self.ElementsColumn.reflectors.addWidget(ElementWidget(hyperbola["name"],self.reflectorActions))
 
     def setForm(self, formData, readAction):
         if hasattr(self, "ParameterWid"):
@@ -292,7 +293,7 @@ class MainWidget(QWidget):
                 self.stm.addHyperbola(elementDict)
             elif elementDict["type"] == "Ellipse":
                 self.stm.addEllipse(elementDict)
-            self.ElementsColumn.reflectors.addWidget(ElementWidget(elementDict["name"],self.refletorActions))
+            self.ElementsColumn.reflectors.addWidget(ElementWidget(elementDict["name"],self.reflectorActions))
         except InputReflError as e:
             self.console.appendPlainText("FormInput Incorrect:")
             self.console.appendPlainText(e.__str__())
@@ -304,21 +305,24 @@ class MainWidget(QWidget):
     def addHyperbolaAction(self):
         elementDict = self.ParameterWid.read()
         self.stm.addHyperbola(elementDict) 
-        self.ElementsColumn.reflectors.addWidget(ElementWidget(elementDict["name"],self.refletorActions))
+        self.ElementsColumn.reflectors.addWidget(ElementWidget(elementDict["name"],self.reflectorActions))
 
     def addEllipseAction(self):
         elementDict = self.ParameterWid.read()
         self.stm.addEllipse(elementDict) 
-        self.ElementsColumn.reflectors.addWidget(ElementWidget(elementDict["name"],self.refletorActions))
+        self.ElementsColumn.reflectors.addWidget(ElementWidget(elementDict["name"],self.reflectorActions))
     
     def addPlaneAction(self):
         elementDict = self.ParameterWid.read()
         self.stm.addPlane(elementDict) 
-        self.ElementsColumn.reflectors.addWidget(ElementWidget(elementDict["name"],self.refletorActions))
+        self.ElementsColumn.reflectors.addWidget(ElementWidget(elementDict["name"],self.reflectorActions))
     
-    def setTransromationForm(self, element):
+    def setTransformationForm(self, element):
         self.setForm(fDataObj.makeTransformationForm(element), self.applyTransformation)
 
+    def setTransformationElementsForm(self):
+        self.setForm(fDataObj.makeTransformationElementsForm(self.stm.system.keys()), self.applyTransformationElements)
+    
     def applyTransformation(self, element):
         dd = self.ParameterWid.read()
         transformationType = dd["type"]
@@ -328,11 +332,22 @@ class MainWidget(QWidget):
             self.stm.translateGrids(dd["element"], vector)
             print(f'Translated {dd["element"]} by {self._formatVector(vector)} mm')
         elif transformationType == "Rotation":
-            self.stm.rotateGrids(dd["element"], vector, cRot=dd["centerOfRotation"])
+            self.stm.rotateGrids(dd["element"], vector, cRot=dd["pivot"])
             print(f'Rotated {dd["element"]} by {self._formatVector(vector)} deg around {self._formatVector(dd["centerOfRotation"])}')
         else:
             raise Exception("Transformation type incorrect")
 
+    def applyTransformationElements(self):
+        transfDict = self.ParameterWid.read()
+
+        if transfDict["type"] == "Translation":
+            self.stm.translateGrids(transfDict["elements"], transfDict["vector"])
+            print(f'Translated {dd["elements"]} by {self._formatVector(vector)} mm')
+
+        if transfDict["type"] == "Rotation":
+            self.stm.rotateGrids(transfDict["elements"], transfDict["vector"], transfDict["pivot"])
+            print(f'Translated {dd["elements"]} by {self._formatVector(vector)} mm')
+    
     #NOTE Raytrace widgets
     def setInitTubeFrameForm(self):
         self.setForm(fDataObj.initTubeFrameInp(), readAction=self.addTubeFrameAction)
@@ -463,7 +478,13 @@ class MainWidget(QWidget):
 
     def addPropBeamAction(self):
         propBeamDict = self.ParameterWid.read()
-        self.stm.runPO(propBeamDict)
+       
+        dial = SymDialog()
+
+        self.mgr = TManager.Manager("G", callback=dial.accept)
+        self.mgr.new_gthread(target=self.stm.runPO, args=(propBeamDict,), calc_type=propBeamDict["mode"])
+
+        dial.exec_()
 
         if propBeamDict["mode"] == "JM":
             self.ElementsColumn.POCurrents.addWidget(CurrentWidget(propBeamDict["name_JM"], [self.setPlotCurrentFormOpt, self.stm.removeCurrent]))
@@ -533,11 +554,15 @@ class PyPOMainWindow(QMainWindow):
         reflectorSelector.addAction(planeAction)
         
         ### Quadric Surface
-        hyperbolaAction = QAction('Quadric Surface', self)
+        hyperbolaAction = QAction('Quadric surface', self)
         hyperbolaAction.setShortcut('Ctrl+Q')
         hyperbolaAction.setStatusTip("Quadric Surface")
         hyperbolaAction.triggered.connect(self.mainWid.setQuadricForm)
         reflectorSelector.addAction(hyperbolaAction)
+
+        transformElementsAction = QAction("Transform elements", self)
+        transformElementsAction.triggered.connect(self.mainWid.setTransformationElementsForm)
+        ElementsMenu.addAction(transformElementsAction)
         
 
     ### System actions

@@ -311,7 +311,7 @@ def plotRTframe(frame, project, savePath, returns, aspect):
     idx_good = np.argwhere((frame.dx**2 + frame.dy**2 + frame.dz**2) > 0.8)
 
     if project == "xy":
-        ax.scatter(frame.x[idx_good], frame.y[idx_good], color="black")
+        ax.scatter(frame.x[idx_good], frame.y[idx_good], color="black", s=10)
         ax.set_xlabel(r"$x$ / mm")
         ax.set_ylabel(r"$y$ / mm")
 
@@ -321,22 +321,22 @@ def plotRTframe(frame, project, savePath, returns, aspect):
         ax.set_ylabel(r"$z$ / mm")
     
     elif project == "yz":
-        ax.scatter(frame.y[idx_good], frame.z[idx_good], color="black")
+        ax.scatter(frame.y[idx_good], frame.z[idx_good], color="black", s=10)
         ax.set_xlabel(r"$y$ / mm")
         ax.set_ylabel(r"$z$ / mm")
     
     elif project == "yx":
-        ax.scatter(frame.y[idx_good], frame.x[idx_good], color="black")
+        ax.scatter(frame.y[idx_good], frame.x[idx_good], color="black", s=10)
         ax.set_xlabel(r"$y$ / mm")
         ax.set_ylabel(r"$x$ / mm")
 
     elif project == "zy":
-        ax.scatter(frame.z[idx_good], frame.y[idx_good], color="black")
+        ax.scatter(frame.z[idx_good], frame.y[idx_good], color="black", s=10)
         ax.set_xlabel(r"$z$ / mm")
         ax.set_ylabel(r"$y$ / mm")
     
     elif project == "zx":
-        ax.scatter(frame.z[idx_good], frame.x[idx_good], color="black")
+        ax.scatter(frame.z[idx_good], frame.x[idx_good], color="black", s=10)
         ax.set_xlabel(r"$z$ / mm")
         ax.set_ylabel(r"$x$ / mm")
 

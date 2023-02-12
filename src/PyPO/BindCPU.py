@@ -8,6 +8,7 @@ from src.PyPO.BindUtils import *
 from src.PyPO.Structs import *
 from src.PyPO.PyPOTypes import *
 import src.PyPO.Config as Config
+import src.PyPO.Threadmgr as TManager
 
 import threading
 
@@ -82,6 +83,7 @@ def loadCPUlib():
 # WRAPPER FUNCTIONS DOUBLE PREC
 def PyPO_CPUd(source, target, PODict):
     lib, ws = loadCPUlib()
+    mgr = TManager(Config.__context__)
 
     # Create structs with pointers for source and target
     csp = reflparams()
@@ -123,7 +125,6 @@ def PyPO_CPUd(source, target, PODict):
     args = [csp, ctp, ctypes.byref(cs), ctypes.byref(ct),
             ctypes.byref(c_currents), k, nThreads, epsilon,
             t_direction]
-    start_time = time.time()
 
     if PODict["mode"] == "JM":
         res = c2Bundle()
@@ -131,7 +132,7 @@ def PyPO_CPUd(source, target, PODict):
 
         allocate_c2Bundle(res, gt, ctypes.c_double)
 
-        t = threading.Thread(target=lib.propagateToGrid_JM, args=args)
+        t = mgr.new_sthread(target=lib.propagateToGrid_JM, args=args)
         t.daemon = True
         t.start()
         while t.is_alive(): # wait for the thread to exit

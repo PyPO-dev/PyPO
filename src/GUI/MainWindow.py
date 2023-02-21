@@ -363,7 +363,7 @@ class MainWidget(QWidget):
     
     def addTubeFrameAction(self):
         RTDict = self.ParameterWid.read()
-        self.stm.createFrame(RTDict)
+        self.stm.createTubeFrame(RTDict)
         self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(RTDict["name"],
                             [self.setPlotFrameFormOpt, self.stm.removeFrame, self.calcRMSfromFrame]))    
     
@@ -379,7 +379,7 @@ class MainWidget(QWidget):
     
     def addGaussianAction(self):
         GDict = self.ParameterWid.read()
-        self.stm.createGauss(GDict, GDict["surface"])
+        self.stm.createGaussian(GDict, GDict["surface"])
         self.ElementsColumn.POFields.addWidget(FieldsWidget(GDict["name"], [self.setPlotFieldFormOpt, self.stm.removeField]))
         self.ElementsColumn.POCurrents.addWidget(CurrentWidget(GDict["name"], [self.setPlotCurrentFormOpt, self.stm.removeCurrent]))
     
@@ -407,7 +407,7 @@ class MainWidget(QWidget):
     
     def addPlotFrameAction(self):
         plotFrameDict = self.ParameterWid.read()
-        fig = self.stm.plotRTframe(plotFrameDict["frame"], project=plotFrameDict["project"], returns=True)
+        fig = self.stm.plotRTframe(plotFrameDict["frame"], project=plotFrameDict["project"], ret=True)
         self.addPlot(fig, f'{plotFrameDict["frame"]} - {plotFrameDict["project"]}')
 
         self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
@@ -415,7 +415,7 @@ class MainWidget(QWidget):
     def addPlotFieldAction(self):
         plotFieldDict = self.ParameterWid.read()
         fig, _ = self.stm.plotBeam2D(plotFieldDict["field"], plotFieldDict["comp"], 
-                                    ptype="field", project=plotFieldDict["project"], returns=True)
+                                    project=plotFieldDict["project"], ret=True)
         self.addPlot(fig, f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
 
         self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
@@ -423,7 +423,7 @@ class MainWidget(QWidget):
     def addPlotCurrentAction(self):
         plotFieldDict = self.ParameterWid.read()
         fig, _ = self.stm.plotBeam2D(self.stm.currents[plotFieldDict["field"]].surf, plotFieldDict["field"], 
-                                    plotFieldDict["comp"], ptype="current", project=plotFieldDict["project"], returns=True)
+                                    plotFieldDict["comp"], project=plotFieldDict["project"], ret=True)
         self.addPlot(fig, f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
 
         self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
@@ -482,23 +482,24 @@ class MainWidget(QWidget):
         dial = SymDialog()
 
         self.mgr = TManager.Manager("G", callback=dial.accept)
-        self.mgr.new_gthread(target=self.stm.runPO, args=(propBeamDict,), calc_type=propBeamDict["mode"])
+        t = self.mgr.new_gthread(target=self.stm.runPO, args=(propBeamDict,), calc_type=propBeamDict["mode"])
+        
+        dial.setThread(t)
 
-        dial.exec_()
-
-        if propBeamDict["mode"] == "JM":
-            self.ElementsColumn.POCurrents.addWidget(CurrentWidget(propBeamDict["name_JM"], [self.setPlotCurrentFormOpt, self.stm.removeCurrent]))
+        if dial.exec_():
+            if propBeamDict["mode"] == "JM":
+                self.ElementsColumn.POCurrents.addWidget(CurrentWidget(propBeamDict["name_JM"], [self.setPlotCurrentFormOpt, self.stm.removeCurrent]))
         
-        elif propBeamDict["mode"] == "EH" or propBeamDict["mode"] == "FF":
-            self.ElementsColumn.POFields.addWidget(FieldsWidget(propBeamDict["name_EH"], [self.setPlotFieldFormOpt, self.stm.removeField]))
+            elif propBeamDict["mode"] == "EH" or propBeamDict["mode"] == "FF":
+                self.ElementsColumn.POFields.addWidget(FieldsWidget(propBeamDict["name_EH"], [self.setPlotFieldFormOpt, self.stm.removeField]))
         
-        elif propBeamDict["mode"] == "JMEH":
-            self.ElementsColumn.POCurrents.addWidget(CurrentWidget(propBeamDict["name_JM"], [self.setPlotCurrentFormOpt, self.stm.removeCurrent]))
-            self.ElementsColumn.POFields.addWidget(FieldsWidget(propBeamDict["name_EH"], [self.setPlotFieldFormOpt, self.stm.removeField]))
+            elif propBeamDict["mode"] == "JMEH":
+                self.ElementsColumn.POCurrents.addWidget(CurrentWidget(propBeamDict["name_JM"], [self.setPlotCurrentFormOpt, self.stm.removeCurrent]))
+                self.ElementsColumn.POFields.addWidget(FieldsWidget(propBeamDict["name_EH"], [self.setPlotFieldFormOpt, self.stm.removeField]))
         
-        elif propBeamDict["mode"] == "EHP":
-            self.ElementsColumn.POFields.addWidget(CurrentWidget(propBeamDict["name_EH"], [self.setPlotCurrentFormOpt, self.stm.removeCurrent]))
-            self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(propBeamDict["name_P"], 
+            elif propBeamDict["mode"] == "EHP":
+                self.ElementsColumn.POFields.addWidget(CurrentWidget(propBeamDict["name_EH"], [self.setPlotCurrentFormOpt, self.stm.removeCurrent]))
+                self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(propBeamDict["name_P"], 
                                 [self.setPlotFrameFormOpt, self.stm.removeFrame, self.calcRMSfromFrame]))
     #END NOTE
     

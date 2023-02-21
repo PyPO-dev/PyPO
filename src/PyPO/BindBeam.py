@@ -116,7 +116,6 @@ def makeGauss(gdict_py, source):
 
 def calcCurrents(fields, source, mode):
     lib, ws = loadBeamlib()
-
     source_shape = (source["gridsize"][0], source["gridsize"][1])
     source_size = source["gridsize"][0] * source["gridsize"][1]
 

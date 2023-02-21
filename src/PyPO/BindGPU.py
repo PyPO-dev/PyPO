@@ -185,15 +185,16 @@ def PyPO_GPUf(source, target, PODict):
 
         allocate_c2rBundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
 
-        t = threading.Thread(target=lib.callKernelf_EHP, args=args)
-        t.daemon = True
-        t.start()
-        while t.is_alive(): # wait for the thread to exit
-            Config.print(f'Calculating reflected E, H, P on {target["name"]} {ws.getSymbol()}', end='\r')
-            t.join(.1)
-        dtime = time.time() - start_time
-        Config.print(f'Calculated reflected E, H, P on {target["name"]} in {dtime:.3f} seconds', end='\r')
-        Config.print(f'\n')
+        mgr.new_sthread(target=lib.callKernelf_EHP, args=args, calc_type="reflected fields & Poynting")
+        #t = threading.Thread(target=lib.callKernelf_EHP, args=args)
+        #t.daemon = True
+        #t.start()
+        #while t.is_alive(): # wait for the thread to exit
+        #    Config.print(f'Calculating reflected E, H, P on {target["name"]} {ws.getSymbol()}', end='\r')
+        #    t.join(.1)
+        #dtime = time.time() - start_time
+        #Config.print(f'Calculated reflected E, H, P on {target["name"]} in {dtime:.3f} seconds', end='\r')
+        #Config.print(f'\n')
 
         # Unpack filled struct
         EH, Pr = c2rBundleToObj(res, shape=target_shape, np_t=np.float64)

@@ -1,5 +1,6 @@
 import threading
 import time
+import sys
 
 from src.PyPO.BindUtils import *
 import src.PyPO.Config as Config
@@ -22,7 +23,9 @@ class Manager(object):
         dtime = time.time() - start_time
         Config.print(f'Calculated {calc_type} in {dtime:.3f} seconds', end='\r')
         Config.print(f'\n')
-        """ 
+        """
+
+        return t
     
     def new_sthread(self, target, args, calc_type):
         if self.context == "S":
@@ -53,10 +56,14 @@ class GThread(threading.Thread):
         self.parent = parent
         self.target = target
         self.args = args
+        self.event = threading.Event()
        
         super(GThread, self).__init__()
 
     def run(self):
+        #while not self.event:
         self.target(*list(self.args)) 
         self.parent.on_thread_finished()
-
+   
+    def exit(self):
+        return

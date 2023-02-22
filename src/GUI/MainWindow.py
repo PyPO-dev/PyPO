@@ -104,7 +104,7 @@ class MainWidget(QWidget):
             self.ElementsColumn.setParent(None)
 
         self.refletorActions = {
-            "transform" : self.setTransromationForm,
+            "transform" : self.setTransformationForm,
             "plot" : self.plotElement,
             "remove" : self.removeElement,
         } 
@@ -221,7 +221,7 @@ class MainWidget(QWidget):
     def refreshColumn(self, columnDict, columnType):
         for key, item in columnDict.items():
             if columnType == "elements":
-                self.ElementsColumn.reflectors.addWidget(ReflectorWidget(key, self.removeElement, self.setTransromationForm, self.plotElement))
+                self.ElementsColumn.reflectors.addWidget(ReflectorWidget(key, self.removeElement, self.setTransformationForm, self.plotElement))
             
             elif columnType == "frames":
                 self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(key, self.stm.removeFrame, self.setPlotFrameFormOpt,  self.calcRMSfromFrame))

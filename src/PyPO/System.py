@@ -876,6 +876,7 @@ class System(object):
     #
     # @returns rms RMS spot size of frame in mm.
     def calcSpotRMS(self, name_frame):
+        print(name_frame)
         frame = self.frames[name_frame]
         rms = effs.calcRMS(frame)
         return rms
@@ -942,7 +943,12 @@ class System(object):
         return out
 
     ##
-    # 
+    # Generate point-source PO fields and currents.
+    #
+    # @param PSDict A PSDict dictionary, containing parameters for the point source.
+    # @param name_surface Name of surface on which to define the point-source.
+    #
+    # @see PSDict
     def generatePointSource(self, PSDict, name_surface):
         surfaceObj = self.system[name_surface]
         ps = np.zeros(surfaceObj["gridsize"], dtype=complex)
@@ -1003,14 +1009,14 @@ class System(object):
         aperDict = {"plot":False} if aperDict is None else aperDict
         
         if comp[0] == "E" or comp[0] == "H":
-            field = self.fields[name_field]
+            field = self.fields[name_obj]
         
             if comp in self.EHcomplist:
                 field_comp = getattr(field, comp)
 
 
         if comp[0] == "J" or comp[0] == "M":
-            field = self.currents[name_field] 
+            field = self.currents[name_obj] 
             
             if comp in self.JMcomplist:
                 field_comp = getattr(field, comp)
@@ -1026,7 +1032,7 @@ class System(object):
         
         fig, ax = plt.plotBeam2D(plotObject, field_comp,
                         vmin, vmax, show, amp_only,
-                        save, polar, interpolation,
+                        save, interpolation,
                         aperDict, mode, project,
                         unitl, name, titleA, titleP, self.savePath, unwrap_phase)
 

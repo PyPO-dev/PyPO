@@ -8,5 +8,7 @@ var searchData=
   ['c4bundlef_5',['c4Bundlef',['../structc4Bundlef.html',1,'c4Bundlef'],['../classPyPO_1_1Structs_1_1c4Bundlef.html',1,'PyPO.Structs.c4Bundlef']]],
   ['cframe_6',['cframe',['../structcframe.html',1,'cframe'],['../classPyPO_1_1Structs_1_1cframe.html',1,'PyPO.Structs.cframe']]],
   ['cframef_7',['cframef',['../structcframef.html',1,'cframef'],['../classPyPO_1_1Structs_1_1cframef.html',1,'PyPO.Structs.cframef']]],
-  ['currents_8',['currents',['../classPyPO_1_1PyPOTypes_1_1currents.html',1,'PyPO::PyPOTypes']]]
+  ['currents_8',['currents',['../classPyPO_1_1PyPOTypes_1_1currents.html',1,'PyPO::PyPOTypes']]],
+  ['customformatter_9',['CustomFormatter',['../classPyPO_1_1CustomLogger_1_1CustomFormatter.html',1,'PyPO::CustomLogger']]],
+  ['customlogger_10',['CustomLogger',['../classPyPO_1_1CustomLogger_1_1CustomLogger.html',1,'PyPO::CustomLogger']]]
 ];

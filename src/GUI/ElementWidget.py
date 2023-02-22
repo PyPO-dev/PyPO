@@ -20,9 +20,9 @@ class SymDialog(QDialog):
         super().__init__()
 
         layout = QGridLayout()
-        abortBtn = QPushButton("Abort")
-        abortBtn.clicked.connect(self.killThread)
-        layout.addWidget(QLabel(self.msg), 0,0,1,2)
+        abortBtn = QPushButton(self.msg)
+        abortBtn.clicked.connect(self.accept)
+        layout.addWidget(QLabel(""), 0,0,1,2)
         layout.addWidget(abortBtn, 1,1)
         self.setLayout(layout)
 
@@ -32,22 +32,45 @@ class SymDialog(QDialog):
     def killThread(self):
         self.thread.exit()
         self.reject()
-
+class RemoveElementDialog(QDialog):
+    def __init__(self, elementName):
+        super().__init__()
+        layout = QGridLayout()
+        okBtn = QPushButton("Ok")
+        okBtn.clicked.connect(self.accept)
+        cancelBtn = QPushButton("Cancel")
+        cancelBtn.clicked.connect(self.reject)
+        layout.addWidget(QLabel("Do you want to delete element %s?" %(elementName)), 0,0,1,2)
+        layout.addWidget(cancelBtn, 1,0)
+        layout.addWidget(okBtn, 1,1)
+        self.setLayout(layout)
 
 class ElementWidget(QWidget):
-    def __init__ (self, element, actions, p=None ):
+    def __init__ (self, name, plotAction, removeAction, transformAction = None, RMSAction = None,  p=None):
         super().__init__(parent=p)
-        self.transformAction = actions[0]
-        self.plotElementAction = actions[1]
-        self.RemoveElementAction = actions[2]
-        self.element = element
-        
+        self.plotAction = plotAction
+        self.removeAction_ = removeAction
+        self.actions = {
+            "plot": self.plot,
+            "remove": self.remove
+        }
+        if transformAction:
+            self.transformAction = transformAction
+            self.actions["transform"] = self.transform
+        if RMSAction:
+            self.RMSFrameAction = RMSAction
+            self.actions["RMS"] = self.RMSFrame
+
+        self.name = name
+        self.setupUI()
+
+    def setupUI(self):
         layout = QHBoxLayout()
-        label = QLabel(element)
+        layout.setContentsMargins(0,0,0,0)
+        label = QLabel(self.name)
 
         label.setFixedSize(200,39)
 
-        # layout.setContentsMargins(0,0,0,0)
         self.btn = MyButton("⋮")
         self.btn.clicked.connect(self._openOptionsMenu)
         self.btn.setFixedSize(50,39)
@@ -62,22 +85,14 @@ class ElementWidget(QWidget):
     def _openOptionsMenu(self):
         self.dlg = selfClosingDialog(self._closeOptionsMenu, parent = self)
 
-        dlgLayout = QVBoxLayout()
+        dlgLayout = QVBoxLayout(self.dlg)
         dlgLayout.setContentsMargins(0,0,0,0)
 
-        btn1 = QPushButton("Transform")
-        btn2 = QPushButton("Remove")
-        btn3 = QPushButton("Plot")
+        for name, action in self.actions.items():
+            btn = QPushButton(name.capitalize())
+            btn.clicked.connect(action)
+            dlgLayout.addWidget(btn)
 
-        btn1.clicked.connect(self.transform)
-        btn2.clicked.connect(self.removeElement)
-        btn3.clicked.connect(self.plotElement)
-
-        dlgLayout.addWidget(btn1)
-        dlgLayout.addWidget(btn2)
-        dlgLayout.addWidget(btn3)
-
-        self.dlg.setLayout(dlgLayout)
         self.dlg.setWindowFlag(Qt.FramelessWindowHint)
         posi = self.mapToGlobal(self.btn.pos())
         self.dlg.setGeometry(posi.x(), posi.y() ,100,80)
@@ -85,246 +100,43 @@ class ElementWidget(QWidget):
         
     def _closeOptionsMenu(self):
         self.dlg.close()
-
+    
     def transform(self):
-        self.transformAction(self.element)
         self._closeOptionsMenu()
+        self.transformAction(self.name)
 
-    def plotElement(self):
-        self.plotElementAction(self.element)
+    def plot(self):
         self._closeOptionsMenu()
-    
-    def removeElement(self):
-        self._closeOptionsMenu()
-        removeElementDialog = QDialog()
-        layout = QGridLayout()
-        okBtn = QPushButton("Ok")
-        okBtn.clicked.connect(removeElementDialog.accept)
-        cancelBtn = QPushButton("Cancel")
-        cancelBtn.clicked.connect(removeElementDialog.reject)
-        layout.addWidget(QLabel("Do you want to delete element %s?" %(self.element)), 0,0,1,2)
-        layout.addWidget(cancelBtn, 1,0)
-        layout.addWidget(okBtn, 1,1)
-        removeElementDialog.setLayout(layout)
-
-        if removeElementDialog.exec_():
-            self.RemoveElementAction(self.element)
-            self.setParent(None)
-   
-class FrameWidget(QWidget):
-    def __init__ (self, frame, actions, p=None ):
-        super().__init__(parent=p)
-        self.plotFrameAction = actions[0]
-        self.RemoveFrameAction = actions[1]
-        self.RMSFrameAction = actions[2]
-        self.frame = frame
+        self.plotAction(self.name)
         
-        layout = QHBoxLayout()
-        label = QLabel(frame)
-
-        label.setFixedSize(200,39)
-
-        # layout.setContentsMargins(0,0,0,0)
-        self.btn = MyButton("⋮")
-        self.btn.clicked.connect(self._openOptionsMenu)
-        self.btn.setFixedSize(50,39)
-        
-        layout.addWidget(label)
-        layout.addWidget(self.btn)
-        layout.setSpacing(40)
-
-        self.setLayout(layout)
-        self.setFixedSize(250,60)
-
-    def _openOptionsMenu(self):
-        self.dlg = selfClosingDialog(self._closeOptionsMenu, parent = self)
-
-        dlgLayout = QVBoxLayout()
-        dlgLayout.setContentsMargins(0,0,0,0)
-
-        btn1 = QPushButton("Remove")
-        btn2 = QPushButton("Plot")
-        btn3 = QPushButton("RMS")
-
-        btn1.clicked.connect(self.removeFrame)
-        btn2.clicked.connect(self.plotFrame)
-        btn3.clicked.connect(self.RMSFrame)
-
-        dlgLayout.addWidget(btn1)
-        dlgLayout.addWidget(btn2)
-        dlgLayout.addWidget(btn3)
-
-        self.dlg.setLayout(dlgLayout)
-        self.dlg.setWindowFlag(Qt.FramelessWindowHint)
-        posi = self.mapToGlobal(self.btn.pos())
-        self.dlg.setGeometry(posi.x(), posi.y() ,100,80)
-        self.dlg.show()
-        
-    def _closeOptionsMenu(self):
-        self.dlg.close()
-
-    def plotFrame(self):
-        self.plotFrameAction(self.frame)
-        self._closeOptionsMenu()
-    
     def RMSFrame(self):
-        self.RMSFrameAction(self.frame)
         self._closeOptionsMenu()
-    
-    def removeFrame(self):
-        self._closeOptionsMenu()
-        removeFrameDialog = QDialog()
-        layout = QGridLayout()
-        okBtn = QPushButton("Ok")
-        okBtn.clicked.connect(removeFrameDialog.accept)
-        cancelBtn = QPushButton("Cancel")
-        cancelBtn.clicked.connect(removeFrameDialog.reject)
-        layout.addWidget(QLabel("Do you want to delete frame %s?" %(self.frame)), 0,0,1,2)
-        layout.addWidget(cancelBtn, 1,0)
-        layout.addWidget(okBtn, 1,1)
-        removeFrameDialog.setLayout(layout)
+        self.RMSFrameAction(self.name)
 
-        if removeFrameDialog.exec_():
-            self.RemoveFrameAction(self.frame)
+    def remove(self):
+        self._closeOptionsMenu()        
+        if RemoveElementDialog(self.name).exec_():
+            self.removeAction_(self.name)
             self.setParent(None)
 
-class FieldsWidget(QWidget):
-    def __init__ (self, field, actions, p=None ):
-        super().__init__(parent=p)
-        self.plotFieldsAction = actions[0]
-        self.RemoveFieldAction = actions[1]
-        self.field = field
+class ReflectorWidget(ElementWidget):
+    def __init__(self, name, removeAction, transformAction, plotAction, p=None):
+        super().__init__(name, plotAction, removeAction, transformAction=transformAction, p=p)
+
+   
+class FrameWidget(ElementWidget):
+    def __init__ (self, name, removeAction, plotAction, RMSAction,  p=None ):
+        super().__init__(name, plotAction, removeAction,RMSAction=RMSAction, p=p)
+
+class FieldsWidget(ElementWidget):
+    def __init__ (self, name, removeAction, plotAction, p=None ):
+        print(name, removeAction, plotAction)
+        super().__init__(name, plotAction, removeAction, p=p)
+
+class CurrentWidget(ElementWidget):
+   def __init__ (self, name, removeAction, plotAction, p=None ):
+        super().__init__(name, plotAction, removeAction, p=p)
         
-        layout = QHBoxLayout()
-        label = QLabel(field)
-
-        label.setFixedSize(200,39)
-
-        # layout.setContentsMargins(0,0,0,0)
-        self.btn = MyButton("⋮")
-        self.btn.clicked.connect(self._openOptionsMenu)
-        self.btn.setFixedSize(50,39)
-        
-        layout.addWidget(label)
-        layout.addWidget(self.btn)
-        layout.setSpacing(40)
-
-        self.setLayout(layout)
-        self.setFixedSize(250,60)
-
-    def _openOptionsMenu(self):
-        self.dlg = selfClosingDialog(self._closeOptionsMenu, parent = self)
-
-        dlgLayout = QVBoxLayout()
-        dlgLayout.setContentsMargins(0,0,0,0)
-
-        btn1 = QPushButton("Remove")
-        btn2 = QPushButton("Plot")
-
-        btn1.clicked.connect(self.removeField)
-        btn2.clicked.connect(self.plotField)
-
-        dlgLayout.addWidget(btn1)
-        dlgLayout.addWidget(btn2)
-
-        self.dlg.setLayout(dlgLayout)
-        self.dlg.setWindowFlag(Qt.FramelessWindowHint)
-        posi = self.mapToGlobal(self.btn.pos())
-        self.dlg.setGeometry(posi.x(), posi.y() ,100,80)
-        self.dlg.show()
-        
-    def _closeOptionsMenu(self):
-        self.dlg.close()
-
-    def plotField(self):
-        self.plotFieldsAction(self.field)
-        self._closeOptionsMenu()
-    
-    def removeField(self):
-        self._closeOptionsMenu()
-        removeFieldDialog = QDialog()
-        layout = QGridLayout()
-        okBtn = QPushButton("Ok")
-        okBtn.clicked.connect(removeFieldDialog.accept)
-        cancelBtn = QPushButton("Cancel")
-        cancelBtn.clicked.connect(removeFieldDialog.reject)
-        layout.addWidget(QLabel("Do you want to delete field %s?" %(self.field)), 0,0,1,2)
-        layout.addWidget(cancelBtn, 1,0)
-        layout.addWidget(okBtn, 1,1)
-        removeFieldDialog.setLayout(layout)
-
-        if removeFieldDialog.exec_():
-            self.RemoveFieldAction(self.field)
-            self.setParent(None)
-
-class CurrentWidget(QWidget):
-    def __init__ (self, current, actions, p=None ):
-        super().__init__(parent=p)
-        self.plotCurrentAction = actions[0]
-        self.RemoveCurrentAction = actions[1]
-        self.current = current
-        
-        layout = QHBoxLayout()
-        label = QLabel(current)
-
-        label.setFixedSize(200,39)
-
-        # layout.setContentsMargins(0,0,0,0)
-        self.btn = MyButton("⋮")
-        self.btn.clicked.connect(self._openOptionsMenu)
-        self.btn.setFixedSize(50,39)
-        
-        layout.addWidget(label)
-        layout.addWidget(self.btn)
-        layout.setSpacing(40)
-
-        self.setLayout(layout)
-        self.setFixedSize(250,60)
-
-    def _openOptionsMenu(self):
-        self.dlg = selfClosingDialog(self._closeOptionsMenu, parent = self)
-
-        dlgLayout = QVBoxLayout()
-        dlgLayout.setContentsMargins(0,0,0,0)
-
-        btn1 = QPushButton("Remove")
-        btn2 = QPushButton("Plot")
-
-        btn1.clicked.connect(self.removeCurrent)
-        btn2.clicked.connect(self.plotCurrent)
-
-        dlgLayout.addWidget(btn1)
-        dlgLayout.addWidget(btn2)
-
-        self.dlg.setLayout(dlgLayout)
-        self.dlg.setWindowFlag(Qt.FramelessWindowHint)
-        posi = self.mapToGlobal(self.btn.pos())
-        self.dlg.setGeometry(posi.x(), posi.y() ,100,80)
-        self.dlg.show()
-        
-    def _closeOptionsMenu(self):
-        self.dlg.close()
-
-    def plotCurrent(self):
-        self.plotCurrentAction(self.current)
-        self._closeOptionsMenu()
-    
-    def removeCurrent(self):
-        self._closeOptionsMenu()
-        removeCurrentDialog = QDialog()
-        layout = QGridLayout()
-        okBtn = QPushButton("Ok")
-        okBtn.clicked.connect(removeCurrentDialog.accept)
-        cancelBtn = QPushButton("Cancel")
-        cancelBtn.clicked.connect(removeCurrentDialog.reject)
-        layout.addWidget(QLabel("Do you want to delete current %s?" %(self.current)), 0,0,1,2)
-        layout.addWidget(cancelBtn, 1,0)
-        layout.addWidget(okBtn, 1,1)
-        removeCurrentDialog.setLayout(layout)
-
-        if removeCurrentDialog.exec_():
-            self.RemoveCurrentAction(self.current)
-            self.setParent(None)
 
 if __name__ == "__main__":
     app = QApplication([])

@@ -103,7 +103,7 @@ class MainWidget(QWidget):
         if hasattr(self, "ElementsColumn"):
             self.ElementsColumn.setParent(None)
 
-        self.refletorActions = {
+        self.reflectorActions = {
             "transform" : self.setTransformationForm,
             "plot" : self.plotElement,
             "remove" : self.removeElement,
@@ -267,7 +267,7 @@ class MainWidget(QWidget):
                 self.stm.addHyperbola(elementDict)
             elif elementDict["type"] == "Ellipse":
                 self.stm.addEllipse(elementDict)
-            self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"],self.reflectorActions))
+            self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"], self.reflectorActions))
         except InputReflError as e:
             self.console.appendPlainText("FormInput Incorrect:")
             self.console.appendPlainText(e.__str__())
@@ -279,17 +279,17 @@ class MainWidget(QWidget):
     def addHyperbolaAction(self):
         elementDict = self.ParameterWid.read()
         self.stm.addHyperbola(elementDict) 
-        self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"],self.refletorActions))
+        self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"],self.reflectorActions))
 
     def addEllipseAction(self):
         elementDict = self.ParameterWid.read()
         self.stm.addEllipse(elementDict) 
-        self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"],self.refletorActions))
+        self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"],self.reflectorActions))
     
     def addPlaneAction(self):
         elementDict = self.ParameterWid.read()
         self.stm.addPlane(elementDict) 
-        self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"],self.refletorActions))
+        self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"],self.reflectorActions))
     
     def setTransformationForm(self, element):
         self.setForm(fDataObj.makeTransformationForm(element), self.applyTransformation)
@@ -584,13 +584,21 @@ class PyPOMainWindow(QMainWindow):
 
         # PO actions
         makeBeam = PhysOptMenu.addMenu("Initialize beam")
-        initPointAction = QAction("Point source", self)
-        initPointAction.triggered.connect(self.mainWid.setInitPSForm)
-        makeBeam.addAction(initPointAction)
+        makeBeamPS = makeBeam.addMenu("Point source")
+        initPointVecAction = QAction("Vectorial", self)
+        initPointVecAction.triggered.connect(self.mainWid.setInitPSForm)
+        makeBeamPS.addAction(initPointVecAction)
+        initPointScalAction = QAction("Scalar", self)
+        initPointScalAction.triggered.connect(self.mainWid.setInitPSForm)
+        makeBeamPS.addAction(initPointScalAction)
     
-        initGaussAction = QAction("Gaussian beam", self)
-        initGaussAction.triggered.connect(self.mainWid.setInitGaussianForm)
-        makeBeam.addAction(initGaussAction)
+        makeBeamG = makeBeam.addMenu("Gaussian beam")
+        initGaussVecAction = QAction("Vectorial", self)
+        initGaussVecAction.triggered.connect(self.mainWid.setInitGaussianForm)
+        makeBeamG.addAction(initGaussVecAction)
+        initGaussScalAction = QAction("Scalar", self)
+        initGaussScalAction.triggered.connect(self.mainWid.setInitGaussianForm)
+        makeBeamG.addAction(initGaussScalAction)
 
         propBeam = PhysOptMenu.addMenu("Propagate beam") 
         initPropSurfAction = QAction("To surface", self)

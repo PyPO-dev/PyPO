@@ -10,8 +10,8 @@ import numpy as np
 ##
 # Two arrays representing a 1D complex array of double.
 class arrC1(ctypes.Structure):
-    _fields_ = [("rx", ctypes.POINTER(ctypes.c_double)),
-                ("ry", ctypes.POINTER(ctypes.c_double))]
+    _fields_ = [("x", ctypes.POINTER(ctypes.c_double)),
+                ("y", ctypes.POINTER(ctypes.c_double))]
 
 ##
 # Three arrays representing a 3D real array of double.

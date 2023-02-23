@@ -65,6 +65,13 @@ def loadGPUlib():
                                    ctypes.c_float, ctypes.c_int, ctypes.c_int]
 
     lib.callKernelf_FF.restype = None
+    
+    lib.callKernelf_scalar.argtypes = [ctypes.POINTER(arrC1f), reflparamsf, reflparamsf,
+                                   ctypes.POINTER(reflcontainerf), ctypes.POINTER(reflcontainerf),
+                                   ctypes.POINTER(arrC1f), ctypes.c_float, ctypes.c_float,
+                                   ctypes.c_float, ctypes.c_int, ctypes.c_int]
+
+    lib.callKernelf_scalar.restype = None
 
     lib.callRTKernel.argtypes = [reflparamsf, ctypes.POINTER(cframef), ctypes.POINTER(cframef),
                                 ctypes.c_float, ctypes.c_float, ctypes.c_int, ctypes.c_int]
@@ -177,15 +184,6 @@ def PyPO_GPUf(source, target, PODict):
         allocate_c2rBundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
 
         mgr.new_sthread(target=lib.callKernelf_EHP, args=args)
-        #t = threading.Thread(target=lib.callKernelf_EHP, args=args)
-        #t.daemon = True
-        #t.start()
-        #while t.is_alive(): # wait for the thread to exit
-        #    Config.print(f'Calculating reflected E, H, P on {target["name"]} {ws.getSymbol()}', end='\r')
-        #    t.join(.1)
-        #dtime = time.time() - start_time
-        #Config.print(f'Calculated reflected E, H, P on {target["name"]} in {dtime:.3f} seconds', end='\r')
-        #Config.print(f'\n')
 
         # Unpack filled struct
         EH, Pr = c2rBundleToObj(res, shape=target_shape, np_t=np.float64)
@@ -201,6 +199,18 @@ def PyPO_GPUf(source, target, PODict):
         mgr.new_sthread(target=lib.callKernelf_FF, args=args)
         # Unpack filled struct
         EH = c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
+
+        return EH
+    
+    elif PODict["mode"] == "scalar":
+        res = arrC1f()
+        args.insert(0, res)
+
+        allocate_arrC1(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
+
+        mgr.new_sthread(target=lib.callKernelf_scalar, args=args)
+        # Unpack filled struct
+        EH = arrC1ToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
 
         return EH
 

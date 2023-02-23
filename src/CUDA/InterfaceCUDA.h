@@ -57,6 +57,11 @@ extern "C"
                float k, float epsilon,
                float t_direction, int nBlocks, int nThreads);
     
+    PYPO_DLL void callKernelf_scalar(arrC1f *res, reflparamsf source, reflparamsf target,
+               reflcontainerf *cs, reflcontainerf *ct, arrC1f *inp,
+               float k, float epsilon,
+               float t_direction, int nBlocks, int nThreads);
+    
     PYPO_DLL void callRTKernel(reflparamsf ctp, cframef *fr_in,
                cframef *fr_out, float epsilon, float t0,
                int nBlocks, int nThreads);

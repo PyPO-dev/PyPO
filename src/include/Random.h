@@ -37,6 +37,9 @@ public:
 };
 #endif
 
+/**
+ * Initialize RNG. This constructor generates a random seed for the random draws.
+ */
 template <typename T>
 Random<T>::Random()
 {
@@ -46,6 +49,11 @@ Random<T>::Random()
     this->gen = geno;
 }
 
+/**
+ * Initialize RNG. This constructor takes a pre-set seed for the random draws.
+ *
+ * @param seed Positive integer determining the RNG seed.
+ */
 template <typename T>
 Random<T>::Random(unsigned int seed)
 {

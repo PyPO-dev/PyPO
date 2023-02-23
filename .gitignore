@@ -159,6 +159,7 @@ datadir/
 *.swp
 *.swo
 #vscode specific
+.vscode
 .vscode/settings.json
 .idea/misc.xml
 .idea/modules.xml

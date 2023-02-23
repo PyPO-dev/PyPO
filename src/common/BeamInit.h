@@ -39,19 +39,31 @@ void initFrame(T rdict, U *fr);
 /** 
  * Initialize Gaussian ray-trace frame from RTDict or RTDictf.
  *
- * Takes an RTDict or RTDictf and generates a frame object, which can be used 
+ * Takes a GRTDict or GRTDictf and generates a frame object, which can be used 
  *      to initialize a Gaussian ray-trace.
  *
- * @param rdict RTDict or RTDictf object from which to generate a frame.
+ * @param grdict GRTDict or GRTDictf object from which to generate a frame.
  * @param fr Pointer to cframe or cframef object.
  * 
- * @see RTDict
- * @see RTDictf
+ * @see GRTDict
+ * @see GRTDictf
  * @see cframe
  * @see cframef
  */
 template<typename T, typename U, typename V>
 void initRTGauss(T grdict, U *fr);
+
+/**
+ * Probability density function for drawing ray positions and tilts from Gaussian.
+ *
+ * The density function is used for generating Gaussian ray-trace beams.
+ * Using rejection sampling, the method draws samples from the Gaussian pdf.
+ *
+ * @param vars Vector of length 4, containing the xy positions and tilts of the ray to be checked.
+ * @param scales Vector of length 4 containing the scale factors along xy and tilts
+ */
+template<typename T>
+T pdfGauss(std::vector<T> vars, std::vector<T> scales);
 
 /** 
  * Initialize Gaussian beam from GDict or GDictf.
@@ -72,9 +84,6 @@ void initRTGauss(T grdict, U *fr);
  * @see c2Bundle
  * @see c2Bundlef
  */
-template<typename T>
-T pdfGauss(std::vector<T> vars, std::vector<T> scales);
-
 template<typename T, typename U, typename V, typename W, typename G>
 void initGauss(T gdict, U refldict, V *res_field, V *res_current);
 

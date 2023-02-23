@@ -81,9 +81,9 @@ def extractorScalar(source, target, field, ct_t):
 
     return xyzs, xyzt, area, rEs, iEs
 
-def arrC1ToObj(res, shape):
-    x1 = np.ctypeslib.as_array(res.x, shape=shape) + 1j * np.ctypeslib.as_array(res.y, shape=shape)
-    return x1
+def arrC1ToObj(res, shape, np_t):
+    res = np.ctypeslib.as_array(res.x, shape=shape) + 1j * np.ctypeslib.as_array(res.y, shape=shape)
+    return res
 
 def c2BundleToObj(res, shape, obj_t, np_t):
     x1 = np.ctypeslib.as_array(res.r1x, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i1x, shape=shape).astype(np_t)
@@ -143,8 +143,8 @@ def c2rBundleToObj(res, shape, np_t):
     return out1, out2
 
 def allocate_arrC1(res, size, ct_t):
-    res.rx = (ct_t * size)()
-    res.ix = (ct_t * size)()
+    res.x = (ct_t * size)()
+    res.y = (ct_t * size)()
 
 def allocate_c2Bundle(res, size, ct_t):
     res.r1x = (ct_t * size)()

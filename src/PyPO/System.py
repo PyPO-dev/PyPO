@@ -63,6 +63,7 @@ class System(object):
 
     savePathElem = os.path.join(sysPath, "save", "elements")
     savePathFields = os.path.join(sysPath, "save", "fields")
+    savePathScalarFields = os.path.join(sysPath, "save", "scalarfields")
     savePathCurrents = os.path.join(sysPath, "save", "currents")
     savePathSystems = os.path.join(sysPath, "save", "systems")
 
@@ -81,6 +82,7 @@ class System(object):
         self.frames = {}
         self.fields = {}
         self.currents = {}
+        self.scalarfields = {}
 
         self.EHcomplist = np.array(["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"])
         self.JMcomplist = np.array(["Jx", "Jy", "Jz", "Mx", "My", "Mz"])
@@ -90,6 +92,7 @@ class System(object):
 
         saveElemExist = os.path.isdir(self.savePathElem)
         saveFieldsExist = os.path.isdir(self.savePathFields)
+        saveScalarFieldsExist = os.path.isdir(self.savePathScalarFields)
         saveCurrentsExist = os.path.isdir(self.savePathCurrents)
         saveSystemsExist = os.path.isdir(self.savePathSystems)
 
@@ -98,6 +101,9 @@ class System(object):
 
         elif not saveFieldsExist:
             os.makedirs(self.savePathFields)
+        
+        elif not saveScalarFieldsExist:
+            os.makedirs(self.savePathScalarFields)
 
         elif not saveCurrentsExist:
             os.makedirs(self.savePathCurrents)
@@ -116,6 +122,12 @@ class System(object):
         self.clog = self.clog_mgr.getCustomLogger() if verbose else self.clog_mgr.getCustomLogger(open(os.devnull, "w"))
 
         self.clog.info("Initialized empty system.")
+    ##
+    # Destructor. Deletes any reference to the logger assigned to current system.
+    def __del__(self):
+        self.clog.info("Deleting current system.")
+        del self.clog_mgr
+        del self.clog
 
     def __str__(self):
         s = "Reflectors in system:\n"
@@ -541,6 +553,9 @@ class System(object):
         
         with open(os.path.join(path, "currents"), 'wb') as file: 
             pickle.dump(self.currents, file)
+        
+        with open(os.path.join(path, "scalarfields"), 'wb') as file: 
+            pickle.dump(self.scalarfields, file)
 
     ##
     # Load a system object from /save/systems/. This loads all reflectors, fields, currents and frames in the system to disk.
@@ -646,13 +661,20 @@ class System(object):
     #
     # @see PODict
     def runPO(self, PODict):
-        sc_name = PODict["s_current"]
-        PODict["s_current"] = self.currents[PODict["s_current"]]
-       
-        self.clog.info("Starting PO propagation!")
-        self.clog.info(f"Propagating {sc_name} on {PODict['s_current'].surf} to {PODict['t_name']}, propagation mode: {PODict['mode']}.")
+        self.clog.info("*** Starting PO propagation ***")
+        
+        if PODict["mode"] != "scalar":
+            sc_name = PODict["s_current"]
+            PODict["s_current"] = self.currents[PODict["s_current"]]
+            self.clog.info(f"Propagating {sc_name} on {PODict['s_current'].surf} to {PODict['t_name']}, propagation mode: {PODict['mode']}.")
+            source = self.system[PODict["s_current"].surf]
 
-        source = self.system[PODict["s_current"].surf]
+        else:
+            sc_name = PODict["s_scalarfield"]
+            PODict["s_scalarfield"] = self.scalarfields[PODict["s_scalarfield"]]
+            self.clog.info(f"Propagating {sc_name} on {PODict['s_scalarfield'].surf} to {PODict['t_name']}, propagation mode: {PODict['mode']}.")
+            source = self.system[PODict["s_scalarfield"].surf]
+       
         target = self.system[PODict["t_name"]]
         PODict["k"] = PODict["s_current"].k
         
@@ -665,12 +687,12 @@ class System(object):
         start_time = time.time()
         
         if PODict["device"] == "CPU":
-            self.clog.info(f"Running {PODict['nThreads']} CPU threads.")
+            self.clog.info(f"Hardware: running {PODict['nThreads']} CPU threads.")
             self.clog.info(f"... Calculating ...")
             out = PyPO_CPUd(source, target, PODict)
 
         elif PODict["device"] == "GPU":
-            self.clog.info(f"Running {PODict['nThreads']} CUDA threads per block.")
+            self.clog.info(f"Hardware: running {PODict['nThreads']} CUDA threads per block.")
             self.clog.info(f"... Calculating ...")
             out = PyPO_GPUf(source, target, PODict)
 
@@ -697,7 +719,11 @@ class System(object):
             frame = self.loadFramePoynt(out[1], PODict["t_name"])
             self.frames[PODict["name_P"]] = frame
 
-        self.clog.info(f"Succesfully finished propagation in {dtime:.3f} second.")
+        elif PODict["mode"] == "scalar":
+            out.setMeta(PODict["t_name"], PODict["k"])
+            self.scalarfields[PODict["name_field"]] = out
+
+        self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
         return out
 
     ##
@@ -1001,6 +1027,29 @@ class System(object):
         self.fields[PSDict["name"]] = field
         self.currents[PSDict["name"]] = current
 
+    ##
+    # Generate point-source scalar PO field.
+    #
+    # @param PSDict A PSDict dictionary, containing parameters for the point source.
+    # @param name_surface Name of surface on which to define the point-source.
+    #
+    # @see PSDict
+    def generatePointSourceScalar(self, PSDict, name_surface):
+        surfaceObj = self.system[name_surface]
+        ps = np.zeros(surfaceObj["gridsize"], dtype=complex)
+
+        xs_idx = int((surfaceObj["gridsize"][0] - 1) / 2)
+        ys_idx = int((surfaceObj["gridsize"][1] - 1) / 2)
+
+        ps[xs_idx, ys_idx] = PSDict["E0"] * np.exp(1j * PSDict["phase"])
+        sfield = scalarfield(ps)
+
+        k =  2 * np.pi / PSDict["lam"]
+
+        sfield.setMeta(name_surface, k)
+
+        self.scalarfields[PSDict["name"]] = sfield
+    
     ##
     # Generate a 2D plot of a field or current.
     #

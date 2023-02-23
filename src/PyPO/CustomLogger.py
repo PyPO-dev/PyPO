@@ -31,10 +31,17 @@ class CustomLogger(object):
     def __init__(self, owner=None):
         self.owner = "Logger" if owner is None else owner
 
+    def __del__(self):
+        del self
+
     def getCustomLogger(self, stdout=None):
         stdout = sys.stdout if stdout is None else stdout
 
         logger = logging.getLogger(self.owner)
+        
+        if logger.hasHandlers():
+            logger.handlers = []
+        
         logger.setLevel(logging.DEBUG)
 
         ch = logging.StreamHandler(stdout)

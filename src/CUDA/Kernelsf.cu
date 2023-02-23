@@ -66,7 +66,6 @@ __host__ __device__ void _debugArray(float arr[3])
  *
  * Take complex exponential by decomposing into sine and cosine.
  *
-
  * @return res cuFloatComplex number.
  */
 __device__ __inline__ cuFloatComplex expCo(cuFloatComplex z)
@@ -94,7 +93,7 @@ __device__ __inline__ cuFloatComplex expCo(cuFloatComplex z)
  * @param nBlocks Number of blocks per grid.
  * @param nThreads Number of threads per block.
  *
- * @return BT Array of two dim3 objects.
+ * @return BT Array of two dim3 objects, containing number of blocks per grid and number of threads per block.
  */
 
  __host__ std::array<dim3, 2> _initCUDA(float k, float epsilon, int gt, int gs, float t_direction, int nBlocks, int nThreads)
@@ -209,8 +208,6 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
         js[1] = d_Jy[i];
         js[2] = d_Jz[i];
 
-        //if (i == 2){printf("%.16f\n", d_My[i].x);}
-        //printf("hello from fieldatpoint %d\n", i);
         ms[0] = d_Mx[i];
         ms[1] = d_My[i];
         ms[2] = d_Mz[i];
@@ -261,8 +258,6 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
     d_hi[0] = h_field[0];
     d_hi[1] = h_field[1];
     d_hi[2] = h_field[2];
-
-
 }
 
 /**
@@ -576,8 +571,6 @@ __global__ void GpropagateBeam_2(float *d_xs, float *d_ys, float *d_zs,
             e_out_h_r[n] = temp2[n].x;                      // e_out_h_r
         }
 
-
-
         normalize(e_out_h_r, S_i_norm);                       // S_i_norm
 
         // Calculate incoming polarization vectors
@@ -708,7 +701,6 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
         norms[2] = d_nzt[idx];
 
         // Calculate total incoming E and H field at point on target
-
         fieldAtPoint(d_xs, d_ys, d_zs,
                     d_Jx, d_Jy, d_Jz,
                     d_Mx, d_My, d_Mz,
@@ -920,6 +912,89 @@ void __global__ GpropagateBeam_4(float *d_xs, float *d_ys, float *d_zs,
     }
 }
 
+void __device__ scalarfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
+                                   cuFloatComplex *d_sfs, float (&point)[3], float *d_A, cuFloatComplex &e)
+{
+    float r;
+    float r_vec[3];
+    float source_point[3];
+    
+    e = con[8];
+    cuFloatComplex expo;
+    cuFloatComplex cfact;
+
+    for(int i=0; i<g_s; i++)
+    {
+        source_point[0] = d_xs[i];
+        source_point[1] = d_ys[i];
+        source_point[2] = d_zs[i];
+
+        diff(point, source_point, r_vec);
+        abs(r_vec, r);
+
+        expo = expCo(cuCmulf(con[7], make_cuFloatComplex(con[6].x * con[0].x * r, 0)));
+        cfact = make_cuFloatComplex(-con[0].x * con[0].x / (4 * r * con[4].x) * d_A[i], 0);
+        
+        e = cuCaddf(cuCmulf(cfact, expo), e);
+    }
+}
+
+/**
+ * Calculate scalar field on target.
+ *
+ * Kernel for calculating scalar field on a target, given a scattered field and source surface..
+ *
+ * @param d_xs Array containing source points x-coordinate.
+ * @param d_ys Array containing source points y-coordinate.
+ * @param d_zs Array containing source points z-coordinate.
+ * @param d_A Array containing area elements.
+ * @param d_xt Array containing target direction x-coordinate.
+ * @param d_yt Array containing target direction y-coordinate.
+ * @param d_zt Array containing target direction z-coordinate.
+ * @param d_sfs Array containing source scalar field.
+ * @param d_sft Array to be filled with target scalar field.
+ */
+void __global__ GpropagateBeam_5(float *d_xs, float *d_ys, float *d_zs,
+                                float *d_A, float *d_xt, float *d_yt, float *d_zt,
+                                cuFloatComplex *d_sfs, cuFloatComplex *d_sft)
+{
+    // Arrays of floats
+    float point[3];                // Unit vector in far-field point direction
+
+    // Complex floats
+    cuFloatComplex e;            // scalar field at point
+
+    int idx = blockDim.x*blockIdx.x + threadIdx.x;
+    if (idx < g_t)
+    {
+        point[0] = d_xt[idx];
+        point[1] = d_yt[idx];
+        point[2] = d_zt[idx];
+
+        // Calculate total incoming E field at point on far-field
+        scalarfieldAtPoint(d_xs, d_ys, d_zs,
+                      d_sfs, point, d_A, e);
+
+        d_sft[idx] = e;
+    }
+}
+
+/**
+ * Convert 2 arrays of floats to 1 array of cuComplex
+ *
+ * @param rarr Real part of complex array.
+ * @param iarr Real part of complex array.
+ * @param carr Array of cuFloatComplex, to be filled.
+ * @param size Size of arrays.
+ */
+__host__ void _arrC1ToCUDAC(float *rarr, float *iarr, cuFloatComplex* carr,  int size)
+{
+    for (int i=0; i<size; i++)
+    {
+        carr[i] = make_cuFloatComplex(rarr[i], iarr[i]);
+    }
+}
+
 /**
  * Convert 6 arrays of floats to 3 arrays of cuComplex
  *
@@ -945,6 +1020,24 @@ __host__ void _arrC3ToCUDAC(float *r1arr, float *r2arr, float *r3arr,
         c2arr[i] = make_cuFloatComplex(r2arr[i], i2arr[i]);
         c3arr[i] = make_cuFloatComplex(r3arr[i], i3arr[i]);
 
+    }
+}
+
+
+/**
+ * Convert 1 array of cuComplex to 2 arrays of floats.
+ *
+ * @param carr Array of cuFloatComplex.
+ * @param rarr Real part of complex array, to be filled.
+ * @param iarr Imaginary part of complex array, to be filled.
+ * @param size Size of arrays.
+ */
+__host__ void _arrCUDACToC1(cuFloatComplex* carr, float *rarr, float *iarr, int size)
+{
+    for (int i=0; i<size; i++)
+    {
+        rarr[i] = carr[i].x;
+        iarr[i] = carr[i].y;
     }
 }
 
@@ -1116,16 +1209,7 @@ void callKernelf_JM(c2Bundlef *res, reflparamsf source, reflparamsf target,
                                 d_Mx, d_My, d_Mz,
                                 d_Jxt, d_Jyt, d_Jzt,
                                 d_Mxt, d_Myt, d_Mzt);
-    /*
-    while(cudaEventQuery(event) != cudaSuccess)
-    {
-        //printf("nothing to see\n");
-        //std::this_thread::sleep_for(std::chrono::microseconds(wsleep));
-    }
-
-    printf("finished\n");
-    */
-
+    
     gpuErrchk( cudaDeviceSynchronize() );
 
     // Allocate Host arrays for J and M
@@ -1895,6 +1979,107 @@ void callKernelf_FF(c2Bundlef *res, reflparamsf source, reflparamsf target,
     delete h_Hzt;
 }
 
+/**
+ * Call scalar kernel.
+ *
+ * Calculate scalar field on a target surface using CUDA.
+ *
+ * @param res Pointer to arrC1f object.
+ * @param source reflparamsf object containing source surface parameters.
+ * @param target reflparamsf object containing target surface parameters.
+ * @param cs Pointer to reflcontainerf object containing source grids.
+ * @param ct Pointer to reflcontainerf object containing target grids.
+ * @param inp Pointer to arrC1f object containing source field.
+ * @param k Wavenumber of radiation in 1 /mm.
+ * @param epsilon Relative permittivity of source surface.
+ * @param t_direction Time direction (experimental!).
+ * @param nBlocks Number of blocks in GPU grid.
+ * @param nThreads Number of threads in a block.
+ *
+ * @see arrC1f
+ * @see reflparamsf
+ * @see reflcontainerf
+ */
+void callKernelf_scalar(arrC1f *res, reflparamsf source, reflparamsf target,
+                                reflcontainerf *cs, reflcontainerf *ct,
+                                arrC1f *inp,
+                                float k, float epsilon,
+                                float t_direction, int nBlocks, int nThreads)
+{
+    // Generate source and target grids
+    generateGridf(source, cs);
+    generateGridf(target, ct);
+
+    // Initialize and copy constant memory to device
+    std::array<dim3, 2> BT;
+    BT = _initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
+    //alsd
+    // Create pointers to device arrays and allocate/copy source grid and area.
+    float *d_xs, *d_ys, *d_zs, *d_A;
+
+    gpuErrchk( cudaMalloc((void**)&d_xs, cs->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_ys, cs->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_zs, cs->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_A, cs->size * sizeof(float)) );
+
+    gpuErrchk( cudaMemcpy(d_xs, cs->x, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_ys, cs->y, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_zs, cs->z, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_A, cs->area, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+
+    // Create pointers to target grid
+    float *d_xt, *d_yt, *d_zt;
+    gpuErrchk( cudaMalloc((void**)&d_xt, ct->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_yt, ct->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_zt, ct->size * sizeof(float)) );
+
+    gpuErrchk( cudaMemcpy(d_xt, ct->x, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_yt, ct->y, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_zt, ct->z, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
+    
+    cuFloatComplex *h_sfs = new cuFloatComplex[cs->size];
+
+    _arrC1ToCUDAC(inp->x, inp->y, h_sfs, cs->size);
+
+    cuFloatComplex *d_sfs;
+
+    // Allocate and copy scalar input field
+    gpuErrchk( cudaMalloc((void**)&d_sfs, cs->size * sizeof(cuFloatComplex)) );
+
+    gpuErrchk( cudaMemcpy(d_sfs, h_sfs, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
+
+    // Delete host arrays for source currents - not needed anymore
+    delete h_sfs;
+    
+    cuFloatComplex *d_sft;
+
+    gpuErrchk( cudaMalloc((void**)&d_sft, ct->size * sizeof(cuFloatComplex)) );
+
+    // Create stopping event for kernel
+    cudaEvent_t event;
+    gpuErrchk( cudaEventCreateWithFlags(&event, cudaEventDisableTiming) );
+
+    // Call to KERNEL 5
+    GpropagateBeam_5<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs,
+                                d_A, d_xt, d_yt, d_zt,
+                                d_sfs, d_sft);
+
+    gpuErrchk( cudaDeviceSynchronize() );
+
+    // Allocate Host arrays for scalar res
+    cuFloatComplex *h_sft = new cuFloatComplex[ct->size];
+
+    // Copy data back from Device to Host
+    gpuErrchk( cudaMemcpy(h_sft, d_sft, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
+
+    // Free Device memory
+    gpuErrchk( cudaDeviceReset() );
+
+    _arrCUDACToC1(h_sft, res->x, res->y, ct->size);
+
+    // Delete host arrays for target fields
+    delete h_sft;
+}
 //__host__ getComputeCapability
 
 //cudaDeviceProp deviceProp;

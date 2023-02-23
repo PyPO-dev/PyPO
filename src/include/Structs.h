@@ -26,8 +26,8 @@ struct GDict;
 
 /** 1D array of complex numbers.*/
 struct arrC1 {
-    double *rx;     /**< array of double, representing real part of array.*/
-    double *ix;     /**< array of double, representing imaginary part of array.*/
+    double *x;     /**< array of double, representing real part of array.*/
+    double *y;     /**< array of double, representing imaginary part of array.*/
 };
 
 /** 3D array of real numbers.*/
@@ -207,8 +207,8 @@ struct GDictf;
 
 /** 1D array of complex numbers.*/
 struct arrC1f {
-    float *rx;     /**< array of float, representing real part of array.*/
-    float *ix;     /**< array of float, representing imaginary part of array.*/
+    float *x;     /**< array of float, representing real part of array.*/
+    float *y;     /**< array of float, representing imaginary part of array.*/
 };
 
 /** 3D array of real numbers.*/

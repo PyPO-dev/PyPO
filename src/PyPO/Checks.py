@@ -1,5 +1,8 @@
 import numpy as np
+import os
+
 from src.PyPO.PyPOTypes import *
+from src.PyPO.CustomLogger import CustomLogger
 
 # Error classes to be used
 class InputReflError(Exception):
@@ -10,26 +13,26 @@ class InputRTError(Exception):
 
 # Error message definitions
 def errMsg_name(elemName):
-    return f"\nName \"{elemName}\" already in use. Choose different name."
+    return f"Name \"{elemName}\" already in use. Choose different name.\n"
 
 def errMsg_field(fieldName, elemName):
-    return f"\nMissing field \"{fieldName}\", element {elemName}."
+    return f"Missing field \"{fieldName}\", element {elemName}.\n"
 
 def errMsg_type(fieldName, inpType, elemName, fieldType):
-    return f"\nWrong type {inpType} in field \"{fieldName}\", element {elemName}. Expected {fieldType}."
+    return f"Wrong type {inpType} in field \"{fieldName}\", element {elemName}. Expected {fieldType}.\n"
 
 def errMsg_option(fieldName, option, elemName, args):
     if len(args) == 2:
-        return f"\nUnknown option \"{option}\" in field \"{fieldName}\", element {elemName}. Expected \"{args[0]}\" or \"{args[1]}\"."
+        return f"Unknown option \"{option}\" in field \"{fieldName}\", element {elemName}. Expected \"{args[0]}\" or \"{args[1]}\".\n"
 
     elif len(args) == 3:
-        return f"\nUnknown option \"{option}\" in field \"{fieldName}\", element {elemName}. Expected \"{args[0]}\", \"{args[1]}\" or \"{args[2]}\"."
+        return f"Unknown option \"{option}\" in field \"{fieldName}\", element {elemName}. Expected \"{args[0]}\", \"{args[1]}\" or \"{args[2]}\".\n"
 
 def errMsg_shape(fieldName, shape, elemName, shapeExpect):
-    return f"\nIncorrect input shape of {shape} for field \"{fieldName}\", element {elemName}. Expected {shapeExpect}."
+    return f"Incorrect input shape of {shape} for field \"{fieldName}\", element {elemName}. Expected {shapeExpect}.\n"
 
 def errMsg_value(fieldName, value, elemName):
-    return f"\nIncorrect value {value} encountered in field \"{fieldName}\", element {elemName}."
+    return f"Incorrect value {value} encountered in field \"{fieldName}\", element {elemName}.\n"
 
 # Check blocks for different datatypes
 def block_ndarray(fieldName, elemDict, shape):
@@ -50,7 +53,9 @@ def block_ndarray(fieldName, elemDict, shape):
 # @param elemName Name of element, string.
 # @param nameList List of names in system dictionary.
 def check_ElemDict(elemDict, nameList):
-
+    clog_mgr = CustomLogger(os.path.basename(__file__))
+    clog = clog_mgr.getCustomLogger()
+    
     errStr = ""
    
     if elemDict["name"] in nameList:
@@ -197,7 +202,11 @@ def check_ElemDict(elemDict, nameList):
             errStr += errMsg_type("gridsize[1]", type(elemDict["gridsize"][1]), elemDict["name"], [np.int64, np.int32])
     
     if errStr:
-        raise InputReflError(errStr)
+        errList = errStr.split("\n")[:-1]
+
+        for err in errList:
+            clog.error(err)
+        raise InputReflError()
     
     else:
         return 0
@@ -264,7 +273,11 @@ def check_RTDict(RTDict, nameList):
         errStr += errMsg_field("oChief", "RTDict")
 
     if errStr:
-        raise InputRTError(errStr)
+        errList = errStr.split("\n")[:-1]
+
+        for err in errList:
+            clog.error(err)
+        raise InputRTError()
 
 def check_GBDict(GBDict):
     errStr = ""

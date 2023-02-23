@@ -23,7 +23,7 @@ from src.PyPO.MatTransform import *
 from src.PyPO.PyPOTypes import *
 from src.PyPO.Checks import *
 import src.PyPO.Config as Config
-
+from src.PyPO.CustomLogger import CustomLogger
 import src.PyPO.Plotter as plt
 import src.PyPO.Efficiencies as effs
 import src.PyPO.FitGauss as fgs
@@ -71,7 +71,7 @@ class System(object):
     #
     # @param redirect Redirect all print statements within system to given stdout.
     # @param context Whether system is created in script or in GUI.
-    def __init__(self, redirect=None, context=None):
+    def __init__(self, redirect=None, context=None, verbose=True):
         self.num_ref = 0
         self.num_cam = 0
         Config.initPrint(redirect)
@@ -111,6 +111,11 @@ class System(object):
 
         if not existSave:
             os.makedirs(self.savePath)
+        
+        self.clog_mgr = CustomLogger(os.path.basename(__file__))
+        self.clog = self.clog_mgr.getCustomLogger() if verbose else self.clog_mgr.getCustomLogger(open(os.devnull, "w"))
+
+        self.clog.info("Initialized empty system.")
 
     def __str__(self):
         s = "Reflectors in system:\n"
@@ -164,10 +169,6 @@ class System(object):
     #
     # @param reflDict A filled reflectordictionary. Will raise an exception if not properly filled.
     def addParabola(self, reflDict):
-        """
-        Function for adding paraboloid reflector to system. If gmode='uv', lims_x should contain the smallest and largest radius and lims_y
-        should contain rotation.
-        """
         if not "name" in reflDict:
             reflDict["name"] = "Parabola"
 
@@ -236,7 +237,8 @@ class System(object):
                                                         self.system[reflDict["name"]]["lims_v"][1]]
 
             self.system[reflDict["name"]]["gmode"] = 1
-
+        
+        self.clog.info(f"Added paraboloid {reflDict['name']} to system.")
         self.num_ref += 1
 
     ##
@@ -316,6 +318,7 @@ class System(object):
 
             self.system[reflDict["name"]]["gmode"] = 1
 
+        self.clog.info(f"Added hyperboloid {reflDict['name']} to system.")
         self.num_ref += 1
 
     ##
@@ -390,6 +393,7 @@ class System(object):
 
             self.system[reflDict["name"]]["gmode"] = 1
 
+        self.clog.info(f"Added ellipsoid {reflDict['name']} to system.")
         self.num_ref += 1
 
     ##
@@ -448,6 +452,7 @@ class System(object):
 
             self.system[reflDict["name"]]["gmode"] = 2
 
+        self.clog.info(f"Added plane {reflDict['name']} to system.")
         self.num_ref += 1
     
     ##
@@ -464,9 +469,10 @@ class System(object):
         if isinstance(name, list):
             for _name in name:
                 self.system[_name]["transf"] = MatRotate(rotation, self.system[_name]["transf"], pivot)
-
+            
         else:
             self.system[name]["transf"] = MatRotate(rotation, self.system[name]["transf"], pivot)
+        self.clog.info(f"Rotated {name} by {list(rotation)} degrees around {list(pivot)}.")
 
     ##
     # Translate reflector grids.
@@ -480,7 +486,8 @@ class System(object):
             for _name in name:
                 self.system[_name]["transf"] = MatTranslate(translation, self.system[_name]["transf"])
         else:
-            self.system[name]["transf"] = MatTranslate(translation, self.system[name]["transf"])
+            self.clog.info(f"Translated {name} by {list(translation)} millimeters.")
+        self.system[name]["transf"] = MatTranslate(translation, self.system[name]["transf"])
 
     ##
     # Home a reflector back into default configuration.
@@ -494,7 +501,8 @@ class System(object):
                 self.system[_name]["transf"] = np.eye(4)
         else:
             self.system[name]["transf"] = np.eye(4)
-
+        self.clog.info(f"Transforming {name} to home position.")
+    
     ##
     # Generate reflector grids and normals.
     # 
@@ -638,22 +646,36 @@ class System(object):
     #
     # @see PODict
     def runPO(self, PODict):
+        sc_name = PODict["s_current"]
         PODict["s_current"] = self.currents[PODict["s_current"]]
-        
+       
+        self.clog.info("Starting PO propagation!")
+        self.clog.info(f"Propagating {sc_name} on {PODict['s_current'].surf} to {PODict['t_name']}, propagation mode: {PODict['mode']}.")
+
         source = self.system[PODict["s_current"].surf]
         target = self.system[PODict["t_name"]]
         PODict["k"] = PODict["s_current"].k
+        
         # Default exponent to -1
         if not "exp" in PODict:
             PODict["exp"] = "fwd"
 
         # TODO: insert check for PODict
+        
+        start_time = time.time()
+        
         if PODict["device"] == "CPU":
+            self.clog.info(f"Running {PODict['nThreads']} CPU threads.")
+            self.clog.info(f"... Calculating ...")
             out = PyPO_CPUd(source, target, PODict)
 
         elif PODict["device"] == "GPU":
+            self.clog.info(f"Running {PODict['nThreads']} CUDA threads per block.")
+            self.clog.info(f"... Calculating ...")
             out = PyPO_GPUf(source, target, PODict)
 
+        dtime = time.time() - start_time
+        
         if PODict["mode"] == "JM":
             out.setMeta(PODict["t_name"], PODict["k"])
             self.currents[PODict["name_JM"]] = out
@@ -675,7 +697,7 @@ class System(object):
             frame = self.loadFramePoynt(out[1], PODict["t_name"])
             self.frames[PODict["name_P"]] = frame
 
-
+        self.clog.info(f"Succesfully finished propagation in {dtime:.3f} second.")
         return out
 
     ##
@@ -807,6 +829,7 @@ class System(object):
     #
     # TODO: Change input to dictionary object.
     def runRayTracer(self, fr_in, fr_out, name_target, epsilon=1e-3, nThreads=1, t0=100, device="CPU", verbose=True):
+        self.clog.info("Starting ray-trace propagation!")
         if verbose:
             if device == "CPU":
                 frameObj = RT_CPUd(self.system[name_target], self.frames[fr_in], epsilon, t0, nThreads)
@@ -822,6 +845,7 @@ class System(object):
                 elif device == "GPU":
                     frameObj = RT_GPUf(self.system[name_target], self.frames[fr_in], epsilon, t0, nThreads)
         
+        self.clog.info(f"Succesfully finished ray-trace.")
         self.frames[fr_out] = frameObj
 
 

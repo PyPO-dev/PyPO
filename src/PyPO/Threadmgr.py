@@ -4,6 +4,7 @@ import sys
 
 from src.PyPO.BindUtils import *
 import src.PyPO.Config as Config
+from src.PyPO.CustomLogger import CustomLogger
 
 class Manager(object):
     def __init__(self, context, callback=None):
@@ -16,33 +17,22 @@ class Manager(object):
         t = GThread(target=target, args=args, parent=self)
         t.daemon = True
         t.start()
-        """ 
-        while t.is_alive(): # wait for the thread to exit
-            Config.print(f'Calculating {calc_type} {self.ws.getSymbol()}', end='\r')
-            t.join(.1)
-        dtime = time.time() - start_time
-        Config.print(f'Calculated {calc_type} in {dtime:.3f} seconds', end='\r')
-        Config.print(f'\n')
-        """
 
         return t
     
-    def new_sthread(self, target, args, calc_type):
+    def new_sthread(self, target, args):
         if self.context == "S":
-            start_time = time.time()
             t = threading.Thread(target=target, args=args)
             t.daemon = True
             t.start()
         
             while t.is_alive(): # wait for the thread to exit
-                #Config.print(np.array([1,0,0]))
-                Config.print(f'Calculating {calc_type} {self.ws.getSymbol()}', end='\r')
+                #Config.print(f'Calculating {calc_type} {self.ws.getSymbol()}', end='\r')
                 t.join(.1)
 
 
-            dtime = time.time() - start_time
-            Config.print(f'Calculated {calc_type} in {dtime:.3f} seconds', end='\r')
-            Config.print(f'\n')
+            #Config.print(f'Calculated {calc_type} in {dtime:.3f} seconds', end='\r')
+            #Config.print(f'\n')
         
         else:
             target(*list(args))

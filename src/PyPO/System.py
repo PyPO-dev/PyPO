@@ -173,6 +173,14 @@ class System(object):
             self.currents.update(sys_copy)
             self.frames.update(sys_copy)
 
+    def setLoggingVerbosity(self, verbose=True, handler=None):
+        if handler is None:
+            for fstream in self.clog.handlers:
+                fstream.setStream() if verbose else fstream.setStream(open(os.devnull, "w"))
+
+        else:
+            self.clog.handlers[handler].setStream() if verbose else self.clog.handlers[handler].setStream(open(os.devnull, "w"))
+
     ##
     # Add a paraboloid reflector to the System.
     #
@@ -498,8 +506,9 @@ class System(object):
             for _name in name:
                 self.system[_name]["transf"] = MatTranslate(translation, self.system[_name]["transf"])
         else:
-            self.clog.info(f"Translated {name} by {list(translation)} millimeters.")
-        self.system[name]["transf"] = MatTranslate(translation, self.system[name]["transf"])
+            self.system[name]["transf"] = MatTranslate(translation, self.system[name]["transf"])
+        
+        self.clog.info(f"Translated {name} by {list(translation)} millimeters.")
 
     ##
     # Home a reflector back into default configuration.
@@ -566,7 +575,7 @@ class System(object):
         loadExist = os.path.isdir(path)
 
         if not loadExist:
-            print("Not here...")
+            self.clog.error("Specified system does not exist.")
         
         with open(os.path.join(path, "system"), 'rb') as file: 
             self.system = pickle.load(file)
@@ -746,14 +755,19 @@ class System(object):
     #
     # @see GRTDict
     def createGRTFrame(self, argDict):
+        self.clog.info(f"Generating Gaussian ray-trace beam.")
+        self.clog.info(f"... Sampling ...")
         if not argDict["name"]:
             argDict["name"] = f"Frame_{len(self.frames)}"
        
+        start_time = time.time()
         argDict["angx0"] = np.degrees(argDict["lam"] / (np.pi * argDict["n"] * argDict["x0"]))
         argDict["angy0"] = np.degrees(argDict["lam"] / (np.pi * argDict["n"] * argDict["y0"]))
 
         #check_RTDict(argDict, self.frames.keys())
         self.frames[argDict["name"]] = makeGRTframe(argDict)
+        dtime = time.time() - start_time
+        self.clog.info(f"Succesfully sampled {argDict['nRays']} rays: {dtime} seconds.")
 
     ##
     # Convert a Poynting vector grid to a frame object. Sort of private method
@@ -926,7 +940,6 @@ class System(object):
     #
     # @returns rms RMS spot size of frame in mm.
     def calcSpotRMS(self, name_frame):
-        print(name_frame)
         frame = self.frames[name_frame]
         rms = effs.calcRMS(frame)
         return rms

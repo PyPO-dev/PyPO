@@ -1,10 +1,11 @@
 var searchData=
 [
-  ['tchief_0',['tChief',['../structRTDict.html#a73419cb6acbe5ee511010d2ea3736c47',1,'RTDict::tChief()'],['../structRTDictf.html#ae9e47b54717ddc25848d8f5b2b3186f3',1,'RTDictf::tChief()']]],
-  ['threadpool_1',['threadPool',['../classPropagation.html#a2a5c3d3e2dfef55d84e3c561db8e5610',1,'Propagation::threadPool()'],['../classRayTracer.html#a20d7d1fcca98cb681c8436a024b2092b',1,'RayTracer::threadPool()']]],
-  ['transf_2',['transf',['../structreflparams.html#a8434d4e674be3ec03170fb0088e2c760',1,'reflparams::transf()'],['../structreflparamsf.html#a15b792a2a65a1834a09990a17ed649dd',1,'reflparamsf::transf()']]],
-  ['transformgrids_3',['transformGrids',['../InterfaceReflector_8cpp.html#ac12e89b8d533f7b60f638452323be9a3',1,'InterfaceReflector.cpp']]],
-  ['transfrays_4',['transfRays',['../classRayTracer.html#a54308039ddbee81e5c2d2cb0cc7f992f',1,'RayTracer::transfRays()'],['../KernelsRTf_8cu.html#a8e11820281e7691d1ebe20e66176bb53',1,'transfRays():&#160;KernelsRTf.cu']]],
-  ['translategrids_5',['translateGrids',['../classPyPO_1_1System_1_1System.html#a161bdb6a88e7c0716b9af6e7dda92699',1,'PyPO::System::System']]],
-  ['type_6',['type',['../structreflparams.html#a8ac54ddf87ce608439170fc70bbddb4d',1,'reflparams::type()'],['../structreflparamsf.html#aee4936b839c62673c1d12a2924579e32',1,'reflparamsf::type()']]]
+  ['tchief_0',['tChief',['../structRTDict.html#a73419cb6acbe5ee511010d2ea3736c47',1,'RTDict::tChief()'],['../structGRTDict.html#a8a3da355eb71bc6888ce78fc04eaaf75',1,'GRTDict::tChief()'],['../structRTDictf.html#ae9e47b54717ddc25848d8f5b2b3186f3',1,'RTDictf::tChief()'],['../structGRTDictf.html#aa005f4727eceb7d21e7d0e8902959db7',1,'GRTDictf::tChief()']]],
+  ['templates_2epy_1',['Templates.py',['../Templates_8py.html',1,'']]],
+  ['threadpool_2',['threadPool',['../classPropagation.html#a2a5c3d3e2dfef55d84e3c561db8e5610',1,'Propagation::threadPool()'],['../classRayTracer.html#a20d7d1fcca98cb681c8436a024b2092b',1,'RayTracer::threadPool()']]],
+  ['transf_3',['transf',['../structreflparams.html#a8434d4e674be3ec03170fb0088e2c760',1,'reflparams::transf()'],['../structreflparamsf.html#a15b792a2a65a1834a09990a17ed649dd',1,'reflparamsf::transf()']]],
+  ['transformgrids_4',['transformGrids',['../InterfaceReflector_8cpp.html#ac12e89b8d533f7b60f638452323be9a3',1,'InterfaceReflector.cpp']]],
+  ['transfrays_5',['transfRays',['../classRayTracer.html#a54308039ddbee81e5c2d2cb0cc7f992f',1,'RayTracer::transfRays()'],['../KernelsRTf_8cu.html#a8e11820281e7691d1ebe20e66176bb53',1,'transfRays():&#160;KernelsRTf.cu']]],
+  ['translategrids_6',['translateGrids',['../classPyPO_1_1System_1_1System.html#a161bdb6a88e7c0716b9af6e7dda92699',1,'PyPO::System::System']]],
+  ['type_7',['type',['../structreflparams.html#a8ac54ddf87ce608439170fc70bbddb4d',1,'reflparams::type()'],['../structreflparamsf.html#aee4936b839c62673c1d12a2924579e32',1,'reflparamsf::type()']]]
 ];

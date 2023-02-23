@@ -10,6 +10,8 @@ class inType(Enum):
     floats = 3
     boolean = 4
     dropdown = 5
+    radio = 6
+    xyzradio =7
 
 
 @define
@@ -23,6 +25,7 @@ class InputDescription:
     oArray: bool = field(default=False)
     subdict: dict = field(default=None)
     sublist: list = field(default=None)
+    hidden: bool = field(default=False)
 
     def __attrs_post_init__(self):
         if self.label == None:
@@ -35,6 +38,10 @@ class InputDescription:
             self.numFields = None
         else: 
             self.filloutHints()
+        if self.inType is inType.radio:
+            # print("radio")
+            if self.sublist == None:
+                raise Exception("radio without sublist")
         # if not operator.xor(self.subdict == None , self.sublist == None):
         #     raise Exception("Sublist/subdict Error")
 

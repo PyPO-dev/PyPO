@@ -13,7 +13,7 @@ var searchData=
   ['i4y_10',['i4y',['../structc4Bundle.html#aa4ae85da136d3d91e1711996d59d7191',1,'c4Bundle::i4y()'],['../structc4Bundlef.html#a386296ae42953bf54675db9451e9a9b9',1,'c4Bundlef::i4y()']]],
   ['i4z_11',['i4z',['../structc4Bundle.html#ab4fbcccb08842b48ff5568319427fe0d',1,'c4Bundle::i4z()'],['../structc4Bundlef.html#acce3a13270d4e4ffdfa1e43caa79b562',1,'c4Bundlef::i4z()']]],
   ['initframe_12',['initFrame',['../BeamInit_8h.html#aa1ee8f6478af52fd972fc68bb5a5c6a6',1,'BeamInit.h']]],
-  ['initgauss_13',['initGauss',['../BeamInit_8h.html#aebee209858ba31b61058c5691e9a7cba',1,'BeamInit.h']]],
+  ['initrtgauss_13',['initRTGauss',['../BeamInit_8h.html#aff1a3644f9fba1d9bd64c9fb4b91fe6d',1,'BeamInit.h']]],
   ['inputreflerror_14',['InputReflError',['../classPyPO_1_1Checks_1_1InputReflError.html',1,'PyPO::Checks']]],
   ['inputrterror_15',['InputRTError',['../classPyPO_1_1Checks_1_1InputRTError.html',1,'PyPO::Checks']]],
   ['interfacebeam_2ecpp_16',['InterfaceBeam.cpp',['../InterfaceBeam_8cpp.html',1,'']]],

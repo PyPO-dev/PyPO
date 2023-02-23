@@ -8,9 +8,9 @@ var searchData=
   ['np_5',['np',['../classRTRefls.html#af3a809bc5021ac4abaf9fc32888cbd2f',1,'RTRefls::np()'],['../KernelsRTf_8cu.html#a8e1559c2ea648b1288085b2faf63bad7',1,'np():&#160;KernelsRTf.cu']]],
   ['npencoder_6',['NpEncoder',['../classPyPO_1_1System_1_1NpEncoder.html',1,'PyPO::System']]],
   ['npl_7',['npl',['../KernelsRTf_8cu.html#ae03d7f2f3141a07eca2cd1e6cc6040da',1,'npl():&#160;KernelsRTf.cu'],['../classRTRefls.html#a8adb0add912ae72df0afe6fa87c3f812',1,'RTRefls::npl()']]],
-  ['nrays_8',['nRays',['../structRTDictf.html#a44756df9adb2c8514a28511a00ed07a5',1,'RTDictf::nRays()'],['../structRTDict.html#ad8d2fce8a2bbcb02308843c07c5b1745',1,'RTDict::nRays()']]],
+  ['nrays_8',['nRays',['../structGRTDictf.html#a2e03bce49f79c79d6b87413b8d4ca43d',1,'GRTDictf::nRays()'],['../structRTDictf.html#a44756df9adb2c8514a28511a00ed07a5',1,'RTDictf::nRays()'],['../structGRTDict.html#a30b3004729305813debbe1d89ae9994b',1,'GRTDict::nRays()'],['../structRTDict.html#ad8d2fce8a2bbcb02308843c07c5b1745',1,'RTDict::nRays()']]],
   ['nring_9',['nRing',['../structRTDictf.html#a087b9b84bc06e8ec57f4fc54aa03adc9',1,'RTDictf::nRing()'],['../structRTDict.html#add71a44e886bcd94a47de8003c3c18c6',1,'RTDict::nRing()']]],
-  ['nx_10',['nx',['../structreflcontainerf.html#a53fe29cfc58c61904f8517bd0f7c20dc',1,'reflcontainerf::nx()'],['../structreflcontainer.html#ab862b2fa619189a2c0bfe4391d9001ee',1,'reflcontainer::nx()']]],
+  ['nx_10',['nx',['../structreflcontainer.html#ab862b2fa619189a2c0bfe4391d9001ee',1,'reflcontainer::nx()'],['../structreflcontainerf.html#a53fe29cfc58c61904f8517bd0f7c20dc',1,'reflcontainerf::nx()']]],
   ['ny_11',['ny',['../structreflcontainer.html#a2737304edbcc529252b75a96e0138d7c',1,'reflcontainer::ny()'],['../structreflcontainerf.html#a3361936844af5a235400f0804d7beef5',1,'reflcontainerf::ny()']]],
   ['nz_12',['nz',['../structreflcontainer.html#ac6db2cc383c52f6ede1bc0215e048845',1,'reflcontainer::nz()'],['../structreflcontainerf.html#a87ade7f24d62d965a50746719fd0cb76',1,'reflcontainerf::nz()']]]
 ];

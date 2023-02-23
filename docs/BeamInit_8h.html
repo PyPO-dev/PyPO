@@ -89,6 +89,7 @@ $(function() {
 <code>#include &quot;<a class="el" href="Utils_8h_source.html">Utils.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="Structs_8h_source.html">Structs.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="InterfaceReflector_8h_source.html">InterfaceReflector.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="Random_8h_source.html">Random.h</a>&quot;</code><br />
 </div>
 <p><a href="BeamInit_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -97,8 +98,15 @@ Functions</h2></td></tr>
 <tr class="memitem:aa1ee8f6478af52fd972fc68bb5a5c6a6"><td class="memTemplParams" colspan="2">template&lt;typename T , typename U , typename V &gt; </td></tr>
 <tr class="memitem:aa1ee8f6478af52fd972fc68bb5a5c6a6"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="BeamInit_8h.html#aa1ee8f6478af52fd972fc68bb5a5c6a6">initFrame</a> (T rdict, U *fr)</td></tr>
 <tr class="separator:aa1ee8f6478af52fd972fc68bb5a5c6a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aebee209858ba31b61058c5691e9a7cba"><td class="memTemplParams" colspan="2">template&lt;typename T , typename U , typename V , typename W , typename G &gt; </td></tr>
-<tr class="memitem:aebee209858ba31b61058c5691e9a7cba"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="BeamInit_8h.html#aebee209858ba31b61058c5691e9a7cba">initGauss</a> (T gdict, U refldict, V *res_field, V *res_current)</td></tr>
+<tr class="memitem:aff1a3644f9fba1d9bd64c9fb4b91fe6d"><td class="memTemplParams" colspan="2">template&lt;typename T , typename U , typename V &gt; </td></tr>
+<tr class="memitem:aff1a3644f9fba1d9bd64c9fb4b91fe6d"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="BeamInit_8h.html#aff1a3644f9fba1d9bd64c9fb4b91fe6d">initRTGauss</a> (T grdict, U *fr)</td></tr>
+<tr class="separator:aff1a3644f9fba1d9bd64c9fb4b91fe6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55c124c125d518c772c59f36506bb5c0"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a55c124c125d518c772c59f36506bb5c0"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="BeamInit_8h.html#a55c124c125d518c772c59f36506bb5c0">pdfGauss</a> (std::vector&lt; T &gt; vars, std::vector&lt; T &gt; scales)</td></tr>
+<tr class="separator:a55c124c125d518c772c59f36506bb5c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebee209858ba31b61058c5691e9a7cba"><td class="memTemplParams" colspan="2"><a id="aebee209858ba31b61058c5691e9a7cba" name="aebee209858ba31b61058c5691e9a7cba"></a>
+template&lt;typename T , typename U , typename V , typename W , typename G &gt; </td></tr>
+<tr class="memitem:aebee209858ba31b61058c5691e9a7cba"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>initGauss</b> (T gdict, U refldict, V *res_field, V *res_current)</td></tr>
 <tr class="separator:aebee209858ba31b61058c5691e9a7cba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aafe19b6a388a2d2ea2c69943a1a7c00b"><td class="memTemplParams" colspan="2">template&lt;typename T , typename U , typename V , typename W &gt; </td></tr>
 <tr class="memitem:aafe19b6a388a2d2ea2c69943a1a7c00b"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="BeamInit_8h.html#aafe19b6a388a2d2ea2c69943a1a7c00b">calcJM</a> (T *res_field, T *res_current, V refldict, int mode)</td></tr>
@@ -214,37 +222,71 @@ template&lt;typename T , typename U , typename V &gt; </div>
 
 </div>
 </div>
-<a id="aebee209858ba31b61058c5691e9a7cba" name="aebee209858ba31b61058c5691e9a7cba"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aebee209858ba31b61058c5691e9a7cba">&#9670;&#160;</a></span>initGauss()</h2>
+<a id="aff1a3644f9fba1d9bd64c9fb4b91fe6d" name="aff1a3644f9fba1d9bd64c9fb4b91fe6d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff1a3644f9fba1d9bd64c9fb4b91fe6d">&#9670;&#160;</a></span>initRTGauss()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename T , typename U , typename V , typename W , typename G &gt; </div>
+template&lt;typename T , typename U , typename V &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">void initGauss </td>
+          <td class="memname">void initRTGauss </td>
           <td>(</td>
           <td class="paramtype">T&#160;</td>
-          <td class="paramname"><em>gdict</em>, </td>
+          <td class="paramname"><em>grdict</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">U&#160;</td>
-          <td class="paramname"><em>refldict</em>, </td>
+          <td class="paramtype">U *&#160;</td>
+          <td class="paramname"><em>fr</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Initialize Gaussian ray-trace frame from <a class="el" href="structRTDict.html">RTDict</a> or <a class="el" href="structRTDictf.html">RTDictf</a>.</p>
+<p>Takes an <a class="el" href="structRTDict.html">RTDict</a> or <a class="el" href="structRTDictf.html">RTDictf</a> and generates a frame object, which can be used to initialize a Gaussian ray-trace.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">rdict</td><td><a class="el" href="structRTDict.html">RTDict</a> or <a class="el" href="structRTDictf.html">RTDictf</a> object from which to generate a frame. </td></tr>
+    <tr><td class="paramname">fr</td><td>Pointer to cframe or cframef object.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="structRTDict.html">RTDict</a> </dd>
+<dd>
+<a class="el" href="structRTDictf.html">RTDictf</a> </dd>
+<dd>
+<a class="el" href="structcframe.html">cframe</a> </dd>
+<dd>
+<a class="el" href="structcframef.html">cframef</a> </dd></dl>
+
+</div>
+</div>
+<a id="a55c124c125d518c772c59f36506bb5c0" name="a55c124c125d518c772c59f36506bb5c0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a55c124c125d518c772c59f36506bb5c0">&#9670;&#160;</a></span>pdfGauss()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">T pdfGauss </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>vars</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">V *&#160;</td>
-          <td class="paramname"><em>res_field</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">V *&#160;</td>
-          <td class="paramname"><em>res_current</em>&#160;</td>
+          <td class="paramtype">std::vector&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>scales</em>&#160;</td>
         </tr>
         <tr>
           <td></td>

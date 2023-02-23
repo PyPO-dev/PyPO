@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['npencoder_0',['NpEncoder',['../classPyPO_1_1System_1_1NpEncoder.html',1,'PyPO::System']]]
+  ['manager_0',['Manager',['../classPyPO_1_1Threadmgr_1_1Manager.html',1,'PyPO::Threadmgr']]]
 ];

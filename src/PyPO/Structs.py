@@ -1,17 +1,27 @@
 import ctypes
 import numpy as np
 
-# Classes to represent used return structtypes
-# DOUBLES
+## 
+# @file
+# Definitions of data structures used in the ctypes interface.
+# The structures come in double format for CPU and single format for GPU.
+# These defintions are only for passing structures from Python to the C++ backend.
+
+##
+# Two arrays representing a 1D complex array of double.
 class arrC1(ctypes.Structure):
     _fields_ = [("rx", ctypes.POINTER(ctypes.c_double)),
                 ("ry", ctypes.POINTER(ctypes.c_double))]
 
+##
+# Three arrays representing a 3D real array of double.
 class arrR3(ctypes.Structure):
     _fields_ = [("x", ctypes.POINTER(ctypes.c_double)),
                 ("y", ctypes.POINTER(ctypes.c_double)),
                 ("z", ctypes.POINTER(ctypes.c_double))]
 
+##
+# Twelve arrays representing two 3D complex arrays of double.
 class c2Bundle(ctypes.Structure):
     _fields_ = [("r1x", ctypes.POINTER(ctypes.c_double)),
                 ("r1y", ctypes.POINTER(ctypes.c_double)),
@@ -26,7 +36,8 @@ class c2Bundle(ctypes.Structure):
                 ("i2y", ctypes.POINTER(ctypes.c_double)),
                 ("i2z", ctypes.POINTER(ctypes.c_double))]
 
-
+##
+# Twenty-four arrays representing four 3D complex arrays of double.
 class c4Bundle(ctypes.Structure):
     _fields_ = [("r1x", ctypes.POINTER(ctypes.c_double)),
                 ("r1y", ctypes.POINTER(ctypes.c_double)),
@@ -53,6 +64,8 @@ class c4Bundle(ctypes.Structure):
                 ("i4y", ctypes.POINTER(ctypes.c_double)),
                 ("i4z", ctypes.POINTER(ctypes.c_double))]
 
+##
+# Fifteen arrays representing two 3D complex arrays and one 3D real array of double.
 class c2rBundle(ctypes.Structure):
     _fields_ = [("r1x", ctypes.POINTER(ctypes.c_double)),
                 ("r1y", ctypes.POINTER(ctypes.c_double)),
@@ -70,6 +83,8 @@ class c2rBundle(ctypes.Structure):
                 ("r3y", ctypes.POINTER(ctypes.c_double)),
                 ("r3z", ctypes.POINTER(ctypes.c_double))]
 
+##
+# Reflectorparameters used by C++ backend, double precision..
 class reflparams(ctypes.Structure):
     _fields_ = [("coeffs", ctypes.POINTER(ctypes.c_double)),
                 ("lxu", ctypes.POINTER(ctypes.c_double)),
@@ -83,6 +98,8 @@ class reflparams(ctypes.Structure):
                 ("type", ctypes.c_int),
                 ("transf", ctypes.POINTER(ctypes.c_double))]
 
+##
+# Container for realised reflector grids and normals in double precision.
 class reflcontainer(ctypes.Structure):
     _fields_ = [("size", ctypes.c_int),
                 ("x", ctypes.POINTER(ctypes.c_double)),
@@ -93,6 +110,8 @@ class reflcontainer(ctypes.Structure):
                 ("nz", ctypes.POINTER(ctypes.c_double)),
                 ("area", ctypes.POINTER(ctypes.c_double))]
 
+##
+# Container for storing ray-trace frames.
 class cframe(ctypes.Structure):
     _fields_ = [("size", ctypes.c_int),
                 ("x", ctypes.POINTER(ctypes.c_double)),
@@ -102,6 +121,8 @@ class cframe(ctypes.Structure):
                 ("dy", ctypes.POINTER(ctypes.c_double)),
                 ("dz", ctypes.POINTER(ctypes.c_double))]
 
+##
+# Parameters for initializing a ray-trace frame.
 class RTDict(ctypes.Structure):
     _fields_ = [("nRays", ctypes.c_int),
                 ("nRing", ctypes.c_int),
@@ -114,13 +135,16 @@ class RTDict(ctypes.Structure):
 
 class GRTDict(ctypes.Structure):
     _fields_ = [("nRays", ctypes.c_int),
-                ("angx", ctypes.c_double),
-                ("angy", ctypes.c_double),
-                ("a", ctypes.c_double),
-                ("b", ctypes.c_double),
+                ("angx0", ctypes.c_double),
+                ("angy0", ctypes.c_double),
+                ("x0", ctypes.c_double),
+                ("y0", ctypes.c_double),
+                ("seed", ctypes.c_int),
                 ("tChief", ctypes.POINTER(ctypes.c_double)),
                 ("oChief", ctypes.POINTER(ctypes.c_double))]
 
+##
+# Parameters for initializing a Gaussian beam.
 class GDict(ctypes.Structure):
     _fields_ = [("lam", ctypes.c_double),
                 ("w0x", ctypes.c_double),
@@ -242,10 +266,11 @@ class RTDictf(ctypes.Structure):
 
 class GRTDictf(ctypes.Structure):
     _fields_ = [("nRays", ctypes.c_int),
-                ("angx", ctypes.c_float),
-                ("angy", ctypes.c_float),
-                ("a", ctypes.c_float),
-                ("b", ctypes.c_float),
+                ("angx0", ctypes.c_float),
+                ("angy0", ctypes.c_float),
+                ("x0", ctypes.c_float),
+                ("y0", ctypes.c_float),
+                ("seed", ctypes.c_int),
                 ("tChief", ctypes.POINTER(ctypes.c_float)),
                 ("oChief", ctypes.POINTER(ctypes.c_float))]
 

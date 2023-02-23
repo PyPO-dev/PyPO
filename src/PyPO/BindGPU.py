@@ -3,10 +3,13 @@ import math
 import numpy as np
 import os
 import sys
+import time
 import pathlib
 from src.PyPO.BindUtils import *
 from src.PyPO.Structs import *
 from src.PyPO.PyPOTypes import *
+import src.PyPO.Config as Config
+import src.PyPO.Threadmgr as TManager
 
 import threading
 
@@ -68,13 +71,16 @@ def loadGPUlib():
 
     lib.callRTKernel.restype = None
 
-    return lib
+    ws = WaitSymbol()
+
+    return lib, ws
 
 # WRAPPER FUNCTIONS DOUBLE PREC
 
 #### SINGLE PRECISION
 def PyPO_GPUf(source, target, PODict):
-    lib = loadGPUlib()
+    lib, ws = loadGPUlib()
+    mgr = TManager.Manager(Config.context)
 
     # Create structs with pointers for source and target
     csp = reflparamsf()
@@ -120,6 +126,7 @@ def PyPO_GPUf(source, target, PODict):
             ctypes.byref(c_currents), k, epsilon,
             t_direction, nBlocks, nThreads]
 
+
     if PODict["mode"] == "JM":
         res = c2Bundlef()
 
@@ -127,12 +134,9 @@ def PyPO_GPUf(source, target, PODict):
 
         allocate_c2Bundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
 
-        t = threading.Thread(target=lib.callKernelf_JM, args=args)
-        t.daemon = True
-        t.start()
-        while t.is_alive(): # wait for the thread to exit
-            t.join(.1)
-
+        #t = mgr.new_sthread(target=lib.callKernelf_JM, args=args)
+        mgr.new_sthread(target=lib.callKernelf_JM, args=args)
+        
         # Unpack filled struct
         JM = c2BundleToObj(res, shape=target_shape, obj_t='currents', np_t=np.float64)
 
@@ -145,12 +149,7 @@ def PyPO_GPUf(source, target, PODict):
 
         allocate_c2Bundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
 
-        t = threading.Thread(target=lib.callKernelf_EH, args=args)
-        t.daemon = True
-        t.start()
-        while t.is_alive(): # wait for the thread to exit
-            t.join(.1)
-
+        mgr.new_sthread(target=lib.callKernelf_EH, args=args)
         # Unpack filled struct
         EH = c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
 
@@ -163,12 +162,8 @@ def PyPO_GPUf(source, target, PODict):
 
         allocate_c4Bundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
 
-        t = threading.Thread(target=lib.callKernelf_JMEH, args=args)
-        t.daemon = True
-        t.start()
-        while t.is_alive(): # wait for the thread to exit
-            t.join(.1)
-
+        mgr.new_sthread(target=lib.callKernelf_JMEH, args=args)
+        
         # Unpack filled struct
         JM, EH = c4BundleToObj(res, shape=target_shape, np_t=np.float64)
 
@@ -181,11 +176,16 @@ def PyPO_GPUf(source, target, PODict):
 
         allocate_c2rBundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
 
-        t = threading.Thread(target=lib.callKernelf_EHP, args=args)
-        t.daemon = True
-        t.start()
-        while t.is_alive(): # wait for the thread to exit
-            t.join(.1)
+        mgr.new_sthread(target=lib.callKernelf_EHP, args=args)
+        #t = threading.Thread(target=lib.callKernelf_EHP, args=args)
+        #t.daemon = True
+        #t.start()
+        #while t.is_alive(): # wait for the thread to exit
+        #    Config.print(f'Calculating reflected E, H, P on {target["name"]} {ws.getSymbol()}', end='\r')
+        #    t.join(.1)
+        #dtime = time.time() - start_time
+        #Config.print(f'Calculated reflected E, H, P on {target["name"]} in {dtime:.3f} seconds', end='\r')
+        #Config.print(f'\n')
 
         # Unpack filled struct
         EH, Pr = c2rBundleToObj(res, shape=target_shape, np_t=np.float64)
@@ -198,19 +198,15 @@ def PyPO_GPUf(source, target, PODict):
 
         allocate_c2Bundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
 
-        t = threading.Thread(target=lib.callKernelf_FF, args=args)
-        t.daemon = True
-        t.start()
-        while t.is_alive(): # wait for the thread to exit
-            t.join(.1)
-
+        mgr.new_sthread(target=lib.callKernelf_FF, args=args)
         # Unpack filled struct
         EH = c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
 
         return EH
 
 def RT_GPUf(target, fr_in, epsilon, t0, nThreads):
-    lib = loadGPUlib()
+    lib, ws = loadGPUlib()
+    mgr = TManager.Manager(Config.context)
 
     ctp = reflparamsf()
     allfill_reflparams(ctp, target, ctypes.c_float)
@@ -231,12 +227,10 @@ def RT_GPUf(target, fr_in, epsilon, t0, nThreads):
     args = [ctp, ctypes.byref(inp), ctypes.byref(res),
             epsilon, t0, nBlocks, nThreads]
 
-    t = threading.Thread(target=lib.callRTKernel, args=args)
-    t.daemon = True
-    t.start()
-    while t.is_alive(): # wait for the thread to exit
-        t.join(.1)
-
+    start_time = time.time()
+    
+    mgr.new_sthread(target=lib.callRTKernel, args=args)
+    
     shape = (fr_in.size,)
     fr_out = frameToObj(res, np_t=np.float32, shape=shape)
 

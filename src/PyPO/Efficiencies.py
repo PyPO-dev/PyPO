@@ -7,18 +7,34 @@ def _generateMask(x, y, aperDict):
     
     t = np.arctan2(y, x) + np.pi
 
-    outer = (aperDict["r_out"] * np.cos(t))**2 + (aperDict["b_out"] * np.sin(t))**2
+    outer = (aperDict["outer"][0] * np.cos(t))**2 + (aperDict["outer"][1] * np.sin(t))**2
+    inner = (aperDict["inner"][0] * np.cos(t))**2 + (aperDict["inner"][1] * np.sin(t))**2
 
     cond1 = (x - aperDict["center"][0])**2 + (y - aperDict["center"][1])**2 < outer
-    cond2 = np.sqrt((x - aperDict["center"][0])**2 + (y - aperDict["center"][1])**2) > aperDict["r_in"]
+    cond2 = (x - aperDict["center"][0])**2 + (y - aperDict["center"][1])**2 > inner
  
     return cond1 & cond2
 
+def calcRTcenter(frame):
+    idx_good = np.argwhere((frame.dx**2 + frame.dy**2 + frame.dz**2) > 0.8)
+    c_x = np.sum(frame.x[idx_good]) / len(frame.x[idx_good])
+    c_y = np.sum(frame.y[idx_good]) / len(frame.y[idx_good])
+    c_z = np.sum(frame.z[idx_good]) / len(frame.z[idx_good])
+    
+    return np.array([c_x, c_y, c_z])
+
+def calcRTtilt(frame):
+    idx_good = np.argwhere((frame.dx**2 + frame.dy**2 + frame.dz**2) > 0.8)
+    t_x = np.sum(frame.dx[idx_good]) / len(frame.dx[idx_good])
+    t_y = np.sum(frame.dy[idx_good]) / len(frame.dy[idx_good])
+    t_z = np.sum(frame.dz[idx_good]) / len(frame.dz[idx_good])
+    
+    return np.array([t_x, t_y, t_z])
+
 def calcRMS(frame):
-    c_x = np.sum(frame.x) / len(frame.x)
-    c_y = np.sum(frame.y) / len(frame.y)
-    c_z = np.sum(frame.z) / len(frame.z)
-    rms = np.sqrt(np.sum((frame.x - c_x)**2 + (frame.y - c_y)**2 + (frame.z - c_z)**2) / len(frame.x))
+    idx_good = np.argwhere((frame.dx**2 + frame.dy**2 + frame.dz**2) > 0.8)
+    c_f = calcRTcenter(frame) 
+    rms = np.sqrt(np.sum((frame.x[idx_good] - c_f[0])**2 + (frame.y[idx_good] - c_f[1])**2 + (frame.z[idx_good] - c_f[2])**2) / len(frame.x[idx_good]))
 
     return rms
 
@@ -38,20 +54,18 @@ def calcSpillover(field, surfaceObject, aperDict):
 
 def calcTaper(field, surfaceObject, aperDict):
     grids = generateGrid(surfaceObject, transform=False, spheric=True)
-
-    x = grids.x
-    y = grids.y
     area = grids.area
+    
+    if aperDict:
+        x = grids.x
+        y = grids.y
+        mask = _generateMask(x, y, aperDict) 
 
-    cond1 = np.sqrt((x - aperDict["center"][0])**2 + (y - aperDict["center"][1])**2) < aperDict["r_out"]
-    cond2 = np.sqrt((x - aperDict["center"][0])**2 + (y - aperDict["center"][1])**2) > aperDict["r_in"]
-    mask = cond1 & cond2
 
+        field = field[mask]
+        area = area[mask]
 
-    field_ap = field[mask]
-    area_m = area[mask]
-
-    eff_t = np.absolute(np.sum(field_ap * area_m))**2 / np.sum(np.absolute(field_ap)**2 * area_m) / np.sum(area_m)
+    eff_t = np.absolute(np.sum(field * area))**2 / np.sum(np.absolute(field)**2 * area) / np.sum(area)
 
     return eff_t
 

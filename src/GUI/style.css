@@ -1,4 +1,19 @@
+ElementWidget{
+    padding: 0px;
+    margin: 0px;
+}
+
 ElementWidget MyButton{
+    background:#151ca5;
+    color:#f2c50f;
+    font-weight: bold;
+    font-size: 1.2em;
+    border-top-left-radius :0px;
+    border-top-right-radius : 15px; 
+    border-bottom-left-radius : 0px; 
+    border-bottom-right-radius : 15px;
+}
+FrameWidget MyButton{
     background:#6715a5;
     color:#f2c50f;
     font-weight: bold;
@@ -6,69 +21,88 @@ ElementWidget MyButton{
     border-top-left-radius :0px;
     border-top-right-radius : 15px; 
     border-bottom-left-radius : 0px; 
-    border-bottom-right-radius : 15px
+    border-bottom-right-radius : 15px;
 }
-FrameWidget MyButton{
-    background:#a5156b;
+FieldsWidget MyButton{
+    background:#a51577;
     color:#f2c50f;
+    font-weight: bold;
+    font-size: 1.2em;
     border-top-left-radius :0px;
     border-top-right-radius : 15px; 
     border-bottom-left-radius : 0px; 
-    border-bottom-right-radius : 15px
+    border-bottom-right-radius : 15px;
+}
+CurrentWidget MyButton{
+    background:#a51515;
+    color:#f2c50f;
+    font-weight: bold;
+    font-size: 1.2em;
+    border-top-left-radius :0px;
+    border-top-right-radius : 15px; 
+    border-bottom-left-radius : 0px; 
+    border-bottom-right-radius : 15px;
 }
 QPushButton:hover{
     background:#a51554;
 }
 
 ElementWidget QLabel{
-    background: #6715a5;
+    background: #151ca5;
     font-weight: bold;
     color:#f2c50f;
-    border-radius :15px 15px 15px 15px;
-    /* border-top-right-radius : 0px; 
+    border-top-left-radius :15px;
+    border-top-right-radius : 0px; 
     border-bottom-left-radius : 15px; 
-    border-bottom-right-radius : 0px; */
+    border-bottom-right-radius : 0px;
     padding: 10px;
 }
 
 FrameWidget QLabel{
-    background: #a5156b;
+    background: #6715a5;
     font-weight: bold;
     color:#f2c50f;
-    border-radius :15px 15px 15px 15px;
-    /* border-top-right-radius : 0px; 
+    border-top-left-radius :15px;
+    border-top-right-radius : 0px; 
     border-bottom-left-radius : 15px; 
-    border-bottom-right-radius : 0px; */
+    border-bottom-right-radius : 0px;
     padding: 10px;
 }
-/* FrameWidget QLabel{
-    background: #a5156b;
-    border-radius :15px 0px 0px 0px;
-    /* border-top-right-radius : 0px; 
+FieldsWidget QLabel{
+    background: #a51577;
+    font-weight: bold;
+    color:#f2c50f;
+    border-top-left-radius :15px;
+    border-top-right-radius : 0px; 
     border-bottom-left-radius : 15px; 
-    border-bottom-right-radius : 0px
-} */
- 
-/* QWidget[class="parameterForm"]{
-    background: #6715a5;
-} */
-
-/* FormGenerator{
-    align-items: stretch;
-} */
+    border-bottom-right-radius : 0px;
+    padding: 10px;
+}
+CurrentWidget QLabel{
+    background: #a51515;
+    font-weight: bold;
+    color:#f2c50f;
+    border-top-left-radius :15px;
+    border-top-right-radius : 0px; 
+    border-bottom-left-radius : 15px; 
+    border-bottom-right-radius : 0px;
+    padding: 10px;
+}
 
 MyLabel {
     min-width: 7em;
     max-width: 7em;
 }
 
-/* MyLabel:hover {
-    min-width: 16em;
-    max-width: 100%;
-    color: #a51554;
-} */
-
 QPlainTextEdit{
     background: #333333;
     color: white;
+    font-size: 24px;
 }
+
+FormGenerator{
+    padding: 26px;
+}
+/* .QScrollArea{
+    border: 0px;
+} */

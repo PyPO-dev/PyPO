@@ -16,23 +16,27 @@ def AoE_opts():
             InputDescription(inType.floats, "lims_El", label="Elevation limits", oArray=True, numFields=2)]
 
 def focus_opts_hyp_ell():
-    return [InputDescription(inType.floats, "focus_1", label="Upper focus xyz", oArray=True, numFields=3),
+    return [
+        InputDescription(inType.floats, "focus_1", label="Upper focus xyz", oArray=True, numFields=3),
             InputDescription(inType.floats, "focus_2", label="Lower focus xyz", oArray=True, numFields=3),
-            InputDescription(inType.floats, "ecc", label="Eccentricity", numFields=1)]
+            InputDescription(inType.floats, "ecc", label="Eccentricity", numFields=1)
+    ]
 
 def makeParabolaInp():
-    return [InputDescription(inType.string, "name"),
-            InputDescription(inType.dropdown, "pmode", label="Parameter mode", subdict={
-                "focus"     : [InputDescription(inType.floats, "focus_1", label="Focus xyz", oArray=True, numFields=3),
-                                InputDescription(inType.floats, "vertex", label="Vertex xyz", oArray=True, numFields=3)],
-                "manual"    : [InputDescription(inType.floats, "coeffs", label="AB coefficients", oArray=True, numFields=2)]
-                }),
-            InputDescription(inType.integers, "gridsize", label="Grid size", hints=[101,101], numFields=2, oArray=True),
-            InputDescription(inType.boolean, "flip", label="Flip Normal Vectors"),
-            InputDescription(inType.dropdown, "gmode", label="Grid mode", subdict={
-                "xy" : xy_opts(),
-                "uv" : uv_opts()
-            })]
+    return [
+        InputDescription(inType.string, "name"),
+        InputDescription(inType.dropdown, "pmode", label="Parameter mode", subdict={
+            "focus"     : [InputDescription(inType.floats, "focus_1", label="Focus xyz", oArray=True, numFields=3),
+                            InputDescription(inType.floats, "vertex", label="Vertex xyz", oArray=True, numFields=3)],
+            "manual"    : [InputDescription(inType.floats, "coeffs", label="AB coefficients", oArray=True, numFields=2)]
+            }),
+        InputDescription(inType.integers, "gridsize", label="Grid size", hints=[101,101], numFields=2, oArray=True),
+        InputDescription(inType.boolean, "flip", label="Flip Normal Vectors"),
+        InputDescription(inType.dropdown, "gmode", label="Grid mode", subdict={
+            "xy" : xy_opts(),
+            "uv" : uv_opts()
+        })
+    ]
 
 def makeHyperbolaEllipseInp():
     return [InputDescription(inType.string, "name"),
@@ -78,8 +82,20 @@ def makeTransformationForm(elementName):
         })
     ]
 
-# NOTE
-def initFrameInp():
+def makeTransformationElementsForm(elementList):
+    return[
+        InputDescription(inType.xyzradio, "project", label="Abscissa - ordinate"),
+        InputDescription(inType.dropdown, "type", subdict={
+            "Translation":[
+                InputDescription(inType.floats, "vector", label="Translation Vector", hints=["x","y","z"], numFields=3,oArray=True)],
+            "Rotation": [
+                InputDescription(inType.floats, "vector", label="Rotation Vector", hints=["x","y","z"], numFields=3,oArray=True),
+                InputDescription(inType.floats, "centerOfRotation", label="Center of Rotation", hints=["x","y","z"], numFields=3,oArray=True)
+                ]
+        })
+    ]
+
+def initTubeFrameInp():
     return [InputDescription(inType.string, "name", label="Name of frame", numFields=1),
             InputDescription(inType.integers, "nRays", label="# of rays", hints=[0], numFields=1),
             InputDescription(inType.integers, "nRing", label="# of rings", hints=[0], numFields=1),
@@ -88,7 +104,23 @@ def initFrameInp():
             InputDescription(inType.floats, "a", label="X radius of outer ring", hints=[0], numFields=1),
             InputDescription(inType.floats, "b", label="Y radius of outer ring", hints=[0], numFields=1),
             InputDescription(inType.floats, "tChief", label="Chief ray tilt", hints=[0,0,1], numFields=3, oArray=True),
-            InputDescription(inType.floats, "oChief", label="Chief ray origin", hints=[0,0,0], numFields=3, oArray=True)]
+            InputDescription(inType.floats, "oChief", label="Chief ray origin", hints=[0,0,0], numFields=3, oArray=True)
+            ]
+
+def initGaussianFrameInp():
+
+    return [InputDescription(inType.string, "name", label="Name of frame", numFields=1),
+            InputDescription(inType.integers, "nRays", label="# of rays", hints=[0], numFields=1),
+            InputDescription(inType.floats, "n", label="Refractive index of medium", hints=[1], numFields=1),
+            InputDescription(inType.floats, "lam", label="Wavelength", hints=[1], numFields=1),
+            InputDescription(inType.floats, "x0", label="X beamwaist", hints=[5], numFields=1),
+            InputDescription(inType.floats, "y0", label="Y beamwaist", hints=[5], numFields=1),
+            InputDescription(inType.floats, "tChief", label="Chief ray tilt", hints=[0,0,1], numFields=3, oArray=True),
+            InputDescription(inType.floats, "oChief", label="Chief ray origin", hints=[0,0,0], numFields=3, oArray=True),
+            InputDescription(inType.dropdown, "setseed", label="Set seed", subdict={
+                "random" : [],
+                "set" : [InputDescription(inType.integers, "seed", label="", hints=[0], numFields=1)]
+            })]
 
 def plotFrameInp(frameDict):
     sublist_frames = []
@@ -98,7 +130,7 @@ def plotFrameInp(frameDict):
     
     plotFrame = [
             InputDescription(inType.dropdown, "frame", label="Frame", sublist = sublist_frames),
-            InputDescription(inType.string, "project", label="Abscissa - ordinate", hints=["xy"], numFields=1)
+            InputDescription(inType.xyzradio, "project", label="Abscissa - ordinate")
             ]
 
     return plotFrame
@@ -106,7 +138,7 @@ def plotFrameInp(frameDict):
 def plotFrameOpt(frameName):
     plotFrame = [
             InputDescription(inType.static, "frame", label="Frame", staticValue=frameName),
-            InputDescription(inType.string, "project", label="Abscissa - ordinate", hints=["xy"], numFields=1)
+            InputDescription(inType.xyzradio, "project", label="Abscissa - ordinate")
             ]
 
     return plotFrame
@@ -177,15 +209,25 @@ def initGaussianInp(elemDict):
     
     return initGauss
 
-def plotFieldOpt(fieldName):
+def plotField(fieldName):
     complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
     
     plotField = [
             InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
             InputDescription(inType.dropdown, "comp", label="Component", sublist = complist),
-            InputDescription(inType.string, "project", label="Abscissa - ordinate", hints=["xy"], numFields=1)
+            InputDescription(inType.xyzradio, "project", label="Abscissa - ordinate")
             ]
 
+    return plotField
+
+def plotFarField(fieldName):
+    complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
+    
+    plotField = [
+            InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
+            InputDescription(inType.dropdown, "comp", label="Component", sublist = complist),
+            InputDescription(inType.static, "project", staticValue="xy", hidden=True)
+            ]
     return plotField
 
 def plotCurrentOpt(fieldName):
@@ -194,7 +236,7 @@ def plotCurrentOpt(fieldName):
     plotCurrent = [
             InputDescription(inType.static, "field", label="Current", staticValue=fieldName),
             InputDescription(inType.dropdown, "comp", label="Component", sublist = complist),
-            InputDescription(inType.string, "project", label="Abscissa - ordinate", hints=["xy"], numFields=1)
+            InputDescription(inType.xyzradio, "project", label="Abscissa - ordinate")
             ]
 
     return plotCurrent
@@ -262,6 +304,58 @@ def propPOFFInp(currentDict, elemDict):
             ]
 
     return propFields
+
+def calcSpillEff(fieldDict, elemDict):
+    complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
+   
+    sublist_fields = []
+    if fieldDict:
+        for key, item in fieldDict.items():
+            if elemDict[item.surf]["type"] == 3:
+                sublist_fields.append(key)
+    
+    formTaper = [
+        InputDescription(inType.dropdown, "f_name", label="Field", sublist = sublist_fields),
+        InputDescription(inType.dropdown, "comp", label="Component", sublist = complist),
+        InputDescription(inType.floats, "center", label="Center", numFields=2, oArray=True),
+        InputDescription(inType.floats, "inner", label="Inner axes", numFields=2),
+        InputDescription(inType.floats, "outer", label="Outer axes", numFields=2)
+        ]
+
+    return formTaper
+
+def calcTaperEff(fieldDict, elemDict):
+    complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
+    
+    sublist_fields = []
+    if fieldDict:
+        for key, item in fieldDict.items():
+            if elemDict[item.surf]["type"] == 3:
+                sublist_fields.append(key)
+    
+    formTaper = [
+        InputDescription(inType.dropdown, "f_name", label="Field", sublist = sublist_fields),
+        InputDescription(inType.dropdown, "comp", label="Component", sublist = complist),
+        ]
+
+    return formTaper
+
+def calcXpolEff(fieldDict, elemDict):
+    complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
+    
+    sublist_fields = []
+    if fieldDict:
+        for key, item in fieldDict.items():
+            if elemDict[item.surf]["gmode"] == 2:
+                sublist_fields.append(key)
+    
+    formXpol = [
+        InputDescription(inType.dropdown, "f_name", label="Field", sublist = sublist_fields),
+        InputDescription(inType.dropdown, "co_comp", label="Co-component", sublist = complist),
+        InputDescription(inType.dropdown, "cr_comp", label="X-component", sublist = complist),
+        ]
+
+    return formXpol
 
 def saveSystemForm():
     return [InputDescription(inType.string, "name", label="Name of system", numFields=1)]

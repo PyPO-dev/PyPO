@@ -2,10 +2,13 @@ import ctypes
 import numpy as np
 import os
 import sys
+import time
 import pathlib
 from src.PyPO.BindUtils import *
 from src.PyPO.Structs import *
 from src.PyPO.PyPOTypes import *
+import src.PyPO.Config as Config
+import src.PyPO.Threadmgr as TManager
 
 import threading
 
@@ -73,11 +76,14 @@ def loadCPUlib():
 
     lib.propagateRays.restype = None
 
-    return lib
+    ws = WaitSymbol()
+
+    return lib, ws
 
 # WRAPPER FUNCTIONS DOUBLE PREC
 def PyPO_CPUd(source, target, PODict):
-    lib = loadCPUlib()
+    lib, ws = loadCPUlib()
+    mgr = TManager.Manager(Config.context)
 
     # Create structs with pointers for source and target
     csp = reflparams()
@@ -126,11 +132,7 @@ def PyPO_CPUd(source, target, PODict):
 
         allocate_c2Bundle(res, gt, ctypes.c_double)
 
-        t = threading.Thread(target=lib.propagateToGrid_JM, args=args)
-        t.daemon = True
-        t.start()
-        while t.is_alive(): # wait for the thread to exit
-            t.join(.1)
+        mgr.new_sthread(target=lib.propagateToGrid_JM, args=args)
 
         # Unpack filled struct
         JM = c2BundleToObj(res, shape=target_shape, obj_t='currents', np_t=np.float64)
@@ -143,11 +145,7 @@ def PyPO_CPUd(source, target, PODict):
 
         allocate_c2Bundle(res, gt, ctypes.c_double)
 
-        t = threading.Thread(target=lib.propagateToGrid_EH, args=args)
-        t.daemon = True
-        t.start()
-        while t.is_alive(): # wait for the thread to exit
-            t.join(.1)
+        mgr.new_sthread(target=lib.propagateToGrid_EH, args=args)
 
         # Unpack filled struct
         EH = c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
@@ -160,11 +158,7 @@ def PyPO_CPUd(source, target, PODict):
 
         allocate_c4Bundle(res, gt, ctypes.c_double)
 
-        t = threading.Thread(target=lib.propagateToGrid_JMEH, args=args)
-        t.daemon = True
-        t.start()
-        while t.is_alive(): # wait for the thread to exit
-            t.join(.1)
+        mgr.new_sthread(target=lib.propagateToGrid_JMEH, args=args)
 
         # Unpack filled struct
         JM, EH = c4BundleToObj(res, shape=target_shape, np_t=np.float64)
@@ -177,11 +171,7 @@ def PyPO_CPUd(source, target, PODict):
 
         allocate_c2rBundle(res, gt, ctypes.c_double)
 
-        t = threading.Thread(target=lib.propagateToGrid_EHP, args=args)
-        t.daemon = True
-        t.start()
-        while t.is_alive(): # wait for the thread to exit
-            t.join(.1)
+        mgr.new_sthread(target=lib.propagateToGrid_EHP, args=args)
 
         # Unpack filled struct
         EH, Pr = c2rBundleToObj(res, shape=target_shape, np_t=np.float64)
@@ -194,11 +184,7 @@ def PyPO_CPUd(source, target, PODict):
 
         allocate_arrC1(res, gt, ctypes.c_double)
 
-        t = threading.Thread(target=lib.propagateToGrid_scalar, args=args)
-        t.daemon = True
-        t.start()
-        while t.is_alive(): # wait for the thread to exit
-            t.join(.1)
+        mgr.new_sthread(target=lib.propagateToGrid_scalar, args=args)
 
         # Unpack filled struct
         E = arrC1ToObj(res, shape=target_shape)
@@ -211,11 +197,7 @@ def PyPO_CPUd(source, target, PODict):
 
         allocate_c2Bundle(res, gt, ctypes.c_double)
 
-        t = threading.Thread(target=lib.propagateToFarField, args=args)
-        t.daemon = True
-        t.start()
-        while t.is_alive(): # wait for the thread to exit
-            t.join(.1)
+        mgr.new_sthread(target=lib.propagateToFarField, args=args)
 
         # Unpack filled struct
         EH = c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
@@ -223,7 +205,8 @@ def PyPO_CPUd(source, target, PODict):
         return EH
 
 def RT_CPUd(target, fr_in, epsilon, t0, nThreads):
-    lib = loadCPUlib()
+    lib, ws = loadCPUlib()
+    mgr = TManager.Manager(Config.context)
 
     inp = cframe()
     res = cframe()
@@ -240,16 +223,11 @@ def RT_CPUd(target, fr_in, epsilon, t0, nThreads):
 
     args = [ctp, ctypes.byref(inp), ctypes.byref(res),
                         nThreads, epsilon, t0]
-
-    t = threading.Thread(target=lib.propagateRays, args=args)
-    t.daemon = True
-    t.start()
-    while t.is_alive(): # wait for the thread to exit
-        t.join(.1)
+    
+    mgr.new_sthread(target=lib.propagateRays, args=args)
 
     shape = (fr_in.size,)
     fr_out = frameToObj(res, np_t=np.float64, shape=shape)
-
     return fr_out
 
 if __name__ == "__main__":

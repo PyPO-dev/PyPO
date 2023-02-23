@@ -1,6 +1,6 @@
 import numpy as np
 
-def MatRotate(theta, matAppend, origin=np.zeros(3), radians=False):
+def MatRotate(theta, matAppend, pivot=None, radians=False):
     """
     Create 3D rotation matrix and rotate grids of points.
 
@@ -12,14 +12,14 @@ def MatRotate(theta, matAppend, origin=np.zeros(3), radians=False):
     @return ->
         matOut      :   Full affine rotation matrix.
     """
-
+    pivot = np.zeros(3) if pivot is None else pivot
     if radians:
         theta_x, theta_y, theta_z = theta
 
     else:
         theta_x, theta_y, theta_z = np.radians(theta)
 
-    ox, oy, oz = origin
+    ox, oy, oz = pivot
 
     trans1 = np.array([[1, 0, 0, -ox],
                     [0, 1, 0, -oy],

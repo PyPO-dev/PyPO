@@ -1,8 +1,10 @@
 import ctypes
 import numpy as np
 
-from src.PyPO.PyPOTypes import *
+import matplotlib.pyplot as pt
 
+from src.PyPO.PyPOTypes import *
+import src.PyPO.Config as Config
 # UTILITY FUNCTIONS
 
 def currentConv(currents, c_currents, size, ct_t):
@@ -279,6 +281,8 @@ def allocate_cframe(res, size, ct_t):
 def allfill_cframe(res, frame_py, size, ct_t):
     res.size = size
 
+    print("size is: ", frame_py.size)
+    print("size x is:", len(frame_py.x))
     res.x = (ct_t * size)(*(frame_py.x.tolist()))
     res.y = (ct_t * size)(*(frame_py.y.tolist()))
     res.z = (ct_t * size)(*(frame_py.z.tolist()))
@@ -300,15 +304,16 @@ def allfill_RTDict(res, rdict_py, ct_t):
     res.oChief = (ct_t * 3)(*rdict_py["oChief"].tolist())
 
 def allfill_GRTDict(res, grdict_py, ct_t):
-    res.nRays = ctypes.c_int(rdict_py["nRays"])
+    res.nRays = ctypes.c_int(grdict_py["nRays"])
 
-    res.angx = ct_t(np.radians(rdict_py["angx"]))
-    res.angy = ct_t(np.radians(rdict_py["angy"]))
-    res.a = ct_t(rdict_py["a"])
-    res.b = ct_t(rdict_py["b"])
+    res.angx0 = ct_t(np.radians(grdict_py["angx0"]))
+    res.angy0 = ct_t(np.radians(grdict_py["angy0"]))
+    res.x0 = ct_t(grdict_py["x0"])
+    res.y0 = ct_t(grdict_py["y0"])
+    res.seed = ctypes.c_int(grdict_py["seed"])
 
-    res.tChief = (ct_t * 3)(*np.radians(rdict_py["tChief"]).tolist())
-    res.oChief = (ct_t * 3)(*rdict_py["oChief"].tolist())
+    res.tChief = (ct_t * 3)(*np.radians(grdict_py["tChief"]).tolist())
+    res.oChief = (ct_t * 3)(*grdict_py["oChief"].tolist())
 
 def allfill_GDict(res, gdict_py, ct_t):
     res.lam = ct_t(gdict_py["lam"])
@@ -341,5 +346,24 @@ def frameToObj(res, np_t, shape):
     dx = np.ctypeslib.as_array(res.dx, shape=shape).astype(np_t)
     dy = np.ctypeslib.as_array(res.dy, shape=shape).astype(np_t)
     dz = np.ctypeslib.as_array(res.dz, shape=shape).astype(np_t)
+    
+    out = frame(shape[0], x, y, z, dx, dy, dz)
 
-    return frame(shape[0], x, y, z, dx, dy, dz)
+    return out 
+
+class WaitSymbol(object):
+    def __init__(self):
+        self.symList = ["|", "/", "-", "\\"]
+        self.period = len(self.symList)
+        self.n = 0
+
+    def getSymbol(self):
+        out = self.symList[self.n]
+        self.n += 1
+
+        if self.n == self.period:
+            self.n = 0
+
+        return out
+
+

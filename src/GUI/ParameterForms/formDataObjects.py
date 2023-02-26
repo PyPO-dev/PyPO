@@ -187,6 +187,24 @@ def initPSInp(elemDict):
     
     return initPS
 
+def initSPSInp(elemDict):
+    sublist_surf = []
+
+    if elemDict:
+        for key, item in elemDict.items():
+            if item["type"] == 3: # Only append plane types
+                sublist_surf.append(key)
+
+    initSPS = [
+            InputDescription(inType.dropdown, "surface", label="Point source surface", sublist = sublist_surf),
+            InputDescription(inType.string, "name", label="Beam name", numFields=1),
+            InputDescription(inType.floats, "lam", label="Wavelength of radiation", hints=[1], numFields=1),
+            InputDescription(inType.floats, "E0", label="Peak value", hints=[1], numFields=1),
+            InputDescription(inType.floats, "phase", label="Phase", hints=[0], numFields=1),
+            ]
+    
+    return initSPS
+
 def initGaussianInp(elemDict):
     sublist_surf = []
 
@@ -209,6 +227,27 @@ def initGaussianInp(elemDict):
     
     return initGauss
 
+def initSGaussianInp(elemDict):
+    sublist_surf = []
+
+    if elemDict:
+        for key, item in elemDict.items():
+            if item["type"] == 3: # Only append plane types
+                sublist_surf.append(key)
+
+    initSGauss = [
+            InputDescription(inType.dropdown, "surface", label="Gaussian beam surface", sublist = sublist_surf),
+            InputDescription(inType.string, "name", label="Beam name", numFields=1),
+            InputDescription(inType.floats, "lam", label="Wavelength of radiation", hints=[1], numFields=1),
+            InputDescription(inType.floats, "w0x", label="Beamwaist in X", hints=[5], numFields=1),
+            InputDescription(inType.floats, "w0y", label="Beamwaist in Y", hints=[5], numFields=1),
+            InputDescription(inType.floats, "n", label="Refractive index", hints=[1], numFields=1),
+            InputDescription(inType.floats, "E0", label="Peak value", hints=[1], numFields=1),
+            InputDescription(inType.floats, "z", label="Focal distance", hints=[0], numFields=1),
+            ]
+    
+    return initSGauss
+
 def plotField(fieldName):
     complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
     
@@ -219,6 +258,16 @@ def plotField(fieldName):
             ]
 
     return plotField
+
+def plotSField(fieldName):
+    complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
+    
+    plotSField = [
+            InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
+            InputDescription(inType.xyzradio, "project", label="Abscissa - ordinate")
+            ]
+
+    return plotSField
 
 def plotFarField(fieldName):
     complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
@@ -241,12 +290,18 @@ def plotCurrentOpt(fieldName):
 
     return plotCurrent
 
-def propPOInp(currentDict, elemDict):
+def propPOInp(currentDict, scalarFieldDict, elemDict):
     sublist_currents = []
+    sublist_sfields = []
     sublist_target = []
+
     if currentDict:
         for key, item in currentDict.items():
             sublist_currents.append(key)
+    
+    if scalarFieldDict:
+        for key, item in scalarFieldDict.items():
+            sublist_sfields.append(key)
     
     if elemDict:
         for key, item in elemDict.items():
@@ -257,19 +312,25 @@ def propPOInp(currentDict, elemDict):
 
 
     propFields = [
-            InputDescription(inType.dropdown, "s_current", label="Source currents", sublist = sublist_currents),
             InputDescription(inType.dropdown, "t_name", label="Target surface", sublist = sublist_target),
             InputDescription(inType.dropdown, "mode", label="Propagation mode", subdict={
                 "JM":[
+                    InputDescription(inType.dropdown, "s_current", label="Source currents", sublist = sublist_currents),
                     InputDescription(inType.string, "name_JM", label="Output currents", numFields=1)],
                 "EH":[
+                    InputDescription(inType.dropdown, "s_current", label="Source currents", sublist = sublist_currents),
                     InputDescription(inType.string, "name_EH", label="Output fields", numFields=1)],
                 "JMEH": [
+                    InputDescription(inType.dropdown, "s_current", label="Source currents", sublist = sublist_currents),
                     InputDescription(inType.string, "name_JM", label="Output currents", numFields=1),
                     InputDescription(inType.string, "name_EH", label="Output fields", numFields=1)],
                 "EHP": [ 
+                    InputDescription(inType.dropdown, "s_current", label="Source currents", sublist = sublist_currents),
                     InputDescription(inType.string, "name_EH", label="Output fields", numFields=1),
-                    InputDescription(inType.string, "name_P", label="Output frame", numFields=1)]
+                    InputDescription(inType.string, "name_P", label="Output frame", numFields=1)],
+                "scalar":[
+                    InputDescription(inType.dropdown, "s_scalarfield", label="Source scalar field", sublist = sublist_sfields),
+                    InputDescription(inType.string, "name_field", label="Output scalar field", numFields=1)]
                 }),
             InputDescription(inType.floats, "epsilon", label="Relative permittivity", hints=[1], numFields=1),
             InputDescription(inType.integers, "nThreads", label="# of threads", hints=[1], numFields=1),

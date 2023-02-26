@@ -237,10 +237,10 @@ void initRTGauss(T grdict, U *fr)
        if (pdfGauss<V>(xi, scales) > yi) 
        {
            // Rotate chief ray by tilt angles found
-           rotation  = {-xi[3], xi[2], 0};
+           rotation  = {xi[3], xi[2], 0};
            ut.matRot(rotation, nomChief, zero, ddirection);
            ut.matRot(tChief, ddirection, zero, direction);
-
+           //std::cout << ddirection[2] << std::endl;
            ppos = {xi[0] + oChief[0], xi[1] + oChief[1], oChief[2]};
            ut.matRot(tChief, ppos, oChief, pos);
 

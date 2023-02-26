@@ -46,9 +46,9 @@ def MatRotate(theta, matAppend, pivot=None, radians=False):
                     [0, 0, 1, oz],
                     [0, 0, 0, 1]])
 
-    matOut = np.matmul(trans2, np.matmul(rotZ, np.matmul(rotY, np.matmul(rotX, trans1))))
+    matOut = trans2 @ (rotZ @ (rotY @ (rotX @ trans1)))
 
-    return np.matmul(matOut, matAppend)
+    return matOut @ matAppend
 
 def MatTranslate(trans, matAppend):
     xt, yt, zt = trans
@@ -57,14 +57,15 @@ def MatTranslate(trans, matAppend):
                     [0, 0, 1, zt],
                     [0, 0, 0, 1]])
 
-    return np.matmul(trans, matAppend)
+    return trans @ matAppend
 
 def InvertMat(mat):
     R_T = mat[:3, :3].T
-    R_Tt = np.matmul(-R_T, mat[:3, -1])
+    R_Tt = -R_T @ mat[:3, -1]
 
     matInv = np.eye(4)
     matInv[:3, :3] = R_T
     matInv[:3, -1] = R_Tt
 
     return matInv
+

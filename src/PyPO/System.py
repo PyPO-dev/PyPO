@@ -75,6 +75,8 @@ class System(object):
     def __init__(self, redirect=None, context=None, verbose=True):
         self.num_ref = 0
         self.num_cam = 0
+        self.nThreads_cpu = os.cpu_count()
+        
         Config.initPrint(redirect)
         Config.setContext(context)
         # Internal dictionaries
@@ -571,6 +573,7 @@ class System(object):
     #
     # @param name Load the system under this name.
     def loadSystem(self, name):
+        self.clog.info(f"Loading system {name} from {self.savePathSystems} into current system.")
         path = os.path.join(self.savePathSystems, name)
         loadExist = os.path.isdir(path)
 
@@ -594,6 +597,7 @@ class System(object):
     #
     # @ param name Name of reflector to be removed.
     def removeElement(self, name):
+        self.clog.info(f"Removed element {name} from system.")
         del self.system[name]
     
     ##
@@ -601,6 +605,7 @@ class System(object):
     #
     # @param frameName Name of frame to be removed.
     def removeFrame(self, frameName):
+        self.clog.info(f"Removed frame {frameName} from system.")
         del self.frames[frameName]
     
     ##
@@ -608,6 +613,7 @@ class System(object):
     #
     # @param fieldName Name of field to be removed.
     def removeField(self, fieldName):
+        self.clog.info(f"Removed PO field {fieldName} from system.")
         del self.fields[fieldName]
     
     ##
@@ -615,8 +621,17 @@ class System(object):
     #
     # @param curentName Name of current to be removed.
     def removeCurrent(self, currentName):
+        self.clog.info(f"Removed PO current {currentName} from system.")
         del self.currents[currentName]
 
+    ##
+    # Remove a scalar PO field from system
+    #
+    # @param fieldName Name of scalar field to be removed.
+    def removeScalarField(self, fieldName):
+        self.clog.info(f"Removed scalar PO field {fieldName} from system.")
+        del self.scalarfields[fieldName]
+    
     ##
     # Read a custom beam from disk into the system. 
     #
@@ -677,15 +692,16 @@ class System(object):
             PODict["s_current"] = self.currents[PODict["s_current"]]
             self.clog.info(f"Propagating {sc_name} on {PODict['s_current'].surf} to {PODict['t_name']}, propagation mode: {PODict['mode']}.")
             source = self.system[PODict["s_current"].surf]
+            PODict["k"] = PODict["s_current"].k
 
         else:
             sc_name = PODict["s_scalarfield"]
             PODict["s_scalarfield"] = self.scalarfields[PODict["s_scalarfield"]]
             self.clog.info(f"Propagating {sc_name} on {PODict['s_scalarfield'].surf} to {PODict['t_name']}, propagation mode: {PODict['mode']}.")
             source = self.system[PODict["s_scalarfield"].surf]
+            PODict["k"] = PODict["s_scalarfield"].k
        
         target = self.system[PODict["t_name"]]
-        PODict["k"] = PODict["s_current"].k
         
         # Default exponent to -1
         if not "exp" in PODict:
@@ -696,6 +712,10 @@ class System(object):
         start_time = time.time()
         
         if PODict["device"] == "CPU":
+            if PODict["nThreads"] > self.nThreads_cpu:
+                self.clog.warning(f"Not enough CPU threads available, automatically reducing threadcount.")
+                PODict["nThreads"] = self.nThreads_cpu
+            
             self.clog.info(f"Hardware: running {PODict['nThreads']} CPU threads.")
             self.clog.info(f"... Calculating ...")
             out = PyPO_CPUd(source, target, PODict)
@@ -868,25 +888,24 @@ class System(object):
     # Run a ray-trace propagation from a frame to a surface.
     #
     # TODO: Change input to dictionary object.
-    def runRayTracer(self, fr_in, fr_out, name_target, epsilon=1e-3, nThreads=1, t0=100, device="CPU", verbose=True):
+    #def runRayTracer(self, fr_in, fr_out, name_target, epsilon=1e-3, nThreads=1, t0=100, device="CPU", verbose=True):
+    def runRayTracer(self, runRTDict):
         self.clog.info("Starting ray-trace propagation!")
-        if verbose:
-            if device == "CPU":
-                frameObj = RT_CPUd(self.system[name_target], self.frames[fr_in], epsilon, t0, nThreads)
 
-            elif device == "GPU":
-                frameObj = RT_GPUf(self.system[name_target], self.frames[fr_in], epsilon, t0, nThreads)
+        check_runRTDict(runRTDict, self.system, self.frames)
 
-        else:
-            with suppress_stdout():
-                if device == "CPU":
-                    frameObj = RT_CPUd(self.system[name_target], self.frames[fr_in], epsilon, t0, nThreads)
+        # TODO: write checker for this dict
+        runRTDict["fr_in"] = self.frames[runRTDict["fr_in"]]
+        runRTDict["t_name"] = self.system[runRTDict["t_name"]]
+        
+        if runRTDict["device"] == "CPU":
+            frameObj = RT_CPUd(runRTDict)
 
-                elif device == "GPU":
-                    frameObj = RT_GPUf(self.system[name_target], self.frames[fr_in], epsilon, t0, nThreads)
+        elif runRTDict["device"] == "GPU":
+            frameObj = RT_GPUf(runRTDict)
         
         self.clog.info(f"Succesfully finished ray-trace.")
-        self.frames[fr_out] = frameObj
+        self.frames[runRTDict["fr_out"]] = frameObj
 
 
     def interpFrame(self, name_fr_in, name_field, name_target, name_out, comp, method="nearest"):
@@ -1085,7 +1104,7 @@ class System(object):
     # @param ret Return the Figure and Axis object. Only called by GUI. Default is False.
     #
     # @see aperDict
-    def plotBeam2D(self, name_obj, comp,
+    def plotBeam2D(self, name_obj, comp=None,
                     vmin=-30, vmax=0, show=True, amp_only=False,
                     save=False, interpolation=None,
                     aperDict=None, mode='dB', project='xy',
@@ -1094,20 +1113,25 @@ class System(object):
 
         aperDict = {"plot":False} if aperDict is None else aperDict
         
-        if comp[0] == "E" or comp[0] == "H":
+        if comp is None:
+            field_comp = self.scalarfields[name_obj].S
+            name_surface = self.scalarfields[name_obj].surf
+        
+        elif comp[0] == "E" or comp[0] == "H":
             field = self.fields[name_obj]
+            name_surface = field.surf
         
             if comp in self.EHcomplist:
                 field_comp = getattr(field, comp)
 
-
-        if comp[0] == "J" or comp[0] == "M":
+        elif comp[0] == "J" or comp[0] == "M":
             field = self.currents[name_obj] 
+            name_surface = field.surf
             
             if comp in self.JMcomplist:
                 field_comp = getattr(field, comp)
 
-        name_surface = field.surf
+
         plotObject = self.system[name_surface]
         
         default = "mm"
@@ -1235,10 +1259,10 @@ class System(object):
     # @param ret Return Figure and Axis. Default is False.
     # @param aspect Aspect ratio of plot. Default is 1.
     def plotRTframe(self, frame_name, project="xy", ret=False, aspect=1):
-        if returns:
-            return plt.plotRTframe(self.frames[frame_name], project, self.savePath, returns, aspect)
+        if ret:
+            return plt.plotRTframe(self.frames[frame_name], project, self.savePath, ret, aspect)
         else:
-            plt.plotRTframe(self.frames[frame_name], project, self.savePath, returns, aspect)
+            plt.plotRTframe(self.frames[frame_name], project, self.savePath, ret, aspect)
 
     ##
     # Create a deep copy of any object.
@@ -1248,6 +1272,63 @@ class System(object):
     # @returns copy A deepcopy of obj.
     def copyObj(self, obj):
         return copy.deepcopy(obj)
+
+    ##
+    # Find rotation matrix to rotate v onto u.
+    #
+    # @param v Numpy array of length 3. 
+    # @param u Numpy array of length 3.
+    def findMatrix(self, v, u):
+        I = np.eye(3)
+        if np.array_equal(v, u):
+            return I
+
+        lenv = np.linalg.norm(v)
+        lenu = np.linalg.norm(u)
+        if lenv == 0 or lenu == 0:
+            self.clog.error("Encountered 0-length vector. Cannot proceed.")
+            exit(0)
+
+        w = np.cross(v, u)
+        lenw = np.linalg.norm(w)
+        
+        w = w / lenw
+        
+        K = np.array([[0, -w[2], w[1]], [w[2], 0, -w[0]], [-w[1], w[0], 0]])
+        #print(K)
+        theta = np.arcsin(lenw / (lenv * lenu))
+        R = I + np.sin(theta) * K + (1 - np.cos(theta)) * K @ K
+        return R
+
+    ##
+    # Find x, y and z rotation angles from general rotation matrix.
+    #
+    # @param M Numpy array of shape (3,3) containg a general rotation matrix.
+    #
+    # @returns r Numpy array of length 3 containing rotation angles around x, y and z.
+    def getAnglesFromMatrix(self, M):
+        if M[2,0] < 1:
+            if M[2,0] > -1:
+                ry = np.arcsin(-M[2,0])
+                rz = np.arctan2(M[1,0], M[0,0])
+                rx = np.arctan2(M[2,1], M[2,2])
+
+            else:
+                ry = np.pi / 2
+                rz = -np.arctan2(-M[1,2], M[1,1])
+                rx = 0
+
+        else:
+            ry = -np.pi / 2
+            rz = np.arctan2(-M[1,2], M[1,1])
+            rx = 0
+        #self.clog.debug(M[1,2])
+
+        r = np.degrees(np.array([rx, ry, rz]))
+
+
+
+        return r
 
     def _compToFields(self, comp, field):
         null = np.zeros(field.shape, dtype=complex)

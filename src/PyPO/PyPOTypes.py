@@ -109,9 +109,9 @@ class scalarfield(object):
     ##
     # Constructor for scalar field.
     #
-    # @param x Scalar field.
-    def __init__(self, x):
-        self.x = x
+    # @param S Scalar field.
+    def __init__(self, S):
+        self.S = S
 
     ##
     # Set scalar field metadata.

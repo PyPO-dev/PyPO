@@ -101,14 +101,6 @@ def PyPO_CPUd(source, target, PODict):
     allocate_reflcontainer(cs, gs, ctypes.c_double)
     allocate_reflcontainer(ct, gt, ctypes.c_double)
 
-    if PODict["mode"] == "Scalar":
-        c_cfield = arrC1()
-        fieldConv(PODict["s_field"], c_field, gs, ctypes.c_double)
-
-    else:
-        c_currents = c2Bundle()
-        currentConv(PODict["s_current"], c_currents, gs, ctypes.c_double)
-
     target_shape = (target["gridsize"][0], target["gridsize"][1])
 
     if PODict["exp"] == "fwd":
@@ -121,10 +113,22 @@ def PyPO_CPUd(source, target, PODict):
     nThreads    = ctypes.c_int(PODict["nThreads"])
     epsilon     = ctypes.c_double(PODict["epsilon"])
     t_direction = ctypes.c_double(exp_prop)
+    
+    if PODict["mode"] == "scalar":
+        c_field = arrC1()
+        sfieldConv(PODict["s_scalarfield"], c_field, gs, ctypes.c_double)
+        args = [csp, ctp, ctypes.byref(cs), ctypes.byref(ct),
+                ctypes.byref(c_field), k, nThreads, epsilon,
+                t_direction]
 
-    args = [csp, ctp, ctypes.byref(cs), ctypes.byref(ct),
-            ctypes.byref(c_currents), k, nThreads, epsilon,
-            t_direction]
+    else:
+        c_currents = c2Bundle()
+        currentConv(PODict["s_current"], c_currents, gs, ctypes.c_double)
+        args = [csp, ctp, ctypes.byref(cs), ctypes.byref(ct),
+                ctypes.byref(c_currents), k, nThreads, epsilon,
+                t_direction]
+
+
 
     if PODict["mode"] == "JM":
         res = c2Bundle()
@@ -178,7 +182,7 @@ def PyPO_CPUd(source, target, PODict):
 
         return [EH, Pr]
 
-    elif PODict["mode"] == "Scalar":
+    elif PODict["mode"] == "scalar":
         res = arrC1()
         args.insert(0, res)
 
@@ -187,9 +191,9 @@ def PyPO_CPUd(source, target, PODict):
         mgr.new_sthread(target=lib.propagateToGrid_scalar, args=args)
 
         # Unpack filled struct
-        E = arrC1ToObj(res, shape=target_shape)
+        S = arrC1ToObj(res, shape=target_shape)
 
-        return E
+        return S
 
     elif PODict["mode"] == "FF":
         res = c2Bundle()
@@ -204,29 +208,29 @@ def PyPO_CPUd(source, target, PODict):
 
         return EH
 
-def RT_CPUd(target, fr_in, epsilon, t0, nThreads):
+def RT_CPUd(runRTDict):
     lib, ws = loadCPUlib()
     mgr = TManager.Manager(Config.context)
 
     inp = cframe()
     res = cframe()
 
-    allocate_cframe(res, fr_in.size, ctypes.c_double)
-    allfill_cframe(inp, fr_in, fr_in.size, ctypes.c_double)
+    allocate_cframe(res, runRTDict["fr_in"].size, ctypes.c_double)
+    allfill_cframe(inp, runRTDict["fr_in"], runRTDict["fr_in"].size, ctypes.c_double)
 
     ctp = reflparams()
-    allfill_reflparams(ctp, target, ctypes.c_double)
+    allfill_reflparams(ctp, runRTDict["t_name"], ctypes.c_double)
 
-    nThreads    = ctypes.c_int(nThreads)
-    epsilon     = ctypes.c_double(epsilon)
-    t0          = ctypes.c_double(t0)
+    nThreads    = ctypes.c_int(runRTDict["nThreads"])
+    tol         = ctypes.c_double(runRTDict["tol"])
+    t0          = ctypes.c_double(runRTDict["t0"])
 
     args = [ctp, ctypes.byref(inp), ctypes.byref(res),
-                        nThreads, epsilon, t0]
+                        nThreads, tol, t0]
     
     mgr.new_sthread(target=lib.propagateRays, args=args)
 
-    shape = (fr_in.size,)
+    shape = (runRTDict["fr_in"].size,)
     fr_out = frameToObj(res, np_t=np.float64, shape=shape)
     return fr_out
 

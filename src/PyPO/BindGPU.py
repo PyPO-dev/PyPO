@@ -105,14 +105,6 @@ def PyPO_GPUf(source, target, PODict):
     allocate_reflcontainer(cs, gs, ctypes.c_float)
     allocate_reflcontainer(ct, gt, ctypes.c_float)
 
-    if PODict["mode"] == "Scalar":
-        c_cfield = arrC1f()
-        fieldConv(PODict["s_field"], c_field, gs, ctypes.c_float)
-
-    else:
-        c_currents = c2Bundlef()
-        currentConv(PODict["s_current"], c_currents, gs, ctypes.c_float)
-
     target_shape = (target["gridsize"][0], target["gridsize"][1])
 
     nBlocks = math.ceil(gt / PODict["nThreads"])
@@ -128,11 +120,20 @@ def PyPO_GPUf(source, target, PODict):
     nBlocks     = ctypes.c_int(nBlocks)
     epsilon     = ctypes.c_float(PODict["epsilon"])
     t_direction = ctypes.c_float(exp_prop)
+    
+    if PODict["mode"] == "scalar":
+        c_field = arrC1f()
+        sfieldConv(PODict["s_scalarfield"], c_field, gs, ctypes.c_float)
+        args = [csp, ctp, ctypes.byref(cs), ctypes.byref(ct),
+                ctypes.byref(c_field), k, epsilon,
+                t_direction, nBlocks, nThreads]
 
-    args = [csp, ctp, ctypes.byref(cs), ctypes.byref(ct),
-            ctypes.byref(c_currents), k, epsilon,
-            t_direction, nBlocks, nThreads]
-
+    else:
+        c_currents = c2Bundlef()
+        currentConv(PODict["s_current"], c_currents, gs, ctypes.c_float)
+        args = [csp, ctp, ctypes.byref(cs), ctypes.byref(ct),
+                ctypes.byref(c_currents), k, epsilon,
+                t_direction, nBlocks, nThreads]
 
     if PODict["mode"] == "JM":
         res = c2Bundlef()
@@ -210,9 +211,9 @@ def PyPO_GPUf(source, target, PODict):
 
         mgr.new_sthread(target=lib.callKernelf_scalar, args=args)
         # Unpack filled struct
-        EH = arrC1ToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
+        S = arrC1ToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
 
-        return EH
+        return S
 
 def RT_GPUf(target, fr_in, epsilon, t0, nThreads):
     lib, ws = loadGPUlib()

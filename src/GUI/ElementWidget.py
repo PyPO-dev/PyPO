@@ -137,6 +137,9 @@ class CurrentWidget(ElementWidget):
    def __init__ (self, name, removeAction, plotAction, p=None ):
         super().__init__(name, plotAction, removeAction, p=p)
         
+class SFieldsWidget(ElementWidget):
+    def __init__ (self, name, removeAction, plotAction, p=None ):
+        super().__init__(name, plotAction, removeAction, p=p)
 
 if __name__ == "__main__":
     app = QApplication([])

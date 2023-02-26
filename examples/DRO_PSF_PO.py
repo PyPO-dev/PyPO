@@ -72,7 +72,7 @@ def ex_DRO_PO(device):
         nThreads = 256
 
     else:
-        nThreads = 11
+        nThreads = 112
 
     plane1_to_p1 = {
             "s_name"    : "plane1",

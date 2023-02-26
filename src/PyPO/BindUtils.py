@@ -42,8 +42,8 @@ def fieldConv(field, c_fields, size, ct_t):
     c_fields.i2z = (ct_t * size)(*np.imag(field.Hz).ravel().tolist())
 
 def sfieldConv(field, c_field, size, ct_t):
-    c_currents.rx = (ct_t * size)(*np.real(field.x).ravel().tolist())
-    c_currents.ix = (ct_t * size)(*np.imag(field.x).ravel().tolist())
+    c_field.rx = (ct_t * size)(*np.real(field.S).ravel().tolist())
+    c_field.ix = (ct_t * size)(*np.imag(field.S).ravel().tolist())
 
 def extractorScalar(source, target, field, ct_t):
     """
@@ -281,8 +281,6 @@ def allocate_cframe(res, size, ct_t):
 def allfill_cframe(res, frame_py, size, ct_t):
     res.size = size
 
-    print("size is: ", frame_py.size)
-    print("size x is:", len(frame_py.x))
     res.x = (ct_t * size)(*(frame_py.x.tolist()))
     res.y = (ct_t * size)(*(frame_py.y.tolist()))
     res.z = (ct_t * size)(*(frame_py.z.tolist()))

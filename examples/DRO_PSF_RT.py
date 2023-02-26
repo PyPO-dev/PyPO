@@ -54,19 +54,32 @@ def ex_DRO_RT(device):
 
     s.plotSystem()
 
-    s.createFrame(RTpar)
+    s.createTubeFrame(RTpar)
 
-    if device == "CPU":
-        s.runRayTracer("start", "pri", "p1", nThreads=11, t0=1e4)
-        s.runRayTracer("pri", "focus", "plane1", nThreads=11, t0=1e4)
+    start_pri_RT = {
+            "fr_in"     : "start",
+            "t_name"    : "p1",
+            "fr_out"    : "pri",
+            "tol"       : 1e-3,
+            "nThreads"  : 11 if device == "CPU" else 256,
+            "device"    : device
+            }
 
-    elif device == "GPU":
-        s.runRayTracer("start", "pri", "p1", nThreads=256, t0=1e4, device=device)
-        s.runRayTracer("pri", "focus", "plane1", nThreads=256, t0=1e4, device=device)
+    pri_focus_RT = {
+            "fr_in"     : "pri",
+            "t_name"    : "plane1",
+            "fr_out"    : "focus",
+            "tol"       : -1e-3,
+            "nThreads"  : 11 if device == "CPU" else 256,
+            "device"    : device
+            }
+    
+    s.runRayTracer(start_pri_RT)
+    s.runRayTracer(pri_focus_RT)
 
     pt.show()
     s.plotRTframe("focus")
     s.plotSystem(RTframes=["start", "pri", "focus"])
 
 if __name__ == "__main__":
-    ex_DRO()
+    ex_DRO_RT()

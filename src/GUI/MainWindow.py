@@ -12,7 +12,7 @@ import src.GUI.ParameterForms.formDataObjects as fDataObj
 from src.GUI.PlotScreen import PlotScreen
 from src.GUI.TransformationWidget import TransformationWidget
 from src.GUI.Acccordion import Accordion
-from src.GUI.ElementWidget import ReflectorWidget, FrameWidget, FieldsWidget, CurrentWidget, SymDialog
+from src.GUI.ElementWidget import ReflectorWidget, FrameWidget, FieldsWidget, CurrentWidget, SFieldsWidget, SymDialog
 from src.GUI.Console import ConsoleGenerator
 from src.GUI.Console import print
 import numpy as np
@@ -210,6 +210,7 @@ class MainWidget(QWidget):
         self.refreshColumn(self.stm.frames, "frames")
         self.refreshColumn(self.stm.fields, "fields")
         self.refreshColumn(self.stm.currents, "currents")
+        self.refreshColumn(self.stm.scalarfields, "scalarfields")
    
     def removeSystemCall(self):
         removeDict = self.ParameterWid.read()
@@ -232,6 +233,8 @@ class MainWidget(QWidget):
             elif columnType == "currents":
                 self.ElementsColumn.POCurrents.addWidget(CurrentWidget(key, self.stm.removeCurrent, self.setPlotFieldFormOpt))
 
+            elif columnType == "scalarfields":
+                self.ElementsColumn.SPOFields.addWidget(SFieldsWidget(key,self.stm.removeField, self.setPlotSFieldFormOpt))
 
 
     def setForm(self, formData, readAction):
@@ -275,6 +278,7 @@ class MainWidget(QWidget):
     def addParabolaAction(self):
         elementDict = self.ParameterWid.read()
         self.stm.addParabola(elementDict) 
+        self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"],self.reflectorActions))
     
     def addHyperbolaAction(self):
         elementDict = self.ParameterWid.read()
@@ -335,6 +339,9 @@ class MainWidget(QWidget):
     def setInitPSForm(self):
         self.setForm(fDataObj.initPSInp(self.stm.system), readAction=self.addPSAction)
     
+    def setInitSPSForm(self):
+        self.setForm(fDataObj.initSPSInp(self.stm.system), readAction=self.addSPSAction)
+    
     def addTubeFrameAction(self):
         RTDict = self.ParameterWid.read()
         self.stm.createTubeFrame(RTDict)
@@ -349,19 +356,24 @@ class MainWidget(QWidget):
 
         self.stm.createGRTFrame(GRTDict)
         self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(GRTDict["name"],
-                             self.stm.removeFrame,self.setPlotFrameFormOpt, self.calcRMSfromFrame,))    
+                             self.stm.removeFrame,self.setPlotFrameFormOpt, self.calcRMSfromFrame))    
     
     def addGaussianAction(self):
         GDict = self.ParameterWid.read()
         self.stm.createGaussian(GDict, GDict["surface"])
-        self.ElementsColumn.POFields.addWidget(FieldsWidget(GDict["name"], [self.setPlotFieldFormOpt, self.stm.removeField]))
-        self.ElementsColumn.POCurrents.addWidget(CurrentWidget(GDict["name"], [self.setPlotCurrentFormOpt, self.stm.removeCurrent]))
+        self.ElementsColumn.POFields.addWidget(FieldsWidget(GDict["name"], self.stm.removeField, self.setPlotFieldFormOpt))
+        self.ElementsColumn.POCurrents.addWidget(CurrentWidget(GDict["name"], self.stm.removeCurrent, self.setPlotCurrentFormOpt))
     
     def addPSAction(self):
         PSDict = self.ParameterWid.read()
         self.stm.generatePointSource(PSDict, PSDict["surface"])
-        self.ElementsColumn.POFields.addWidget(FieldsWidget(PSDict["name"], [self.setPlotFieldFormOpt, self.stm.removeField]))
-        self.ElementsColumn.POCurrents.addWidget(CurrentWidget(PSDict["name"], [self.setPlotCurrentFormOpt, self.stm.removeCurrent]))
+        self.ElementsColumn.POFields.addWidget(FieldsWidget(PSDict["name"], self.stm.removeField, self.setPlotFieldFormOpt))
+        self.ElementsColumn.POCurrents.addWidget(CurrentWidget(PSDict["name"], self.stm.removeCurrent, self.setPlotCurrentFormOpt))
+    
+    def addSPSAction(self):
+        SPSDict = self.ParameterWid.read()
+        self.stm.generatePointSourceScalar(SPSDict, SPSDict["surface"])
+        self.ElementsColumn.SPOFields.addWidget(SFieldsWidget(SPSDict["name"], self.stm.removeScalarField, self.setPlotSFieldFormOpt))
     
     def setPlotFrameForm(self):
         self.setForm(fDataObj.plotFrameInp(self.stm.frames), readAction=self.addPlotFrameAction)
@@ -374,8 +386,10 @@ class MainWidget(QWidget):
             self.setForm(fDataObj.plotFarField(field), readAction=self.addPlotFieldAction)
         else:
             self.setForm(fDataObj.plotField(field), readAction=self.addPlotFieldAction)
-            
-        
+                
+    def setPlotSFieldFormOpt(self, field):
+        self.setForm(fDataObj.plotSField(field), readAction=self.addPlotSFieldAction)
+    
     def setPlotCurrentFormOpt(self, current):
         self.setForm(fDataObj.plotCurrentOpt(current), readAction=self.addPlotCurrentAction)
     
@@ -391,6 +405,14 @@ class MainWidget(QWidget):
         fig, _ = self.stm.plotBeam2D(plotFieldDict["field"], plotFieldDict["comp"], 
                                     project=plotFieldDict["project"], ret=True)
         self.addPlot(fig, f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
+
+        self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
+    
+    def addPlotSFieldAction(self):
+        plotSFieldDict = self.ParameterWid.read()
+        fig, _ = self.stm.plotBeam2D(plotSFieldDict["field"], 
+                                    project=plotSFieldDict["project"], ret=True)
+        self.addPlot(fig, f'{plotSFieldDict["field"]} - {plotSFieldDict["project"]}')
 
         self.addToWindowGrid(self.PlotScreen, self.GPPlotScreen)
     
@@ -414,7 +436,7 @@ class MainWidget(QWidget):
                                 [self.setPlotFrameFormOpt, self.stm.removeFrame, self.calcRMSfromFrame]))
     
     def setPOInitForm(self):
-        self.setForm(fDataObj.propPOInp(self.stm.currents, self.stm.system), self.addPropBeamAction)
+        self.setForm(fDataObj.propPOInp(self.stm.currents, self.stm.scalarfields, self.stm.system), self.addPropBeamAction)
     
     def setPOFFInitForm(self):
         self.setForm(fDataObj.propPOFFInp(self.stm.currents, self.stm.system), self.addPropBeamAction)
@@ -589,7 +611,7 @@ class PyPOMainWindow(QMainWindow):
         initPointVecAction.triggered.connect(self.mainWid.setInitPSForm)
         makeBeamPS.addAction(initPointVecAction)
         initPointScalAction = QAction("Scalar", self)
-        initPointScalAction.triggered.connect(self.mainWid.setInitPSForm)
+        initPointScalAction.triggered.connect(self.mainWid.setInitSPSForm)
         makeBeamPS.addAction(initPointScalAction)
     
         makeBeamG = makeBeam.addMenu("Gaussian beam")

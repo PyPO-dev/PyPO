@@ -343,7 +343,7 @@ __device__ __inline__ void s_mult(cuFloatComplex (&cv)[3], const float &s, cuFlo
 }
 
 /**
- * Snell's law.
+ * Snell's law reflection.
  *
  * Calculate reflected direction vector from incoming direction and normal vector.
  * 
@@ -365,7 +365,7 @@ __device__ __inline__ void snell(cuFloatComplex (&cvin)[3], float (&normal)[3], 
 }
 
 /**
- * Snell's law.
+ * Snell's law reflection.
  *
  * Calculate reflected direction vector from incoming direction and normal vector.
  * 
@@ -384,6 +384,33 @@ __device__ __inline__ void snell(float (&vin)[3], float (&normal)[3], float (&ou
     s_mult(normal, factor, rhs);
 
     diff(vin, rhs, out);
+}
+
+/**
+ * Snell's law refraction.
+ *
+ * Calculate refracted direction vector from incoming direction and normal vector.
+ * 
+ * @param vin Array of 3 double/float, incoming direction vector.
+ * @param normal Array of 3 double/float, normal vector of surface.
+ * @param mu Ratio of n1 to n2.
+ * @param out Array of 3 double/float.
+ */
+__device__ __inline__ void snell(float (&vin)[3], float (&normal)[3], float mu, float (&out)[3])
+{
+    float in_dot_n, factor1;
+    float term1[3], term2[3], temp1[3], temp2[3];
+
+    dot(vin, normal, in_dot_n);
+    
+    factor1 = sqrt(1 - mu*mu * (1 - in_dot_n*in_dot_n));
+    s_mult(normal, factor1, term1);
+
+    s_mult(normal, in_dot_n, temp1);
+    diff(vin, temp1, temp2);
+    s_mult(temp2, mu, term2);
+
+    diff(term1, term2, out);
 }
 
 /**

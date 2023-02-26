@@ -29,7 +29,7 @@ def calcRTtilt(frame):
     t_y = np.sum(frame.dy[idx_good]) / len(frame.dy[idx_good])
     t_z = np.sum(frame.dz[idx_good]) / len(frame.dz[idx_good])
     
-    return np.array([t_x, t_y, t_z])
+    return np.array([t_x, t_y, t_z]) / np.linalg.norm(np.array([t_x, t_y, t_z]))
 
 def calcRMS(frame):
     idx_good = np.argwhere((frame.dx**2 + frame.dy**2 + frame.dz**2) > 0.8)

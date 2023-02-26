@@ -1,14 +1,32 @@
 import numpy as np
 import os
+import ctypes
+import pathlib
+
+nThreads_cpu = os.cpu_count()
 
 from src.PyPO.PyPOTypes import *
 from src.PyPO.CustomLogger import CustomLogger
+
+def has_CUDA():
+    has = False
+
+    win_cuda = os.path.exists(pathlib.Path(__file__).parents[2]/"out/build/Debug/pypogpu.dll")    
+    nix_cuda = os.path.exists(pathlib.Path(__file__).parents[2]/"out/build/libpypogpu.so")
+    mac_cuda = os.path.exists(pathlib.Path(__file__).parents[2]/"out/build/libpypogpu.dylib")
+
+    has = win_cuda or nix_cuda or mac_cuda
+
+    return has
 
 # Error classes to be used
 class InputReflError(Exception):
     pass
 
 class InputRTError(Exception):
+    pass
+
+class RunRTError(Exception):
     pass
 
 # Error message definitions
@@ -33,6 +51,21 @@ def errMsg_shape(fieldName, shape, elemName, shapeExpect):
 
 def errMsg_value(fieldName, value, elemName):
     return f"Incorrect value {value} encountered in field \"{fieldName}\", element {elemName}.\n"
+
+def errMsg_noelem(elemName):
+    return f"Element {elemName} not in current system.\n"
+
+def errMsg_noframe(frameName):
+    return f"Frame {frameName} not in current system.\n"
+
+def errMsg_nofield(fieldName):
+    return f"Field {fieldName} not in current system.\n"
+
+def errMsg_nocurrent(currentName):
+    return f"Current {currentName} not in current system.\n"
+
+def errMsg_noscalarfield(scalarfieldName):
+    return f"Scalar field {scalarfieldName} not in current system.\n"
 
 # Check blocks for different datatypes
 def block_ndarray(fieldName, elemDict, shape):
@@ -213,6 +246,9 @@ def check_ElemDict(elemDict, nameList):
 
 def check_RTDict(RTDict, nameList):
     errStr = ""
+    clog_mgr = CustomLogger(os.path.basename(__file__))
+    clog = clog_mgr.getCustomLogger()
+    
     if RTDict["name"] in nameList:
         errStr += errMsg_name(RTDict["name"])
 
@@ -278,6 +314,57 @@ def check_RTDict(RTDict, nameList):
         for err in errList:
             clog.error(err)
         raise InputRTError()
+
+def check_runRTDict(runRTDict, elements, frames):
+    errStr = ""
+
+    clog_mgr = CustomLogger(os.path.basename(__file__))
+    clog = clog_mgr.getCustomLogger()
+   
+    cuda = has_CUDA()
+    print(cuda)
+    if runRTDict["fr_in"] not in frames:
+        errStr += errMsg_noframe(runRTDict["fr_in"])
+    
+    if runRTDict["t_name"] not in elements:
+        errStr += errMsg_noelem(runRTDict["t_name"])
+   
+    if "tol" not in runRTDict:
+        runRTDict["tol"] = 1e-3
+
+    elif "tol" in runRTDict:
+        if runRTDict["tol"] < 0:
+            clog.warning("Negative tolerances are not allowed. Changing sign.")
+            runRTDict["tol"] *= -1
+
+
+    if "t0" not in runRTDict:
+        runRTDict["t0"] = 1
+
+    if "device" not in runRTDict:
+        runRTDict["device"] = "CPU"
+
+    elif "device" in runRTDict:
+        if runRTDict["device"] != "CPU" or runRTDict["device"] != "GPU":
+            clog.warning(f"Device {runRTDict['device']} unknown. Defaulting to CPU.")
+            runRTDict["device"] = "CPU"
+
+        if runRTDict["device"] == "GPU" and not cuda:
+            clog.warning(f"No PyPO CUDA libraries found. Defaulting to CPU.")
+            runRTDict["device"] = "CPU"
+
+        if runRTDict["device"] == "CPU":
+            
+            if runRTDict["nThreads"] > nThreads_cpu:
+                clog.warning(f"Insufficient CPU threads available, automatically reducing threadcount.")
+                runRTDict["nThreads"] = nThreads_cpu
+
+    if errStr:
+        errList = errStr.split("\n")[:-1]
+
+        for err in errList:
+            clog.error(err)
+        raise RunRTError()
 
 def check_GBDict(GBDict):
     errStr = ""

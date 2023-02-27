@@ -35,14 +35,16 @@ def BuildPyPO():
         clog.info("Installing PyPO prerequisites...")
         if platform.system() == "Linux":
             os.system("sudo apt-get install cm-super dvipng gcc build-essential cmake")
-            os.system("python3 -m pip install numpy matplotlib scipy setuptools nose PyQt5 tqdm python-inquirer")
+            os.system("sudo apt install qtbase5-dev qt5-qmake qtbase5-dev-tools")
+            os.system("python3 -m pip install numpy matplotlib scipy setuptools nose PyQt5 tqdm inquirer attrs")
         elif platform.system() == "Darwin":
             os.system("brew install gcc cmake qt5")
-            os.system("python3 -m pip install numpy matplotlib scipy setuptools nose tqdm python-inquirer")
+            os.system("brew install qtbase5-dev qt5-qmake qtbase5-dev-tools")
+            os.system("python3 -m pip install numpy matplotlib scipy setuptools nose tqdm inquirer attrs")
             os.system("xcode-select --install")
             
         elif platform.system() == "Windows":
-            os.system("py -m pip install numpy matplotlib scipy setuptools nose PyQt5 tqdm python-inquirer")
+            os.system("py -m pip install numpy matplotlib scipy setuptools nose PyQt5 tqdm inquirer attrs")
             
         clog.info("Succesfully installed PyPO prerequisites.")
         clog.warning("Install CUDA manually to enable PyPO on GPU.")

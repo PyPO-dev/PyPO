@@ -363,7 +363,6 @@ def check_runRTDict(runRTDict, elements, frames):
     cuda = has_CUDA()
     if runRTDict["fr_in"] not in frames:
         errStr += errMsg_noframe(runRTDict["fr_in"])
-    
     if runRTDict["t_name"] not in elements:
         errStr += errMsg_noelem(runRTDict["t_name"])
    

@@ -418,7 +418,7 @@ class MainWidget(QWidget):
     
     def addPlotCurrentAction(self):
         plotFieldDict = self.ParameterWid.read()
-        fig, _ = self.stm.plotBeam2D(self.stm.currents[plotFieldDict["field"]].surf, plotFieldDict["field"], 
+        fig, _ = self.stm.plotBeam2D(plotFieldDict["field"], 
                                     plotFieldDict["comp"], project=plotFieldDict["project"], ret=True)
         self.addPlot(fig, f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
 

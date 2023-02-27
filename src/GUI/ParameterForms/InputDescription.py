@@ -1,39 +1,28 @@
-from enum import Enum
 from attr import define, field, Factory
 from attrs import validators
+from src.GUI.utils import inType
 import operator
-
-class inType(Enum):
-    static = 0
-    string = 1
-    integers = 2
-    floats = 3
-    boolean = 4
-    dropdown = 5
-    radio = 6
-    xyzradio =7
 
 
 @define
 class InputDescription:
     inType : inType
-    outputName : str = field(validator=validators.instance_of(str))
+    outputName : str = field(default=None)
     label : str = field(default=None)
     staticValue : str = field(default=None)
     hints : list = Factory(list)
-    numFields : int = 1
+    numFields : int = field(default=1)
     oArray: bool = field(default=False)
     subdict: dict = field(default=None)
     sublist: list = field(default=None)
     hidden: bool = field(default=False)
 
     def __attrs_post_init__(self):
-        if self.label == None:
+        if self.outputName and self.label == None:
             self.label = self.outputName.capitalize()
-
-        if len(self.hints) > self.numFields:
-            raise Exception("Too many hints! at InputDescription with: inType= %s, outputName= %s" %(self.inType,self.outputName))
-        if self.inType.value == 5:
+        if len(self.hints) > self.numFields and self.inType.value < 4:
+            raise Exception(f"Too many hints! at InputDescription with: inType= {self.inType}, outputName= {self.outputName} \nMake sure to wrap the hints in a list")
+        if self.inType.value > 3:
             self.hints = None
             self.numFields = None
         else: 

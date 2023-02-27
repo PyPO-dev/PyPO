@@ -293,7 +293,7 @@ class MainWidget(QWidget):
     def addPlaneAction(self):
         elementDict = self.ParameterWid.read()
         self.stm.addPlane(elementDict) 
-        self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"],self.reflectorActions))
+        self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"],self.removeElement,self.setTransformationForm,self.plotElement))
     
     def setTransformationForm(self, element):
         self.setForm(fDataObj.makeTransformationForm(element), self.applyTransformation)

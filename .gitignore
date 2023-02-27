@@ -170,3 +170,4 @@ datadir/
 fromDesigner.py
 src/GUI/fromDesigner.ui
 src/GUI/Tests
+GUIWidgetTester.py

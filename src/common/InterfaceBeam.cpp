@@ -72,6 +72,31 @@ void makeGauss(GDict gdict, reflparams plane, c2Bundle *res_field, c2Bundle *res
 }
 
 /** 
+ * Initialize Gaussian beam from GDict or GDictf.
+ *
+ * Takes a GDict or GDictf and generates two arrC3 or arrC3f objects, which contain the field and 
+ *      associated currents and are allocated to passed pointer arguments. Wrapper for initGauss.
+ *
+ * @param gdict GDict or GDictf object from which to generate a Gaussian beam.
+ * @param plane reflparams or reflparamsf object corresponding to surface on
+ *      which to generate the Gaussian beam.
+ * @param res_field Pointer to c2Bundle or c2Bundlef object.
+ * @param res_current Pointer to c2Bundle or c2Bundlef object.
+ *
+ * @see initGauss()
+ * @see GDict
+ * @see GDictf
+ * @see reflparams
+ * @see reflparamsf
+ * @see c2Bundle
+ * @see c2Bundlef
+ */
+void makeScalarGauss(ScalarGDict sgdict, reflparams plane, arrC1 *res_field)
+{
+    initScalarGauss<ScalarGDict, reflparams, arrC1, reflcontainer, double>(sgdict, plane, res_field);
+}
+
+/** 
  * Calculate currents from electromagnetic field.
  * 
  * Calculate the J and M vectorial currents given a vectorial E and H field.

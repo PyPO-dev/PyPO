@@ -805,7 +805,7 @@ class System(object):
         return out
 
     ##
-    # Create a Gaussian beam.
+    # Create a vectorial Gaussian beam.
     #
     # @param argDict A GDict containing parameters for the Gaussian beam.
     # @param name_source Name of plane on which to define Gaussian.
@@ -821,6 +821,21 @@ class System(object):
         self.fields[gaussDict["name"]] = gauss_in[0]
         self.currents[gaussDict["name"]] = gauss_in[1]
         #return gauss_in
+    
+    ##
+    # Create a scalar Gaussian beam.
+    #
+    # @param argDict A GDict containing parameters for the Gaussian beam.
+    # @param name_source Name of plane on which to define Gaussian.
+    #
+    # @see GDict
+    def createScalarGaussian(self, gaussDict, name_source):
+        gauss_in = makeScalarGauss(gaussDict, self.system[name_source])
+
+        k = 2 * np.pi / gaussDict["lam"]
+        gauss_in.setMeta(name_source, k)
+
+        self.scalarfields[gaussDict["name"]] = gauss_in
 
     ##
     # Run a ray-trace propagation from a frame to a surface.

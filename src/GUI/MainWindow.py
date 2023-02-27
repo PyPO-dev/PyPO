@@ -336,6 +336,9 @@ class MainWidget(QWidget):
     def setInitGaussianForm(self):
         self.setForm(fDataObj.initGaussianInp(self.stm.system), readAction=self.addGaussianAction)
     
+    def setInitSGaussianForm(self):
+        self.setForm(fDataObj.initSGaussianInp(self.stm.system), readAction=self.addSGaussianAction)
+    
     def setInitPSForm(self):
         self.setForm(fDataObj.initPSInp(self.stm.system), readAction=self.addPSAction)
     
@@ -363,6 +366,11 @@ class MainWidget(QWidget):
         self.stm.createGaussian(GDict, GDict["surface"])
         self.ElementsColumn.POFields.addWidget(FieldsWidget(GDict["name"], self.stm.removeField, self.setPlotFieldFormOpt))
         self.ElementsColumn.POCurrents.addWidget(CurrentWidget(GDict["name"], self.stm.removeCurrent, self.setPlotCurrentFormOpt))
+    
+    def addSGaussianAction(self):
+        GDict = self.ParameterWid.read()
+        self.stm.createScalarGaussian(GDict, GDict["surface"])
+        self.ElementsColumn.SPOFields.addWidget(SFieldsWidget(GDict["name"], self.stm.removeScalarField, self.setPlotSFieldFormOpt))
     
     def addPSAction(self):
         PSDict = self.ParameterWid.read()
@@ -472,8 +480,15 @@ class MainWidget(QWidget):
 
     def addPropBeamAction(self):
         propBeamDict = self.ParameterWid.read()
-       
-        dial = SymDialog()
+      
+        if propBeamDict["mode"] == "scalar":
+            subStr = "scalar field"
+        else:
+            subStr = propBeamDict["mode"]
+
+        dialStr = f"Calculating {subStr} on {propBeamDict['t_name']}..."
+
+        dial = SymDialog(dialStr)
 
         self.mgr = TManager.Manager("G", callback=dial.accept)
         t = self.mgr.new_gthread(target=self.stm.runPO, args=(propBeamDict,), calc_type=propBeamDict["mode"])
@@ -621,7 +636,7 @@ class PyPOMainWindow(QMainWindow):
         initGaussVecAction.triggered.connect(self.mainWid.setInitGaussianForm)
         makeBeamG.addAction(initGaussVecAction)
         initGaussScalAction = QAction("Scalar", self)
-        initGaussScalAction.triggered.connect(self.mainWid.setInitGaussianForm)
+        initGaussScalAction.triggered.connect(self.mainWid.setInitSGaussianForm)
         makeBeamG.addAction(initGaussScalAction)
 
         propBeam = PhysOptMenu.addMenu("Propagate beam") 

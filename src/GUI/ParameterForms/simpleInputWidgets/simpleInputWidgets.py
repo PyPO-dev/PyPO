@@ -1,7 +1,8 @@
-from PyQt5.QtWidgets import QHBoxLayout, QCheckBox, QFormLayout, QGridLayout, QWidget, QButtonGroup, QRadioButton
+from PyQt5.QtWidgets import QHBoxLayout, QCheckBox, QFormLayout, QGridLayout, QWidget, QButtonGroup, QRadioButton, QComboBox
+from PyQt5.QtCore import pyqtSignal
 from src.GUI.utils import MyLabel, MyEdit, makeLabelFromString, inType
 from src.GUI.ParameterForms.InputDescription import InputDescription
-from src.GUI.ParameterForms.simpleInputWidgets.inputWidget import inputWidgetInterface
+from src.GUI.ParameterForms.simpleInputWidgets.inputWidget import inputWidgetInterface, selectionWidgetInterface
 from numpy import array 
 
 class StaticInput(inputWidgetInterface):
@@ -91,7 +92,10 @@ class VectorInput(inputWidgetInterface):
 
 
 
-class SimpleRadio(inputWidgetInterface):
+class SimpleRadio(selectionWidgetInterface):
+
+    selectionChangedSignal = pyqtSignal(int)
+
     def __init__ (self, inp:InputDescription):
         super().__init__()
         self.inputDescription = inp
@@ -104,10 +108,10 @@ class SimpleRadio(inputWidgetInterface):
 
         if self.inputDescription.hints:
             options = self.inputDescription.hints
-            print(f"{self.inputDescription.hints = }")
         else:
-            options = self.inputDescription.sublist
+            options = self.inputDescription.options
         self.group = QButtonGroup()
+        self.group.buttonClicked.connect(self.selectionChanged)
         for i in range(len(options)):
             rb = QRadioButton(options[i])
             self.group.addButton(rb)
@@ -115,11 +119,64 @@ class SimpleRadio(inputWidgetInterface):
             radiolayout.addWidget(rb)
         layout.addRow(MyLabel(self.inputDescription.label), radioWidget)
 
+
     def read(self):
-        d = {self.inputDescription.outputName : self.inputDescription.sublist[self.group.checkedId()]}
+        if self.inputDescription.outputName is None:
+            return {}
+        d = {self.inputDescription.outputName : self.inputDescription.options[self.group.checkedId()]}
         print(d)
         return d
     
+    def currentIndex(self):
+        return self.group.checkedId()
+
+    def selectionChanged(self):
+        self.selectionChangedSignal.emit(self.group.checkedId())
+
+
+
+class SimpleDropdown(selectionWidgetInterface):
+    
+    selectionChangedSignal = pyqtSignal(int)
+
+    def __init__ (self, inp:InputDescription, dynamic = False):
+        super().__init__()
+        self.inputDescription = inp
+
+        layout = QFormLayout(self)
+        layout.setContentsMargins(0,0,0,0)
+
+
+        if self.inputDescription.hints:
+            options = self.inputDescription.hints
+        else:
+            options = self.inputDescription.options
+
+        self.comboBox = QComboBox()
+        self.comboBox.currentIndexChanged.connect(self.selectionChanged)
+        if dynamic:
+            self.comboBox.addItem("--Select item--")
+        if options:
+            self.comboBox.addItems(options)
+        
+        layout.addRow(MyLabel(self.inputDescription.label), self.comboBox)
+
+
+    def read(self):
+        if self.inputDescription.outputName is None:
+            return {}
+        d = {self.inputDescription.outputName : self.inputDescription.options[self.comboBox.currentIndex()]}
+        print(d)
+        return d
+    
+
+    def selectionChanged(self):
+        self.selectionChangedSignal.emit(self.comboBox.currentIndex())
+
+    def currentIndex(self):
+        return self.comboBox.currentIndex()
+
+
 class XYZRadio(inputWidgetInterface):
     class RadioSubWidget(QWidget):
         def __init__(self, options, name, parent=None):

@@ -1,11 +1,11 @@
 from PyQt5.QtWidgets import QWidget
+# from PyQt5.QtCore import pyqtSignal
 from abc import ABC, abstractclassmethod
 
 from src.GUI.ParameterForms.InputDescription import InputDescription, inType
 
-class MetaCombiner(type(QWidget), type(ABC)): pass
-
-class inputWidgetInterface(QWidget, ABC, metaclass=MetaCombiner):
+class MetaCombinerInputWidget(type(QWidget), type(ABC)): pass
+class inputWidgetInterface(QWidget, ABC, metaclass=MetaCombinerInputWidget):
     """This is a base class for inputWidgets and should not be instatiated"""
     def __init__ (self, parent = None):
         super().__init__(parent)
@@ -19,3 +19,17 @@ class inputWidgetInterface(QWidget, ABC, metaclass=MetaCombiner):
         None then it should return an empty dict   
         """
         pass
+
+class MetaCombinerselectionWidget(type(inputWidgetInterface), type(ABC)): pass
+class selectionWidgetInterface(inputWidgetInterface, ABC, metaclass=MetaCombinerselectionWidget):
+    """This is a base class for selectionWidgets and should not be instatiated"""
+    def __init__ (self, parent = None):
+        super().__init__(parent)
+
+    @abstractclassmethod
+    def selectionChanged(self):
+        raise NotImplementedError
+   
+
+
+    

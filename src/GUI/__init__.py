@@ -16,6 +16,6 @@ __all__ = [
     'FormGenerator',
     'inType',
     'InputDescription',
-    'DynamicInputWidget',
+    'DynamicDropdownWidget',
     'Acccordion'
 ]

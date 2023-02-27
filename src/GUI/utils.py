@@ -13,6 +13,8 @@ class inType(Enum):
     dropdown = 5
     radio = 6
     xyzradio = 7
+    dynamicDropdown = 8
+    dynamicRadio = 9
 
 class MyLabel(QLabel):
     def __init__ (self, s):

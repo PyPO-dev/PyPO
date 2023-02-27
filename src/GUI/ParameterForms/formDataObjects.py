@@ -129,7 +129,7 @@ def plotFrameInp(frameDict):
             sublist_frames.append(key)
     
     plotFrame = [
-            InputDescription(inType.dropdown, "frame", label="Frame", sublist = sublist_frames),
+            InputDescription(inType.dropdown, "frame", label="Frame", options = sublist_frames),
             InputDescription(inType.xyzradio, "project", label="Abscissa - ordinate")
             ]
 
@@ -157,13 +157,13 @@ def propRaysInp(frameDict, elemDict):
     sublist_dev = ["CPU", "GPU"]
 
     propRays = [
-            InputDescription(inType.dropdown, "fr_in", label="Input frame", sublist = sublist_frames),
-            InputDescription(inType.dropdown, "t_name", label="Target surface", sublist = sublist_target),
+            InputDescription(inType.dropdown, "fr_in", label="Input frame", options = sublist_frames),
+            InputDescription(inType.dropdown, "t_name", label="Target surface", options = sublist_target),
             InputDescription(inType.vectorStrings, "fr_out", label="Name of output frame", numFields=1),
             InputDescription(inType.vectorFloats, "tol", label="Accuracy", hints=[1e-3], numFields=1),
             InputDescription(inType.vectorIntegers, "nThreads", label="# of threads", hints=[1], numFields=1),
             InputDescription(inType.vectorFloats, "t0", label="Initial guess", hints=[1], numFields=1),
-            InputDescription(inType.dropdown, "device", label="Hardware to use", sublist = sublist_dev)
+            InputDescription(inType.dropdown, "device", label="Hardware to use", options = sublist_dev)
             ]
 
     return propRays
@@ -177,7 +177,7 @@ def initPSInp(elemDict):
                 sublist_surf.append(key)
 
     initPS = [
-            InputDescription(inType.dropdown, "surface", label="Point source surface", sublist = sublist_surf),
+            InputDescription(inType.dropdown, "surface", label="Point source surface", options = sublist_surf),
             InputDescription(inType.vectorStrings, "name", label="Beam name", numFields=1),
             InputDescription(inType.vectorFloats, "lam", label="Wavelength of radiation", hints=[1], numFields=1),
             InputDescription(inType.vectorFloats, "E0", label="Peak value", hints=[1], numFields=1),
@@ -196,7 +196,7 @@ def initSPSInp(elemDict):
                 sublist_surf.append(key)
 
     initSPS = [
-            InputDescription(inType.dropdown, "surface", label="Point source surface", sublist = sublist_surf),
+            InputDescription(inType.dropdown, "surface", label="Point source surface", options = sublist_surf),
             InputDescription(inType.vectorStrings, "name", label="Beam name", numFields=1),
             InputDescription(inType.vectorFloats, "lam", label="Wavelength of radiation", hints=[1], numFields=1),
             InputDescription(inType.vectorFloats, "E0", label="Peak value", hints=[1], numFields=1),
@@ -214,7 +214,7 @@ def initGaussianInp(elemDict):
                 sublist_surf.append(key)
 
     initGauss = [
-            InputDescription(inType.dropdown, "surface", label="Gaussian beam surface", sublist = sublist_surf),
+            InputDescription(inType.dropdown, "surface", label="Gaussian beam surface", options = sublist_surf),
             InputDescription(inType.vectorStrings, "name", label="Beam name", numFields=1),
             InputDescription(inType.vectorFloats, "lam", label="Wavelength of radiation", hints=[1], numFields=1),
             InputDescription(inType.vectorFloats, "w0x", label="Beamwaist in X", hints=[5], numFields=1),
@@ -236,7 +236,7 @@ def initSGaussianInp(elemDict):
                 sublist_surf.append(key)
 
     initSGauss = [
-            InputDescription(inType.dropdown, "surface", label="Gaussian beam surface", sublist = sublist_surf),
+            InputDescription(inType.dropdown, "surface", label="Gaussian beam surface", options = sublist_surf),
             InputDescription(inType.vectorStrings, "name", label="Beam name", numFields=1),
             InputDescription(inType.vectorFloats, "lam", label="Wavelength of radiation", hints=[1], numFields=1),
             InputDescription(inType.vectorFloats, "w0x", label="Beamwaist in X", hints=[5], numFields=1),
@@ -253,7 +253,7 @@ def plotField(fieldName):
     
     plotField = [
             InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
-            InputDescription(inType.dropdown, "comp", label="Component", sublist = complist),
+            InputDescription(inType.dropdown, "comp", label="Component", options = complist),
             InputDescription(inType.xyzradio, "project", label="Abscissa - ordinate")
             ]
 
@@ -274,7 +274,7 @@ def plotFarField(fieldName):
     
     plotField = [
             InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
-            InputDescription(inType.dropdown, "comp", label="Component", sublist = complist),
+            InputDescription(inType.dropdown, "comp", label="Component", options = complist),
             InputDescription(inType.static, "project", staticValue="xy", hidden=True)
             ]
     return plotField
@@ -284,7 +284,7 @@ def plotCurrentOpt(fieldName):
     
     plotCurrent = [
             InputDescription(inType.static, "field", label="Current", staticValue=fieldName),
-            InputDescription(inType.dropdown, "comp", label="Component", sublist = complist),
+            InputDescription(inType.dropdown, "comp", label="Component", options = complist),
             InputDescription(inType.xyzradio, "project", label="Abscissa - ordinate")
             ]
 
@@ -312,29 +312,29 @@ def propPOInp(currentDict, scalarFieldDict, elemDict):
 
 
     propFields = [
-            InputDescription(inType.dropdown, "t_name", label="Target surface", sublist = sublist_target),
+            InputDescription(inType.dropdown, "t_name", label="Target surface", options = sublist_target),
             InputDescription(inType.dropdown, "mode", label="Propagation mode", subdict={
                 "JM":[
-                    InputDescription(inType.dropdown, "s_current", label="Source currents", sublist = sublist_currents),
+                    InputDescription(inType.dropdown, "s_current", label="Source currents", options = sublist_currents),
                     InputDescription(inType.vectorStrings, "name_JM", label="Output currents", numFields=1)],
                 "EH":[
-                    InputDescription(inType.dropdown, "s_current", label="Source currents", sublist = sublist_currents),
+                    InputDescription(inType.dropdown, "s_current", label="Source currents", options = sublist_currents),
                     InputDescription(inType.vectorStrings, "name_EH", label="Output fields", numFields=1)],
                 "JMEH": [
-                    InputDescription(inType.dropdown, "s_current", label="Source currents", sublist = sublist_currents),
+                    InputDescription(inType.dropdown, "s_current", label="Source currents", options = sublist_currents),
                     InputDescription(inType.vectorStrings, "name_JM", label="Output currents", numFields=1),
                     InputDescription(inType.vectorStrings, "name_EH", label="Output fields", numFields=1)],
                 "EHP": [ 
-                    InputDescription(inType.dropdown, "s_current", label="Source currents", sublist = sublist_currents),
+                    InputDescription(inType.dropdown, "s_current", label="Source currents", options = sublist_currents),
                     InputDescription(inType.vectorStrings, "name_EH", label="Output fields", numFields=1),
                     InputDescription(inType.vectorStrings, "name_P", label="Output frame", numFields=1)],
                 "scalar":[
-                    InputDescription(inType.dropdown, "s_scalarfield", label="Source scalar field", sublist = sublist_sfields),
+                    InputDescription(inType.dropdown, "s_scalarfield", label="Source scalar field", options = sublist_sfields),
                     InputDescription(inType.vectorStrings, "name_field", label="Output scalar field", numFields=1)]
                 }),
             InputDescription(inType.vectorFloats, "epsilon", label="Relative permittivity", hints=[1], numFields=1),
             InputDescription(inType.vectorIntegers, "nThreads", label="# of threads", hints=[1], numFields=1),
-            InputDescription(inType.dropdown, "device", label="Hardware to use", sublist = sublist_dev)
+            InputDescription(inType.dropdown, "device", label="Hardware to use", options = sublist_dev)
             ]
 
     return propFields
@@ -355,13 +355,13 @@ def propPOFFInp(currentDict, elemDict):
 
 
     propFields = [
-            InputDescription(inType.dropdown, "s_current", label="Source currents", sublist = sublist_currents),
-            InputDescription(inType.dropdown, "t_name", label="Target surface", sublist = sublist_target),
+            InputDescription(inType.dropdown, "s_current", label="Source currents", options = sublist_currents),
+            InputDescription(inType.dropdown, "t_name", label="Target surface", options = sublist_target),
             InputDescription(inType.static, "mode", label="Propagation mode", staticValue="FF"),
             InputDescription(inType.vectorStrings, "name_EH", label="Output fields"),
             InputDescription(inType.vectorFloats, "epsilon", label="Relative permittivity", hints=[1], numFields=1),
             InputDescription(inType.vectorIntegers, "nThreads", label="# of threads", hints=[1], numFields=1),
-            InputDescription(inType.dropdown, "device", label="Hardware to use", sublist = sublist_dev)
+            InputDescription(inType.dropdown, "device", label="Hardware to use", options = sublist_dev)
             ]
 
     return propFields
@@ -376,8 +376,8 @@ def calcSpillEff(fieldDict, elemDict):
                 sublist_fields.append(key)
     
     formTaper = [
-        InputDescription(inType.dropdown, "f_name", label="Field", sublist = sublist_fields),
-        InputDescription(inType.dropdown, "comp", label="Component", sublist = complist),
+        InputDescription(inType.dropdown, "f_name", label="Field", options = sublist_fields),
+        InputDescription(inType.dropdown, "comp", label="Component", options = complist),
         InputDescription(inType.vectorFloats, "center", label="Center", numFields=2, oArray=True),
         InputDescription(inType.vectorFloats, "inner", label="Inner axes", numFields=2),
         InputDescription(inType.vectorFloats, "outer", label="Outer axes", numFields=2)
@@ -395,8 +395,8 @@ def calcTaperEff(fieldDict, elemDict):
                 sublist_fields.append(key)
     
     formTaper = [
-        InputDescription(inType.dropdown, "f_name", label="Field", sublist = sublist_fields),
-        InputDescription(inType.dropdown, "comp", label="Component", sublist = complist),
+        InputDescription(inType.dropdown, "f_name", label="Field", options = sublist_fields),
+        InputDescription(inType.dropdown, "comp", label="Component", options = complist),
         ]
 
     return formTaper
@@ -411,9 +411,9 @@ def calcXpolEff(fieldDict, elemDict):
                 sublist_fields.append(key)
     
     formXpol = [
-        InputDescription(inType.dropdown, "f_name", label="Field", sublist = sublist_fields),
-        InputDescription(inType.dropdown, "co_comp", label="Co-component", sublist = complist),
-        InputDescription(inType.dropdown, "cr_comp", label="X-component", sublist = complist),
+        InputDescription(inType.dropdown, "f_name", label="Field", options = sublist_fields),
+        InputDescription(inType.dropdown, "co_comp", label="Co-component", options = complist),
+        InputDescription(inType.dropdown, "cr_comp", label="X-component", options = complist),
         ]
 
     return formXpol
@@ -422,5 +422,5 @@ def saveSystemForm():
     return [InputDescription(inType.vectorStrings, "name", label="Name of system", numFields=1)]
 
 def loadSystemForm(systemList):
-    return [InputDescription(inType.dropdown, "name", label="Name of system", sublist=systemList)]
+    return [InputDescription(inType.dropdown, "name", label="Name of system", options=systemList)]
 

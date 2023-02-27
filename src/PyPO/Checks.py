@@ -8,6 +8,8 @@ nThreads_cpu = os.cpu_count()
 from src.PyPO.PyPOTypes import *
 from src.PyPO.CustomLogger import CustomLogger
 
+PO_modelist = ["JM", "EH", "JMEH", "EHP", "FF", "scalar"]
+
 def has_CUDA():
     has = False
 
@@ -29,6 +31,8 @@ class InputRTError(Exception):
 class RunRTError(Exception):
     pass
 
+class RunPOError(Exception):
+    pass
 # Error message definitions
 def errMsg_name(elemName):
     return f"Name \"{elemName}\" already in use. Choose different name.\n"
@@ -53,19 +57,19 @@ def errMsg_value(fieldName, value, elemName):
     return f"Incorrect value {value} encountered in field \"{fieldName}\", element {elemName}.\n"
 
 def errMsg_noelem(elemName):
-    return f"Element {elemName} not in current system.\n"
+    return f"Element {elemName} not in system.\n"
 
 def errMsg_noframe(frameName):
-    return f"Frame {frameName} not in current system.\n"
+    return f"Frame {frameName} not in system.\n"
 
 def errMsg_nofield(fieldName):
-    return f"Field {fieldName} not in current system.\n"
+    return f"Field {fieldName} not in system.\n"
 
-def errMsg_nocurrent(currentName):
-    return f"Current {currentName} not in current system.\n"
+def errMsg_nocurrent(Name):
+    return f"Current {Name} not in system.\n"
 
 def errMsg_noscalarfield(scalarfieldName):
-    return f"Scalar field {scalarfieldName} not in current system.\n"
+    return f"Scalar field {scalarfieldName} not in system.\n"
 
 # Check blocks for different datatypes
 def block_ndarray(fieldName, elemDict, shape):
@@ -85,17 +89,25 @@ def block_ndarray(fieldName, elemDict, shape):
 #
 # @param elemName Name of element, string.
 # @param nameList List of names in system dictionary.
-def check_ElemDict(elemDict, nameList):
+def check_ElemDict(elemDict, nameList, num_ref):
     clog_mgr = CustomLogger(os.path.basename(__file__))
     clog = clog_mgr.getCustomLogger()
     
     errStr = ""
    
-    if elemDict["name"] in nameList:
-        errStr += errMsg_name(elemDict["name"])
+    elemDict["transf"] = np.eye(4)
+    
+    if not "flip" in elemDict:
+        elemDict["flip"] = False
+
+    else:
+        if not isinstance(elemDict["flip"], bool):
+            clog.warning("Invalid option {elemDict['flip']} for flip. Defaulting to False.")
 
     if elemDict["type"] == 0:
-
+        if not "name" in elemDict:
+            elemDict["name"] = "Parabola"
+        
         if "pmode" in elemDict:
             if elemDict["pmode"] == "focus":
                 if "vertex" in elemDict:
@@ -123,6 +135,14 @@ def check_ElemDict(elemDict, nameList):
             errStr += errMsg_field("pmode", elemDict["name"])
 
     elif elemDict["type"] == 1 or elemDict["type"] == 2:
+        if elemDict["type"] == 1:
+            
+            if not "name" in elemDict:
+                elemDict["name"] = "Hyperbola"
+        
+        else:
+            if not "name" in elemDict:
+                elemDict["name"] = "Ellipse"
 
         if "pmode" in elemDict:
             if elemDict["pmode"] == "focus":
@@ -161,6 +181,10 @@ def check_ElemDict(elemDict, nameList):
                 args = ["focus", "manual"]
                 errStr += errMsg_option("pmode", elemDict["pmode"], elemDict["name"], args=args)
 
+    elif elemDict["type"] == 3:
+        if not "name" in elemDict:
+            elemDict["name"] = "plane"
+
     if "gmode" in elemDict:
         if elemDict["gmode"] == "xy":
             if "lims_x" in elemDict:
@@ -174,6 +198,15 @@ def check_ElemDict(elemDict, nameList):
                 errStr += errMsg_field("lims_y", elemDict["name"])
 
         elif elemDict["gmode"] == "uv":
+            if not "gcenter" in elemDict:
+                elemDict["gcenter"] = np.zeros(2)
+           
+            if not "ecc_uv" in elemDict:
+                elemDict["ecc_uv"] = 0
+
+            if not "rot_uv" in elemDict:
+                elemDict["rot_uv"] = 0
+
             if "lims_u" in elemDict:
                 errStr += block_ndarray("lims_u", elemDict, (2,))
 
@@ -207,6 +240,9 @@ def check_ElemDict(elemDict, nameList):
                 if not ((isinstance(elemDict["rot_uv"], float) or isinstance(elemDict["rot_uv"], int))):
                     errStr += errMsg_type("rot_uv", type(elemDict["rot_uv"]), elemDict["name"], [float, int])
         
+            if "gcenter" in elemDict:
+                errStr += block_ndarray("gcenter", elemDict, (2,))
+
         elif elemDict["gmode"] == "AoE":
             if "lims_Az" in elemDict:
                 errStr += block_ndarray("lims_Az", elemDict, (2,))
@@ -234,6 +270,9 @@ def check_ElemDict(elemDict, nameList):
         if not (isinstance(elemDict["gridsize"][1], np.int64) or isinstance(elemDict["gridsize"][1], np.int32)):
             errStr += errMsg_type("gridsize[1]", type(elemDict["gridsize"][1]), elemDict["name"], [np.int64, np.int32])
     
+    if elemDict["name"] in nameList:
+        elemDict["name"] = elemDict["name"] + "_{}".format(num_ref)
+
     if errStr:
         errList = errStr.split("\n")[:-1]
 
@@ -244,69 +283,69 @@ def check_ElemDict(elemDict, nameList):
     else:
         return 0
 
-def check_RTDict(RTDict, nameList):
+def check_TubeRTDict(TubeRTDict, nameList):
     errStr = ""
     clog_mgr = CustomLogger(os.path.basename(__file__))
     clog = clog_mgr.getCustomLogger()
     
-    if RTDict["name"] in nameList:
-        errStr += errMsg_name(RTDict["name"])
+    if TubeRTDict["name"] in nameList:
+        errStr += errMsg_name(TubeRTDict["name"])
 
-    if "nRays" in RTDict:
-        if not isinstance(RTDict["nRays"], int):
-            errStr += errMsg_type("nRays", type(RTDict["nRays"]), "RTDict", int)
-
-    else:
-        errStr += errMsg_field("nRays", "RTDict")
-
-    if "nRing" in RTDict:
-        if not isinstance(RTDict["nRing"], int):
-            errStr += errMsg_type("nRing", type(RTDict["nRays"]), "RTDict", int)
+    if "nRays" in TubeRTDict:
+        if not isinstance(TubeRTDict["nRays"], int):
+            errStr += errMsg_type("nRays", type(TubeRTDict["nRays"]), "TubeRTDict", int)
 
     else:
-        errStr += errMsg_field("nRays", "RTDict")
+        errStr += errMsg_field("nRays", "TubeRTDict")
 
-
-    if "angx" in RTDict:
-        if not ((isinstance(RTDict["angx"], float) or isinstance(RTDict["angx"], int))):
-            errStr += errMsg_type("angx", type(RTDict["angx"]), "RTDict", [float, int])
-
-    else:
-        errStr += errMsg_field("angx", "RTDict")
-
-
-    if "angy" in RTDict:
-        if not ((isinstance(RTDict["angy"], float) or isinstance(RTDict["angy"], int))):
-            errStr += errMsg_type("angy", type(RTDict["angy"]), "RTDict", [float, int])
+    if "nRing" in TubeRTDict:
+        if not isinstance(TubeRTDict["nRing"], int):
+            errStr += errMsg_type("nRing", type(TubeRTDict["nRays"]), "TubeRTDict", int)
 
     else:
-        errStr += errMsg_field("angy", "RTDict")
+        errStr += errMsg_field("nRays", "TubeRTDict")
 
 
-    if "a" in RTDict:
-        if not ((isinstance(RTDict["a"], float) or isinstance(RTDict["a"], int))):
-            errStr += errMsg_type("a", type(RTDict["a"]), "RTDict", [float, int])
-
-    else:
-        errStr += errMsg_field("a", "RTDict")
-
-
-    if "b" in RTDict:
-        if not ((isinstance(RTDict["b"], float) or isinstance(RTDict["b"], int))):
-            errStr += errMsg_type("b", type(RTDict["b"]), "RTDict", [float, int])
+    if "angx" in TubeRTDict:
+        if not ((isinstance(TubeRTDict["angx"], float) or isinstance(TubeRTDict["angx"], int))):
+            errStr += errMsg_type("angx", type(TubeRTDict["angx"]), "TubeRTDict", [float, int])
 
     else:
-        errStr += errMsg_field("b", "RTDict")
+        errStr += errMsg_field("angx", "TubeRTDict")
 
-    if "tChief" in RTDict:
-        errStr += block_ndarray("tChief", RTDict, (3,))
-    else:
-        errStr += errMsg_field("tChief", "RTDict")
 
-    if "oChief" in RTDict:
-        errStr += block_ndarray("oChief", RTDict, (3,))
+    if "angy" in TubeRTDict:
+        if not ((isinstance(TubeRTDict["angy"], float) or isinstance(TubeRTDict["angy"], int))):
+            errStr += errMsg_type("angy", type(TubeRTDict["angy"]), "TubeRTDict", [float, int])
+
     else:
-        errStr += errMsg_field("oChief", "RTDict")
+        errStr += errMsg_field("angy", "TubeRTDict")
+
+
+    if "a" in TubeRTDict:
+        if not ((isinstance(TubeRTDict["a"], float) or isinstance(TubeRTDict["a"], int))):
+            errStr += errMsg_type("a", type(TubeRTDict["a"]), "TubeRTDict", [float, int])
+
+    else:
+        errStr += errMsg_field("a", "TubeRTDict")
+
+
+    if "b" in TubeRTDict:
+        if not ((isinstance(TubeRTDict["b"], float) or isinstance(TubeRTDict["b"], int))):
+            errStr += errMsg_type("b", type(TubeRTDict["b"]), "TubeRTDict", [float, int])
+
+    else:
+        errStr += errMsg_field("b", "TubeRTDict")
+
+    if "tChief" in TubeRTDict:
+        errStr += block_ndarray("tChief", TubeRTDict, (3,))
+    else:
+        errStr += errMsg_field("tChief", "TubeRTDict")
+
+    if "oChief" in TubeRTDict:
+        errStr += block_ndarray("oChief", TubeRTDict, (3,))
+    else:
+        errStr += errMsg_field("oChief", "TubeRTDict")
 
     if errStr:
         errList = errStr.split("\n")[:-1]
@@ -322,7 +361,6 @@ def check_runRTDict(runRTDict, elements, frames):
     clog = clog_mgr.getCustomLogger()
    
     cuda = has_CUDA()
-    print(cuda)
     if runRTDict["fr_in"] not in frames:
         errStr += errMsg_noframe(runRTDict["fr_in"])
     
@@ -343,9 +381,10 @@ def check_runRTDict(runRTDict, elements, frames):
 
     if "device" not in runRTDict:
         runRTDict["device"] = "CPU"
+    
 
     elif "device" in runRTDict:
-        if runRTDict["device"] != "CPU" or runRTDict["device"] != "GPU":
+        if runRTDict["device"] != "CPU" and runRTDict["device"] != "GPU":
             clog.warning(f"Device {runRTDict['device']} unknown. Defaulting to CPU.")
             runRTDict["device"] = "CPU"
 
@@ -355,9 +394,18 @@ def check_runRTDict(runRTDict, elements, frames):
 
         if runRTDict["device"] == "CPU":
             
-            if runRTDict["nThreads"] > nThreads_cpu:
-                clog.warning(f"Insufficient CPU threads available, automatically reducing threadcount.")
+            if "nThreads" in runRTDict:
+                if runRTDict["nThreads"] > nThreads_cpu:
+                    clog.warning(f"Insufficient CPU threads available, automatically reducing threadcount.")
+                    runRTDict["nThreads"] = nThreads_cpu
+
+            else:
                 runRTDict["nThreads"] = nThreads_cpu
+
+        elif runRTDict["device"] == "GPU":
+            if "nThreads" not in runRTDict:
+                runRTDict["nThreads"] = 256
+
 
     if errStr:
         errList = errStr.split("\n")[:-1]
@@ -368,3 +416,69 @@ def check_runRTDict(runRTDict, elements, frames):
 
 def check_GBDict(GBDict):
     errStr = ""
+
+def check_runPODict(runPODict, elements, currents, scalarfields):
+    errStr = ""
+
+    clog_mgr = CustomLogger(os.path.basename(__file__))
+    clog = clog_mgr.getCustomLogger()
+   
+    cuda = has_CUDA()
+    
+    if not "exp" in runPODict:
+        runPODict["exp"] = "fwd"
+
+    if "mode" not in runPODict:
+        errStr += f"Please provide propagation mode.\n"
+    
+    else:
+        if runPODict["mode"] not in PO_modelist:
+            errStr += f"{runPODict['mode']} is not a valid propagation mode.\n"
+
+        if "s_current" in runPODict:
+            if runPODict["s_current"] not in currents:
+                errStr += errMsg_nocurrent(runPODict["s_current"])
+        
+        if "s_scalarfield" in runPODict:
+            if runPODict["s_scalarfield"] not in scalarfields:
+                errStr += errMsg_noscalarfield(runPODict["scalarfield"])
+    
+    if runPODict["t_name"] not in elements:
+        errStr += errMsg_noelem(runPODict["t_name"])
+   
+    if "epsilon" not in runPODict:
+        runPODict["epsilon"] = 1
+
+    if "device" not in runPODict:
+        runPODict["device"] = "CPU"
+
+    elif "device" in runPODict:
+        if runPODict["device"] != "CPU" and runPODict["device"] != "GPU":
+            clog.warning(f"Device {runPODict['device']} unknown. Defaulting to CPU.")
+            runPODict["device"] = "CPU"
+
+        if runPODict["device"] == "GPU" and not cuda:
+            clog.warning(f"No PyPO CUDA libraries found. Defaulting to CPU.")
+            runPODict["device"] = "CPU"
+
+        if runPODict["device"] == "CPU":
+            
+            if "nThreads" in runPODict:
+                if runPODict["nThreads"] > nThreads_cpu:
+                    clog.warning(f"Insufficient CPU threads available, automatically reducing threadcount.")
+                    runPODict["nThreads"] = nThreads_cpu
+
+            else:
+                runPODict["nThreads"] = nThreads_cpu
+
+        elif runPODict["device"] == "GPU":
+            if "nThreads" not in runPODict:
+                runPODict["nThreads"] = 256
+
+
+    if errStr:
+        errList = errStr.split("\n")[:-1]
+        for err in errList:
+            clog.error(err)
+        raise RunPOError()
+    

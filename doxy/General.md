@@ -11,20 +11,20 @@ python Build.py --prereqs
 Alternatively, the prerequisites can be installed manually on Linux by running:
 ```
 sudo apt install gcc build-essential cmake qtcreator
-python3 -m pip install numpy matplotlib scipy setuptools nose PyQt5
+python3 -m pip install numpy matplotlib scipy setuptools nose PyQt5 attrs tqdm python-inquirer
 ```
 On Mac OS, the prereqs are installed using:
 ```
 brew install gcc cmake
 xcode-select --install
-python3 -m pip install numpy matplotlib scipy setuptools nose PyQt5
+python3 -m pip install numpy matplotlib scipy setuptools nose PyQt5 attrs tqdm python-inquirer
 ```
 On Windows, things are slightly more complicated. First, install [Visual Studio](https://visualstudio.microsoft.com/#2010-Visual-CPP). 
 This is necessary as Visual Studio contains CMake and the build tool [NMake](https://learn.microsoft.com/en-us/cpp/build/reference/nmake-reference?view=msvc-170), which are important for building PyPO.
 During installation, select the 'Community' install.
 You will be prompted to install components and/or workloads. 
 Under 'Desktop & Mobile', tick 'Desktop development with C++' and proceed. 
-This is the minimum requirement, and more components/workloads can be installed, if so desired. After installation, proceed with regular installation.
+This is the minimum requirement, and more components/workloads can be installed, if so desired. After installation of Visual Studio, proceed with regular installation.
 
 PyPO is capable of producing figures using LaTeX typesetting. For this, a [LaTeX installation](https://www.tug.org/texlive/quickinstall.html) should be present on the machine. The LaTeX prerequisites will be installed automatically upon running Build.py but can also be installed manually:
 ```

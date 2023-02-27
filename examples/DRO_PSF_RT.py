@@ -49,8 +49,6 @@ def ex_DRO_RT(device):
     s.addParabola(parabola)
     s.addPlane(plane)
     s.translateGrids("plane1", np.array([0,0,12e3]))
-    
-    #s.rotateGrids("p1", np.array([30,0,0]), np.array([0,0,12e3]))
 
     s.plotSystem()
 
@@ -60,8 +58,6 @@ def ex_DRO_RT(device):
             "fr_in"     : "start",
             "t_name"    : "p1",
             "fr_out"    : "pri",
-            "tol"       : 1e-3,
-            "nThreads"  : 11 if device == "CPU" else 256,
             "device"    : device
             }
 
@@ -69,8 +65,6 @@ def ex_DRO_RT(device):
             "fr_in"     : "pri",
             "t_name"    : "plane1",
             "fr_out"    : "focus",
-            "tol"       : -1e-3,
-            "nThreads"  : 11 if device == "CPU" else 256,
             "device"    : device
             }
     

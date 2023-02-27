@@ -191,27 +191,10 @@ class System(object):
     #
     # @param reflDict A filled reflectordictionary. Will raise an exception if not properly filled.
     def addParabola(self, reflDict):
-        if not "name" in reflDict:
-            reflDict["name"] = "Parabola"
-
-        if not "gcenter" in reflDict:
-            reflDict["gcenter"] = np.zeros(2)
-
-        if reflDict["name"] == "Parabola":
-            reflDict["name"] = reflDict["name"] + "_{}".format(self.num_ref)
 
         reflDict["type"] = 0
-        reflDict["transf"] = np.eye(4)
 
-        if not "flip" in reflDict:
-            reflDict["flip"] = False
-
-        check_ElemDict(reflDict, self.system.keys()) 
-        if not "ecc_uv" in reflDict:
-            reflDict["ecc_uv"] = 0
-
-        if not "rot_uv" in reflDict:
-            reflDict["rot_uv"] = 0
+        check_ElemDict(reflDict, self.system.keys(), self.num_ref) 
 
         self.system[reflDict["name"]] = self.copyObj(reflDict)
 
@@ -249,6 +232,7 @@ class System(object):
             self.system[reflDict["name"]]["coeffs"] = np.array([reflDict["coeffs"][0], reflDict["coeffs"][1], -1])
 
         if reflDict["gmode"] == "xy":
+            self.system[reflDict["name"]]["gcenter"] = np.zeros(2)
             self.system[reflDict["name"]]["ecc_uv"] = 0
             self.system[reflDict["name"]]["rot_uv"] = 0
             self.system[reflDict["name"]]["gmode"] = 0
@@ -272,23 +256,8 @@ class System(object):
     # @param reflDict A filled reflectordictionary. Will raise an exception if not properly filled.
     def addHyperbola(self, reflDict):
 
-        if not "name" in reflDict:
-            reflDict["name"] = "Hyperbola"
-        if reflDict["name"] == "Hyperbola":
-            reflDict["name"] = reflDict["name"] + "_{}".format(self.num_ref)
-        if not "gcenter" in reflDict:
-            reflDict["gcenter"] = np.zeros(2)
-
         reflDict["type"] = 1
-        reflDict["transf"] = np.eye(4)
-        if not "flip" in reflDict:
-            reflDict["flip"] = False
-        check_ElemDict(reflDict, self.system.keys()) 
-        if not "ecc_uv" in reflDict:
-            reflDict["ecc_uv"] = 0
-
-        if not "rot_uv" in reflDict:
-            reflDict["rot_uv"] = 0
+        check_ElemDict(reflDict, self.system.keys(), self.num_ref) 
         self.system[reflDict["name"]] = self.copyObj(reflDict)
 
         if reflDict["pmode"] == "focus":
@@ -330,6 +299,7 @@ class System(object):
             self.system[reflDict["name"]]["coeffs"][2] = c3
 
         if reflDict["gmode"] == "xy":
+            self.system[reflDict["name"]]["gcenter"] = np.zeros(2)
             self.system[reflDict["name"]]["ecc_uv"] = 0
             self.system[reflDict["name"]]["rot_uv"] = 0
             self.system[reflDict["name"]]["gmode"] = 0
@@ -351,25 +321,9 @@ class System(object):
     #
     # @param reflDict A filled reflectordictionary. Will raise an exception if not properly filled.
     def addEllipse(self, reflDict):
-        if not "name" in reflDict:
-            reflDict["name"] = "Ellipse"
 
-        if reflDict["name"] == "Ellipse":
-            reflDict["name"] = reflDict["name"] + "_{}".format(self.num_ref)
-
-        if not "gcenter" in reflDict:
-            reflDict["gcenter"] = np.zeros(2)
         reflDict["type"] = 2
-        reflDict["transf"] = np.eye(4)
-        if not "flip" in reflDict:
-            reflDict["flip"] = False
-
-        check_ElemDict(reflDict, self.system.keys()) 
-        if not "ecc_uv" in reflDict:
-            reflDict["ecc_uv"] = 0
-
-        if not "rot_uv" in reflDict:
-            reflDict["rot_uv"] = 0
+        check_ElemDict(reflDict, self.system.keys(), self.num_ref) 
         self.system[reflDict["name"]] = self.copyObj(reflDict)
 
         if reflDict["pmode"] == "focus":
@@ -405,6 +359,7 @@ class System(object):
 
 
         if reflDict["gmode"] == "xy":
+            self.system[reflDict["name"]]["gcenter"] = np.zeros(2)
             self.system[reflDict["name"]]["ecc_uv"] = 0
             self.system[reflDict["name"]]["rot_uv"] = 0
             self.system[reflDict["name"]]["gmode"] = 0
@@ -426,27 +381,10 @@ class System(object):
     #
     # @param reflDict A filled reflectordictionary. Will raise an exception if not properly filled.
     def addPlane(self, reflDict):
-        if not "name" in reflDict:
-            reflDict["name"] = "plane"
-
-        if not "gcenter" in reflDict:
-            reflDict["gcenter"] = np.zeros(2)
-
-        if reflDict["name"] == "plane":
-            reflDict["name"] = reflDict["name"] + "_{}".format(self.num_ref)
 
         reflDict["type"] = 3
-        reflDict["transf"] = np.eye(4)
-        if not "flip" in reflDict:
-            reflDict["flip"] = False
-        check_ElemDict(reflDict, self.system.keys()) 
+        check_ElemDict(reflDict, self.system.keys(), self.num_ref) 
 
-        if not "ecc_uv" in reflDict:
-            reflDict["ecc_uv"] = 0
-
-        if not "rot_uv" in reflDict:
-            reflDict["rot_uv"] = 0
-        
         self.system[reflDict["name"]] = self.copyObj(reflDict)
         self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
 
@@ -455,6 +393,7 @@ class System(object):
         self.system[reflDict["name"]]["coeffs"][2] = -1
 
         if reflDict["gmode"] == "xy":
+            self.system[reflDict["name"]]["gcenter"] = np.zeros(2)
             self.system[reflDict["name"]]["ecc_uv"] = 0
             self.system[reflDict["name"]]["rot_uv"] = 0
             self.system[reflDict["name"]]["gmode"] = 0
@@ -465,6 +404,10 @@ class System(object):
         elif reflDict["gmode"] == "AoE":
             # Assume is given in degrees
             # Convert Az and El to radians
+            self.system[reflDict["name"]]["gcenter"] = np.zeros(2)
+            self.system[reflDict["name"]]["ecc_uv"] = 0
+            self.system[reflDict["name"]]["rot_uv"] = 0
+            self.system[reflDict["name"]]["gmode"] = 0
 
             self.system[reflDict["name"]]["lims_Az"] = [self.system[reflDict["name"]]["lims_Az"][0],
                                                         self.system[reflDict["name"]]["lims_Az"][1]]
@@ -579,7 +522,8 @@ class System(object):
 
         if not loadExist:
             self.clog.error("Specified system does not exist.")
-        
+            exit(1)
+
         with open(os.path.join(path, "system"), 'rb') as file: 
             self.system = pickle.load(file)
         
@@ -686,7 +630,9 @@ class System(object):
     # @see PODict
     def runPO(self, PODict):
         self.clog.info("*** Starting PO propagation ***")
-        
+       
+        check_runPODict(PODict, self.system, self.currents, self.scalarfields)
+
         if PODict["mode"] != "scalar":
             sc_name = PODict["s_current"]
             PODict["s_current"] = self.currents[PODict["s_current"]]
@@ -703,19 +649,9 @@ class System(object):
        
         target = self.system[PODict["t_name"]]
         
-        # Default exponent to -1
-        if not "exp" in PODict:
-            PODict["exp"] = "fwd"
-
-        # TODO: insert check for PODict
-        
         start_time = time.time()
         
         if PODict["device"] == "CPU":
-            if PODict["nThreads"] > self.nThreads_cpu:
-                self.clog.warning(f"Not enough CPU threads available, automatically reducing threadcount.")
-                PODict["nThreads"] = self.nThreads_cpu
-            
             self.clog.info(f"Hardware: running {PODict['nThreads']} CPU threads.")
             self.clog.info(f"... Calculating ...")
             out = PyPO_CPUd(source, target, PODict)
@@ -765,7 +701,7 @@ class System(object):
         if not argDict["name"]:
             argDict["name"] = f"Frame_{len(self.frames)}"
         
-        check_RTDict(argDict, self.frames.keys())
+        check_TubeRTDict(argDict, self.frames.keys())
         self.frames[argDict["name"]] = makeRTframe(argDict)
     
     ##
@@ -890,7 +826,7 @@ class System(object):
     # TODO: Change input to dictionary object.
     #def runRayTracer(self, fr_in, fr_out, name_target, epsilon=1e-3, nThreads=1, t0=100, device="CPU", verbose=True):
     def runRayTracer(self, runRTDict):
-        self.clog.info("Starting ray-trace propagation!")
+        self.clog.info("*** Starting RT propagation ***")
 
         check_runRTDict(runRTDict, self.system, self.frames)
 
@@ -898,13 +834,21 @@ class System(object):
         runRTDict["fr_in"] = self.frames[runRTDict["fr_in"]]
         runRTDict["t_name"] = self.system[runRTDict["t_name"]]
         
+        start_time = time.time()
+        
         if runRTDict["device"] == "CPU":
+            self.clog.info(f"Hardware: running {runRTDict['nThreads']} CPU threads.")
+            self.clog.info(f"... Calculating ...")
             frameObj = RT_CPUd(runRTDict)
 
         elif runRTDict["device"] == "GPU":
+            self.clog.info(f"Hardware: running {runRTDict['nThreads']} CUDA threads per block.")
+            self.clog.info(f"... Calculating ...")
             frameObj = RT_GPUf(runRTDict)
         
-        self.clog.info(f"Succesfully finished ray-trace.")
+        dtime = time.time() - start_time
+        
+        self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
         self.frames[runRTDict["fr_out"]] = frameObj
 
 

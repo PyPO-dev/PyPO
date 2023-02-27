@@ -25,14 +25,14 @@ def focus_opts_hyp_ell():
 def makeParabolaInp():
     return [
         InputDescription(inType.vectorStrings, "name"),
-        InputDescription(inType.dropdown, "pmode", label="Parameter mode", subdict={
+        InputDescription(inType.dynamicRadio, "pmode", label="Parameter mode", subdict={
             "focus"     : [InputDescription(inType.vectorFloats, "focus_1", label="Focus xyz", oArray=True, numFields=3),
                             InputDescription(inType.vectorFloats, "vertex", label="Vertex xyz", oArray=True, numFields=3)],
             "manual"    : [InputDescription(inType.vectorFloats, "coeffs", label="AB coefficients", oArray=True, numFields=2)]
             }),
         InputDescription(inType.vectorIntegers, "gridsize", label="Grid size", hints=[101,101], numFields=2, oArray=True),
         InputDescription(inType.checkbox, "flip", label="Flip Normal Vectors"),
-        InputDescription(inType.dropdown, "gmode", label="Grid mode", subdict={
+        InputDescription(inType.dynamicRadio, "gmode", label="Grid mode", subdict={
             "xy" : xy_opts(),
             "uv" : uv_opts()
         })
@@ -40,19 +40,19 @@ def makeParabolaInp():
 
 def makeHyperbolaEllipseInp():
     return [InputDescription(inType.vectorStrings, "name"),
-            InputDescription(inType.dropdown, "pmode", label="Parameter mode", subdict={
+            InputDescription(inType.dynamicRadio, "pmode", label="Parameter mode", subdict={
                 "focus"     : focus_opts_hyp_ell(),
                 "manual"    : [InputDescription(inType.vectorFloats, "coeffs", label="ABC coefficients", oArray=True, numFields=3)]
                 }),
             InputDescription(inType.vectorIntegers, "gridsize", label="Grid size", hints=[101,101], numFields=2, oArray=True),
-            InputDescription(inType.dropdown, "gmode", label="Grid mode", subdict={
+            InputDescription(inType.dynamicRadio, "gmode", label="Grid mode", subdict={
                 "xy" : xy_opts(),
                 "uv" : uv_opts()
             })]
 
 def makeQuadricSurfaceInp():
     return [
-        InputDescription(inType.dropdown, "type", subdict={
+        InputDescription(inType.dynamicDropdown, "type", subdict={
             "Parabola": makeParabolaInp(),
             "Hyperbola": makeHyperbolaEllipseInp(),
             "Ellipse": makeHyperbolaEllipseInp()
@@ -62,7 +62,7 @@ def makeQuadricSurfaceInp():
 def makePlaneInp():
     return [InputDescription(inType.vectorStrings, "name"),
             InputDescription(inType.vectorIntegers, "gridsize", label="Grid size", hints=[101,101], numFields=2, oArray=True),
-            InputDescription(inType.dropdown, "gmode", label="Grid mode", subdict={
+            InputDescription(inType.dynamicRadio, "gmode", label="Grid mode", subdict={
                 "xy" : xy_opts(),
                 "uv" : uv_opts(),
                 "AoE" : AoE_opts()
@@ -72,7 +72,7 @@ def makePlaneInp():
 def makeTransformationForm(elementName):
     return[
         InputDescription(inType.static, "element", staticValue=elementName),
-        InputDescription(inType.dropdown, "type", subdict={
+        InputDescription(inType.dynamicRadio, "type", subdict={
             "Translation":[
                 InputDescription(inType.vectorFloats, "vector", label="Translation Vector", hints=["x","y","z"], numFields=3,oArray=True)],
             "Rotation": [
@@ -85,7 +85,7 @@ def makeTransformationForm(elementName):
 def makeTransformationElementsForm(elementList):
     return[
         InputDescription(inType.xyzradio, "project", label="Abscissa - ordinate"),
-        InputDescription(inType.dropdown, "type", subdict={
+        InputDescription(inType.dynamicRadio, "type", subdict={
             "Translation":[
                 InputDescription(inType.vectorFloats, "vector", label="Translation Vector", hints=["x","y","z"], numFields=3,oArray=True)],
             "Rotation": [
@@ -117,7 +117,7 @@ def initGaussianFrameInp():
             InputDescription(inType.vectorFloats, "y0", label="Y beamwaist", hints=[5], numFields=1),
             InputDescription(inType.vectorFloats, "tChief", label="Chief ray tilt", hints=[0,0,1], numFields=3, oArray=True),
             InputDescription(inType.vectorFloats, "oChief", label="Chief ray origin", hints=[0,0,0], numFields=3, oArray=True),
-            InputDescription(inType.dropdown, "setseed", label="Set seed", subdict={
+            InputDescription(inType.dynamicRadio, "setseed", label="Set seed", subdict={
                 "random" : [],
                 "set" : [InputDescription(inType.vectorIntegers, "seed", label="", hints=[0], numFields=1)]
             })]
@@ -313,7 +313,7 @@ def propPOInp(currentDict, scalarFieldDict, elemDict):
 
     propFields = [
             InputDescription(inType.dropdown, "t_name", label="Target surface", options = sublist_target),
-            InputDescription(inType.dropdown, "mode", label="Propagation mode", subdict={
+            InputDescription(inType.dynamicDropdown, "mode", label="Propagation mode", subdict={
                 "JM":[
                     InputDescription(inType.dropdown, "s_current", label="Source currents", options = sublist_currents),
                     InputDescription(inType.vectorStrings, "name_JM", label="Output currents", numFields=1)],

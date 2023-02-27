@@ -181,9 +181,9 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>setLoggingVerbosity</b
 <tr class="memitem:acc292ccd0ae5065e43dce2133afad7b3"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1System_1_1System.html#acc292ccd0ae5065e43dce2133afad7b3">createGaussian</a> (self, gaussDict, name_source)</td></tr>
 <tr class="memdesc:acc292ccd0ae5065e43dce2133afad7b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a Gaussian beam.  <br /></td></tr>
 <tr class="separator:acc292ccd0ae5065e43dce2133afad7b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae3ab0e792ac3512cc9ca6ff7b7090849"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1System_1_1System.html#ae3ab0e792ac3512cc9ca6ff7b7090849">runRayTracer</a> (self, fr_in, fr_out, name_target, epsilon=1e-3, nThreads=1, t0=100, device=&quot;CPU&quot;, verbose=True)</td></tr>
-<tr class="memdesc:ae3ab0e792ac3512cc9ca6ff7b7090849"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run a ray-trace propagation from a frame to a surface.  <br /></td></tr>
-<tr class="separator:ae3ab0e792ac3512cc9ca6ff7b7090849"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3aa9332414533e7ed91697ab0a9ba3c"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1System_1_1System.html#ac3aa9332414533e7ed91697ab0a9ba3c">runRayTracer</a> (self, runRTDict)</td></tr>
+<tr class="memdesc:ac3aa9332414533e7ed91697ab0a9ba3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run a ray-trace propagation from a frame to a surface.  <br /></td></tr>
+<tr class="separator:ac3aa9332414533e7ed91697ab0a9ba3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4ee274ef08af9e51ea2fd3f9bdaa7d9a"><td class="memItemLeft" align="right" valign="top"><a id="a4ee274ef08af9e51ea2fd3f9bdaa7d9a" name="a4ee274ef08af9e51ea2fd3f9bdaa7d9a"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>interpFrame</b> (self, name_fr_in, name_field, name_target, name_out, comp, method=&quot;nearest&quot;)</td></tr>
 <tr class="separator:a4ee274ef08af9e51ea2fd3f9bdaa7d9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -2180,8 +2180,8 @@ frame </dd></dl>
 
 </div>
 </div>
-<a id="ae3ab0e792ac3512cc9ca6ff7b7090849" name="ae3ab0e792ac3512cc9ca6ff7b7090849"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae3ab0e792ac3512cc9ca6ff7b7090849">&#9670;&#160;</a></span>runRayTracer()</h2>
+<a id="ac3aa9332414533e7ed91697ab0a9ba3c" name="ac3aa9332414533e7ed91697ab0a9ba3c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac3aa9332414533e7ed91697ab0a9ba3c">&#9670;&#160;</a></span>runRayTracer()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2196,49 +2196,7 @@ frame </dd></dl>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>fr_in</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>fr_out</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>name_target</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>epsilon</em> = <code>1e-3</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>nThreads</em> = <code>1</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>t0</em> = <code>100</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>device</em> = <code>&quot;CPU&quot;</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>verbose</em> = <code>True</code>&#160;</td>
+          <td class="paramname"><em>runRTDict</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -2249,7 +2207,7 @@ frame </dd></dl>
 </div><div class="memdoc">
 
 <p>Run a ray-trace propagation from a frame to a surface. </p>
-<p>TODO: Change input to dictionary object. </p>
+<p>TODO: Change input to dictionary object. def runRayTracer(self, fr_in, fr_out, name_target, epsilon=1e-3, nThreads=1, t0=100, device="CPU", verbose=True): </p>
 
 </div>
 </div>

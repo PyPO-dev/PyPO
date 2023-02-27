@@ -540,17 +540,19 @@ class System(object):
     # Remove reflector from system.
     #
     # @ param name Name of reflector to be removed.
-    def removeElement(self, name):
+    def removeElement(self, *name):
         self.clog.info(f"Removed element {name} from system.")
-        del self.system[name]
+        for n in name:
+            del self.system[n]
     
     ##
     # Remove a ray-trace frame from system
     #
     # @param frameName Name of frame to be removed.
-    def removeFrame(self, frameName):
+    def removeFrame(self, *frameName):
         self.clog.info(f"Removed frame {frameName} from system.")
-        del self.frames[frameName]
+        for fn in frameName:
+            del self.frames[fn]
     
     ##
     # Remove a PO field from system
@@ -1214,7 +1216,8 @@ class System(object):
     # @param obj Object do be deepcopied.
     #
     # @returns copy A deepcopy of obj.
-    def copyObj(self, obj):
+    def copyObj(self, obj=None):
+        obj = self if obj is None else obj
         return copy.deepcopy(obj)
 
     ##

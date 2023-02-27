@@ -234,7 +234,7 @@ class MainWidget(QWidget):
                 self.ElementsColumn.POCurrents.addWidget(CurrentWidget(key, self.stm.removeCurrent, self.setPlotFieldFormOpt))
 
             elif columnType == "scalarfields":
-                self.ElementsColumn.SPOFields.addWidget(SFieldsWidget(key,self.stm.removeField, self.setPlotSFieldFormOpt))
+                self.ElementsColumn.SPOFields.addWidget(SFieldsWidget(key,self.stm.removeScalarField, self.setPlotSFieldFormOpt))
 
 
     def setForm(self, formData, readAction):
@@ -418,7 +418,7 @@ class MainWidget(QWidget):
     
     def addPlotCurrentAction(self):
         plotFieldDict = self.ParameterWid.read()
-        fig, _ = self.stm.plotBeam2D(self.stm.currents[plotFieldDict["field"]].surf, plotFieldDict["field"], 
+        fig, _ = self.stm.plotBeam2D(plotFieldDict["field"], 
                                     plotFieldDict["comp"], project=plotFieldDict["project"], ret=True)
         self.addPlot(fig, f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
 
@@ -482,19 +482,23 @@ class MainWidget(QWidget):
 
         if dial.exec_():
             if propBeamDict["mode"] == "JM":
-                self.ElementsColumn.POCurrents.addWidget(CurrentWidget(propBeamDict["name_JM"], [self.setPlotCurrentFormOpt, self.stm.removeCurrent]))
+                self.ElementsColumn.POCurrents.addWidget(CurrentWidget(propBeamDict["name_JM"], self.stm.removeCurrent, self.setPlotCurrentFormOpt))
         
             elif propBeamDict["mode"] == "EH" or propBeamDict["mode"] == "FF":
-                self.ElementsColumn.POFields.addWidget(FieldsWidget(propBeamDict["name_EH"], [self.setPlotFieldFormOpt, self.stm.removeField]))
+                self.ElementsColumn.POFields.addWidget(FieldsWidget(propBeamDict["name_EH"], self.stm.removeField, self.setPlotFieldFormOpt))
         
             elif propBeamDict["mode"] == "JMEH":
-                self.ElementsColumn.POCurrents.addWidget(CurrentWidget(propBeamDict["name_JM"], [self.setPlotCurrentFormOpt, self.stm.removeCurrent]))
-                self.ElementsColumn.POFields.addWidget(FieldsWidget(propBeamDict["name_EH"], [self.setPlotFieldFormOpt, self.stm.removeField]))
+                self.ElementsColumn.POCurrents.addWidget(CurrentWidget(propBeamDict["name_JM"], self.stm.removeCurrent, self.setPlotCurrentFormOpt))
+                self.ElementsColumn.POFields.addWidget(FieldsWidget(propBeamDict["name_EH"], self.stm.removeField, self.setPlotFieldFormOpt))
         
             elif propBeamDict["mode"] == "EHP":
-                self.ElementsColumn.POFields.addWidget(CurrentWidget(propBeamDict["name_EH"], [self.setPlotCurrentFormOpt, self.stm.removeCurrent]))
+                self.ElementsColumn.POFields.addWidget(FieldsWidget(propBeamDict["name_EH"], self.stm.removeField, self.setPlotFieldFormOpt))
                 self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(propBeamDict["name_P"], 
-                                [self.setPlotFrameFormOpt, self.stm.removeFrame, self.calcRMSfromFrame]))
+                                self.stm.removeFrame, self.setPlotFrameFormOpt,self.calcRMSfromFrame))
+    
+            elif propBeamDict["mode"] == "scalar":
+                self.ElementsColumn.SPOFields.addWidget(SFieldsWidget(propBeamDict["name_field"], self.stm.removeScalarField, self.setPlotSFieldFormOpt))
+
     #END NOTE
     
     def calcRMSfromFrame(self, frame):

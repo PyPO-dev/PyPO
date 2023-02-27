@@ -21,7 +21,7 @@ class SymDialog(QDialog):
 
         layout = QGridLayout()
         abortBtn = QPushButton(self.msg)
-        abortBtn.clicked.connect(self.accept)
+        abortBtn.clicked.connect(self.reject)
         layout.addWidget(QLabel(""), 0,0,1,2)
         layout.addWidget(abortBtn, 1,1)
         self.setLayout(layout)
@@ -32,6 +32,7 @@ class SymDialog(QDialog):
     def killThread(self):
         self.thread.exit()
         self.reject()
+
 class RemoveElementDialog(QDialog):
     def __init__(self, elementName):
         super().__init__()

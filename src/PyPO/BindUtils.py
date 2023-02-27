@@ -42,8 +42,8 @@ def fieldConv(field, c_fields, size, ct_t):
     c_fields.i2z = (ct_t * size)(*np.imag(field.Hz).ravel().tolist())
 
 def sfieldConv(field, c_field, size, ct_t):
-    c_field.rx = (ct_t * size)(*np.real(field.S).ravel().tolist())
-    c_field.ix = (ct_t * size)(*np.imag(field.S).ravel().tolist())
+    c_field.x = (ct_t * size)(*np.real(field.S).ravel().tolist())
+    c_field.y = (ct_t * size)(*np.imag(field.S).ravel().tolist())
 
 def extractorScalar(source, target, field, ct_t):
     """
@@ -82,7 +82,10 @@ def extractorScalar(source, target, field, ct_t):
     return xyzs, xyzt, area, rEs, iEs
 
 def arrC1ToObj(res, shape, np_t):
-    res = np.ctypeslib.as_array(res.x, shape=shape) + 1j * np.ctypeslib.as_array(res.y, shape=shape)
+    obj = np.ctypeslib.as_array(res.x, shape=shape) + 1j * np.ctypeslib.as_array(res.y, shape=shape)
+
+    res = scalarfield(obj)
+
     return res
 
 def c2BundleToObj(res, shape, obj_t, np_t):

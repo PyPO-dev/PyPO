@@ -429,9 +429,7 @@ class MainWidget(QWidget):
 
     def addPropRaysAction(self): 
         propRaysDict = self.ParameterWid.read()
-        self.stm.runRayTracer(propRaysDict["frame_in"], propRaysDict["frame_out"], 
-                            propRaysDict["target"], propRaysDict["epsilon"], propRaysDict["nThreads"], 
-                            propRaysDict["t0"], propRaysDict["device"], verbose=False)
+        self.stm.runRayTracer(propRaysDict)
         self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(propRaysDict["frame_out"], 
                                 [self.setPlotFrameFormOpt, self.stm.removeFrame, self.calcRMSfromFrame]))
     

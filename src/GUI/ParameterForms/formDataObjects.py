@@ -157,12 +157,12 @@ def propRaysInp(frameDict, elemDict):
     sublist_dev = ["CPU", "GPU"]
 
     propRays = [
-            InputDescription(inType.dropdown, "frame_in", label="Input frame", sublist = sublist_frames),
-            InputDescription(inType.dropdown, "target", label="Target surface", sublist = sublist_target),
-            InputDescription(inType.string, "frame_out", label="Name of output frame", numFields=1),
-            InputDescription(inType.floats, "epsilon", label="Accuracy", hints=[1e-3], numFields=1),
+            InputDescription(inType.dropdown, "fr_in", label="Input frame", sublist = sublist_frames),
+            InputDescription(inType.dropdown, "t_name", label="Target surface", sublist = sublist_target),
+            InputDescription(inType.string, "fr_out", label="Name of output frame", numFields=1),
+            InputDescription(inType.floats, "tol", label="Accuracy", hints=[1e-3], numFields=1),
             InputDescription(inType.integers, "nThreads", label="# of threads", hints=[1], numFields=1),
-            InputDescription(inType.floats, "t0", label="Initial guess", hints=[100], numFields=1),
+            InputDescription(inType.floats, "t0", label="Initial guess", hints=[1], numFields=1),
             InputDescription(inType.dropdown, "device", label="Hardware to use", sublist = sublist_dev)
             ]
 

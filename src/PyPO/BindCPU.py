@@ -191,7 +191,7 @@ def PyPO_CPUd(source, target, PODict):
         mgr.new_sthread(target=lib.propagateToGrid_scalar, args=args)
 
         # Unpack filled struct
-        S = arrC1ToObj(res, shape=target_shape)
+        S = arrC1ToObj(res, shape=target_shape, np_t=np.float64)
 
         return S
 

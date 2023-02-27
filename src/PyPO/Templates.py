@@ -56,7 +56,6 @@ PlotAper = {
         }
 
 runPODict = {
-        "s_name"    : "Name of source surface (string)",
         "t_name"    : "Name of target surface (string)",
         "s_current" : "Name of current object in system.currents (string)",
         "s_field"   : "Scalar complex field for scalar propagation only (Numpy array)",

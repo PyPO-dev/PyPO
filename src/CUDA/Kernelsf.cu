@@ -935,7 +935,7 @@ void __device__ scalarfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
         expo = expCo(cuCmulf(con[7], make_cuFloatComplex(con[6].x * con[0].x * r, 0)));
         cfact = make_cuFloatComplex(-con[0].x * con[0].x / (4 * r * con[4].x) * d_A[i], 0);
         
-        e = cuCaddf(cuCmulf(cfact, expo), e);
+        e = cuCaddf(cuCmulf(cuCmulf(cfact, expo), d_sfs[i]), e);
     }
 }
 

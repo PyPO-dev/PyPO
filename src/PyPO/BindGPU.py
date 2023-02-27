@@ -211,38 +211,38 @@ def PyPO_GPUf(source, target, PODict):
 
         mgr.new_sthread(target=lib.callKernelf_scalar, args=args)
         # Unpack filled struct
-        S = arrC1ToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
+        S = arrC1ToObj(res, shape=target_shape, np_t=np.float64)
 
         return S
 
-def RT_GPUf(target, fr_in, epsilon, t0, nThreads):
+def RT_GPUf(runRTDict):
     lib, ws = loadGPUlib()
     mgr = TManager.Manager(Config.context)
 
     ctp = reflparamsf()
-    allfill_reflparams(ctp, target, ctypes.c_float)
+    allfill_reflparams(ctp, runRTDict["t_name"], ctypes.c_float)
 
     inp = cframef()
     res = cframef()
 
-    allocate_cframe(res, fr_in.size, ctypes.c_float)
-    allfill_cframe(inp, fr_in, fr_in.size, ctypes.c_float)
+    allocate_cframe(res, runRTDict["fr_in"].size, ctypes.c_float)
+    allfill_cframe(inp, runRTDict["fr_in"], runRTDict["fr_in"].size, ctypes.c_float)
 
-    nBlocks = math.ceil(fr_in.size / nThreads)
+    nBlocks = math.ceil(runRTDict["fr_in"].size / runRTDict["nThreads"])
 
-    nBocks      = ctypes.c_int(nBlocks)
-    nThreads    = ctypes.c_int(nThreads)
-    epsilon     = ctypes.c_float(epsilon)
-    t0          = ctypes.c_float(t0)
+    nBlocks      = ctypes.c_int(nBlocks)
+    nThreads    = ctypes.c_int(runRTDict["nThreads"])
+    tol         = ctypes.c_float(runRTDict["tol"])
+    t0          = ctypes.c_float(runRTDict["t0"])
 
     args = [ctp, ctypes.byref(inp), ctypes.byref(res),
-            epsilon, t0, nBlocks, nThreads]
+            tol, t0, nBlocks, nThreads]
 
     start_time = time.time()
     
     mgr.new_sthread(target=lib.callRTKernel, args=args)
     
-    shape = (fr_in.size,)
+    shape = (runRTDict["fr_in"].size,)
     fr_out = frameToObj(res, np_t=np.float32, shape=shape)
 
     return fr_out

@@ -20,7 +20,7 @@ affiliations:
  - name: Faculty of Electrical Engineering, Mathematics and Computer Science, Delft University of Technology, Mekelweg 4, 2628 CD,
 Delft, The Netherlands
    index: 1
- - name: Institution Name, Country
+ - name: The Hague university of applied sciences, Johanna Westerdijkplein 75, 2521 EN, The Hague, The Netherlands
    index: 2
 date: 13 August 2017
 bibliography: paper.bib
@@ -30,7 +30,7 @@ bibliography: paper.bib
 # Summary
 
 Physical optics (PO) is a high-frequency approximation commonly used for solving
-electromagnetic scattering problems[@Balanis89]. In this approximation, the electromagnetic field scattered by 
+electromagnetic scattering problems [@Balanis89]. In this approximation, the electromagnetic field scattered by 
 an object is obtained by first integrating the total field illuminating the object. 
 Then, using geometrical optics (GO), the induced electromagnetic currents are calculated. 
 These currents are then used to calculate the resultant scattered field and can be either analysed or

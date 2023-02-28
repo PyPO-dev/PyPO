@@ -9,20 +9,19 @@ tags:
   - Geometrical Optics
 authors:
   - name: Arend Moerman
-    orcid: 0000-0000-0000-0000
+    orcid: 0000-0002-0475-6134
     equal-contrib: true
-    corresponding: true # (This is how to denote the corresponding author)
-    affiliation: 1 # (Multiple affiliations must be quoted)
+    corresponding: true
+    affiliation: 1
   - name: Maikel H. Gafaji
     equal-contrib: true
     affiliation: 2
 affiliations:
- - name: Faculty of Electrical Engineering, Mathematics and Computer Science, Delft University of Technology, Mekelweg 4, 2628 CD,
-Delft, The Netherlands
-   index: 1
- - name: The Hague university of applied sciences, Johanna Westerdijkplein 75, 2521 EN, The Hague, The Netherlands
-   index: 2
-date: 13 August 2017
+  - name: Faculty of Electrical Engineering, Mathematics and Computer Science, Delft University of Technology, Mekelweg 4, 2628 CD, Delft, The Netherlands
+    index: 1
+  - name: The Hague University of Applied Science, Johanna Westerdijkplein 75, 2521 EN, The Hague, The Netherlands
+    index: 2
+date: 28 February 2023
 bibliography: paper.bib
 ---
 
@@ -51,21 +50,6 @@ Commercial software, such as Zemax and GRASP, for these ends has already been de
 # Availability
 `PyPO` can be found on [Github](https://github.com/arend95/PyPO). Instructions regarding installation and low-level descriptions of the source code can be found in the [documentation](https://arend95.github.io/PyPO/). The package comes with several examples illustrating the workflow and features, and can be used as building blocks for new reflector systems.
 
-# Citations
-
-Citations to entries in paper.bib should be in
-[rMarkdown](http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html)
-format.
-
-If you want to cite a software repository URL (e.g. something on GitHub without a preferred
-citation) then you can do it with the example BibTeX entry below for @fidgit.
-
-For a quick reference, the following citation commands can be used:
-- `@author:2001`  ->  "Author et al. (2001)"
-- `[@author:2001]` -> "(Author et al., 2001)"
-- `[@author1:2001; @author2:2001]` -> "(Author1 et al., 2001; Author2 et al., 2002)"
-
-# Figures
 
 Figures can be included like this:
 ![Caption for example figure.\label{fig:example}](figure.png)

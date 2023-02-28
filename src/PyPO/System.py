@@ -976,15 +976,49 @@ class System(object):
         field = self.fields[name_field]
         field_co = getattr(field, comp_co)
         
-        field_cr = getattr(field, comp_X)
+        field_cr = getattr(field, comp_cr)
         
-        return effs.calcXpol(field_co, field_X)
+        return effs.calcXpol(field_co, field_cr)
 
-    def fitGaussAbs(self, field, name_surface, thres, mode):
-        surfaceObj = self.system[name_surface]
-        out = fgs.fitGaussAbs(field, surfaceObj, thres, mode)
-        return out
+    ##
+    # Fit a Gaussian profile to the amplitude of a field component and adds the result to scalar field in system.
+    #
+    # @param name_field Name of field object.
+    # @param comp Component of field object.
+    # @param thres Threshold to fit to, in decibels.
+    # @param mode Fit to amplitude in decibels, linear or logarithmically.
+    # @param full_output Return fitted parameters and standard deviations.
+    #
+    # @returns popt Fitted beam parameters.
+    # @returns perr Standard deviation of fitted parameters.
+    def fitGaussAbs(self, name_field, comp, thres=None, mode=None, full_output=False):
+        thres = -11 if thres is None else thres
+        mode = "dB" if mode is None else mode
 
+        field = getattr(self.fields[name_field], comp)
+        surfaceObj = self.system[self.fields[name_field].surf]
+        popt, perr = fgs.fitGaussAbs(field, surfaceObj, thres, mode)
+
+        Psi = scalarfield(fgs.generateGauss(popt, surfaceObj, mode="linear"))
+        Psi.setMeta(self.fields[name_field].surf, self.fields[name_field].k)
+
+        self.scalarfields[f"fitGauss_{name_field}"] = Psi
+ 
+        if full_output:
+            return popt, perr
+
+    def calcMainBeam(self, name_field, comp, thres=None, mode=None):
+        thres = -11 if thres is None else thres
+        mode = "dB" if mode is None else mode
+        
+        self.fitGaussAbs(name_field, comp, thres, mode)
+        field = getattr(self.fields[name_field], comp)
+        surfaceObj = self.system[self.fields[name_field].surf]
+        
+        eff = effs.calcMainBeam(field, surfaceObj, self.scalarfields[f"fitGauss_{name_field}"].S)
+
+        return eff
+    
     ##
     # Generate point-source PO fields and currents.
     #
@@ -1252,7 +1286,7 @@ class System(object):
             exit(0)
 
         w = np.cross(v, u)
-        lenw = np.linalg.norm(w)
+
         
         w = w / lenw
         

@@ -74,6 +74,14 @@ def calcXpol(Cofield, Xfield):
 
     return eff_Xpol
 
+def calcMainBeam(field, surfaceObject, fitGauss):
+    field_norm = field / np.max(np.absolute(field))
+    fitGauss_norm = fitGauss / np.max(np.absolute(fitGauss))
+    
+    eff_mb = np.sum(np.absolute(fitGauss_norm)**2) / np.sum(np.absolute(field_norm)**2)
+    
+    return eff_mb
+
 def calcDirectivity(eta_t, surfaceObject, k):
     grids = generateGrid(surfaceObject, transform=False, spheric=True)
 

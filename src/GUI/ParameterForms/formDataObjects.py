@@ -191,7 +191,7 @@ def initSPSInp(elemDict):
     sublist_surf = []
 
     if elemDict:
-        for key, item in elemDict.items():
+        for key, item in elemDict.item():
             if item["type"] == 3: # Only append plane types
                 sublist_surf.append(key)
 
@@ -259,14 +259,20 @@ def plotField(fieldName):
 
     return plotField
 
-def plotSField(fieldName):
+def plotSField(fieldName, gmode):
     complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
-    
-    plotSField = [
-            InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
-            InputDescription(inType.xyzradio, "project", label="Abscissa - ordinate")
-            ]
+    if gmode != 2:
+        plotSField = [
+               InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
+                InputDescription(inType.xyzradio, "project", label="Abscissa - ordinate")
+                ]
 
+    else:
+        plotSField = [
+                InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
+                InputDescription(inType.static, "project", staticValue="xy", hidden=True)
+                ]
+    
     return plotSField
 
 def plotFarField(fieldName):
@@ -417,6 +423,26 @@ def calcXpolEff(fieldDict, elemDict):
         ]
 
     return formXpol
+
+def calcMBEff(fieldDict, elemDict):
+    complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
+    
+    sublist_fields = []
+    if fieldDict:
+        for key, item in fieldDict.items():
+            if elemDict[item.surf]["type"] == 3:
+                sublist_fields.append(key)
+    
+    mode_options = ["dB", "linear", "log"]
+
+    formMB = [
+        InputDescription(inType.dropdown, "f_name", label="Field", options = sublist_fields),
+        InputDescription(inType.dropdown, "comp", label="Component", options = complist),
+        InputDescription(inType.vectorFloats, "thres", label="Threshold", numFields=1),
+        InputDescription(inType.radio, "mode", label="Fitting mode", options=mode_options)
+        ]
+
+    return formMB
 
 def saveSystemForm():
     return [InputDescription(inType.vectorStrings, "name", label="Name of system", numFields=1)]

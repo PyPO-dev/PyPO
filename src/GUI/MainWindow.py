@@ -396,7 +396,7 @@ class MainWidget(QWidget):
             self.setForm(fDataObj.plotField(field), readAction=self.addPlotFieldAction)
                 
     def setPlotSFieldFormOpt(self, field):
-        self.setForm(fDataObj.plotSField(field), readAction=self.addPlotSFieldAction)
+        self.setForm(fDataObj.plotSField(field, self.stm.system[self.stm.scalarfields[field].surf]["gmode"]), readAction=self.addPlotSFieldAction)
     
     def setPlotCurrentFormOpt(self, current):
         self.setForm(fDataObj.plotCurrentOpt(current), readAction=self.addPlotCurrentAction)
@@ -456,6 +456,9 @@ class MainWidget(QWidget):
     def setXpolEffsForm(self):
         self.setForm(fDataObj.calcXpolEff(self.stm.fields, self.stm.system), self.calcXpolAction)
 
+    def setMBEffsForm(self):
+        self.setForm(fDataObj.calcMBEff(self.stm.fields, self.stm.system), self.calcMBAction)
+    
     def calcTaperAction(self):
         TaperDict = self.ParameterWid.read()
         eff_taper = self.stm.calcTaper(TaperDict["f_name"], TaperDict["comp"])
@@ -477,6 +480,12 @@ class MainWidget(QWidget):
         XpolDict = self.ParameterWid.read()
         eff_Xpol = self.stm.calcXpol(XpolDict["f_name"], XpolDict["co_comp"], XpolDict["cr_comp"])
         print(f'X-pol efficiency of {XpolDict["f_name"]}, co-component {XpolDict["co_comp"]} and X-component {XpolDict["cr_comp"]} = {eff_Xpol}\n')
+
+    def calcMBAction(self):
+        MBDict = self.ParameterWid.read()
+        eff_mb = self.stm.calcMainBeam(MBDict["f_name"], MBDict["comp"], MBDict["thres"], MBDict["mode"])
+        print(f'Main beam efficiency of {MBDict["f_name"]}, component {MBDict["comp"]} = {eff_mb}\n')
+        self.ElementsColumn.SPOFields.addWidget(SFieldsWidget(f"fitGauss_{MBDict['f_name']}", self.stm.removeScalarField, self.setPlotSFieldFormOpt))
 
     def addPropBeamAction(self):
         propBeamDict = self.ParameterWid.read()
@@ -661,6 +670,9 @@ class PyPOMainWindow(QMainWindow):
         calcXpolEffsAction.triggered.connect(self.mainWid.setXpolEffsForm)
         calcEffs.addAction(calcXpolEffsAction)
 
+        calcMBEffsAction = QAction("Main beam", self)
+        calcMBEffsAction.triggered.connect(self.mainWid.setMBEffsForm)
+        calcEffs.addAction(calcMBEffsAction)
         # END NOTE
 if __name__ == "__main__":
 

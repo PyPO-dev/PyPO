@@ -93,6 +93,9 @@ def fitGaussAbs(field, surfaceObject, thres, mode):
     popt, pcov = opt.curve_fit(couplingMasked, xy, field_est.ravel(), p0, bounds=bounds, method="dogbox")
     perr = np.sqrt(np.diag(pcov))
 
+    popt = np.append(popt, np.max(np.absolute(field)))
+    perr = np.append(perr, 0.0)
+
     #print(f"Fitted shift and rotation:\nmu_x = {popt[-3]}, mu_y = {popt[-2]}\nTheta = {popt[-1]}")
     return popt, perr
 
@@ -122,7 +125,7 @@ def generateGauss(fgs_out, surfaceObject, mode, mask=None):
     if mask == None:
         mask = np.ones(x.shape)
 
-    x0, y0, xs, ys, theta = fgs_out
+    x0, y0, xs, ys, theta, amp = fgs_out
 
     Psi = GaussAbs(mask, mode, (x, y), x0, y0, xs, ys, theta)
-    return Psi.reshape(x.shape)
+    return amp * Psi.reshape(x.shape)

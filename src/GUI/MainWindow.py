@@ -329,6 +329,9 @@ class MainWidget(QWidget):
     def setInitGaussianForm(self):
         self.setForm(fDataObj.initGaussianInp(self.stm.system), readAction=self.addGaussianAction)
     
+    def setInitSGaussianForm(self):
+        self.setForm(fDataObj.initSGaussianInp(self.stm.system), readAction=self.addSGaussianAction)
+    
     def setInitPSForm(self):
         self.setForm(fDataObj.initPSInp(self.stm.system), readAction=self.addPSAction)
     
@@ -357,6 +360,11 @@ class MainWidget(QWidget):
         self.ElementsColumn.POFields.addWidget(FieldsWidget(GDict["name"], self.stm.removeField, self.setPlotFieldFormOpt))
         self.ElementsColumn.POCurrents.addWidget(CurrentWidget(GDict["name"], self.stm.removeCurrent, self.setPlotCurrentFormOpt))
     
+    def addSGaussianAction(self):
+        GDict = self.ParameterWid.read()
+        self.stm.createScalarGaussian(GDict, GDict["surface"])
+        self.ElementsColumn.SPOFields.addWidget(SFieldsWidget(GDict["name"], self.stm.removeScalarField, self.setPlotSFieldFormOpt))
+    
     def addPSAction(self):
         PSDict = self.ParameterWid.read()
         self.stm.generatePointSource(PSDict, PSDict["surface"])
@@ -381,7 +389,7 @@ class MainWidget(QWidget):
             self.setForm(fDataObj.plotField(field), readAction=self.addPlotFieldAction)
                 
     def setPlotSFieldFormOpt(self, field):
-        self.setForm(fDataObj.plotSField(field), readAction=self.addPlotSFieldAction)
+        self.setForm(fDataObj.plotSField(field, self.stm.system[self.stm.scalarfields[field].surf]["gmode"]), readAction=self.addPlotSFieldAction)
     
     def setPlotCurrentFormOpt(self, current):
         self.setForm(fDataObj.plotCurrentOpt(current), readAction=self.addPlotCurrentAction)
@@ -441,6 +449,9 @@ class MainWidget(QWidget):
     def setXpolEffsForm(self):
         self.setForm(fDataObj.calcXpolEff(self.stm.fields, self.stm.system), self.calcXpolAction)
 
+    def setMBEffsForm(self):
+        self.setForm(fDataObj.calcMBEff(self.stm.fields, self.stm.system), self.calcMBAction)
+    
     def calcTaperAction(self):
         TaperDict = self.ParameterWid.read()
         eff_taper = self.stm.calcTaper(TaperDict["f_name"], TaperDict["comp"])
@@ -463,10 +474,23 @@ class MainWidget(QWidget):
         eff_Xpol = self.stm.calcXpol(XpolDict["f_name"], XpolDict["co_comp"], XpolDict["cr_comp"])
         print(f'X-pol efficiency of {XpolDict["f_name"]}, co-component {XpolDict["co_comp"]} and X-component {XpolDict["cr_comp"]} = {eff_Xpol}\n')
 
+    def calcMBAction(self):
+        MBDict = self.ParameterWid.read()
+        eff_mb = self.stm.calcMainBeam(MBDict["f_name"], MBDict["comp"], MBDict["thres"], MBDict["mode"])
+        print(f'Main beam efficiency of {MBDict["f_name"]}, component {MBDict["comp"]} = {eff_mb}\n')
+        self.ElementsColumn.SPOFields.addWidget(SFieldsWidget(f"fitGauss_{MBDict['f_name']}", self.stm.removeScalarField, self.setPlotSFieldFormOpt))
+
     def addPropBeamAction(self):
         propBeamDict = self.ParameterWid.read()
-       
-        dial = SymDialog()
+      
+        if propBeamDict["mode"] == "scalar":
+            subStr = "scalar field"
+        else:
+            subStr = propBeamDict["mode"]
+
+        dialStr = f"Calculating {subStr} on {propBeamDict['t_name']}..."
+
+        dial = SymDialog(dialStr)
 
         self.mgr = TManager.Manager("G", callback=dial.accept)
         t = self.mgr.new_gthread(target=self.stm.runPO, args=(propBeamDict,), calc_type=propBeamDict["mode"])
@@ -614,7 +638,7 @@ class PyPOMainWindow(QMainWindow):
         initGaussVecAction.triggered.connect(self.mainWid.setInitGaussianForm)
         makeBeamG.addAction(initGaussVecAction)
         initGaussScalAction = QAction("Scalar", self)
-        initGaussScalAction.triggered.connect(self.mainWid.setInitGaussianForm)
+        initGaussScalAction.triggered.connect(self.mainWid.setInitSGaussianForm)
         makeBeamG.addAction(initGaussScalAction)
 
         propBeam = PhysOptMenu.addMenu("Propagate beam") 
@@ -639,6 +663,9 @@ class PyPOMainWindow(QMainWindow):
         calcXpolEffsAction.triggered.connect(self.mainWid.setXpolEffsForm)
         calcEffs.addAction(calcXpolEffsAction)
 
+        calcMBEffsAction = QAction("Main beam", self)
+        calcMBEffsAction.triggered.connect(self.mainWid.setMBEffsForm)
+        calcEffs.addAction(calcMBEffsAction)
         # END NOTE
 if __name__ == "__main__":
 

@@ -154,6 +154,14 @@ class GDict(ctypes.Structure):
                 ("z", ctypes.c_double),
                 ("pol", ctypes.POINTER(ctypes.c_double))]
 
+class ScalarGDict(ctypes.Structure):
+    _fields_ = [("lam", ctypes.c_double),
+                ("w0x", ctypes.c_double),
+                ("w0y", ctypes.c_double),
+                ("n", ctypes.c_double),
+                ("E0", ctypes.c_double),
+                ("z", ctypes.c_double)]
+
 # FLOATS
 class arrC1f(ctypes.Structure):
     _fields_ = [("x", ctypes.POINTER(ctypes.c_float)),
@@ -282,3 +290,11 @@ class GDictf(ctypes.Structure):
                 ("E0", ctypes.c_float),
                 ("z", ctypes.c_float),
                 ("pol", ctypes.POINTER(ctypes.c_float))]
+
+class ScalarGDictf(ctypes.Structure):
+    _fields_ = [("lam", ctypes.c_float),
+                ("w0x", ctypes.c_float),
+                ("w0y", ctypes.c_float),
+                ("n", ctypes.c_float),
+                ("E0", ctypes.c_float),
+                ("z", ctypes.c_float)]

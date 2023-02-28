@@ -323,7 +323,16 @@ def allfill_GDict(res, gdict_py, ct_t):
     res.n = ct_t(gdict_py["n"])
     res.E0 = ct_t(gdict_py["E0"])
     res.z = ct_t(gdict_py["z"])
+
     res.pol = (ct_t * 3)(*gdict_py["pol"].tolist())
+
+def allfill_SGDict(res, sgdict_py, ct_t):
+    res.lam = ct_t(sgdict_py["lam"])
+    res.w0x = ct_t(sgdict_py["w0x"])
+    res.w0y = ct_t(sgdict_py["w0y"])
+    res.n = ct_t(sgdict_py["n"])
+    res.E0 = ct_t(sgdict_py["E0"])
+    res.z = ct_t(sgdict_py["z"])
 
 def creflToObj(res, shape, np_t):
 

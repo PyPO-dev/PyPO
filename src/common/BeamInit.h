@@ -88,6 +88,26 @@ template<typename T, typename U, typename V, typename W, typename G>
 void initGauss(T gdict, U refldict, V *res_field, V *res_current);
 
 /** 
+ * Initialize scalar Gaussian beam from GDict or GDictf.
+ *
+ * Takes a ScalarGDict or ScalarGDictf and generates an arrC1 or arrC1f object.
+ *
+ * @param gdict ScalarGDict or ScalarGDictf object from which to generate a Gaussian beam.
+ * @param refldict reflparams or reflparamsf object corresponding to surface on
+ *      which to generate the Gaussian beam.
+ * @param res_field Pointer to arrC1 or arrC1f object.
+ *
+ * @see ScalarGDict
+ * @see ScalarGDictf
+ * @see reflparams
+ * @see reflparamsf
+ * @see arrC1
+ * @see arrC1f
+ */
+template<typename T, typename U, typename V, typename W, typename G>
+void initScalarGauss(T sgdict, U refldict, V *res_field);
+
+/** 
  * Calculate currents from electromagnetic field.
  * 
  * Calculate the J and M vectorial currents given a vectorial E and H field.
@@ -291,7 +311,7 @@ void initGauss(T gdict, U refldict, V *res_field, V *res_current)
 
 
     G zRx      = M_PI * gdict.w0x*gdict.w0x * gdict.n / gdict.lam;
-    G zRy      = M_PI * gdict.w0x*gdict.w0x * gdict.n / gdict.lam;
+    G zRy      = M_PI * gdict.w0y*gdict.w0y * gdict.n / gdict.lam;
     G wzx      = gdict.w0x * sqrt(1 + (gdict.z / zRx)*(gdict.z / zRx));
     G wzy      = gdict.w0y * sqrt(1 + (gdict.z / zRy)*(gdict.z / zRy));
     G Rzx_inv  = gdict.z / (gdict.z*gdict.z + zRx*zRx);
@@ -371,6 +391,67 @@ void initGauss(T gdict, U refldict, V *res_field, V *res_current)
     delete reflc.y;
     delete reflc.z;
 
+    delete reflc.nx;
+    delete reflc.ny;
+    delete reflc.nz;
+
+    delete reflc.area;
+}
+
+template<typename T, typename U, typename V, typename W, typename G>
+void initScalarGauss(T sgdict, U refldict, V *res_field)
+{
+    int nTot = refldict.n_cells[0] * refldict.n_cells[1];
+    W reflc;
+
+    reflc.size = nTot;
+    reflc.x = new G[nTot];
+    reflc.y = new G[nTot];
+    reflc.z = new G[nTot];
+
+    reflc.nx = new G[nTot];
+    reflc.ny = new G[nTot];
+    reflc.nz = new G[nTot];
+
+    reflc.area = new G[nTot];
+    Utils<G> ut;
+
+    bool transform = false;
+    generateGrid(refldict, &reflc, transform);
+
+    G zRx      = M_PI * sgdict.w0x*sgdict.w0x * sgdict.n / sgdict.lam;
+    G zRy      = M_PI * sgdict.w0y*sgdict.w0y * sgdict.n / sgdict.lam;
+    G wzx      = sgdict.w0x * sqrt(1 + (sgdict.z / zRx)*(sgdict.z / zRx));
+    G wzy      = sgdict.w0y * sqrt(1 + (sgdict.z / zRy)*(sgdict.z / zRy));
+    G Rzx_inv  = sgdict.z / (sgdict.z*sgdict.z + zRx*zRx);
+    G Rzy_inv  = sgdict.z / (sgdict.z*sgdict.z + zRy*zRy);
+    G phizx    = atan(sgdict.z / zRx);
+    G phizy    = atan(sgdict.z / zRy);
+    G k        = 2 * M_PI / sgdict.lam;
+
+    G r2;
+
+    std::complex<G> j(0, 1);
+
+    std::complex<G> efield;
+    std::array<G, 3> n_source;
+
+    for (int i=0; i<nTot; i++)
+    {
+        r2 = reflc.x[i]*reflc.x[i] + reflc.y[i]*reflc.y[i];
+
+        //field_atPoint = gdict.E0 * gdict.w0/wz * exp(-r2/(wz*wz)) * exp(-j * (k*gdict.z + k*r2*Rz_inv/2 - phiz));
+        efield = sgdict.E0 * sqrt(2 / (M_PI * wzx * wzy)) * exp(-(reflc.x[i]/wzx)*(reflc.x[i]/wzx) - (reflc.y[i]/wzy)*(reflc.y[i]/wzy) -
+                j*M_PI/sgdict.lam * (reflc.x[i]*reflc.x[i]*Rzx_inv + reflc.y[i]*reflc.y[i]*Rzy_inv) - j*k*sgdict.z + j*(phizx - phizy)*0.5);
+
+        res_field->x[i] = efield.real();
+        res_field->y[i] = efield.imag();
+    }
+
+    delete reflc.x;
+    delete reflc.y;
+    delete reflc.z;
+    
     delete reflc.nx;
     delete reflc.ny;
     delete reflc.nz;

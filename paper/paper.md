@@ -24,7 +24,6 @@ Delft, The Netherlands
    index: 2
 date: 13 August 2017
 bibliography: paper.bib
-
 ---
 
 # Summary

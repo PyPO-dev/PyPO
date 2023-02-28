@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QHBoxLayout, QCheckBox, QFormLayout, QGridLayout, QWidget, QButtonGroup, QRadioButton, QComboBox
+from PyQt5.QtWidgets import QHBoxLayout, QCheckBox, QFormLayout, QGridLayout, QWidget, QButtonGroup, QRadioButton, QComboBox, QListWidget
 from PyQt5.QtCore import pyqtSignal
 from src.GUI.utils import MyLabel, MyEdit, makeLabelFromString, inType
 from src.GUI.ParameterForms.InputDescription import InputDescription
@@ -238,3 +238,48 @@ class XYZRadio(inputWidgetInterface):
         if self.r1.group.checkedButton()==None or self.r2.group.checkedButton()==None:
             raise Exception("RadioButton no option selected") 
         return {self.inputDescription.outputName:self.r1.group.checkedButton().text() + self.r2.group.checkedButton().text()}
+
+class ElementSelectionWidget(QWidget):
+    def __init__ (self, inp: InputDescription):
+        super().__init__()
+
+        self.layout = QFormLayout(self)
+        self.inputDescription = inp
+        elements = self.inputDescription.options
+
+        self.selectedElements = []
+
+        ### make dropdown
+        self.dropdown = QComboBox()
+        self.dropdown.addItems(["--select element--"]+elements)
+        self.dropdown.currentIndexChanged.connect(self.addElement)
+
+        ### make list
+        self.selectedList = QListWidget()
+        self.selectedList.itemClicked.connect(self.removeItem)
+
+        self.layout.addRow(MyLabel("addElement"), self.dropdown)
+        self.layout.addRow(self.selectedList)
+
+        self.setFixedHeight(150)
+
+    def addElement(self):
+        index = self.dropdown.currentIndex()
+        if index != 0:
+            element = self.dropdown.currentText()
+            self.dropdown.setCurrentIndex(0)
+            self.dropdown.removeItem(index)
+            self.selectedList.addItem(element)
+            self.selectedElements.append(element)
+            self.selectedList.setToolTip("Click item to remove")
+
+    def removeItem(self, x):
+        i = self.selectedList.takeItem(self.selectedList.indexFromItem(x).row())
+        self.dropdown.addItem(i.text())
+        self.selectedElements.remove(i.text())
+
+    def read(self):
+        return {self.inputDescription.outputName :self.selectedElements}
+
+
+

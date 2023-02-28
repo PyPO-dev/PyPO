@@ -102,15 +102,7 @@ class MainWidget(QWidget):
         # delete if exists
         if hasattr(self, "ElementsColumn"):
             self.ElementsColumn.setParent(None)
-
-        self.reflectorActions = {
-            "transform" : self.setTransformationForm,
-            "plot" : self.plotElement,
-            "remove" : self.removeElement,
-        } 
-       
         # rebuild 
-        
         self.ElementsColumn = Accordion()
 
         scroll = QScrollArea()
@@ -297,6 +289,7 @@ class MainWidget(QWidget):
     
     def setTransformationForm(self, element):
         self.setForm(fDataObj.makeTransformationForm(element), self.applyTransformation)
+
 
     def setTransformationElementsForm(self):
         self.setForm(fDataObj.makeTransformationElementsForm(self.stm.system.keys()), self.applyTransformationElements)

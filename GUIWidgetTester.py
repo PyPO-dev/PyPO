@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QApplication
 from src.GUI import *
 from src.GUI.Acccordion import Accordion
 from src.GUI.ElementWidget import ElementWidget
+from src.GUI.ParameterForms.simpleInputWidgets.simpleInputWidgets import ElementSelectionWidget
 # from src.GUI.SystemsColumn import *
 # from src.GUI.selfClosingDialog import *
 # from src.GUI.selfClosingDialog_HoverableBtn import *
@@ -25,10 +26,16 @@ Plane = [
     # InputDescription(inType.checkbox, "checkBox", staticValue="pla"),
     # InputDescription(inType.vectorStrings, "string", hints=["Enter name"]),
     # InputDescription(inType.vectorIntegers, "integers", hints=[2]),
+    # InputDescription(inType.static, "static do output", staticValue="codeFilledValue"),
+    # InputDescription(inType.static, "hidden field", staticValue="hidden value", hidden=True),
+    # InputDescription(inType.checkbox, "checkBox", staticValue="pla"),
+    # InputDescription(inType.vectorStrings, "string", hints=["Enter name"]),
+    # InputDescription(inType.vectorIntegers, "integers", hints=[2]),
     # InputDescription(inType.vectorFloats, "floats", label="Coefficients", hints=[1,2,3], numFields=3, oArray=True),
     # InputDescription(inType.radio, "radio buttons", options= ["a", "b", "c"], hints= ["A", "B", "C"]),
     # InputDescription(inType.dropdown, "radio buttons", options= ["a", "b", "c"], hints= ["A", "B", "C"]),
     # InputDescription(inType.xyzradio, "Axes selector"),
+    InputDescription(inType.elementSelector, "outname", options= ["parabola1", "frame1", "other object", "frame1", "other object", "frame1", "other object", "frame1", "other object"]),
     InputDescription(inType.dynamicDropdown, "Axes selector", label = "dynamic dropdown", subdict={
         "a" : [
             InputDescription(inType.vectorStrings, "string", hints=["Enter name"]),
@@ -52,10 +59,26 @@ Plane = [
         ],
     })
 ]
+# +   [InputDescription(inType.vectorStrings, "name", label="Name of frame", numFields=1),
+#             InputDescription(inType.vectorIntegers, "nRays", label="# of rays", hints=[0], numFields=1),
+#             InputDescription(inType.vectorFloats, "n", label="Refractive index of medium", hints=[1], numFields=1),
+#             InputDescription(inType.vectorFloats, "lam", label="Wavelength", hints=[1], numFields=1),
+#             InputDescription(inType.vectorFloats, "x0", label="X beamwaist", hints=[5], numFields=1),
+#             InputDescription(inType.vectorFloats, "y0", label="Y beamwaist", hints=[5], numFields=1),
+#             InputDescription(inType.vectorFloats, "tChief", label="Chief ray tilt", hints=[0,0,1], numFields=3, oArray=True),
+#             InputDescription(inType.vectorFloats, "oChief", label="Chief ray origin", hints=[0,0,0], numFields=3, oArray=True),
+#             InputDescription(inType.dynamicRadio, "setseed", label="Set seed", subdict={
+#                 "random" : [],
+#                 "set" : [InputDescription(inType.vectorIntegers, "seed", label="", hints=[0], numFields=1)]
+#             })] 
+
 def reader():
     print(win.read())
 
+# inp = 
+# print(type(inp), inp)
 win = FormGenerator(Plane, reader)
+# win = ElementSelectionWidget(inp, reader)
 
 # win = Accordion()
 # win.reflectors.addWidget(ElementWidget("Refl1", lambda x:0, lambda x:0))

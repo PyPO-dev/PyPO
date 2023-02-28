@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QWidget, QComboBox, QFormLayout, QLabel, QLineEdit, 
 from PyQt5.QtCore import QRegExp, Qt, pyqtSlot
 from PyQt5.QtGui import QRegExpValidator
 from src.GUI.utils import *
-from src.GUI.ParameterForms.simpleInputWidgets.simpleInputWidgets import checkbox, StaticInput, VectorInput, SimpleRadio, SimpleDropdown, XYZRadio
+from src.GUI.ParameterForms.simpleInputWidgets.simpleInputWidgets import checkbox, StaticInput, VectorInput, SimpleRadio, SimpleDropdown, XYZRadio, ElementSelectionWidget
 
 
 
@@ -23,6 +23,7 @@ class FormGenerator(QWidget):
         self.readme = readAction
 
         self.layout = QFormLayout(self)
+        self.layout.setAlignment(Qt.AlignTop)
         self.layout.setContentsMargins(0,0,0,0)
         # self.layout.setAlignment(self.layout.formAlignment())
 
@@ -65,6 +66,10 @@ class FormGenerator(QWidget):
                 input = DynamicRadioWidget(inp)
                 self.inputs.append(input)
                 self.layout.addRow(input)
+            elif inp.inType.value == 10:
+                input = ElementSelectionWidget(inp)
+                self.inputs.append(input)
+                self.layout.addRow(input)
 
     def setupButtons(self):
         addBtn = QPushButton("Add")
@@ -74,7 +79,7 @@ class FormGenerator(QWidget):
         self.layout.addRow(canselBtn, addBtn)
         spacerWidget = QWidget()
         spacerLayout = QVBoxLayout(spacerWidget)
-        spacerLayout.addItem(QSpacerItem(0,0, QSizePolicy.Minimum, QSizePolicy.Expanding))
+        spacerLayout.addItem(QSpacerItem(0,0, QSizePolicy.Expanding, QSizePolicy.MinimumExpanding))
         self.layout.addRow(spacerWidget)
 
     def cancelAction(self):
@@ -153,6 +158,7 @@ class DynamicRadioWidget(QWidget):
     def __init__ (self, inp):
         super().__init__()
         self.inputDescription = inp
+        # self.setSizePolicy(QSizePolicy.verticalStretch(0))
         
         self.layout = QFormLayout()
         self.layout.setContentsMargins(0,0,0,0)
@@ -177,7 +183,9 @@ class DynamicRadioWidget(QWidget):
 
     def makeCildren(self):
         self.stackedWidget = QStackedWidget()
-        self.stackedWidget.addWidget(QWidget())
+        placeholder = QWidget()
+        placeholder.setFixedSize(0,0)
+        self.stackedWidget.addWidget(placeholder)
         self.layout.addRow(self.stackedWidget)
         for childInDesList in self.inputDescription.subdict.values():
             child = FormGenerator(childInDesList, addButtons=False, readAction=None)

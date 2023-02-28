@@ -1274,7 +1274,7 @@ class System(object):
     #
     # @param v Numpy array of length 3. 
     # @param u Numpy array of length 3.
-    def findMatrix(self, v, u):
+    def findRotation(self, v, u):
         I = np.eye(3)
         if np.array_equal(v, u):
             return I
@@ -1287,6 +1287,7 @@ class System(object):
 
         w = np.cross(v, u)
 
+        lenw = np.linalg.norm(w)
         
         w = w / lenw
         
@@ -1295,6 +1296,39 @@ class System(object):
         theta = np.arcsin(lenw / (lenv * lenu))
         R = I + np.sin(theta) * K + (1 - np.cos(theta)) * K @ K
         return R
+
+    def findRTfocus(self, name_frame):
+        frame_in = self.frames[name_frame]
+        syst = syst.copyObj()
+        
+        tilt = self.calcRTtilt(name_frame)
+        match = np.array([0, 0, 1])
+
+        R = self.findRotation(match, tilt)
+
+        target = {
+                "name"  : "focus"
+                }
+
+    ell_focusff = {
+            "fr_in"     : "ell",
+            "fr_out"    : "focus",
+            "t_name"    : "wfp",
+            "device"    : "CPU"
+            }
+
+    meas_pl = np.array([486.3974883317985, 1371.340617233771, 0])
+    translation = np.array([486.3974883317985, ymp, 0])
+    syst.rotateGrids("wfp", np.array([-90, 0, 0]))
+
+    syst.translateGrids("wfp", translation)
+    syst.runRayTracer(ell_focusff)
+    #syst.homeReflector("wfp")
+    RMS = syst.calcSpotRMS("focus")
+
+    return RMS 
+
+
 
     ##
     # Find x, y and z rotation angles from general rotation matrix.
@@ -1322,9 +1356,9 @@ class System(object):
 
         r = np.degrees(np.array([rx, ry, rz]))
 
+        testM = MatRotate(r, np.eye(4), pivot=None, radians=False)
 
-
-        return r
+        return r, testM
 
     def _compToFields(self, comp, field):
         null = np.zeros(field.shape, dtype=complex)

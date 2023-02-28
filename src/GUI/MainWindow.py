@@ -577,18 +577,19 @@ class PyPOMainWindow(QMainWindow):
         ### Planar Surface
         planeAction = QAction("Plane", self)
         planeAction.setShortcut("Ctrl+L")
-        planeAction.setStatusTip("Add a plane surface.")
+        planeAction.setStatusTip("Add a planar element.")
         planeAction.triggered.connect(self.mainWid.setPlaneForm)
         reflectorSelector.addAction(planeAction)
         
         ### Quadric Surface
         hyperbolaAction = QAction('Quadric surface', self)
         hyperbolaAction.setShortcut('Ctrl+Q')
-        hyperbolaAction.setStatusTip("Quadric Surface")
+        hyperbolaAction.setStatusTip("Add a paraboloid, hyperboloid or ellipsoid element.")
         hyperbolaAction.triggered.connect(self.mainWid.setQuadricForm)
         reflectorSelector.addAction(hyperbolaAction)
 
         transformElementsAction = QAction("Transform elements", self)
+        transformElementsAction.setStatusTip("Transform a group of elements.")
         transformElementsAction.triggered.connect(self.mainWid.setTransformationElementsForm)
         ElementsMenu.addAction(transformElementsAction)
         
@@ -599,22 +600,27 @@ class PyPOMainWindow(QMainWindow):
         # SystemsMenu.addAction(newSystem)
 
         plotSystem = QAction("Plot System", self)
+        plotSystem.setStatusTip("Plot all elements in the current system.")
         plotSystem.triggered.connect(self.mainWid.plotSystem)
         SystemsMenu.addAction(plotSystem)
 
         plotRaytrace = QAction("Plot ray-trace", self)
+        plotSystem.setStatusTip("Plot all elements in the current system, including ray-traces.")
         plotRaytrace.triggered.connect(self.mainWid.plotRaytrace)
         SystemsMenu.addAction(plotRaytrace)
         
         saveSystem = QAction("Save system", self)
+        saveSystem.setStatusTip("Save the current system to disk.")
         saveSystem.triggered.connect(self.mainWid.saveSystemAction)
         SystemsMenu.addAction(saveSystem)
 
         loadSystem = QAction("Load system", self)
+        loadSystem.setStatusTip("Load a saved system from disk.")
         loadSystem.triggered.connect(self.mainWid.loadSystemAction)
         SystemsMenu.addAction(loadSystem)
         
         removeSystem = QAction("Remove system", self)
+        removeSystem.setStatusTip("Remove a saved system from disk.")
         removeSystem.triggered.connect(self.mainWid.removeSystemAction)
         SystemsMenu.addAction(removeSystem)
         
@@ -632,50 +638,63 @@ class PyPOMainWindow(QMainWindow):
         
         # Propagate rays
         propRaysAction = QAction("Propagate rays", self)
+        propRaysAction.setStatusTip("Propagate a frame of rays to a target surface")
         propRaysAction.triggered.connect(self.mainWid.setPropRaysForm)
         RaytraceMenu.addAction(propRaysAction)
-
+        
         # PO actions
         makeBeam = PhysOptMenu.addMenu("Initialize beam")
         makeBeamPS = makeBeam.addMenu("Point source")
         initPointVecAction = QAction("Vectorial", self)
+        initPointVecAction.setStatusTip("Initialize a vectorial point source.")
         initPointVecAction.triggered.connect(self.mainWid.setInitPSForm)
         makeBeamPS.addAction(initPointVecAction)
+        
         initPointScalAction = QAction("Scalar", self)
+        initPointScalAction.setStatusTip("Initialize a scalar point source.")
         initPointScalAction.triggered.connect(self.mainWid.setInitSPSForm)
         makeBeamPS.addAction(initPointScalAction)
     
         makeBeamG = makeBeam.addMenu("Gaussian beam")
         initGaussVecAction = QAction("Vectorial", self)
+        initGaussVecAction.setStatusTip("Initialize a vectorial Gaussian beam.")
         initGaussVecAction.triggered.connect(self.mainWid.setInitGaussianForm)
         makeBeamG.addAction(initGaussVecAction)
+        
         initGaussScalAction = QAction("Scalar", self)
+        initGaussScalAction.setStatusTip("Initialize a scalar Gaussian beam.")
         initGaussScalAction.triggered.connect(self.mainWid.setInitSGaussianForm)
         makeBeamG.addAction(initGaussScalAction)
 
         propBeam = PhysOptMenu.addMenu("Propagate beam") 
         initPropSurfAction = QAction("To surface", self)
+        initPropSurfAction.setStatusTip("Propagate a PO beam from a source surface to a target surface.")
         initPropSurfAction.triggered.connect(self.mainWid.setPOInitForm)
         propBeam.addAction(initPropSurfAction)
         
         initPropFFAction = QAction("To far-field", self)
+        initPropSurfAction.setStatusTip("Propagate a PO beam from a source surface to a far-field surface.")
         initPropFFAction.triggered.connect(self.mainWid.setPOFFInitForm)
         propBeam.addAction(initPropFFAction)
 
         calcEffs = PhysOptMenu.addMenu("Efficiencies")
         calcSpillEffsAction = QAction("Spillover", self)
+        calcSpillEffsAction.setStatusTip("Calculate spillover efficiency of a PO field.")
         calcSpillEffsAction.triggered.connect(self.mainWid.setSpillEffsForm)
         calcEffs.addAction(calcSpillEffsAction)
         
         calcTaperEffsAction = QAction("Taper", self)
+        calcTaperEffsAction.setStatusTip("Calculate taper efficiency of a PO field.")
         calcTaperEffsAction.triggered.connect(self.mainWid.setTaperEffsForm)
         calcEffs.addAction(calcTaperEffsAction)
         
         calcXpolEffsAction = QAction("X-pol", self)
+        calcXpolEffsAction.setStatusTip("Calculate cross-polar efficiency of a PO field.")
         calcXpolEffsAction.triggered.connect(self.mainWid.setXpolEffsForm)
         calcEffs.addAction(calcXpolEffsAction)
 
         calcMBEffsAction = QAction("Main beam", self)
+        calcMBEffsAction.setStatusTip("Calculate main beam efficiency of a PO field.")
         calcMBEffsAction.triggered.connect(self.mainWid.setMBEffsForm)
         calcEffs.addAction(calcMBEffsAction)
         # END NOTE

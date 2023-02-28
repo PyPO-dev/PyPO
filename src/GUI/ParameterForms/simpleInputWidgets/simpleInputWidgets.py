@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QHBoxLayout, QCheckBox, QFormLayout, QGridLayout, QWidget, QButtonGroup, QRadioButton, QComboBox, QListWidget
+from PyQt5.QtWidgets import QHBoxLayout, QCheckBox, QFormLayout, QGridLayout, QWidget, QButtonGroup, QRadioButton, QComboBox, QListWidget, QSizePolicy
 from PyQt5.QtCore import pyqtSignal
 from src.GUI.utils import MyLabel, MyEdit, makeLabelFromString, inType
 from src.GUI.ParameterForms.InputDescription import InputDescription
@@ -9,10 +9,12 @@ class StaticInput(inputWidgetInterface):
     def __init__ (self, inp:InputDescription):
         super().__init__()
         self.inputDescription = inp
+        self.setSizePolicy(QSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed))
+
         if not inp.hidden:
             layout = QFormLayout()
             self.setLayout(layout)
-            layout.setContentsMargins(0,0,0,0)
+            layout.setContentsMargins(0,10,0,10)
             layout.addRow(MyLabel(inp.label), MyLabel(inp.staticValue))
 
     def read(self):
@@ -25,6 +27,7 @@ class checkbox(inputWidgetInterface):
     def __init__ (self, inp:InputDescription):
         super().__init__()
         self.inputDescription = inp
+        self.setSizePolicy(QSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed))
         layout = QHBoxLayout()
         layout.setContentsMargins(0,0,0,0)
         self.box = QCheckBox()
@@ -43,6 +46,7 @@ class VectorInput(inputWidgetInterface):
     def __init__ (self, inp:InputDescription):
         super().__init__()
         self.inputDescription = inp
+        self.setSizePolicy(QSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed))
 
         self.layout = QFormLayout()
         self.layout.setContentsMargins(0,0,0,0)
@@ -86,6 +90,7 @@ class VectorInput(inputWidgetInterface):
 
     @staticmethod
     def enumToType(intype):
+        print(f"{intype = }")
         if intype == inType.vectorIntegers: return int
         if intype == inType.vectorFloats: return float
         if intype == inType.vectorStrings: return str
@@ -99,6 +104,7 @@ class SimpleRadio(selectionWidgetInterface):
     def __init__ (self, inp:InputDescription):
         super().__init__()
         self.inputDescription = inp
+        self.setSizePolicy(QSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed))
 
         layout = QFormLayout(self)
         layout.setContentsMargins(0,0,0,0)
@@ -142,6 +148,7 @@ class SimpleDropdown(selectionWidgetInterface):
     def __init__ (self, inp:InputDescription, dynamic = False):
         super().__init__()
         self.inputDescription = inp
+        self.setSizePolicy(QSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed))
 
         layout = QFormLayout(self)
         layout.setContentsMargins(0,0,0,0)
@@ -224,6 +231,7 @@ class XYZRadio(inputWidgetInterface):
     def __init__(self, inp, parent=None):
         super().__init__(parent)
         self.inputDescription = inp
+        self.setSizePolicy(QSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed))
 
         layout = QFormLayout(self)
         layout.setContentsMargins(0,0,0,0)
@@ -242,9 +250,10 @@ class XYZRadio(inputWidgetInterface):
 class ElementSelectionWidget(QWidget):
     def __init__ (self, inp: InputDescription):
         super().__init__()
+        self.inputDescription = inp
+        self.setSizePolicy(QSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed))
 
         self.layout = QFormLayout(self)
-        self.inputDescription = inp
         elements = self.inputDescription.options
 
         self.selectedElements = []

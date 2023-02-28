@@ -77,20 +77,19 @@ def makeTransformationForm(elementName):
                 InputDescription(inType.vectorFloats, "vector", label="Translation Vector", hints=["x","y","z"], numFields=3,oArray=True)],
             "Rotation": [
                 InputDescription(inType.vectorFloats, "vector", label="Rotation Vector", hints=["x","y","z"], numFields=3,oArray=True),
-                InputDescription(inType.vectorFloats, "centerOfRotation", label="Center of Rotation", hints=["x","y","z"], numFields=3,oArray=True)
+                InputDescription(inType.vectorFloats, "pivot", label="Center of Rotation", hints=["x","y","z"], numFields=3,oArray=True)
                 ]
         })
     ]
 
 def makeTransformationElementsForm(elementList):
     return[
-        InputDescription(inType.xyzradio, "project", label="Abscissa - ordinate"),
         InputDescription(inType.dynamicRadio, "type", subdict={
             "Translation":[
                 InputDescription(inType.vectorFloats, "vector", label="Translation Vector", hints=["x","y","z"], numFields=3,oArray=True)],
             "Rotation": [
                 InputDescription(inType.vectorFloats, "vector", label="Rotation Vector", hints=["x","y","z"], numFields=3,oArray=True),
-                InputDescription(inType.vectorFloats, "centerOfRotation", label="Center of Rotation", hints=["x","y","z"], numFields=3,oArray=True)
+                InputDescription(inType.vectorFloats, "pivot", label="Center of Rotation", hints=["x","y","z"], numFields=3,oArray=True)
                 ]
         })
     ]

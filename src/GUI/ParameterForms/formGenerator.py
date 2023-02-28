@@ -100,6 +100,7 @@ class DynamicDropdownWidget(QWidget):
     def __init__ (self, inp):
         super().__init__()
         self.inputDescription = inp
+        self.setSizePolicy(QSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed))
         
         self.layout = QFormLayout()
         self.layout.setContentsMargins(0,0,0,0)
@@ -158,7 +159,7 @@ class DynamicRadioWidget(QWidget):
     def __init__ (self, inp):
         super().__init__()
         self.inputDescription = inp
-        # self.setSizePolicy(QSizePolicy.verticalStretch(0))
+        self.setSizePolicy(QSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed))
         
         self.layout = QFormLayout()
         self.layout.setContentsMargins(0,0,0,0)

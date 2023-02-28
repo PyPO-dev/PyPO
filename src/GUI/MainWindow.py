@@ -8,12 +8,15 @@ from PyQt5.QtGui import QFont, QIcon, QTextCursor
 from PyQt5.QtCore import Qt
 
 from src.GUI.ParameterForms import formGenerator
+from src.GUI.ParameterForms.InputDescription import InputDescription
+from src.GUI.utils import inType
 import src.GUI.ParameterForms.formDataObjects as fDataObj
 from src.GUI.PlotScreen import PlotScreen
 from src.GUI.TransformationWidget import TransformationWidget
 from src.GUI.Acccordion import Accordion
 from src.GUI.ElementWidget import ReflectorWidget, FrameWidget, FieldsWidget, CurrentWidget, SFieldsWidget, SymDialog
 from src.GUI.Console import ConsoleGenerator
+
 from src.GUI.Console import print
 import numpy as np
 from src.PyPO.Checks import InputReflError, InputRTError
@@ -292,7 +295,16 @@ class MainWidget(QWidget):
 
 
     def setTransformationElementsForm(self):
-        self.setForm(fDataObj.makeTransformationElementsForm(self.stm.system.keys()), self.applyTransformationElements)
+        movableElements = []
+        for key, elem in self.stm.system.items():
+            if elem["gmode"] != 2:
+                movableElements.append(key)
+        print(f"{movableElements = }")
+
+        self.setForm(
+            [InputDescription(inType.elementSelector, "elements", options=movableElements)]+
+            fDataObj.makeTransformationElementsForm(self.stm.system.keys()), self.applyTransformationElements
+            )
     
     def applyTransformation(self, element):
         dd = self.ParameterWid.read()

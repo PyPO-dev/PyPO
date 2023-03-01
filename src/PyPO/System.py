@@ -500,7 +500,12 @@ class System(object):
     # @param snap_name Name of snapshot to save.
     def snapReflector(self, name, snap_name):
         # TODO write checkers for the input
-        self.system[name]["snapshots"][snap_name] = self.system[name]["transf"]
+        if isinstance(name, list):
+            for _name in name:
+                self.system[_name]["snapshots"][snap_name] = self.system[_name]["transf"]
+
+        else:
+            self.system[_name]["snapshots"][snap_name] = self.system[_name]["transf"]
     
     ##
     # Revert reflector configuration to a saved snapshot.
@@ -509,7 +514,13 @@ class System(object):
     # @param snap_name Name of snapshot to revert to.
     def revertToSnapshot(self, name, snap_name):
         # TODO write checker
-        self.system[name]["transf"] = self.system[name]["snapshot"][snap_name]
+        if isinstance(name, list):
+            for _name in name:
+                self.system[_name]["transf"] = self.system[_name]["snapshot"][snap_name]
+
+        else:
+            self.system[name]["transf"] = self.system[name]["snapshot"][snap_name]
+
 
     ##
     # Generate reflector grids and normals.

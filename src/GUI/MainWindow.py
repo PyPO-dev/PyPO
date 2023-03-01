@@ -553,10 +553,11 @@ class PyPOMainWindow(QMainWindow):
     def _createMenuBar(self):
         menuBar = self.menuBar()
 
-        ElementsMenu = menuBar.addMenu("Elements")
-        SystemsMenu = menuBar.addMenu("Systems")
-        RaytraceMenu = menuBar.addMenu("Ray-tracer")
-        PhysOptMenu = menuBar.addMenu("Physical-optics")
+        ElementsMenu    = menuBar.addMenu("Elements")
+        SystemsMenu     = menuBar.addMenu("Systems")
+        RaytraceMenu    = menuBar.addMenu("Ray-tracer")
+        PhysOptMenu     = menuBar.addMenu("Physical-optics")
+        ToolsMenu       = menuBar.addMenu("Tools")
 
         # ### Generate test parabola
         # AddTestParabola = QAction('Add Test Parabola', self)
@@ -697,7 +698,9 @@ class PyPOMainWindow(QMainWindow):
         calcMBEffsAction.setStatusTip("Calculate main beam efficiency of a PO field.")
         calcMBEffsAction.triggered.connect(self.mainWid.setMBEffsForm)
         calcEffs.addAction(calcMBEffsAction)
-        # END NOTE
+
+        
+
 if __name__ == "__main__":
 
     print("lala")

@@ -516,10 +516,10 @@ class System(object):
         # TODO write checker
         if isinstance(name, list):
             for _name in name:
-                self.system[_name]["transf"] = self.system[_name]["snapshot"][snap_name]
+                self.system[_name]["transf"] = self.system[_name]["snapshots"][snap_name]
 
         else:
-            self.system[name]["transf"] = self.system[name]["snapshot"][snap_name]
+            self.system[name]["transf"] = self.system[name]["snapshots"][snap_name]
 
 
     ##

@@ -438,7 +438,7 @@ class System(object):
             
         else:
             self.system[name]["transf"] = MatRotate(rotation, self.system[name]["transf"], pivot)
-        self.clog.info(f"Rotated {name} by {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {list(pivot)}.")
+        self.clog.info(f"Rotated {name} by {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
     ##
     # Translate reflector grids.

@@ -476,7 +476,7 @@ class System(object):
             if rot:
                 for _name in name:
                     _transf = self.system[_name]["transf"]
-                    _transf[:-1, :-1] = np.zeros(3)
+                    _transf[:-1, :-1] = np.eye(3)
                     self.system[_name]["transf"] = _transf
 
                     
@@ -506,6 +506,8 @@ class System(object):
 
         else:
             self.system[_name]["snapshots"][snap_name] = self.system[_name]["transf"]
+
+        self.clog.info(f"Saved snapshot {snap_name} for elements {name}.")
     
     ##
     # Revert reflector configuration to a saved snapshot.
@@ -520,6 +522,8 @@ class System(object):
 
         else:
             self.system[name]["transf"] = self.system[name]["snapshots"][snap_name]
+        
+        self.clog.info(f"Reverted elements {snap_name} to snapshot {snap_name}.")
 
 
     ##

@@ -265,7 +265,7 @@ class MainWidget(QWidget):
                 self.stm.addHyperbola(elementDict)
             elif elementDict["type"] == "Ellipse":
                 self.stm.addEllipse(elementDict)
-            self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"], self.reflectorActions))
+            self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"], self.removeElement, self.setTransformationForm, self.plotElement))
         except InputReflError as e:
             self.console.appendPlainText("FormInput Incorrect:")
             self.console.appendPlainText(e.__str__())
@@ -273,17 +273,17 @@ class MainWidget(QWidget):
     def addParabolaAction(self):
         elementDict = self.ParameterWid.read()
         self.stm.addParabola(elementDict) 
-        self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"],self.reflectorActions))
+        self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"],self.removeElement, self.setTransformationForm, self.plotElement))
     
     def addHyperbolaAction(self):
         elementDict = self.ParameterWid.read()
         self.stm.addHyperbola(elementDict) 
-        self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"],self.reflectorActions))
+        self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"],self.removeElement, self.setTransformationForm, self.plotElement))
 
     def addEllipseAction(self):
         elementDict = self.ParameterWid.read()
         self.stm.addEllipse(elementDict) 
-        self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"],self.reflectorActions))
+        self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"],self.removeElement, self.setTransformationForm, self.plotElement))
     
     def addPlaneAction(self):
         elementDict = self.ParameterWid.read()

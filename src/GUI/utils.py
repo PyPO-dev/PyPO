@@ -1,8 +1,9 @@
 from PyQt5.QtWidgets import QLabel, QLineEdit
 from PyQt5.QtCore import Qt
-from enum import Enum
+from enum import Enum, auto
 
-
+# class validation(Enum):
+#     integers = auto()
 
 class inType(Enum):
     static = 0

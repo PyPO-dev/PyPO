@@ -14,8 +14,11 @@ class StaticInput(inputWidgetInterface):
         if not inp.hidden:
             layout = QFormLayout()
             self.setLayout(layout)
-            layout.setContentsMargins(0,10,0,10)
+            layout.setContentsMargins(5,4,20,0)
             layout.addRow(MyLabel(inp.label), MyLabel(inp.staticValue))
+        
+        if self.inputDescription.toolTip:
+            self.setToolTip(self.inputDescription.toolTip)
 
     def read(self):
         if self.inputDescription.outputName is None:
@@ -29,12 +32,15 @@ class checkbox(inputWidgetInterface):
         self.inputDescription = inp
         self.setSizePolicy(QSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed))
         layout = QHBoxLayout()
-        layout.setContentsMargins(0,0,0,0)
+        layout.setContentsMargins(5,4,20,0)
         self.box = QCheckBox()
         self.label = MyLabel(self.inputDescription.label)
         layout.addWidget(self.label)
         layout.addWidget(self.box)
         self.setLayout(layout)
+
+        if self.inputDescription.toolTip:
+            self.setToolTip(self.inputDescription.toolTip)
 
     def read(self):
         if self.inputDescription.outputName is None:
@@ -49,9 +55,12 @@ class VectorInput(inputWidgetInterface):
         self.setSizePolicy(QSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed))
 
         self.layout = QFormLayout()
-        self.layout.setContentsMargins(0,0,0,0)
+        self.layout.setContentsMargins(5,4,20,0)
         self.setupUI()
         self.setLayout(self.layout)
+
+        if self.inputDescription.toolTip:
+            self.setToolTip(self.inputDescription.toolTip)
 
     def setupUI(self):
         inp = self.inputDescription
@@ -60,7 +69,7 @@ class VectorInput(inputWidgetInterface):
         for edit in self.inputs:
             edit.setValidator(None)
         editLayout = QHBoxLayout()
-        editLayout.setContentsMargins(2,0,2,0)
+        editLayout.setContentsMargins(5,4,20,0)
         
         for i in range(inp.numFields):
             edit = self.inputs[i]
@@ -90,7 +99,6 @@ class VectorInput(inputWidgetInterface):
 
     @staticmethod
     def enumToType(intype):
-        print(f"{intype = }")
         if intype == inType.vectorIntegers: return int
         if intype == inType.vectorFloats: return float
         if intype == inType.vectorStrings: return str
@@ -107,7 +115,7 @@ class SimpleRadio(selectionWidgetInterface):
         self.setSizePolicy(QSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed))
 
         layout = QFormLayout(self)
-        layout.setContentsMargins(0,0,0,0)
+        layout.setContentsMargins(5,4,20,0)
 
         radioWidget = QWidget()
         radiolayout = QHBoxLayout(radioWidget)
@@ -124,6 +132,9 @@ class SimpleRadio(selectionWidgetInterface):
             self.group.setId(rb,i)
             radiolayout.addWidget(rb)
         layout.addRow(MyLabel(self.inputDescription.label), radioWidget)
+
+        if self.inputDescription.toolTip:
+            self.setToolTip(self.inputDescription.toolTip)
 
 
     def read(self):
@@ -151,7 +162,7 @@ class SimpleDropdown(selectionWidgetInterface):
         self.setSizePolicy(QSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed))
 
         layout = QFormLayout(self)
-        layout.setContentsMargins(0,0,0,0)
+        layout.setContentsMargins(5,4,20,0)
 
 
         if self.inputDescription.hints:
@@ -167,6 +178,9 @@ class SimpleDropdown(selectionWidgetInterface):
             self.comboBox.addItems(options)
         
         layout.addRow(MyLabel(self.inputDescription.label), self.comboBox)
+
+        if self.inputDescription.toolTip:
+            self.setToolTip(self.inputDescription.toolTip)
 
 
     def read(self):
@@ -189,7 +203,7 @@ class XYZRadio(inputWidgetInterface):
         def __init__(self, options, name, parent=None):
             super().__init__(parent)
             layout = QGridLayout(self)
-            layout.setContentsMargins(0,0,0,0)
+            layout.setContentsMargins(5,4,20,0)
             self.buttons = []
             self.name = name
 
@@ -234,13 +248,16 @@ class XYZRadio(inputWidgetInterface):
         self.setSizePolicy(QSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed))
 
         layout = QFormLayout(self)
-        layout.setContentsMargins(0,0,0,0)
+        layout.setContentsMargins(5,4,20,0)
         self.r1 = self.RadioSubWidget(["x", "y", "z"],"r1")
         self.r2 = self.RadioSubWidget(["x", "y", "z"],"r2")
         self.r1.setCompanion(self.r2)
         self.r2.setCompanion(self.r1)
         layout.addRow(MyLabel("Abscissa"), self.r1)
         layout.addRow(MyLabel("Ordinate"), self.r2)
+
+        if self.inputDescription.toolTip:
+            self.setToolTip(self.inputDescription.toolTip)
 
     def read(self):
         if self.r1.group.checkedButton()==None or self.r2.group.checkedButton()==None:
@@ -262,15 +279,20 @@ class ElementSelectionWidget(QWidget):
         self.dropdown = QComboBox()
         self.dropdown.addItems(["--select element--"]+elements)
         self.dropdown.currentIndexChanged.connect(self.addElement)
+        label = MyLabel("addElement")
+        if self.inputDescription.toolTip:
+            label.setToolTip(self.inputDescription.toolTip)
+            self.dropdown.setToolTip(self.inputDescription.toolTip)
+        self.layout.addRow(label, self.dropdown)
 
         ### make list
         self.selectedList = QListWidget()
         self.selectedList.itemClicked.connect(self.removeItem)
 
-        self.layout.addRow(MyLabel("addElement"), self.dropdown)
         self.layout.addRow(self.selectedList)
 
         self.setFixedHeight(150)
+
 
     def addElement(self):
         index = self.dropdown.currentIndex()

@@ -1,6 +1,6 @@
 from attr import define, field, Factory
 from attrs import validators
-from src.GUI.utils import inType
+from src.GUI.utils import inType#, validation
 import operator
 
 
@@ -16,6 +16,10 @@ class InputDescription:
     subdict: dict = field(default=None)
     options: list = field(default=None)
     hidden: bool = field(default=False)
+    toolTip: str = field(default=None)
+    # validation: validation = field(default=None)
+    # prefill : bool = field(default=False)
+
 
     def __attrs_post_init__(self):
         if self.outputName and self.label == None:

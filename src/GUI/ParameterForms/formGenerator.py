@@ -76,7 +76,11 @@ class FormGenerator(QWidget):
         addBtn.clicked.connect(self.readme)
         canselBtn = QPushButton("Cancel")
         canselBtn.clicked.connect(self.cancelAction)
-        self.layout.addRow(canselBtn, addBtn)
+        btnWidget = QWidget()
+        btnlayout = QFormLayout(btnWidget)
+        btnlayout.addRow(canselBtn, addBtn)
+        btnWidget.setContentsMargins(0,4,20,0)
+        self.layout.addRow(btnWidget)
         spacerWidget = QWidget()
         spacerLayout = QVBoxLayout(spacerWidget)
         spacerLayout.addItem(QSpacerItem(0,0, QSizePolicy.Expanding, QSizePolicy.MinimumExpanding))
@@ -111,7 +115,7 @@ class DynamicDropdownWidget(QWidget):
         else:
             options = self.inputDescription.options
         
-        self.mode = SimpleDropdown(InputDescription(inType.dropdown, self.inputDescription.outputName, self.inputDescription.label, options=options), dynamic = True)
+        self.mode = SimpleDropdown(InputDescription(inType.dropdown, self.inputDescription.outputName, self.inputDescription.label, options=options, toolTip= self.inputDescription.toolTip), dynamic = True)
         self.mode.selectionChangedSignal.connect(self.modeUpdate)
 
         self.layout.addRow(self.mode)
@@ -170,8 +174,9 @@ class DynamicRadioWidget(QWidget):
         else:
             options = self.inputDescription.options
         
-        self.mode = SimpleRadio(InputDescription(inType.dropdown, self.inputDescription.outputName, self.inputDescription.label, options=options))
+        self.mode = SimpleRadio(InputDescription(inType.dropdown, self.inputDescription.outputName, self.inputDescription.label, options=options, toolTip=self.inputDescription.toolTip))
         self.mode.selectionChangedSignal.connect(self.modeUpdate)
+        
 
         self.layout.addRow(self.mode)
 

@@ -1354,8 +1354,11 @@ class System(object):
         R_transf[:-1, :-1] = R
         return R_transf
 
-    def findRTfocus(self, name_frame, f0=None):
+    def findRTfocus(self, name_frame, f0=None, verbose=False):
         f0 = 0 if f0 is None else f0
+        
+        if not verbose:
+            self.setLoggingVerbosity(verbose=False)
         
         tilt = self.calcRTtilt(name_frame)
         center = self.calcRTcenter(name_frame)
@@ -1387,12 +1390,13 @@ class System(object):
                 }
 
         self.clog.info(f"Finding focus of {name_frame}...")
-        self.setLoggingVerbosity(verbose=False)
         res = opt.fmin(self._optimiseFocus, f0, args=(runRTDict, tilt), full_output=True, disp=False)
-        self.setLoggingVerbosity(verbose=True)
 
         out = res[0] * tilt + center
         self.clog.info(f"Focus: {*['{:0.3e}'.format(x) for x in out],}, RMS: {res[1]:.3e}")
+
+        if not verbose:
+            self.setLoggingVerbosity(verbose=True)
 
         return out
 

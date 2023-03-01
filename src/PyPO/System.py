@@ -244,7 +244,7 @@ class System(object):
                                                         self.system[reflDict["name"]]["lims_v"][1]]
 
             self.system[reflDict["name"]]["gmode"] = 1
-        
+        self.system[reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added paraboloid {reflDict['name']} to system.")
         self.num_ref += 1
 
@@ -311,6 +311,7 @@ class System(object):
 
             self.system[reflDict["name"]]["gmode"] = 1
 
+        self.system[reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added hyperboloid {reflDict['name']} to system.")
         self.num_ref += 1
 
@@ -371,6 +372,7 @@ class System(object):
 
             self.system[reflDict["name"]]["gmode"] = 1
 
+        self.system[reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added ellipsoid {reflDict['name']} to system.")
         self.num_ref += 1
 
@@ -418,6 +420,7 @@ class System(object):
 
             self.system[reflDict["name"]]["gmode"] = 2
 
+        self.system[reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added plane {reflDict['name']} to system.")
         self.num_ref += 1
     
@@ -429,15 +432,15 @@ class System(object):
     # @param name Reflector name or list of reflector names.
     # @param rotation Numpy ndarray of length 3, containing rotation angles around x, y and z axes, in degrees.
     # @param pivot Numpy ndarray of length 3, containing pivot x, y and z co-ordinates, in mm. Defaults to origin. 
-    def rotateGrids(self, name, rotation, pivot=None, reverse=False):
+    def rotateGrids(self, name, rotation, pivot=None):
         pivot = np.zeros(3) if pivot is None else pivot
 
         if isinstance(name, list):
             for _name in name:
-                self.system[_name]["transf"] = MatRotate(rotation, self.system[_name]["transf"], pivot, reverse)
+                self.system[_name]["transf"] = MatRotate(rotation, self.system[_name]["transf"], pivot)
             
         else:
-            self.system[name]["transf"] = MatRotate(rotation, self.system[name]["transf"], pivot, reverse)
+            self.system[name]["transf"] = MatRotate(rotation, self.system[name]["transf"], pivot)
         self.clog.info(f"Rotated {name} by {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
     ##
@@ -489,7 +492,25 @@ class System(object):
                 self.system[name]["transf"] = _transf
 
         self.clog.info(f"Transforming {name} to home position.")
+   
+    ##
+    # Take and store snapshot of reflector's current configuration.
+    # 
+    # @param name Name of reflector to be snapped.
+    # @param snap_name Name of snapshot to save.
+    def snapReflector(self, name, snap_name):
+        # TODO write checkers for the input
+        self.system[name]["snapshots"][snap_name] = self.system[name]["transf"]
     
+    ##
+    # Revert reflector configuration to a saved snapshot.
+    # 
+    # @param name Name of reflector to revert.
+    # @param snap_name Name of snapshot to revert to.
+    def revertToSnapshot(self, name, snap_name):
+        # TODO write checker
+        self.system[name]["transf"] = self.system[name]["snapshot"][snap_name]
+
     ##
     # Generate reflector grids and normals.
     # 
@@ -1322,7 +1343,7 @@ class System(object):
         R_transf[:-1, :-1] = R
         return R_transf
 
-    def findRTfocus(self, name_frame, f0=None, verbose=False):
+    def findRTfocus(self, name_frame, f0=None):
         f0 = 0 if f0 is None else f0
         
         tilt = self.calcRTtilt(name_frame)
@@ -1357,8 +1378,7 @@ class System(object):
         self.clog.info(f"Finding focus of {name_frame}...")
         self.setLoggingVerbosity(verbose=False)
         res = opt.fmin(self._optimiseFocus, f0, args=(runRTDict, tilt), full_output=True, disp=False)
-        if verbose:
-            self.setLoggingVerbosity(verbose=True)
+        self.setLoggingVerbosity(verbose=True)
 
         out = res[0] * tilt + center
         self.clog.info(f"Focus: {*['{:0.3e}'.format(x) for x in out],}, RMS: {res[1]:.3e}")

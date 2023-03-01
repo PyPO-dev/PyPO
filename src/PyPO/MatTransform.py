@@ -1,6 +1,6 @@
 import numpy as np
 
-def MatRotate(theta, matAppend, pivot=None, radians=False, reverse=False):
+def MatRotate(theta, matAppend, pivot=None, radians=False):
     """
     Create 3D rotation matrix and rotate grids of points.
 
@@ -46,11 +46,7 @@ def MatRotate(theta, matAppend, pivot=None, radians=False, reverse=False):
                     [0, 0, 1, oz],
                     [0, 0, 0, 1]])
     
-    if reverse:
-        matOut = trans2 @ (rotX @ (rotY @ (rotZ @ trans1)))
-
-    else:
-        matOut = trans2 @ (rotZ @ (rotY @ (rotX @ trans1)))
+    matOut = trans2 @ (rotZ @ (rotY @ (rotX @ trans1)))
 
     return matOut @ matAppend
 

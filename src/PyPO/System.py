@@ -429,15 +429,15 @@ class System(object):
     # @param name Reflector name or list of reflector names.
     # @param rotation Numpy ndarray of length 3, containing rotation angles around x, y and z axes, in degrees.
     # @param pivot Numpy ndarray of length 3, containing pivot x, y and z co-ordinates, in mm. Defaults to origin. 
-    def rotateGrids(self, name, rotation, pivot=None):
+    def rotateGrids(self, name, rotation, pivot=None, reverse=False):
         pivot = np.zeros(3) if pivot is None else pivot
 
         if isinstance(name, list):
             for _name in name:
-                self.system[_name]["transf"] = MatRotate(rotation, self.system[_name]["transf"], pivot)
+                self.system[_name]["transf"] = MatRotate(rotation, self.system[_name]["transf"], pivot, reverse)
             
         else:
-            self.system[name]["transf"] = MatRotate(rotation, self.system[name]["transf"], pivot)
+            self.system[name]["transf"] = MatRotate(rotation, self.system[name]["transf"], pivot, reverse)
         self.clog.info(f"Rotated {name} by {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
     ##

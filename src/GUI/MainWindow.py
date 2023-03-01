@@ -699,7 +699,9 @@ class PyPOMainWindow(QMainWindow):
         calcMBEffsAction.triggered.connect(self.mainWid.setMBEffsForm)
         calcEffs.addAction(calcMBEffsAction)
 
-        
+        findRTfocusAction = QAction("Find ray-trace focus", self)
+        findRTfocusAction.setStatusTip("Calculate the focus co-ordinates of a ray-trace beam.")
+        #findRTfocusAction.triggered.connect(self.mainWid.set)
 
 if __name__ == "__main__":
 

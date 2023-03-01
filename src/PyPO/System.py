@@ -1,5 +1,6 @@
 # Standard Python imports
 import numbers
+import scipy.optimize as opt
 import numpy as np
 import matplotlib.pyplot as pt
 import matplotlib.cm as cm
@@ -123,11 +124,11 @@ class System(object):
         self.clog_mgr = CustomLogger(os.path.basename(__file__))
         self.clog = self.clog_mgr.getCustomLogger() if verbose else self.clog_mgr.getCustomLogger(open(os.devnull, "w"))
 
-        self.clog.info("Initialized empty system.")
+        self.clog.info("INITIALIZED EMPTY SYSTEM.")
     ##
     # Destructor. Deletes any reference to the logger assigned to current system.
     def __del__(self):
-        self.clog.info("Deleting current system.")
+        self.clog.info("EXITING SYSTEM.")
         del self.clog_mgr
         del self.clog
 
@@ -178,7 +179,7 @@ class System(object):
     def setLoggingVerbosity(self, verbose=True, handler=None):
         if handler is None:
             for fstream in self.clog.handlers:
-                fstream.setStream() if verbose else fstream.setStream(open(os.devnull, "w"))
+                fstream.setStream(sys.stdout) if verbose else fstream.setStream(open(os.devnull, "w"))
 
         else:
             self.clog.handlers[handler].setStream() if verbose else self.clog.handlers[handler].setStream(open(os.devnull, "w"))
@@ -243,7 +244,7 @@ class System(object):
                                                         self.system[reflDict["name"]]["lims_v"][1]]
 
             self.system[reflDict["name"]]["gmode"] = 1
-        
+        self.system[reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added paraboloid {reflDict['name']} to system.")
         self.num_ref += 1
 
@@ -310,6 +311,7 @@ class System(object):
 
             self.system[reflDict["name"]]["gmode"] = 1
 
+        self.system[reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added hyperboloid {reflDict['name']} to system.")
         self.num_ref += 1
 
@@ -370,6 +372,7 @@ class System(object):
 
             self.system[reflDict["name"]]["gmode"] = 1
 
+        self.system[reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added ellipsoid {reflDict['name']} to system.")
         self.num_ref += 1
 
@@ -417,6 +420,7 @@ class System(object):
 
             self.system[reflDict["name"]]["gmode"] = 2
 
+        self.system[reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added plane {reflDict['name']} to system.")
         self.num_ref += 1
     
@@ -437,7 +441,7 @@ class System(object):
             
         else:
             self.system[name]["transf"] = MatRotate(rotation, self.system[name]["transf"], pivot)
-        self.clog.info(f"Rotated {name} by {list(rotation)} degrees around {list(pivot)}.")
+        self.clog.info(f"Rotated {name} by {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
     ##
     # Translate reflector grids.
@@ -453,7 +457,7 @@ class System(object):
         else:
             self.system[name]["transf"] = MatTranslate(translation, self.system[name]["transf"])
         
-        self.clog.info(f"Translated {name} by {list(translation)} millimeters.")
+        self.clog.info(f"Translated {name} by {*['{:0.3e}'.format(x) for x in list(translation)],} millimeters.")
 
     ##
     # Home a reflector back into default configuration.
@@ -461,14 +465,63 @@ class System(object):
     # Set internal transformation matrix of a (selection of) reflector(s) to identity.
     #
     # @param name Reflector name or list of reflector names to be homed.
-    def homeReflector(self, name):
+    def homeReflector(self, name, trans=True, rot=True):
+        if isinstance(name, list):
+            if trans:
+                for _name in name:
+                    _transf = np.eye(4)
+                    _transf[:-1, :-1] = self.system[_name]["transf"][:-1, :-1]
+                    self.system[_name]["transf"] = _transf
+            
+            if rot:
+                for _name in name:
+                    _transf = self.system[_name]["transf"]
+                    _transf[:-1, :-1] = np.zeros(3)
+                    self.system[_name]["transf"] = _transf
+
+                    
+        else:
+            if trans:
+                _transf = np.eye(4)
+                _transf[:-1, :-1] = self.system[name]["transf"][:-1, :-1]
+                self.system[name]["transf"] = _transf
+            
+            if rot:
+                _transf = self.system[name]["transf"]
+                _transf[:-1, :-1] = np.zeros(3)
+                self.system[name]["transf"] = _transf
+
+        self.clog.info(f"Transforming {name} to home position.")
+   
+    ##
+    # Take and store snapshot of reflector's current configuration.
+    # 
+    # @param name Name of reflector to be snapped.
+    # @param snap_name Name of snapshot to save.
+    def snapReflector(self, name, snap_name):
+        # TODO write checkers for the input
         if isinstance(name, list):
             for _name in name:
-                self.system[_name]["transf"] = np.eye(4)
+                self.system[_name]["snapshots"][snap_name] = self.system[_name]["transf"]
+
         else:
-            self.system[name]["transf"] = np.eye(4)
-        self.clog.info(f"Transforming {name} to home position.")
+            self.system[_name]["snapshots"][snap_name] = self.system[_name]["transf"]
     
+    ##
+    # Revert reflector configuration to a saved snapshot.
+    # 
+    # @param name Name of reflector to revert.
+    # @param snap_name Name of snapshot to revert to.
+    def revertToSnapshot(self, name, snap_name):
+        # TODO write checker
+        if isinstance(name, list):
+            for _name in name:
+                self.system[_name]["transf"] = self.system[_name]["snapshots"][snap_name]
+
+        else:
+            self.system[name]["transf"] = self.system[name]["snapshots"][snap_name]
+
+
     ##
     # Generate reflector grids and normals.
     # 
@@ -496,19 +549,19 @@ class System(object):
         if not saveExist:
             os.makedirs(path)
         
-        with open(os.path.join(path, "system"), 'wb') as file: 
+        with open(os.path.join(path, "system.pys"), 'wb') as file: 
             pickle.dump(self.system, file)
         
-        with open(os.path.join(path, "frames"), 'wb') as file: 
+        with open(os.path.join(path, "frames.pys"), 'wb') as file: 
             pickle.dump(self.frames, file)
         
-        with open(os.path.join(path, "fields"), 'wb') as file: 
+        with open(os.path.join(path, "fields.pys"), 'wb') as file: 
             pickle.dump(self.fields, file)
         
-        with open(os.path.join(path, "currents"), 'wb') as file: 
+        with open(os.path.join(path, "currents.pys"), 'wb') as file: 
             pickle.dump(self.currents, file)
         
-        with open(os.path.join(path, "scalarfields"), 'wb') as file: 
+        with open(os.path.join(path, "scalarfields.pys"), 'wb') as file: 
             pickle.dump(self.scalarfields, file)
 
     ##
@@ -524,17 +577,20 @@ class System(object):
             self.clog.error("Specified system does not exist.")
             exit(1)
 
-        with open(os.path.join(path, "system"), 'rb') as file: 
+        with open(os.path.join(path, "system.pys"), 'rb') as file: 
             self.system = pickle.load(file)
         
-        with open(os.path.join(path, "frames"), 'rb') as file: 
+        with open(os.path.join(path, "frames.pys"), 'rb') as file: 
             self.frames = pickle.load(file)
         
-        with open(os.path.join(path, "fields"), 'rb') as file: 
+        with open(os.path.join(path, "fields.pys"), 'rb') as file: 
             self.fields = pickle.load(file)
         
-        with open(os.path.join(path, "currents"), 'rb') as file: 
+        with open(os.path.join(path, "currents.pys"), 'rb') as file: 
             self.currents = pickle.load(file)
+        
+        with open(os.path.join(path, "scalarfields.pys"), 'rb') as file: 
+            self.scalarfields = pickle.load(file)
     
     ##
     # Remove reflector from system.
@@ -840,34 +896,33 @@ class System(object):
     ##
     # Run a ray-trace propagation from a frame to a surface.
     #
-    # TODO: Change input to dictionary object.
-    #def runRayTracer(self, fr_in, fr_out, name_target, epsilon=1e-3, nThreads=1, t0=100, device="CPU", verbose=True):
+    # @param runRTDict A runRTDict object specifying the ray-trace.
     def runRayTracer(self, runRTDict):
         self.clog.info("*** Starting RT propagation ***")
+        
+        _runRTDict = self.copyObj(runRTDict)
 
-        check_runRTDict(runRTDict, self.system, self.frames)
+        check_runRTDict(_runRTDict, self.system, self.frames)
 
-        # TODO: write checker for this dict
-        runRTDict["fr_in"] = self.frames[runRTDict["fr_in"]]
-        runRTDict["t_name"] = self.system[runRTDict["t_name"]]
+        _runRTDict["fr_in"] = self.frames[_runRTDict["fr_in"]]
+        _runRTDict["t_name"] = self.system[_runRTDict["t_name"]]
         
         start_time = time.time()
         
-        if runRTDict["device"] == "CPU":
-            self.clog.info(f"Hardware: running {runRTDict['nThreads']} CPU threads.")
+        if _runRTDict["device"] == "CPU":
+            self.clog.info(f"Hardware: running {_runRTDict['nThreads']} CPU threads.")
             self.clog.info(f"... Calculating ...")
-            frameObj = RT_CPUd(runRTDict)
+            frameObj = RT_CPUd(_runRTDict)
 
-        elif runRTDict["device"] == "GPU":
-            self.clog.info(f"Hardware: running {runRTDict['nThreads']} CUDA threads per block.")
+        elif _runRTDict["device"] == "GPU":
+            self.clog.info(f"Hardware: running {_runRTDict['nThreads']} CUDA threads per block.")
             self.clog.info(f"... Calculating ...")
-            frameObj = RT_GPUf(runRTDict)
+            frameObj = RT_GPUf(_runRTDict)
         
         dtime = time.time() - start_time
         
         self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
-        self.frames[runRTDict["fr_out"]] = frameObj
-
+        self.frames[_runRTDict["fr_out"]] = frameObj
 
     def interpFrame(self, name_fr_in, name_field, name_target, name_out, comp, method="nearest"):
         grids = generateGrid(self.system[name_target])
@@ -1274,7 +1329,7 @@ class System(object):
     #
     # @param v Numpy array of length 3. 
     # @param u Numpy array of length 3.
-    def findMatrix(self, v, u):
+    def findRotation(self, v, u):
         I = np.eye(3)
         if np.array_equal(v, u):
             return I
@@ -1287,6 +1342,7 @@ class System(object):
 
         w = np.cross(v, u)
 
+        lenw = np.linalg.norm(w)
         
         w = w / lenw
         
@@ -1294,8 +1350,69 @@ class System(object):
         #print(K)
         theta = np.arcsin(lenw / (lenv * lenu))
         R = I + np.sin(theta) * K + (1 - np.cos(theta)) * K @ K
-        return R
+        R_transf = np.eye(4)
+        R_transf[:-1, :-1] = R
+        return R_transf
 
+    def findRTfocus(self, name_frame, f0=None, verbose=False):
+        f0 = 0 if f0 is None else f0
+        
+        if not verbose:
+            self.setLoggingVerbosity(verbose=False)
+        
+        tilt = self.calcRTtilt(name_frame)
+        center = self.calcRTcenter(name_frame)
+        match = np.array([0, 0, 1])
+
+        R = self.findRotation(match, tilt)
+
+        t_name = f"focal_plane_{name_frame}"
+        fr_out = f"focus_{name_frame}"
+
+        target = {
+                "name"      : t_name,
+                "gmode"     : "xy",
+                "lims_x"    : np.array([-42, 42]),
+                "lims_y"    : np.array([-42, 42]),
+                "gridsize"  : np.array([3, 3])
+                }
+
+        self.addPlane(target)
+        self.system[t_name]["transf"] = R 
+        self.translateGrids(t_name, center)
+        
+        runRTDict = {
+                "fr_in"     : name_frame,
+                "fr_out"    : fr_out,
+                "t_name"    : t_name,
+                "device"    : "CPU",
+                "nThreads"  : 1
+                }
+
+        self.clog.info(f"Finding focus of {name_frame}...")
+        res = opt.fmin(self._optimiseFocus, f0, args=(runRTDict, tilt), full_output=True, disp=False)
+
+        out = res[0] * tilt + center
+        self.clog.info(f"Focus: {*['{:0.3e}'.format(x) for x in out],}, RMS: {res[1]:.3e}")
+
+        if not verbose:
+            self.setLoggingVerbosity(verbose=True)
+
+        return out
+
+    def _optimiseFocus(self, f0, *args):
+        runRTDict, tilt = args
+
+        trans = f0 * tilt
+
+        self.translateGrids(f"focal_plane_{runRTDict['fr_in']}", trans)
+        
+        self.runRayTracer(runRTDict)
+        RMS = self.calcSpotRMS(f"focus_{runRTDict['fr_in']}")
+        self.translateGrids(f"focal_plane_{runRTDict['fr_in']}", -trans)
+        #self.removeFrame() 
+        return RMS
+        
     ##
     # Find x, y and z rotation angles from general rotation matrix.
     #
@@ -1322,9 +1439,9 @@ class System(object):
 
         r = np.degrees(np.array([rx, ry, rz]))
 
+        testM = MatRotate(r, np.eye(4), pivot=None, radians=False)
 
-
-        return r
+        return r, testM
 
     def _compToFields(self, comp, field):
         null = np.zeros(field.shape, dtype=complex)

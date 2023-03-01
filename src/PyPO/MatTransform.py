@@ -45,7 +45,7 @@ def MatRotate(theta, matAppend, pivot=None, radians=False):
                     [0, 1, 0, oy],
                     [0, 0, 1, oz],
                     [0, 0, 0, 1]])
-
+    
     matOut = trans2 @ (rotZ @ (rotY @ (rotX @ trans1)))
 
     return matOut @ matAppend

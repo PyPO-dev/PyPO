@@ -18,7 +18,7 @@ class InputDescription:
     hidden: bool = field(default=False)
     toolTip: str = field(default=None)
     # validation: validation = field(default=None)
-    # prefill : bool = field(default=False)
+    prefill : bool = field(default=False)
 
 
     def __attrs_post_init__(self):

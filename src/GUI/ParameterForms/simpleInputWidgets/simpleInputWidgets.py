@@ -42,6 +42,9 @@ class checkbox(inputWidgetInterface):
         if self.inputDescription.toolTip:
             self.setToolTip(self.inputDescription.toolTip)
 
+        if self.inputDescription.prefill:
+            self.box.setChecked(True)
+
     def read(self):
         if self.inputDescription.outputName is None:
             return {}
@@ -61,6 +64,21 @@ class VectorInput(inputWidgetInterface):
 
         if self.inputDescription.toolTip:
             self.setToolTip(self.inputDescription.toolTip)
+
+        if self.inputDescription.prefill:
+            self.prefill()
+
+    def prefill(self):
+        if len(self.inputDescription.hints) != self.inputDescription.numFields:
+            raise Exception("Cannot prefill field(s). Number of hints doesn't match number of fields")
+        
+        for i in range(len(self.inputs)):
+            hint = self.inputDescription.hints[i]
+            if hint == "":
+                raise Exception(f"Empty hint at outname={self.inputDescription.outputName}")
+            if type(hint) != self.enumToType(self.inputDescription.inType):
+                raise Exception(f"Cannot prefill. Hint has unexpected type {type(hint)}, expected {self.enumToType(self.inputDescription.inType)}")
+            self.inputs[i].setText(str(hint))
 
     def setupUI(self):
         inp = self.inputDescription

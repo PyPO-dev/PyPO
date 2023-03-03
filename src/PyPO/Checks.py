@@ -10,6 +10,9 @@ from src.PyPO.CustomLogger import CustomLogger
 
 PO_modelist = ["JM", "EH", "JMEH", "EHP", "FF", "scalar"]
 
+clog_mgr = CustomLogger(os.path.basename(__file__))
+clog = clog_mgr.getCustomLogger()
+
 def has_CUDA():
     has = False
 
@@ -20,6 +23,96 @@ def has_CUDA():
     has = win_cuda or nix_cuda or mac_cuda
 
     return has
+
+def check_elemSystem(name, elements, errStr="", extern=False):
+    if name not in elements:
+        errStr += errMsg_noelem(name)
+
+    if extern:
+        if errStr:
+            errList = errStr.split("\n")[:-1]
+
+            for err in errList:
+                clog.error(err)
+            raise ElemNameError()
+    
+    else:
+        return errStr
+
+def check_fieldSystem(name, fields, errStr="", extern=False):
+    if name not in fields:
+        errStr += errMsg_nofield(name)
+
+    if extern:
+        if errStr:
+            errList = errStr.split("\n")[:-1]
+
+            for err in errList:
+                clog.error(err)
+            raise FieldNameError()
+    
+    else:
+        return errStr
+
+def check_currentSystem(name, currents, errStr="", extern=False):
+    if name not in currents:
+        errStr += errMsg_nocurrent(name)
+
+    if extern:
+        if errStr:
+            errList = errStr.split("\n")[:-1]
+
+            for err in errList:
+                clog.error(err)
+            raise CurrentNameError()
+    
+    else:
+        return errStr
+
+def check_scalarfieldSystem(name, scalarfields, errStr="", extern=False):
+    if name not in scalarfields:
+        errStr += errMsg_noscalarfield(name)
+
+    if extern:
+        if errStr:
+            errList = errStr.split("\n")[:-1]
+
+            for err in errList:
+                clog.error(err)
+            raise ScalarFieldNameError()
+    
+    else:
+        return errStr
+
+def check_frameSystem(name, frames, errStr="", extern=False):
+    if name not in frames:
+        errStr += errMsg_noframe(name)
+
+    if extern:
+        if errStr:
+            errList = errStr.split("\n")[:-1]
+
+            for err in errList:
+                clog.error(err)
+            raise FrameNameError()
+    
+    else:
+        return errStr
+
+def check_groupSystem(name, groups, errStr="", extern=False):
+    if name not in groups:
+        errStr += errMsg_nogroup(name)
+
+    if extern:
+        if errStr:
+            errList = errStr.split("\n")[:-1]
+
+            for err in errList:
+                clog.error(err)
+            raise GroupNameError()
+    
+    else:
+        return errStr
 
 # Error classes to be used
 class InputReflError(Exception):
@@ -33,6 +126,25 @@ class RunRTError(Exception):
 
 class RunPOError(Exception):
     pass
+
+class ElemNameError(Exception):
+    pass
+
+class FieldNameError(Exception):
+    pass
+
+class CurrentNameError(Exception):
+    pass
+
+class FrameNameError(Exception):
+    pass
+
+class ScalarFieldNameError(Exception):
+    pass
+
+class GroupNameError(Exception):
+    pass
+
 # Error message definitions
 def errMsg_name(elemName):
     return f"Name \"{elemName}\" already in use. Choose different name.\n"
@@ -71,6 +183,9 @@ def errMsg_nocurrent(Name):
 def errMsg_noscalarfield(scalarfieldName):
     return f"Scalar field {scalarfieldName} not in system.\n"
 
+def errMsg_nogroup(groupName):
+    return f"Group {groupName} not in system.\n"
+
 # Check blocks for different datatypes
 def block_ndarray(fieldName, elemDict, shape):
     _errStr = ""
@@ -90,8 +205,6 @@ def block_ndarray(fieldName, elemDict, shape):
 # @param elemName Name of element, string.
 # @param nameList List of names in system dictionary.
 def check_ElemDict(elemDict, nameList, num_ref):
-    clog_mgr = CustomLogger(os.path.basename(__file__))
-    clog = clog_mgr.getCustomLogger()
     
     errStr = ""
    
@@ -285,8 +398,6 @@ def check_ElemDict(elemDict, nameList, num_ref):
 
 def check_TubeRTDict(TubeRTDict, nameList):
     errStr = ""
-    clog_mgr = CustomLogger(os.path.basename(__file__))
-    clog = clog_mgr.getCustomLogger()
     
     if TubeRTDict["name"] in nameList:
         errStr += errMsg_name(TubeRTDict["name"])
@@ -356,16 +467,11 @@ def check_TubeRTDict(TubeRTDict, nameList):
 
 def check_runRTDict(runRTDict, elements, frames):
     errStr = ""
-
-    clog_mgr = CustomLogger(os.path.basename(__file__))
-    clog = clog_mgr.getCustomLogger()
    
     cuda = has_CUDA()
-    if runRTDict["fr_in"] not in frames:
-        errStr += errMsg_noframe(runRTDict["fr_in"])
-    if runRTDict["t_name"] not in elements:
-        errStr += errMsg_noelem(runRTDict["t_name"])
-   
+    errStr = check_frameSystem(runRTDict["fr_in"], frames, errStr)
+    errStr = check_elemSystem(runRTDict["t_name"], elements, errStr)
+
     if "tol" not in runRTDict:
         runRTDict["tol"] = 1e-3
 
@@ -419,9 +525,6 @@ def check_GBDict(GBDict):
 def check_runPODict(runPODict, elements, currents, scalarfields):
     errStr = ""
 
-    clog_mgr = CustomLogger(os.path.basename(__file__))
-    clog = clog_mgr.getCustomLogger()
-   
     cuda = has_CUDA()
     
     if not "exp" in runPODict:
@@ -435,15 +538,12 @@ def check_runPODict(runPODict, elements, currents, scalarfields):
             errStr += f"{runPODict['mode']} is not a valid propagation mode.\n"
 
         if "s_current" in runPODict:
-            if runPODict["s_current"] not in currents:
-                errStr += errMsg_nocurrent(runPODict["s_current"])
+            errStr = check_currentSystem(runPODict["s_currents"], currents, errStr)
         
         if "s_scalarfield" in runPODict:
-            if runPODict["s_scalarfield"] not in scalarfields:
-                errStr += errMsg_noscalarfield(runPODict["scalarfield"])
+            errStr = check_frameSystem(runPODict["s_scalarfield"], scalarfields, errStr)
     
-    if runPODict["t_name"] not in elements:
-        errStr += errMsg_noelem(runPODict["t_name"])
+    errStr = check_elemSystem(runPODict["t_name"], elements, errStr)
    
     if "epsilon" not in runPODict:
         runPODict["epsilon"] = 1

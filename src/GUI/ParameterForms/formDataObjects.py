@@ -186,11 +186,12 @@ def initPSInp(elemDict):
     
     return initPS
 
+#TODO: this file should not contain functional code It should only provide data
 def initSPSInp(elemDict):
     sublist_surf = []
 
     if elemDict:
-        for key, item in elemDict.item():
+        for key, item in elemDict.items():
             if item["type"] == 3: # Only append plane types
                 sublist_surf.append(key)
 

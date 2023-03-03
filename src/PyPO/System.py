@@ -172,12 +172,21 @@ class System(object):
             fie_copy = self.copyObj(sysObject.fields)
             cur_copy = self.copyObj(sysObject.currents)
             fra_copy = self.copyObj(sysObject.frames)
+            gro_copy = self.copyObj(sysObject.groups)
+            sfi_copy = self.copyObj(sysObject.scalarfields)
             
             self.system.update(sys_copy)
             self.fields.update(sys_copy)
             self.currents.update(sys_copy)
             self.frames.update(sys_copy)
+            self.groups.update(sys_copy)
+            self.scalarfields.update(sys_copy)
 
+    ##
+    # Set the verbosity of the logging from within the system.
+    #
+    # @param verbose Whether to enable logging or not.
+    # @param handler If multiple handlers are present, select which handler to adjust.
     def setLoggingVerbosity(self, verbose=True, handler=None):
         if handler is None:
             for fstream in self.clog.handlers:
@@ -200,9 +209,6 @@ class System(object):
         check_ElemDict(reflDict, self.system.keys(), self.num_ref) 
 
         self.system[reflDict["name"]] = self.copyObj(reflDict)
-
-        self.system[reflDict["name"]]["pos"] = np.zeros(3)
-        self.system[reflDict["name"]]["ori"] = np.array([0,0,1])
 
         if reflDict["pmode"] == "focus":
             self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
@@ -266,9 +272,6 @@ class System(object):
         check_ElemDict(reflDict, self.system.keys(), self.num_ref) 
         self.system[reflDict["name"]] = self.copyObj(reflDict)
         
-        self.system[reflDict["name"]]["pos"] = np.zeros(3)
-        self.system[reflDict["name"]]["ori"] = np.array([0,0,1])
-
         if reflDict["pmode"] == "focus":
             self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
             # Calculate a, b, c of hyperbola
@@ -336,9 +339,6 @@ class System(object):
         check_ElemDict(reflDict, self.system.keys(), self.num_ref) 
         self.system[reflDict["name"]] = self.copyObj(reflDict)
 
-        self.system[reflDict["name"]]["pos"] = np.zeros(3)
-        self.system[reflDict["name"]]["ori"] = np.array([0,0,1])
-
         if reflDict["pmode"] == "focus":
             self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
             f1 = reflDict["focus_1"]
@@ -401,9 +401,6 @@ class System(object):
 
         self.system[reflDict["name"]] = self.copyObj(reflDict)
         self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
-        
-        self.system[reflDict["name"]]["pos"] = np.zeros(3)
-        self.system[reflDict["name"]]["ori"] = np.array([0,0,1])
 
         self.system[reflDict["name"]]["coeffs"][0] = -1
         self.system[reflDict["name"]]["coeffs"][1] = -1
@@ -441,89 +438,165 @@ class System(object):
     ##
     # Rotate reflector grids.
     #
-    # Apply a rotation, around a center of rotation, to a (selection of) reflector(s).
+    # Apply a rotation, around a center of rotation, to a reflector or group. 
+    # Note that an absolute orientation rotates the orientation such that it is oriented w.r.t. the z-axis.
+    # In this case, the pivot defaults to the origin.
     #
     # @param name Reflector name or list of reflector names.
     # @param rotation Numpy ndarray of length 3, containing rotation angles around x, y and z axes, in degrees.
-    # @param pivot Numpy ndarray of length 3, containing pivot x, y and z co-ordinates, in mm. Defaults to origin. 
-    def rotateGrids(self, name, rotation, pivot=None):
-        pivot = np.zeros(3) if pivot is None else pivot
+    # @param pivot Numpy ndarray of length 3, containing pivot x, y and z co-ordinates, in mm. Defaults to pos. 
+    # @param obj Whether the name corresponds to a single element or group.
+    # @param mode Apply rotation relative ('relative') to current orientation, or rotate to specified orientation ('absolute').
+    def rotateGrids(self, name, rotation, obj="element", mode="relative", pivot=None):
 
-        if isinstance(name, list):
-            for _name in name:
-                check_elemSystem(_name, self.system, extern=True)
-                self.system[_name]["transf"] = MatRotate(rotation, self.system[_name]["transf"], pivot)
-            
-        else:
+        if obj == "element":
             check_elemSystem(name, self.system, extern=True)
-            self.system[name]["transf"] = MatRotate(rotation, self.system[name]["transf"], pivot)
-        self.clog.info(f"Rotated {name} by {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
+            pivot = self.system[name]["pos"] if pivot is None else pivot
+            
+            if mode == "absolute":
+                match = np.array([0,0,1])
+                match_rot = (MatRotate(rotation))[:-1, :-1] @ match
+                R = self.findRotation(self.system[name]["ori"], match_rot)
+
+                self.system[name]["transf"][:-1, :-1] = R[:-1, :-1]
+
+                self.system[name]["pos"] = (MatRotate(rotation, pivot=pivot) @ np.append(self.system[name]["pos"], 1))[:-1]
+                self.system[name]["ori"] = R[:-1, :-1] @ self.system[name]["ori"]
+                self.clog.info(f"Rotated element {name} to {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
+
+            elif mode == "relative":
+                self.system[name]["transf"] = MatRotate(rotation, self.system[name]["transf"], pivot)
+                
+                self.system[name]["pos"] = (MatRotate(rotation, pivot=pivot) @ np.append(self.system[name]["pos"], 1))[:-1]
+                self.system[name]["ori"] = MatRotate(rotation)[:-1, :-1] @ self.system[name]["ori"]
+
+            
+                self.clog.info(f"Rotated element {name} by {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
+
+        elif obj == "group":
+            check_groupSystem(name, self.groups, extern=True)
+            pivot = self.group[name]["pos"] if pivot is None else pivot
+            
+            if mode == "absolute":
+                match = np.array([0,0,1])
+                match_rot = (MatRotate(rotation))[:-1, :-1] @ match
+                R = self.findRotation(self.groups[name]["ori"], match_rot)
+
+                self.group[name]["transf"][:-1, :-1] = R[:-1, :-1]
+                
+                for elem in self.groups[name]["elements"]:
+                    elem["transf"][:-1, :-1] = R[:-1, :-1]
+
+                    elem["pos"] = (MatRotate(rotation, pivot=pivot) @ np.append(elem["pos"], 1))[:-1]
+                    elem["ori"] = R[:-1, :-1] @ elem["ori"]
+
+                self.groups[name]["pos"]  = (MatRotate(rotation, pivot=pivot) @ np.append(self.groups[name]["pos"], 1))[:-1]
+                self.groups[name]["ori"] = R[:-1, :-1] @ self.groups[name]["ori"]
+                self.clog.info(f"Rotated group {name} to {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
+
+            elif mode == "relative":
+                for elem in self.groups[name]["elements"]:
+                    elem["transf"] = MatRotate(rotation, self.system[name]["transf"], pivot)
+
+                    elem["pos"] = (MatRotate(rotation, pivot=pivot) @ np.append(elem["pos"], 1))[:-1]
+                    elem["ori"] = MatRotate(rotation)[:-1, :-1] @ elem["ori"]
+
+                self.groups[name]["pos"]  = (MatRotate(rotation, pivot=pivot) @ np.append(self.groups[name]["pos"], 1))[:-1]
+                self.groups[name]["ori"] = MatRotate(rotation)[:-1, :-1] @ self.groups[name]["ori"]
+                self.clog.info(f"Rotated group {name} by {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
     ##
     # Translate reflector grids.
     #
-    # Apply a translation to a (selection of) reflector(s).
+    # Apply a translation to a reflector or a group.
     #
     # @param name Reflector name or list of reflector names.
     # @param translation Numpy ndarray of length 3, containing translation x, y and z co-ordinates, in mm.
+    # @param obj Whether the name corresponds to a single element or group.
     # @param mode Apply translation relative ('relative') to current position, or move to specified position ('absolute').
-    def translateGrids(self, name, translation, mode="relative"):
-        if isinstance(name, list):
-            for _name in name:
-                check_elemSystem(_name, self.system, extern=True)
-                self.system[_name]["transf"] = MatTranslate(translation, self.system[_name]["transf"])
-                self.system[_name]["pos"] += translation
-        else:
+    def translateGrids(self, name, translation, obj="element", mode="relative"):
+
+        if obj == "element":
+            if mode == "absolute":
+                translation -= self.system[name]["pos"]
+
             check_elemSystem(name, self.system, extern=True)
             self.system[name]["transf"] = MatTranslate(translation, self.system[name]["transf"])
             self.system[name]["pos"] += translation
+            
+            if mode == "absolute":
+                self.clog.info(f"Translated element {name} to {*['{:0.3e}'.format(x) for x in list(translation)],} millimeters.")
+            else:
+                self.clog.info(f"Translated element {name} by {*['{:0.3e}'.format(x) for x in list(translation)],} millimeters.")
         
-        self.clog.info(f"Translated {name} by {*['{:0.3e}'.format(x) for x in list(translation)],} millimeters.")
+        elif obj == "group":
+            if mode == "absolute":
+                translation -= self.groups[name]["pos"]
+            
+            check_groupSystem(name, self.groups, extern=True)
+            for elem in self.groups[name]["elements"]:
+                self.system[name]["transf"] = MatTranslate(translation, self.system[name]["transf"])
+                self.system[name]["pos"] += translation
+            
+            self.groups[name]["pos"] += translation
+            
+            if mode == "absolute":
+                self.clog.info(f"Translated group {name} to {*['{:0.3e}'.format(x) for x in list(translation)],} millimeters.")
+            
+            else:
+                self.clog.info(f"Translated group {name} by {*['{:0.3e}'.format(x) for x in list(translation)],} millimeters.")
 
     ##
-    # Home a reflector back into default configuration.
+    # Home a reflector or a group back into default configuration.
     #
     # Set internal transformation matrix of a (selection of) reflector(s) to identity.
     #
     # @param name Reflector name or list of reflector names to be homed.
-    def homeReflector(self, name, trans=True, rot=True):
-        if isinstance(name, list):
+    def homeReflector(self, name, obj="element", trans=True, rot=True):
+        if obj == "group" 
+            check_groupSystem(name, self.groups, extern=True)
             if trans:
-                for _name in name:
-                    check_elemSystem(_name, self.system, extern=True)
+                for elem in self.groups[name]:
                     _transf = np.eye(4)
-                    _transf[:-1, :-1] = self.system[_name]["transf"][:-1, :-1]
-                    self.system[_name]["transf"] = _transf
+                    _transf[:-1, :-1] = elem["transf"][:-1, :-1]
+                    elem["transf"] = _transf
+                    elem["pos"] = np.zeros(3)
+
+                self.groups[name]["pos"] = np.zeros(3)
             
             if rot:
-                for _name in name:
-                    check_elemSystem(_name, self.system, extern=True)
-                    _transf = self.system[_name]["transf"]
+                for elem in self.groups[name]:
+                    _transf = elem["transf"]
                     _transf[:-1, :-1] = np.eye(3)
-                    self.system[_name]["transf"] = _transf
+                    elem["transf"] = _transf
+                
+                self.groups[name]["ori"] = np.array([0,0,1])
+            
+            self.clog.info(f"Transforming group {name} to home position.")
 
                     
         else:
-            check_elemSystem(name, self.system, extern=True)
+            check_elemSystem(name, self.groups, extern=True)
             if trans:
                 _transf = np.eye(4)
                 _transf[:-1, :-1] = self.system[name]["transf"][:-1, :-1]
                 self.system[name]["transf"] = _transf
+                self.system[name]["pos"] = np.zeros(3)
+
             
             if rot:
                 _transf = self.system[name]["transf"]
-                _transf[:-1, :-1] = np.zeros(3)
+                _transf[:-1, :-1] = np.eye(3)
                 self.system[name]["transf"] = _transf
-
-        self.clog.info(f"Transforming {name} to home position.")
-   
+            
+            self.clog.info(f"Transforming element {name} to home position.")
+ 
     ##
     # Take and store snapshot of reflector's current configuration.
     # 
     # @param name Name of reflector to be snapped.
     # @param snap_name Name of snapshot to save.
     def snapReflector(self, name, snap_name):
-        # TODO write checkers for the input
         if isinstance(name, list):
             for _name in name:
                 check_elemSystem(_name, self.system, extern=True)
@@ -541,7 +614,6 @@ class System(object):
     # @param name Name of reflector to revert.
     # @param snap_name Name of snapshot to revert to.
     def revertToSnapshot(self, name, snap_name):
-        # TODO write checker
         if isinstance(name, list):
             for _name in name:
                 check_elemSystem(_name, self.system, extern=True)
@@ -558,6 +630,8 @@ class System(object):
     #
     # @param names Names of elements to put in group.
     # @param name_group Name of the group.
+    # @param pos Position tracer for the group.
+    # @param ori Orientation tracker for group.
     def groupElements(self, name_group, *names, pos=None, ori=None):
         pos = np.zeros(3) if pos is None else pos
         ori = np.array([0,0,1]) if ori is None else ori
@@ -572,10 +646,11 @@ class System(object):
     # Remove a group of elements from system. Note that this does not remove the elements inside the group.
     #
     # @param name_group Name of the group to be removed.
-    def removeGroup(self, name_group):
+    def removeGroup(self, *names):
         check_groupSystem(name_group, self.groups, extern=True)
-        self.groups[name_group] = names
-   
+        for ng in names:
+            del self.groups[ng]
+
     ##
     # Generate reflector grids and normals.
     # 

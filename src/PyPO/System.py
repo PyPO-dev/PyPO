@@ -690,65 +690,67 @@ class System(object):
     # @param PODict Dictionary containing the PO propagation instructions.
     #
     # @see PODict
-    def runPO(self, PODict):
+    def runPO(self, runPODict):
         self.clog.info("*** Starting PO propagation ***")
        
-        check_runPODict(PODict, self.system, self.currents, self.scalarfields)
+        check_runPODict(runPODict, self.system, self.currents, self.scalarfields)
 
-        if PODict["mode"] != "scalar":
-            sc_name = PODict["s_current"]
-            PODict["s_current"] = self.currents[PODict["s_current"]]
-            self.clog.info(f"Propagating {sc_name} on {PODict['s_current'].surf} to {PODict['t_name']}, propagation mode: {PODict['mode']}.")
-            source = self.system[PODict["s_current"].surf]
-            PODict["k"] = PODict["s_current"].k
+        _runPODict = self.copyObj(runPODict)
+
+        if _runPODict["mode"] != "scalar":
+            sc_name = _runPODict["s_current"]
+            _runPODict["s_current"] = self.currents[_runPODict["s_current"]]
+            self.clog.info(f"Propagating {sc_name} on {_runPODict['s_current'].surf} to {_runPODict['t_name']}, propagation mode: {_runPODict['mode']}.")
+            source = self.system[_runPODict["s_current"].surf]
+            _runPODict["k"] = _runPODict["s_current"].k
 
         else:
-            sc_name = PODict["s_scalarfield"]
-            PODict["s_scalarfield"] = self.scalarfields[PODict["s_scalarfield"]]
-            self.clog.info(f"Propagating {sc_name} on {PODict['s_scalarfield'].surf} to {PODict['t_name']}, propagation mode: {PODict['mode']}.")
-            source = self.system[PODict["s_scalarfield"].surf]
-            PODict["k"] = PODict["s_scalarfield"].k
+            sc_name = _runPODict["s_scalarfield"]
+            _runPODict["s_scalarfield"] = self.scalarfields[_runPODict["s_scalarfield"]]
+            self.clog.info(f"Propagating {sc_name} on {_runPODict['s_scalarfield'].surf} to {_runPODict['t_name']}, propagation mode: {_runPODict['mode']}.")
+            source = self.system[_runPODict["s_scalarfield"].surf]
+            _runPODict["k"] = _runPODict["s_scalarfield"].k
        
-        target = self.system[PODict["t_name"]]
+        target = self.system[_runPODict["t_name"]]
         
         start_time = time.time()
         
-        if PODict["device"] == "CPU":
-            self.clog.info(f"Hardware: running {PODict['nThreads']} CPU threads.")
+        if _runPODict["device"] == "CPU":
+            self.clog.info(f"Hardware: running {_runPODict['nThreads']} CPU threads.")
             self.clog.info(f"... Calculating ...")
-            out = PyPO_CPUd(source, target, PODict)
+            out = PyPO_CPUd(source, target, _runPODict)
 
-        elif PODict["device"] == "GPU":
-            self.clog.info(f"Hardware: running {PODict['nThreads']} CUDA threads per block.")
+        elif _runPODict["device"] == "GPU":
+            self.clog.info(f"Hardware: running {_runPODict['nThreads']} CUDA threads per block.")
             self.clog.info(f"... Calculating ...")
-            out = PyPO_GPUf(source, target, PODict)
+            out = PyPO_GPUf(source, target, _runPODict)
 
         dtime = time.time() - start_time
         
-        if PODict["mode"] == "JM":
-            out.setMeta(PODict["t_name"], PODict["k"])
-            self.currents[PODict["name_JM"]] = out
+        if _runPODict["mode"] == "JM":
+            out.setMeta(_runPODict["t_name"], _runPODict["k"])
+            self.currents[_runPODict["name_JM"]] = out
         
-        elif PODict["mode"] == "EH" or PODict["mode"] == "FF":
-            out.setMeta(PODict["t_name"], PODict["k"])
-            self.fields[PODict["name_EH"]] = out
+        elif _runPODict["mode"] == "EH" or _runPODict["mode"] == "FF":
+            out.setMeta(_runPODict["t_name"], _runPODict["k"])
+            self.fields[_runPODict["name_EH"]] = out
         
-        elif PODict["mode"] == "JMEH":
-            out[0].setMeta(PODict["t_name"], PODict["k"])
-            out[1].setMeta(PODict["t_name"], PODict["k"])
-            self.currents[PODict["name_JM"]] = out[0]
-            self.fields[PODict["name_EH"]] = out[1]
+        elif _runPODict["mode"] == "JMEH":
+            out[0].setMeta(_runPODict["t_name"], _runPODict["k"])
+            out[1].setMeta(_runPODict["t_name"], _runPODict["k"])
+            self.currents[_runPODict["name_JM"]] = out[0]
+            self.fields[_runPODict["name_EH"]] = out[1]
         
-        elif PODict["mode"] == "EHP":
-            out[0].setMeta(PODict["t_name"], PODict["k"])
-            self.fields[PODict["name_EH"]] = out[0]
+        elif _runPODict["mode"] == "EHP":
+            out[0].setMeta(_runPODict["t_name"], _runPODict["k"])
+            self.fields[_runPODict["name_EH"]] = out[0]
 
-            frame = self.loadFramePoynt(out[1], PODict["t_name"])
-            self.frames[PODict["name_P"]] = frame
+            frame = self.loadFramePoynt(out[1], _runPODict["t_name"])
+            self.frames[_runPODict["name_P"]] = frame
 
-        elif PODict["mode"] == "scalar":
-            out.setMeta(PODict["t_name"], PODict["k"])
-            self.scalarfields[PODict["name_field"]] = out
+        elif _runPODict["mode"] == "scalar":
+            out.setMeta(_runPODict["t_name"], _runPODict["k"])
+            self.scalarfields[_runPODict["name_field"]] = out
 
         self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
         return out

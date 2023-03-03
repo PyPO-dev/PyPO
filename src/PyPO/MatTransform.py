@@ -1,6 +1,6 @@
 import numpy as np
 
-def MatRotate(theta, matAppend, origin=np.zeros(3), radians=False):
+def MatRotate(theta, matAppend=None, pivot=None, radians=False):
     """
     Create 3D rotation matrix and rotate grids of points.
 
@@ -12,6 +12,8 @@ def MatRotate(theta, matAppend, origin=np.zeros(3), radians=False):
     @return ->
         matOut      :   Full affine rotation matrix.
     """
+    pivot = np.zeros(3) if pivot is None else pivot
+    matAppend = np.eye(4) if matAppend is None else matAppend
 
     if radians:
         theta_x, theta_y, theta_z = theta
@@ -19,7 +21,7 @@ def MatRotate(theta, matAppend, origin=np.zeros(3), radians=False):
     else:
         theta_x, theta_y, theta_z = np.radians(theta)
 
-    ox, oy, oz = origin
+    ox, oy, oz = pivot
 
     trans1 = np.array([[1, 0, 0, -ox],
                     [0, 1, 0, -oy],
@@ -45,10 +47,10 @@ def MatRotate(theta, matAppend, origin=np.zeros(3), radians=False):
                     [0, 1, 0, oy],
                     [0, 0, 1, oz],
                     [0, 0, 0, 1]])
+    
+    matOut = trans2 @ (rotZ @ (rotY @ (rotX @ trans1)))
 
-    matOut = np.matmul(trans2, np.matmul(rotZ, np.matmul(rotY, np.matmul(rotX, trans1))))
-
-    return np.matmul(matOut, matAppend)
+    return matOut @ matAppend
 
 def MatTranslate(trans, matAppend):
     xt, yt, zt = trans
@@ -57,14 +59,15 @@ def MatTranslate(trans, matAppend):
                     [0, 0, 1, zt],
                     [0, 0, 0, 1]])
 
-    return np.matmul(trans, matAppend)
+    return trans @ matAppend
 
 def InvertMat(mat):
     R_T = mat[:3, :3].T
-    R_Tt = np.matmul(-R_T, mat[:3, -1])
+    R_Tt = -R_T @ mat[:3, -1]
 
     matInv = np.eye(4)
     matInv[:3, :3] = R_T
     matInv[:3, -1] = R_Tt
 
     return matInv
+

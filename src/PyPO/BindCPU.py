@@ -8,6 +8,7 @@ from src.PyPO.BindUtils import *
 from src.PyPO.Structs import *
 from src.PyPO.PyPOTypes import *
 import src.PyPO.Config as Config
+import src.PyPO.Threadmgr as TManager
 
 import threading
 
@@ -82,6 +83,7 @@ def loadCPUlib():
 # WRAPPER FUNCTIONS DOUBLE PREC
 def PyPO_CPUd(source, target, PODict):
     lib, ws = loadCPUlib()
+    mgr = TManager.Manager(Config.context)
 
     # Create structs with pointers for source and target
     csp = reflparams()
@@ -99,14 +101,6 @@ def PyPO_CPUd(source, target, PODict):
     allocate_reflcontainer(cs, gs, ctypes.c_double)
     allocate_reflcontainer(ct, gt, ctypes.c_double)
 
-    if PODict["mode"] == "Scalar":
-        c_cfield = arrC1()
-        fieldConv(PODict["s_field"], c_field, gs, ctypes.c_double)
-
-    else:
-        c_currents = c2Bundle()
-        currentConv(PODict["s_current"], c_currents, gs, ctypes.c_double)
-
     target_shape = (target["gridsize"][0], target["gridsize"][1])
 
     if PODict["exp"] == "fwd":
@@ -119,11 +113,22 @@ def PyPO_CPUd(source, target, PODict):
     nThreads    = ctypes.c_int(PODict["nThreads"])
     epsilon     = ctypes.c_double(PODict["epsilon"])
     t_direction = ctypes.c_double(exp_prop)
+    
+    if PODict["mode"] == "scalar":
+        c_field = arrC1()
+        sfieldConv(PODict["s_scalarfield"], c_field, gs, ctypes.c_double)
+        args = [csp, ctp, ctypes.byref(cs), ctypes.byref(ct),
+                ctypes.byref(c_field), k, nThreads, epsilon,
+                t_direction]
 
-    args = [csp, ctp, ctypes.byref(cs), ctypes.byref(ct),
-            ctypes.byref(c_currents), k, nThreads, epsilon,
-            t_direction]
-    start_time = time.time()
+    else:
+        c_currents = c2Bundle()
+        currentConv(PODict["s_current"], c_currents, gs, ctypes.c_double)
+        args = [csp, ctp, ctypes.byref(cs), ctypes.byref(ct),
+                ctypes.byref(c_currents), k, nThreads, epsilon,
+                t_direction]
+
+
 
     if PODict["mode"] == "JM":
         res = c2Bundle()
@@ -131,15 +136,7 @@ def PyPO_CPUd(source, target, PODict):
 
         allocate_c2Bundle(res, gt, ctypes.c_double)
 
-        t = threading.Thread(target=lib.propagateToGrid_JM, args=args)
-        t.daemon = True
-        t.start()
-        while t.is_alive(): # wait for the thread to exit
-            Config.print(f'Calculating J, M on {target["name"]} {ws.getSymbol()}', end='\r')
-            t.join(.1)
-        dtime = time.time() - start_time
-        Config.print(f'Calculated J, M on {target["name"]} in {dtime:.3f} seconds', end='\r')
-        Config.print(f'\n')
+        mgr.new_sthread(target=lib.propagateToGrid_JM, args=args)
 
         # Unpack filled struct
         JM = c2BundleToObj(res, shape=target_shape, obj_t='currents', np_t=np.float64)
@@ -152,15 +149,7 @@ def PyPO_CPUd(source, target, PODict):
 
         allocate_c2Bundle(res, gt, ctypes.c_double)
 
-        t = threading.Thread(target=lib.propagateToGrid_EH, args=args)
-        t.daemon = True
-        t.start()
-        while t.is_alive(): # wait for the thread to exit
-            Config.print(f'Calculating E, H on {target["name"]} {ws.getSymbol()}', end='\r')
-            t.join(.1)
-        dtime = time.time() - start_time
-        Config.print(f'Calculated E, H on {target["name"]} in {dtime:.3f} seconds', end='\r')
-        Config.print(f'\n')
+        mgr.new_sthread(target=lib.propagateToGrid_EH, args=args)
 
         # Unpack filled struct
         EH = c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
@@ -173,15 +162,7 @@ def PyPO_CPUd(source, target, PODict):
 
         allocate_c4Bundle(res, gt, ctypes.c_double)
 
-        t = threading.Thread(target=lib.propagateToGrid_JMEH, args=args)
-        t.daemon = True
-        t.start()
-        while t.is_alive(): # wait for the thread to exit
-            Config.print(f'Calculating J, M, E, H on {target["name"]} {ws.getSymbol()}', end='\r')
-            t.join(.1)
-        dtime = time.time() - start_time
-        Config.print(f'Calculated J, M, E, H on {target["name"]} in {dtime:.3f} seconds', end='\r')
-        Config.print(f'\n')
+        mgr.new_sthread(target=lib.propagateToGrid_JMEH, args=args)
 
         # Unpack filled struct
         JM, EH = c4BundleToObj(res, shape=target_shape, np_t=np.float64)
@@ -194,41 +175,25 @@ def PyPO_CPUd(source, target, PODict):
 
         allocate_c2rBundle(res, gt, ctypes.c_double)
 
-        t = threading.Thread(target=lib.propagateToGrid_EHP, args=args)
-        t.daemon = True
-        t.start()
-        while t.is_alive(): # wait for the thread to exit
-            Config.print(f'Calculating reflected E, H, P on {target["name"]} {ws.getSymbol()}', end='\r')
-            t.join(.1)
-        dtime = time.time() - start_time
-        Config.print(f'Calculated reflected E, H, P on {target["name"]} in {dtime:.3f} seconds', end='\r')
-        Config.print(f'\n')
+        mgr.new_sthread(target=lib.propagateToGrid_EHP, args=args)
 
         # Unpack filled struct
         EH, Pr = c2rBundleToObj(res, shape=target_shape, np_t=np.float64)
 
         return [EH, Pr]
 
-    elif PODict["mode"] == "Scalar":
+    elif PODict["mode"] == "scalar":
         res = arrC1()
         args.insert(0, res)
 
         allocate_arrC1(res, gt, ctypes.c_double)
 
-        t = threading.Thread(target=lib.propagateToGrid_scalar, args=args)
-        t.daemon = True
-        t.start()
-        while t.is_alive(): # wait for the thread to exit
-            Config.print(f'Calculating scalar field on {target["name"]} {ws.getSymbol()}', end='\r')
-            t.join(.1)
-        dtime = time.time() - start_time
-        Config.print(f'Calculated scalar field on {target["name"]} in {dtime:.3f} seconds', end='\r')
-        Config.print(f'\n')
+        mgr.new_sthread(target=lib.propagateToGrid_scalar, args=args)
 
         # Unpack filled struct
-        E = arrC1ToObj(res, shape=target_shape)
+        S = arrC1ToObj(res, shape=target_shape, np_t=np.float64)
 
-        return E
+        return S
 
     elif PODict["mode"] == "FF":
         res = c2Bundle()
@@ -236,53 +201,37 @@ def PyPO_CPUd(source, target, PODict):
 
         allocate_c2Bundle(res, gt, ctypes.c_double)
 
-        t = threading.Thread(target=lib.propagateToFarField, args=args)
-        t.daemon = True
-        t.start()
-        while t.is_alive(): # wait for the thread to exit
-            Config.print(f'Calculating far-field E, H on {target["name"]} {ws.getSymbol()}', end='\r')
-            t.join(.1)
-        dtime = time.time() - start_time
-        Config.print(f'Calculated far-field E, H on {target["name"]} in {dtime:.3f} seconds', end='\r')
-        Config.print(f'\n')
+        mgr.new_sthread(target=lib.propagateToFarField, args=args)
 
         # Unpack filled struct
         EH = c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
 
         return EH
 
-def RT_CPUd(target, fr_in, epsilon, t0, nThreads):
+def RT_CPUd(runRTDict):
     lib, ws = loadCPUlib()
+    mgr = TManager.Manager(Config.context)
 
     inp = cframe()
     res = cframe()
 
-    allocate_cframe(res, fr_in.size, ctypes.c_double)
-    allfill_cframe(inp, fr_in, fr_in.size, ctypes.c_double)
+    allocate_cframe(res, runRTDict["fr_in"].size, ctypes.c_double)
+    allfill_cframe(inp, runRTDict["fr_in"], runRTDict["fr_in"].size, ctypes.c_double)
 
     ctp = reflparams()
-    allfill_reflparams(ctp, target, ctypes.c_double)
+    allfill_reflparams(ctp, runRTDict["t_name"], ctypes.c_double)
 
-    nThreads    = ctypes.c_int(nThreads)
-    epsilon     = ctypes.c_double(epsilon)
-    t0          = ctypes.c_double(t0)
+    nThreads    = ctypes.c_int(runRTDict["nThreads"])
+    tol         = ctypes.c_double(runRTDict["tol"])
+    t0          = ctypes.c_double(runRTDict["t0"])
 
     args = [ctp, ctypes.byref(inp), ctypes.byref(res),
-                        nThreads, epsilon, t0]
-    start_time = time.time()
-    t = threading.Thread(target=lib.propagateRays, args=args)
-    t.daemon = True
-    t.start()
-    while t.is_alive(): # wait for the thread to exit
-        Config.print(f'Calculating ray-trace to {target["name"]} {ws.getSymbol()}', end='\r')
-        t.join(.1)
-    dtime = time.time() - start_time
-    Config.print(f'Calculated ray-trace to {target["name"]} in {dtime:.3f} seconds', end='\r')
-    Config.print(f'\n')
+                        nThreads, tol, t0]
+    
+    mgr.new_sthread(target=lib.propagateRays, args=args)
 
-    shape = (fr_in.size,)
+    shape = (runRTDict["fr_in"].size,)
     fr_out = frameToObj(res, np_t=np.float64, shape=shape)
-
     return fr_out
 
 if __name__ == "__main__":

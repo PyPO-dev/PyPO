@@ -24,15 +24,6 @@ def ex_DRO_RT(device):
             "gridsize"  : np.array([1501,1501])
             }
 
-    plane = {
-            "name"      : "plane1",
-            "gmode"     : "xy",
-            "flip"      : False,
-            "lims_x"    : np.array([-100,100]),
-            "lims_y"    : np.array([-100,100]),
-            "gridsize"  : np.array([3, 3])
-            }
-
     RTpar = {
             "name"      : "start",
             "nRays"     : 10,
@@ -47,26 +38,24 @@ def ex_DRO_RT(device):
 
     s = System()
     s.addParabola(parabola)
-    s.addPlane(plane)
-    s.translateGrids("plane1", np.array([0,0,12e3]))
-    
-    #s.rotateGrids("p1", np.array([30,0,0]), np.array([0,0,12e3]))
 
     s.plotSystem()
 
-    s.createFrame(RTpar)
+    s.createTubeFrame(RTpar)
 
-    if device == "CPU":
-        s.runRayTracer("start", "pri", "p1", nThreads=11, t0=1e4)
-        s.runRayTracer("pri", "focus", "plane1", nThreads=11, t0=1e4)
+    start_pri_RT = {
+            "fr_in"     : "start",
+            "t_name"    : "p1",
+            "fr_out"    : "pri",
+            "device"    : device,
+            "tol"       : 1e-6
+            }
 
-    elif device == "GPU":
-        s.runRayTracer("start", "pri", "p1", nThreads=256, t0=1e4, device=device)
-        s.runRayTracer("pri", "focus", "plane1", nThreads=256, t0=1e4, device=device)
+    s.runRayTracer(start_pri_RT)
+    s.findRTfocus("pri")
 
-    pt.show()
-    s.plotRTframe("focus")
-    s.plotSystem(RTframes=["start", "pri", "focus"])
+    s.plotRTframe("focus_pri")
+    s.plotSystem(RTframes=["start", "pri", "focus_pri"])
 
 if __name__ == "__main__":
-    ex_DRO()
+    ex_DRO_RT()

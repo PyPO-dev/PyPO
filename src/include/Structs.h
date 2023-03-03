@@ -23,11 +23,12 @@ struct cframe;
 struct RTDict;
 struct GRTDict;
 struct GDict;
+struct ScalarGDict;
 
 /** 1D array of complex numbers.*/
 struct arrC1 {
-    double *rx;     /**< array of double, representing real part of array.*/
-    double *ix;     /**< array of double, representing imaginary part of array.*/
+    double *x;     /**< array of double, representing real part of array.*/
+    double *y;     /**< array of double, representing imaginary part of array.*/
 };
 
 /** 3D array of real numbers.*/
@@ -192,6 +193,16 @@ struct GDict {
     double *pol;    /**<array of 3 double. Polarization components along x, y and z axes.*/
 };
 
+/** Object for initializing a scalar Gaussian beam.*/
+struct ScalarGDict {
+    double lam;     /**<Wavelength of beam, in millimeters.*/
+    double w0x;     /**<Beamwaist size along x-direction, in millimeters.*/
+    double w0y;     /**<Beamwaist size along y-direction, in millimeters.*/
+    double n;       /**<Refractive index of medium.*/
+    double E0;      /**<Peak electric field value.*/
+    double z;       /**<z co-ordinate at which to evaluate Gaussian beam, in millimeters.*/
+};
+
 // Have to write explicit types for float and float: ctypes doesnt support templates
 struct arrC1f;
 struct arrR3f;
@@ -207,8 +218,8 @@ struct GDictf;
 
 /** 1D array of complex numbers.*/
 struct arrC1f {
-    float *rx;     /**< array of float, representing real part of array.*/
-    float *ix;     /**< array of float, representing imaginary part of array.*/
+    float *x;     /**< array of float, representing real part of array.*/
+    float *y;     /**< array of float, representing imaginary part of array.*/
 };
 
 /** 3D array of real numbers.*/

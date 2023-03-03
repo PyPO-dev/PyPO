@@ -117,8 +117,17 @@ Functions</h2></td></tr>
 <tr class="separator:a2b2fe507d139af1fc75ec76defbde434"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a17d7044786124f00cc30b2be01a9d91f"><td class="memItemLeft" align="right" valign="top">void __global__&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a17d7044786124f00cc30b2be01a9d91f">GpropagateBeam_4</a> (float *d_xs, float *d_ys, float *d_zs, float *d_A, float *d_xt, float *d_yt, cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz, cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz, cuFloatComplex *d_Ext, cuFloatComplex *d_Eyt, cuFloatComplex *d_Ezt, cuFloatComplex *d_Hxt, cuFloatComplex *d_Hyt, cuFloatComplex *d_Hzt)</td></tr>
 <tr class="separator:a17d7044786124f00cc30b2be01a9d91f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49925cbda435fea312a83f1b0c441389"><td class="memItemLeft" align="right" valign="top"><a id="a49925cbda435fea312a83f1b0c441389" name="a49925cbda435fea312a83f1b0c441389"></a>
+void __device__&#160;</td><td class="memItemRight" valign="bottom"><b>scalarfieldAtPoint</b> (float *d_xs, float *d_ys, float *d_zs, cuFloatComplex *d_sfs, float(&amp;point)[3], float *d_A, cuFloatComplex &amp;e)</td></tr>
+<tr class="separator:a49925cbda435fea312a83f1b0c441389"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac63efbfa4cb6c7f63ed98f0137184ed3"><td class="memItemLeft" align="right" valign="top">void __global__&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#ac63efbfa4cb6c7f63ed98f0137184ed3">GpropagateBeam_5</a> (float *d_xs, float *d_ys, float *d_zs, float *d_A, float *d_xt, float *d_yt, float *d_zt, cuFloatComplex *d_sfs, cuFloatComplex *d_sft)</td></tr>
+<tr class="separator:ac63efbfa4cb6c7f63ed98f0137184ed3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1536f5d7be6659c3b4c717597cbb621b"><td class="memItemLeft" align="right" valign="top">__host__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a1536f5d7be6659c3b4c717597cbb621b">_arrC1ToCUDAC</a> (float *rarr, float *iarr, cuFloatComplex *carr, int size)</td></tr>
+<tr class="separator:a1536f5d7be6659c3b4c717597cbb621b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0a8dc68cd14e31c1262b3f001eeb7374"><td class="memItemLeft" align="right" valign="top">__host__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a0a8dc68cd14e31c1262b3f001eeb7374">_arrC3ToCUDAC</a> (float *r1arr, float *r2arr, float *r3arr, float *i1arr, float *i2arr, float *i3arr, cuFloatComplex *c1arr, cuFloatComplex *c2arr, cuFloatComplex *c3arr, int size)</td></tr>
 <tr class="separator:a0a8dc68cd14e31c1262b3f001eeb7374"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a92b9063166d7f6bfe6dffdba614af933"><td class="memItemLeft" align="right" valign="top">__host__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a92b9063166d7f6bfe6dffdba614af933">_arrCUDACToC1</a> (cuFloatComplex *carr, float *rarr, float *iarr, int size)</td></tr>
+<tr class="separator:a92b9063166d7f6bfe6dffdba614af933"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a06b277d10f9f9a4e6b233f487c5d6f48"><td class="memItemLeft" align="right" valign="top">__host__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a06b277d10f9f9a4e6b233f487c5d6f48">_arrCUDACToC3</a> (cuFloatComplex *c1arr, cuFloatComplex *c2arr, cuFloatComplex *c3arr, float *r1arr, float *r2arr, float *r3arr, float *i1arr, float *i2arr, float *i3arr, int size)</td></tr>
 <tr class="separator:a06b277d10f9f9a4e6b233f487c5d6f48"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a369d792b232ead83b2b9db7ae8373a77"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a369d792b232ead83b2b9db7ae8373a77">callKernelf_JM</a> (<a class="el" href="structc2Bundlef.html">c2Bundlef</a> *res, <a class="el" href="structreflparamsf.html">reflparamsf</a> source, <a class="el" href="structreflparamsf.html">reflparamsf</a> target, <a class="el" href="structreflcontainerf.html">reflcontainerf</a> *cs, <a class="el" href="structreflcontainerf.html">reflcontainerf</a> *ct, <a class="el" href="structc2Bundlef.html">c2Bundlef</a> *currents, float k, float epsilon, float t_direction, int nBlocks, int nThreads)</td></tr>
@@ -131,6 +140,8 @@ Functions</h2></td></tr>
 <tr class="separator:a782e4edb3dd2bfd699c89f502642722e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9513614b1aaf7c6a869edc7693d1d013"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a9513614b1aaf7c6a869edc7693d1d013">callKernelf_FF</a> (<a class="el" href="structc2Bundlef.html">c2Bundlef</a> *res, <a class="el" href="structreflparamsf.html">reflparamsf</a> source, <a class="el" href="structreflparamsf.html">reflparamsf</a> target, <a class="el" href="structreflcontainerf.html">reflcontainerf</a> *cs, <a class="el" href="structreflcontainerf.html">reflcontainerf</a> *ct, <a class="el" href="structc2Bundlef.html">c2Bundlef</a> *currents, float k, float epsilon, float t_direction, int nBlocks, int nThreads)</td></tr>
 <tr class="separator:a9513614b1aaf7c6a869edc7693d1d013"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad2b2bebbbbcea7a3eb5eadb3522871a3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#ad2b2bebbbbcea7a3eb5eadb3522871a3">callKernelf_scalar</a> (<a class="el" href="structarrC1f.html">arrC1f</a> *res, <a class="el" href="structreflparamsf.html">reflparamsf</a> source, <a class="el" href="structreflparamsf.html">reflparamsf</a> target, <a class="el" href="structreflcontainerf.html">reflcontainerf</a> *cs, <a class="el" href="structreflcontainerf.html">reflcontainerf</a> *ct, <a class="el" href="structarrC1f.html">arrC1f</a> *inp, float k, float epsilon, float t_direction, int nBlocks, int nThreads)</td></tr>
+<tr class="separator:ad2b2bebbbbcea7a3eb5eadb3522871a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
@@ -151,6 +162,56 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
 <div class="textblock"><p>Kernels for CUDA PO calculations. </p>
 <p>Contains kernels for PO calculations. Multiple kernels are defined, each one optimized for a certain calculation. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="a1536f5d7be6659c3b4c717597cbb621b" name="a1536f5d7be6659c3b4c717597cbb621b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1536f5d7be6659c3b4c717597cbb621b">&#9670;&#160;</a></span>_arrC1ToCUDAC()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">__host__ void _arrC1ToCUDAC </td>
+          <td>(</td>
+          <td class="paramtype">float *&#160;</td>
+          <td class="paramname"><em>rarr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float *&#160;</td>
+          <td class="paramname"><em>iarr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">cuFloatComplex *&#160;</td>
+          <td class="paramname"><em>carr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Convert 2 arrays of floats to 1 array of cuComplex</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">rarr</td><td>Real part of complex array. </td></tr>
+    <tr><td class="paramname">iarr</td><td>Real part of complex array. </td></tr>
+    <tr><td class="paramname">carr</td><td>Array of cuFloatComplex, to be filled. </td></tr>
+    <tr><td class="paramname">size</td><td>Size of arrays. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a0a8dc68cd14e31c1262b3f001eeb7374" name="a0a8dc68cd14e31c1262b3f001eeb7374"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0a8dc68cd14e31c1262b3f001eeb7374">&#9670;&#160;</a></span>_arrC3ToCUDAC()</h2>
 
@@ -236,6 +297,56 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
     <tr><td class="paramname">c1arr</td><td>Array of cuFloatComplex, to be filled. </td></tr>
     <tr><td class="paramname">c2arr</td><td>Array of cuFloatComplex, to be filled. </td></tr>
     <tr><td class="paramname">c3arr</td><td>Array of cuFloatComplex, to be filled. </td></tr>
+    <tr><td class="paramname">size</td><td>Size of arrays. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a92b9063166d7f6bfe6dffdba614af933" name="a92b9063166d7f6bfe6dffdba614af933"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a92b9063166d7f6bfe6dffdba614af933">&#9670;&#160;</a></span>_arrCUDACToC1()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">__host__ void _arrCUDACToC1 </td>
+          <td>(</td>
+          <td class="paramtype">cuFloatComplex *&#160;</td>
+          <td class="paramname"><em>carr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float *&#160;</td>
+          <td class="paramname"><em>rarr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float *&#160;</td>
+          <td class="paramname"><em>iarr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Convert 1 array of cuComplex to 2 arrays of floats.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">carr</td><td>Array of cuFloatComplex. </td></tr>
+    <tr><td class="paramname">rarr</td><td>Real part of complex array, to be filled. </td></tr>
+    <tr><td class="paramname">iarr</td><td>Imaginary part of complex array, to be filled. </td></tr>
     <tr><td class="paramname">size</td><td>Size of arrays. </td></tr>
   </table>
   </dd>
@@ -456,7 +567,7 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>BT Array of two dim3 objects. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>BT Array of two dim3 objects, containing number of blocks per grid and number of threads per block. </dd></dl>
 
 </div>
 </div>
@@ -989,6 +1100,111 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
 
 </div>
 </div>
+<a id="ad2b2bebbbbcea7a3eb5eadb3522871a3" name="ad2b2bebbbbcea7a3eb5eadb3522871a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad2b2bebbbbcea7a3eb5eadb3522871a3">&#9670;&#160;</a></span>callKernelf_scalar()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void callKernelf_scalar </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structarrC1f.html">arrC1f</a> *&#160;</td>
+          <td class="paramname"><em>res</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structreflparamsf.html">reflparamsf</a>&#160;</td>
+          <td class="paramname"><em>source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structreflparamsf.html">reflparamsf</a>&#160;</td>
+          <td class="paramname"><em>target</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structreflcontainerf.html">reflcontainerf</a> *&#160;</td>
+          <td class="paramname"><em>cs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structreflcontainerf.html">reflcontainerf</a> *&#160;</td>
+          <td class="paramname"><em>ct</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structarrC1f.html">arrC1f</a> *&#160;</td>
+          <td class="paramname"><em>inp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>k</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>epsilon</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>t_direction</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nBlocks</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nThreads</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Call scalar kernel.</p>
+<p>Calculate scalar field on a target surface using CUDA.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">res</td><td>Pointer to <a class="el" href="structarrC1f.html">arrC1f</a> object. </td></tr>
+    <tr><td class="paramname">source</td><td>reflparamsf object containing source surface parameters. </td></tr>
+    <tr><td class="paramname">target</td><td>reflparamsf object containing target surface parameters. </td></tr>
+    <tr><td class="paramname">cs</td><td>Pointer to reflcontainerf object containing source grids. </td></tr>
+    <tr><td class="paramname">ct</td><td>Pointer to reflcontainerf object containing target grids. </td></tr>
+    <tr><td class="paramname">inp</td><td>Pointer to <a class="el" href="structarrC1f.html">arrC1f</a> object containing source field. </td></tr>
+    <tr><td class="paramname">k</td><td>Wavenumber of radiation in 1 /mm. </td></tr>
+    <tr><td class="paramname">epsilon</td><td>Relative permittivity of source surface. </td></tr>
+    <tr><td class="paramname">t_direction</td><td>Time direction (experimental!). </td></tr>
+    <tr><td class="paramname">nBlocks</td><td>Number of blocks in GPU grid. </td></tr>
+    <tr><td class="paramname">nThreads</td><td>Number of threads in a block.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="structarrC1f.html">arrC1f</a> </dd>
+<dd>
+<a class="el" href="structreflparamsf.html">reflparamsf</a> </dd>
+<dd>
+<a class="el" href="structreflcontainerf.html">reflcontainerf</a> </dd></dl>
+
+</div>
+</div>
 <a id="a2d622c64cff344e6e8f9bd8013d8c7af" name="a2d622c64cff344e6e8f9bd8013d8c7af"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2d622c64cff344e6e8f9bd8013d8c7af">&#9670;&#160;</a></span>expCo()</h2>
 
@@ -1006,12 +1222,6 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
 </div><div class="memdoc">
 <p>Take complex exponential.</p>
 <p>Take complex exponential by decomposing into sine and cosine.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">z</td><td>cuFloatComplex number.</td></tr>
-  </table>
-  </dd>
-</dl>
 <dl class="section return"><dt>Returns</dt><dd>res cuFloatComplex number. </dd></dl>
 
 </div>
@@ -2128,6 +2338,92 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
     <tr><td class="paramname">d_Hxt</td><td>Array to be filled with target H x-component. </td></tr>
     <tr><td class="paramname">d_Hyt</td><td>Array to be filled with target H y-component. </td></tr>
     <tr><td class="paramname">d_Hzt</td><td>Array to be filled with target H z-component. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ac63efbfa4cb6c7f63ed98f0137184ed3" name="ac63efbfa4cb6c7f63ed98f0137184ed3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac63efbfa4cb6c7f63ed98f0137184ed3">&#9670;&#160;</a></span>GpropagateBeam_5()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void __global__ GpropagateBeam_5 </td>
+          <td>(</td>
+          <td class="paramtype">float *&#160;</td>
+          <td class="paramname"><em>d_xs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float *&#160;</td>
+          <td class="paramname"><em>d_ys</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float *&#160;</td>
+          <td class="paramname"><em>d_zs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float *&#160;</td>
+          <td class="paramname"><em>d_A</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float *&#160;</td>
+          <td class="paramname"><em>d_xt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float *&#160;</td>
+          <td class="paramname"><em>d_yt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float *&#160;</td>
+          <td class="paramname"><em>d_zt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">cuFloatComplex *&#160;</td>
+          <td class="paramname"><em>d_sfs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">cuFloatComplex *&#160;</td>
+          <td class="paramname"><em>d_sft</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Calculate scalar field on target.</p>
+<p>Kernel for calculating scalar field on a target, given a scattered field and source surface..</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">d_xs</td><td>Array containing source points x-coordinate. </td></tr>
+    <tr><td class="paramname">d_ys</td><td>Array containing source points y-coordinate. </td></tr>
+    <tr><td class="paramname">d_zs</td><td>Array containing source points z-coordinate. </td></tr>
+    <tr><td class="paramname">d_A</td><td>Array containing area elements. </td></tr>
+    <tr><td class="paramname">d_xt</td><td>Array containing target direction x-coordinate. </td></tr>
+    <tr><td class="paramname">d_yt</td><td>Array containing target direction y-coordinate. </td></tr>
+    <tr><td class="paramname">d_zt</td><td>Array containing target direction z-coordinate. </td></tr>
+    <tr><td class="paramname">d_sfs</td><td>Array containing source scalar field. </td></tr>
+    <tr><td class="paramname">d_sft</td><td>Array to be filled with target scalar field. </td></tr>
   </table>
   </dd>
 </dl>

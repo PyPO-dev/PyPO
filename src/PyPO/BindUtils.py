@@ -1,8 +1,10 @@
 import ctypes
 import numpy as np
 
-from src.PyPO.PyPOTypes import *
+import matplotlib.pyplot as pt
 
+from src.PyPO.PyPOTypes import *
+import src.PyPO.Config as Config
 # UTILITY FUNCTIONS
 
 def currentConv(currents, c_currents, size, ct_t):
@@ -40,8 +42,8 @@ def fieldConv(field, c_fields, size, ct_t):
     c_fields.i2z = (ct_t * size)(*np.imag(field.Hz).ravel().tolist())
 
 def sfieldConv(field, c_field, size, ct_t):
-    c_currents.rx = (ct_t * size)(*np.real(field.x).ravel().tolist())
-    c_currents.ix = (ct_t * size)(*np.imag(field.x).ravel().tolist())
+    c_field.x = (ct_t * size)(*np.real(field.S).ravel().tolist())
+    c_field.y = (ct_t * size)(*np.imag(field.S).ravel().tolist())
 
 def extractorScalar(source, target, field, ct_t):
     """
@@ -79,9 +81,12 @@ def extractorScalar(source, target, field, ct_t):
 
     return xyzs, xyzt, area, rEs, iEs
 
-def arrC1ToObj(res, shape):
-    x1 = np.ctypeslib.as_array(res.x, shape=shape) + 1j * np.ctypeslib.as_array(res.y, shape=shape)
-    return x1
+def arrC1ToObj(res, shape, np_t):
+    obj = np.ctypeslib.as_array(res.x, shape=shape) + 1j * np.ctypeslib.as_array(res.y, shape=shape)
+
+    res = scalarfield(obj)
+
+    return res
 
 def c2BundleToObj(res, shape, obj_t, np_t):
     x1 = np.ctypeslib.as_array(res.r1x, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i1x, shape=shape).astype(np_t)
@@ -141,8 +146,8 @@ def c2rBundleToObj(res, shape, np_t):
     return out1, out2
 
 def allocate_arrC1(res, size, ct_t):
-    res.rx = (ct_t * size)()
-    res.ix = (ct_t * size)()
+    res.x = (ct_t * size)()
+    res.y = (ct_t * size)()
 
 def allocate_c2Bundle(res, size, ct_t):
     res.r1x = (ct_t * size)()
@@ -318,7 +323,16 @@ def allfill_GDict(res, gdict_py, ct_t):
     res.n = ct_t(gdict_py["n"])
     res.E0 = ct_t(gdict_py["E0"])
     res.z = ct_t(gdict_py["z"])
+
     res.pol = (ct_t * 3)(*gdict_py["pol"].tolist())
+
+def allfill_SGDict(res, sgdict_py, ct_t):
+    res.lam = ct_t(sgdict_py["lam"])
+    res.w0x = ct_t(sgdict_py["w0x"])
+    res.w0y = ct_t(sgdict_py["w0y"])
+    res.n = ct_t(sgdict_py["n"])
+    res.E0 = ct_t(sgdict_py["E0"])
+    res.z = ct_t(sgdict_py["z"])
 
 def creflToObj(res, shape, np_t):
 
@@ -342,8 +356,10 @@ def frameToObj(res, np_t, shape):
     dx = np.ctypeslib.as_array(res.dx, shape=shape).astype(np_t)
     dy = np.ctypeslib.as_array(res.dy, shape=shape).astype(np_t)
     dz = np.ctypeslib.as_array(res.dz, shape=shape).astype(np_t)
+    
+    out = frame(shape[0], x, y, z, dx, dy, dz)
 
-    return frame(shape[0], x, y, z, dx, dy, dz)
+    return out 
 
 class WaitSymbol(object):
     def __init__(self):

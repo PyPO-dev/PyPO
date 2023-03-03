@@ -24,6 +24,5 @@ var searchData=
   ['interfacecuda_2eh_21',['InterfaceCUDA.h',['../InterfaceCUDA_8h.html',1,'']]],
   ['interfacereflector_2ecpp_22',['InterfaceReflector.cpp',['../InterfaceReflector_8cpp.html',1,'']]],
   ['interfacereflector_2eh_23',['InterfaceReflector.h',['../InterfaceReflector_8h.html',1,'']]],
-  ['invmatvec4_24',['invmatVec4',['../classUtils.html#a35cba5ab0f77ff7a2d96ca9b72dbc5fd',1,'Utils::invmatVec4()'],['../KernelsRTf_8cu.html#a649d89f5441887504550b7ea70fa7dc8',1,'invmatVec4():&#160;KernelsRTf.cu']]],
-  ['ix_25',['ix',['../structarrC1.html#ac54f4431fa2581fa829ef3b0dd5cdd5e',1,'arrC1::ix()'],['../structarrC1f.html#a8d99e8702c040d5b06a1339fc541e7bd',1,'arrC1f::ix()']]]
+  ['invmatvec4_24',['invmatVec4',['../classUtils.html#a35cba5ab0f77ff7a2d96ca9b72dbc5fd',1,'Utils::invmatVec4()'],['../KernelsRTf_8cu.html#a649d89f5441887504550b7ea70fa7dc8',1,'invmatVec4():&#160;KernelsRTf.cu']]]
 ];

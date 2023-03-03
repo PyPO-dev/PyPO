@@ -58,6 +58,7 @@ public:
     // Snell's function
     void snell(const std::array<std::complex<T>, 3> &cvin, const std::array<T, 3> &normal, std::array<std::complex<T>, 3> &out);
     void snell(const std::array<T, 3> &vin, const std::array<T, 3> &normal, std::array<T, 3> &out);
+    void snell_t(const std::array<T, 3> &vin, const std::array<T, 3> &normal, T mu, std::array<T, 3> &out);
 
     // Dyadic products
     void dyad(const std::array<T, 3> &v1, const std::array<T, 3> &v2, std::array<std::array<T, 3>, 3> &out);
@@ -450,7 +451,7 @@ void Utils<T>::snell(const std::array<std::complex<T>, 3> &cvin, const std::arra
 }
 
 /**
- * Snell's law.
+ * Snell's law for reflection.
  *
  * Calculate reflected direction vector from incoming direction and normal vector.
  * 
@@ -470,6 +471,34 @@ void Utils<T>::snell(const std::array<T, 3> &vin, const std::array<T, 3> &normal
     s_mult(normal, factor, rhs);
 
     diff(vin, rhs, out);
+}
+
+/**
+ * Snell's law refraction.
+ *
+ * Calculate refracted direction vector from incoming direction and normal vector.
+ * 
+ * @param vin Array of 3 double/float, incoming direction vector.
+ * @param normal Array of 3 double/float, normal vector of surface.
+ * @param mu Ratio of n1 to n2.
+ * @param out Array of 3 double/float.
+ */
+template <typename T> inline
+void Utils<T>::snell_t(const std::array<T, 3> &vin, const std::array<T, 3> &normal, T mu, std::array<T, 3> &out)
+{
+    T in_dot_n, factor1;
+    std::array<T, 3> term1, term2, temp1, temp2;
+
+    dot(vin, normal, in_dot_n);
+    
+    factor1 = sqrt(1 - mu*mu * (1 - in_dot_n*in_dot_n));
+    s_mult(normal, factor1, term1);
+
+    s_mult(normal, in_dot_n, temp1);
+    diff(vin, temp1, temp2);
+    s_mult(temp2, mu, term2);
+
+    diff(term1, term2, out);
 }
 
 /**

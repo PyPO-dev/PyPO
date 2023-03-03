@@ -122,6 +122,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a7a84d81e066107eb2024c01e229a2020"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aed2261b8dbb2e2c4f016838bc2965297"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUtils.html#aed2261b8dbb2e2c4f016838bc2965297">snell</a> (const std::array&lt; T, 3 &gt; &amp;vin, const std::array&lt; T, 3 &gt; &amp;normal, std::array&lt; T, 3 &gt; &amp;out)</td></tr>
 <tr class="separator:aed2261b8dbb2e2c4f016838bc2965297"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a562852db4aee43e276d2ef796355aea3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUtils.html#a562852db4aee43e276d2ef796355aea3">snell_t</a> (const std::array&lt; T, 3 &gt; &amp;vin, const std::array&lt; T, 3 &gt; &amp;normal, T mu, std::array&lt; T, 3 &gt; &amp;out)</td></tr>
+<tr class="separator:a562852db4aee43e276d2ef796355aea3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1947abd98bcfe594b950d90db4f12e59"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUtils.html#a1947abd98bcfe594b950d90db4f12e59">dyad</a> (const std::array&lt; T, 3 &gt; &amp;v1, const std::array&lt; T, 3 &gt; &amp;v2, std::array&lt; std::array&lt; T, 3 &gt;, 3 &gt; &amp;out)</td></tr>
 <tr class="separator:a1947abd98bcfe594b950d90db4f12e59"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8c5357425dca3e1e7c06597c365cd655"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUtils.html#a8c5357425dca3e1e7c06597c365cd655">matDiff</a> (const std::array&lt; std::array&lt; T, 3 &gt;, 3 &gt; &amp;m1, const std::array&lt; std::array&lt; T, 3 &gt;, 3 &gt; &amp;m2, std::array&lt; std::array&lt; T, 3 &gt;, 3 &gt; &amp;out)</td></tr>
@@ -1627,12 +1629,73 @@ template&lt;typename T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Snell's law.</p>
+<p>Snell's law for reflection.</p>
 <p>Calculate reflected direction vector from incoming direction and normal vector.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">vin</td><td>Array of 3 double/float, incoming direction vector. </td></tr>
     <tr><td class="paramname">normal</td><td>Array of 3 double/float, normal vector of surface. </td></tr>
+    <tr><td class="paramname">out</td><td>Array of 3 double/float. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a562852db4aee43e276d2ef796355aea3" name="a562852db4aee43e276d2ef796355aea3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a562852db4aee43e276d2ef796355aea3">&#9670;&#160;</a></span>snell_t()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classUtils.html">Utils</a>&lt; T &gt;::snell_t </td>
+          <td>(</td>
+          <td class="paramtype">const std::array&lt; T, 3 &gt; &amp;&#160;</td>
+          <td class="paramname"><em>vin</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::array&lt; T, 3 &gt; &amp;&#160;</td>
+          <td class="paramname"><em>normal</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>mu</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::array&lt; T, 3 &gt; &amp;&#160;</td>
+          <td class="paramname"><em>out</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Snell's law refraction.</p>
+<p>Calculate refracted direction vector from incoming direction and normal vector.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">vin</td><td>Array of 3 double/float, incoming direction vector. </td></tr>
+    <tr><td class="paramname">normal</td><td>Array of 3 double/float, normal vector of surface. </td></tr>
+    <tr><td class="paramname">mu</td><td>Ratio of n1 to n2. </td></tr>
     <tr><td class="paramname">out</td><td>Array of 3 double/float. </td></tr>
   </table>
   </dd>

@@ -190,24 +190,31 @@ void RayTracer<T, U, V>::propagateRaysToP(int start, int stop,
 
             _t = t1;
         }
-        fr_out->x[i] = x + _t*dx;
-        fr_out->y[i] = y + _t*dy;
-        fr_out->z[i] = z + _t*dz;
-
-        norms = refls.np(fr_out->x[i], fr_out->y[i], fr_out->z[i], flip);
-        check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
-
-        fr_out->dx[i] = dx - 2*check*norms[0];
-        fr_out->dy[i] = dy - 2*check*norms[1];
-        fr_out->dz[i] = dz - 2*check*norms[2];
-
-        if((i * 100 / this->step) > jc && start == 0 * this->step)
+        
+        if ((abs(round(dx)) == 0 && abs(round(dy)) == 0 && abs(round(dz)) == 0) || std::isnan(_t)) 
         {
-            std::cout << jc << " / 100" << '\r';
-            std::cout.flush();
-            jc++;
+            fr_out->x[i] = x;
+            fr_out->y[i] = y;
+            fr_out->z[i] = z;
+        
+            fr_out->dx[i] = 0; // Set at 2: since beta should be normalized, can select on 2
+            fr_out->dy[i] = 0;
+            fr_out->dz[i] = 0;
         }
 
+        else
+        {
+            fr_out->x[i] = x + _t*dx;
+            fr_out->y[i] = y + _t*dy;
+            fr_out->z[i] = z + _t*dz;
+
+            norms = refls.np(fr_out->x[i], fr_out->y[i], fr_out->z[i], flip);
+            check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
+
+            fr_out->dx[i] = dx - 2*check*norms[0];
+            fr_out->dy[i] = dy - 2*check*norms[1];
+            fr_out->dz[i] = dz - 2*check*norms[2];
+        }
     }
 }
 
@@ -265,17 +272,31 @@ void RayTracer<T, U, V>::propagateRaysToH(int start, int stop,
 
             _t = t1;
         }
+        
+        if ((abs(round(dx)) == 0 && abs(round(dy)) == 0 && abs(round(dz)) == 0) || std::isnan(_t)) 
+        {
+            fr_out->x[i] = x;
+            fr_out->y[i] = y;
+            fr_out->z[i] = z;
+        
+            fr_out->dx[i] = 0; // Set at 2: since beta should be normalized, can select on 2
+            fr_out->dy[i] = 0;
+            fr_out->dz[i] = 0;
+        }
 
-        fr_out->x[i] = x + _t*dx;
-        fr_out->y[i] = y + _t*dy;
-        fr_out->z[i] = z + _t*dz;
+        else
+        {
+            fr_out->x[i] = x + _t*dx;
+            fr_out->y[i] = y + _t*dy;
+            fr_out->z[i] = z + _t*dz;
 
-        norms = refls.nh(fr_out->x[i], fr_out->y[i], fr_out->z[i], flip);
-        check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
+            norms = refls.nh(fr_out->x[i], fr_out->y[i], fr_out->z[i], flip);
+            check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
 
-        fr_out->dx[i] = dx - 2*check*norms[0];
-        fr_out->dy[i] = dy - 2*check*norms[1];
-        fr_out->dz[i] = dz - 2*check*norms[2];
+            fr_out->dx[i] = dx - 2*check*norms[0];
+            fr_out->dy[i] = dy - 2*check*norms[1];
+            fr_out->dz[i] = dz - 2*check*norms[2];
+        }
     }
 }
 
@@ -334,16 +355,30 @@ void RayTracer<T, U, V>::propagateRaysToE(int start, int stop,
             _t = t1;
         }
 
-        fr_out->x[i] = x + _t*dx;
-        fr_out->y[i] = y + _t*dy;
-        fr_out->z[i] = z + _t*dz;
+        if ((abs(round(dx)) == 0 && abs(round(dy)) == 0 && abs(round(dz)) == 0) || std::isnan(_t)) 
+        {
+            fr_out->x[i] = x;
+            fr_out->y[i] = y;
+            fr_out->z[i] = z;
+        
+            fr_out->dx[i] = 0; // Set at 2: since beta should be normalized, can select on 2
+            fr_out->dy[i] = 0;
+            fr_out->dz[i] = 0;
+        }
 
-        norms = refls.ne(fr_out->x[i], fr_out->y[i], fr_out->z[i], flip);
-        check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
+        else
+        {
+            fr_out->x[i] = x + _t*dx;
+            fr_out->y[i] = y + _t*dy;
+            fr_out->z[i] = z + _t*dz;
 
-        fr_out->dx[i] = dx - 2*check*norms[0];
-        fr_out->dy[i] = dy - 2*check*norms[1];
-        fr_out->dz[i] = dz - 2*check*norms[2];
+            norms = refls.ne(fr_out->x[i], fr_out->y[i], fr_out->z[i], flip);
+            check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
+
+            fr_out->dx[i] = dx - 2*check*norms[0];
+            fr_out->dy[i] = dy - 2*check*norms[1];
+            fr_out->dz[i] = dz - 2*check*norms[2];
+        }
     }
 }
 
@@ -401,16 +436,30 @@ void RayTracer<T, U, V>::propagateRaysToPl(int start, int stop,
             _t = t1;
         }
 
-        fr_out->x[i] = x + _t*dx;
-        fr_out->y[i] = y + _t*dy;
-        fr_out->z[i] = z + _t*dz;
+        if ((abs(round(dx)) == 0 && abs(round(dy)) == 0 && abs(round(dz)) == 0) || std::isnan(_t)) 
+        {
+            fr_out->x[i] = x;
+            fr_out->y[i] = y;
+            fr_out->z[i] = z;
+        
+            fr_out->dx[i] = 0; // Set at 2: since beta should be normalized, can select on 2
+            fr_out->dy[i] = 0;
+            fr_out->dz[i] = 0;
+        }
 
-        norms = refls.npl(fr_out->x[i], fr_out->y[i], fr_out->z[i], flip);
-        check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
+        else
+        {
+            fr_out->x[i] = x + _t*dx;
+            fr_out->y[i] = y + _t*dy;
+            fr_out->z[i] = z + _t*dz;
 
-        fr_out->dx[i] = dx - 2*check*norms[0];
-        fr_out->dy[i] = dy - 2*check*norms[1];
-        fr_out->dz[i] = dz - 2*check*norms[2];
+            norms = refls.npl(fr_out->x[i], fr_out->y[i], fr_out->z[i], flip);
+            check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
+
+            fr_out->dx[i] = dx - 2*check*norms[0];
+            fr_out->dy[i] = dy - 2*check*norms[1];
+            fr_out->dz[i] = dz - 2*check*norms[2];
+        }
     }
 }
 

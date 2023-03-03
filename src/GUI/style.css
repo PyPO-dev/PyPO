@@ -99,3 +99,10 @@ QPlainTextEdit{
     color: white;
     font-size: 24px;
 }
+
+FormGenerator{
+    padding: 26px;
+}
+/* .QScrollArea{
+    border: 0px;
+} */

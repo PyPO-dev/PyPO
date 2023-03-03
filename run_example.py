@@ -5,16 +5,21 @@ from examples.DRO_PSF_RT import ex_DRO_RT
 from examples.ASTE_PSF_PO import ex_ASTE_PO
 from examples.ASTE_PSF_RT import ex_ASTE_RT
 
+import inquirer
+
 def select_example():
-    example = input("""Welcome to the PyPO example interface!
-Please select an example to run.
+    print("Welcome to the PyPO example interface!\n")
+    options = [
+        inquirer.List(
+            "option",
+            message= "Please select an example to run",
+            choices=["DRO_PO-CPU", "DRO_PO-GPU", "DRO_RT-CPU", "DRO_RT-GPU", "ASTE_PO-CPU", "ASTE_PO-GPU", "ASTE_RT-CPU", "ASTE_RT-GPU"],
+            carousel=True
+            )
+        ]
 
-Possible options: DRO_PO-(CPU/GPU)
-                  DRO_RT-(CPU/GPU)
-                  ASTE_PO-(CPU/GPU)
-                  ASTE_RT-(CPU/GPU)
-
-> """)
+    example = inquirer.prompt(options)["option"]
+    print(example)
 
     if example == "0":
         example = "DRO_PO-CPU"

@@ -13,7 +13,7 @@ import src.PyPO.Colormaps as cmaps
 from src.PyPO.BindRefl import *
 def plotBeam2D(plotObject, field,
                 vmin, vmax, show, amp_only,
-                save, polar, interpolation,
+                save, interpolation,
                 aperDict, mode, project,
                 units, name, titleA, titleP, savePath, unwrap_phase):
 
@@ -64,14 +64,13 @@ def plotBeam2D(plotObject, field,
 
     comps = list(project)
 
-
     if not amp_only:
         fig, ax = pt.subplots(1,2, figsize=(10,5), gridspec_kw={'wspace':0.5})
 
         if mode == 'linear':
-            extent = [np.min(grid_x1), np.max(grid_x1), np.min(grid_x2), np.max(grid_x2)]
-            ampfig = ax[0].imshow(np.absolute(field), origin='lower', extent=extent, cmap=cmaps.parula, interpolation=interpolation)
-            phasefig = ax[1].imshow(np.angle(field), origin='lower', extent=extent, cmap=cmaps.parula)
+            ampfig = ax[0].pcolormesh(grid_x1 * units[1], grid_x2 * units[1], field,
+                                    vmin=vmin, vmax=vmax, cmap=cmaps.parula, shading='auto')
+            phasefig = ax[1].pcolormesh(grid_x1 * units[1], grid_x2 * units[1], phase, cmap=cmaps.parula, shading='auto')
 
         elif mode == 'dB':
             if unwrap_phase:
@@ -79,7 +78,7 @@ def plotBeam2D(plotObject, field,
 
             else:
                 phase = np.angle(field)
-
+            
             ampfig = ax[0].pcolormesh(grid_x1 * units[1], grid_x2 * units[1], 20 * np.log10(np.absolute(field) / max_field),
                                     vmin=vmin, vmax=vmax, cmap=cmaps.parula, shading='auto')
             phasefig = ax[1].pcolormesh(grid_x1 * units[1], grid_x2 * units[1], phase, cmap=cmaps.parula, shading='auto')
@@ -113,20 +112,6 @@ def plotBeam2D(plotObject, field,
         ax[1].set_aspect(1)
 
 
-
-        if aperDict["plot"]:
-            xc = aperDict["center"][0]
-            yc = aperDict["center"][1]
-            Ro = aperDict["outer"] * 2
-            Ri = aperDict["inner"] * 2
-
-            circleo=mpl.patches.Ellipse((xc,yc),Ro[0], Ro[1], color='black', fill=False)
-            circlei=mpl.patches.Ellipse((xc,yc),Ri[0], Ri[1], color='black', fill=False)
-
-            ax[0].add_patch(circleo)
-            #ax[0].add_patch(circlei)
-            ax[0].scatter(xc, yc, color='black', marker='x')
-
     else:
         fig, ax = pt.subplots(1,1, figsize=(5,5))
 
@@ -143,27 +128,34 @@ def plotBeam2D(plotObject, field,
                                     vmin=vmin, vmax=vmax, cmap=cmaps.parula, shading='auto')
 
         if ff_flag:
-            ax.set_ylabel(r"El / [{}]".format(units[0]))
-            ax.set_xlabel(r"Az / [{}]".format(units[0]))
+            ax.set_ylabel(r"dEl / {}".format(units[0]))
+            ax.set_xlabel(r"dAz / {}".format(units[0]))
 
         else:
-            ax.set_ylabel(r"$y$ / [{}]".format(units[0]))
-            ax.set_xlabel(r"$x$ / [{}]".format(units[0]))
+            ax.set_ylabel(r"${}$ / {}".format(comps[1], units[0]))
+            ax.set_xlabel(r"${}$ / {}".format(comps[0], units[0]))
 
         ax.set_title(titleA, y=1.08)
         ax.set_box_aspect(1)
 
         c = fig.colorbar(ampfig, cax=cax, orientation='vertical')
+    
+    if aperDict["plot"]:
+        xc = aperDict["center"][0]
+        yc = aperDict["center"][1]
+        Ro = aperDict["outer"]
+        Ri = aperDict["inner"]
 
-        if aperDict["plot"]:
-            xc = aperDict["center"][0]
-            yc = aperDict["center"][1]
-            Ro = aperDict["r_out"]
-            Ri = aperDict["r_in"]
+        circleo=mpl.patches.Ellipse((xc,yc),Ro[0], Ro[1], color='black', fill=False)
+        circlei=mpl.patches.Ellipse((xc,yc),Ri[0], Ri[1], color='black', fill=False)
 
-            circleo=mpl.patches.Circle((xc,yc),Ro, color='black', fill=False)
-            circlei=mpl.patches.Circle((xc,yc),Ri, color='black', fill=False)
-
+        try:
+            for axx in ax:
+                axx.add_patch(circleo)
+                axx.add_patch(circlei)
+                axx.scatter(xc, yc, color='black', marker='x')
+        
+        except:
             ax.add_patch(circleo)
             ax.add_patch(circlei)
             ax.scatter(xc, yc, color='black', marker='x')
@@ -308,33 +300,35 @@ def beamCut(self, plotObject, field, cross='', units='', vmin=-50, vmax=0, frac=
 def plotRTframe(frame, project, savePath, returns, aspect):
     fig, ax = pt.subplots(1,1, figsize=(5,5))
 
+    idx_good = np.argwhere((frame.dx**2 + frame.dy**2 + frame.dz**2) > 0.8)
+
     if project == "xy":
-        ax.scatter(frame.x, frame.y, color="black")
+        ax.scatter(frame.x[idx_good], frame.y[idx_good], color="black", s=10)
         ax.set_xlabel(r"$x$ / mm")
         ax.set_ylabel(r"$y$ / mm")
 
     elif project == "xz":
-        ax.scatter(frame.x, frame.z, color="black")
+        ax.scatter(frame.x[idx_good], frame.z[idx_good], color="black", s=10)
         ax.set_xlabel(r"$x$ / mm")
         ax.set_ylabel(r"$z$ / mm")
     
     elif project == "yz":
-        ax.scatter(frame.y, frame.z, color="black")
+        ax.scatter(frame.y[idx_good], frame.z[idx_good], color="black", s=10)
         ax.set_xlabel(r"$y$ / mm")
         ax.set_ylabel(r"$z$ / mm")
     
     elif project == "yx":
-        ax.scatter(frame.y, frame.x, color="black")
+        ax.scatter(frame.y[idx_good], frame.x[idx_good], color="black", s=10)
         ax.set_xlabel(r"$y$ / mm")
         ax.set_ylabel(r"$x$ / mm")
 
     elif project == "zy":
-        ax.scatter(frame.z, frame.y, color="black")
+        ax.scatter(frame.z[idx_good], frame.y[idx_good], color="black", s=10)
         ax.set_xlabel(r"$z$ / mm")
         ax.set_ylabel(r"$y$ / mm")
     
     elif project == "zx":
-        ax.scatter(frame.z, frame.x, color="black")
+        ax.scatter(frame.z[idx_good], frame.x[idx_good], color="black", s=10)
         ax.set_xlabel(r"$z$ / mm")
         ax.set_ylabel(r"$x$ / mm")
 

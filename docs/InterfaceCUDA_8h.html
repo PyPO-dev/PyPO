@@ -122,6 +122,8 @@ Functions</h2></td></tr>
 <tr class="separator:a07ab0b2854c12a2c1de63e828ca7e59a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa0f2b77b579f659939a1636073e5d30c"><td class="memItemLeft" align="right" valign="top">PYPO_DLL void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="InterfaceCUDA_8h.html#aa0f2b77b579f659939a1636073e5d30c">callKernelf_FF</a> (<a class="el" href="structc2Bundlef.html">c2Bundlef</a> *res, <a class="el" href="structreflparamsf.html">reflparamsf</a> source, <a class="el" href="structreflparamsf.html">reflparamsf</a> target, <a class="el" href="structreflcontainerf.html">reflcontainerf</a> *cs, <a class="el" href="structreflcontainerf.html">reflcontainerf</a> *ct, <a class="el" href="structc2Bundlef.html">c2Bundlef</a> *currents, float k, float epsilon, float t_direction, int nBlocks, int nThreads)</td></tr>
 <tr class="separator:aa0f2b77b579f659939a1636073e5d30c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7563acdb1e3f2a9cfe6ecbe62a4ebbba"><td class="memItemLeft" align="right" valign="top">PYPO_DLL void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="InterfaceCUDA_8h.html#a7563acdb1e3f2a9cfe6ecbe62a4ebbba">callKernelf_scalar</a> (<a class="el" href="structarrC1f.html">arrC1f</a> *res, <a class="el" href="structreflparamsf.html">reflparamsf</a> source, <a class="el" href="structreflparamsf.html">reflparamsf</a> target, <a class="el" href="structreflcontainerf.html">reflcontainerf</a> *cs, <a class="el" href="structreflcontainerf.html">reflcontainerf</a> *ct, <a class="el" href="structarrC1f.html">arrC1f</a> *inp, float k, float epsilon, float t_direction, int nBlocks, int nThreads)</td></tr>
+<tr class="separator:a7563acdb1e3f2a9cfe6ecbe62a4ebbba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afd99cd13f9977d3429332c22dc81cf28"><td class="memItemLeft" align="right" valign="top">PYPO_DLL void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="InterfaceCUDA_8h.html#afd99cd13f9977d3429332c22dc81cf28">callRTKernel</a> (<a class="el" href="structreflparamsf.html">reflparamsf</a> ctp, <a class="el" href="structcframef.html">cframef</a> *fr_in, <a class="el" href="structcframef.html">cframef</a> *fr_out, float epsilon, float t0, int nBlocks, int nThreads)</td></tr>
 <tr class="separator:afd99cd13f9977d3429332c22dc81cf28"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -651,6 +653,111 @@ Functions</h2></td></tr>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="structc4Bundlef.html">c4Bundlef</a> </dd>
 <dd>
 <a class="el" href="structc2Bundlef.html">c2Bundlef</a> </dd>
+<dd>
+<a class="el" href="structreflparamsf.html">reflparamsf</a> </dd>
+<dd>
+<a class="el" href="structreflcontainerf.html">reflcontainerf</a> </dd></dl>
+
+</div>
+</div>
+<a id="a7563acdb1e3f2a9cfe6ecbe62a4ebbba" name="a7563acdb1e3f2a9cfe6ecbe62a4ebbba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7563acdb1e3f2a9cfe6ecbe62a4ebbba">&#9670;&#160;</a></span>callKernelf_scalar()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">PYPO_DLL void callKernelf_scalar </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structarrC1f.html">arrC1f</a> *&#160;</td>
+          <td class="paramname"><em>res</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structreflparamsf.html">reflparamsf</a>&#160;</td>
+          <td class="paramname"><em>source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structreflparamsf.html">reflparamsf</a>&#160;</td>
+          <td class="paramname"><em>target</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structreflcontainerf.html">reflcontainerf</a> *&#160;</td>
+          <td class="paramname"><em>cs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structreflcontainerf.html">reflcontainerf</a> *&#160;</td>
+          <td class="paramname"><em>ct</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structarrC1f.html">arrC1f</a> *&#160;</td>
+          <td class="paramname"><em>inp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>k</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>epsilon</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>t_direction</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nBlocks</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nThreads</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Call scalar kernel.</p>
+<p>Calculate scalar field on a target surface using CUDA.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">res</td><td>Pointer to <a class="el" href="structarrC1f.html">arrC1f</a> object. </td></tr>
+    <tr><td class="paramname">source</td><td>reflparamsf object containing source surface parameters. </td></tr>
+    <tr><td class="paramname">target</td><td>reflparamsf object containing target surface parameters. </td></tr>
+    <tr><td class="paramname">cs</td><td>Pointer to reflcontainerf object containing source grids. </td></tr>
+    <tr><td class="paramname">ct</td><td>Pointer to reflcontainerf object containing target grids. </td></tr>
+    <tr><td class="paramname">inp</td><td>Pointer to <a class="el" href="structarrC1f.html">arrC1f</a> object containing source field. </td></tr>
+    <tr><td class="paramname">k</td><td>Wavenumber of radiation in 1 /mm. </td></tr>
+    <tr><td class="paramname">epsilon</td><td>Relative permittivity of source surface. </td></tr>
+    <tr><td class="paramname">t_direction</td><td>Time direction (experimental!). </td></tr>
+    <tr><td class="paramname">nBlocks</td><td>Number of blocks in GPU grid. </td></tr>
+    <tr><td class="paramname">nThreads</td><td>Number of threads in a block.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="structarrC1f.html">arrC1f</a> </dd>
 <dd>
 <a class="el" href="structreflparamsf.html">reflparamsf</a> </dd>
 <dd>

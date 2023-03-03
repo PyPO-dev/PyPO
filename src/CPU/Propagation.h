@@ -699,8 +699,6 @@ void Propagation<T, U, V, W>::propagateScalarBeam(int start, int stop,
     std::array<T, 3> point_target;
     std::complex<T> ets;
 
-    int jc = 0;
-
     for(int i=start; i<stop; i++)
     {
         point_target[0] = ct->x[i];
@@ -709,8 +707,8 @@ void Propagation<T, U, V, W>::propagateScalarBeam(int start, int stop,
 
         ets = fieldScalarAtPoint(cs, field, point_target);
 
-        res->rx[i] = ets.real();
-        res->ix[i] = ets.imag();
+        res->x[i] = ets.real();
+        res->y[i] = ets.imag();
     }
 }
 
@@ -853,12 +851,12 @@ std::complex<T> Propagation<T, U, V, W>::fieldScalarAtPoint(V *cs,
         source_point[1] = cs->y[i];
         source_point[2] = cs->z[i];
 
-        _field = {field->rx[i], field->ix[i]};
+        _field = {field->x[i], field->y[i]};
 
         ut.diff(point_target, source_point, r_vec);
         ut.abs(r_vec, r);
 
-        out += - k * k * _field * exp(-j * k * r) / (4 * M_PIf * r) * cs->area[i];
+        out += - k * k * _field * exp(this->t_direction * j * k * r) / (4 * M_PIf * r) * cs->area[i];
 
     }
     return out;

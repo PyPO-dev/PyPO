@@ -19,7 +19,6 @@ def ex_DRO_PO(device):
             "name"      : "p1",
             "pmode"     : "focus",
             "gmode"     : "uv",
-            "flip"      : False,
             "vertex"    : np.zeros(3),
             "focus_1"   : np.array([0,0,12e3]),
             "lims_u"    : np.array([200,12.5e3]),
@@ -68,20 +67,12 @@ def ex_DRO_PO(device):
     s.translateGrids("plane1", translation)
     #s.rotateGrids(["p1", "plane1"], np.array([1, 0, 0]))
 
-    if device == "GPU":
-        nThreads = 256
-
-    else:
-        nThreads = 11
 
     plane1_to_p1 = {
-            "s_name"    : "plane1",
             "t_name"    : "p1",
             "s_current" : "ps1",
             "name_JM"   : "JM",
             "epsilon"   : 10,
-            "exp"       : "fwd",
-            "nThreads"  : nThreads,
             "device"    : device,
             "mode"      : "JM"
             }
@@ -89,13 +80,10 @@ def ex_DRO_PO(device):
     s.runPO(plane1_to_p1)
 
     p1_to_planeff = {
-            "s_name"    : "p1",
             "t_name"    : "planeff",
             "name_EH"   : "ff",
             "s_current" : "JM",
             "epsilon"   : 10,
-            "exp"       : "fwd",
-            "nThreads"  : nThreads,
             "device"    : device,
             "mode"      : "FF"
             }

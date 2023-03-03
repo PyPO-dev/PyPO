@@ -29,7 +29,7 @@ def calcRTtilt(frame):
     t_y = np.sum(frame.dy[idx_good]) / len(frame.dy[idx_good])
     t_z = np.sum(frame.dz[idx_good]) / len(frame.dz[idx_good])
     
-    return np.array([t_x, t_y, t_z])
+    return np.array([t_x, t_y, t_z]) / np.linalg.norm(np.array([t_x, t_y, t_z]))
 
 def calcRMS(frame):
     idx_good = np.argwhere((frame.dx**2 + frame.dy**2 + frame.dz**2) > 0.8)
@@ -73,6 +73,14 @@ def calcXpol(Cofield, Xfield):
     eff_Xpol = 1 - np.sum(np.absolute(Xfield)**2) / (np.sum(np.absolute(Cofield)**2)+np.sum(np.absolute(Xfield)**2))
 
     return eff_Xpol
+
+def calcMainBeam(field, surfaceObject, fitGauss):
+    field_norm = field / np.max(np.absolute(field))
+    fitGauss_norm = fitGauss / np.max(np.absolute(fitGauss))
+    
+    eff_mb = np.sum(np.absolute(fitGauss_norm)**2) / np.sum(np.absolute(field_norm)**2)
+    
+    return eff_mb
 
 def calcDirectivity(eta_t, surfaceObject, k):
     grids = generateGrid(surfaceObject, transform=False, spheric=True)

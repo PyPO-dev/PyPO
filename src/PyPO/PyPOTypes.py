@@ -104,6 +104,25 @@ class rfield(object):
         self.z = Prz
 
 ##
+# Structure for storing scalar fields and associated metadata.
+class scalarfield(object):
+    ##
+    # Constructor for scalar field.
+    #
+    # @param S Scalar field.
+    def __init__(self, S):
+        self.S = S
+
+    ##
+    # Set scalar field metadata.
+    #
+    # @param surf Name of surface on which scalar field is defined.
+    # @param k Wavenumber in 1 / mm of scalar field.
+    def setMeta(self, surf, k):
+        self.surf = surf 
+        self.k = k
+
+##
 # Structure for storing reflector grids, area and normals
 class reflGrids(object):
     def __init__(self, x, y, z, nx, ny, nz, area):

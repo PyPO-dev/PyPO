@@ -8,6 +8,7 @@ from src.PyPO.BindUtils import *
 from src.PyPO.Structs import *
 from src.PyPO.PyPOTypes import *
 import src.PyPO.Config as Config
+import src.PyPO.Threadmgr as TManager
 
 import threading
 #############################################################################
@@ -36,6 +37,9 @@ def loadBeamlib():
     lib.makeGauss.argtypes = [GDict, reflparams, ctypes.POINTER(c2Bundle), ctypes.POINTER(c2Bundle)]
     lib.makeGauss.restype = None
 
+    lib.makeScalarGauss.argtypes = [ScalarGDict, reflparams, ctypes.POINTER(arrC1)]
+    lib.makeScalarGauss.restype = None
+    
     lib.calcCurrents.argtypes = [ctypes.POINTER(c2Bundle), ctypes.POINTER(c2Bundle),
                                 reflparams, ctypes.c_int]
     lib.calcCurrents.restype = None
@@ -64,6 +68,7 @@ def makeRTframe(rdict_py):
 
 def makeGRTframe(grdict_py):
     lib, ws = loadBeamlib()
+    mgr = TManager.Manager(Config.context)
 
     nTot = grdict_py["nRays"]
 
@@ -74,16 +79,7 @@ def makeGRTframe(grdict_py):
     allfill_GRTDict(c_grdict, grdict_py, ctypes.c_double)
     
     args = [c_grdict, ctypes.byref(res)]
-    start_time = time.time()
-    t = threading.Thread(target=lib.makeGRTframe, args=args)
-    t.daemon = True
-    t.start()
-    while t.is_alive(): # wait for the thread to exit
-        Config.print(f'Sampling {nTot} Gaussian beam rays {ws.getSymbol()}', end='\r')
-        t.join(.1)
-    dtime = time.time() - start_time
-    Config.print(f'Sampled {nTot} Gaussian beam rays in {dtime:.3f} seconds', end='\r')
-    Config.print(f'\n')
+    mgr.new_sthread(target=lib.makeGRTframe, args=args)
     
     shape = (nTot,)
     out = frameToObj(res, np_t=np.float64, shape=shape)
@@ -113,6 +109,26 @@ def makeGauss(gdict_py, source):
     out_current = c2BundleToObj(res_current, shape=source_shape, obj_t='currents', np_t=np.float64)
 
     return out_field, out_current
+
+def makeScalarGauss(gdict_py, source):
+    lib, ws = loadBeamlib()
+
+    source_shape = (source["gridsize"][0], source["gridsize"][1])
+    source_size = source["gridsize"][0] * source["gridsize"][1]
+
+    c_gdict = ScalarGDict()
+    c_source = reflparams()
+
+    allfill_SGDict(c_gdict, gdict_py, ctypes.c_double)
+    allfill_reflparams(c_source, source, ctypes.c_double)
+    
+    res_field = arrC1()
+    allocate_arrC1(res_field, source_size, ctypes.c_double)
+    lib.makeScalarGauss(c_gdict, c_source, ctypes.byref(res_field))
+    
+    out_field = arrC1ToObj(res_field, shape=source_shape, np_t=np.float64)
+
+    return out_field
 
 def calcCurrents(fields, source, mode):
     lib, ws = loadBeamlib()

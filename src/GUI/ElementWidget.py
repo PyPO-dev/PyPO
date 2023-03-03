@@ -20,10 +20,10 @@ class SymDialog(QDialog):
         super().__init__()
 
         layout = QGridLayout()
-        abortBtn = QPushButton(self.msg)
-        abortBtn.clicked.connect(self.accept)
-        layout.addWidget(QLabel(""), 0,0,1,2)
-        layout.addWidget(abortBtn, 1,1)
+        abortBtn = QPushButton("Abort")
+        abortBtn.clicked.connect(self.reject)
+        layout.addWidget(QLabel(self.msg), 0,0)
+        layout.addWidget(abortBtn, 1,0)
         self.setLayout(layout)
 
     def setThread(self, thread):
@@ -32,6 +32,7 @@ class SymDialog(QDialog):
     def killThread(self):
         self.thread.exit()
         self.reject()
+
 class RemoveElementDialog(QDialog):
     def __init__(self, elementName):
         super().__init__()
@@ -137,6 +138,9 @@ class CurrentWidget(ElementWidget):
    def __init__ (self, name, removeAction, plotAction, p=None ):
         super().__init__(name, plotAction, removeAction, p=p)
         
+class SFieldsWidget(ElementWidget):
+    def __init__ (self, name, removeAction, plotAction, p=None ):
+        super().__init__(name, plotAction, removeAction, p=p)
 
 if __name__ == "__main__":
     app = QApplication([])

@@ -55,8 +55,7 @@ PlotAper = {
         "r_in"      : 0
         }
 
-PODict = {
-        "s_name"    : "Name of source surface (string)",
+runPODict = {
         "t_name"    : "Name of target surface (string)",
         "s_current" : "Name of current object in system.currents (string)",
         "s_field"   : "Scalar complex field for scalar propagation only (Numpy array)",
@@ -64,5 +63,17 @@ PODict = {
         "exp"       : "Divergent or convergent beam (string)",
         "nThreads"  : "Number of CPU/GPU threads (int)",
         "device"    : "Device to use for calculation",
-        "mode"      : "Determine return object (string)",
+        "mode"      : "Determine return object (string)"
+        }
+
+runRTDict = {
+        "fr_in"     : "Name of input frame",
+        "fr_out"    : "Name of output frame",
+        "t_name"    : "Name of target surface",
+        "tol"       : "Tolerance of ray-tracer",
+        "nThreads"  : "Number of CPU/GPU threads (int)",
+        "t0"        : "Initial guess for propagation",
+        "device"    : "Device to use for calculation",
+        "nexus"     : "Reflect or transmit the field at surface"
+        "epsilon"   : "Relative permittivity of nexus medium",
         }

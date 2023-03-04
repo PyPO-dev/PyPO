@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['fields_0',['fields',['../classPyPO_1_1PyPOTypes_1_1fields.html',1,'PyPO::PyPOTypes']]],
-  ['frame_1',['frame',['../classPyPO_1_1PyPOTypes_1_1frame.html',1,'PyPO::PyPOTypes']]]
+  ['elementwidget_0',['ElementWidget',['../classGUI_1_1ElementWidget_1_1ElementWidget.html',1,'GUI::ElementWidget']]],
+  ['elemnameerror_1',['ElemNameError',['../classPyPO_1_1Checks_1_1ElemNameError.html',1,'PyPO::Checks']]]
 ];

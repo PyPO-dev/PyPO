@@ -30,6 +30,7 @@ def BuildPyPO():
     cmakec  = sys.argv.count("--clean") or sys.argv.count("-c")
     docs    = sys.argv.count("--docs") or sys.argv.count("-d")
     docsv   = sys.argv.count("--docs-v") or sys.argv.count("-dv")
+    tests   = sys.argv.count("--test") or sys.argv.count("-t")
 
     if prereq:
         clog.info("Installing PyPO prerequisites...")
@@ -130,6 +131,18 @@ def BuildPyPO():
         except:
             clog.error("Failed to generate documentation. Is doxygen installed?")
         return 0
+    
+    if tests:
+        try:
+            clog.info("Running PyPO unittests...")
+            dir_tests = os.path.join(os.getcwd(), "tests")
+
+            os.system(f"nosetests --exe")
+
+        except:
+            clog.error("Failed to test PyPO.")
+        
+        return 0
 
     if helpf:
         print("PyPO build interface list of options:")
@@ -140,6 +153,7 @@ def BuildPyPO():
         print("'--make',    '-m'            : build PyPO libraries.")
         print("'--docs',    '-d'            : generate PyPO documentation. Needs doxygen!")
         print("'--docs-v',  '-dv'           : generate PyPO documentation with verbose settings. Needs doxygen!")
+        print("'--test',    '-t'            : run the unittests.")
         return 0
  
 if __name__ == "__main__":

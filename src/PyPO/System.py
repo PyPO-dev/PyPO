@@ -516,35 +516,37 @@ class System(object):
     # @param mode Apply translation relative ('relative') to current position, or move to specified position ('absolute').
     def translateGrids(self, name, translation, obj="element", mode="relative"):
 
+        _translation = self.copyObj(translation)
+        
         if obj == "element":
             if mode == "absolute":
-                translation -= self.system[name]["pos"]
-
+                _translation -= self.system[name]["pos"]# - translation
+            
             check_elemSystem(name, self.system, extern=True)
-            self.system[name]["transf"] = MatTranslate(translation, self.system[name]["transf"])
-            self.system[name]["pos"] += translation
+            self.system[name]["transf"] = MatTranslate(_translation, self.system[name]["transf"])
+            self.system[name]["pos"] += _translation
             
             if mode == "absolute":
-                self.clog.info(f"Translated element {name} to {*['{:0.3e}'.format(x) for x in list(translation)],} millimeters.")
+                self.clog.info(f"Translated element {name} to {*['{:0.3e}'.format(x) for x in list(_translation)],} millimeters.")
             else:
-                self.clog.info(f"Translated element {name} by {*['{:0.3e}'.format(x) for x in list(translation)],} millimeters.")
+                self.clog.info(f"Translated element {name} by {*['{:0.3e}'.format(x) for x in list(_translation)],} millimeters.")
         
         elif obj == "group":
             if mode == "absolute":
-                translation -= self.groups[name]["pos"]
+                _translation -= self.groups[name]["pos"]# - translation
             
             check_groupSystem(name, self.groups, extern=True)
             for elem in self.groups[name]["elements"]:
-                self.system[name]["transf"] = MatTranslate(translation, self.system[name]["transf"])
-                self.system[name]["pos"] += translation
+                self.system[name]["transf"] = MatTranslate(_translation, self.system[name]["transf"])
+                self.system[name]["pos"] += _translation
             
-            self.groups[name]["pos"] += translation
+            self.groups[name]["pos"] += _translation
             
             if mode == "absolute":
-                self.clog.info(f"Translated group {name} to {*['{:0.3e}'.format(x) for x in list(translation)],} millimeters.")
+                self.clog.info(f"Translated group {name} to {*['{:0.3e}'.format(x) for x in list(_translation)],} millimeters.")
             
             else:
-                self.clog.info(f"Translated group {name} by {*['{:0.3e}'.format(x) for x in list(translation)],} millimeters.")
+                self.clog.info(f"Translated group {name} by {*['{:0.3e}'.format(x) for x in list(_translation)],} millimeters.")
 
     ##
     # Home a reflector or a group back into default configuration.
@@ -553,7 +555,7 @@ class System(object):
     #
     # @param name Reflector name or list of reflector names to be homed.
     def homeReflector(self, name, obj="element", trans=True, rot=True):
-        if obj == "group" 
+        if obj == "group":
             check_groupSystem(name, self.groups, extern=True)
             if trans:
                 for elem in self.groups[name]:
@@ -576,7 +578,7 @@ class System(object):
 
                     
         else:
-            check_elemSystem(name, self.groups, extern=True)
+            check_elemSystem(name, self.system, extern=True)
             if trans:
                 _transf = np.eye(4)
                 _transf[:-1, :-1] = self.system[name]["transf"][:-1, :-1]

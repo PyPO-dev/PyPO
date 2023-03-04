@@ -52,7 +52,8 @@ def MatRotate(theta, matAppend=None, pivot=None, radians=False):
 
     return matOut @ matAppend
 
-def MatTranslate(trans, matAppend):
+def MatTranslate(trans, matAppend=None):
+    matAppend = np.eye(4) if matAppend is None else matAppend
     xt, yt, zt = trans
     trans = np.array([[1, 0, 0, xt],
                     [0, 1, 0, yt],

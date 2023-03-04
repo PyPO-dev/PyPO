@@ -107,6 +107,9 @@ Functions</h2></td></tr>
 <tr class="memitem:aebee209858ba31b61058c5691e9a7cba"><td class="memTemplParams" colspan="2">template&lt;typename T , typename U , typename V , typename W , typename G &gt; </td></tr>
 <tr class="memitem:aebee209858ba31b61058c5691e9a7cba"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="BeamInit_8h.html#aebee209858ba31b61058c5691e9a7cba">initGauss</a> (T gdict, U refldict, V *res_field, V *res_current)</td></tr>
 <tr class="separator:aebee209858ba31b61058c5691e9a7cba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49b77bfbe46f02936242f02e9e6a3a9f"><td class="memTemplParams" colspan="2">template&lt;typename T , typename U , typename V , typename W , typename G &gt; </td></tr>
+<tr class="memitem:a49b77bfbe46f02936242f02e9e6a3a9f"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="BeamInit_8h.html#a49b77bfbe46f02936242f02e9e6a3a9f">initScalarGauss</a> (T sgdict, U refldict, V *res_field)</td></tr>
+<tr class="separator:a49b77bfbe46f02936242f02e9e6a3a9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aafe19b6a388a2d2ea2c69943a1a7c00b"><td class="memTemplParams" colspan="2">template&lt;typename T , typename U , typename V , typename W &gt; </td></tr>
 <tr class="memitem:aafe19b6a388a2d2ea2c69943a1a7c00b"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="BeamInit_8h.html#aafe19b6a388a2d2ea2c69943a1a7c00b">calcJM</a> (T *res_field, T *res_current, V refldict, int mode)</td></tr>
 <tr class="separator:aafe19b6a388a2d2ea2c69943a1a7c00b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -328,6 +331,63 @@ template&lt;typename T , typename U , typename V &gt; </div>
 <a class="el" href="structcframe.html">cframe</a> </dd>
 <dd>
 <a class="el" href="structcframef.html">cframef</a> </dd></dl>
+
+</div>
+</div>
+<a id="a49b77bfbe46f02936242f02e9e6a3a9f" name="a49b77bfbe46f02936242f02e9e6a3a9f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a49b77bfbe46f02936242f02e9e6a3a9f">&#9670;&#160;</a></span>initScalarGauss()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T , typename U , typename V , typename W , typename G &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void initScalarGauss </td>
+          <td>(</td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>sgdict</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">U&#160;</td>
+          <td class="paramname"><em>refldict</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">V *&#160;</td>
+          <td class="paramname"><em>res_field</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Initialize scalar Gaussian beam from <a class="el" href="structGDict.html">GDict</a> or <a class="el" href="structGDictf.html">GDictf</a>.</p>
+<p>Takes a <a class="el" href="structScalarGDict.html">ScalarGDict</a> or ScalarGDictf and generates an <a class="el" href="structarrC1.html">arrC1</a> or <a class="el" href="structarrC1f.html">arrC1f</a> object.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">gdict</td><td><a class="el" href="structScalarGDict.html">ScalarGDict</a> or ScalarGDictf object from which to generate a Gaussian beam. </td></tr>
+    <tr><td class="paramname">refldict</td><td>reflparams or reflparamsf object corresponding to surface on which to generate the Gaussian beam. </td></tr>
+    <tr><td class="paramname">res_field</td><td>Pointer to <a class="el" href="structarrC1.html">arrC1</a> or <a class="el" href="structarrC1f.html">arrC1f</a> object.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="structScalarGDict.html">ScalarGDict</a> </dd>
+<dd>
+ScalarGDictf </dd>
+<dd>
+<a class="el" href="structreflparams.html">reflparams</a> </dd>
+<dd>
+<a class="el" href="structreflparamsf.html">reflparamsf</a> </dd>
+<dd>
+<a class="el" href="structarrC1.html">arrC1</a> </dd>
+<dd>
+<a class="el" href="structarrC1f.html">arrC1f</a> </dd></dl>
 
 </div>
 </div>

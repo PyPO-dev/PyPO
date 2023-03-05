@@ -37,7 +37,7 @@ import src.PyPO.Threadmgr as TManager
 #
 class MainWidget(QWidget):
     ##
-    # Constructot. Configures the layout and initialises the underlying system
+    # Constructot. Configures the layout and initializes the underlying system
     # @see System
     # 
     # 
@@ -402,36 +402,40 @@ class MainWidget(QWidget):
         self.setForm(fDataObj.initTubeFrameInp(), readAction=self.addTubeFrameAction)
     
     ##
-    # Shows gaussian frame form
+    # Shows form to initialize gaussian frame 
     def setInitGaussianFrameForm(self):
         self.setForm(fDataObj.initGaussianFrameInp(), readAction=self.addGaussianFrameAction)
     
     ##
-    # Shows gaussian TODO: gaussian beam? form 
+    # Shows form to initialize gaussian beam 
     def setInitGaussianForm(self):
         self.setForm(fDataObj.initGaussianInp(self.stm.system), readAction=self.addGaussianAction)
     
     ##
-    # Shows gaussian TODO: gaussian s? form 
+    # Shows form to initialize scalar gaussian beam TODO: klopt dit 
     def setInitSGaussianForm(self):
         self.setForm(fDataObj.initSGaussianInp(self.stm.system), readAction=self.addSGaussianAction)
     
     ##
-    # TODO:doc
+    # Shows form to initialize a physical optics propagation
     def setInitPSForm(self):
         self.setForm(fDataObj.initPSInp(self.stm.system), readAction=self.addPSAction)
     
     ##
-    # TODO:doc
+    # Shows form to initialize a scalar point source beam
     def setInitSPSForm(self):
         self.setForm(fDataObj.initSPSInp(self.stm.system), readAction=self.addSPSAction)
     
+    ##
+    # Reads form and adds a tube frame to system
     def addTubeFrameAction(self):
         RTDict = self.ParameterWid.read()
         self.stm.createTubeFrame(RTDict)
         self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(RTDict["name"],
                            self.stm.removeFrame,  self.setPlotFrameFormOpt, self.calcRMSfromFrame))    
     
+    ##
+    # Reads form and adds a gaussian frame to system
     def addGaussianFrameAction(self):
         GRTDict = self.ParameterWid.read()
 
@@ -442,46 +446,74 @@ class MainWidget(QWidget):
         self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(GRTDict["name"],
                              self.stm.removeFrame,self.setPlotFrameFormOpt, self.calcRMSfromFrame))    
     
+    ##
+    # Reads form and adds a vectorial gaussian beam to system
     def addGaussianAction(self):
         GDict = self.ParameterWid.read()
         self.stm.createGaussian(GDict, GDict["surface"])
         self.ElementsColumn.POFields.addWidget(FieldsWidget(GDict["name"], self.stm.removeField, self.setPlotFieldFormOpt))
         self.ElementsColumn.POCurrents.addWidget(CurrentWidget(GDict["name"], self.stm.removeCurrent, self.setPlotCurrentFormOpt))
     
+    ##
+    # Reads form and adds a scalar gaussian beam to system
     def addSGaussianAction(self):
         GDict = self.ParameterWid.read()
         self.stm.createScalarGaussian(GDict, GDict["surface"])
         self.ElementsColumn.SPOFields.addWidget(SFieldsWidget(GDict["name"], self.stm.removeScalarField, self.setPlotSFieldFormOpt))
     
+    ##
+    # Reads form and adds a vectorial point source beam to system
     def addPSAction(self):
         PSDict = self.ParameterWid.read()
         self.stm.generatePointSource(PSDict, PSDict["surface"])
         self.ElementsColumn.POFields.addWidget(FieldsWidget(PSDict["name"], self.stm.removeField, self.setPlotFieldFormOpt))
         self.ElementsColumn.POCurrents.addWidget(CurrentWidget(PSDict["name"], self.stm.removeCurrent, self.setPlotCurrentFormOpt))
     
+    ##
+    # Reads form and adds a scalar point source beam to system
     def addSPSAction(self):
         SPSDict = self.ParameterWid.read()
         self.stm.generatePointSourceScalar(SPSDict, SPSDict["surface"])
         self.ElementsColumn.SPOFields.addWidget(SFieldsWidget(SPSDict["name"], self.stm.removeScalarField, self.setPlotSFieldFormOpt))
     
+    ##
+    # Shows form to plot a frame
     def setPlotFrameForm(self):
         self.setForm(fDataObj.plotFrameInp(self.stm.frames), readAction=self.addPlotFrameAction)
     
+    ##
+    # TODO: whats the difference with above? Perhase we should rename function
+    #
+    # @param frame Frame to plot
     def setPlotFrameFormOpt(self, frame):
         self.setForm(fDataObj.plotFrameOpt(frame), readAction=self.addPlotFrameAction)
 
+    ##
+    # Shows form to plot field
+    #
+    # @param field Field to plot
     def setPlotFieldFormOpt(self, field):
         if self.stm.system[self.stm.fields[field].surf]["gmode"] == 2:
             self.setForm(fDataObj.plotFarField(field), readAction=self.addPlotFieldAction)
         else:
             self.setForm(fDataObj.plotField(field), readAction=self.addPlotFieldAction)
                 
+    ##
+    # TODO: whats the difference with above? Perhase we should rename function
+    #
+    # @param field Field to plot
     def setPlotSFieldFormOpt(self, field):
         self.setForm(fDataObj.plotSField(field, self.stm.system[self.stm.scalarfields[field].surf]["gmode"]), readAction=self.addPlotSFieldAction)
     
+    ## 
+    # Shows form to plot current
+    #
+    # @param current Current to plot
     def setPlotCurrentFormOpt(self, current):
         self.setForm(fDataObj.plotCurrentOpt(current), readAction=self.addPlotCurrentAction)
     
+    ##
+    # Reads form and plots frame
     def addPlotFrameAction(self):
         plotFrameDict = self.ParameterWid.read()
         fig = self.stm.plotRTframe(plotFrameDict["frame"], project=plotFrameDict["project"], ret=True)
@@ -489,6 +521,8 @@ class MainWidget(QWidget):
 
         self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
 
+    ##
+    # Reads form and plots field
     def addPlotFieldAction(self):
         plotFieldDict = self.ParameterWid.read()
         fig, _ = self.stm.plotBeam2D(plotFieldDict["field"], plotFieldDict["comp"], 
@@ -497,6 +531,8 @@ class MainWidget(QWidget):
 
         self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
     
+    ##
+    # Reads form and plots scalar field
     def addPlotSFieldAction(self):
         plotSFieldDict = self.ParameterWid.read()
         fig, _ = self.stm.plotBeam2D(plotSFieldDict["field"], 
@@ -505,6 +541,8 @@ class MainWidget(QWidget):
 
         self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
     
+    ##
+    # Reads form and plots current
     def addPlotCurrentAction(self):
         plotFieldDict = self.ParameterWid.read()
         fig, _ = self.stm.plotBeam2D(plotFieldDict["field"], 
@@ -513,38 +551,58 @@ class MainWidget(QWidget):
 
         self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
     
+    ##
+    # Shows form to propagate rays
     def setPropRaysForm(self):
         self.setForm(fDataObj.propRaysInp(self.stm.frames, self.stm.system), self.addPropRaysAction)
 
+    ##
+    # Reads form and popagates rays
     def addPropRaysAction(self): 
         propRaysDict = self.ParameterWid.read()
         self.stm.runRayTracer(propRaysDict)
         self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(propRaysDict["frame_out"], 
                                 [self.setPlotFrameFormOpt, self.stm.removeFrame, self.calcRMSfromFrame]))
     
+    ##
+    # Shows form to propagate physical optics beam to surface 
     def setPOInitForm(self):
         self.setForm(fDataObj.propPOInp(self.stm.currents, self.stm.scalarfields, self.stm.system), self.addPropBeamAction)
     
+    ##
+    # Shows form to propagate physical optics beam far field 
     def setPOFFInitForm(self):
         self.setForm(fDataObj.propPOFFInp(self.stm.currents, self.stm.system), self.addPropBeamAction)
     
+    ##
+    # Shows form to calculate taper efficientie
     def setTaperEffsForm(self):
         self.setForm(fDataObj.calcTaperEff(self.stm.fields, self.stm.system), self.calcTaperAction)
     
+    ##
+    # Shows form to calculate spillover efficientie
     def setSpillEffsForm(self):
         self.setForm(fDataObj.calcSpillEff(self.stm.fields, self.stm.system), self.calcSpillAction)
 
+    ##
+    # Shows form to calculate x-pol efficientie TODO: x-pol
     def setXpolEffsForm(self):
         self.setForm(fDataObj.calcXpolEff(self.stm.fields, self.stm.system), self.calcXpolAction)
 
+    ##
+    # Shows form to calculate main beam efficientie
     def setMBEffsForm(self):
         self.setForm(fDataObj.calcMBEff(self.stm.fields, self.stm.system), self.calcMBAction)
     
+    ##
+    # Reads form and calculates taper efficientie
     def calcTaperAction(self):
         TaperDict = self.ParameterWid.read()
         eff_taper = self.stm.calcTaper(TaperDict["f_name"], TaperDict["comp"])
         print(f'Taper efficiency of {TaperDict["f_name"]}, component {TaperDict["comp"]} = {eff_taper}\n')
     
+    ##
+    # Reads form and calculates spillover efficientie
     def calcSpillAction(self):
         SpillDict = self.ParameterWid.read()
 
@@ -557,17 +615,23 @@ class MainWidget(QWidget):
         eff_spill = self.stm.calcSpillover(SpillDict["f_name"], SpillDict["comp"], aperDict)
         print(f'Spillover efficiency of {SpillDict["f_name"]}, component {SpillDict["comp"]} = {eff_spill}\n')
     
+    ##
+    # Reads form and calculates x-pol efficientie TODO: x-pol?
     def calcXpolAction(self):
         XpolDict = self.ParameterWid.read()
         eff_Xpol = self.stm.calcXpol(XpolDict["f_name"], XpolDict["co_comp"], XpolDict["cr_comp"])
         print(f'X-pol efficiency of {XpolDict["f_name"]}, co-component {XpolDict["co_comp"]} and X-component {XpolDict["cr_comp"]} = {eff_Xpol}\n')
 
+    ##
+    # Reads form and calculates main beam efficientie
     def calcMBAction(self):
         MBDict = self.ParameterWid.read()
         eff_mb = self.stm.calcMainBeam(MBDict["f_name"], MBDict["comp"], MBDict["thres"], MBDict["mode"])
         print(f'Main beam efficiency of {MBDict["f_name"]}, component {MBDict["comp"]} = {eff_mb}\n')
         self.ElementsColumn.SPOFields.addWidget(SFieldsWidget(f"fitGauss_{MBDict['f_name']}", self.stm.removeScalarField, self.setPlotSFieldFormOpt))
 
+    ##
+    # Reads form propagates beam, runs calculation on another thread
     def addPropBeamAction(self):
         propBeamDict = self.ParameterWid.read()
       
@@ -606,6 +670,8 @@ class MainWidget(QWidget):
 
     #END NOTE
     
+    ##
+    # calculates root mean square of a frame
     def calcRMSfromFrame(self, frame):
         rms = self.stm.calcSpotRMS(frame)
         print(f"RMS value of {frame} = {rms} mm\n")
@@ -733,7 +799,7 @@ class PyPOMainWindow(QMainWindow):
         makeBeamPS.addAction(initPointScalAction)
     
         makeBeamG = makeBeam.addMenu("Gaussian beam")
-        initGaussVecAction = QAction("Vectorial", self)
+        initGaussVecAction = QAction("Vectorial", self)#TODO Vectorial?
         initGaussVecAction.setStatusTip("Initialize a vectorial Gaussian beam.")
         initGaussVecAction.triggered.connect(self.mainWid.setInitGaussianForm)
         makeBeamG.addAction(initGaussVecAction)

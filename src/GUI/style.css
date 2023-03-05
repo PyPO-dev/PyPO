@@ -2,7 +2,7 @@ ElementWidget{
     padding: 0px;
     margin: 0px;
 }
-
+/* 
 ElementWidget MyButton{
     background:#151ca5;
     color:#f2c50f;
@@ -42,11 +42,11 @@ CurrentWidget MyButton{
     border-top-right-radius : 15px; 
     border-bottom-left-radius : 0px; 
     border-bottom-right-radius : 15px;
-}
+} */
 QPushButton:hover{
     background:#a51554;
 }
-
+/* 
 ElementWidget QLabel{
     background: #151ca5;
     font-weight: bold;
@@ -87,7 +87,7 @@ CurrentWidget QLabel{
     border-bottom-left-radius : 15px; 
     border-bottom-right-radius : 0px;
     padding: 10px;
-}
+} */
 
 MyLabel {
     min-width: 7em;

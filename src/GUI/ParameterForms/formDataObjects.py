@@ -450,3 +450,7 @@ def saveSystemForm():
 def loadSystemForm(systemList):
     return [InputDescription(inType.dropdown, "name", label="Name of system", options=systemList)]
 
+def focusFind(frameList):
+    print(frameList)
+    return [InputDescription(inType.dropdown, outputName="name_frame", label="Name of frame", options=frameList)]
+

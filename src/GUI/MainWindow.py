@@ -676,6 +676,15 @@ class MainWidget(QWidget):
         rms = self.stm.calcSpotRMS(frame)
         print(f"RMS value of {frame} = {rms} mm\n")
 
+    def setFocusFindForm(self):
+        self.setForm(fDataObj.focusFind(list(self.stm.frames.keys())), self.findFocusAction)
+
+    def findFocusAction(self):
+        print(self.ParameterWid.read())
+        findFocusDict = self.ParameterWid.read()
+        focus = self.stm.findRTfocus(findFocusDict["name_frame"], verbose=True) 
+        print(f"Focus of {findFocusDict['name_frame']} = {focus}\n")
+
 class PyPOMainWindow(QMainWindow):
     def __init__(self, parent=None):
         """Initializer."""
@@ -841,8 +850,11 @@ class PyPOMainWindow(QMainWindow):
         calcMBEffsAction.triggered.connect(self.mainWid.setMBEffsForm)
         calcEffs.addAction(calcMBEffsAction)
 
-        findRTfocusAction = QAction("Find ray-trace focus", self)
-        findRTfocusAction.setStatusTip("Calculate the focus co-ordinates of a ray-trace beam.")
+        
+        FocusFind = QAction("Focus finder", self)
+        FocusFind.setToolTip("Calculate the focus co-ordinates of a ray-trace beam.")
+        ToolsMenu.triggered.connect(self.mainWid.setFocusFindForm)
+        ToolsMenu.addAction(FocusFind)
         #findRTfocusAction.triggered.connect(self.mainWid.set)
 
 if __name__ == "__main__":

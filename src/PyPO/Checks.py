@@ -209,7 +209,19 @@ def check_ElemDict(elemDict, nameList, num_ref):
     errStr = ""
    
     elemDict["transf"] = np.eye(4)
+   
+    if not "pos" in elemDict:
+        elemDict["pos"] = np.zeros(3)
+
+    else:
+        errStr += block_ndarray("pos", elemDict, (3,))
+
+    if not "ori" in elemDict:
+        elemDict["ori"] = np.array([0,0,1])
     
+    else:
+        errStr += block_ndarray("ori", elemDict, (3,))
+
     if not "flip" in elemDict:
         elemDict["flip"] = False
 
@@ -538,7 +550,7 @@ def check_runPODict(runPODict, elements, currents, scalarfields):
             errStr += f"{runPODict['mode']} is not a valid propagation mode.\n"
 
         if "s_current" in runPODict:
-            errStr = check_currentSystem(runPODict["s_currents"], currents, errStr)
+            errStr = check_currentSystem(runPODict["s_current"], currents, errStr)
         
         if "s_scalarfield" in runPODict:
             errStr = check_frameSystem(runPODict["s_scalarfield"], scalarfields, errStr)

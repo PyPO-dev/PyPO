@@ -8,7 +8,11 @@ var searchData=
   ['c4bundlef_5',['c4Bundlef',['../structc4Bundlef.html',1,'c4Bundlef'],['../classPyPO_1_1Structs_1_1c4Bundlef.html',1,'PyPO.Structs.c4Bundlef']]],
   ['cframe_6',['cframe',['../structcframe.html',1,'cframe'],['../classPyPO_1_1Structs_1_1cframe.html',1,'PyPO.Structs.cframe']]],
   ['cframef_7',['cframef',['../structcframef.html',1,'cframef'],['../classPyPO_1_1Structs_1_1cframef.html',1,'PyPO.Structs.cframef']]],
-  ['currents_8',['currents',['../classPyPO_1_1PyPOTypes_1_1currents.html',1,'PyPO::PyPOTypes']]],
-  ['customformatter_9',['CustomFormatter',['../classPyPO_1_1CustomLogger_1_1CustomFormatter.html',1,'PyPO::CustomLogger']]],
-  ['customlogger_10',['CustomLogger',['../classPyPO_1_1CustomLogger_1_1CustomLogger.html',1,'PyPO::CustomLogger']]]
+  ['console_8',['Console',['../classGUI_1_1Console_1_1Console.html',1,'GUI::Console']]],
+  ['consolegenerator_9',['ConsoleGenerator',['../classGUI_1_1Console_1_1ConsoleGenerator.html',1,'GUI::Console']]],
+  ['currentnameerror_10',['CurrentNameError',['../classPyPO_1_1Checks_1_1CurrentNameError.html',1,'PyPO::Checks']]],
+  ['currents_11',['currents',['../classPyPO_1_1PyPOTypes_1_1currents.html',1,'PyPO::PyPOTypes']]],
+  ['currentwidget_12',['CurrentWidget',['../classGUI_1_1ElementWidget_1_1CurrentWidget.html',1,'GUI::ElementWidget']]],
+  ['customformatter_13',['CustomFormatter',['../classPyPO_1_1CustomLogger_1_1CustomFormatter.html',1,'PyPO::CustomLogger']]],
+  ['customlogger_14',['CustomLogger',['../classPyPO_1_1CustomLogger_1_1CustomLogger.html',1,'PyPO::CustomLogger']]]
 ];

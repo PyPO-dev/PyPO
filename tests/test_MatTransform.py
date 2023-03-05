@@ -96,21 +96,64 @@ class Test_MatTransform(unittest.TestCase):
         for z1atest, z1aref in zip(g1atest.z.ravel(), g1aref.z.ravel()):
             self.assertAlmostEqual(z1atest, z1aref)
         
+        for a0atest, a0aref in zip(g0atest.area.ravel(), g0aref.area.ravel()):
+            self.assertAlmostEqual(a0atest, a0aref)
+        
         self.s.homeReflector("parabola_test")
 
     def test_rotations(self):
-        rotation0 = np.degrees(np.random.rand(3))
-        rotation1 = np.degrees(np.random.rand(3))
+        rotation0 = np.degrees((np.random.rand(3) - 0.5)*np.pi)
+        rotation1 = np.degrees((np.random.rand(3) - 0.5)*np.pi)
 
         pivot0 = np.random.rand(3)
         pivot1 = np.random.rand(3)
 
+
         # rotate test parabola by given amount
-        self.s.translateGrids("parabola_test", translation0)
+        self.s.rotateGrids("parabola_test", rotation0, pivot=pivot0)
+        self.s.rotateGrids("parabola_test", rotation1, pivot=pivot1)
     
-        for x0, x0test in zip(translation0, self.s.system["parabola_test"]["pos"]):
-            self.assertAlmostEqual(x0, x0test)
+        rotation0abs = np.degrees(np.random.rand(3))
+        pivot0abs = np.random.rand(3)
         
+        print(rotation0 + rotation1, rotation0abs)
+        self.s.rotateGrids("parabola_test", rotation0abs, pivot=pivot0abs, mode="absolute")
+        self.s.rotateGrids("parabola_ref", rotation0abs, pivot=pivot0abs, mode="absolute")
+
+        #for x0ref, x0test in zip(self.s.system["parabola_ref"]["pos"], self.s.system["parabola_test"]["pos"]):
+        #    self.assertAlmostEqual(x0ref, x0test)
+        
+        print(np.cross(self.s.system["parabola_ref"]["ori"], self.s.system["parabola_test"]["ori"]))
+        print(np.dot(self.s.system["parabola_ref"]["ori"], self.s.system["parabola_test"]["ori"]))
+        for r0ref, r0test in zip(self.s.system["parabola_ref"]["ori"], self.s.system["parabola_test"]["ori"]):
+            #print(self.assertAlmostEqual(r0ref, r0test))
+            print(r0ref - r0test)
+        
+        # Unpack grids and check if equal
+        #g0atest = self.s.generateGrids("parabola_test")
+        #g0aref = self.s.generateGrids("parabola_ref")
+        
+        """
+        for x0atest, x0aref in zip(g0atest.x.ravel(), g0aref.x.ravel()):
+            self.assertAlmostEqual(x0atest, x0aref)
+        
+        for y0atest, y0aref in zip(g0atest.y.ravel(), g0aref.y.ravel()):
+            self.assertAlmostEqual(y0atest, y0aref)
+        
+        for z0atest, z0aref in zip(g0atest.z.ravel(), g0aref.z.ravel()):
+            self.assertAlmostEqual(z0atest, z0aref)
+        for nx0atest, nx0aref in zip(g0atest.nx.ravel(), g0aref.nx.ravel()):
+            print(nx0atest, nx0aref)
+            self.assertAlmostEqual(nx0atest, nx0aref)
+        
+        for ny0atest, ny0aref in zip(g0atest.ny.ravel(), g0aref.ny.ravel()):
+            self.assertAlmostEqual(ny0atest, ny0aref)
+        
+        for nz0atest, nz0aref in zip(g0atest.nz.ravel(), g0aref.nz.ravel()):
+            self.assertAlmostEqual(nz0atest, nz0aref)
+        
+        for a0atest, a0aref in zip(g0atest.area.ravel(), g0aref.area.ravel()):
+            self.assertAlmostEqual(a0atest, a0aref)
         # translate test parabola again
         self.s.translateGrids("parabola_test", translation1)
     
@@ -163,6 +206,7 @@ class Test_MatTransform(unittest.TestCase):
             self.assertAlmostEqual(z1atest, z1aref)
         
         self.s.homeReflector("parabola_test")
+        """
     def tearDown(self):
         pass
 

@@ -458,7 +458,7 @@ class System(object):
                 match_rot = (MatRotate(rotation))[:-1, :-1] @ match
                 R = self.findRotation(self.system[name]["ori"], match_rot)
 
-                self.system[name]["transf"][:-1, :-1] = R[:-1, :-1]
+                self.system[name]["transf"] = R @ self.system[name]["transf"]
 
                 self.system[name]["pos"] = (MatRotate(rotation, pivot=pivot) @ np.append(self.system[name]["pos"], 1))[:-1]
                 self.system[name]["ori"] = R[:-1, :-1] @ self.system[name]["ori"]
@@ -481,11 +481,9 @@ class System(object):
                 match = np.array([0,0,1])
                 match_rot = (MatRotate(rotation))[:-1, :-1] @ match
                 R = self.findRotation(self.groups[name]["ori"], match_rot)
-
-                self.group[name]["transf"][:-1, :-1] = R[:-1, :-1]
                 
                 for elem in self.groups[name]["elements"]:
-                    elem["transf"][:-1, :-1] = R[:-1, :-1]
+                    elem["transf"] = R @ elem["transf"]
 
                     elem["pos"] = (MatRotate(rotation, pivot=pivot) @ np.append(elem["pos"], 1))[:-1]
                     elem["ori"] = R[:-1, :-1] @ elem["ori"]

@@ -457,10 +457,10 @@ class System(object):
                 match = np.array([0,0,1])
                 match_rot = (MatRotate(rotation))[:-1, :-1] @ match
                 R = self.findRotation(self.system[name]["ori"], match_rot)
-
                 self.system[name]["transf"] = R @ self.system[name]["transf"]
 
                 self.system[name]["pos"] = (MatRotate(rotation, pivot=pivot) @ np.append(self.system[name]["pos"], 1))[:-1]
+                #self.system[name]["ori"] = R[:-1, :-1] @ self.system[name]["ori"]
                 self.system[name]["ori"] = R[:-1, :-1] @ self.system[name]["ori"]
                 self.clog.info(f"Rotated element {name} to {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
@@ -1501,7 +1501,7 @@ class System(object):
     def findRotation(self, v, u):
         I = np.eye(3)
         if np.array_equal(v, u):
-            return I
+            return np.eye(4)
 
         lenv = np.linalg.norm(v)
         lenu = np.linalg.norm(u)
@@ -1513,14 +1513,18 @@ class System(object):
 
         lenw = np.linalg.norm(w)
         
-        w = w / lenw
+        #w = w / lenw
         
         K = np.array([[0, -w[2], w[1]], [w[2], 0, -w[0]], [-w[1], w[0], 0]])
         #print(K)
-        theta = np.arcsin(lenw / (lenv * lenu))
-        R = I + np.sin(theta) * K + (1 - np.cos(theta)) * K @ K
+        #theta = np.arcsin(lenw / (lenv * lenu))
+        #R = I + np.sin(theta) * K + (1 - np.cos(theta)) * K @ K
+
+        R = I + K + K @ K * (1 - np.dot(v, u)) / lenw**2
+
         R_transf = np.eye(4)
         R_transf[:-1, :-1] = R
+        
         return R_transf
 
     def findRTfocus(self, name_frame, f0=None, verbose=False):

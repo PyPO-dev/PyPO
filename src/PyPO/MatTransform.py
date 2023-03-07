@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.linalg import svd as svd
 
 def MatRotate(theta, matAppend=None, pivot=None, radians=False):
     """
@@ -48,9 +49,14 @@ def MatRotate(theta, matAppend=None, pivot=None, radians=False):
                     [0, 0, 1, oz],
                     [0, 0, 0, 1]])
     
-    matOut = trans2 @ (rotZ @ (rotY @ (rotX @ trans1)))
+    matOut = (trans2 @ (rotZ @ (rotY @ (rotX @ trans1)))) @ matAppend
+    
+    # Orthonormalise rotational part
 
-    return matOut @ matAppend
+    U, S, V = svd(matOut[:-1, :-1])
+    matOut[:-1, :-1] = U @ V
+
+    return matOut
 
 def MatTranslate(trans, matAppend=None):
     matAppend = np.eye(4) if matAppend is None else matAppend
@@ -60,7 +66,14 @@ def MatTranslate(trans, matAppend=None):
                     [0, 0, 1, zt],
                     [0, 0, 0, 1]])
 
-    return trans @ matAppend
+    matOut = trans @ matAppend
+
+    # Orthonormalise rotational part
+
+    U, S, V = svd(matOut[:-1, :-1])
+    matOut[:-1, :-1] = U @ V
+
+    return matOut
 
 def InvertMat(mat):
     R_T = mat[:3, :3].T

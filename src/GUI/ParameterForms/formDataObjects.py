@@ -72,6 +72,9 @@ def makePlaneInp():
 def makeTransformationForm(elementName):
     return[
         InputDescription(inType.static, "element", staticValue=elementName),
+        InputDescription(inType.radio, "mode", label="Transformation mode", options=[
+            "Relative", "Absolute"
+            ]),
         InputDescription(inType.dynamicRadio, "type", subdict={
             "Translation":[
                 InputDescription(inType.vectorFloats, "vector", label="Translation Vector", hints=["x","y","z"], numFields=3,oArray=True)],
@@ -451,6 +454,18 @@ def loadSystemForm(systemList):
     return [InputDescription(inType.dropdown, "name", label="Name of system", options=systemList)]
 
 def focusFind(frameList):
-    print(frameList)
     return [InputDescription(inType.dropdown, outputName="name_frame", label="Name of frame", options=frameList)]
 
+def snapForm(elem, snapList, obj="element"):
+    optionDict = {
+            "Take" : [InputDescription(inType.vectorStrings, "snap_name", label="Snapshot name", numFields=1)],
+            "Revert" : [InputDescription(inType.dropdown, "snap_name", label="Snapshot name", options=snapList)],
+            "Delete" : [InputDescription(inType.dropdown, "snap_name", label="Snapshot name", options=snapList)],
+
+            }
+    form = [
+            InputDescription(inType.static, "name", label=f"Name of {obj}", staticValue=elem),
+            InputDescription(inType.dynamicDropdown, "options", label="Options", subdict=optionDict)
+            ]
+
+    return form

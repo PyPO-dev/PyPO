@@ -613,38 +613,66 @@ class System(object):
             self.clog.info(f"Transforming element {name} to home position.")
  
     ##
-    # Take and store snapshot of reflector's current configuration.
+    # Take and store snapshot of object's current configuration.
     # 
-    # @param name Name of reflector to be snapped.
+    # @param name Name of object to be snapped.
     # @param snap_name Name of snapshot to save.
-    def snapReflector(self, name, snap_name):
-        if isinstance(name, list):
-            for _name in name:
-                check_elemSystem(_name, self.system, extern=True)
-                self.system[_name]["snapshots"][snap_name] = self.system[_name]["transf"]
+    # @param obj Whether object is an element or a group.
+    def snapObj(self, name, snap_name, obj="element"):
+        if obj == "group":
+            check_groupSystem(name, self.groups, extern=True)
+            self.groups[name]["snapshots"][snap_name] = []
 
+            for elem in self.groups[name]:
+                self.groups[name]["snapshots"][snap_name].append(elem["transf"])
+            
+            self.clog.info(f"Saved snapshot {snap_name} for group {name}.")
+        
         else:
             check_elemSystem(name, self.system, extern=True)
-            self.system[_name]["snapshots"][snap_name] = self.system[_name]["transf"]
+            self.system[name]["snapshots"][snap_name] = self.system[name]["transf"]
 
-        self.clog.info(f"Saved snapshot {snap_name} for elements {name}.")
+            self.clog.info(f"Saved snapshot {snap_name} for element {name}.")
     
     ##
-    # Revert reflector configuration to a saved snapshot.
+    # Revert object configuration to a saved snapshot.
     # 
-    # @param name Name of reflector to revert.
+    # @param name Name of obj to revert.
     # @param snap_name Name of snapshot to revert to.
-    def revertToSnapshot(self, name, snap_name):
-        if isinstance(name, list):
-            for _name in name:
-                check_elemSystem(_name, self.system, extern=True)
-                self.system[_name]["transf"] = self.system[_name]["snapshots"][snap_name]
+    # @param obj Whether object is an element or a group.
+    def revertToSnap(self, name, snap_name, obj="element"):
+        if obj == "group":
+            check_groupSystem(name, self.groups, extern=True)
+
+            for elem, snap in zip(self.groups[name], self.groups[name]["snapshots"][snap_name]):
+                elem["transf"] = snap
+            
+            self.clog.info(f"Reverted group {name} to snapshot {snap_name}.")
 
         else:
             check_elemSystem(name, self.system, extern=True)
             self.system[name]["transf"] = self.system[name]["snapshots"][snap_name]
         
-        self.clog.info(f"Reverted elements {snap_name} to snapshot {snap_name}.")
+            self.clog.info(f"Reverted element {name} to snapshot {snap_name}.")
+    
+    ##
+    # Delete a saved snapshot belonging to an object.
+    # 
+    # @param name Name of object.
+    # @param snap_name Name of snapshot to delete.
+    # @param obj Whether object is an element or a group.
+    def deleteSnap(self, name, snap_name, obj="element"):
+        if obj == "group":
+            check_groupSystem(name, self.groups, extern=True)
+           
+            del self.groups[name]["snapshots"][snap_name]
+
+            self.clog.info(f"Deleted snapshot {snap_name} belonging to group {name}.")
+
+        else:
+            del self.system[name]["snapshots"][snap_name]
+
+            self.clog.info(f"Deleted snapshot {snap_name} belonging to element {name}.")
     
     ##
     # Group elements together into a single block. After grouping, can translate, rotate and characterise as one.
@@ -661,7 +689,8 @@ class System(object):
         self.groups[name_group] = {
                 "members"   : names,
                 "pos"       : pos,
-                "ori"       : ori
+                "ori"       : ori,
+                "snapshots" : {}
                 }
     ##
     # Remove a group of elements from system. Note that this does not remove the elements inside the group.

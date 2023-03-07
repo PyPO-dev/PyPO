@@ -47,7 +47,7 @@ class RemoveElementDialog(QDialog):
         self.setLayout(layout)
 
 class ElementWidget(QWidget):
-    def __init__ (self, name, plotAction, removeAction, transformAction = None, RMSAction = None, removeFromTree = None,  p=None):
+    def __init__ (self, name, plotAction, removeAction, transformAction = None, RMSAction = None, snapAction = None, removeFromTree = None, p=None):
         super().__init__(parent=p)
         self.plotAction = plotAction
         self.removeAction_ = removeAction
@@ -63,6 +63,10 @@ class ElementWidget(QWidget):
         if RMSAction:
             self.RMSFrameAction = RMSAction
             self.actions["RMS"] = self.RMSFrame
+
+        if snapAction:
+            self.snapAction = snapAction
+            self.actions["snapshot"] = self.snap
 
         self.name = name
         self.setupUI()
@@ -123,12 +127,20 @@ class ElementWidget(QWidget):
             self.setParent(None)
             if self.removeFromTree:
                 self.removeFromTree()
+    
+    def snap(self):
+        self._closeOptionsMenu()        
+        self.snapAction(self.name)
+
 
 class ReflectorWidget(ElementWidget):
-    def __init__(self, name, removeAction, transformAction, plotAction, removeFromTree=None, p=None):
-        super().__init__(name, plotAction, removeAction, transformAction=transformAction, removeFromTree=removeFromTree, p=p)
+    def __init__(self, name, removeAction, transformAction, plotAction, snapAction, removeFromTree=None, p=None):
+        super().__init__(name, plotAction, removeAction, transformAction=transformAction, removeFromTree=removeFromTree, snapAction=snapAction, p=p)
 
-   
+class GroupWidget(ElementWidget):
+    def __init__(self, name, removeAction, transformAction, plotAction, snapActionp=None):
+        super().__init__(name, plotAction, removeAction, transformAction=transformAction, snapAction=snapAction, p=p)
+
 class FrameWidget(ElementWidget):
     def __init__ (self, name, removeAction, plotAction, RMSAction,  p=None ):
         super().__init__(name, plotAction, removeAction,RMSAction=RMSAction, p=p)

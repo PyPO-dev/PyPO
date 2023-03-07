@@ -183,7 +183,7 @@ class MainWidget(QWidget):
         self.PlotWidget.setCurrentIndex(self.PlotWidget.count()-1)
 
     ##
-    # plots a sigle element from the System
+    # plots a single element from the System
     # 
     # @param surface str Name of the surface in system
     # 
@@ -194,6 +194,27 @@ class MainWidget(QWidget):
             figure = None
         self.addPlot(figure, surface)
 
+    ##
+    # Generate a snapshot form.
+    def snapActionForm(self, element):
+        self.setForm(fDataObj.snapForm(element, list(self.stm.system[element]["snapshots"].keys())), readAction=self.snapAction)
+ 
+    ##
+    # Take, revert or delete a snapshot
+    # 
+    # @param element Name of the surface in system
+    # 
+    def snapAction(self):
+        snapDict = self.ParameterWid.read()
+        if snapDict["options"] == "Take":
+            self.stm.snapObj(snapDict["name"], snapDict["snap_name"])
+        
+        elif snapDict["options"] == "Revert":
+            self.stm.revertToSnap(snapDict["name"], snapDict["snap_name"])
+        
+        elif snapDict["options"] == "Delete":
+            self.stm.deleteSnap(snapDict["name"], snapDict["snap_name"])
+    
     ##
     # plots all elements of the system in one plot
     def plotSystem(self):
@@ -318,7 +339,7 @@ class MainWidget(QWidget):
     ### Functionalities: Adding Elements in gui
     # TODO:doc
     def addReflectorWidget(self, name):
-        self.ElementsColumn.reflectors.addWidget(ReflectorWidget(name, self.removeElement, self.transformSingleForm, self.plotElement)) 
+        self.ElementsColumn.reflectors.addWidget(ReflectorWidget(name, self.removeElement, self.transformSingleForm, self.plotElement, self.snapActionForm)) 
 
     def addFrameWidget(self, name):
         self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(name, self.stm.removeFrame, self.plotFrameForm,  self.calcRMSfromFrame))
@@ -405,11 +426,11 @@ class MainWidget(QWidget):
         vector = dd["vector"]
 
         if transformationType == "Translation":
-            self.stm.translateGrids(dd["element"], vector)
+            self.stm.translateGrids(dd["element"], vector, mode=dd["mode"].lower())
             print(f'Translated {dd["element"]} by {self._formatVector(vector)} mm')
         elif transformationType == "Rotation":
-            self.stm.rotateGrids(dd["element"], vector, cRot=dd["pivot"])
-            print(f'Rotated {dd["element"]} by {self._formatVector(vector)} deg around {self._formatVector(dd["centerOfRotation"])}')
+            self.stm.rotateGrids(dd["element"], vector, pivot=dd["pivot"], mode=dd["mode"].lower())
+            print(f'Rotated {dd["element"]} by {self._formatVector(vector)} deg around {self._formatVector(dd["pivot"])}')
         else:
             raise Exception("Transformation type incorrect")
 
@@ -481,14 +502,7 @@ class MainWidget(QWidget):
     def addPropRaysAction(self): 
         propRaysDict = self.ParameterWid.read()
         self.stm.runRayTracer(propRaysDict)
-        self.addFrameWidget(propRaysDict["frame_out"])
-
-
-    #TODO: use this or delete it
-    ##
-    # Shows form to plot a frame (without preselected frame) 
-    def plotAnyFrameForm(self):
-        self.setForm(fDataObj.plotFrameInp(self.stm.frames), readAction=self.addPlotFrameAction)
+        self.addFrameWidget(propRaysDict["fr_out"])
 
     ##
     # Shows form to plot preselected a frame
@@ -506,8 +520,6 @@ class MainWidget(QWidget):
 
         self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
 
-    
-    
     ### Functionalities: PO 
     ##
     # Shows form to initialize gaussian beam 

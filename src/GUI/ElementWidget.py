@@ -47,10 +47,12 @@ class RemoveElementDialog(QDialog):
         self.setLayout(layout)
 
 class ElementWidget(QWidget):
-    def __init__ (self, name, plotAction, removeAction, transformAction = None, RMSAction = None,  p=None):
+    def __init__ (self, name, plotAction, removeAction, transformAction = None, RMSAction = None, removeFromTree = None,  p=None):
         super().__init__(parent=p)
         self.plotAction = plotAction
         self.removeAction_ = removeAction
+        self.removeFromTree = removeFromTree
+
         self.actions = {
             "plot": self.plot,
             "remove": self.remove
@@ -119,10 +121,12 @@ class ElementWidget(QWidget):
         if RemoveElementDialog(self.name).exec_():
             self.removeAction_(self.name)
             self.setParent(None)
+            if self.removeFromTree:
+                self.removeFromTree()
 
 class ReflectorWidget(ElementWidget):
-    def __init__(self, name, removeAction, transformAction, plotAction, p=None):
-        super().__init__(name, plotAction, removeAction, transformAction=transformAction, p=p)
+    def __init__(self, name, removeAction, transformAction, plotAction, removeFromTree=None, p=None):
+        super().__init__(name, plotAction, removeAction, transformAction=transformAction, removeFromTree=removeFromTree, p=p)
 
    
 class FrameWidget(ElementWidget):

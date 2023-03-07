@@ -5,7 +5,7 @@ from src.GUI.Acccordion import Accordion
 from src.GUI.ElementWidget import ElementWidget
 from src.GUI.ParameterForms.simpleInputWidgets.simpleInputWidgets import ElementSelectionWidget
 
-from src.GUI.Workspace import Workspace
+from src.GUI.Workspace.Workspace import Workspace
 # from src.GUI.selfClosingDialog import *
 # from src.GUI.selfClosingDialog_HoverableBtn import *
 # from src.GUI.PlotScreen import *

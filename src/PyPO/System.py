@@ -456,23 +456,36 @@ class System(object):
             if mode == "absolute":
                 match = np.array([0,0,1])
                 match_rot = (MatRotate(rotation))[:-1, :-1] @ match
+                print(match_rot)
                 R = self.findRotation(self.system[name]["ori"], match_rot)
-                self.system[name]["transf"] = R @ self.system[name]["transf"]
 
-                self.system[name]["pos"] = (MatRotate(rotation, pivot=pivot) @ np.append(self.system[name]["pos"], 1))[:-1]
+                print(R[:-1,:-1] @ np.array([1,0,0]))
+                Tp = np.eye(4)
+                Tpm = np.eye(4)
+                Tp[:-1,-1] = pivot
+                Tpm[:-1,-1] = -pivot
+                
+                Rtot = Tp @ R @ Tpm
+
+                self.system[name]["transf"] = Rtot @ self.system[name]["transf"]
+
+                self.system[name]["pos"] = (Rtot @ np.append(self.system[name]["pos"], 1))[:-1]
                 #self.system[name]["ori"] = R[:-1, :-1] @ self.system[name]["ori"]
-                self.system[name]["ori"] = R[:-1, :-1] @ self.system[name]["ori"]
+                self.system[name]["ori"] = Rtot[:-1, :-1] @ self.system[name]["ori"]
                 self.clog.info(f"Rotated element {name} to {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
+
+                print(Rtot)
 
             elif mode == "relative":
                 self.system[name]["transf"] = MatRotate(rotation, self.system[name]["transf"], pivot)
-                
+                print(self.system[name]["transf"][:-1,:-1] @ np.array([0, 0, 1])) 
                 self.system[name]["pos"] = (MatRotate(rotation, pivot=pivot) @ np.append(self.system[name]["pos"], 1))[:-1]
                 self.system[name]["ori"] = MatRotate(rotation)[:-1, :-1] @ self.system[name]["ori"]
-
             
                 self.clog.info(f"Rotated element {name} by {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
+                print(MatRotate(rotation, pivot=pivot))
+            #print(self.system[name]["transf"])
         elif obj == "group":
             check_groupSystem(name, self.groups, extern=True)
             pivot = self.group[name]["pos"] if pivot is None else pivot
@@ -588,6 +601,7 @@ class System(object):
                 _transf = self.system[name]["transf"]
                 _transf[:-1, :-1] = np.eye(3)
                 self.system[name]["transf"] = _transf
+                self.system[name]["ori"] = np.array([0,0,1])
             
             self.clog.info(f"Transforming element {name} to home position.")
  
@@ -1505,11 +1519,12 @@ class System(object):
 
         lenv = np.linalg.norm(v)
         lenu = np.linalg.norm(u)
+
         if lenv == 0 or lenu == 0:
             self.clog.error("Encountered 0-length vector. Cannot proceed.")
             exit(0)
 
-        w = np.cross(v, u)
+        w = np.cross(v/lenv, u/lenu)
 
         lenw = np.linalg.norm(w)
         

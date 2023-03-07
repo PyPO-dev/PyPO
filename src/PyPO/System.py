@@ -456,10 +456,8 @@ class System(object):
             if mode == "absolute":
                 match = np.array([0,0,1])
                 match_rot = (MatRotate(rotation))[:-1, :-1] @ match
-                print(match_rot)
                 R = self.findRotation(self.system[name]["ori"], match_rot)
 
-                print(R[:-1,:-1] @ np.array([1,0,0]))
                 Tp = np.eye(4)
                 Tpm = np.eye(4)
                 Tp[:-1,-1] = pivot
@@ -468,24 +466,23 @@ class System(object):
                 Rtot = Tp @ R @ Tpm
 
                 self.system[name]["transf"] = Rtot @ self.system[name]["transf"]
+                self.system[name]["transf"][:-1, :-1] = (MatRotate(rotation, pivot=pivot))[:-1, :-1]
+
+                #print(np.linalg.det(self.system[name]["transf"]))
 
                 self.system[name]["pos"] = (Rtot @ np.append(self.system[name]["pos"], 1))[:-1]
-                #self.system[name]["ori"] = R[:-1, :-1] @ self.system[name]["ori"]
                 self.system[name]["ori"] = Rtot[:-1, :-1] @ self.system[name]["ori"]
                 self.clog.info(f"Rotated element {name} to {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
-                print(Rtot)
-
             elif mode == "relative":
                 self.system[name]["transf"] = MatRotate(rotation, self.system[name]["transf"], pivot)
-                print(self.system[name]["transf"][:-1,:-1] @ np.array([0, 0, 1])) 
+                #print(np.linalg.det(self.system[name]["transf"]))
+                
                 self.system[name]["pos"] = (MatRotate(rotation, pivot=pivot) @ np.append(self.system[name]["pos"], 1))[:-1]
                 self.system[name]["ori"] = MatRotate(rotation)[:-1, :-1] @ self.system[name]["ori"]
             
                 self.clog.info(f"Rotated element {name} by {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
-                print(MatRotate(rotation, pivot=pivot))
-            #print(self.system[name]["transf"])
         elif obj == "group":
             check_groupSystem(name, self.groups, extern=True)
             pivot = self.group[name]["pos"] if pivot is None else pivot
@@ -493,27 +490,37 @@ class System(object):
             if mode == "absolute":
                 match = np.array([0,0,1])
                 match_rot = (MatRotate(rotation))[:-1, :-1] @ match
-                R = self.findRotation(self.groups[name]["ori"], match_rot)
+                R = self.findRotation(self.system[name]["ori"], match_rot)
+
+                Tp = np.eye(4)
+                Tpm = np.eye(4)
+                Tp[:-1,-1] = pivot
+                Tpm[:-1,-1] = -pivot
+                
+                Rtot = Tp @ R @ Tpm
                 
                 for elem in self.groups[name]["elements"]:
-                    elem["transf"] = R @ elem["transf"]
+                    elem["transf"] = Rtot @ elem["transf"]
+                    elem["transf"][:-1, :-1] = (MatRotate(rotation, pivot=pivot))[:-1, :-1]
 
-                    elem["pos"] = (MatRotate(rotation, pivot=pivot) @ np.append(elem["pos"], 1))[:-1]
-                    elem["ori"] = R[:-1, :-1] @ elem["ori"]
+                    elem["pos"] = (Rtot @ np.append(elem["pos"], 1))[:-1]
+                    elem["ori"] = Rtot[:-1, :-1] @ elem["ori"]
 
-                self.groups[name]["pos"]  = (MatRotate(rotation, pivot=pivot) @ np.append(self.groups[name]["pos"], 1))[:-1]
-                self.groups[name]["ori"] = R[:-1, :-1] @ self.groups[name]["ori"]
+                self.groups[name]["pos"] = (Rtot @ np.append(self.groups[name]["pos"], 1))[:-1]
+                self.groups[name]["ori"] = Rtot[:-1, :-1] @ self.groups[name]["ori"]
+                
                 self.clog.info(f"Rotated group {name} to {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
             elif mode == "relative":
                 for elem in self.groups[name]["elements"]:
-                    elem["transf"] = MatRotate(rotation, self.system[name]["transf"], pivot)
-
+                    elem["transf"] = MatRotate(rotation, elem["transf"], pivot)
+                    
                     elem["pos"] = (MatRotate(rotation, pivot=pivot) @ np.append(elem["pos"], 1))[:-1]
                     elem["ori"] = MatRotate(rotation)[:-1, :-1] @ elem["ori"]
 
-                self.groups[name]["pos"]  = (MatRotate(rotation, pivot=pivot) @ np.append(self.groups[name]["pos"], 1))[:-1]
+                self.groups[name]["pos"] = (MatRotate(rotation, pivot=pivot) @ np.append(self.groups[name]["pos"], 1))[:-1]
                 self.groups[name]["ori"] = MatRotate(rotation)[:-1, :-1] @ self.groups[name]["ori"]
+                
                 self.clog.info(f"Rotated group {name} by {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
     ##

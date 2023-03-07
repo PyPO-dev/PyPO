@@ -592,4 +592,37 @@ def check_runPODict(runPODict, elements, currents, scalarfields):
         for err in errList:
             clog.error(err)
         raise RunPOError()
-    
+
+def check_ellipseLimits(ellipsoid):
+    buff = 1000
+    idx_lim = 0
+
+    if ellipsoid["coeffs"][1] < ellipsoid["coeffs"][0]:
+        idx_lim = 1
+
+    if ellipsoid["gmode"] == 0:
+        if np.absolute(ellipsoid["lims_x"][0]) > ellipsoid["coeffs"][idx_lim]:
+            clog.warning(f"Lower x-limit of {ellipsoid['lims_x'][0]:.3f} incompatible with ellipsoid {ellipsoid['name']}. Changing to {ellipsoid['coeffs'][idx_lim]}.")
+            ellipsoid["lims_x"][0] = ellipsoid["coeffs"][idx_lim] + ellipsoid["coeffs"][0] / buff
+        
+        if np.absolute(ellipsoid["lims_x"][1]) > ellipsoid["coeffs"][idx_lim]:
+            clog.warning(f"Upper x-limit of {ellipsoid['lims_x'][1]:.3f} incompatible with ellipsoid {ellipsoid['name']}. Changing to {ellipsoid['coeffs'][idx_lim]}.")
+            ellipsoid["lims_x"][1] = ellipsoid["coeffs"][idx_lim] - ellipsoid["lims_x"][1] / buff
+        
+        if np.absolute(ellipsoid["lims_y"][0]) > ellipsoid["coeffs"][idx_lim]:
+            clog.warning(f"Lower y-limit of {ellipsoid['lims_y'][0]:.3f} incompatible with ellipsoid {ellipsoid['name']}. Changing to {ellipsoid['coeffs'][idx_lim]}.")
+            ellipsoid["lims_y"][0] = ellipsoid["coeffs"][idx_lim] + ellipsoid["lims_y"][0] / buff
+        
+        if np.absolute(ellipsoid["lims_y"][1]) > ellipsoid["coeffs"][idx_lim]:
+            clog.warning(f"Upper y-limit of {ellipsoid['lims_y'][1]:.3f} incompatible with ellipsoid {ellipsoid['name']}. Changing to {ellipsoid['coeffs'][idx_lim]}.")
+            ellipsoid["lims_y"][1] = ellipsoid["coeffs"][idx_lim] - ellipsoid["lims_y"][1] / buff
+
+    elif ellipsoid["gmode"] == 1:
+        if np.absolute(ellipsoid["lims_u"][0]) > ellipsoid["coeffs"][idx_lim]:
+            clog.warning(f"Lower u-limit of {ellipsoid['lims_u'][0]:.3f} incompatible with ellipsoid {ellipsoid['name']}. Changing to {ellipsoid['coeffs'][idx_lim]}.")
+            ellipsoid["lims_u"][0] = ellipsoid["coeffs"][idx_lim]# - ellipsoid["lims_u"][0] / buff
+ 
+        if np.absolute(ellipsoid["lims_u"][1]) > ellipsoid["coeffs"][idx_lim]:
+            clog.warning(f"Upper u-limit of {ellipsoid['lims_u'][1]:.3f} incompatible with ellipsoid {ellipsoid['name']}. Changing to {ellipsoid['coeffs'][idx_lim]}.")
+            ellipsoid["lims_u"][1] = ellipsoid["coeffs"][idx_lim]# - ellipsoid["lims_u"][1] / buff
+

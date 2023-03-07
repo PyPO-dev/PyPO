@@ -50,11 +50,6 @@ def MatRotate(theta, matAppend=None, pivot=None, radians=False):
                     [0, 0, 0, 1]])
     
     matOut = (trans2 @ (rotZ @ (rotY @ (rotX @ trans1)))) @ matAppend
-    
-    # Orthonormalise rotational part
-
-    U, S, V = svd(matOut[:-1, :-1])
-    matOut[:-1, :-1] = U @ V
 
     return matOut
 
@@ -67,11 +62,6 @@ def MatTranslate(trans, matAppend=None):
                     [0, 0, 0, 1]])
 
     matOut = trans @ matAppend
-
-    # Orthonormalise rotational part
-
-    U, S, V = svd(matOut[:-1, :-1])
-    matOut[:-1, :-1] = U @ V
 
     return matOut
 

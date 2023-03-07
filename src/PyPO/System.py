@@ -225,16 +225,11 @@ class System(object):
             orientation = diff / np.sqrt(np.dot(diff, diff))
             offTrans = ve
 
-            # Find rotation in frame of vertex
-            rx = np.arccos(1 - np.dot(np.array([1,0,0]), orientation))
-            ry = np.arccos(1 - np.dot(np.array([0,1,0]), orientation))
-            rz = 0
-
-            offRot = np.array([rx, ry, rz])
-            pivot = offTrans
-
-            self.system[reflDict["name"]]["transf"] = MatRotate(offRot, reflDict["transf"], pivot)
-            self.system[reflDict["name"]]["transf"] = MatTranslate(offTrans, reflDict["transf"])
+            R = self.findRotation(np.array([0,0,1]), orientation)
+            
+            self.system[reflDict["name"]]["transf"] = MatTranslate(offTrans, R)
+            self.system[reflDict["name"]]["pos"] = (self.system[reflDict["name"]]["transf"] @ np.append(self.system[reflDict["name"]]["pos"], 1))[:-1]
+            self.system[reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[reflDict["name"]]["ori"]
 
             self.system[reflDict["name"]]["coeffs"][0] = a
             self.system[reflDict["name"]]["coeffs"][1] = b
@@ -290,21 +285,19 @@ class System(object):
             c3 = a
 
             # Find direction between focii
-            orientation = diff / np.sqrt(np.dot(diff, diff))
+            orientation = diff / np.linalg.norm(diff)
 
             # Find offset from center. Use offset as rotation origin for simplicity
             center = (f1 + f2) / 2
             offTrans = center
 
             # Find rotation in frame of center
-            rx = np.arccos(1 - np.dot(np.array([1,0,0]), orientation))
-            ry = np.arccos(1 - np.dot(np.array([0,1,0]), orientation))
-            rz = 0
+            R = self.findRotation(np.array([0,0,1]), orientation)
+            
+            self.system[reflDict["name"]]["transf"] = MatTranslate(offTrans, R)
 
-            offRot = np.array([rx, ry, rz])
-
-            _transf = MatRotate(offRot, reflDict["transf"])
-            self.system[reflDict["name"]]["transf"] = MatTranslate(offTrans, _transf)
+            self.system[reflDict["name"]]["pos"] = (self.system[reflDict["name"]]["transf"] @ np.append(self.system[reflDict["name"]]["pos"], 1))[:-1]
+            self.system[reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[reflDict["name"]]["ori"]
 
             self.system[reflDict["name"]]["coeffs"][0] = a3
             self.system[reflDict["name"]]["coeffs"][1] = b3
@@ -349,27 +342,22 @@ class System(object):
 
             trans = (f1 + f2) / 2
 
-            f_norm = diff / np.sqrt(np.dot(diff, diff))
-            fxy = np.array([f_norm[0], f_norm[1], 0])
-            fxy /= np.sqrt(np.dot(fxy, fxy))
+            f_norm = diff / np.linalg.norm(diff)
 
-            rot_z = np.degrees(np.arccos(np.dot(fxy, np.array([1, 0, 0]))))
-            fxz = np.array([f_norm[0], 0, f_norm[2]])
-            fxz /= np.sqrt(np.dot(fxz, fxz))
-
-            rot_y = np.degrees(np.arccos(np.dot(fxz, np.array([1, 0, 0]))))
-            rotation = np.array([0, rot_y, rot_z])
+            R = self.findRotation(np.array([1,0,0]), f_norm)
 
             a = np.sqrt(np.dot(diff, diff)) / (2 * ecc)
             b = a * np.sqrt(1 - ecc**2)
             
-            _transf = MatRotate(rotation, reflDict["transf"])
-            self.system[reflDict["name"]]["transf"] = MatTranslate(trans, _transf)
+            #_transf = MatRotate(rotation, reflDict["transf"])
+            self.system[reflDict["name"]]["transf"] = MatTranslate(trans, R)
+            
+            self.system[reflDict["name"]]["pos"] = (self.system[reflDict["name"]]["transf"] @ np.append(self.system[reflDict["name"]]["pos"], 1))[:-1]
+            self.system[reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[reflDict["name"]]["ori"]
 
             self.system[reflDict["name"]]["coeffs"][0] = a
             self.system[reflDict["name"]]["coeffs"][1] = b
             self.system[reflDict["name"]]["coeffs"][2] = b
-
 
         if reflDict["gmode"] == "xy":
             self.system[reflDict["name"]]["gcenter"] = np.zeros(2)
@@ -382,6 +370,8 @@ class System(object):
                                                         self.system[reflDict["name"]]["lims_v"][1]]
 
             self.system[reflDict["name"]]["gmode"] = 1
+
+        check_ellipseLimits(self.system[reflDict["name"]])
 
         self.system[reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added ellipsoid {reflDict['name']} to system.")

@@ -138,8 +138,8 @@ class ReflectorWidget(ElementWidget):
         super().__init__(name, plotAction, removeAction, transformAction=transformAction, removeFromTree=removeFromTree, snapAction=snapAction, p=p)
 
 class GroupWidget(ElementWidget):
-    def __init__(self, name, removeAction, transformAction, plotAction, snapActionp=None):
-        super().__init__(name, plotAction, removeAction, transformAction=transformAction, snapAction=snapAction, p=p)
+    def __init__(self, name, removeAction, transformAction, plotAction, snapActionp=None, p=None):
+        super().__init__(name, plotAction, removeAction, transformAction=transformAction, snapAction=self.snapAction, p=p)
 
 class FrameWidget(ElementWidget):
     def __init__ (self, name, removeAction, plotAction, RMSAction,  p=None ):

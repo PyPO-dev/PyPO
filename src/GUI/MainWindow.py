@@ -502,14 +502,7 @@ class MainWidget(QWidget):
     def addPropRaysAction(self): 
         propRaysDict = self.ParameterWid.read()
         self.stm.runRayTracer(propRaysDict)
-        self.addFrameWidget(propRaysDict["frame_out"])
-
-
-    #TODO: use this or delete it
-    ##
-    # Shows form to plot a frame (without preselected frame) 
-    def plotAnyFrameForm(self):
-        self.setForm(fDataObj.plotFrameInp(self.stm.frames), readAction=self.addPlotFrameAction)
+        self.addFrameWidget(propRaysDict["fr_out"])
 
     ##
     # Shows form to plot preselected a frame
@@ -527,8 +520,6 @@ class MainWidget(QWidget):
 
         self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
 
-    
-    
     ### Functionalities: PO 
     ##
     # Shows form to initialize gaussian beam 

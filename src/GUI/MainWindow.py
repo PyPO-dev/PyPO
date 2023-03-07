@@ -37,7 +37,7 @@ import src.PyPO.Threadmgr as TManager
 #
 class MainWidget(QWidget):
     ##
-    # Constructot. Configures the layout and initializes the underlying system
+    # Constructot. Configures the layout and initializes the underlying systemmlala
     # @see System
     # 
     # 
@@ -51,6 +51,7 @@ class MainWidget(QWidget):
         self.stm = st.System(redirect=print, context="G")
         self.pyprint = print
 
+
         # GridParameters
         self.GPElementsColumn = [0, 0, 2, 1]
         self.GPParameterForm  = [0, 1, 2, 1]
@@ -61,10 +62,11 @@ class MainWidget(QWidget):
         # init layout
         self.grid = QGridLayout()
         self.grid.setContentsMargins(0,0,0,0)
-        self.grid.setSpacing(0)
+        # self.grid.setMargin(0)
+        self.grid.setSpacing(20)
 
         self._mkElementsColumn()
-        self._setupPlotScreen()
+        self._mkPlotScreen()
         self._mkConsole()
         self.setLayout(self.grid)
 
@@ -73,13 +75,70 @@ class MainWidget(QWidget):
         self.frameDict = {}
         # end NOTE
 
-
+    ### Gui setup functions
     ##
+    # @guiSetup
     # Adds a widget to the layout of PyPOMainWidget
     def addToWindowGrid(self, widget, param):
         self.grid.addWidget(widget, param[0], param[1], param[2], param[3])
 
+
+    ##  
+    # @guiSetup
+    # Configures the console widget
+    # 
+    def _mkConsole(self):
+        self.console = ConsoleGenerator.get()
+        self.addToWindowGrid(self.console, self.GPConsole)
+        self.cursor = QTextCursor(self.console.document())
+        
+        global print ##TODO: Remove print redefinitions
+        def print(s, end=''):
+            if end == '\r':
+                self.cursor.select(QTextCursor.LineUnderCursor)
+                self.cursor.removeSelectedText()
+                self.console.insertPlainText(str(s))
+            else:
+                self.console.appendPlainText(str(s))
+            self.console.repaint()
+        
+        self.console.appendPlainText("********** PyPO Console **********")
+        self.addToWindowGrid(self.console, self.GPConsole)
+    
     ##
+    # @guiSetup
+    # constructs the elements column on the left side of the screen
+    # 
+    def _mkElementsColumn(self):
+        # delete if exists
+        if hasattr(self, "ElementsColumn"):
+            self.ElementsColumn.setParent(None)
+        # rebuild 
+        self.ElementsColumn = Accordion()
+
+        scroll = QScrollArea()
+        scroll.setWidget(self.ElementsColumn)
+        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroll.setWidgetResizable(True)
+        scroll.setContentsMargins(0,0,0,0)
+        scroll.setMinimumWidth(300)
+        scroll.setMaximumWidth(300)
+        self.addToWindowGrid(scroll, self.GPElementsColumn)
+
+    ##
+    # @guiSetup
+    # Constructs the tab widget which will later hold plots
+    def _mkPlotScreen(self):
+        self.PlotWidget = QTabWidget()
+        self.PlotWidget.setTabsClosable(True)
+        self.PlotWidget.setTabShape(QTabWidget.Rounded)
+        self.PlotWidget.tabCloseRequested.connect(self.closePlotTab)
+        self.PlotWidget.setMaximumHeight(550)
+        self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
+
+    ##
+    # @guiSetup
     # Generates a form widget
     # 
     # @param formData List of InputDescription objects
@@ -102,81 +161,27 @@ class MainWidget(QWidget):
         scroll.setMinimumWidth(300)
         scroll.setMaximumWidth(400)
         self.addToWindowGrid(scroll,self.GPParameterForm)
-
-    ##  
-    # Configures the console widget
-    # 
-    def _mkConsole(self):
-        self.console = ConsoleGenerator.get()
-        self.addToWindowGrid(self.console, self.GPConsole)
-        self.cursor = QTextCursor(self.console.document())
-        
-        global print ##TODO: Remove print redefinitions
-        def print(s, end=''):
-            if end == '\r':
-                self.cursor.select(QTextCursor.LineUnderCursor)
-                self.cursor.removeSelectedText()
-                self.console.insertPlainText(str(s))
-            else:
-                self.console.appendPlainText(str(s))
-            self.console.repaint()
-        
-        self.console.appendPlainText("********** PyPO Console **********")
-        self.addToWindowGrid(self.console, self.GPConsole)
+    
+    ## 
+    # removes the form ParameterWid if exists 
+    def removeForm(self):
+        if hasattr(self, "ParameterWid"):
+            self.ParameterWid.setParent(None)
     
     ##
-    # constructs the elements column on the left side of the screen
-    # 
-    def _mkElementsColumn(self):
-        # delete if exists
-        if hasattr(self, "ElementsColumn"):
-            self.ElementsColumn.setParent(None)
-        # rebuild 
-        self.ElementsColumn = Accordion()
-
-        scroll = QScrollArea()
-        scroll.setWidget(self.ElementsColumn)
-        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        scroll.setWidgetResizable(True)
-        scroll.setContentsMargins(0,0,0,0)
-        scroll.setMinimumWidth(300)
-        scroll.setMaximumWidth(300)
-        self.addToWindowGrid(scroll, self.GPElementsColumn)
-
-    ##
-    # Constructs the tab widget which will later hold plots
-    def _setupPlotScreen(self):
-        self.PlotWidget = QTabWidget()
-        self.PlotWidget.setTabsClosable(True)
-        self.PlotWidget.setTabShape(QTabWidget.Rounded)
-        self.PlotWidget.tabCloseRequested.connect(self.closeTab)
-        self.PlotWidget.setMaximumHeight(550)
-        self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
-
-    ##
-    # TODO: doc
-    def _formatVector(self, vector):
+    # TODO: Remove this function from here
+    @staticmethod
+    def _formatVector(vector):
         return f"[{vector[0]}, {vector[1]}, {vector[2]}]"
+    
+    ### Functionalities: Plotting
+
     ##
     # Constructs a PlotScreen and adds it to the plotWidget along with a label for the tab
     def addPlot(self, figure, label):
         self.PlotWidget.addTab(PlotScreen(figure, parent=self), label)
         self.PlotWidget.setCurrentIndex(self.PlotWidget.count()-1)
 
-    ##
-    # removes a plot from the tabWidget
-    # @param i Index of the plot to be removed
-    def closeTab(self, i):
-        self.PlotWidget.removeTab(i)
-
-    ##
-    # removes an element from the system
-    # @param element Name of the element in the system
-    def removeElement(self, element):
-        print(f"removed: {element}")
-        self.stm.removeElement(element)
-    
     ##
     # plots a sigle element from the System
     # 
@@ -198,9 +203,14 @@ class MainWidget(QWidget):
             figure = None
         self.addPlot(figure, "System Plot %d" %self.getSysPlotNr())
         
-
     ##
-    # Gets the plot number froms System and increments it TODO: doc
+    # removes a plot from the tabWidget
+    # @param i Index of the plot to be removed
+    def closePlotTab(self, i):
+        self.PlotWidget.removeTab(i)
+    ### Functionalities: Naming 
+    ##
+    # Gets the plot number and increments it 
     # @return The incremented plot number 
     def getSysPlotNr(self):
         if not hasattr(self, "sysPlotNr"):
@@ -209,7 +219,7 @@ class MainWidget(QWidget):
         return self.sysPlotNr
 
     ##
-    # Gets the frame plot number froms System and increments it TODO: doc
+    # Gets the frame plot number and increments it
     # @return The incremented frame plot number 
     def getRayPlotNr(self):
         if not hasattr(self, "rayPlotNr"):
@@ -233,32 +243,42 @@ class MainWidget(QWidget):
             figure = None
         self.addPlot(figure,"Ray Trace Frame %d" %(self.getRayPlotNr()))
 
+    ### Functionalities: Systems 
+
+
     ##
     # opens a form that allows user to save the System
-    def saveSystemAction(self):
-        self.setForm(fDataObj.saveSystemForm(), readAction=self.saveSystemCall)
-    
-    ##
-    # opens a form that allows user to load a saved System
-    def loadSystemAction(self):
-        systemList = [os.path.split(x[0])[-1] for x in os.walk(self.stm.savePathSystems) if os.path.split(x[0])[-1] != "systems"]
-        self.setForm(fDataObj.loadSystemForm(systemList), readAction=self.loadSystemCall)
-    
-    ##
-    # opens a form that allows user to delete a saved System
-    def deleteSystemAction(self):
-        systemList = [os.path.split(x[0])[-1] for x in os.walk(self.stm.savePathSystems) if os.path.split(x[0])[-1] != "systems"]
-        self.setForm(fDataObj.loadSystemForm(systemList), readAction=self.removeSystemCall)
+    def saveSystemForm(self):
+        self.setForm(fDataObj.saveSystemForm(), readAction=self.saveSystemAction)
     
     ##
     # Saves the current system state under the name given in form
-    def saveSystemCall(self):
+    def saveSystemAction(self):
         saveDict = self.ParameterWid.read()
         self.stm.saveSystem(saveDict["name"]) 
     
+    
+    ##
+    # opens a form that allows user to delete a saved System
+    def deleteSavedSystemForm(self):
+        systemList = [os.path.split(x[0])[-1] for x in os.walk(self.stm.savePathSystems) if os.path.split(x[0])[-1] != "systems"]
+        self.setForm(fDataObj.loadSystemForm(systemList), readAction=self.deleteSavedSystemAction)
+
+    ##
+    # Deletes system selected in form
+    def deleteSavedSystemAction(self):
+        removeDict = self.ParameterWid.read()
+        shutil.rmtree(os.path.join(self.stm.savePathSystems, removeDict["name"]))
+
+    ##
+    # opens a form that allows user to load a saved System
+    def loadSystemForm(self):
+        systemList = [os.path.split(x[0])[-1] for x in os.walk(self.stm.savePathSystems) if os.path.split(x[0])[-1] != "systems"]
+        self.setForm(fDataObj.loadSystemForm(systemList), readAction=self.loadSystemAction)
+    
     ##
     # Loads system selected in from form
-    def loadSystemCall(self):
+    def loadSystemAction(self):
         loadDict = self.ParameterWid.read()
         self._mkElementsColumn()
         self.stm.loadSystem(loadDict["name"]) 
@@ -268,41 +288,70 @@ class MainWidget(QWidget):
         self.refreshColumn(self.stm.currents, "currents")
         self.refreshColumn(self.stm.scalarfields, "scalarfields")
 
-    ##
-    # Deletes system selected in form
-    def removeSystemCall(self):
-        removeDict = self.ParameterWid.read()
-        shutil.rmtree(os.path.join(self.stm.savePathSystems, removeDict["name"]))
 
+    ##
+    # removes an element from the system
+    # @param element Name of the element in the system
+    def removeElement(self, element):
+        print(f"removed: {element}") # TODO remove print redirection
+        self.stm.removeElement(element)
+    
     ##
     # TODO: @Maikel Rename this function and evaluate its nessecity
     def refreshColumn(self, columnDict, columnType):
         for key, item in columnDict.items():
             if columnType == "elements":
-                self.ElementsColumn.reflectors.addWidget(ReflectorWidget(key, self.removeElement, self.setTransformationForm, self.plotElement))
+                self.addReflectorWidget(key)
             
             elif columnType == "frames":
-                self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(key, self.stm.removeFrame, self.setPlotFrameFormOpt,  self.calcRMSfromFrame))
+                self.addFrameWidget(key)
             
             elif columnType == "fields":
-                self.ElementsColumn.POFields.addWidget(FieldsWidget(key,self.stm.removeField, self.setPlotFieldFormOpt))
+                self.addFieldWidget(key)
             
             elif columnType == "currents":
-                self.ElementsColumn.POCurrents.addWidget(CurrentWidget(key, self.stm.removeCurrent, self.setPlotFieldFormOpt))
+                self.addCurrentWidget(key)
 
             elif columnType == "scalarfields":
-                self.ElementsColumn.SPOFields.addWidget(SFieldsWidget(key,self.stm.removeScalarField, self.setPlotSFieldFormOpt))
+                self.addSFieldWidget(key)
 
-    ##
-    # Shows from to add a quadric surface
-    def setQuadricForm(self):
-        self.setForm(fDataObj.makeQuadricSurfaceInp(), readAction=self.addQuadricAction)
-    
+    ### Functionalities: Adding Elements in gui
+    # TODO:doc
+    def addReflectorWidget(self, name):
+        self.ElementsColumn.reflectors.addWidget(ReflectorWidget(name, self.removeElement, self.transformSingleForm, self.plotElement)) 
+
+    def addFrameWidget(self, name):
+        self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(name, self.stm.removeFrame, self.plotFrameForm,  self.calcRMSfromFrame))
+
+    def addFieldWidget(self, name):
+        self.ElementsColumn.POFields.addWidget(FieldsWidget(name,self.stm.removeField, self.plotFieldForm))
+
+    def addCurrentWidget(self, name):
+        self.ElementsColumn.POCurrents.addWidget(CurrentWidget(name, self.stm.removeCurrent, self.plotFieldForm))
+
+    def addSFieldWidget(self, name):
+        self.ElementsColumn.SPOFields.addWidget(SFieldsWidget(name,self.stm.removeScalarField, self.plotSFieldForm))
+
+
+    ### Functionalities: Adding Elements 
+
     ##
     # Shows form to add a plane
-    def setPlaneForm(self):
+    def addPlaneForm(self):
         self.setForm(fDataObj.makePlaneInp(), readAction=self.addPlaneAction)
 
+    ##
+    # Reads form and adds plane to System
+    def addPlaneAction(self):
+        elementDict = self.ParameterWid.read()
+        self.stm.addPlane(elementDict) 
+        self.addReflectorWidget(elementDict["name"])
+    
+    ##
+    # Shows from to add a quadric surface
+    def addQuadricForm(self):
+        self.setForm(fDataObj.makeQuadricSurfaceInp(), readAction=self.addQuadricAction)
+    
     ##
     # Reads quadric form, evaluates surface type and calls corresponding add____Action
     def addQuadricAction(self):
@@ -314,7 +363,8 @@ class MainWidget(QWidget):
                 self.stm.addHyperbola(elementDict)
             elif elementDict["type"] == "Ellipse":
                 self.stm.addEllipse(elementDict)
-            self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"], self.removeElement, self.setTransformationForm, self.plotElement))
+
+            self.addReflectorWidget(elementDict["name"])
         except InputReflError as e: #TODO: Does this errorCatching work?
             self.console.appendPlainText("FormInput Incorrect:")
             self.console.appendPlainText(e.__str__())
@@ -324,50 +374,32 @@ class MainWidget(QWidget):
     def addParabolaAction(self):
         elementDict = self.ParameterWid.read()
         self.stm.addParabola(elementDict) 
-        self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"],self.removeElement, self.setTransformationForm, self.plotElement))
+        self.addReflectorWidget(elementDict["name"])
     
     ##
     # Reads form and adds hyperbola to System
     def addHyperbolaAction(self):
         elementDict = self.ParameterWid.read()
         self.stm.addHyperbola(elementDict) 
-        self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"],self.removeElement, self.setTransformationForm, self.plotElement))
+        self.addReflectorWidget(elementDict["name"])
 
     ##
     # Reads form and adds ellipse to System
     def addEllipseAction(self):
         elementDict = self.ParameterWid.read()
         self.stm.addEllipse(elementDict) 
-        self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"],self.removeElement, self.setTransformationForm, self.plotElement))
+        self.addReflectorWidget(elementDict["name"])
     
-    ##
-    # Reads form and adds plane to System
-    def addPlaneAction(self):
-        elementDict = self.ParameterWid.read()
-        self.stm.addPlane(elementDict) 
-        self.ElementsColumn.reflectors.addWidget(ReflectorWidget(elementDict["name"],self.removeElement,self.setTransformationForm,self.plotElement))
-    
+    ### Functionalities: Transforming Elements 
+
     ##
     # Shows single element transformation form
-    def setTransformationForm(self, element):
-        self.setForm(fDataObj.makeTransformationForm(element), self.applyTransformation)
-
-    ##
-    # Shows multiple element transformation form
-    def setTransformationElementsForm(self):
-        movableElements = []
-        for key, elem in self.stm.system.items():
-            if elem["gmode"] != 2:
-                movableElements.append(key)
-
-        self.setForm(
-            [InputDescription(inType.elementSelector, "elements", options=movableElements)]+
-            fDataObj.makeTransformationElementsForm(self.stm.system.keys()), self.applyTransformationElements
-            )
+    def transformSingleForm(self, element):
+        self.setForm(fDataObj.makeTransformationForm(element), self.transformAction)
     
     ##
     # Applies single element transformation
-    def applyTransformation(self, element):
+    def transformAction(self, element):
         dd = self.ParameterWid.read()
         transformationType = dd["type"]
         vector = dd["vector"]
@@ -382,8 +414,21 @@ class MainWidget(QWidget):
             raise Exception("Transformation type incorrect")
 
     ##
+    # Shows multiple element transformation form
+    def transformationMultipleForm(self):
+        movableElements = []
+        for key, elem in self.stm.system.items():
+            if elem["gmode"] != 2:
+                movableElements.append(key)
+
+        self.setForm(
+            [InputDescription(inType.elementSelector, "elements", options=movableElements)]+
+            fDataObj.makeTransformationElementsForm(self.stm.system.keys()), self.transformationMultipleAction
+            )
+
+    ##
     # Applies multiple element transformation
-    def applyTransformationElements(self):
+    def transformationMultipleAction(self):
         transfDict = self.ParameterWid.read()
 
         if transfDict["type"] == "Translation":
@@ -394,163 +439,38 @@ class MainWidget(QWidget):
             self.stm.rotateGrids(transfDict["elements"], transfDict["vector"], transfDict["pivot"])
             print(f'Translated {transfDict["elements"]} by {self._formatVector(transfDict["vector"])} mm')
     
+    ### Functionalities: TRFrames 
     #NOTE Raytrace widgets
 
     ##
     # Shows tube frame form
-    def setInitTubeFrameForm(self):
-        self.setForm(fDataObj.initTubeFrameInp(), readAction=self.addTubeFrameAction)
-    
-    ##
-    # Shows form to initialize gaussian frame 
-    def setInitGaussianFrameForm(self):
-        self.setForm(fDataObj.initGaussianFrameInp(), readAction=self.addGaussianFrameAction)
-    
-    ##
-    # Shows form to initialize gaussian beam 
-    def setInitGaussianForm(self):
-        self.setForm(fDataObj.initGaussianInp(self.stm.system), readAction=self.addGaussianAction)
-    
-    ##
-    # Shows form to initialize scalar gaussian beam TODO: klopt dit 
-    def setInitSGaussianForm(self):
-        self.setForm(fDataObj.initSGaussianInp(self.stm.system), readAction=self.addSGaussianAction)
-    
-    ##
-    # Shows form to initialize a physical optics propagation
-    def setInitPSForm(self):
-        self.setForm(fDataObj.initPSInp(self.stm.system), readAction=self.addPSAction)
-    
-    ##
-    # Shows form to initialize a scalar point source beam
-    def setInitSPSForm(self):
-        self.setForm(fDataObj.initSPSInp(self.stm.system), readAction=self.addSPSAction)
+    def initTubeFrameForm(self):
+        self.setForm(fDataObj.initTubeFrameInp(), readAction=self.initTubeFrameAction)
     
     ##
     # Reads form and adds a tube frame to system
-    def addTubeFrameAction(self):
+    def initTubeFrameAction(self):
         RTDict = self.ParameterWid.read()
         self.stm.createTubeFrame(RTDict)
-        self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(RTDict["name"],
-                           self.stm.removeFrame,  self.setPlotFrameFormOpt, self.calcRMSfromFrame))    
+        self.addFrameWidget(RTDict["name"])
     
     ##
+    # Shows form to initialize gaussian frame 
+    def initGaussianFrameForm(self):
+        self.setForm(fDataObj.initGaussianFrameInp(), readAction=self.initGaussianFrameAction)
+    
+
+    ##
     # Reads form and adds a gaussian frame to system
-    def addGaussianFrameAction(self):
+    def initGaussianFrameAction(self):
         GRTDict = self.ParameterWid.read()
 
         if not "seed" in GRTDict.keys():
             GRTDict["seed"] = -1
 
         self.stm.createGRTFrame(GRTDict)
-        self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(GRTDict["name"],
-                             self.stm.removeFrame,self.setPlotFrameFormOpt, self.calcRMSfromFrame))    
-    
-    ##
-    # Reads form and adds a vectorial gaussian beam to system
-    def addGaussianAction(self):
-        GDict = self.ParameterWid.read()
-        self.stm.createGaussian(GDict, GDict["surface"])
-        self.ElementsColumn.POFields.addWidget(FieldsWidget(GDict["name"], self.stm.removeField, self.setPlotFieldFormOpt))
-        self.ElementsColumn.POCurrents.addWidget(CurrentWidget(GDict["name"], self.stm.removeCurrent, self.setPlotCurrentFormOpt))
-    
-    ##
-    # Reads form and adds a scalar gaussian beam to system
-    def addSGaussianAction(self):
-        GDict = self.ParameterWid.read()
-        self.stm.createScalarGaussian(GDict, GDict["surface"])
-        self.ElementsColumn.SPOFields.addWidget(SFieldsWidget(GDict["name"], self.stm.removeScalarField, self.setPlotSFieldFormOpt))
-    
-    ##
-    # Reads form and adds a vectorial point source beam to system
-    def addPSAction(self):
-        PSDict = self.ParameterWid.read()
-        self.stm.generatePointSource(PSDict, PSDict["surface"])
-        self.ElementsColumn.POFields.addWidget(FieldsWidget(PSDict["name"], self.stm.removeField, self.setPlotFieldFormOpt))
-        self.ElementsColumn.POCurrents.addWidget(CurrentWidget(PSDict["name"], self.stm.removeCurrent, self.setPlotCurrentFormOpt))
-    
-    ##
-    # Reads form and adds a scalar point source beam to system
-    def addSPSAction(self):
-        SPSDict = self.ParameterWid.read()
-        self.stm.generatePointSourceScalar(SPSDict, SPSDict["surface"])
-        self.ElementsColumn.SPOFields.addWidget(SFieldsWidget(SPSDict["name"], self.stm.removeScalarField, self.setPlotSFieldFormOpt))
-    
-    ##
-    # Shows form to plot a frame
-    def setPlotFrameForm(self):
-        self.setForm(fDataObj.plotFrameInp(self.stm.frames), readAction=self.addPlotFrameAction)
-    
-    ##
-    # TODO: whats the difference with above? Perhase we should rename function
-    #
-    # @param frame Frame to plot
-    def setPlotFrameFormOpt(self, frame):
-        self.setForm(fDataObj.plotFrameOpt(frame), readAction=self.addPlotFrameAction)
-
-    ##
-    # Shows form to plot field
-    #
-    # @param field Field to plot
-    def setPlotFieldFormOpt(self, field):
-        if self.stm.system[self.stm.fields[field].surf]["gmode"] == 2:
-            self.setForm(fDataObj.plotFarField(field), readAction=self.addPlotFieldAction)
-        else:
-            self.setForm(fDataObj.plotField(field), readAction=self.addPlotFieldAction)
-                
-    ##
-    # TODO: whats the difference with above? Perhase we should rename function
-    #
-    # @param field Field to plot
-    def setPlotSFieldFormOpt(self, field):
-        self.setForm(fDataObj.plotSField(field, self.stm.system[self.stm.scalarfields[field].surf]["gmode"]), readAction=self.addPlotSFieldAction)
-    
-    ## 
-    # Shows form to plot current
-    #
-    # @param current Current to plot
-    def setPlotCurrentFormOpt(self, current):
-        self.setForm(fDataObj.plotCurrentOpt(current), readAction=self.addPlotCurrentAction)
-    
-    ##
-    # Reads form and plots frame
-    def addPlotFrameAction(self):
-        plotFrameDict = self.ParameterWid.read()
-        fig = self.stm.plotRTframe(plotFrameDict["frame"], project=plotFrameDict["project"], ret=True)
-        self.addPlot(fig, f'{plotFrameDict["frame"]} - {plotFrameDict["project"]}')
-
-        self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
-
-    ##
-    # Reads form and plots field
-    def addPlotFieldAction(self):
-        plotFieldDict = self.ParameterWid.read()
-        fig, _ = self.stm.plotBeam2D(plotFieldDict["field"], plotFieldDict["comp"], 
-                                    project=plotFieldDict["project"], ret=True)
-        self.addPlot(fig, f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
-
-        self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
-    
-    ##
-    # Reads form and plots scalar field
-    def addPlotSFieldAction(self):
-        plotSFieldDict = self.ParameterWid.read()
-        fig, _ = self.stm.plotBeam2D(plotSFieldDict["field"], 
-                                    project=plotSFieldDict["project"], ret=True)
-        self.addPlot(fig, f'{plotSFieldDict["field"]} - {plotSFieldDict["project"]}')
-
-        self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
-    
-    ##
-    # Reads form and plots current
-    def addPlotCurrentAction(self):
-        plotFieldDict = self.ParameterWid.read()
-        fig, _ = self.stm.plotBeam2D(plotFieldDict["field"], 
-                                    plotFieldDict["comp"], project=plotFieldDict["project"], ret=True)
-        self.addPlot(fig, f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
-
-        self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
-    
+        self.addFrameWidget(GRTDict["name"])
+        
     ##
     # Shows form to propagate rays
     def setPropRaysForm(self):
@@ -561,19 +481,195 @@ class MainWidget(QWidget):
     def addPropRaysAction(self): 
         propRaysDict = self.ParameterWid.read()
         self.stm.runRayTracer(propRaysDict)
-        self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(propRaysDict["frame_out"], 
-                                [self.setPlotFrameFormOpt, self.stm.removeFrame, self.calcRMSfromFrame]))
+        self.addFrameWidget(propRaysDict["frame_out"])
+
+
+    #TODO: use this or delete it
+    ##
+    # Shows form to plot a frame (without preselected frame) 
+    def plotAnyFrameForm(self):
+        self.setForm(fDataObj.plotFrameInp(self.stm.frames), readAction=self.addPlotFrameAction)
+
+    ##
+    # Shows form to plot preselected a frame
+    # 
+    # @param frame Frame to plot
+    def plotFrameForm(self, frame):
+        self.setForm(fDataObj.plotFrameOpt(frame), readAction=self.addPlotFrameAction)
+
+    ##
+    # Reads form and plots frame
+    def addPlotFrameAction(self):
+        plotFrameDict = self.ParameterWid.read()
+        fig = self.stm.plotRTframe(plotFrameDict["frame"], project=plotFrameDict["project"], ret=True)
+        self.addPlot(fig, f'{plotFrameDict["frame"]} - {plotFrameDict["project"]}')
+
+        self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
+
+    
+    
+    ### Functionalities: PO 
+    ##
+    # Shows form to initialize gaussian beam 
+    def initGaussBeamForm(self):
+        self.setForm(fDataObj.initGaussianInp(self.stm.system), readAction=self.initGaussBeamAction)
+
+    ##
+    # Reads form and adds a vectorial gaussian beam to system
+    def initGaussBeamAction(self):
+        GDict = self.ParameterWid.read()
+        self.stm.createGaussian(GDict, GDict["surface"])
+        self.addFieldWidget(GDict["name"])
+        self.addCurrentWidget(GDict["name"])
+    
+    
+    ##
+    # Shows form to initialize scalar gaussian beam TODO: klopt dit 
+    def initSGaussBeamForm(self):
+        self.setForm(fDataObj.initSGaussianInp(self.stm.system), readAction=self.initSGaussBeamAction)
+    
+    ##
+    # Reads form and adds a scalar gaussian beam to system
+    def initSGaussBeamAction(self):
+        GDict = self.ParameterWid.read()
+        self.stm.createScalarGaussian(GDict, GDict["surface"])
+        self.addSFieldWidget(GDict["name"])
+
+    ##
+    # Shows form to initialize a physical optics propagation
+    def initPSBeamForm(self):
+        self.setForm(fDataObj.initPSInp(self.stm.system), readAction=self.initPSBeamAction)
+    
+    
+    ##
+    # Reads form and adds a vectorial point source beam to system
+    def initPSBeamAction(self):
+        PSDict = self.ParameterWid.read()
+        self.stm.generatePointSource(PSDict, PSDict["surface"])
+        self.addFieldWidget(PSDict["name"])
+        self.addCurrentWidget(PSDict["name"])
+    
+    ##
+    # Shows form to initialize a scalar point source beam
+    def initSPSBeamForm(self):
+        self.setForm(fDataObj.initSPSInp(self.stm.system), readAction=self.initSPSBeamAction)
+    
+
+    ##
+    # Reads form and adds a scalar point source beam to system
+    def initSPSBeamAction(self):
+        SPSDict = self.ParameterWid.read()
+        self.stm.generatePointSourceScalar(SPSDict, SPSDict["surface"])
+        self.addSFieldWidget(SPSDict["name"])
+    
+
+
+    ##
+    # Shows form to plot field
+    #
+    # @param field Field to plot
+    def plotFieldForm(self, field):
+        if self.stm.system[self.stm.fields[field].surf]["gmode"] == 2:
+            self.setForm(fDataObj.plotFarField(field), readAction=self.plotFieldAction)
+        else:
+            self.setForm(fDataObj.plotField(field), readAction=self.plotFieldAction)
+
+    ##
+    # Reads form and plots field
+    def plotFieldAction(self):
+        plotFieldDict = self.ParameterWid.read()
+        fig, _ = self.stm.plotBeam2D(plotFieldDict["field"], plotFieldDict["comp"], 
+                                    project=plotFieldDict["project"], ret=True)
+        self.addPlot(fig, f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
+
+        self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
+                
+    ##
+    # TODO: whats the difference with above? Perhase we should rename function
+    #
+    # @param field Field to plot
+    def plotSFieldForm(self, field):
+        self.setForm(fDataObj.plotSField(field, self.stm.system[self.stm.scalarfields[field].surf]["gmode"]), readAction=self.plotSFieldAction)
+
+    ##
+    # Reads form and plots scalar field
+    def plotSFieldAction(self):
+        plotSFieldDict = self.ParameterWid.read()
+        fig, _ = self.stm.plotBeam2D(plotSFieldDict["field"], 
+                                    project=plotSFieldDict["project"], ret=True)
+        self.addPlot(fig, f'{plotSFieldDict["field"]} - {plotSFieldDict["project"]}')
+
+        self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
+    
+    
+    ## 
+    # Shows form to plot current
+    #
+    # @param current Current to plot
+    def plotCurrentForm(self, current):
+        self.setForm(fDataObj.plotCurrentOpt(current), readAction=self.plotCurrentAction)
+    
+
+    ##
+    # Reads form and plots current
+    def plotCurrentAction(self):
+        plotFieldDict = self.ParameterWid.read()
+        fig, _ = self.stm.plotBeam2D(plotFieldDict["field"], 
+                                    plotFieldDict["comp"], project=plotFieldDict["project"], ret=True)
+        self.addPlot(fig, f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
+
+        self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
+    
+    
     
     ##
     # Shows form to propagate physical optics beam to surface 
-    def setPOInitForm(self):
-        self.setForm(fDataObj.propPOInp(self.stm.currents, self.stm.scalarfields, self.stm.system), self.addPropBeamAction)
+    def propPOForm(self):
+        self.setForm(fDataObj.propPOInp(self.stm.currents, self.stm.scalarfields, self.stm.system), self.propPOAction)
     
     ##
     # Shows form to propagate physical optics beam far field 
-    def setPOFFInitForm(self):
-        self.setForm(fDataObj.propPOFFInp(self.stm.currents, self.stm.system), self.addPropBeamAction)
+    def propPOFFForm(self):
+        self.setForm(fDataObj.propPOFFInp(self.stm.currents, self.stm.system), self.propPOAction)
     
+    ##
+    # Reads form propagates beam, runs calculation on another thread
+    def propPOAction(self):
+        propBeamDict = self.ParameterWid.read()
+      
+        if propBeamDict["mode"] == "scalar":
+            subStr = "scalar field"
+        else:
+            subStr = propBeamDict["mode"]
+
+        dialStr = f"Calculating {subStr} on {propBeamDict['t_name']}..."
+
+        dial = SymDialog(dialStr)
+
+        self.mgr = TManager.Manager("G", callback=dial.accept)
+        t = self.mgr.new_gthread(target=self.stm.runPO, args=(propBeamDict,), calc_type=propBeamDict["mode"])
+        
+        dial.setThread(t)
+
+        if dial.exec_():
+            if propBeamDict["mode"] == "JM":
+                self.addCurrentWidget(propBeamDict["name_JM"])
+        
+            elif propBeamDict["mode"] == "EH" or propBeamDict["mode"] == "FF":
+                self.addFieldWidget(propBeamDict["name_EH"])
+        
+            elif propBeamDict["mode"] == "JMEH":
+                self.addCurrentWidget(propBeamDict["name_JM"])
+                self.addFieldWidget(propBeamDict["name_EH"])
+        
+            elif propBeamDict["mode"] == "EHP":
+                self.addFieldWidget(propBeamDict["name_EH"])
+                self.addFrameWidget(propBeamDict["name_P"])
+    
+            elif propBeamDict["mode"] == "scalar":
+                self.addSFieldWidget(propBeamDict["name_field"])
+
+    #TODO Unite efficiencies
     ##
     # Shows form to calculate taper efficientie
     def setTaperEffsForm(self):
@@ -628,46 +724,9 @@ class MainWidget(QWidget):
         MBDict = self.ParameterWid.read()
         eff_mb = self.stm.calcMainBeam(MBDict["f_name"], MBDict["comp"], MBDict["thres"], MBDict["mode"])
         print(f'Main beam efficiency of {MBDict["f_name"]}, component {MBDict["comp"]} = {eff_mb}\n')
-        self.ElementsColumn.SPOFields.addWidget(SFieldsWidget(f"fitGauss_{MBDict['f_name']}", self.stm.removeScalarField, self.setPlotSFieldFormOpt))
+        self.addSFieldWidget(f"fitGauss_{MBDict['f_name']}")
 
-    ##
-    # Reads form propagates beam, runs calculation on another thread
-    def addPropBeamAction(self):
-        propBeamDict = self.ParameterWid.read()
-      
-        if propBeamDict["mode"] == "scalar":
-            subStr = "scalar field"
-        else:
-            subStr = propBeamDict["mode"]
-
-        dialStr = f"Calculating {subStr} on {propBeamDict['t_name']}..."
-
-        dial = SymDialog(dialStr)
-
-        self.mgr = TManager.Manager("G", callback=dial.accept)
-        t = self.mgr.new_gthread(target=self.stm.runPO, args=(propBeamDict,), calc_type=propBeamDict["mode"])
-        
-        dial.setThread(t)
-
-        if dial.exec_():
-            if propBeamDict["mode"] == "JM":
-                self.ElementsColumn.POCurrents.addWidget(CurrentWidget(propBeamDict["name_JM"], self.stm.removeCurrent, self.setPlotCurrentFormOpt))
-        
-            elif propBeamDict["mode"] == "EH" or propBeamDict["mode"] == "FF":
-                self.ElementsColumn.POFields.addWidget(FieldsWidget(propBeamDict["name_EH"], self.stm.removeField, self.setPlotFieldFormOpt))
-        
-            elif propBeamDict["mode"] == "JMEH":
-                self.ElementsColumn.POCurrents.addWidget(CurrentWidget(propBeamDict["name_JM"], self.stm.removeCurrent, self.setPlotCurrentFormOpt))
-                self.ElementsColumn.POFields.addWidget(FieldsWidget(propBeamDict["name_EH"], self.stm.removeField, self.setPlotFieldFormOpt))
-        
-            elif propBeamDict["mode"] == "EHP":
-                self.ElementsColumn.POFields.addWidget(FieldsWidget(propBeamDict["name_EH"], self.stm.removeField, self.setPlotFieldFormOpt))
-                self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(propBeamDict["name_P"], 
-                                self.stm.removeFrame, self.setPlotFrameFormOpt,self.calcRMSfromFrame))
     
-            elif propBeamDict["mode"] == "scalar":
-                self.ElementsColumn.SPOFields.addWidget(SFieldsWidget(propBeamDict["name_field"], self.stm.removeScalarField, self.setPlotSFieldFormOpt))
-
     #END NOTE
     
     ##
@@ -691,8 +750,9 @@ class PyPOMainWindow(QMainWindow):
         super().__init__(parent)
         self.mainWid = MainWidget()
         self.mainWid.setContentsMargins(0,0,0,0)
+        self.setStyleSheet("background:red")
         self.setContentsMargins(0,0,0,0)
-        self.setAutoFillBackground(True)
+        # self.setAutoFillBackground(True)
         self._createMenuBar()
         self.setCentralWidget(self.mainWid)
         self.showMaximized()
@@ -730,19 +790,19 @@ class PyPOMainWindow(QMainWindow):
         planeAction = QAction("Plane", self)
         planeAction.setShortcut("Ctrl+L")
         planeAction.setStatusTip("Add a planar element.")
-        planeAction.triggered.connect(self.mainWid.setPlaneForm)
+        planeAction.triggered.connect(self.mainWid.addPlaneForm)
         reflectorSelector.addAction(planeAction)
         
         ### Quadric Surface
         hyperbolaAction = QAction('Quadric surface', self)
         hyperbolaAction.setShortcut('Ctrl+Q')
         hyperbolaAction.setStatusTip("Add a paraboloid, hyperboloid or ellipsoid element.")
-        hyperbolaAction.triggered.connect(self.mainWid.setQuadricForm)
+        hyperbolaAction.triggered.connect(self.mainWid.addQuadricForm)
         reflectorSelector.addAction(hyperbolaAction)
 
         transformElementsAction = QAction("Transform elements", self)
         transformElementsAction.setStatusTip("Transform a group of elements.")
-        transformElementsAction.triggered.connect(self.mainWid.setTransformationElementsForm)
+        transformElementsAction.triggered.connect(self.mainWid.transformationMultipleForm)
         ElementsMenu.addAction(transformElementsAction)
         
 
@@ -763,29 +823,29 @@ class PyPOMainWindow(QMainWindow):
         
         saveSystem = QAction("Save system", self)
         saveSystem.setStatusTip("Save the current system to disk.")
-        saveSystem.triggered.connect(self.mainWid.saveSystemAction)
+        saveSystem.triggered.connect(self.mainWid.saveSystemForm)
         SystemsMenu.addAction(saveSystem)
 
         loadSystem = QAction("Load system", self)
         loadSystem.setStatusTip("Load a saved system from disk.")
-        loadSystem.triggered.connect(self.mainWid.loadSystemAction)
+        loadSystem.triggered.connect(self.mainWid.loadSystemForm)
         SystemsMenu.addAction(loadSystem)
         
         removeSystem = QAction("Remove system", self)
         removeSystem.setStatusTip("Remove a saved system from disk.")
-        removeSystem.triggered.connect(self.mainWid.deleteSystemAction)
+        removeSystem.triggered.connect(self.mainWid.deleteSavedSystemForm)
         SystemsMenu.addAction(removeSystem)
         
         # NOTE Raytrace actions
         makeFrame = RaytraceMenu.addMenu("Make frame")
         initTubeFrameAction = QAction("Tube", self)
         initTubeFrameAction.setStatusTip("Initialize ray-trace tube from input form")
-        initTubeFrameAction.triggered.connect(self.mainWid.setInitTubeFrameForm)
+        initTubeFrameAction.triggered.connect(self.mainWid.initTubeFrameForm)
         makeFrame.addAction(initTubeFrameAction)
 
         initGaussianFrameAction = QAction("Gaussian", self)
         initGaussianFrameAction.setStatusTip("Initialize ray-trace Gaussian from input form")
-        initGaussianFrameAction.triggered.connect(self.mainWid.setInitGaussianFrameForm)
+        initGaussianFrameAction.triggered.connect(self.mainWid.initGaussianFrameForm)
         makeFrame.addAction(initGaussianFrameAction)
         
         # Propagate rays
@@ -799,34 +859,34 @@ class PyPOMainWindow(QMainWindow):
         makeBeamPS = makeBeam.addMenu("Point source")
         initPointVecAction = QAction("Vectorial", self)
         initPointVecAction.setStatusTip("Initialize a vectorial point source.")
-        initPointVecAction.triggered.connect(self.mainWid.setInitPSForm)
+        initPointVecAction.triggered.connect(self.mainWid.initPSBeamForm)
         makeBeamPS.addAction(initPointVecAction)
         
         initPointScalAction = QAction("Scalar", self)
         initPointScalAction.setStatusTip("Initialize a scalar point source.")
-        initPointScalAction.triggered.connect(self.mainWid.setInitSPSForm)
+        initPointScalAction.triggered.connect(self.mainWid.initSPSBeamForm)
         makeBeamPS.addAction(initPointScalAction)
     
         makeBeamG = makeBeam.addMenu("Gaussian beam")
         initGaussVecAction = QAction("Vectorial", self)#TODO Vectorial?
         initGaussVecAction.setStatusTip("Initialize a vectorial Gaussian beam.")
-        initGaussVecAction.triggered.connect(self.mainWid.setInitGaussianForm)
+        initGaussVecAction.triggered.connect(self.mainWid.initGaussBeamForm)
         makeBeamG.addAction(initGaussVecAction)
         
         initGaussScalAction = QAction("Scalar", self)
         initGaussScalAction.setStatusTip("Initialize a scalar Gaussian beam.")
-        initGaussScalAction.triggered.connect(self.mainWid.setInitSGaussianForm)
+        initGaussScalAction.triggered.connect(self.mainWid.initSGaussBeamForm)
         makeBeamG.addAction(initGaussScalAction)
 
         propBeam = PhysOptMenu.addMenu("Propagate beam") 
         initPropSurfAction = QAction("To surface", self)
         initPropSurfAction.setStatusTip("Propagate a PO beam from a source surface to a target surface.")
-        initPropSurfAction.triggered.connect(self.mainWid.setPOInitForm)
+        initPropSurfAction.triggered.connect(self.mainWid.propPOForm)
         propBeam.addAction(initPropSurfAction)
         
         initPropFFAction = QAction("To far-field", self)
         initPropSurfAction.setStatusTip("Propagate a PO beam from a source surface to a far-field surface.")
-        initPropFFAction.triggered.connect(self.mainWid.setPOFFInitForm)
+        initPropFFAction.triggered.connect(self.mainWid.propPOFFForm)
         propBeam.addAction(initPropFFAction)
 
         calcEffs = PhysOptMenu.addMenu("Efficiencies")

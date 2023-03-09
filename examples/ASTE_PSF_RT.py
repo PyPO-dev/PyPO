@@ -51,8 +51,6 @@ def ex_ASTE_RT(device):
             "angy"          : 0,
             "a"             : 4000,
             "b"             : 4000,
-            "tChief"        : np.array([0,0,0]),
-            "oChief"        : np.array([0,0,3.5e3])
             }
 
     rotation = np.array([0, 0, 0])
@@ -68,8 +66,16 @@ def ex_ASTE_RT(device):
     #s.rotateGrids("sec", np.array([1,0,0]), np.array([0,0,3.5e3]))
 
     s.createTubeFrame(argDict=RTpar)
+    s.translateGrids("start", np.array([0,0,3.5e3]), obj="frame")
 
+    _rotation = np.array([160,45,14])
 
+    s.rotateGrids("start", _rotation, obj="frame", pivot=np.zeros(3))
+
+    s.groupElements("ASTE", "pri", "sec", "plane1")
+    s.rotateGrids("ASTE", _rotation, obj="group", pivot=np.zeros(3))
+
+    s.plotSystem()
     start_pri_RT = {
             "fr_in"     : "start",
             "t_name"    : "pri",

@@ -460,16 +460,6 @@ def check_TubeRTDict(TubeRTDict, nameList):
     else:
         errStr += errMsg_field("b", "TubeRTDict")
 
-    if "tChief" in TubeRTDict:
-        errStr += block_ndarray("tChief", TubeRTDict, (3,))
-    else:
-        errStr += errMsg_field("tChief", "TubeRTDict")
-
-    if "oChief" in TubeRTDict:
-        errStr += block_ndarray("oChief", TubeRTDict, (3,))
-    else:
-        errStr += errMsg_field("oChief", "TubeRTDict")
-
     if errStr:
         errList = errStr.split("\n")[:-1]
 
@@ -620,9 +610,9 @@ def check_ellipseLimits(ellipsoid):
     elif ellipsoid["gmode"] == 1:
         if np.absolute(ellipsoid["lims_u"][0]) > ellipsoid["coeffs"][idx_lim]:
             clog.warning(f"Lower u-limit of {ellipsoid['lims_u'][0]:.3f} incompatible with ellipsoid {ellipsoid['name']}. Changing to {ellipsoid['coeffs'][idx_lim]}.")
-            ellipsoid["lims_u"][0] = ellipsoid["coeffs"][idx_lim]# - ellipsoid["lims_u"][0] / buff
+            ellipsoid["lims_u"][0] = ellipsoid["coeffs"][idx_lim] - ellipsoid["lims_u"][0] / buff
  
         if np.absolute(ellipsoid["lims_u"][1]) > ellipsoid["coeffs"][idx_lim]:
             clog.warning(f"Upper u-limit of {ellipsoid['lims_u'][1]:.3f} incompatible with ellipsoid {ellipsoid['name']}. Changing to {ellipsoid['coeffs'][idx_lim]}.")
-            ellipsoid["lims_u"][1] = ellipsoid["coeffs"][idx_lim]# - ellipsoid["lims_u"][1] / buff
+            ellipsoid["lims_u"][1] = ellipsoid["coeffs"][idx_lim] - ellipsoid["lims_u"][1] / buff
 

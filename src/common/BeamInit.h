@@ -146,51 +146,35 @@ void initFrame(T rdict, U *fr)
 
     int n = 1;
 
-    std::array<V, 3> tChief;
-    std::array<V, 3> oChief;
     std::array<V, 3> rotation;
-    std::array<V, 3> _direction;
     std::array<V, 3> direction;
+    
+    fr->x[0] = 0.;
+    fr->y[0] = 0.;
+    fr->z[0] = 0.;
 
-    for (int n=0; n<3; n++) {tChief[n] = rdict.tChief[n];}
-    for (int n=0; n<3; n++) {oChief[n] = rdict.oChief[n];}
+    fr->dx[0] = 0.;
+    fr->dy[0] = 0.;
+    fr->dz[0] = 1.;
 
-    ut.matRot(tChief, nomChief, zero, direction);
-
-    fr->x[0] = oChief[0];
-    fr->y[0] = oChief[1];
-    fr->z[0] = oChief[2];
-
-    fr->dx[0] = direction[0];
-    fr->dy[0] = direction[1];
-    fr->dz[0] = direction[2];
-
-    std::array<V, 3> _pos;
     std::array<V, 3> pos;
 
     for (int i=1; i<nTot; i++)
     {
-        _pos[0] = rdict.a * cos(alpha) / rdict.nRing * n + rdict.oChief[0];
-        _pos[1] = rdict.b * sin(alpha) / rdict.nRing * n + rdict.oChief[1];
-        _pos[2] = rdict.oChief[2];
+        fr->x[i] = rdict.a * cos(alpha) / rdict.nRing * n;
+        fr->y[i] = rdict.b * sin(alpha) / rdict.nRing * n;
+        fr->z[i] = 0.;
 
         rotation[0] = rdict.angy * sin(alpha) / rdict.nRing * n;
         rotation[1] = rdict.angx * cos(alpha) / rdict.nRing * n;
         rotation[2] = 2 * alpha;
 
-        ut.matRot(rotation, nomChief, zero, _direction);
-        ut.matRot(tChief, _direction, zero, direction);
-
-        ut.matRot(tChief, _pos, oChief, pos);
-
-        fr->x[i] = pos[0];
-        fr->y[i] = pos[1];
-        fr->z[i] = pos[2];
+        ut.matRot(rotation, nomChief, zero, direction);
 
         fr->dx[i] = direction[0];
         fr->dy[i] = direction[1];
         fr->dz[i] = direction[2];
-
+        std::cout << pos[0] << std::endl;
         alpha += d_alpha;
 
         if (i == int(nTot / rdict.nRing) * n)
@@ -213,31 +197,21 @@ void initRTGauss(T grdict, U *fr)
     if (grdict.seed != -1) {Random<V> rando(grdict.seed);}
 
     fr->size = grdict.nRays;
-
-    std::array<V, 3> tChief;
-    std::array<V, 3> oChief;
+    
     std::array<V, 3> rotation;
     std::array<V, 3> direction;
-    std::array<V, 3> ddirection;
     std::array<V, 3> pos;
-    std::array<V, 3> ppos;
-
-    for (int n=0; n<3; n++) {tChief[n] = grdict.tChief[n];}
-    for (int n=0; n<3; n++) {oChief[n] = grdict.oChief[n];}
 
     // Initialize scale vector
     std::vector<V> scales{grdict.x0, grdict.y0, grdict.angx0, grdict.angy0};
 
-    // Initialize first entry in frame: chief ray
-    ut.matRot(tChief, nomChief, zero, direction);
+    fr->x[0] = 0.;
+    fr->y[0] = 0.;
+    fr->z[0] = 0.;
 
-    fr->x[0] = oChief[0];
-    fr->y[0] = oChief[1];
-    fr->z[0] = oChief[2];
-
-    fr->dx[0] = direction[0];
-    fr->dy[0] = direction[1];
-    fr->dz[0] = direction[2];
+    fr->dx[0] = 0.;
+    fr->dy[0] = 0.;
+    fr->dz[0] = 1.;
 
     // Start rejection sampling. Use n_suc as succes counter
     int n_suc = 1;
@@ -258,11 +232,9 @@ void initRTGauss(T grdict, U *fr)
        {
            // Rotate chief ray by tilt angles found
            rotation  = {xi[3], xi[2], 0};
-           ut.matRot(rotation, nomChief, zero, ddirection);
-           ut.matRot(tChief, ddirection, zero, direction);
+           ut.matRot(rotation, nomChief, zero, direction);
            //std::cout << ddirection[2] << std::endl;
-           ppos = {xi[0] + oChief[0], xi[1] + oChief[1], oChief[2]};
-           ut.matRot(tChief, ppos, oChief, pos);
+           pos = {xi[0], xi[1], 0};
 
            fr->x[n_suc] = pos[0];
            fr->y[n_suc] = pos[1];

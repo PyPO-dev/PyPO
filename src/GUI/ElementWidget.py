@@ -142,8 +142,8 @@ class GroupWidget(ElementWidget):
         super().__init__(name, plotAction, removeAction, transformAction=transformAction, snapAction=self.snapAction, p=p)
 
 class FrameWidget(ElementWidget):
-    def __init__ (self, name, removeAction, plotAction, RMSAction,  p=None ):
-        super().__init__(name, plotAction, removeAction,RMSAction=RMSAction, p=p)
+    def __init__ (self, name, removeAction, transformAction, plotAction, RMSAction,  p=None ):
+        super().__init__(name, plotAction, removeAction, transformAction=transformAction, RMSAction=RMSAction, p=p)
 
 class FieldsWidget(ElementWidget):
     def __init__ (self, name, removeAction, plotAction, p=None ):

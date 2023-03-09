@@ -166,8 +166,6 @@ struct RTDict {
     double angy;    /**<Apex angle of beam at focus in y-direction, in degrees.*/
     double a;       /**<Semi-major axis of outer ring, in millimeters.*/
     double b;       /**<Semi-minor axis of outer ring, in millimeters.*/
-    double *tChief; /**<array of 3 double. Tilt of chief, ray, along x, y or z axis, in degrees.*/
-    double *oChief; /**<array of 3 double. Co-ordinate of chief ray origin.*/
 };
 
 /** Object for initializing a Gaussian ray-trace frame object.*/
@@ -178,8 +176,6 @@ struct GRTDict {
     double x0;       /**<Beam waist along x-direction, in millimeters.*/
     double y0;       /**<Beam waist along x-direction, in millimeters.*/
     int seed;
-    double *tChief; /**<array of 3 double. Tilt of chief, ray, along x, y or z axis, in degrees.*/
-    double *oChief; /**<array of 3 double. Co-ordinate of chief ray origin.*/
 };
 
 /** Object for initializing a Gaussian beam.*/

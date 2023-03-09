@@ -203,6 +203,7 @@ class Test_MatTransform(unittest.TestCase):
         plane_test["name"] = "plane_test"
 
         self.s.addPlane(plane_test)
+
     #def tearDown(self):
     #    del self.s
 

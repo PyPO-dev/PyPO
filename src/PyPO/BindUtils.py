@@ -301,9 +301,6 @@ def allfill_RTDict(res, rdict_py, ct_t):
     res.a = ct_t(rdict_py["a"])
     res.b = ct_t(rdict_py["b"])
 
-    res.tChief = (ct_t * 3)(*np.radians(rdict_py["tChief"]).tolist())
-    res.oChief = (ct_t * 3)(*rdict_py["oChief"].tolist())
-
 def allfill_GRTDict(res, grdict_py, ct_t):
     res.nRays = ctypes.c_int(grdict_py["nRays"])
 
@@ -312,9 +309,6 @@ def allfill_GRTDict(res, grdict_py, ct_t):
     res.x0 = ct_t(grdict_py["x0"])
     res.y0 = ct_t(grdict_py["y0"])
     res.seed = ctypes.c_int(grdict_py["seed"])
-
-    res.tChief = (ct_t * 3)(*np.radians(grdict_py["tChief"]).tolist())
-    res.oChief = (ct_t * 3)(*grdict_py["oChief"].tolist())
 
 def allfill_GDict(res, gdict_py, ct_t):
     res.lam = ct_t(gdict_py["lam"])

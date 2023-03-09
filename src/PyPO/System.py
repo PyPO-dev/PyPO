@@ -29,6 +29,8 @@ import src.PyPO.Plotter as plt
 import src.PyPO.Efficiencies as effs
 import src.PyPO.FitGauss as fgs
 
+from src.PyPO.WorldParam import *
+
 # Set PyPO absolute root path
 sysPath = Path(__file__).parents[2]
 logging.getLogger(__name__)
@@ -67,6 +69,7 @@ class System(object):
     savePathScalarFields = os.path.join(sysPath, "save", "scalarfields")
     savePathCurrents = os.path.join(sysPath, "save", "currents")
     savePathSystems = os.path.join(sysPath, "save", "systems")
+
 
     ##
     # Constructor. Initializes system state.
@@ -489,12 +492,12 @@ class System(object):
                 
                 Rtot = Tp @ R @ Tpm
                 
-                for elem in self.groups[name]["elements"]:
-                    elem["transf"] = Rtot @ elem["transf"]
-                    elem["transf"][:-1, :-1] = (MatRotate(rotation, pivot=pivot))[:-1, :-1]
+                for self.system[elem] in self.groups[name]["members"]:
+                    self.system[elem]["transf"] = Rtot @ self.system[elem]["transf"]
+                    self.system[elem]["transf"][:-1, :-1] = (MatRotate(rotation, pivot=pivot))[:-1, :-1]
 
-                    elem["pos"] = (Rtot @ np.append(elem["pos"], 1))[:-1]
-                    elem["ori"] = Rtot[:-1, :-1] @ elem["ori"]
+                    self.system[elem]["pos"] = (Rtot @ np.append(self.system[elem]["pos"], 1))[:-1]
+                    self.system[elem]["ori"] = Rtot[:-1, :-1] @ self.system[elem]["ori"]
 
                 self.groups[name]["pos"] = (Rtot @ np.append(self.groups[name]["pos"], 1))[:-1]
                 self.groups[name]["ori"] = Rtot[:-1, :-1] @ self.groups[name]["ori"]
@@ -502,17 +505,53 @@ class System(object):
                 self.clog.info(f"Rotated group {name} to {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
             elif mode == "relative":
-                for elem in self.groups[name]["elements"]:
-                    elem["transf"] = MatRotate(rotation, elem["transf"], pivot)
+                for elem in self.groups[name]["members"]:
+                    self.system[elem]["transf"] = MatRotate(rotation, self.system[elem]["transf"], pivot)
                     
-                    elem["pos"] = (MatRotate(rotation, pivot=pivot) @ np.append(elem["pos"], 1))[:-1]
-                    elem["ori"] = MatRotate(rotation)[:-1, :-1] @ elem["ori"]
+                    self.system[elem]["pos"] = (MatRotate(rotation, pivot=pivot) @ np.append(self.system[elem]["pos"], 1))[:-1]
+                    self.system[elem]["ori"] = MatRotate(rotation)[:-1, :-1] @ self.system[elem]["ori"]
 
                 self.groups[name]["pos"] = (MatRotate(rotation, pivot=pivot) @ np.append(self.groups[name]["pos"], 1))[:-1]
                 self.groups[name]["ori"] = MatRotate(rotation)[:-1, :-1] @ self.groups[name]["ori"]
                 
                 self.clog.info(f"Rotated group {name} by {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
+        if obj == "frame":
+            check_frameSystem(name, self.frames, extern=True)
+            pivot = self.frames[name].pos if pivot is None else pivot
+            
+            if mode == "absolute":
+                match = np.array([0,0,1])
+                match_rot = (MatRotate(rotation))[:-1, :-1] @ match
+                R = self.findRotation(self.frames[name].ori, match_rot)
+
+                Tp = np.eye(4)
+                Tpm = np.eye(4)
+                Tp[:-1,-1] = pivot
+                Tpm[:-1,-1] = -pivot
+                
+                Rtot = Tp @ R @ Tpm
+
+                self.frames[name].transf = Rtot
+                self.frames[name].transf[:-1, :-1] = (MatRotate(rotation, pivot=pivot))[:-1, :-1]
+                self._transformFrame(self.frames[name])
+
+                #print(np.linalg.det(self.frames[name].transf))
+
+                self.frames[name].pos = (Rtot @ np.append(self.frames[name].pos, 1))[:-1]
+                self.frames[name].ori = Rtot[:-1, :-1] @ self.frames[name].ori
+                self.clog.info(f"Rotated element {name} to {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
+
+            elif mode == "relative":
+                self.frames[name].transf = MatRotate(rotation, pivot=pivot)
+                self._transformFrame(self.frames[name])
+                #print(np.linalg.det(self.frames[name].transf))
+                
+                self.frames[name].pos = (MatRotate(rotation, pivot=pivot) @ np.append(self.frames[name].pos, 1))[:-1]
+                self.frames[name].ori = MatRotate(rotation)[:-1, :-1] @ self.frames[name].ori
+            
+                self.clog.info(f"Rotated frame {name} by {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
+    
     ##
     # Translate reflector grids.
     #
@@ -544,9 +583,9 @@ class System(object):
                 _translation -= self.groups[name]["pos"]# - translation
             
             check_groupSystem(name, self.groups, extern=True)
-            for elem in self.groups[name]["elements"]:
-                self.system[name]["transf"] = MatTranslate(_translation, self.system[name]["transf"])
-                self.system[name]["pos"] += _translation
+            for elem in self.groups[name]["members"]:
+                self.system[elem]["transf"] = MatTranslate(_translation, self.system[elem]["transf"])
+                self.system[elem]["pos"] += _translation
             
             self.groups[name]["pos"] += _translation
             
@@ -556,6 +595,22 @@ class System(object):
             else:
                 self.clog.info(f"Translated group {name} by {*['{:0.3e}'.format(x) for x in list(_translation)],} millimeters.")
 
+        elif obj == "frame":
+            if mode == "absolute":
+                _translation -= self.frames[name].pos# - translation
+            
+            check_frameSystem(name, self.frames, extern=True)
+            
+
+            self.frames[name].transf = MatTranslate(_translation)
+            self._transformFrame(self.frames[name])
+            self.frames[name].pos += _translation
+            
+            if mode == "absolute":
+                self.clog.info(f"Translated frame {name} to {*['{:0.3e}'.format(x) for x in list(_translation)],} millimeters.")
+            else:
+                self.clog.info(f"Translated frame {name} by {*['{:0.3e}'.format(x) for x in list(_translation)],} millimeters.")
+    
     ##
     # Home a reflector or a group back into default configuration.
     #
@@ -675,7 +730,9 @@ class System(object):
         pos = np.zeros(3) if pos is None else pos
         ori = np.array([0,0,1]) if ori is None else ori
 
-        check_elemSystem(_name, self.system, extern=True)
+        for _name in names:
+            check_elemSystem(_name, self.system, extern=True)
+        
         self.groups[name_group] = {
                 "members"   : names,
                 "pos"       : pos,
@@ -943,7 +1000,13 @@ class System(object):
             argDict["name"] = f"Frame_{len(self.frames)}"
         
         check_TubeRTDict(argDict, self.frames.keys())
+        
         self.frames[argDict["name"]] = makeRTframe(argDict)
+
+        self.frames[argDict["name"]].setMeta(np.zeros(3), np.array([0,0,1]), np.eye(4))
+        self.frames[argDict["name"]].pos = np.zeros(3)
+        self.frames[argDict["name"]].ori = np.array([0,0,1])
+        self.frames[argDict["name"]].transf = np.eye(4)
     
     ##
     # Create a Gaussian beam distribution of rays from a GRTDict.
@@ -963,9 +1026,30 @@ class System(object):
 
         #check_RTDict(argDict, self.frames.keys())
         self.frames[argDict["name"]] = makeGRTframe(argDict)
+        
+        self.frames[argDict["name"]].pos = np.zeros(3)
+        self.frames[argDict["name"]].ori = np.array([0,0,1])
+        self.frames[argDict["name"]].transf = np.eye(4)
+        
         dtime = time.time() - start_time
         self.clog.info(f"Succesfully sampled {argDict['nRays']} rays: {dtime} seconds.")
 
+    def _transformFrame(self, frame):
+        for i in range(frame.size):
+            vec = np.array([frame.x[i], frame.y[i], frame.z[i], 1])
+            pos_new = frame.transf @ vec
+
+            frame.x[i] = pos_new[0]
+            frame.y[i] = pos_new[1]
+            frame.z[i] = pos_new[2]
+
+            vec = np.array([frame.dx[i], frame.dy[i], frame.dz[i]])
+            ori_new = frame.transf[:-1, :-1] @ vec
+
+            frame.dx[i] = ori_new[0]
+            frame.dy[i] = ori_new[1]
+            frame.dz[i] = ori_new[2]
+    
     ##
     # Convert a Poynting vector grid to a frame object. Sort of private method
     # 
@@ -1095,7 +1179,7 @@ class System(object):
 
         _runRTDict["fr_in"] = self.frames[_runRTDict["fr_in"]]
         _runRTDict["t_name"] = self.system[_runRTDict["t_name"]]
-        
+
         start_time = time.time()
         
         if _runRTDict["device"] == "CPU":
@@ -1111,7 +1195,10 @@ class System(object):
         dtime = time.time() - start_time
         
         self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
-        self.frames[_runRTDict["fr_out"]] = frameObj
+        self.frames[runRTDict["fr_out"]] = frameObj
+        
+        self.frames[runRTDict["fr_out"]].setMeta(self.calcRTcenter(runRTDict["fr_out"]), self.calcRTtilt(runRTDict["fr_out"]), np.eye(4))
+
 
     def interpFrame(self, name_fr_in, name_field, name_target, name_out, comp, method="nearest"):
         check_frameSystem(name_fr_in, self.frames, extern=True)

@@ -342,7 +342,7 @@ class MainWidget(QWidget):
         self.ElementsColumn.reflectors.addWidget(ReflectorWidget(name, self.removeElement, self.transformSingleForm, self.plotElement, self.snapActionForm)) 
 
     def addFrameWidget(self, name):
-        self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(name, self.stm.removeFrame, self.plotFrameForm,  self.calcRMSfromFrame))
+        self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(name, self.stm.removeFrame, self.transformFrameForm, self.plotFrameForm,  self.calcRMSfromFrame))
 
     def addFieldWidget(self, name):
         self.ElementsColumn.POFields.addWidget(FieldsWidget(name,self.stm.removeField, self.plotFieldForm))
@@ -419,6 +419,11 @@ class MainWidget(QWidget):
         self.setForm(fDataObj.makeTransformationForm(element), self.transformAction)
     
     ##
+    # Shows single element transformation form
+    def transformFrameForm(self, frame):
+        self.setForm(fDataObj.makeTransformationForm(frame, obj="frame"), self.transformFrameAction)
+    
+    ##
     # Applies single element transformation
     def transformAction(self, element):
         dd = self.ParameterWid.read()
@@ -434,6 +439,22 @@ class MainWidget(QWidget):
         else:
             raise Exception("Transformation type incorrect")
 
+    ##
+    # Applies single frame transformation
+    def transformFrameAction(self, frame):
+        dd = self.ParameterWid.read()
+        transformationType = dd["type"]
+        vector = dd["vector"]
+
+        if transformationType == "Translation":
+            self.stm.translateGrids(dd["frame"], vector, mode=dd["mode"].lower(), obj="frame")
+            print(f'Translated {dd["frame"]} by {self._formatVector(vector)} mm')
+        elif transformationType == "Rotation":
+            self.stm.rotateGrids(dd["frame"], vector, pivot=dd["pivot"], mode=dd["mode"].lower(), obj="frame")
+            print(f'Rotated {dd["frame"]} by {self._formatVector(vector)} deg around {self._formatVector(dd["pivot"])}')
+        else:
+            raise Exception("Transformation type incorrect")
+    
     ##
     # Shows multiple element transformation form
     def transformationMultipleForm(self):

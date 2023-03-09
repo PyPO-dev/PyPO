@@ -11,12 +11,16 @@ import src.PyPO.Config as Config
 import src.PyPO.Threadmgr as TManager
 
 import threading
-#############################################################################
-#                                                                           #
-#           List of bindings for the beam init interface of PyPO.          #
-#                                                                           #
-#############################################################################
 
+##
+# @file
+# Bindings for the ctypes interface for PyPO. 
+# These bindings are concerned with beam generation for the ray-tracer and the physical optics.
+
+##
+# Load the pypobeam shared library. Will detect the operating system and link the library accordingly.
+#
+# @returns lib The ctypes library containing the C/C++ functions.
 def loadBeamlib():
     try:
         LD_PATH = pathlib.Path(__file__).parents[2]/"out/build/Debug"
@@ -44,12 +48,20 @@ def loadBeamlib():
                                 reflparams, ctypes.c_int]
     lib.calcCurrents.restype = None
 
-    ws = WaitSymbol()
+    return lib
 
-    return lib, ws
-
+##
+# Generate a tubular ray-trace frame.
+# The tube consists of annular rings of rays and can be given opening angles and radii.
+#
+# @param rdict_py A filled TubeRTDict.
+#
+# @returns out A frame object containing the ray-trace frame.
+#
+# @see TubeRTDict
+# @see frame
 def makeRTframe(rdict_py):
-    lib, ws = loadBeamlib()
+    lib = loadBeamlib()
 
     nTot = 1 + rdict_py["nRays"] * 4 * rdict_py["nRing"]
 
@@ -66,8 +78,18 @@ def makeRTframe(rdict_py):
 
     return out
 
+##
+# Generate a Gaussian ray-trace frame.
+# The Gaussian ray-trace frame has positions and directions chosen from a Gaussian distribution..
+#
+# @param grdict_py A filled GRTDict.
+#
+# @returns out A frame object containing the ray-trace frame.
+# 
+# @see GRTDict
+# @see frame
 def makeGRTframe(grdict_py):
-    lib, ws = loadBeamlib()
+    lib = loadBeamlib()
     mgr = TManager.Manager(Config.context)
 
     nTot = grdict_py["nRays"]
@@ -86,8 +108,10 @@ def makeGRTframe(grdict_py):
 
     return out
 
+##
+# Generate a Gaussian 
 def makeGauss(gdict_py, source):
-    lib, ws = loadBeamlib()
+    lib = loadBeamlib()
 
     source_shape = (source["gridsize"][0], source["gridsize"][1])
     source_size = source["gridsize"][0] * source["gridsize"][1]
@@ -111,7 +135,7 @@ def makeGauss(gdict_py, source):
     return out_field, out_current
 
 def makeScalarGauss(gdict_py, source):
-    lib, ws = loadBeamlib()
+    lib = loadBeamlib()
 
     source_shape = (source["gridsize"][0], source["gridsize"][1])
     source_size = source["gridsize"][0] * source["gridsize"][1]
@@ -131,7 +155,7 @@ def makeScalarGauss(gdict_py, source):
     return out_field
 
 def calcCurrents(fields, source, mode):
-    lib, ws = loadBeamlib()
+    lib = loadBeamlib()
     source_shape = (source["gridsize"][0], source["gridsize"][1])
     source_size = source["gridsize"][0] * source["gridsize"][1]
 

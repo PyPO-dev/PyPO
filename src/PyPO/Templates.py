@@ -2,10 +2,11 @@
 # @file
 # Templates for commonly used PyPO dictionaries.
 #
-# Here, the templates for reflDicts, (G)RTDicts and PODicts are provided.
+# For each key, a short summary of the key is given.
 
 ##
-# Template for a reflDict. Note that some fields are only relevent when a certain gmode or 
+# Template for a reflDict, containing reflector parameters. Note that some fields are only relevent when a certain reflectortype, gmode or pmode is chosen.
+# This is signified in the key description.
 reflDict = {
         "name"      : "Reflector name (string)",
         "pmode"     : "Direct abc definition, or vertex & foc(ii) (string). Only for quadric surfaces",
@@ -25,16 +26,19 @@ reflDict = {
         "gridsize"  : "Number of cells along x(u) and y(v) axes (Numpy array of 2 ints)"
         }
 
-# Manual raytracer
+##
+# Template for a TubeRTDict, containing parameters for constructing a tubular ray-trace frame.
+# 
+# The tube is cosntructed from concentrical elliptical rings, spaced equally apart. If the number of rings is zero, only the chief ray is generated.
+# The tube can be given a semi-major and semi-minor axis. These are the used to construct the outer ring in the tube. 
+# In addition, opening angles along the semi-major and semi-minor axis can be specified. The
 TubeRTDict = {
         "nRays"     : "Number of rays in a ray-trace ring (int)",
         "nRing"     : "Number of concentric ray-trace rings (int)",
         "angx"      : "Opening angle in x-direction, degrees (real)",
         "angy"      : "Opening angle in y-direction, degrees (real)",
         "a"         : "Radius of outer ring along x-axis (real)",
-        "b"         : "Radius of outer ring along y-axis (real)",
-        "tChief"    : "Tilt w.r.t. positive z-axis of chief ray (len-3 Numpy array)",
-        "oChief"    : "origin of chief ray (len-3 Numpy array)"
+        "b"         : "Radius of outer ring along y-axis (real)"
         }
 
 # Gaussian beam dict, contains definitions of beam

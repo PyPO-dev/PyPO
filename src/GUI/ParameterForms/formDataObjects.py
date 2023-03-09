@@ -69,24 +69,12 @@ def makePlaneInp():
             })]
             #InputDescription(inType.integers, "flip", label="Flip normal vectors", numFields=1)]
 
-def makeTransformationForm(elementName):
+def makeTransformationForm(elementName, obj="element"):
     return[
-        InputDescription(inType.static, "element", staticValue=elementName),
+        InputDescription(inType.static, obj, staticValue=elementName),
         InputDescription(inType.radio, "mode", label="Transformation mode", options=[
             "Relative", "Absolute"
             ]),
-        InputDescription(inType.dynamicRadio, "type", subdict={
-            "Translation":[
-                InputDescription(inType.vectorFloats, "vector", label="Translation Vector", hints=["x","y","z"], numFields=3,oArray=True)],
-            "Rotation": [
-                InputDescription(inType.vectorFloats, "vector", label="Rotation Vector", hints=["x","y","z"], numFields=3,oArray=True),
-                InputDescription(inType.vectorFloats, "pivot", label="Center of Rotation", hints=["x","y","z"], numFields=3,oArray=True)
-                ]
-        })
-    ]
-
-def makeTransformationElementsForm(elementList):
-    return[
         InputDescription(inType.dynamicRadio, "type", subdict={
             "Translation":[
                 InputDescription(inType.vectorFloats, "vector", label="Translation Vector", hints=["x","y","z"], numFields=3,oArray=True)],
@@ -104,9 +92,7 @@ def initTubeFrameInp():
             InputDescription(inType.vectorFloats, "angx", label="X-apex angle", hints=[0], numFields=1),
             InputDescription(inType.vectorFloats, "angy", label="Y-apex angle", hints=[0], numFields=1),
             InputDescription(inType.vectorFloats, "a", label="X radius of outer ring", hints=[0], numFields=1),
-            InputDescription(inType.vectorFloats, "b", label="Y radius of outer ring", hints=[0], numFields=1),
-            InputDescription(inType.vectorFloats, "tChief", label="Chief ray tilt", hints=[0,0,1], numFields=3, oArray=True),
-            InputDescription(inType.vectorFloats, "oChief", label="Chief ray origin", hints=[0,0,0], numFields=3, oArray=True)
+            InputDescription(inType.vectorFloats, "b", label="Y radius of outer ring", hints=[0], numFields=1)
             ]
 
 def initGaussianFrameInp():
@@ -117,8 +103,6 @@ def initGaussianFrameInp():
             InputDescription(inType.vectorFloats, "lam", label="Wavelength", hints=[1], numFields=1),
             InputDescription(inType.vectorFloats, "x0", label="X beamwaist", hints=[5], numFields=1),
             InputDescription(inType.vectorFloats, "y0", label="Y beamwaist", hints=[5], numFields=1),
-            InputDescription(inType.vectorFloats, "tChief", label="Chief ray tilt", hints=[0,0,1], numFields=3, oArray=True),
-            InputDescription(inType.vectorFloats, "oChief", label="Chief ray origin", hints=[0,0,0], numFields=3, oArray=True),
             InputDescription(inType.dynamicRadio, "setseed", label="Set seed", subdict={
                 "random" : [],
                 "set" : [InputDescription(inType.vectorIntegers, "seed", label="", hints=[0], numFields=1)]

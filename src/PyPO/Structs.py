@@ -129,9 +129,7 @@ class RTDict(ctypes.Structure):
                 ("angx", ctypes.c_double),
                 ("angy", ctypes.c_double),
                 ("a", ctypes.c_double),
-                ("b", ctypes.c_double),
-                ("tChief", ctypes.POINTER(ctypes.c_double)),
-                ("oChief", ctypes.POINTER(ctypes.c_double))]
+                ("b", ctypes.c_double)]
 
 class GRTDict(ctypes.Structure):
     _fields_ = [("nRays", ctypes.c_int),
@@ -139,9 +137,7 @@ class GRTDict(ctypes.Structure):
                 ("angy0", ctypes.c_double),
                 ("x0", ctypes.c_double),
                 ("y0", ctypes.c_double),
-                ("seed", ctypes.c_int),
-                ("tChief", ctypes.POINTER(ctypes.c_double)),
-                ("oChief", ctypes.POINTER(ctypes.c_double))]
+                ("seed", ctypes.c_int)]
 
 ##
 # Parameters for initializing a Gaussian beam.

@@ -31,9 +31,7 @@ def ex_DRO_RT(device):
             "angx"      : 0,
             "angy"      : 0,
             "a"         : 10000,
-            "b"         : 10000,
-            "tChief"    : np.array([180,0,0]),
-            "oChief"    : np.array([0,0,12e3])
+            "b"         : 10000
             }
 
     s = System()
@@ -42,6 +40,8 @@ def ex_DRO_RT(device):
     s.plotSystem()
 
     s.createTubeFrame(RTpar)
+
+    s.translateGrids("start", np.array([0, 0, 12.5e3]), obj="frame")
 
     start_pri_RT = {
             "fr_in"     : "start",

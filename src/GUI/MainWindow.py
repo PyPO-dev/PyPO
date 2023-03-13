@@ -197,8 +197,13 @@ class MainWidget(QWidget):
     ##
     # Generate a snapshot form.
     def snapActionForm(self, element):
-        self.setForm(fDataObj.snapForm(element, list(self.stm.system[element]["snapshots"].keys())), readAction=self.snapAction)
+        self.setForm(fDataObj.snapForm(element, list(self.stm.system[element]["snapshots"].keys()), "element"), readAction=self.snapAction)
  
+    ##
+    # Generate a snapshot form for ray-trace frame.
+    def snapFrameActionForm(self, frame):
+        self.setForm(fDataObj.snapForm(frame, list(self.stm.frames.snapshots.keys()), "frame"), readAction=self.snapAction)
+    
     ##
     # Take, revert or delete a snapshot
     # 
@@ -207,13 +212,13 @@ class MainWidget(QWidget):
     def snapAction(self):
         snapDict = self.ParameterWid.read()
         if snapDict["options"] == "Take":
-            self.stm.snapObj(snapDict["name"], snapDict["snap_name"])
+            self.stm.snapObj(snapDict["name"], snapDict["snap_name"], snapDict["obj"])
         
         elif snapDict["options"] == "Revert":
-            self.stm.revertToSnap(snapDict["name"], snapDict["snap_name"])
+            self.stm.revertToSnap(snapDict["name"], snapDict["snap_name"], snapDict["obj"])
         
         elif snapDict["options"] == "Delete":
-            self.stm.deleteSnap(snapDict["name"], snapDict["snap_name"])
+            self.stm.deleteSnap(snapDict["name"], snapDict["snap_name"], snapDict["obj"])
     
     ##
     # plots all elements of the system in one plot
@@ -342,7 +347,9 @@ class MainWidget(QWidget):
         self.ElementsColumn.reflectors.addWidget(ReflectorWidget(name, self.removeElement, self.transformSingleForm, self.plotElement, self.snapActionForm)) 
 
     def addFrameWidget(self, name):
-        self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(name, self.stm.removeFrame, self.transformFrameForm, self.plotFrameForm,  self.calcRMSfromFrame))
+        self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(name, self.stm.removeFrame, 
+                                                    self.transformFrameForm, self.plotFrameForm,  
+                                                    self.calcRMSfromFrame, self.snapFrameActionForm))
 
     def addFieldWidget(self, name):
         self.ElementsColumn.POFields.addWidget(FieldsWidget(name,self.stm.removeField, self.plotFieldForm))

@@ -147,9 +147,10 @@ class frame(object):
         self.dy = dy
         self.dz = dz
 
+        self.snapshots = {}
+
     def setMeta(self, pos, ori, transf):
         self.pos = pos
         self.ori = ori
         self.transf = transf
-
 

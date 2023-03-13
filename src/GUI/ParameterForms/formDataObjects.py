@@ -448,6 +448,7 @@ def snapForm(elem, snapList, obj="element"):
 
             }
     form = [
+            InputDescription(inType.static, "obj", staticValue=obj, hidden=True),
             InputDescription(inType.static, "name", label=f"Name of {obj}", staticValue=elem),
             InputDescription(inType.dynamicDropdown, "options", label="Options", subdict=optionDict)
             ]

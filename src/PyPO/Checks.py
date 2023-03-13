@@ -489,8 +489,7 @@ def check_runRTDict(runRTDict, elements, frames):
     if "device" not in runRTDict:
         runRTDict["device"] = "CPU"
     
-
-    elif "device" in runRTDict:
+    if "device" in runRTDict:
         if runRTDict["device"] != "CPU" and runRTDict["device"] != "GPU":
             clog.warning(f"Device {runRTDict['device']} unknown. Defaulting to CPU.")
             runRTDict["device"] = "CPU"
@@ -500,7 +499,6 @@ def check_runRTDict(runRTDict, elements, frames):
             runRTDict["device"] = "CPU"
 
         if runRTDict["device"] == "CPU":
-            
             if "nThreads" in runRTDict:
                 if runRTDict["nThreads"] > nThreads_cpu:
                     clog.warning(f"Insufficient CPU threads available, automatically reducing threadcount.")
@@ -553,7 +551,7 @@ def check_runPODict(runPODict, elements, currents, scalarfields):
     if "device" not in runPODict:
         runPODict["device"] = "CPU"
 
-    elif "device" in runPODict:
+    if "device" in runPODict:
         if runPODict["device"] != "CPU" and runPODict["device"] != "GPU":
             clog.warning(f"Device {runPODict['device']} unknown. Defaulting to CPU.")
             runPODict["device"] = "CPU"

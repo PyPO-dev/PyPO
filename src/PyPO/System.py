@@ -162,8 +162,12 @@ class System(object):
     def setSavePath(self, path, append=False):
         if append:
             self.savePath = os.path.join(self.savePath, path)
+
         else:
             self.savePath = path
+
+        if not os.path.isdir(self.savePath):
+            os.makedirs(self.savePath)
 
     ##
     # Merge multiple systems together into current system.
@@ -533,7 +537,7 @@ class System(object):
                 Rtot = Tp @ R @ Tpm
 
                 self.frames[name].transf = Rtot
-                self.frames[name].transf[:-1, :-1] = (MatRotate(rotation, pivot=pivot))[:-1, :-1]
+                #self.frames[name].transf[:-1, :-1] = (MatRotate(rotation, pivot=pivot))[:-1, :-1]
                 self._transformFrame(self.frames[name])
 
                 #print(np.linalg.det(self.frames[name].transf))
@@ -673,11 +677,17 @@ class System(object):
             
             self.clog.info(f"Saved snapshot {snap_name} for group {name}.")
         
-        else:
+        elif obj == "element":
             check_elemSystem(name, self.system, extern=True)
             self.system[name]["snapshots"][snap_name] = self.system[name]["transf"]
 
             self.clog.info(f"Saved snapshot {snap_name} for element {name}.")
+        
+        elif obj == "frame":
+            check_frameSystem(name, self.frames, extern=True)
+            self.frames[name].snapshots[snap_name] = self.frames[name].transf
+
+            self.clog.info(f"Saved snapshot {snap_name} for frame {name}.")
     
     ##
     # Revert object configuration to a saved snapshot.
@@ -694,11 +704,19 @@ class System(object):
             
             self.clog.info(f"Reverted group {name} to snapshot {snap_name}.")
 
-        else:
+        elif obj == "element":
             check_elemSystem(name, self.system, extern=True)
             self.system[name]["transf"] = self.system[name]["snapshots"][snap_name]
         
             self.clog.info(f"Reverted element {name} to snapshot {snap_name}.")
+        
+        elif obj == "frame":
+            check_frameSystem(name, self.frames, extern=True)
+            self.frames[name].transf = self.frames[name].snapshots[snap_name]
+            
+            self._transformFrame(self.frames[name])
+            
+            self.clog.info(f"Reverted frame {name} to snapshot {snap_name}.")
     
     ##
     # Delete a saved snapshot belonging to an object.
@@ -714,10 +732,15 @@ class System(object):
 
             self.clog.info(f"Deleted snapshot {snap_name} belonging to group {name}.")
 
-        else:
+        elif obj == "element":
             del self.system[name]["snapshots"][snap_name]
 
             self.clog.info(f"Deleted snapshot {snap_name} belonging to element {name}.")
+        
+        elif obj == "frame":
+            del self.frames[name].snapshots[snap_name]
+
+            self.clog.info(f"Deleted snapshot {snap_name} belonging to frame {name}.")
     
     ##
     # Group elements together into a single block. After grouping, can translate, rotate and characterise as one.
@@ -1181,7 +1204,7 @@ class System(object):
         _runRTDict["t_name"] = self.system[_runRTDict["t_name"]]
 
         start_time = time.time()
-        
+       
         if _runRTDict["device"] == "CPU":
             self.clog.info(f"Hardware: running {_runRTDict['nThreads']} CPU threads.")
             self.clog.info(f"... Calculating ...")

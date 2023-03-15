@@ -1,6 +1,6 @@
 ## 
 # @file
-# Definitions of internal PyPO data structures.
+# Definitions of PyPO data structures.
 
 ##
 # Base class for EH fields and JM currents.
@@ -97,7 +97,16 @@ class fields(resContainer):
     def __init__(self, Ex, Ey, Ez, Hx, Hy, Hz):
         super().__init__(Ex, Ey, Ez, Hx, Hy, Hz, restype="EH")
 
+##
+# Class for making a real-vaLuad 3D object, used for Poynting vectors.
 class rfield(object):
+
+    ##
+    # Constructor. Takes Poynting components and assigns to member variables.
+    #
+    # @param Prx Poynting x-component.
+    # @param Pry Poynting y-component.
+    # @param Prz Poynting z-component.
     def __init__(self, Prx, Pry, Prz):
         self.x = Prx
         self.y = Pry
@@ -125,6 +134,17 @@ class scalarfield(object):
 ##
 # Structure for storing reflector grids, area and normals
 class reflGrids(object):
+
+    ##
+    # Constructor. Takes grid points, normals and area elements and stores them.
+    #
+    # @param x The x-components of the points making up the grid.
+    # @param y The y-components of the points making up the grid.
+    # @param z The z-components of the points making up the grid.
+    # @param nx The x-components of the normals to the grid.
+    # @param ny The y-components of the normals to the grid.
+    # @param nz The z-components of the normals to the grid.
+    # @param area The area elements of the grid.
     def __init__(self, x, y, z, nx, ny, nz, area):
         self.x = x
         self.y = y
@@ -136,7 +156,20 @@ class reflGrids(object):
 
         self.area = area
 
+##
+# Structure for storing ray-trace frames.
 class frame(object):
+
+    ##
+    # Constructor. Takes frame points and directions and stores them.
+    #
+    # @param size Number of rays in frame.
+    # @param x The x-components of the rays in the frame.
+    # @param y The y-components of the rays in the frame.
+    # @param z The z-components of the rays in the frame.
+    # @param dx The x-components of the direction of the rays in the frame. 
+    # @param dy The y-components of the direction of the rays in the frame.
+    # @param dz The z-components of the direction of the rays in the frame.
     def __init__(self, size, x, y, z, dx, dy, dz):
         self.size = size
         self.x = x
@@ -149,6 +182,12 @@ class frame(object):
 
         self.snapshots = {}
 
+    ##
+    # Set frame metadata.
+    #
+    # @param pos Co-ordinate of reference point of frame..
+    # @param ori Reference orientation of frame.
+    # @param transf Transformation matrix for the frame.
     def setMeta(self, pos, ori, transf):
         self.pos = pos
         self.ori = ori

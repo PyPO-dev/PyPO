@@ -673,19 +673,19 @@ class System(object):
             self.groups[name]["snapshots"][snap_name] = []
 
             for elem in self.groups[name]:
-                self.groups[name]["snapshots"][snap_name].append(elem["transf"])
+                self.groups[name]["snapshots"][snap_name].append(self.copyObj(elem["transf"]))
             
             self.clog.info(f"Saved snapshot {snap_name} for group {name}.")
         
         elif obj == "element":
             check_elemSystem(name, self.system, extern=True)
-            self.system[name]["snapshots"][snap_name] = self.system[name]["transf"]
+            self.system[name]["snapshots"][snap_name] = self.copyObj(self.system[name]["transf"])
 
             self.clog.info(f"Saved snapshot {snap_name} for element {name}.")
         
         elif obj == "frame":
             check_frameSystem(name, self.frames, extern=True)
-            self.frames[name].snapshots[snap_name] = self.frames[name].transf
+            self.frames[name].snapshots[snap_name] = self.copyObj(self.frames[name].transf)
 
             self.clog.info(f"Saved snapshot {snap_name} for frame {name}.")
     
@@ -700,19 +700,19 @@ class System(object):
             check_groupSystem(name, self.groups, extern=True)
 
             for elem, snap in zip(self.groups[name], self.groups[name]["snapshots"][snap_name]):
-                elem["transf"] = snap
+                elem["transf"] = self.copyObj(snap)
             
             self.clog.info(f"Reverted group {name} to snapshot {snap_name}.")
 
         elif obj == "element":
             check_elemSystem(name, self.system, extern=True)
-            self.system[name]["transf"] = self.system[name]["snapshots"][snap_name]
+            self.system[name]["transf"] = self.copyObj(self.system[name]["snapshots"][snap_name])
         
             self.clog.info(f"Reverted element {name} to snapshot {snap_name}.")
         
         elif obj == "frame":
             check_frameSystem(name, self.frames, extern=True)
-            self.frames[name].transf = self.frames[name].snapshots[snap_name]
+            self.frames[name].transf = self.copyObj(self.frames[name].snapshots[snap_name])
             
             self._transformFrame(self.frames[name])
             
@@ -1766,7 +1766,7 @@ class System(object):
 
         testM = MatRotate(r, np.eye(4), pivot=None, radians=False)
 
-        return r, testM
+        return r#, testM
 
     def _compToFields(self, comp, field):
         null = np.zeros(field.shape, dtype=complex)

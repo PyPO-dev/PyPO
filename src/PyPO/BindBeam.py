@@ -109,7 +109,20 @@ def makeGRTframe(grdict_py):
     return out
 
 ##
-# Generate a Gaussian 
+# Generate a polarised Gaussian beam.
+# The beam is always defined parallel to the x, y plane. The z-coordinate can be adjusted.
+# In order to tilt the beam, you have to tilt the underlying plane AFTER defining the beam on it.
+#
+# @param gdict_py A GDict dictionary containing relevant Gaussian beam parameters.
+# @param source A reflDict dictionary describing the plane on which the Gaussian is defined.
+#
+# @returns out_field Field object containing the electromagnetic fields associated with the Gaussian.
+# @returns out_current Current object containing the electromagnetic currents associated with the Gaussian.
+#
+# @see GDict
+# @see reflDict
+# @see fields
+# @see currents
 def makeGauss(gdict_py, source):
     lib = loadBeamlib()
 
@@ -134,6 +147,19 @@ def makeGauss(gdict_py, source):
 
     return out_field, out_current
 
+##
+# Generate a scalar Gaussian beam.
+# The beam is always defined parallel to the x, y plane. The z-coordinate can be adjusted.
+# In order to tilt the beam, you have to tilt the underlying plane AFTER defining the beam on it.
+#
+# @param gdict_py A GDict dictionary containing relevant scalar Gaussian beam parameters.
+# @param source A reflDict dictionary describing the plane on which the scalar Gaussian is defined.
+#
+# @returns out_field Scalarfield object containing the electric scalar field associated with the Gaussian.
+#
+# @see GDict
+# @see reflDict
+# @see fields
 def makeScalarGauss(gdict_py, source):
     lib = loadBeamlib()
 
@@ -154,6 +180,17 @@ def makeScalarGauss(gdict_py, source):
 
     return out_field
 
+##
+# Calculate electyromagnetic currents from electromagnetic field.
+#
+# @param fields Fields object containing electromagnetic fields.
+# @param source A reflDict dictionary describing the plane on which the Gaussian is defined.
+# @param mode Whether to assume plane is perfect electrical conductor ('PEC'), magnetic conductor ('PMC') or no assumptions ('full').
+#
+# @returns out_current Currents object containing the currents calculated on source.
+#
+# @see fields
+# @see currents
 def calcCurrents(fields, source, mode):
     lib = loadBeamlib()
     source_shape = (source["gridsize"][0], source["gridsize"][1])

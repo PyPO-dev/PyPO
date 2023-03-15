@@ -5,7 +5,7 @@ import numpy as np
 # @file
 # Definitions of data structures used in the ctypes interface.
 # The structures come in double format for CPU and single format for GPU.
-# These defintions are only for passing structures from Python to the C++ backend.
+# These defintions are only for passing structures from Python to the C/C++ backend.
 
 ##
 # Two arrays representing a 1D complex array of double.

@@ -12,7 +12,7 @@ import logging
 import json
 from pathlib import Path
 from contextlib import contextmanager
-from scipy.interpolate import griddata
+from scipy.interpolate import griddata, interpn
 import pickle 
 
 # PyPO-specific modules
@@ -245,13 +245,13 @@ class System(object):
         elif reflDict["pmode"] == "manual":
             self.system[reflDict["name"]]["coeffs"] = np.array([reflDict["coeffs"][0], reflDict["coeffs"][1], -1])
 
-        if reflDict["gmode"] == "xy":
+        if reflDict["gmode"] == "xy" or reflDict["gmode"] == 0:
             self.system[reflDict["name"]]["gcenter"] = np.zeros(2)
             self.system[reflDict["name"]]["ecc_uv"] = 0
             self.system[reflDict["name"]]["rot_uv"] = 0
             self.system[reflDict["name"]]["gmode"] = 0
 
-        elif reflDict["gmode"] == "uv":
+        elif reflDict["gmode"] == "uv" or reflDict["gmode"] == 1:
             # Convert v in degrees to radians
             self.system[reflDict["name"]]["lims_v"] = [self.system[reflDict["name"]]["lims_v"][0],
                                                         self.system[reflDict["name"]]["lims_v"][1]]
@@ -310,13 +310,13 @@ class System(object):
             self.system[reflDict["name"]]["coeffs"][1] = b3
             self.system[reflDict["name"]]["coeffs"][2] = c3
 
-        if reflDict["gmode"] == "xy":
+        if reflDict["gmode"] == "xy" or reflDict["gmode"] == 0:
             self.system[reflDict["name"]]["gcenter"] = np.zeros(2)
             self.system[reflDict["name"]]["ecc_uv"] = 0
             self.system[reflDict["name"]]["rot_uv"] = 0
             self.system[reflDict["name"]]["gmode"] = 0
 
-        elif reflDict["gmode"] == "uv":
+        elif reflDict["gmode"] == "uv" or reflDict["gmode"] == 1:
             self.system[reflDict["name"]]["lims_v"] = [self.system[reflDict["name"]]["lims_v"][0],
                                                         self.system[reflDict["name"]]["lims_v"][1]]
 
@@ -366,13 +366,13 @@ class System(object):
             self.system[reflDict["name"]]["coeffs"][1] = b
             self.system[reflDict["name"]]["coeffs"][2] = b
 
-        if reflDict["gmode"] == "xy":
+        if reflDict["gmode"] == "xy" or reflDict["gmode"] == 0:
             self.system[reflDict["name"]]["gcenter"] = np.zeros(2)
             self.system[reflDict["name"]]["ecc_uv"] = 0
             self.system[reflDict["name"]]["rot_uv"] = 0
             self.system[reflDict["name"]]["gmode"] = 0
 
-        elif reflDict["gmode"] == "uv":
+        elif reflDict["gmode"] == "uv" or reflDict["gmode"] == 1:
             self.system[reflDict["name"]]["lims_v"] = [self.system[reflDict["name"]]["lims_v"][0],
                                                         self.system[reflDict["name"]]["lims_v"][1]]
 
@@ -403,16 +403,16 @@ class System(object):
         self.system[reflDict["name"]]["coeffs"][1] = -1
         self.system[reflDict["name"]]["coeffs"][2] = -1
 
-        if reflDict["gmode"] == "xy":
+        if reflDict["gmode"] == "xy" or reflDict["gmode"] == 0:
             self.system[reflDict["name"]]["gcenter"] = np.zeros(2)
             self.system[reflDict["name"]]["ecc_uv"] = 0
             self.system[reflDict["name"]]["rot_uv"] = 0
             self.system[reflDict["name"]]["gmode"] = 0
 
-        elif reflDict["gmode"] == "uv":
+        elif reflDict["gmode"] == "uv" or reflDict["gmode"] == 1:
             self.system[reflDict["name"]]["gmode"] = 1
 
-        elif reflDict["gmode"] == "AoE":
+        elif reflDict["gmode"] == "AoE" or reflDict["gmode"] == 2:
             # Assume is given in degrees
             # Convert Az and El to radians
             self.system[reflDict["name"]]["gcenter"] = np.zeros(2)
@@ -851,6 +851,15 @@ class System(object):
             check_elemSystem(n, self.system, extern=True)
             del self.system[n]
         self.clog.info(f"Removed element {name} from system.")
+    
+    ##
+    # Copy reflector.
+    #
+    # @ param name Name of reflector to be copied.
+    def copyElement(self, name, name_copy):
+        check_elemSystem(name, self.system, extern=True)
+        self.system[name_copy] = self.copyObj(self.system[name])
+        self.clog.info(f"Copied element {name} to {name_copy}.")
     
     ##
     # Remove a ray-trace frame from system
@@ -1443,7 +1452,58 @@ class System(object):
         sfield.setMeta(name_surface, k)
 
         self.scalarfields[PSDict["name"]] = sfield
-    
+   
+    ##
+    # Interpolate a PO beam. Only for beams defined on planar surfaces.
+    # Can interpolate fields and currents separately.
+    # Results are stored in a new fields/currents object with the original name appended by 'interp'.
+    # Also, a new plane will be created with the updated gridsize and name appended by 'interp'.
+    #
+    # @param name Name of beam to be interpolated.
+    # @param gridsize_new New gridsizes for interpolation.
+    # @param obj Whether to interpolate currents or fields.
+    def interpBeam(self, name, gridsize_new, obj_t="fields"):
+        if obj_t == "fields":
+            check_fieldSystem(name, self.fields, extern=True)
+            obj = self.fields[name]
+
+        elif obj_t == "currents":
+            check_currentSystem(name, self.currents, extern=True)
+            obj = self.currents[name]
+
+        self.copyElement(obj.surf, obj.surf + "_interp")
+        self.system[obj.surf + "_interp"]["gridsize"] = gridsize_new
+        self.system[obj.surf + "_interp"]["name"] = obj.surf + "_interp"
+
+        grids = self.generateGrids(obj.surf)
+        grids_interp = self.generateGrids(obj.surf + "_interp")
+        
+        points = (grids.x.ravel(), grids.y.ravel())#, grids.z.ravel())
+        points_interp = (grids_interp.x.ravel(), grids_interp.y.ravel())#, grids_interp.z.ravel())
+        comp_l = []
+
+        for i in range(6):
+            _comp = self.copyObj(obj[i])
+            _cr = np.real(_comp)
+            _ci = np.imag(_comp)
+
+            _cr_interp = griddata(points, _cr.ravel(), points_interp)
+            _ci_interp = griddata(points, _ci.ravel(), points_interp)
+       
+            _comp_interp = _cr_interp + 1j * _ci_interp
+
+            comp_l.append(_comp_interp.reshape(gridsize_new))
+
+        if obj_t == "fields":
+            obj_interp = fields(comp_l[0], comp_l[1], comp_l[2], comp_l[3], comp_l[4], comp_l[5])
+            obj_interp.setMeta(obj.surf + "_interp", obj.k)
+            self.fields[name + "_interp"] = obj_interp
+        
+        elif obj_t == "currents":
+            obj_interp = currents(comp_l[0], comp_l[1], comp_l[2], comp_l[3], comp_l[4], comp_l[5])
+            obj_interp.setMeta(obj.surf + "_interp", obj.k)
+            self.currents[name + "_interp"] = obj_interp
+
     ##
     # Generate a 2D plot of a field or current.
     #

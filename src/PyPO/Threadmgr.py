@@ -9,7 +9,6 @@ from src.PyPO.CustomLogger import CustomLogger
 class Manager(object):
     def __init__(self, context, callback=None):
         self.context = context
-        self.ws = WaitSymbol()
         self.callback = callback
 
     def new_gthread(self, target, args, calc_type):

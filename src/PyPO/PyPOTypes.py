@@ -15,7 +15,9 @@ class resContainer(object):
     def __init__(self, *args, restype=None):
         self.type = "EH" if restype is None else restype
         self.memlist = []
-
+        self.shape = args[0].shape
+        self.size = self.shape[0] * self.shape[1]
+        
         n = 0
         ax = ["x", "y", "z"]
         

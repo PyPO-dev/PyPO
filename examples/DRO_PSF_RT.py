@@ -28,10 +28,10 @@ def ex_DRO_RT(device):
             "name"      : "start",
             "nRays"     : 10,
             "nRing"     : 10,
-            "angx"      : 0,
-            "angy"      : 0,
-            "a"         : 10000,
-            "b"         : 10000
+            "angx0"     : 0,
+            "angy0"     : 0,
+            "x0"        : 10000,
+            "y0"        : 10000
             }
 
     s = System()

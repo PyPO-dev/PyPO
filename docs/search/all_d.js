@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['n_0',['n',['../structGDict.html#a959f2d3c1f932a8997154a7b3ca7e302',1,'GDict::n()'],['../structScalarGDict.html#ad464ea3c61cb648a25ca1d1428659d81',1,'ScalarGDict::n()'],['../structGDictf.html#a071ed3d7718416df2217834c63702c0f',1,'GDictf::n()']]],
+  ['n_0',['n',['../structGDict.html#a959f2d3c1f932a8997154a7b3ca7e302',1,'GDict::n()'],['../structScalarGDict.html#ad464ea3c61cb648a25ca1d1428659d81',1,'ScalarGDict::n()'],['../structGDictf.html#a071ed3d7718416df2217834c63702c0f',1,'GDictf::n()'],['../structScalarGDictf.html#a430b5d93f9cc21b88645206adc14c8a5',1,'ScalarGDictf::n()']]],
   ['n_5fcells_1',['n_cells',['../structreflparams.html#a0098abebe5a4fb9755bc183191af8327',1,'reflparams::n_cells()'],['../structreflparamsf.html#ad7d0eba6186d4faffd405ec456d90f69',1,'reflparamsf::n_cells()']]],
   ['ne_2',['ne',['../KernelsRTf_8cu.html#ab9b820f2d992c2e30a79f0a0bb899240',1,'ne():&#160;KernelsRTf.cu'],['../classRTRefls.html#a66edec57e54602c6c1304a2cab5238d3',1,'RTRefls::ne(T xr, T yr, T zr, int flip)']]],
   ['nh_3',['nh',['../classRTRefls.html#aad2f7720a62683d2505130cbdd7e50a1',1,'RTRefls::nh()'],['../KernelsRTf_8cu.html#a5031891e820b84beb3d1a7e19763f474',1,'nh():&#160;KernelsRTf.cu']]],

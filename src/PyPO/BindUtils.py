@@ -426,13 +426,13 @@ def allfill_cframe(res, frame_py, size, ct_t):
     res.dz = (ct_t * size)(*(frame_py.dz.tolist()))
 
 def allfill_RTDict(res, rdict_py, ct_t):
-    res.nRays = ctypes.c_int(rdict_py["nRays"])
-    res.nRing = ctypes.c_int(rdict_py["nRing"])
+    res.nRays   = ctypes.c_int(rdict_py["nRays"])
+    res.nRing   = ctypes.c_int(rdict_py["nRing"])
 
-    res.angx = ct_t(np.radians(rdict_py["angx"]))
-    res.angy = ct_t(np.radians(rdict_py["angy"]))
-    res.a = ct_t(rdict_py["a"])
-    res.b = ct_t(rdict_py["b"])
+    res.angx0   = ct_t(np.radians(rdict_py["angx0"]))
+    res.angy0   = ct_t(np.radians(rdict_py["angy0"]))
+    res.x0      = ct_t(rdict_py["x0"])
+    res.y0      = ct_t(rdict_py["y0"])
 
 def allfill_GRTDict(res, grdict_py, ct_t):
     res.nRays = ctypes.c_int(grdict_py["nRays"])
@@ -449,7 +449,7 @@ def allfill_GDict(res, gdict_py, ct_t):
     res.w0y = ct_t(gdict_py["w0y"])
     res.n = ct_t(gdict_py["n"])
     res.E0 = ct_t(gdict_py["E0"])
-    res.z = ct_t(gdict_py["z"])
+    res.dxyz = ct_t(gdict_py["dxyz"])
 
     res.pol = (ct_t * 3)(*gdict_py["pol"].tolist())
 
@@ -459,7 +459,7 @@ def allfill_SGDict(res, sgdict_py, ct_t):
     res.w0y = ct_t(sgdict_py["w0y"])
     res.n = ct_t(sgdict_py["n"])
     res.E0 = ct_t(sgdict_py["E0"])
-    res.z = ct_t(sgdict_py["z"])
+    res.dxyz = ct_t(gdict_py["dxyz"])
 
 def creflToObj(res, shape, np_t):
 

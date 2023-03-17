@@ -47,10 +47,10 @@ def ex_ASTE_RT(device):
             "name"          : "start",
             "nRays"         : 10,
             "nRing"         : 10,
-            "angx"          : 0,
-            "angy"          : 0,
-            "a"             : 4000,
-            "b"             : 4000,
+            "angx0"         : 0,
+            "angy0"         : 0,
+            "x0"            : 4000,
+            "y0"            : 4000,
             }
 
     rotation = np.array([0, 0, 0])

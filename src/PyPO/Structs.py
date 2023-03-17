@@ -126,10 +126,10 @@ class cframe(ctypes.Structure):
 class RTDict(ctypes.Structure):
     _fields_ = [("nRays", ctypes.c_int),
                 ("nRing", ctypes.c_int),
-                ("angx", ctypes.c_double),
-                ("angy", ctypes.c_double),
-                ("a", ctypes.c_double),
-                ("b", ctypes.c_double)]
+                ("angx0", ctypes.c_double),
+                ("angy0", ctypes.c_double),
+                ("x0", ctypes.c_double),
+                ("y0", ctypes.c_double)]
 
 class GRTDict(ctypes.Structure):
     _fields_ = [("nRays", ctypes.c_int),
@@ -147,7 +147,7 @@ class GDict(ctypes.Structure):
                 ("w0y", ctypes.c_double),
                 ("n", ctypes.c_double),
                 ("E0", ctypes.c_double),
-                ("z", ctypes.c_double),
+                ("dxyz", ctypes.c_double),
                 ("pol", ctypes.POINTER(ctypes.c_double))]
 
 class ScalarGDict(ctypes.Structure):
@@ -156,7 +156,7 @@ class ScalarGDict(ctypes.Structure):
                 ("w0y", ctypes.c_double),
                 ("n", ctypes.c_double),
                 ("E0", ctypes.c_double),
-                ("z", ctypes.c_double)]
+                ("dxyz", ctypes.c_double)]
 
 # FLOATS
 class arrC1f(ctypes.Structure):
@@ -261,12 +261,10 @@ class cframef(ctypes.Structure):
 class RTDictf(ctypes.Structure):
     _fields_ = [("nRays", ctypes.c_int),
                 ("nRing", ctypes.c_int),
-                ("angx", ctypes.c_float),
-                ("angy", ctypes.c_float),
-                ("a", ctypes.c_float),
-                ("b", ctypes.c_float),
-                ("tChief", ctypes.POINTER(ctypes.c_float)),
-                ("oChief", ctypes.POINTER(ctypes.c_float))]
+                ("angx0", ctypes.c_float),
+                ("angy0", ctypes.c_float),
+                ("x0", ctypes.c_float),
+                ("y0", ctypes.c_float)]
 
 class GRTDictf(ctypes.Structure):
     _fields_ = [("nRays", ctypes.c_int),
@@ -274,9 +272,7 @@ class GRTDictf(ctypes.Structure):
                 ("angy0", ctypes.c_float),
                 ("x0", ctypes.c_float),
                 ("y0", ctypes.c_float),
-                ("seed", ctypes.c_int),
-                ("tChief", ctypes.POINTER(ctypes.c_float)),
-                ("oChief", ctypes.POINTER(ctypes.c_float))]
+                ("seed", ctypes.c_int)]
 
 class GDictf(ctypes.Structure):
     _fields_ = [("lam", ctypes.c_float),
@@ -284,7 +280,7 @@ class GDictf(ctypes.Structure):
                 ("w0y", ctypes.c_float),
                 ("n", ctypes.c_float),
                 ("E0", ctypes.c_float),
-                ("z", ctypes.c_float),
+                ("dxyz", ctypes.c_float),
                 ("pol", ctypes.POINTER(ctypes.c_float))]
 
 class ScalarGDictf(ctypes.Structure):
@@ -293,4 +289,4 @@ class ScalarGDictf(ctypes.Structure):
                 ("w0y", ctypes.c_float),
                 ("n", ctypes.c_float),
                 ("E0", ctypes.c_float),
-                ("z", ctypes.c_float)]
+                ("dxyz", ctypes.c_float)]

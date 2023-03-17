@@ -1,12 +1,19 @@
 var searchData=
 [
-  ['tchief_0',['tChief',['../structRTDict.html#a73419cb6acbe5ee511010d2ea3736c47',1,'RTDict::tChief()'],['../structGRTDict.html#a8a3da355eb71bc6888ce78fc04eaaf75',1,'GRTDict::tChief()'],['../structRTDictf.html#ae9e47b54717ddc25848d8f5b2b3186f3',1,'RTDictf::tChief()'],['../structGRTDictf.html#aa005f4727eceb7d21e7d0e8902959db7',1,'GRTDictf::tChief()']]],
+  ['tchief_0',['tChief',['../structRTDictf.html#ae9e47b54717ddc25848d8f5b2b3186f3',1,'RTDictf::tChief()'],['../structGRTDictf.html#aa005f4727eceb7d21e7d0e8902959db7',1,'GRTDictf::tChief()']]],
   ['templates_2epy_1',['Templates.py',['../Templates_8py.html',1,'']]],
   ['threadpool_2',['threadPool',['../classPropagation.html#a2a5c3d3e2dfef55d84e3c561db8e5610',1,'Propagation::threadPool()'],['../classRayTracer.html#a20d7d1fcca98cb681c8436a024b2092b',1,'RayTracer::threadPool()']]],
   ['transf_3',['transf',['../structreflparams.html#a8434d4e674be3ec03170fb0088e2c760',1,'reflparams::transf()'],['../structreflparamsf.html#a15b792a2a65a1834a09990a17ed649dd',1,'reflparamsf::transf()']]],
-  ['transformationwidget_4',['TransformationWidget',['../classGUI_1_1TransformationWidget_1_1TransformationWidget.html',1,'GUI::TransformationWidget']]],
-  ['transformgrids_5',['transformGrids',['../InterfaceReflector_8cpp.html#ac12e89b8d533f7b60f638452323be9a3',1,'InterfaceReflector.cpp']]],
-  ['transfrays_6',['transfRays',['../classRayTracer.html#a54308039ddbee81e5c2d2cb0cc7f992f',1,'RayTracer::transfRays()'],['../KernelsRTf_8cu.html#a8e11820281e7691d1ebe20e66176bb53',1,'transfRays():&#160;KernelsRTf.cu']]],
-  ['translategrids_7',['translateGrids',['../classPyPO_1_1System_1_1System.html#af59ae2a54a32de1ce547b21a6eb2fb30',1,'PyPO::System::System']]],
-  ['type_8',['type',['../structreflparams.html#a8ac54ddf87ce608439170fc70bbddb4d',1,'reflparams::type()'],['../structreflparamsf.html#aee4936b839c62673c1d12a2924579e32',1,'reflparamsf::type()']]]
+  ['transformaction_4',['transformAction',['../classGUI_1_1MainWindow_1_1MainWidget.html#a5ac8e64f6eceb68a8332f0545983c38c',1,'GUI::MainWindow::MainWidget']]],
+  ['transformationmultipleaction_5',['transformationMultipleAction',['../classGUI_1_1MainWindow_1_1MainWidget.html#a3a72e464d71b6853be2359dc31e68f22',1,'GUI::MainWindow::MainWidget']]],
+  ['transformationmultipleform_6',['transformationMultipleForm',['../classGUI_1_1MainWindow_1_1MainWidget.html#a188923953f5362769a6d40c3d9b8b068',1,'GUI::MainWindow::MainWidget']]],
+  ['transformationwidget_7',['TransformationWidget',['../classGUI_1_1TransformationWidget_1_1TransformationWidget.html',1,'GUI::TransformationWidget']]],
+  ['transformframeaction_8',['transformFrameAction',['../classGUI_1_1MainWindow_1_1MainWidget.html#a43beb9f2dbe5ac92d77ba71cdecb5e77',1,'GUI::MainWindow::MainWidget']]],
+  ['transformframeform_9',['transformFrameForm',['../classGUI_1_1MainWindow_1_1MainWidget.html#acac63bc0067fb34846583030ff7b03ec',1,'GUI::MainWindow::MainWidget']]],
+  ['transformgrids_10',['transformGrids',['../InterfaceReflector_8cpp.html#ac12e89b8d533f7b60f638452323be9a3',1,'InterfaceReflector.cpp']]],
+  ['transformsingleform_11',['transformSingleForm',['../classGUI_1_1MainWindow_1_1MainWidget.html#a2ca1dd8e00d8ff9cacb1668fb6d01ddd',1,'GUI::MainWindow::MainWidget']]],
+  ['transfrays_12',['transfRays',['../classRayTracer.html#a54308039ddbee81e5c2d2cb0cc7f992f',1,'RayTracer::transfRays()'],['../KernelsRTf_8cu.html#a8e11820281e7691d1ebe20e66176bb53',1,'transfRays():&#160;KernelsRTf.cu']]],
+  ['translategrids_13',['translateGrids',['../classPyPO_1_1System_1_1System.html#af59ae2a54a32de1ce547b21a6eb2fb30',1,'PyPO::System::System']]],
+  ['tubertdict_14',['TubeRTDict',['../Templates_8py.html#a14d4e4e0e7614d86723a063101b9589c',1,'PyPO::Templates']]],
+  ['type_15',['type',['../structreflparams.html#a8ac54ddf87ce608439170fc70bbddb4d',1,'reflparams::type()'],['../structreflparamsf.html#aee4936b839c62673c1d12a2924579e32',1,'reflparamsf::type()']]]
 ];

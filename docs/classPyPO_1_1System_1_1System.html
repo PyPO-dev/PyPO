@@ -133,12 +133,15 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>__str__</b> (self)</td
 <tr class="memitem:ac764ef2297620d904d4cadcd78ca926d"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1System_1_1System.html#ac764ef2297620d904d4cadcd78ca926d">homeReflector</a> (self, name, obj=&quot;element&quot;, trans=True, rot=True)</td></tr>
 <tr class="memdesc:ac764ef2297620d904d4cadcd78ca926d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Home a reflector or a group back into default configuration.  <br /></td></tr>
 <tr class="separator:ac764ef2297620d904d4cadcd78ca926d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3d6603fe525b81fc25423fd93f2171ea"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1System_1_1System.html#a3d6603fe525b81fc25423fd93f2171ea">snapReflector</a> (self, name, snap_name)</td></tr>
-<tr class="memdesc:a3d6603fe525b81fc25423fd93f2171ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Take and store snapshot of reflector's current configuration.  <br /></td></tr>
-<tr class="separator:a3d6603fe525b81fc25423fd93f2171ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae535fe03c21bbbe3d8c2364c7a7097c6"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1System_1_1System.html#ae535fe03c21bbbe3d8c2364c7a7097c6">revertToSnapshot</a> (self, name, snap_name)</td></tr>
-<tr class="memdesc:ae535fe03c21bbbe3d8c2364c7a7097c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Revert reflector configuration to a saved snapshot.  <br /></td></tr>
-<tr class="separator:ae535fe03c21bbbe3d8c2364c7a7097c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af85d6e247f11d739a79d3fa07557a98b"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1System_1_1System.html#af85d6e247f11d739a79d3fa07557a98b">snapObj</a> (self, name, snap_name, obj=&quot;element&quot;)</td></tr>
+<tr class="memdesc:af85d6e247f11d739a79d3fa07557a98b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Take and store snapshot of object's current configuration.  <br /></td></tr>
+<tr class="separator:af85d6e247f11d739a79d3fa07557a98b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d8bd4b6d1d5079df7929607a4cc637c"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1System_1_1System.html#a2d8bd4b6d1d5079df7929607a4cc637c">revertToSnap</a> (self, name, snap_name, obj=&quot;element&quot;)</td></tr>
+<tr class="memdesc:a2d8bd4b6d1d5079df7929607a4cc637c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Revert object configuration to a saved snapshot.  <br /></td></tr>
+<tr class="separator:a2d8bd4b6d1d5079df7929607a4cc637c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afbf5787098ac97b9e7f7bb614513c930"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1System_1_1System.html#afbf5787098ac97b9e7f7bb614513c930">deleteSnap</a> (self, name, snap_name, obj=&quot;element&quot;)</td></tr>
+<tr class="memdesc:afbf5787098ac97b9e7f7bb614513c930"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delete a saved snapshot belonging to an object.  <br /></td></tr>
+<tr class="separator:afbf5787098ac97b9e7f7bb614513c930"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7f67ad168a475e769364cd0dd8fb5c5a"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1System_1_1System.html#a7f67ad168a475e769364cd0dd8fb5c5a">groupElements</a> (self, name_group, *names, pos=None, ori=None)</td></tr>
 <tr class="memdesc:a7f67ad168a475e769364cd0dd8fb5c5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Group elements together into a single block.  <br /></td></tr>
 <tr class="separator:a7f67ad168a475e769364cd0dd8fb5c5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -157,6 +160,9 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>__str__</b> (self)</td
 <tr class="memitem:adabf1b4da430f6f70f17973e0e497b20"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1System_1_1System.html#adabf1b4da430f6f70f17973e0e497b20">removeElement</a> (self, *name)</td></tr>
 <tr class="memdesc:adabf1b4da430f6f70f17973e0e497b20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove reflector from system.  <br /></td></tr>
 <tr class="separator:adabf1b4da430f6f70f17973e0e497b20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae7015c3fb6f2c5b78ce05699f1e56be9"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1System_1_1System.html#ae7015c3fb6f2c5b78ce05699f1e56be9">copyElement</a> (self, name, name_copy)</td></tr>
+<tr class="memdesc:ae7015c3fb6f2c5b78ce05699f1e56be9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy reflector.  <br /></td></tr>
+<tr class="separator:ae7015c3fb6f2c5b78ce05699f1e56be9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad167b6f05aeab3b9de9230acf86bd06a"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1System_1_1System.html#ad167b6f05aeab3b9de9230acf86bd06a">removeFrame</a> (self, *frameName)</td></tr>
 <tr class="memdesc:ad167b6f05aeab3b9de9230acf86bd06a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove a ray-trace frame from system.  <br /></td></tr>
 <tr class="separator:ad167b6f05aeab3b9de9230acf86bd06a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -232,6 +238,9 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>calcMainBeam</b> (self
 <tr class="memitem:a6b6f9142b2ffbe533427ecfbe1a11818"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1System_1_1System.html#a6b6f9142b2ffbe533427ecfbe1a11818">generatePointSourceScalar</a> (self, PSDict, name_surface)</td></tr>
 <tr class="memdesc:a6b6f9142b2ffbe533427ecfbe1a11818"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate point-source scalar PO field.  <br /></td></tr>
 <tr class="separator:a6b6f9142b2ffbe533427ecfbe1a11818"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab0b62bd1bfc8e7103b5eb3e105d5e28f"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1System_1_1System.html#ab0b62bd1bfc8e7103b5eb3e105d5e28f">interpBeam</a> (self, name, gridsize_new, obj_t=&quot;fields&quot;)</td></tr>
+<tr class="memdesc:ab0b62bd1bfc8e7103b5eb3e105d5e28f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interpolate a PO beam.  <br /></td></tr>
+<tr class="separator:ab0b62bd1bfc8e7103b5eb3e105d5e28f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a03e8f29d9bdcf1f99f056292fd1bc8ac"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1System_1_1System.html#a03e8f29d9bdcf1f99f056292fd1bc8ac">plotBeam2D</a> (self, name_obj, comp=None, vmin=-30, vmax=0, show=True, amp_only=False, save=False, interpolation=None, aperDict=None, mode='dB', project='xy', units=&quot;&quot;, name=&quot;&quot;, titleA=&quot;Amp&quot;, titleP=&quot;Phase&quot;, unwrap_phase=False, ret=False)</td></tr>
 <tr class="memdesc:a03e8f29d9bdcf1f99f056292fd1bc8ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a 2D plot of a field or current.  <br /></td></tr>
 <tr class="separator:a03e8f29d9bdcf1f99f056292fd1bc8ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -250,8 +259,8 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>calcMainBeam</b> (self
 <tr class="memitem:a9e58ecbcc82f1e7a7e316a96b3cc8e78"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1System_1_1System.html#a9e58ecbcc82f1e7a7e316a96b3cc8e78">findRotation</a> (self, v, u)</td></tr>
 <tr class="memdesc:a9e58ecbcc82f1e7a7e316a96b3cc8e78"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find rotation matrix to rotate v onto u.  <br /></td></tr>
 <tr class="separator:a9e58ecbcc82f1e7a7e316a96b3cc8e78"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a77749b7ba2640d7fa7957eba487f997b"><td class="memItemLeft" align="right" valign="top"><a id="a77749b7ba2640d7fa7957eba487f997b" name="a77749b7ba2640d7fa7957eba487f997b"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>findRTfocus</b> (self, name_frame, f0=None, verbose=False)</td></tr>
+<tr class="memitem:a77749b7ba2640d7fa7957eba487f997b"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1System_1_1System.html#a77749b7ba2640d7fa7957eba487f997b">findRTfocus</a> (self, name_frame, f0=None, verbose=False)</td></tr>
+<tr class="memdesc:a77749b7ba2640d7fa7957eba487f997b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find the focus of a ray-trace frame.  <br /></td></tr>
 <tr class="separator:a77749b7ba2640d7fa7957eba487f997b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afcc555ca0df753904f74f2bd30125f04"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1System_1_1System.html#afcc555ca0df753904f74f2bd30125f04">getAnglesFromMatrix</a> (self, M)</td></tr>
 <tr class="memdesc:afcc555ca0df753904f74f2bd30125f04"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find x, y and z rotation angles from general rotation matrix.  <br /></td></tr>
@@ -334,14 +343,20 @@ os&#160;</td><td class="memItemRight" valign="bottom"><b>savePathSystems</b> = o
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:ae70568fcb6c10c93a168b07ce31148b6"><td class="memItemLeft" align="right" valign="top"><a id="ae70568fcb6c10c93a168b07ce31148b6" name="ae70568fcb6c10c93a168b07ce31148b6"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>_optimiseFocus</b> (self, f0, *args)</td></tr>
+<tr class="memitem:ae70568fcb6c10c93a168b07ce31148b6"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1System_1_1System.html#ae70568fcb6c10c93a168b07ce31148b6">_optimiseFocus</a> (self, f0, *args)</td></tr>
+<tr class="memdesc:ae70568fcb6c10c93a168b07ce31148b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cost function for finding a ray-trace frame focus.  <br /></td></tr>
 <tr class="separator:ae70568fcb6c10c93a168b07ce31148b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a58afe0b9a4e3e61b410f27514bd0dbf7"><td class="memItemLeft" align="right" valign="top"><a id="a58afe0b9a4e3e61b410f27514bd0dbf7" name="a58afe0b9a4e3e61b410f27514bd0dbf7"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>_compToFields</b> (self, comp, field)</td></tr>
+<tr class="memitem:aefdc45e9522178b867805ed42e2f1ca6"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1System_1_1System.html#aefdc45e9522178b867805ed42e2f1ca6">_checkBoundPO</a> (self, name, transf)</td></tr>
+<tr class="memdesc:aefdc45e9522178b867805ed42e2f1ca6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if an element to be rotated is bound to a PO field/current.  <br /></td></tr>
+<tr class="separator:aefdc45e9522178b867805ed42e2f1ca6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a390166d787be7fa06e0b5caa8e6fec8d"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1System_1_1System.html#a390166d787be7fa06e0b5caa8e6fec8d">_transformFrame</a> (self, frame)</td></tr>
+<tr class="memdesc:a390166d787be7fa06e0b5caa8e6fec8d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transform a ray-trace frame.  <br /></td></tr>
+<tr class="separator:a390166d787be7fa06e0b5caa8e6fec8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a58afe0b9a4e3e61b410f27514bd0dbf7"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1System_1_1System.html#a58afe0b9a4e3e61b410f27514bd0dbf7">_compToFields</a> (self, comp, field)</td></tr>
+<tr class="memdesc:a58afe0b9a4e3e61b410f27514bd0dbf7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transform a single component to a filled fields object by setting all other components to zero.  <br /></td></tr>
 <tr class="separator:a58afe0b9a4e3e61b410f27514bd0dbf7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa1309cefd812d0bdf67d68b34a99e7f8"><td class="memItemLeft" align="right" valign="top"><a id="aa1309cefd812d0bdf67d68b34a99e7f8" name="aa1309cefd812d0bdf67d68b34a99e7f8"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>_units</b> (self, unit, default=&quot;mm&quot;)</td></tr>
+<tr class="memitem:aa1309cefd812d0bdf67d68b34a99e7f8"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1System_1_1System.html#aa1309cefd812d0bdf67d68b34a99e7f8">_units</a> (self, unit, default=&quot;mm&quot;)</td></tr>
+<tr class="memdesc:aa1309cefd812d0bdf67d68b34a99e7f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a string representation of a unit to a list containing the unit and conversion factor.  <br /></td></tr>
 <tr class="separator:aa1309cefd812d0bdf67d68b34a99e7f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
@@ -417,6 +432,263 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>_units</b> (self, unit
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="aefdc45e9522178b867805ed42e2f1ca6" name="aefdc45e9522178b867805ed42e2f1ca6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aefdc45e9522178b867805ed42e2f1ca6">&#9670;&#160;</a></span>_checkBoundPO()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">def PyPO.System.System._checkBoundPO </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>transf</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Check if an element to be rotated is bound to a PO field/current. </p>
+<p>If so, rotate vectorial field/current components along.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>Name of reflector to be rotated. </td></tr>
+    <tr><td class="paramname">rotation</td><td>Array containing the rotation of the reflector. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a58afe0b9a4e3e61b410f27514bd0dbf7" name="a58afe0b9a4e3e61b410f27514bd0dbf7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a58afe0b9a4e3e61b410f27514bd0dbf7">&#9670;&#160;</a></span>_compToFields()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">def PyPO.System.System._compToFields </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>comp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>field</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Transform a single component to a filled fields object by setting all other components to zero. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">comp</td><td>Name of component. </td></tr>
+    <tr><td class="paramname">field</td><td>Array to be inserted in fields object.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>field_c Filled fields object with one component filled. </dd></dl>
+
+</div>
+</div>
+<a id="ae70568fcb6c10c93a168b07ce31148b6" name="ae70568fcb6c10c93a168b07ce31148b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae70568fcb6c10c93a168b07ce31148b6">&#9670;&#160;</a></span>_optimiseFocus()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">def PyPO.System.System._optimiseFocus </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>f0</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">*&#160;</td>
+          <td class="paramname"><em>args</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Cost function for finding a ray-trace frame focus. </p>
+<pre class="fragment">                                #
+</pre><p> PRIVATE METHODS # #</p>
+<p>Optimises RMS spot size as function of tilt multiple f0.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">f0</td><td>Tilt multiple for finding focus. </td></tr>
+    <tr><td class="paramname">args</td><td>The runRTDict for propagation and ray-trace tilt of input frame.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>RMS The RMS spot size of the frame at f0 times the tilt. </dd></dl>
+
+</div>
+</div>
+<a id="a390166d787be7fa06e0b5caa8e6fec8d" name="a390166d787be7fa06e0b5caa8e6fec8d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a390166d787be7fa06e0b5caa8e6fec8d">&#9670;&#160;</a></span>_transformFrame()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">def PyPO.System.System._transformFrame </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>frame</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Transform a ray-trace frame. </p>
+<p>The transformation is done according to the internal transformation matrix of frame object.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">frame</td><td>Frame object to be transformed. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aa1309cefd812d0bdf67d68b34a99e7f8" name="aa1309cefd812d0bdf67d68b34a99e7f8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa1309cefd812d0bdf67d68b34a99e7f8">&#9670;&#160;</a></span>_units()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">def PyPO.System.System._units </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>unit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>default</em> = <code>&quot;mm&quot;</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Convert a string representation of a unit to a list containing the unit and conversion factor. </p>
+<p>The conversion is done with respect of the standard PyPO units, which are millimeters. This method is only used for plotting.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">unit</td><td>String representation of the unit. </td></tr>
+    <tr><td class="paramname">default</td><td>Default unit, millimeters.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>out List containing the string unit and the corresponding conversion factor. </dd></dl>
+
+</div>
+</div>
 <a id="a7d784b6fac24aa2bb84769ba22614a85" name="a7d784b6fac24aa2bb84769ba22614a85"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7d784b6fac24aa2bb84769ba22614a85">&#9670;&#160;</a></span>addEllipse()</h2>
 
@@ -932,6 +1204,43 @@ currents </dd></dl>
 
 </div>
 </div>
+<a id="ae7015c3fb6f2c5b78ce05699f1e56be9" name="ae7015c3fb6f2c5b78ce05699f1e56be9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae7015c3fb6f2c5b78ce05699f1e56be9">&#9670;&#160;</a></span>copyElement()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def PyPO.System.System.copyElement </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>name_copy</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Copy reflector. </p>
+<p>@ param name Name of reflector to be copied. </p>
+
+</div>
+</div>
 <a id="aaa5555adccef41bf030e940237e45ed7" name="aaa5555adccef41bf030e940237e45ed7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aaa5555adccef41bf030e940237e45ed7">&#9670;&#160;</a></span>copyObj()</h2>
 
@@ -1131,6 +1440,56 @@ currents </dd></dl>
 
 </div>
 </div>
+<a id="afbf5787098ac97b9e7f7bb614513c930" name="afbf5787098ac97b9e7f7bb614513c930"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afbf5787098ac97b9e7f7bb614513c930">&#9670;&#160;</a></span>deleteSnap()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def PyPO.System.System.deleteSnap </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>snap_name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>obj</em> = <code>&quot;element&quot;</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Delete a saved snapshot belonging to an object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>Name of object. </td></tr>
+    <tr><td class="paramname">snap_name</td><td>Name of snapshot to delete. </td></tr>
+    <tr><td class="paramname">obj</td><td>Whether object is an element or a group. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a9e58ecbcc82f1e7a7e316a96b3cc8e78" name="a9e58ecbcc82f1e7a7e316a96b3cc8e78"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9e58ecbcc82f1e7a7e316a96b3cc8e78">&#9670;&#160;</a></span>findRotation()</h2>
 
@@ -1171,6 +1530,58 @@ currents </dd></dl>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="a77749b7ba2640d7fa7957eba487f997b" name="a77749b7ba2640d7fa7957eba487f997b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a77749b7ba2640d7fa7957eba487f997b">&#9670;&#160;</a></span>findRTfocus()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def PyPO.System.System.findRTfocus </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>name_frame</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>f0</em> = <code>None</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>verbose</em> = <code>False</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Find the focus of a ray-trace frame. </p>
+<p>Adds a new plane to the System, perpendicular to the mean ray-trace tilt of the input frame. After completion, the new plane is centered at the ray-trace focus.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name_frame</td><td>Name of the input frame. </td></tr>
+    <tr><td class="paramname">f0</td><td>Initial try for focal distance. </td></tr>
+    <tr><td class="paramname">verbose</td><td>Allow verbose System logging.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>out The focus co-ordinate. </dd></dl>
 
 </div>
 </div>
@@ -1526,6 +1937,57 @@ perr Standard deviation of fitted parameters. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">name</td><td>Reflector name or list of reflector names to be homed. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ab0b62bd1bfc8e7103b5eb3e105d5e28f" name="ab0b62bd1bfc8e7103b5eb3e105d5e28f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab0b62bd1bfc8e7103b5eb3e105d5e28f">&#9670;&#160;</a></span>interpBeam()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def PyPO.System.System.interpBeam </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>gridsize_new</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>obj_t</em> = <code>&quot;fields&quot;</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Interpolate a PO beam. </p>
+<p>Only for beams defined on planar surfaces. Can interpolate fields and currents separately. Results are stored in a new fields/currents object with the original name appended by 'interp'. Also, a new plane will be created with the updated gridsize and name appended by 'interp'.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>Name of beam to be interpolated. </td></tr>
+    <tr><td class="paramname">gridsize_new</td><td>New gridsizes for interpolation. </td></tr>
+    <tr><td class="paramname">obj</td><td>Whether to interpolate currents or fields. </td></tr>
   </table>
   </dd>
 </dl>
@@ -2342,14 +2804,14 @@ frame </dd></dl>
 
 </div>
 </div>
-<a id="ae535fe03c21bbbe3d8c2364c7a7097c6" name="ae535fe03c21bbbe3d8c2364c7a7097c6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae535fe03c21bbbe3d8c2364c7a7097c6">&#9670;&#160;</a></span>revertToSnapshot()</h2>
+<a id="a2d8bd4b6d1d5079df7929607a4cc637c" name="a2d8bd4b6d1d5079df7929607a4cc637c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d8bd4b6d1d5079df7929607a4cc637c">&#9670;&#160;</a></span>revertToSnap()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">def PyPO.System.System.revertToSnapshot </td>
+          <td class="memname">def PyPO.System.System.revertToSnap </td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname"><em>self</em>, </td>
@@ -2364,7 +2826,13 @@ frame </dd></dl>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>snap_name</em>&#160;</td>
+          <td class="paramname"><em>snap_name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>obj</em> = <code>&quot;element&quot;</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -2374,11 +2842,12 @@ frame </dd></dl>
       </table>
 </div><div class="memdoc">
 
-<p>Revert reflector configuration to a saved snapshot. </p>
+<p>Revert object configuration to a saved snapshot. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">name</td><td>Name of reflector to revert. </td></tr>
+    <tr><td class="paramname">name</td><td>Name of obj to revert. </td></tr>
     <tr><td class="paramname">snap_name</td><td>Name of snapshot to revert to. </td></tr>
+    <tr><td class="paramname">obj</td><td>Whether object is an element or a group. </td></tr>
   </table>
   </dd>
 </dl>
@@ -2690,14 +3159,14 @@ frame </dd></dl>
 
 </div>
 </div>
-<a id="a3d6603fe525b81fc25423fd93f2171ea" name="a3d6603fe525b81fc25423fd93f2171ea"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3d6603fe525b81fc25423fd93f2171ea">&#9670;&#160;</a></span>snapReflector()</h2>
+<a id="af85d6e247f11d739a79d3fa07557a98b" name="af85d6e247f11d739a79d3fa07557a98b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af85d6e247f11d739a79d3fa07557a98b">&#9670;&#160;</a></span>snapObj()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">def PyPO.System.System.snapReflector </td>
+          <td class="memname">def PyPO.System.System.snapObj </td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname"><em>self</em>, </td>
@@ -2712,7 +3181,13 @@ frame </dd></dl>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>snap_name</em>&#160;</td>
+          <td class="paramname"><em>snap_name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>obj</em> = <code>&quot;element&quot;</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -2722,11 +3197,12 @@ frame </dd></dl>
       </table>
 </div><div class="memdoc">
 
-<p>Take and store snapshot of reflector's current configuration. </p>
+<p>Take and store snapshot of object's current configuration. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">name</td><td>Name of reflector to be snapped. </td></tr>
+    <tr><td class="paramname">name</td><td>Name of object to be snapped. </td></tr>
     <tr><td class="paramname">snap_name</td><td>Name of snapshot to save. </td></tr>
+    <tr><td class="paramname">obj</td><td>Whether object is an element or a group. </td></tr>
   </table>
   </dd>
 </dl>

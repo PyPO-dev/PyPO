@@ -431,7 +431,8 @@ class System(object):
         self.system[reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added plane {reflDict['name']} to system.")
         self.num_ref += 1
-    
+   
+
     ##
     # Rotate reflector grids.
     #
@@ -469,6 +470,9 @@ class System(object):
 
                 self.system[name]["pos"] = (Rtot @ np.append(self.system[name]["pos"], 1))[:-1]
                 self.system[name]["ori"] = Rtot[:-1, :-1] @ self.system[name]["ori"]
+
+                self._checkBoundPO(name, Rtot[:-1, :-1])
+
                 self.clog.info(f"Rotated element {name} to {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
             elif mode == "relative":
@@ -477,6 +481,8 @@ class System(object):
                 
                 self.system[name]["pos"] = (MatRotate(rotation, pivot=pivot) @ np.append(self.system[name]["pos"], 1))[:-1]
                 self.system[name]["ori"] = MatRotate(rotation)[:-1, :-1] @ self.system[name]["ori"]
+                
+                self._checkBoundPO(name, MatRotate(rotation)[:-1, :-1])
             
                 self.clog.info(f"Rotated element {name} by {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
@@ -502,6 +508,8 @@ class System(object):
 
                     self.system[elem]["pos"] = (Rtot @ np.append(self.system[elem]["pos"], 1))[:-1]
                     self.system[elem]["ori"] = Rtot[:-1, :-1] @ self.system[elem]["ori"]
+                    
+                    self._checkBoundPO(elem, Rtot[:-1, :-1])
 
                 self.groups[name]["pos"] = (Rtot @ np.append(self.groups[name]["pos"], 1))[:-1]
                 self.groups[name]["ori"] = Rtot[:-1, :-1] @ self.groups[name]["ori"]
@@ -514,6 +522,8 @@ class System(object):
                     
                     self.system[elem]["pos"] = (MatRotate(rotation, pivot=pivot) @ np.append(self.system[elem]["pos"], 1))[:-1]
                     self.system[elem]["ori"] = MatRotate(rotation)[:-1, :-1] @ self.system[elem]["ori"]
+                    
+                    self._checkBoundPO(elem, MatRotate(rotation)[:-1, :-1])
 
                 self.groups[name]["pos"] = (MatRotate(rotation, pivot=pivot) @ np.append(self.groups[name]["pos"], 1))[:-1]
                 self.groups[name]["ori"] = MatRotate(rotation)[:-1, :-1] @ self.groups[name]["ori"]
@@ -1047,8 +1057,11 @@ class System(object):
     #
     # @see GRTDict
     def createGRTFrame(self, argDict):
+        check_GRTDict(argDict, self.frames.keys())
+        
         self.clog.info(f"Generating Gaussian ray-trace beam.")
         self.clog.info(f"... Sampling ...")
+        
         if not argDict["name"]:
             argDict["name"] = f"Frame_{len(self.frames)}"
        
@@ -1066,22 +1079,6 @@ class System(object):
         dtime = time.time() - start_time
         self.clog.info(f"Succesfully sampled {argDict['nRays']} rays: {dtime} seconds.")
 
-    def _transformFrame(self, frame):
-        for i in range(frame.size):
-            vec = np.array([frame.x[i], frame.y[i], frame.z[i], 1])
-            pos_new = frame.transf @ vec
-
-            frame.x[i] = pos_new[0]
-            frame.y[i] = pos_new[1]
-            frame.z[i] = pos_new[2]
-
-            vec = np.array([frame.dx[i], frame.dy[i], frame.dz[i]])
-            ori_new = frame.transf[:-1, :-1] @ vec
-
-            frame.dx[i] = ori_new[0]
-            frame.dy[i] = ori_new[1]
-            frame.dz[i] = ori_new[2]
-    
     ##
     # Convert a Poynting vector grid to a frame object. Sort of private method
     # 
@@ -1172,6 +1169,8 @@ class System(object):
     # @see GDict
     def createGaussian(self, gaussDict, name_source):
         check_elemSystem(name_source, self.system, extern=True)
+        check_GPODict(gaussDict, self.fields)
+        
         gauss_in = makeGauss(gaussDict, self.system[name_source])
 
         k = 2 * np.pi / gaussDict["lam"]
@@ -1191,6 +1190,8 @@ class System(object):
     # @see GDict
     def createScalarGaussian(self, gaussDict, name_source):
         check_elemSystem(name_source, self.system, extern=True)
+        check_GPODict(gaussDict, self.scalarfields)
+        
         gauss_in = makeScalarGauss(gaussDict, self.system[name_source])
 
         k = 2 * np.pi / gaussDict["lam"]
@@ -1402,6 +1403,8 @@ class System(object):
     # @see PSDict
     def generatePointSource(self, PSDict, name_surface):
         check_elemSystem(name_surface, self.system, extern=True)
+        check_PSDict(PSDict, self.fields)
+
         surfaceObj = self.system[name_surface]
         ps = np.zeros(surfaceObj["gridsize"], dtype=complex)
 
@@ -1438,6 +1441,8 @@ class System(object):
     # @see PSDict
     def generatePointSourceScalar(self, PSDict, name_surface):
         check_elemSystem(name_surface, self.system, extern=True)
+        check_PSDict(PSDict, self.scalarfields)
+        
         surfaceObj = self.system[name_surface]
         ps = np.zeros(surfaceObj["gridsize"], dtype=complex)
 
@@ -1724,12 +1729,7 @@ class System(object):
 
         lenw = np.linalg.norm(w)
         
-        #w = w / lenw
-        
         K = np.array([[0, -w[2], w[1]], [w[2], 0, -w[0]], [-w[1], w[0], 0]])
-        #print(K)
-        #theta = np.arcsin(lenw / (lenv * lenu))
-        #R = I + np.sin(theta) * K + (1 - np.cos(theta)) * K @ K
 
         R = I + K + K @ K * (1 - np.dot(v, u)) / lenw**2
 
@@ -1738,6 +1738,16 @@ class System(object):
         
         return R_transf
 
+    ##
+    # Find the focus of a ray-trace frame.
+    # Adds a new plane to the System, perpendicular to the mean ray-trace tilt of the input frame.
+    # After completion, the new plane is centered at the ray-trace focus.
+    #
+    # @param name_frame Name of the input frame.
+    # @param f0 Initial try for focal distance.
+    # @param verbose Allow verbose System logging.
+    #
+    # @returns out The focus co-ordinate.
     def findRTfocus(self, name_frame, f0=None, verbose=False):
         check_frameSystem(name_frame, self.frames, extern=True)
         f0 = 0 if f0 is None else f0
@@ -1785,18 +1795,6 @@ class System(object):
 
         return out
 
-    def _optimiseFocus(self, f0, *args):
-        runRTDict, tilt = args
-
-        trans = f0 * tilt
-
-        self.translateGrids(f"focal_plane_{runRTDict['fr_in']}", trans)
-        
-        self.runRayTracer(runRTDict)
-        RMS = self.calcSpotRMS(f"focus_{runRTDict['fr_in']}")
-        self.translateGrids(f"focal_plane_{runRTDict['fr_in']}", -trans)
-        #self.removeFrame() 
-        return RMS
         
     ##
     # Find x, y and z rotation angles from general rotation matrix.
@@ -1820,14 +1818,134 @@ class System(object):
             ry = -np.pi / 2
             rz = np.arctan2(-M[1,2], M[1,1])
             rx = 0
-        #self.clog.debug(M[1,2])
 
         r = np.degrees(np.array([rx, ry, rz]))
 
         testM = MatRotate(r, np.eye(4), pivot=None, radians=False)
 
         return r#, testM
+    
+    #############################################################
+    #                                                           #
+    #                       PRIVATE METHODS                     #
+    #                                                           #
+    #############################################################
+    
+    ##
+    # Cost function for finding a ray-trace frame focus.
+    # Optimises RMS spot size as function of tilt multiple f0.
+    #
+    # @param f0 Tilt multiple for finding focus.
+    # @param args The runRTDict for propagation and ray-trace tilt of input frame.
+    #
+    # @returns RMS The RMS spot size of the frame at f0 times the tilt.
+    def _optimiseFocus(self, f0, *args):
+        runRTDict, tilt = args
 
+        trans = f0 * tilt
+
+        self.translateGrids(f"focal_plane_{runRTDict['fr_in']}", trans)
+        
+        self.runRayTracer(runRTDict)
+        RMS = self.calcSpotRMS(f"focus_{runRTDict['fr_in']}")
+        self.translateGrids(f"focal_plane_{runRTDict['fr_in']}", -trans)
+        #self.removeFrame() 
+        return RMS
+    
+    ##
+    # Check if an element to be rotated is bound to a PO field/current.
+    # If so, rotate vectorial field/current components along.
+    #
+    # @param name Name of reflector to be rotated.
+    # @param rotation Array containing the rotation of the reflector.
+    def _checkBoundPO(self, name, transf):
+
+        bound_fields = []
+        bound_currents = []
+
+        for key, item in self.fields.items():
+            if hasattr(item, "surf"):
+                if item.surf == name:
+                    bound_fields.append(key)
+        
+        for key, item in self.currents.items():
+            if hasattr(item, "surf"):
+                if item.surf == name:
+                    bound_currents.append(key)
+
+        if bound_fields:
+            for field in bound_fields:
+                for i in range(self.fields[field].size):
+                    x = self.fields[field].Ex.ravel()[i]
+                    y = self.fields[field].Ey.ravel()[i]
+                    z = self.fields[field].Ez.ravel()[i]
+
+                    new = transf @ np.array([x, y, z])
+
+                    self.fields[field].Ex.ravel()[i] = new[0]
+                    self.fields[field].Ey.ravel()[i] = new[1]
+                    self.fields[field].Ez.ravel()[i] = new[2]
+                    
+                    x = self.fields[field].Hx.ravel()[i]
+                    y = self.fields[field].Hy.ravel()[i]
+                    z = self.fields[field].Hz.ravel()[i]
+                    
+                    new = transf @ np.array([x, y, z])
+
+                    self.fields[field].Hx.ravel()[i] = new[0]
+                    self.fields[field].Hy.ravel()[i] = new[1]
+                    self.fields[field].Hz.ravel()[i] = new[2]
+        
+        if bound_currents:
+            for current in bound_currents:
+                for i in range(self.currents[current].size):
+                    x = self.currents[current].Jx.ravel()[i]
+                    y = self.currents[current].Jy.ravel()[i]
+                    z = self.currents[current].Jz.ravel()[i]
+                    new = transf @ np.array([x, y, z])
+
+                    self.currents[current].Jx.ravel()[i] = new[0]
+                    self.currents[current].Jy.ravel()[i] = new[1]
+                    self.currents[current].Jz.ravel()[i] = new[2]
+                    
+                    x = self.currents[current].Mx.ravel()[i]
+                    y = self.currents[current].My.ravel()[i]
+                    z = self.currents[current].Mz.ravel()[i]
+                    
+                    new = transf @ np.array([x, y, z])
+                    
+                    self.currents[current].Mx.ravel()[i] = new[0]
+                    self.currents[current].My.ravel()[i] = new[1]
+                    self.currents[current].Mz.ravel()[i] = new[2]
+    
+    ##
+    # Transform a ray-trace frame.
+    # The transformation is done according to the internal transformation matrix of frame object.
+    #
+    # @param frame Frame object to be transformed.
+    def _transformFrame(self, frame):
+        for i in range(frame.size):
+            vec = np.array([frame.x[i], frame.y[i], frame.z[i], 1])
+            pos_new = frame.transf @ vec
+
+            frame.x[i] = pos_new[0]
+            frame.y[i] = pos_new[1]
+            frame.z[i] = pos_new[2]
+
+            vec = np.array([frame.dx[i], frame.dy[i], frame.dz[i]])
+            ori_new = frame.transf[:-1, :-1] @ vec
+
+            frame.dx[i] = ori_new[0]
+            frame.dy[i] = ori_new[1]
+            frame.dz[i] = ori_new[2]
+   
+    ##
+    # Transform a single component to a filled fields object by setting all other components to zero.
+    #
+    # @param comp Name of component.
+    # @param field Array to be inserted in fields object.
+    #
+    # @returns field_c Filled fields object with one component filled.
     def _compToFields(self, comp, field):
         null = np.zeros(field.shape, dtype=complex)
 
@@ -1846,6 +1964,15 @@ class System(object):
 
         return field_c
 
+    ##
+    # Convert a string representation of a unit to a list containing the unit and conversion factor.
+    # The conversion is done with respect of the standard PyPO units, which are millimeters.
+    # This method is only used for plotting.
+    #
+    # @param unit String representation of the unit.
+    # @param default Default unit, millimeters.
+    #
+    # @returns out List containing the string unit and the corresponding conversion factor.
     def _units(self, unit, default="mm"):
         if unit == "m":
             return [unit, 1e-3]

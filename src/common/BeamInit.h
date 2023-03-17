@@ -161,12 +161,12 @@ void initFrame(T rdict, U *fr)
 
     for (int i=1; i<nTot; i++)
     {
-        fr->x[i] = rdict.a * cos(alpha) / rdict.nRing * n;
-        fr->y[i] = rdict.b * sin(alpha) / rdict.nRing * n;
+        fr->x[i] = rdict.x0 * cos(alpha) / rdict.nRing * n;
+        fr->y[i] = rdict.y0 * sin(alpha) / rdict.nRing * n;
         fr->z[i] = 0.;
 
-        rotation[0] = rdict.angy * sin(alpha) / rdict.nRing * n;
-        rotation[1] = rdict.angx * cos(alpha) / rdict.nRing * n;
+        rotation[0] = rdict.angy0 * sin(alpha) / rdict.nRing * n;
+        rotation[1] = rdict.angx0 * cos(alpha) / rdict.nRing * n;
         rotation[2] = 2 * alpha;
 
         ut.matRot(rotation, nomChief, zero, direction);
@@ -174,7 +174,6 @@ void initFrame(T rdict, U *fr)
         fr->dx[i] = direction[0];
         fr->dy[i] = direction[1];
         fr->dz[i] = direction[2];
-        std::cout << pos[0] << std::endl;
         alpha += d_alpha;
 
         if (i == int(nTot / rdict.nRing) * n)
@@ -278,21 +277,20 @@ void initGauss(T gdict, U refldict, V *res_field, V *res_current)
 
     Utils<G> ut;
 
-    bool transform = false;
+    bool transform = true;
     generateGrid(refldict, &reflc, transform);
 
 
     G zRx      = M_PI * gdict.w0x*gdict.w0x * gdict.n / gdict.lam;
     G zRy      = M_PI * gdict.w0y*gdict.w0y * gdict.n / gdict.lam;
-    G wzx      = gdict.w0x * sqrt(1 + (gdict.z / zRx)*(gdict.z / zRx));
-    G wzy      = gdict.w0y * sqrt(1 + (gdict.z / zRy)*(gdict.z / zRy));
-    G Rzx_inv  = gdict.z / (gdict.z*gdict.z + zRx*zRx);
-    G Rzy_inv  = gdict.z / (gdict.z*gdict.z + zRy*zRy);
-    G phizx    = atan(gdict.z / zRx);
-    G phizy    = atan(gdict.z / zRy);
-    G k       = 2 * M_PI / gdict.lam;
-
-    G r2;
+    G k        = 2 * M_PI / gdict.lam;
+    
+    G wzx;      
+    G wzy;     
+    G Rzx_inv;  
+    G Rzy_inv;  
+    G phizx;    
+    G phizy;    
 
     std::complex<G> j(0, 1);
 
@@ -303,11 +301,15 @@ void initGauss(T gdict, U refldict, V *res_field, V *res_current)
 
     for (int i=0; i<nTot; i++)
     {
-        r2 = reflc.x[i]*reflc.x[i] + reflc.y[i]*reflc.y[i];
-
-        //field_atPoint = gdict.E0 * gdict.w0/wz * exp(-r2/(wz*wz)) * exp(-j * (k*gdict.z + k*r2*Rz_inv/2 - phiz));
+        wzx      = gdict.w0x * sqrt(1 + (reflc.z[i] / zRx)*(reflc.z[i] / zRx));
+        wzy      = gdict.w0y * sqrt(1 + ((reflc.z[i] - gdict.dxyz) / zRy)*((reflc.z[i] - gdict.dxyz) / zRy));
+        Rzx_inv  = reflc.z[i] / (reflc.z[i]*reflc.z[i] + zRx*zRx);
+        Rzy_inv  = (reflc.z[i] - gdict.dxyz) / ((reflc.z[i] - gdict.dxyz)*(reflc.z[i] - gdict.dxyz) + zRy*zRy);
+        phizx    = atan(reflc.z[i] / zRx);
+        phizy    = atan((reflc.z[i] - gdict.dxyz) / zRy);
+        
         field_atPoint = gdict.E0 * sqrt(2 / (M_PI * wzx * wzy)) * exp(-(reflc.x[i]/wzx)*(reflc.x[i]/wzx) - (reflc.y[i]/wzy)*(reflc.y[i]/wzy) -
-                j*M_PI/gdict.lam * (reflc.x[i]*reflc.x[i]*Rzx_inv + reflc.y[i]*reflc.y[i]*Rzy_inv) - j*k*gdict.z + j*(phizx - phizy)*0.5);
+                j*M_PI/gdict.lam * (reflc.x[i]*reflc.x[i]*Rzx_inv + reflc.y[i]*reflc.y[i]*Rzy_inv) - j*k*reflc.z[i] + j*(phizx - phizy)*0.5);
         
         efield[0] = field_atPoint * gdict.pol[0];
         efield[1] = field_atPoint * gdict.pol[1];
@@ -388,33 +390,35 @@ void initScalarGauss(T sgdict, U refldict, V *res_field)
     reflc.area = new G[nTot];
     Utils<G> ut;
 
-    bool transform = false;
+    bool transform = true;
     generateGrid(refldict, &reflc, transform);
 
     G zRx      = M_PI * sgdict.w0x*sgdict.w0x * sgdict.n / sgdict.lam;
     G zRy      = M_PI * sgdict.w0y*sgdict.w0y * sgdict.n / sgdict.lam;
-    G wzx      = sgdict.w0x * sqrt(1 + (sgdict.z / zRx)*(sgdict.z / zRx));
-    G wzy      = sgdict.w0y * sqrt(1 + (sgdict.z / zRy)*(sgdict.z / zRy));
-    G Rzx_inv  = sgdict.z / (sgdict.z*sgdict.z + zRx*zRx);
-    G Rzy_inv  = sgdict.z / (sgdict.z*sgdict.z + zRy*zRy);
-    G phizx    = atan(sgdict.z / zRx);
-    G phizy    = atan(sgdict.z / zRy);
     G k        = 2 * M_PI / sgdict.lam;
-
-    G r2;
+    
+    G wzx;      
+    G wzy;     
+    G Rzx_inv;  
+    G Rzy_inv;  
+    G phizx;    
+    G phizy;    
 
     std::complex<G> j(0, 1);
 
     std::complex<G> efield;
-    std::array<G, 3> n_source;
 
     for (int i=0; i<nTot; i++)
     {
-        r2 = reflc.x[i]*reflc.x[i] + reflc.y[i]*reflc.y[i];
-
-        //field_atPoint = gdict.E0 * gdict.w0/wz * exp(-r2/(wz*wz)) * exp(-j * (k*gdict.z + k*r2*Rz_inv/2 - phiz));
+        wzx      = sgdict.w0x * sqrt(1 + (reflc.z[i] / zRx)*(reflc.z[i] / zRx));
+        wzy      = sgdict.w0y * sqrt(1 + ((reflc.z[i] - sgdict.dxyz) / zRy)*((reflc.z[i] - sgdict.dxyz) / zRy));
+        Rzx_inv  = reflc.z[i] / (reflc.z[i]*reflc.z[i] + zRx*zRx);
+        Rzy_inv  = (reflc.z[i] - sgdict.dxyz) / ((reflc.z[i] - sgdict.dxyz)*(reflc.z[i] - sgdict.dxyz) + zRy*zRy);
+        phizx    = atan(reflc.z[i] / zRx);
+        phizy    = atan((reflc.z[i] - sgdict.dxyz) / zRy);
+        
         efield = sgdict.E0 * sqrt(2 / (M_PI * wzx * wzy)) * exp(-(reflc.x[i]/wzx)*(reflc.x[i]/wzx) - (reflc.y[i]/wzy)*(reflc.y[i]/wzy) -
-                j*M_PI/sgdict.lam * (reflc.x[i]*reflc.x[i]*Rzx_inv + reflc.y[i]*reflc.y[i]*Rzy_inv) - j*k*sgdict.z + j*(phizx - phizy)*0.5);
+                j*M_PI/sgdict.lam * (reflc.x[i]*reflc.x[i]*Rzx_inv + reflc.y[i]*reflc.y[i]*Rzy_inv) - j*k*reflc.z[i] + j*(phizx - phizy)*0.5);
 
         res_field->x[i] = efield.real();
         res_field->y[i] = efield.imag();

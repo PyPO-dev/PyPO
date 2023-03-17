@@ -77,6 +77,7 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#pro-static-methods">Static Protected Member Functions</a> &#124;
 <a href="classGUI_1_1MainWindow_1_1MainWidget-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">GUI.MainWindow.MainWidget Class Reference</div></div>
 </div><!--header-->
@@ -93,76 +94,107 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4e8c620cd1a89a1f11d5f30fb2a9b8bc"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1MainWindow_1_1MainWidget.html#a4e8c620cd1a89a1f11d5f30fb2a9b8bc">__init__</a> (self, parent=None)</td></tr>
 <tr class="memdesc:a4e8c620cd1a89a1f11d5f30fb2a9b8bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructot.  <br /></td></tr>
 <tr class="separator:a4e8c620cd1a89a1f11d5f30fb2a9b8bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8e7cd26c540840d825d10cf4d8bc07c7"><td class="memItemLeft" align="right" valign="top"><a id="a8e7cd26c540840d825d10cf4d8bc07c7" name="a8e7cd26c540840d825d10cf4d8bc07c7"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>addToWindowGrid</b> (self, widget, param)</td></tr>
-<tr class="memdesc:a8e7cd26c540840d825d10cf4d8bc07c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a widget to the layout of PyPOMainWidget. <br /></td></tr>
+<tr class="memitem:a8e7cd26c540840d825d10cf4d8bc07c7"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1MainWindow_1_1MainWidget.html#a8e7cd26c540840d825d10cf4d8bc07c7">addToWindowGrid</a> (self, widget, param)</td></tr>
+<tr class="memdesc:a8e7cd26c540840d825d10cf4d8bc07c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gui setup functions.  <br /></td></tr>
 <tr class="separator:a8e7cd26c540840d825d10cf4d8bc07c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa72f96f79e0fc9a324ced35b69c7dbbf"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1MainWindow_1_1MainWidget.html#aa72f96f79e0fc9a324ced35b69c7dbbf">setForm</a> (self, formData, readAction)</td></tr>
-<tr class="memdesc:aa72f96f79e0fc9a324ced35b69c7dbbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates a form widget.  <br /></td></tr>
+<tr class="memdesc:aa72f96f79e0fc9a324ced35b69c7dbbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">@guiSetup Generates a form widget  <br /></td></tr>
 <tr class="separator:aa72f96f79e0fc9a324ced35b69c7dbbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac79236da3b455efd5c0faada7d7a66f4"><td class="memItemLeft" align="right" valign="top"><a id="ac79236da3b455efd5c0faada7d7a66f4" name="ac79236da3b455efd5c0faada7d7a66f4"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>addPlot</b> (self, figure, label)</td></tr>
-<tr class="memdesc:ac79236da3b455efd5c0faada7d7a66f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a PlotScreen and adds it to the plotWidget along with a label for the tab. <br /></td></tr>
+<tr class="memitem:a7c534798bac38bf2042fd48fb6db4316"><td class="memItemLeft" align="right" valign="top"><a id="a7c534798bac38bf2042fd48fb6db4316" name="a7c534798bac38bf2042fd48fb6db4316"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>removeForm</b> (self)</td></tr>
+<tr class="memdesc:a7c534798bac38bf2042fd48fb6db4316"><td class="mdescLeft">&#160;</td><td class="mdescRight">removes the form ParameterWid if exists <br /></td></tr>
+<tr class="separator:a7c534798bac38bf2042fd48fb6db4316"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac79236da3b455efd5c0faada7d7a66f4"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1MainWindow_1_1MainWidget.html#ac79236da3b455efd5c0faada7d7a66f4">addPlot</a> (self, figure, label)</td></tr>
+<tr class="memdesc:ac79236da3b455efd5c0faada7d7a66f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Functionalities: Plotting.  <br /></td></tr>
 <tr class="separator:ac79236da3b455efd5c0faada7d7a66f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afeaf066a294df15fe30c8f2ade52a251"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1MainWindow_1_1MainWidget.html#afeaf066a294df15fe30c8f2ade52a251">closeTab</a> (self, i)</td></tr>
-<tr class="memdesc:afeaf066a294df15fe30c8f2ade52a251"><td class="mdescLeft">&#160;</td><td class="mdescRight">removes a plot from the tabWidget  <br /></td></tr>
-<tr class="separator:afeaf066a294df15fe30c8f2ade52a251"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd7e20e3470f9ade5312764539b36ab5"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1MainWindow_1_1MainWidget.html#abd7e20e3470f9ade5312764539b36ab5">removeElement</a> (self, element)</td></tr>
-<tr class="memdesc:abd7e20e3470f9ade5312764539b36ab5"><td class="mdescLeft">&#160;</td><td class="mdescRight">removes an element from the system  <br /></td></tr>
-<tr class="separator:abd7e20e3470f9ade5312764539b36ab5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3bc73c09a3512bc3cb737f06e885f804"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1MainWindow_1_1MainWidget.html#a3bc73c09a3512bc3cb737f06e885f804">plotElement</a> (self, surface)</td></tr>
-<tr class="memdesc:a3bc73c09a3512bc3cb737f06e885f804"><td class="mdescLeft">&#160;</td><td class="mdescRight">plots a sigle element from the System  <br /></td></tr>
+<tr class="memdesc:a3bc73c09a3512bc3cb737f06e885f804"><td class="mdescLeft">&#160;</td><td class="mdescRight">plots a single element from the System  <br /></td></tr>
 <tr class="separator:a3bc73c09a3512bc3cb737f06e885f804"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1aafd2437515c6689da391cc1807bb93"><td class="memItemLeft" align="right" valign="top"><a id="a1aafd2437515c6689da391cc1807bb93" name="a1aafd2437515c6689da391cc1807bb93"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>snapActionForm</b> (self, element)</td></tr>
+<tr class="memdesc:a1aafd2437515c6689da391cc1807bb93"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a snapshot form. <br /></td></tr>
+<tr class="separator:a1aafd2437515c6689da391cc1807bb93"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3290f2a3c3cf8eea6a3191c80b0e82eb"><td class="memItemLeft" align="right" valign="top"><a id="a3290f2a3c3cf8eea6a3191c80b0e82eb" name="a3290f2a3c3cf8eea6a3191c80b0e82eb"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>snapFrameActionForm</b> (self, frame)</td></tr>
+<tr class="memdesc:a3290f2a3c3cf8eea6a3191c80b0e82eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a snapshot form for ray-trace frame. <br /></td></tr>
+<tr class="separator:a3290f2a3c3cf8eea6a3191c80b0e82eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a765c15b1a201eb6dc35d8005bc4a2faa"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1MainWindow_1_1MainWidget.html#a765c15b1a201eb6dc35d8005bc4a2faa">snapAction</a> (self)</td></tr>
+<tr class="memdesc:a765c15b1a201eb6dc35d8005bc4a2faa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Take, revert or delete a snapshot.  <br /></td></tr>
+<tr class="separator:a765c15b1a201eb6dc35d8005bc4a2faa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a62fefcc9328dfc969a5e1beecdbfecb4"><td class="memItemLeft" align="right" valign="top"><a id="a62fefcc9328dfc969a5e1beecdbfecb4" name="a62fefcc9328dfc969a5e1beecdbfecb4"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>plotSystem</b> (self)</td></tr>
 <tr class="memdesc:a62fefcc9328dfc969a5e1beecdbfecb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">plots all elements of the system in one plot <br /></td></tr>
 <tr class="separator:a62fefcc9328dfc969a5e1beecdbfecb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa46d3db98b9223c0fc0e766d2ee25f25"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1MainWindow_1_1MainWidget.html#aa46d3db98b9223c0fc0e766d2ee25f25">closePlotTab</a> (self, i)</td></tr>
+<tr class="memdesc:aa46d3db98b9223c0fc0e766d2ee25f25"><td class="mdescLeft">&#160;</td><td class="mdescRight">removes a plot from the tabWidget  <br /></td></tr>
+<tr class="separator:aa46d3db98b9223c0fc0e766d2ee25f25"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4b395605c8b29da45a0ea7cf19a5ae93"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1MainWindow_1_1MainWidget.html#a4b395605c8b29da45a0ea7cf19a5ae93">getSysPlotNr</a> (self)</td></tr>
-<tr class="memdesc:a4b395605c8b29da45a0ea7cf19a5ae93"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the plot number froms System and increments it TODO: doc.  <br /></td></tr>
+<tr class="memdesc:a4b395605c8b29da45a0ea7cf19a5ae93"><td class="mdescLeft">&#160;</td><td class="mdescRight">Functionalities: Naming.  <br /></td></tr>
 <tr class="separator:a4b395605c8b29da45a0ea7cf19a5ae93"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a845478318b3020633221154776069290"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1MainWindow_1_1MainWidget.html#a845478318b3020633221154776069290">getRayPlotNr</a> (self)</td></tr>
-<tr class="memdesc:a845478318b3020633221154776069290"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the frame plot number froms System and increments it TODO: doc.  <br /></td></tr>
+<tr class="memdesc:a845478318b3020633221154776069290"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the frame plot number and increments it.  <br /></td></tr>
 <tr class="separator:a845478318b3020633221154776069290"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5f439a8062cf4f2dc2304ba0b9c7cf73"><td class="memItemLeft" align="right" valign="top"><a id="a5f439a8062cf4f2dc2304ba0b9c7cf73" name="a5f439a8062cf4f2dc2304ba0b9c7cf73"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>plotSystemWithRaytrace</b> (self)</td></tr>
 <tr class="memdesc:a5f439a8062cf4f2dc2304ba0b9c7cf73"><td class="mdescLeft">&#160;</td><td class="mdescRight">plots all elements of the system including ray traces in one plot <br /></td></tr>
 <tr class="separator:a5f439a8062cf4f2dc2304ba0b9c7cf73"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10175f0678c7b1457112418d661c0379"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1MainWindow_1_1MainWidget.html#a10175f0678c7b1457112418d661c0379">saveSystemForm</a> (self)</td></tr>
+<tr class="memdesc:a10175f0678c7b1457112418d661c0379"><td class="mdescLeft">&#160;</td><td class="mdescRight">Functionalities: Systems.  <br /></td></tr>
+<tr class="separator:a10175f0678c7b1457112418d661c0379"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a044da75d95cd1ef0664fbdcfca505e1b"><td class="memItemLeft" align="right" valign="top"><a id="a044da75d95cd1ef0664fbdcfca505e1b" name="a044da75d95cd1ef0664fbdcfca505e1b"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>saveSystemAction</b> (self)</td></tr>
-<tr class="memdesc:a044da75d95cd1ef0664fbdcfca505e1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">opens a form that allows user to save the System <br /></td></tr>
+<tr class="memdesc:a044da75d95cd1ef0664fbdcfca505e1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Saves the current system state under the name given in form. <br /></td></tr>
 <tr class="separator:a044da75d95cd1ef0664fbdcfca505e1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afaa8df9421e5666b20c186630b175025"><td class="memItemLeft" align="right" valign="top"><a id="afaa8df9421e5666b20c186630b175025" name="afaa8df9421e5666b20c186630b175025"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>deleteSavedSystemForm</b> (self)</td></tr>
+<tr class="memdesc:afaa8df9421e5666b20c186630b175025"><td class="mdescLeft">&#160;</td><td class="mdescRight">opens a form that allows user to delete a saved System <br /></td></tr>
+<tr class="separator:afaa8df9421e5666b20c186630b175025"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae154dc3879e59b5d0cbbc0190515c449"><td class="memItemLeft" align="right" valign="top"><a id="ae154dc3879e59b5d0cbbc0190515c449" name="ae154dc3879e59b5d0cbbc0190515c449"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>deleteSavedSystemAction</b> (self)</td></tr>
+<tr class="memdesc:ae154dc3879e59b5d0cbbc0190515c449"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes system selected in form. <br /></td></tr>
+<tr class="separator:ae154dc3879e59b5d0cbbc0190515c449"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2365928fb9f3a0af8c2aeee7db6d0eeb"><td class="memItemLeft" align="right" valign="top"><a id="a2365928fb9f3a0af8c2aeee7db6d0eeb" name="a2365928fb9f3a0af8c2aeee7db6d0eeb"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>loadSystemForm</b> (self)</td></tr>
+<tr class="memdesc:a2365928fb9f3a0af8c2aeee7db6d0eeb"><td class="mdescLeft">&#160;</td><td class="mdescRight">opens a form that allows user to load a saved System <br /></td></tr>
+<tr class="separator:a2365928fb9f3a0af8c2aeee7db6d0eeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9d33910b9043d3faac5a64b304892592"><td class="memItemLeft" align="right" valign="top"><a id="a9d33910b9043d3faac5a64b304892592" name="a9d33910b9043d3faac5a64b304892592"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>loadSystemAction</b> (self)</td></tr>
-<tr class="memdesc:a9d33910b9043d3faac5a64b304892592"><td class="mdescLeft">&#160;</td><td class="mdescRight">opens a form that allows user to load a saved System <br /></td></tr>
+<tr class="memdesc:a9d33910b9043d3faac5a64b304892592"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loads system selected in from form. <br /></td></tr>
 <tr class="separator:a9d33910b9043d3faac5a64b304892592"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaaaad0920cc3ca3da12855c9bf81f54a"><td class="memItemLeft" align="right" valign="top"><a id="aaaaad0920cc3ca3da12855c9bf81f54a" name="aaaaad0920cc3ca3da12855c9bf81f54a"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>deleteSystemAction</b> (self)</td></tr>
-<tr class="memdesc:aaaaad0920cc3ca3da12855c9bf81f54a"><td class="mdescLeft">&#160;</td><td class="mdescRight">opens a form that allows user to delete a saved System <br /></td></tr>
-<tr class="separator:aaaaad0920cc3ca3da12855c9bf81f54a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae6f4a8b24c31753c1c702b50c00426eb"><td class="memItemLeft" align="right" valign="top"><a id="ae6f4a8b24c31753c1c702b50c00426eb" name="ae6f4a8b24c31753c1c702b50c00426eb"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>saveSystemCall</b> (self)</td></tr>
-<tr class="memdesc:ae6f4a8b24c31753c1c702b50c00426eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Saves the current system state under the name given in form. <br /></td></tr>
-<tr class="separator:ae6f4a8b24c31753c1c702b50c00426eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaab569c49c66901cfc1f4070df4d30f2"><td class="memItemLeft" align="right" valign="top"><a id="aaab569c49c66901cfc1f4070df4d30f2" name="aaab569c49c66901cfc1f4070df4d30f2"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>loadSystemCall</b> (self)</td></tr>
-<tr class="memdesc:aaab569c49c66901cfc1f4070df4d30f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loads system selected in from form. <br /></td></tr>
-<tr class="separator:aaab569c49c66901cfc1f4070df4d30f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9a9b783c028eb27286b5d3f3545051ab"><td class="memItemLeft" align="right" valign="top"><a id="a9a9b783c028eb27286b5d3f3545051ab" name="a9a9b783c028eb27286b5d3f3545051ab"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>removeSystemCall</b> (self)</td></tr>
-<tr class="memdesc:a9a9b783c028eb27286b5d3f3545051ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes system selected in form. <br /></td></tr>
-<tr class="separator:a9a9b783c028eb27286b5d3f3545051ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abd7e20e3470f9ade5312764539b36ab5"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1MainWindow_1_1MainWidget.html#abd7e20e3470f9ade5312764539b36ab5">removeElement</a> (self, element)</td></tr>
+<tr class="memdesc:abd7e20e3470f9ade5312764539b36ab5"><td class="mdescLeft">&#160;</td><td class="mdescRight">removes an element from the system  <br /></td></tr>
+<tr class="separator:abd7e20e3470f9ade5312764539b36ab5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa2f095821add1a5fadad34f3b4bfddf4"><td class="memItemLeft" align="right" valign="top"><a id="aa2f095821add1a5fadad34f3b4bfddf4" name="aa2f095821add1a5fadad34f3b4bfddf4"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>refreshColumn</b> (self, columnDict, columnType)</td></tr>
 <tr class="memdesc:aa2f095821add1a5fadad34f3b4bfddf4"><td class="mdescLeft">&#160;</td><td class="mdescRight">TODO: @Maikel Rename this function and evaluate its nessecity. <br /></td></tr>
 <tr class="separator:aa2f095821add1a5fadad34f3b4bfddf4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab1eea3adfd6f5f2b70fd9c97ed7a91fb"><td class="memItemLeft" align="right" valign="top"><a id="ab1eea3adfd6f5f2b70fd9c97ed7a91fb" name="ab1eea3adfd6f5f2b70fd9c97ed7a91fb"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>setQuadricForm</b> (self)</td></tr>
-<tr class="memdesc:ab1eea3adfd6f5f2b70fd9c97ed7a91fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows from to add a quadric surface. <br /></td></tr>
-<tr class="separator:ab1eea3adfd6f5f2b70fd9c97ed7a91fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8d044856f2b70abfee1a8ed4f24fc440"><td class="memItemLeft" align="right" valign="top"><a id="a8d044856f2b70abfee1a8ed4f24fc440" name="a8d044856f2b70abfee1a8ed4f24fc440"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>setPlaneForm</b> (self)</td></tr>
-<tr class="memdesc:a8d044856f2b70abfee1a8ed4f24fc440"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows form to add a plane. <br /></td></tr>
-<tr class="separator:a8d044856f2b70abfee1a8ed4f24fc440"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a612fb48ceb74998322c1598bc4659c12"><td class="memItemLeft" align="right" valign="top"><a id="a612fb48ceb74998322c1598bc4659c12" name="a612fb48ceb74998322c1598bc4659c12"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>addReflectorWidget</b> (self, name)</td></tr>
+<tr class="memdesc:a612fb48ceb74998322c1598bc4659c12"><td class="mdescLeft">&#160;</td><td class="mdescRight">Functionalities: Adding Elements in gui TODO:doc. <br /></td></tr>
+<tr class="separator:a612fb48ceb74998322c1598bc4659c12"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed1dd796bfb329c599dba3aca1153ad9"><td class="memItemLeft" align="right" valign="top"><a id="aed1dd796bfb329c599dba3aca1153ad9" name="aed1dd796bfb329c599dba3aca1153ad9"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>addFrameWidget</b> (self, name)</td></tr>
+<tr class="separator:aed1dd796bfb329c599dba3aca1153ad9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d7611e99f71145f5724a1b70b71a824"><td class="memItemLeft" align="right" valign="top"><a id="a4d7611e99f71145f5724a1b70b71a824" name="a4d7611e99f71145f5724a1b70b71a824"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>addFieldWidget</b> (self, name)</td></tr>
+<tr class="separator:a4d7611e99f71145f5724a1b70b71a824"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae54b80acacd9ef343a4f4837cc389790"><td class="memItemLeft" align="right" valign="top"><a id="ae54b80acacd9ef343a4f4837cc389790" name="ae54b80acacd9ef343a4f4837cc389790"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>addCurrentWidget</b> (self, name)</td></tr>
+<tr class="separator:ae54b80acacd9ef343a4f4837cc389790"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5eecb205c8a3c7377ed4268bd330741a"><td class="memItemLeft" align="right" valign="top"><a id="a5eecb205c8a3c7377ed4268bd330741a" name="a5eecb205c8a3c7377ed4268bd330741a"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>addSFieldWidget</b> (self, name)</td></tr>
+<tr class="separator:a5eecb205c8a3c7377ed4268bd330741a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a42d28dbd974142ddf98e23e613b9790d"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1MainWindow_1_1MainWidget.html#a42d28dbd974142ddf98e23e613b9790d">addPlaneForm</a> (self)</td></tr>
+<tr class="memdesc:a42d28dbd974142ddf98e23e613b9790d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Functionalities: Adding Elements.  <br /></td></tr>
+<tr class="separator:a42d28dbd974142ddf98e23e613b9790d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8fa343f16c147a64f86ad9c8f1258d82"><td class="memItemLeft" align="right" valign="top"><a id="a8fa343f16c147a64f86ad9c8f1258d82" name="a8fa343f16c147a64f86ad9c8f1258d82"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>addPlaneAction</b> (self)</td></tr>
+<tr class="memdesc:a8fa343f16c147a64f86ad9c8f1258d82"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads form and adds plane to System. <br /></td></tr>
+<tr class="separator:a8fa343f16c147a64f86ad9c8f1258d82"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46f5552887fc351a09b1e3fc52eb96c0"><td class="memItemLeft" align="right" valign="top"><a id="a46f5552887fc351a09b1e3fc52eb96c0" name="a46f5552887fc351a09b1e3fc52eb96c0"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>addQuadricForm</b> (self)</td></tr>
+<tr class="memdesc:a46f5552887fc351a09b1e3fc52eb96c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows from to add a quadric surface. <br /></td></tr>
+<tr class="separator:a46f5552887fc351a09b1e3fc52eb96c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a904611856ad586efa3dc6d3abebd6954"><td class="memItemLeft" align="right" valign="top"><a id="a904611856ad586efa3dc6d3abebd6954" name="a904611856ad586efa3dc6d3abebd6954"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>addQuadricAction</b> (self)</td></tr>
 <tr class="memdesc:a904611856ad586efa3dc6d3abebd6954"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads quadric form, evaluates surface type and calls corresponding add____Action. <br /></td></tr>
@@ -179,137 +211,165 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>addHyperbolaAction</b>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>addEllipseAction</b> (self)</td></tr>
 <tr class="memdesc:a57920fb6edbf781e11e6cc756cc242f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads form and adds ellipse to System. <br /></td></tr>
 <tr class="separator:a57920fb6edbf781e11e6cc756cc242f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8fa343f16c147a64f86ad9c8f1258d82"><td class="memItemLeft" align="right" valign="top"><a id="a8fa343f16c147a64f86ad9c8f1258d82" name="a8fa343f16c147a64f86ad9c8f1258d82"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>addPlaneAction</b> (self)</td></tr>
-<tr class="memdesc:a8fa343f16c147a64f86ad9c8f1258d82"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads form and adds plane to System. <br /></td></tr>
-<tr class="separator:a8fa343f16c147a64f86ad9c8f1258d82"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad50297737820382cb636548ed3c30f13"><td class="memItemLeft" align="right" valign="top"><a id="ad50297737820382cb636548ed3c30f13" name="ad50297737820382cb636548ed3c30f13"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>setTransformationForm</b> (self, element)</td></tr>
-<tr class="memdesc:ad50297737820382cb636548ed3c30f13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows single element transformation form. <br /></td></tr>
-<tr class="separator:ad50297737820382cb636548ed3c30f13"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac646057b5f2e72f8a1fa77418ef4a9d6"><td class="memItemLeft" align="right" valign="top"><a id="ac646057b5f2e72f8a1fa77418ef4a9d6" name="ac646057b5f2e72f8a1fa77418ef4a9d6"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>setTransformationElementsForm</b> (self)</td></tr>
-<tr class="memdesc:ac646057b5f2e72f8a1fa77418ef4a9d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows multiple element transformation form. <br /></td></tr>
-<tr class="separator:ac646057b5f2e72f8a1fa77418ef4a9d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7d222097c49c8489252dd5007a18dac1"><td class="memItemLeft" align="right" valign="top"><a id="a7d222097c49c8489252dd5007a18dac1" name="a7d222097c49c8489252dd5007a18dac1"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>applyTransformation</b> (self, element)</td></tr>
-<tr class="memdesc:a7d222097c49c8489252dd5007a18dac1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies single element transformation. <br /></td></tr>
-<tr class="separator:a7d222097c49c8489252dd5007a18dac1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a48d8f4a039d917a29cadf8204e749e37"><td class="memItemLeft" align="right" valign="top"><a id="a48d8f4a039d917a29cadf8204e749e37" name="a48d8f4a039d917a29cadf8204e749e37"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>applyTransformationElements</b> (self)</td></tr>
-<tr class="memdesc:a48d8f4a039d917a29cadf8204e749e37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies multiple element transformation. <br /></td></tr>
-<tr class="separator:a48d8f4a039d917a29cadf8204e749e37"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3f1e4cc7dab7253e49325396e658cafb"><td class="memItemLeft" align="right" valign="top"><a id="a3f1e4cc7dab7253e49325396e658cafb" name="a3f1e4cc7dab7253e49325396e658cafb"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>setInitTubeFrameForm</b> (self)</td></tr>
-<tr class="memdesc:a3f1e4cc7dab7253e49325396e658cafb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows tube frame form. <br /></td></tr>
-<tr class="separator:a3f1e4cc7dab7253e49325396e658cafb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acb26e59f4037ae3019f6de5128dd6e80"><td class="memItemLeft" align="right" valign="top"><a id="acb26e59f4037ae3019f6de5128dd6e80" name="acb26e59f4037ae3019f6de5128dd6e80"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>setInitGaussianFrameForm</b> (self)</td></tr>
-<tr class="memdesc:acb26e59f4037ae3019f6de5128dd6e80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows gaussian frame form. <br /></td></tr>
-<tr class="separator:acb26e59f4037ae3019f6de5128dd6e80"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2cb3bb6bedd85734eab49d48adf3a41b"><td class="memItemLeft" align="right" valign="top"><a id="a2cb3bb6bedd85734eab49d48adf3a41b" name="a2cb3bb6bedd85734eab49d48adf3a41b"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>setInitGaussianForm</b> (self)</td></tr>
-<tr class="memdesc:a2cb3bb6bedd85734eab49d48adf3a41b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows gaussian TODO: gaussian beam? form. <br /></td></tr>
-<tr class="separator:a2cb3bb6bedd85734eab49d48adf3a41b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a888a5d86365d1abed9cd8ffccbedd97b"><td class="memItemLeft" align="right" valign="top"><a id="a888a5d86365d1abed9cd8ffccbedd97b" name="a888a5d86365d1abed9cd8ffccbedd97b"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>setInitSGaussianForm</b> (self)</td></tr>
-<tr class="memdesc:a888a5d86365d1abed9cd8ffccbedd97b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows gaussian TODO: gaussian s? form. <br /></td></tr>
-<tr class="separator:a888a5d86365d1abed9cd8ffccbedd97b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4d276248d3b60b8bbf96aa82f93bc0f1"><td class="memItemLeft" align="right" valign="top"><a id="a4d276248d3b60b8bbf96aa82f93bc0f1" name="a4d276248d3b60b8bbf96aa82f93bc0f1"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>setInitPSForm</b> (self)</td></tr>
-<tr class="memdesc:a4d276248d3b60b8bbf96aa82f93bc0f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">TODO:doc. <br /></td></tr>
-<tr class="separator:a4d276248d3b60b8bbf96aa82f93bc0f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a11d68794450e1cd70e11f52a160fb1ef"><td class="memItemLeft" align="right" valign="top"><a id="a11d68794450e1cd70e11f52a160fb1ef" name="a11d68794450e1cd70e11f52a160fb1ef"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>setInitSPSForm</b> (self)</td></tr>
-<tr class="memdesc:a11d68794450e1cd70e11f52a160fb1ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">TODO:doc. <br /></td></tr>
-<tr class="separator:a11d68794450e1cd70e11f52a160fb1ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad4a633b4b47ca6401221c05066c292a9"><td class="memItemLeft" align="right" valign="top"><a id="ad4a633b4b47ca6401221c05066c292a9" name="ad4a633b4b47ca6401221c05066c292a9"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>addTubeFrameAction</b> (self)</td></tr>
-<tr class="separator:ad4a633b4b47ca6401221c05066c292a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaaedb3c1af8c07fa8bbfd51e01fa2f71"><td class="memItemLeft" align="right" valign="top"><a id="aaaedb3c1af8c07fa8bbfd51e01fa2f71" name="aaaedb3c1af8c07fa8bbfd51e01fa2f71"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>addGaussianFrameAction</b> (self)</td></tr>
-<tr class="separator:aaaedb3c1af8c07fa8bbfd51e01fa2f71"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3a518a754dcc8e4cf8ffa2d99d5efa4c"><td class="memItemLeft" align="right" valign="top"><a id="a3a518a754dcc8e4cf8ffa2d99d5efa4c" name="a3a518a754dcc8e4cf8ffa2d99d5efa4c"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>addGaussianAction</b> (self)</td></tr>
-<tr class="separator:a3a518a754dcc8e4cf8ffa2d99d5efa4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4e7bc9d8b0c0259ec4cdf73d0c49d789"><td class="memItemLeft" align="right" valign="top"><a id="a4e7bc9d8b0c0259ec4cdf73d0c49d789" name="a4e7bc9d8b0c0259ec4cdf73d0c49d789"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>addSGaussianAction</b> (self)</td></tr>
-<tr class="separator:a4e7bc9d8b0c0259ec4cdf73d0c49d789"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7b5dc8691e88810ad82fbbd8899c731a"><td class="memItemLeft" align="right" valign="top"><a id="a7b5dc8691e88810ad82fbbd8899c731a" name="a7b5dc8691e88810ad82fbbd8899c731a"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>addPSAction</b> (self)</td></tr>
-<tr class="separator:a7b5dc8691e88810ad82fbbd8899c731a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2a79b10298297f22ba9b4eed5a581c02"><td class="memItemLeft" align="right" valign="top"><a id="a2a79b10298297f22ba9b4eed5a581c02" name="a2a79b10298297f22ba9b4eed5a581c02"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>addSPSAction</b> (self)</td></tr>
-<tr class="separator:a2a79b10298297f22ba9b4eed5a581c02"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a15d42594864c0596f5d9fa38ad299ce2"><td class="memItemLeft" align="right" valign="top"><a id="a15d42594864c0596f5d9fa38ad299ce2" name="a15d42594864c0596f5d9fa38ad299ce2"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>setPlotFrameForm</b> (self)</td></tr>
-<tr class="separator:a15d42594864c0596f5d9fa38ad299ce2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a99665a6af37b3bbe578f040d4f81d6cd"><td class="memItemLeft" align="right" valign="top"><a id="a99665a6af37b3bbe578f040d4f81d6cd" name="a99665a6af37b3bbe578f040d4f81d6cd"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>setPlotFrameFormOpt</b> (self, frame)</td></tr>
-<tr class="separator:a99665a6af37b3bbe578f040d4f81d6cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1fc4444c0c531bfc7ed45385880f2290"><td class="memItemLeft" align="right" valign="top"><a id="a1fc4444c0c531bfc7ed45385880f2290" name="a1fc4444c0c531bfc7ed45385880f2290"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>setPlotFieldFormOpt</b> (self, field)</td></tr>
-<tr class="separator:a1fc4444c0c531bfc7ed45385880f2290"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4a4a22f46199c09a8e9758d8c245199b"><td class="memItemLeft" align="right" valign="top"><a id="a4a4a22f46199c09a8e9758d8c245199b" name="a4a4a22f46199c09a8e9758d8c245199b"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>setPlotSFieldFormOpt</b> (self, field)</td></tr>
-<tr class="separator:a4a4a22f46199c09a8e9758d8c245199b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a35cb73053ed19d687eaa6f30b56a5d3c"><td class="memItemLeft" align="right" valign="top"><a id="a35cb73053ed19d687eaa6f30b56a5d3c" name="a35cb73053ed19d687eaa6f30b56a5d3c"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>setPlotCurrentFormOpt</b> (self, current)</td></tr>
-<tr class="separator:a35cb73053ed19d687eaa6f30b56a5d3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a70779b1a7b737840f534f3aeb9c0c6cf"><td class="memItemLeft" align="right" valign="top"><a id="a70779b1a7b737840f534f3aeb9c0c6cf" name="a70779b1a7b737840f534f3aeb9c0c6cf"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>addPlotFrameAction</b> (self)</td></tr>
-<tr class="separator:a70779b1a7b737840f534f3aeb9c0c6cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90d46adaa54b0910ab6772b7d90990c4"><td class="memItemLeft" align="right" valign="top"><a id="a90d46adaa54b0910ab6772b7d90990c4" name="a90d46adaa54b0910ab6772b7d90990c4"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>addPlotFieldAction</b> (self)</td></tr>
-<tr class="separator:a90d46adaa54b0910ab6772b7d90990c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac5e404a2825d7cd58541891be8ebcb0d"><td class="memItemLeft" align="right" valign="top"><a id="ac5e404a2825d7cd58541891be8ebcb0d" name="ac5e404a2825d7cd58541891be8ebcb0d"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>addPlotSFieldAction</b> (self)</td></tr>
-<tr class="separator:ac5e404a2825d7cd58541891be8ebcb0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9041ec8d8c0b2a1a969c09aa9911527d"><td class="memItemLeft" align="right" valign="top"><a id="a9041ec8d8c0b2a1a969c09aa9911527d" name="a9041ec8d8c0b2a1a969c09aa9911527d"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>addPlotCurrentAction</b> (self)</td></tr>
-<tr class="separator:a9041ec8d8c0b2a1a969c09aa9911527d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ca1dd8e00d8ff9cacb1668fb6d01ddd"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1MainWindow_1_1MainWidget.html#a2ca1dd8e00d8ff9cacb1668fb6d01ddd">transformSingleForm</a> (self, element)</td></tr>
+<tr class="memdesc:a2ca1dd8e00d8ff9cacb1668fb6d01ddd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Functionalities: Transforming Elements.  <br /></td></tr>
+<tr class="separator:a2ca1dd8e00d8ff9cacb1668fb6d01ddd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acac63bc0067fb34846583030ff7b03ec"><td class="memItemLeft" align="right" valign="top"><a id="acac63bc0067fb34846583030ff7b03ec" name="acac63bc0067fb34846583030ff7b03ec"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>transformFrameForm</b> (self, frame)</td></tr>
+<tr class="memdesc:acac63bc0067fb34846583030ff7b03ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows single element transformation form. <br /></td></tr>
+<tr class="separator:acac63bc0067fb34846583030ff7b03ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ac8e64f6eceb68a8332f0545983c38c"><td class="memItemLeft" align="right" valign="top"><a id="a5ac8e64f6eceb68a8332f0545983c38c" name="a5ac8e64f6eceb68a8332f0545983c38c"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>transformAction</b> (self, element)</td></tr>
+<tr class="memdesc:a5ac8e64f6eceb68a8332f0545983c38c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies single element transformation. <br /></td></tr>
+<tr class="separator:a5ac8e64f6eceb68a8332f0545983c38c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a43beb9f2dbe5ac92d77ba71cdecb5e77"><td class="memItemLeft" align="right" valign="top"><a id="a43beb9f2dbe5ac92d77ba71cdecb5e77" name="a43beb9f2dbe5ac92d77ba71cdecb5e77"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>transformFrameAction</b> (self, frame)</td></tr>
+<tr class="memdesc:a43beb9f2dbe5ac92d77ba71cdecb5e77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies single frame transformation. <br /></td></tr>
+<tr class="separator:a43beb9f2dbe5ac92d77ba71cdecb5e77"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a188923953f5362769a6d40c3d9b8b068"><td class="memItemLeft" align="right" valign="top"><a id="a188923953f5362769a6d40c3d9b8b068" name="a188923953f5362769a6d40c3d9b8b068"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>transformationMultipleForm</b> (self)</td></tr>
+<tr class="memdesc:a188923953f5362769a6d40c3d9b8b068"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows multiple element transformation form. <br /></td></tr>
+<tr class="separator:a188923953f5362769a6d40c3d9b8b068"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a72e464d71b6853be2359dc31e68f22"><td class="memItemLeft" align="right" valign="top"><a id="a3a72e464d71b6853be2359dc31e68f22" name="a3a72e464d71b6853be2359dc31e68f22"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>transformationMultipleAction</b> (self)</td></tr>
+<tr class="memdesc:a3a72e464d71b6853be2359dc31e68f22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies multiple element transformation. <br /></td></tr>
+<tr class="separator:a3a72e464d71b6853be2359dc31e68f22"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15ff91a795a839e168172ca8291d7d8f"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1MainWindow_1_1MainWidget.html#a15ff91a795a839e168172ca8291d7d8f">initTubeFrameForm</a> (self)</td></tr>
+<tr class="memdesc:a15ff91a795a839e168172ca8291d7d8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Functionalities: TRFrames NOTE Raytrace widgets.  <br /></td></tr>
+<tr class="separator:a15ff91a795a839e168172ca8291d7d8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb212ec672d3ff00b4f7074f2954e791"><td class="memItemLeft" align="right" valign="top"><a id="adb212ec672d3ff00b4f7074f2954e791" name="adb212ec672d3ff00b4f7074f2954e791"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>initTubeFrameAction</b> (self)</td></tr>
+<tr class="memdesc:adb212ec672d3ff00b4f7074f2954e791"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads form and adds a tube frame to system. <br /></td></tr>
+<tr class="separator:adb212ec672d3ff00b4f7074f2954e791"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab44be45a21744b76ca9544ea88558c6e"><td class="memItemLeft" align="right" valign="top"><a id="ab44be45a21744b76ca9544ea88558c6e" name="ab44be45a21744b76ca9544ea88558c6e"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>initGaussianFrameForm</b> (self)</td></tr>
+<tr class="memdesc:ab44be45a21744b76ca9544ea88558c6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows form to initialize gaussian frame. <br /></td></tr>
+<tr class="separator:ab44be45a21744b76ca9544ea88558c6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2860d3e37c58838bf193a9218c92b698"><td class="memItemLeft" align="right" valign="top"><a id="a2860d3e37c58838bf193a9218c92b698" name="a2860d3e37c58838bf193a9218c92b698"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>initGaussianFrameAction</b> (self)</td></tr>
+<tr class="memdesc:a2860d3e37c58838bf193a9218c92b698"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads form and adds a gaussian frame to system. <br /></td></tr>
+<tr class="separator:a2860d3e37c58838bf193a9218c92b698"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab1054ff0eca964f62fa9b7764b3a1f6d"><td class="memItemLeft" align="right" valign="top"><a id="ab1054ff0eca964f62fa9b7764b3a1f6d" name="ab1054ff0eca964f62fa9b7764b3a1f6d"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>setPropRaysForm</b> (self)</td></tr>
+<tr class="memdesc:ab1054ff0eca964f62fa9b7764b3a1f6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows form to propagate rays. <br /></td></tr>
 <tr class="separator:ab1054ff0eca964f62fa9b7764b3a1f6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae8b458c2491f01f0eb6e779d808a670a"><td class="memItemLeft" align="right" valign="top"><a id="ae8b458c2491f01f0eb6e779d808a670a" name="ae8b458c2491f01f0eb6e779d808a670a"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>addPropRaysAction</b> (self)</td></tr>
+<tr class="memdesc:ae8b458c2491f01f0eb6e779d808a670a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads form and popagates rays. <br /></td></tr>
 <tr class="separator:ae8b458c2491f01f0eb6e779d808a670a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a30b6cf8331703f6e5e2889887b72224a"><td class="memItemLeft" align="right" valign="top"><a id="a30b6cf8331703f6e5e2889887b72224a" name="a30b6cf8331703f6e5e2889887b72224a"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>setPOInitForm</b> (self)</td></tr>
-<tr class="separator:a30b6cf8331703f6e5e2889887b72224a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acf641f51f3ec24b550c607b27e957397"><td class="memItemLeft" align="right" valign="top"><a id="acf641f51f3ec24b550c607b27e957397" name="acf641f51f3ec24b550c607b27e957397"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>setPOFFInitForm</b> (self)</td></tr>
-<tr class="separator:acf641f51f3ec24b550c607b27e957397"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a418bedc14b1d983076fe0ab31980e036"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1MainWindow_1_1MainWidget.html#a418bedc14b1d983076fe0ab31980e036">plotFrameForm</a> (self, frame)</td></tr>
+<tr class="memdesc:a418bedc14b1d983076fe0ab31980e036"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows form to plot preselected a frame.  <br /></td></tr>
+<tr class="separator:a418bedc14b1d983076fe0ab31980e036"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70779b1a7b737840f534f3aeb9c0c6cf"><td class="memItemLeft" align="right" valign="top"><a id="a70779b1a7b737840f534f3aeb9c0c6cf" name="a70779b1a7b737840f534f3aeb9c0c6cf"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>addPlotFrameAction</b> (self)</td></tr>
+<tr class="memdesc:a70779b1a7b737840f534f3aeb9c0c6cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads form and plots frame. <br /></td></tr>
+<tr class="separator:a70779b1a7b737840f534f3aeb9c0c6cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a03e9f5b1af42a6709d69306728d357c4"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1MainWindow_1_1MainWidget.html#a03e9f5b1af42a6709d69306728d357c4">initGaussBeamForm</a> (self)</td></tr>
+<tr class="memdesc:a03e9f5b1af42a6709d69306728d357c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Functionalities: PO.  <br /></td></tr>
+<tr class="separator:a03e9f5b1af42a6709d69306728d357c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c276168718f7a056a8556bdd31a4b70"><td class="memItemLeft" align="right" valign="top"><a id="a5c276168718f7a056a8556bdd31a4b70" name="a5c276168718f7a056a8556bdd31a4b70"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>initGaussBeamAction</b> (self)</td></tr>
+<tr class="memdesc:a5c276168718f7a056a8556bdd31a4b70"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads form and adds a vectorial gaussian beam to system. <br /></td></tr>
+<tr class="separator:a5c276168718f7a056a8556bdd31a4b70"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a59598fa1c2e84e4a10f69daa03d7451c"><td class="memItemLeft" align="right" valign="top"><a id="a59598fa1c2e84e4a10f69daa03d7451c" name="a59598fa1c2e84e4a10f69daa03d7451c"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>initSGaussBeamForm</b> (self)</td></tr>
+<tr class="memdesc:a59598fa1c2e84e4a10f69daa03d7451c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows form to initialize scalar gaussian beam TODO: klopt dit. <br /></td></tr>
+<tr class="separator:a59598fa1c2e84e4a10f69daa03d7451c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5368fb1cdb89ac33a45e44026d7ed3c5"><td class="memItemLeft" align="right" valign="top"><a id="a5368fb1cdb89ac33a45e44026d7ed3c5" name="a5368fb1cdb89ac33a45e44026d7ed3c5"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>initSGaussBeamAction</b> (self)</td></tr>
+<tr class="memdesc:a5368fb1cdb89ac33a45e44026d7ed3c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads form and adds a scalar gaussian beam to system. <br /></td></tr>
+<tr class="separator:a5368fb1cdb89ac33a45e44026d7ed3c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb7c1ead33f1ee1b060bb803a6feebde"><td class="memItemLeft" align="right" valign="top"><a id="adb7c1ead33f1ee1b060bb803a6feebde" name="adb7c1ead33f1ee1b060bb803a6feebde"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>initPSBeamForm</b> (self)</td></tr>
+<tr class="memdesc:adb7c1ead33f1ee1b060bb803a6feebde"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows form to initialize a physical optics propagation. <br /></td></tr>
+<tr class="separator:adb7c1ead33f1ee1b060bb803a6feebde"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeb1a4f7ef63b78bc1b41e8bba146ad3c"><td class="memItemLeft" align="right" valign="top"><a id="aeb1a4f7ef63b78bc1b41e8bba146ad3c" name="aeb1a4f7ef63b78bc1b41e8bba146ad3c"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>initPSBeamAction</b> (self)</td></tr>
+<tr class="memdesc:aeb1a4f7ef63b78bc1b41e8bba146ad3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads form and adds a vectorial point source beam to system. <br /></td></tr>
+<tr class="separator:aeb1a4f7ef63b78bc1b41e8bba146ad3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac2ede004e78708b111b2b0847a55aecd"><td class="memItemLeft" align="right" valign="top"><a id="ac2ede004e78708b111b2b0847a55aecd" name="ac2ede004e78708b111b2b0847a55aecd"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>initSPSBeamForm</b> (self)</td></tr>
+<tr class="memdesc:ac2ede004e78708b111b2b0847a55aecd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows form to initialize a scalar point source beam. <br /></td></tr>
+<tr class="separator:ac2ede004e78708b111b2b0847a55aecd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8233f9ebcaef3f9ff45b712f694f4586"><td class="memItemLeft" align="right" valign="top"><a id="a8233f9ebcaef3f9ff45b712f694f4586" name="a8233f9ebcaef3f9ff45b712f694f4586"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>initSPSBeamAction</b> (self)</td></tr>
+<tr class="memdesc:a8233f9ebcaef3f9ff45b712f694f4586"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads form and adds a scalar point source beam to system. <br /></td></tr>
+<tr class="separator:a8233f9ebcaef3f9ff45b712f694f4586"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc5b75862a9b78f925e0c5ce27896e95"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1MainWindow_1_1MainWidget.html#afc5b75862a9b78f925e0c5ce27896e95">plotFieldForm</a> (self, field)</td></tr>
+<tr class="memdesc:afc5b75862a9b78f925e0c5ce27896e95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows form to plot field.  <br /></td></tr>
+<tr class="separator:afc5b75862a9b78f925e0c5ce27896e95"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a26203758c1d1b99292700efd22ec8275"><td class="memItemLeft" align="right" valign="top"><a id="a26203758c1d1b99292700efd22ec8275" name="a26203758c1d1b99292700efd22ec8275"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>plotFieldAction</b> (self)</td></tr>
+<tr class="memdesc:a26203758c1d1b99292700efd22ec8275"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads form and plots field. <br /></td></tr>
+<tr class="separator:a26203758c1d1b99292700efd22ec8275"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a14d646baeb48c65b8dd6d0539ea794f5"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1MainWindow_1_1MainWidget.html#a14d646baeb48c65b8dd6d0539ea794f5">plotSFieldForm</a> (self, field)</td></tr>
+<tr class="memdesc:a14d646baeb48c65b8dd6d0539ea794f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">TODO: whats the difference with above? Perhase we should rename function.  <br /></td></tr>
+<tr class="separator:a14d646baeb48c65b8dd6d0539ea794f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abe1ab044e7fcac0328fca382796d8c0c"><td class="memItemLeft" align="right" valign="top"><a id="abe1ab044e7fcac0328fca382796d8c0c" name="abe1ab044e7fcac0328fca382796d8c0c"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>plotSFieldAction</b> (self)</td></tr>
+<tr class="memdesc:abe1ab044e7fcac0328fca382796d8c0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads form and plots scalar field. <br /></td></tr>
+<tr class="separator:abe1ab044e7fcac0328fca382796d8c0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3932d511e92822748fbcaaddcaa64c6d"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1MainWindow_1_1MainWidget.html#a3932d511e92822748fbcaaddcaa64c6d">plotCurrentForm</a> (self, current)</td></tr>
+<tr class="memdesc:a3932d511e92822748fbcaaddcaa64c6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows form to plot current.  <br /></td></tr>
+<tr class="separator:a3932d511e92822748fbcaaddcaa64c6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf96e91acf404b037e77fe66f113ecf6"><td class="memItemLeft" align="right" valign="top"><a id="acf96e91acf404b037e77fe66f113ecf6" name="acf96e91acf404b037e77fe66f113ecf6"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>plotCurrentAction</b> (self)</td></tr>
+<tr class="memdesc:acf96e91acf404b037e77fe66f113ecf6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads form and plots current. <br /></td></tr>
+<tr class="separator:acf96e91acf404b037e77fe66f113ecf6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9972333b8b790c4d5a9e46c3d54d2fa3"><td class="memItemLeft" align="right" valign="top"><a id="a9972333b8b790c4d5a9e46c3d54d2fa3" name="a9972333b8b790c4d5a9e46c3d54d2fa3"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>propPOForm</b> (self)</td></tr>
+<tr class="memdesc:a9972333b8b790c4d5a9e46c3d54d2fa3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows form to propagate physical optics beam to surface. <br /></td></tr>
+<tr class="separator:a9972333b8b790c4d5a9e46c3d54d2fa3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa354bfb408a3e0e282d27377f7243bfe"><td class="memItemLeft" align="right" valign="top"><a id="aa354bfb408a3e0e282d27377f7243bfe" name="aa354bfb408a3e0e282d27377f7243bfe"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>propPOFFForm</b> (self)</td></tr>
+<tr class="memdesc:aa354bfb408a3e0e282d27377f7243bfe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows form to propagate physical optics beam far field. <br /></td></tr>
+<tr class="separator:aa354bfb408a3e0e282d27377f7243bfe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a601175652e8ff518894781db51858368"><td class="memItemLeft" align="right" valign="top"><a id="a601175652e8ff518894781db51858368" name="a601175652e8ff518894781db51858368"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>propPOAction</b> (self)</td></tr>
+<tr class="memdesc:a601175652e8ff518894781db51858368"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads form propagates beam, runs calculation on another thread. <br /></td></tr>
+<tr class="separator:a601175652e8ff518894781db51858368"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6182cc53049c861bcf3325ca75b045e5"><td class="memItemLeft" align="right" valign="top"><a id="a6182cc53049c861bcf3325ca75b045e5" name="a6182cc53049c861bcf3325ca75b045e5"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>setTaperEffsForm</b> (self)</td></tr>
+<tr class="memdesc:a6182cc53049c861bcf3325ca75b045e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows form to calculate taper efficientie. <br /></td></tr>
 <tr class="separator:a6182cc53049c861bcf3325ca75b045e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6323999282b5e667f13828b568a407e3"><td class="memItemLeft" align="right" valign="top"><a id="a6323999282b5e667f13828b568a407e3" name="a6323999282b5e667f13828b568a407e3"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>setSpillEffsForm</b> (self)</td></tr>
+<tr class="memdesc:a6323999282b5e667f13828b568a407e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows form to calculate spillover efficientie. <br /></td></tr>
 <tr class="separator:a6323999282b5e667f13828b568a407e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae2891a6fd633f23731f80753b02fddd7"><td class="memItemLeft" align="right" valign="top"><a id="ae2891a6fd633f23731f80753b02fddd7" name="ae2891a6fd633f23731f80753b02fddd7"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>setXpolEffsForm</b> (self)</td></tr>
+<tr class="memdesc:ae2891a6fd633f23731f80753b02fddd7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows form to calculate x-pol efficientie TODO: x-pol. <br /></td></tr>
 <tr class="separator:ae2891a6fd633f23731f80753b02fddd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0ef83c27046a8db85ecb541b1ea2a0c0"><td class="memItemLeft" align="right" valign="top"><a id="a0ef83c27046a8db85ecb541b1ea2a0c0" name="a0ef83c27046a8db85ecb541b1ea2a0c0"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>setMBEffsForm</b> (self)</td></tr>
+<tr class="memdesc:a0ef83c27046a8db85ecb541b1ea2a0c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows form to calculate main beam efficientie. <br /></td></tr>
 <tr class="separator:a0ef83c27046a8db85ecb541b1ea2a0c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adbd68b201b75279a72a14b174bcd5615"><td class="memItemLeft" align="right" valign="top"><a id="adbd68b201b75279a72a14b174bcd5615" name="adbd68b201b75279a72a14b174bcd5615"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>calcTaperAction</b> (self)</td></tr>
+<tr class="memdesc:adbd68b201b75279a72a14b174bcd5615"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads form and calculates taper efficientie. <br /></td></tr>
 <tr class="separator:adbd68b201b75279a72a14b174bcd5615"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aab32f87f6746af6dbe146402ea1db73e"><td class="memItemLeft" align="right" valign="top"><a id="aab32f87f6746af6dbe146402ea1db73e" name="aab32f87f6746af6dbe146402ea1db73e"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>calcSpillAction</b> (self)</td></tr>
+<tr class="memdesc:aab32f87f6746af6dbe146402ea1db73e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads form and calculates spillover efficientie. <br /></td></tr>
 <tr class="separator:aab32f87f6746af6dbe146402ea1db73e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac868845c12a3b0d11b644ec3d15102f7"><td class="memItemLeft" align="right" valign="top"><a id="ac868845c12a3b0d11b644ec3d15102f7" name="ac868845c12a3b0d11b644ec3d15102f7"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>calcXpolAction</b> (self)</td></tr>
+<tr class="memdesc:ac868845c12a3b0d11b644ec3d15102f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads form and calculates x-pol efficientie TODO: x-pol? <br /></td></tr>
 <tr class="separator:ac868845c12a3b0d11b644ec3d15102f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a71eafcc8d495841094afc48034ae5f37"><td class="memItemLeft" align="right" valign="top"><a id="a71eafcc8d495841094afc48034ae5f37" name="a71eafcc8d495841094afc48034ae5f37"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>calcMBAction</b> (self)</td></tr>
+<tr class="memdesc:a71eafcc8d495841094afc48034ae5f37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads form and calculates main beam efficientie. <br /></td></tr>
 <tr class="separator:a71eafcc8d495841094afc48034ae5f37"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a67011412fd390b5931435c6a6cfebc1f"><td class="memItemLeft" align="right" valign="top"><a id="a67011412fd390b5931435c6a6cfebc1f" name="a67011412fd390b5931435c6a6cfebc1f"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>addPropBeamAction</b> (self)</td></tr>
-<tr class="separator:a67011412fd390b5931435c6a6cfebc1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abf06a042e54f34c33ac9e567263eabbc"><td class="memItemLeft" align="right" valign="top"><a id="abf06a042e54f34c33ac9e567263eabbc" name="abf06a042e54f34c33ac9e567263eabbc"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>calcRMSfromFrame</b> (self, frame)</td></tr>
+<tr class="memdesc:abf06a042e54f34c33ac9e567263eabbc"><td class="mdescLeft">&#160;</td><td class="mdescRight">calculates root mean square of a frame <br /></td></tr>
 <tr class="separator:abf06a042e54f34c33ac9e567263eabbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a084bd7ce606cabc0c08232bc219f195b"><td class="memItemLeft" align="right" valign="top"><a id="a084bd7ce606cabc0c08232bc219f195b" name="a084bd7ce606cabc0c08232bc219f195b"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>setFocusFindForm</b> (self)</td></tr>
+<tr class="separator:a084bd7ce606cabc0c08232bc219f195b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a11347241542e954fad6bd44f2997369d"><td class="memItemLeft" align="right" valign="top"><a id="a11347241542e954fad6bd44f2997369d" name="a11347241542e954fad6bd44f2997369d"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>findFocusAction</b> (self)</td></tr>
+<tr class="separator:a11347241542e954fad6bd44f2997369d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -337,9 +397,6 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a1a997a46357547d205dfab7d2e4dd310"><td class="memItemLeft" align="right" valign="top"><a id="a1a997a46357547d205dfab7d2e4dd310" name="a1a997a46357547d205dfab7d2e4dd310"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>frameDict</b></td></tr>
 <tr class="separator:a1a997a46357547d205dfab7d2e4dd310"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a165ab243e137d76722be1a20e6aa0756"><td class="memItemLeft" align="right" valign="top"><a id="a165ab243e137d76722be1a20e6aa0756" name="a165ab243e137d76722be1a20e6aa0756"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>ParameterWid</b></td></tr>
-<tr class="separator:a165ab243e137d76722be1a20e6aa0756"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a41570939a72c230cdb95bce8d0aab54b"><td class="memItemLeft" align="right" valign="top"><a id="a41570939a72c230cdb95bce8d0aab54b" name="a41570939a72c230cdb95bce8d0aab54b"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>console</b></td></tr>
 <tr class="separator:a41570939a72c230cdb95bce8d0aab54b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -352,6 +409,9 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a2c4fc8a67531cf40052bdbb9220640e3"><td class="memItemLeft" align="right" valign="top"><a id="a2c4fc8a67531cf40052bdbb9220640e3" name="a2c4fc8a67531cf40052bdbb9220640e3"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>PlotWidget</b></td></tr>
 <tr class="separator:a2c4fc8a67531cf40052bdbb9220640e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a165ab243e137d76722be1a20e6aa0756"><td class="memItemLeft" align="right" valign="top"><a id="a165ab243e137d76722be1a20e6aa0756" name="a165ab243e137d76722be1a20e6aa0756"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>ParameterWid</b></td></tr>
+<tr class="separator:a165ab243e137d76722be1a20e6aa0756"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a224d486b35e1aab667430cd99559d4a7"><td class="memItemLeft" align="right" valign="top"><a id="a224d486b35e1aab667430cd99559d4a7" name="a224d486b35e1aab667430cd99559d4a7"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>sysPlotNr</b></td></tr>
 <tr class="separator:a224d486b35e1aab667430cd99559d4a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -365,19 +425,22 @@ Public Attributes</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:ac1affba5b250807189fbf80da3f9d23c"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1MainWindow_1_1MainWidget.html#ac1affba5b250807189fbf80da3f9d23c">_mkConsole</a> (self)</td></tr>
-<tr class="memdesc:ac1affba5b250807189fbf80da3f9d23c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configures the console widget.  <br /></td></tr>
+<tr class="memdesc:ac1affba5b250807189fbf80da3f9d23c"><td class="mdescLeft">&#160;</td><td class="mdescRight">@guiSetup Configures the console widget  <br /></td></tr>
 <tr class="separator:ac1affba5b250807189fbf80da3f9d23c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a89c051d77ece4f6990862650fcd24841"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1MainWindow_1_1MainWidget.html#a89c051d77ece4f6990862650fcd24841">_mkElementsColumn</a> (self)</td></tr>
-<tr class="memdesc:a89c051d77ece4f6990862650fcd24841"><td class="mdescLeft">&#160;</td><td class="mdescRight">constructs the elements column on the left side of the screen  <br /></td></tr>
+<tr class="memdesc:a89c051d77ece4f6990862650fcd24841"><td class="mdescLeft">&#160;</td><td class="mdescRight">@guiSetup constructs the elements column on the left side of the screen  <br /></td></tr>
 <tr class="separator:a89c051d77ece4f6990862650fcd24841"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a33d9cb025a196aba481067976fc82855"><td class="memItemLeft" align="right" valign="top"><a id="a33d9cb025a196aba481067976fc82855" name="a33d9cb025a196aba481067976fc82855"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>_setupPlotScreen</b> (self)</td></tr>
-<tr class="memdesc:a33d9cb025a196aba481067976fc82855"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs the tab widget which will later hold plots. <br /></td></tr>
-<tr class="separator:a33d9cb025a196aba481067976fc82855"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a168a52a2cd334df212a9b8b3478d0c76"><td class="memItemLeft" align="right" valign="top"><a id="a168a52a2cd334df212a9b8b3478d0c76" name="a168a52a2cd334df212a9b8b3478d0c76"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>_formatVector</b> (self, vector)</td></tr>
-<tr class="memdesc:a168a52a2cd334df212a9b8b3478d0c76"><td class="mdescLeft">&#160;</td><td class="mdescRight">TODO: doc. <br /></td></tr>
-<tr class="separator:a168a52a2cd334df212a9b8b3478d0c76"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba116d56b70f4952cecb9f2b5e52575d"><td class="memItemLeft" align="right" valign="top"><a id="aba116d56b70f4952cecb9f2b5e52575d" name="aba116d56b70f4952cecb9f2b5e52575d"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>_mkPlotScreen</b> (self)</td></tr>
+<tr class="memdesc:aba116d56b70f4952cecb9f2b5e52575d"><td class="mdescLeft">&#160;</td><td class="mdescRight">@guiSetup Constructs the tab widget which will later hold plots <br /></td></tr>
+<tr class="separator:aba116d56b70f4952cecb9f2b5e52575d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-static-methods" name="pro-static-methods"></a>
+Static Protected Member Functions</h2></td></tr>
+<tr class="memitem:a857ccd49f38891d30343221eca8af8d0"><td class="memItemLeft" align="right" valign="top"><a id="a857ccd49f38891d30343221eca8af8d0" name="a857ccd49f38891d30343221eca8af8d0"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>_formatVector</b> (vector)</td></tr>
+<tr class="memdesc:a857ccd49f38891d30343221eca8af8d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">TODO: Remove this function from here. <br /></td></tr>
+<tr class="separator:a857ccd49f38891d30343221eca8af8d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a4e8c620cd1a89a1f11d5f30fb2a9b8bc" name="a4e8c620cd1a89a1f11d5f30fb2a9b8bc"></a>
@@ -407,7 +470,7 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>_formatVector</b> (sel
 </div><div class="memdoc">
 
 <p>Constructot. </p>
-<p>Configures the layout and initialises the underlying system </p><dl class="section see"><dt>See also</dt><dd>System </dd></dl>
+<p>Configures the layout and initializes the underlying systemmlala </p><dl class="section see"><dt>See also</dt><dd>System </dd></dl>
 
 </div>
 </div>
@@ -436,7 +499,7 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>_formatVector</b> (sel
 </table>
 </div><div class="memdoc">
 
-<p>Configures the console widget. </p>
+<p>@guiSetup Configures the console widget </p>
 
 </div>
 </div>
@@ -464,18 +527,113 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>_formatVector</b> (sel
 </table>
 </div><div class="memdoc">
 
-<p>constructs the elements column on the left side of the screen </p>
+<p>@guiSetup constructs the elements column on the left side of the screen </p>
 
 </div>
 </div>
-<a id="afeaf066a294df15fe30c8f2ade52a251" name="afeaf066a294df15fe30c8f2ade52a251"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afeaf066a294df15fe30c8f2ade52a251">&#9670;&#160;</a></span>closeTab()</h2>
+<a id="a42d28dbd974142ddf98e23e613b9790d" name="a42d28dbd974142ddf98e23e613b9790d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a42d28dbd974142ddf98e23e613b9790d">&#9670;&#160;</a></span>addPlaneForm()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">def GUI.MainWindow.MainWidget.closeTab </td>
+          <td class="memname">def GUI.MainWindow.MainWidget.addPlaneForm </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Functionalities: Adding Elements. </p>
+<p>Shows form to add a plane </p>
+
+</div>
+</div>
+<a id="ac79236da3b455efd5c0faada7d7a66f4" name="ac79236da3b455efd5c0faada7d7a66f4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac79236da3b455efd5c0faada7d7a66f4">&#9670;&#160;</a></span>addPlot()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def GUI.MainWindow.MainWidget.addPlot </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>figure</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>label</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Functionalities: Plotting. </p>
+<p>Constructs a PlotScreen and adds it to the plotWidget along with a label for the tab </p>
+
+</div>
+</div>
+<a id="a8e7cd26c540840d825d10cf4d8bc07c7" name="a8e7cd26c540840d825d10cf4d8bc07c7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8e7cd26c540840d825d10cf4d8bc07c7">&#9670;&#160;</a></span>addToWindowGrid()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def GUI.MainWindow.MainWidget.addToWindowGrid </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>widget</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>param</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Gui setup functions. </p>
+<p>@guiSetup Adds a widget to the layout of PyPOMainWidget </p>
+
+</div>
+</div>
+<a id="aa46d3db98b9223c0fc0e766d2ee25f25" name="aa46d3db98b9223c0fc0e766d2ee25f25"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa46d3db98b9223c0fc0e766d2ee25f25">&#9670;&#160;</a></span>closePlotTab()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def GUI.MainWindow.MainWidget.closePlotTab </td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname"><em>self</em>, </td>
@@ -520,7 +678,7 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>_formatVector</b> (sel
       </table>
 </div><div class="memdoc">
 
-<p>Gets the frame plot number froms System and increments it TODO: doc. </p>
+<p>Gets the frame plot number and increments it. </p>
 <dl class="section return"><dt>Returns</dt><dd>The incremented frame plot number </dd></dl>
 
 </div>
@@ -541,8 +699,86 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>_formatVector</b> (sel
       </table>
 </div><div class="memdoc">
 
-<p>Gets the plot number froms System and increments it TODO: doc. </p>
-<dl class="section return"><dt>Returns</dt><dd>The incremented plot number </dd></dl>
+<p>Functionalities: Naming. </p>
+<p>Gets the plot number and increments it </p><dl class="section return"><dt>Returns</dt><dd>The incremented plot number </dd></dl>
+
+</div>
+</div>
+<a id="a03e9f5b1af42a6709d69306728d357c4" name="a03e9f5b1af42a6709d69306728d357c4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a03e9f5b1af42a6709d69306728d357c4">&#9670;&#160;</a></span>initGaussBeamForm()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def GUI.MainWindow.MainWidget.initGaussBeamForm </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Functionalities: PO. </p>
+<p>Shows form to initialize gaussian beam </p>
+
+</div>
+</div>
+<a id="a15ff91a795a839e168172ca8291d7d8f" name="a15ff91a795a839e168172ca8291d7d8f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15ff91a795a839e168172ca8291d7d8f">&#9670;&#160;</a></span>initTubeFrameForm()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def GUI.MainWindow.MainWidget.initTubeFrameForm </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Functionalities: TRFrames NOTE Raytrace widgets. </p>
+<p>Shows tube frame form </p>
+
+</div>
+</div>
+<a id="a3932d511e92822748fbcaaddcaa64c6d" name="a3932d511e92822748fbcaaddcaa64c6d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3932d511e92822748fbcaaddcaa64c6d">&#9670;&#160;</a></span>plotCurrentForm()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def GUI.MainWindow.MainWidget.plotCurrentForm </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>current</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Shows form to plot current. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">current</td><td>Current to plot </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -572,10 +808,118 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>_formatVector</b> (sel
       </table>
 </div><div class="memdoc">
 
-<p>plots a sigle element from the System </p>
+<p>plots a single element from the System </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">surface</td><td>str Name of the surface in system </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="afc5b75862a9b78f925e0c5ce27896e95" name="afc5b75862a9b78f925e0c5ce27896e95"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afc5b75862a9b78f925e0c5ce27896e95">&#9670;&#160;</a></span>plotFieldForm()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def GUI.MainWindow.MainWidget.plotFieldForm </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>field</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Shows form to plot field. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">field</td><td>Field to plot </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a418bedc14b1d983076fe0ab31980e036" name="a418bedc14b1d983076fe0ab31980e036"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a418bedc14b1d983076fe0ab31980e036">&#9670;&#160;</a></span>plotFrameForm()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def GUI.MainWindow.MainWidget.plotFrameForm </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>frame</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Shows form to plot preselected a frame. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">frame</td><td>Frame to plot </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a14d646baeb48c65b8dd6d0539ea794f5" name="a14d646baeb48c65b8dd6d0539ea794f5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a14d646baeb48c65b8dd6d0539ea794f5">&#9670;&#160;</a></span>plotSFieldForm()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def GUI.MainWindow.MainWidget.plotSFieldForm </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>field</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>TODO: whats the difference with above? Perhase we should rename function. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">field</td><td>Field to plot </td></tr>
   </table>
   </dd>
 </dl>
@@ -618,6 +962,27 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>_formatVector</b> (sel
 
 </div>
 </div>
+<a id="a10175f0678c7b1457112418d661c0379" name="a10175f0678c7b1457112418d661c0379"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a10175f0678c7b1457112418d661c0379">&#9670;&#160;</a></span>saveSystemForm()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def GUI.MainWindow.MainWidget.saveSystemForm </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Functionalities: Systems. </p>
+<p>opens a form that allows user to save the System </p>
+
+</div>
+</div>
 <a id="aa72f96f79e0fc9a324ced35b69c7dbbf" name="aa72f96f79e0fc9a324ced35b69c7dbbf"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa72f96f79e0fc9a324ced35b69c7dbbf">&#9670;&#160;</a></span>setForm()</h2>
 
@@ -650,7 +1015,7 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>_formatVector</b> (sel
       </table>
 </div><div class="memdoc">
 
-<p>Generates a form widget. </p>
+<p>@guiSetup Generates a form widget </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">formData</td><td>List of InputDescription objects </td></tr>
@@ -658,6 +1023,63 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>_formatVector</b> (sel
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="a765c15b1a201eb6dc35d8005bc4a2faa" name="a765c15b1a201eb6dc35d8005bc4a2faa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a765c15b1a201eb6dc35d8005bc4a2faa">&#9670;&#160;</a></span>snapAction()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def GUI.MainWindow.MainWidget.snapAction </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Take, revert or delete a snapshot. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">element</td><td>Name of the surface in system </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a2ca1dd8e00d8ff9cacb1668fb6d01ddd" name="a2ca1dd8e00d8ff9cacb1668fb6d01ddd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2ca1dd8e00d8ff9cacb1668fb6d01ddd">&#9670;&#160;</a></span>transformSingleForm()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def GUI.MainWindow.MainWidget.transformSingleForm </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>element</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Functionalities: Transforming Elements. </p>
+<p>Shows single element transformation form </p>
 
 </div>
 </div>

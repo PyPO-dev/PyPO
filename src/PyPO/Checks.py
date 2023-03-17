@@ -13,10 +13,6 @@ PO_modelist = ["JM", "EH", "JMEH", "EHP", "FF", "scalar"]
 clog_mgr = CustomLogger(os.path.basename(__file__))
 clog = clog_mgr.getCustomLogger()
 
-# TODO: WRITE CHECK FOR GRTDict.
-# TODO: WRITE CHECK FOR GBDict.
-# TODO: WRITE CHECK FOR PSDict.
-
 ##
 # @file
 # File containing all commonly used checks for PyPO user input.
@@ -192,6 +188,11 @@ class InputRTError(Exception):
 ##
 # Propagate ray-trace error. Raised when an error is encountered in a ray-trace propagation dictionary.
 class RunRTError(Exception):
+    pass
+
+##
+# Input physical optics error. Raised when an error is encountered in an input PO beam dictionary.
+class InputPOError(Exception):
     pass
 
 ##
@@ -611,36 +612,113 @@ def check_TubeRTDict(TubeRTDict, nameList):
         errStr += errMsg_field("nRays", "TubeRTDict")
 
 
-    if "angx" in TubeRTDict:
-        if not ((isinstance(TubeRTDict["angx"], float) or isinstance(TubeRTDict["angx"], int))):
-            errStr += errMsg_type("angx", type(TubeRTDict["angx"]), "TubeRTDict", [float, int])
+    if "angx0" in TubeRTDict:
+        if not ((isinstance(TubeRTDict["angx0"], float) or isinstance(TubeRTDict["angx0"], int))):
+            errStr += errMsg_type("angx0", type(TubeRTDict["angx0"]), "TubeRTDict", [float, int])
 
     else:
-        errStr += errMsg_field("angx", "TubeRTDict")
+        errStr += errMsg_field("angx0", "TubeRTDict")
 
 
-    if "angy" in TubeRTDict:
-        if not ((isinstance(TubeRTDict["angy"], float) or isinstance(TubeRTDict["angy"], int))):
-            errStr += errMsg_type("angy", type(TubeRTDict["angy"]), "TubeRTDict", [float, int])
-
-    else:
-        errStr += errMsg_field("angy", "TubeRTDict")
-
-
-    if "a" in TubeRTDict:
-        if not ((isinstance(TubeRTDict["a"], float) or isinstance(TubeRTDict["a"], int))):
-            errStr += errMsg_type("a", type(TubeRTDict["a"]), "TubeRTDict", [float, int])
+    if "angy0" in TubeRTDict:
+        if not ((isinstance(TubeRTDict["angy0"], float) or isinstance(TubeRTDict["angy0"], int))):
+            errStr += errMsg_type("angy0", type(TubeRTDict["angy0"]), "TubeRTDict", [float, int])
 
     else:
-        errStr += errMsg_field("a", "TubeRTDict")
+        errStr += errMsg_field("angy0", "TubeRTDict")
 
 
-    if "b" in TubeRTDict:
-        if not ((isinstance(TubeRTDict["b"], float) or isinstance(TubeRTDict["b"], int))):
-            errStr += errMsg_type("b", type(TubeRTDict["b"]), "TubeRTDict", [float, int])
+    if "x0" in TubeRTDict:
+        if not ((isinstance(TubeRTDict["x0"], float) or isinstance(TubeRTDict["x0"], int))):
+            errStr += errMsg_type("x0", type(TubeRTDict["x0"]), "TubeRTDict", [float, int])
+        
+        elif TubeRTDict["x0"] < 0:
+            clog.warning(f"Encountered negative value {TubeRTDict['x0']} in field 'x0' in TubeRTDict {TubeRTDict['name']}. Changing sign.")
+            TubeRTDict["x0"] *= -1
 
     else:
-        errStr += errMsg_field("b", "TubeRTDict")
+        errStr += errMsg_field("x0", "TubeRTDict")
+
+
+    if "y0" in TubeRTDict:
+        if not ((isinstance(TubeRTDict["y0"], float) or isinstance(TubeRTDict["y0"], int))):
+            errStr += errMsg_type("y0", type(TubeRTDict["y0"]), "TubeRTDict", [float, int])
+        
+        elif TubeRTDict["y0"] < 0:
+            clog.warning(f"Encountered negative value {TubeRTDict['y0']} in field 'y0' in TubeRTDict {TubeRTDict['name']}. Changing sign.")
+            TubeRTDict["y0"] *= -1
+
+    else:
+        errStr += errMsg_field("y0", "TubeRTDict")
+
+    if errStr:
+        errList = errStr.split("\n")[:-1]
+
+        for err in errList:
+            clog.error(err)
+        raise InputRTError()
+
+##
+# Check a Gaussian input frame dictionary.
+#
+# @param GRTDict A GRTDict object.
+# @param namelist List containing names of frames in System.
+#
+# @see GRTDict
+def check_GRTDict(GRTDict, nameList):
+    errStr = ""
+    
+    if GRTDict["name"] in nameList:
+        errStr += errMsg_name(GRTDict["name"])
+
+    if "nRays" in GRTDict:
+        if not isinstance(GRTDict["nRays"], int):
+            errStr += errMsg_type("nRays", type(GRTDict["nRays"]), "GRTDict", int)
+
+    else:
+        errStr += errMsg_field("nRays", "GRTDict")
+
+    if "lam" in GRTDict:
+        if GRTDict["lam"] == 0 + 0j:
+            clog.info(f"Never heard of a complex-valued wavelength of zero, but good try... Therefore changing wavelength now to 'lam' equals {np.pi:.42f}!")
+            GRTDict["lam"] = np.pi
+
+        if not isinstance(GRTDict["lam"], float):
+            errStr += errMsg_type("lam", type(GRTDict["lam"]), "GRTDict", float)
+        
+        elif GRTDict["lam"] < 0:
+            clog.warning(f"Encountered negative value {GRTDict['lam']} in field 'lam' in GRTDict {GRTDict['name']}. Changing sign.")
+            GRTDict["lam"] *= -1
+
+    else:
+        errStr += errMsg_field("lam", "GRTDict")
+
+    if "x0" in GRTDict:
+        if not ((isinstance(GRTDict["x0"], float) or isinstance(GRTDict["x0"], int))):
+            errStr += errMsg_type("x0", type(GRTDict["x0"]), "GRTDict", [float, int])
+
+        elif GRTDict["x0"] < 0:
+            clog.warning(f"Encountered negative value {GRTDict['x0']} in field 'x0' in GRTDict {GRTDict['name']}. Changing sign.")
+            GRTDict["x0"] *= -1
+
+    else:
+        errStr += errMsg_field("x0", "GRTDict")
+
+
+    if "y0" in GRTDict:
+        if not ((isinstance(GRTDict["y0"], float) or isinstance(GRTDict["y0"], int))):
+            errStr += errMsg_type("y0", type(GRTDict["y0"]), "GRTDict", [float, int])
+        
+        elif GRTDict["y0"] < 0:
+            clog.warning(f"Encountered negative value {GRTDict['y0']} in field 'y0' in GRTDict {GRTDict['name']}. Changing sign.")
+            GRTDict["y0"] *= -1
+
+    else:
+        errStr += errMsg_field("y0", "GRTDict")
+
+    if "n" in GRTDict:
+        if not ((isinstance(GRTDict["n"], float) or isinstance(GRTDict["n"], int))):
+            errStr += errMsg_type("n", type(GRTDict["n"]), "GRTDict", [float, int])
 
     if errStr:
         errList = errStr.split("\n")[:-1]
@@ -707,8 +785,155 @@ def check_runRTDict(runRTDict, elements, frames):
             clog.error(err)
         raise RunRTError()
 
-def check_GBDict(GBDict):
+##
+# Check a point source input beam dictionary.
+#
+# @param PSDict A PSDict object.
+# @param namelist List containing names of fields in System.
+#
+# @see PSDict
+def check_PSDict(PSDict, nameList):
     errStr = ""
+    
+    if PSDict["name"] in nameList:
+        errStr += errMsg_name(PSDict["name"])
+
+    if "nRays" in PSDict:
+        if not isinstance(PSDict["nRays"], int):
+            errStr += errMsg_type("nRays", type(PSDict["nRays"]), "PSDict", int)
+
+    else:
+        errStr += errMsg_field("nRays", "PSDict")
+
+    if "lam" in PSDict:
+        if PSDict["lam"] == 0 + 0j:
+            clog.info(f"Never heard of a complex-valued wavelength of zero, but good try... Therefore changing wavelength now to 'lam' equals {np.pi:.42f}!")
+            PSDict["lam"] = np.pi
+
+        if not isinstance(PSDict["lam"], float):
+            errStr += errMsg_type("lam", type(PSDict["lam"]), "PSDict", float)
+        
+        elif PSDict["lam"] < 0:
+            clog.warning(f"Encountered negative value {PSDict['lam']} in field 'lam' in PSDict {PSDict['name']}. Changing sign.")
+            PSDict["lam"] *= -1
+
+    else:
+        errStr += errMsg_field("lam", "PSDict")
+
+    if "phase" in PSDict:
+        if not ((isinstance(PSDict["phase"], float) or isinstance(PSDict["phase"], int))):
+            errStr += errMsg_type("phase", type(PSDict["phase"]), "PSDict", [float, int])
+
+    else:
+        PSDict["phase"] = 0
+
+    if "pol" in PSDict:
+        errStr += block_ndarray("pol", PSDict, (3,))
+
+    else:
+        PSDict["pol"] = np.array([1, 0, 0])
+
+    if "E0" in PSDict:
+        if not ((isinstance(PSDict["E0"], float) or isinstance(PSDict["E0"], int))):
+            errStr += errMsg_type("E0", type(PSDict["E0"]), "PSDict", [float, int])
+
+    else:
+        PSDict["E0"] = 1
+
+    if errStr:
+        errList = errStr.split("\n")[:-1]
+
+        for err in errList:
+            clog.error(err)
+        raise InputPOError()
+
+##
+# Check a Gaussian input beam dictionary.
+#
+# @param GPODict A GPODict object.
+# @param namelist List containing names of fields in System.
+#
+# @see GPODict
+def check_GPODict(GPODict, nameList):
+    errStr = ""
+    
+    if GPODict["name"] in nameList:
+        errStr += errMsg_name(GPODict["name"])
+
+    if "lam" in GPODict:
+        if GPODict["lam"] == 0 + 0j:
+            clog.info(f"Never heard of a complex-valued wavelength of zero, but good try... Therefore changing wavelength now to 'lam' equals {np.pi:.42f}!")
+            GPODict["lam"] = np.pi
+
+        if not ((isinstance(GPODict["lam"], float) or isinstance(GPODict["lam"], int))):
+            errStr += errMsg_type("lam", type(GPODict["lam"]), "GPODict", [float, int])
+        
+        elif GPODict["lam"] < 0:
+            clog.warning(f"Encountered negative value {GPODict['lam']} in field 'lam' in GPODict {GPODict['name']}. Changing sign.")
+            GPODict["lam"] *= -1
+
+    else:
+        errStr += errMsg_field("lam", "GPODict")
+
+    if "w0x" in GPODict:
+        if not ((isinstance(GPODict["w0x"], float) or isinstance(GPODict["w0x"], int))):
+            errStr += errMsg_type("w0x", type(GPODict["w0x"]), "GPODict", [float, int])
+
+        elif GPODict["w0x"] < 0:
+            clog.warning(f"Encountered negative value {GPODict['w0x']} in field 'w0x' in GPODict {GPODict['name']}. Changing sign.")
+            GPODict["w0x"] *= -1
+
+    else:
+        errStr += errMsg_field("w0x", "GPODict")
+
+
+    if "w0y" in GPODict:
+        if not ((isinstance(GPODict["w0y"], float) or isinstance(GPODict["w0y"], int))):
+            errStr += errMsg_type("w0y", type(GPODict["w0y"]), "GPODict", [float, int])
+        
+        elif GPODict["w0y"] < 0:
+            clog.warning(f"Encountered negative value {GPODict['w0y']} in field 'w0y' in GPODict {GPODict['name']}. Changing sign.")
+            GPODict["w0y"] *= -1
+
+    else:
+        errStr += errMsg_field("w0y", "GPODict")
+
+    if "n" in GPODict:
+        if not ((isinstance(GPODict["n"], float) or isinstance(GPODict["n"], int))):
+            errStr += errMsg_type("n", type(GPODict["n"]), "GPODict", [float, int])
+
+        elif GPODict["n"] < 1 and GPODict >= 0:
+            clog.warning("Refractive indices smaller than unity are not allowed. Changing to 1.")
+
+    else:
+        GPODict["n"] = 1
+
+    if "dxyz" in GPODict:
+        if not ((isinstance(GPODict["dxyz"], float) or isinstance(GPODict["dxyz"], int))):
+            errStr += errMsg_type("dxyz", type(GPODict["dxyz"]), "GPODict", [float, int])
+
+    else:
+        GPODict["dxyz"] = 0
+
+    if "pol" in GPODict:
+        errStr += block_ndarray("pol", GPODict, (3,))
+
+    else:
+        GPODict["pol"] = np.array([1, 0, 0])
+
+    if "E0" in GPODict:
+        if not ((isinstance(GPODict["E0"], float) or isinstance(GPODict["E0"], int))):
+            errStr += errMsg_type("E0", type(GPODict["E0"]), "GPODict", [float, int])
+
+    else:
+        GPODict["E0"] = 1
+
+    if errStr:
+        errList = errStr.split("\n")[:-1]
+
+        for err in errList:
+            clog.error(err)
+        raise InputPOError()
 
 ##
 # Check a physical optics propagation input dictionary.

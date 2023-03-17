@@ -798,20 +798,13 @@ def check_PSDict(PSDict, nameList):
     if PSDict["name"] in nameList:
         errStr += errMsg_name(PSDict["name"])
 
-    if "nRays" in PSDict:
-        if not isinstance(PSDict["nRays"], int):
-            errStr += errMsg_type("nRays", type(PSDict["nRays"]), "PSDict", int)
-
-    else:
-        errStr += errMsg_field("nRays", "PSDict")
-
     if "lam" in PSDict:
         if PSDict["lam"] == 0 + 0j:
             clog.info(f"Never heard of a complex-valued wavelength of zero, but good try... Therefore changing wavelength now to 'lam' equals {np.pi:.42f}!")
             PSDict["lam"] = np.pi
 
-        if not isinstance(PSDict["lam"], float):
-            errStr += errMsg_type("lam", type(PSDict["lam"]), "PSDict", float)
+        if not ((isinstance(PSDict["lam"], float) or isinstance(PSDict["lam"], int))):
+            errStr += errMsg_type("lam", type(PSDict["lam"]), "PSDict", [float, int])
         
         elif PSDict["lam"] < 0:
             clog.warning(f"Encountered negative value {PSDict['lam']} in field 'lam' in PSDict {PSDict['name']}. Changing sign.")

@@ -27,6 +27,10 @@ class CustomFormatter(logging.Formatter):
         formatter = logging.Formatter(log_fmt, datefmt="%Y-%m-%d %H:%M:%S")
         return formatter.format(record)
 
+class GUILogger(logging.handler):
+    def emit(self, record):
+        self.edit.append_line(self.format(record))
+
 class CustomLogger(object):
     def __init__(self, owner=None):
         self.owner = "Logger" if owner is None else owner
@@ -53,6 +57,10 @@ class CustomLogger(object):
         logger.addHandler(ch)
 
         return logger
+
+    def getCustomGUILogger(self, TextEditWidget):
+        self.edit = TextEditWidget
+        logging.getLogger().addHandler(self)
 
     def getNewStream(self):
         pass

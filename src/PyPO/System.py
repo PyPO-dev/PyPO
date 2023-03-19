@@ -23,7 +23,7 @@ from src.PyPO.BindBeam import *
 from src.PyPO.MatTransform import *
 from src.PyPO.PyPOTypes import *
 from src.PyPO.Checks import *
-import src.PyPO.Config as Config
+#import src.PyPO.Config as Config
 from src.PyPO.CustomLogger import CustomLogger
 import src.PyPO.Plotter as plt
 import src.PyPO.Efficiencies as effs
@@ -81,8 +81,9 @@ class System(object):
         self.num_cam = 0
         self.nThreads_cpu = os.cpu_count()
         
-        Config.initPrint(redirect)
+        Config.initPrint(None)
         Config.setContext(context)
+        
         # Internal dictionaries
         self.system = {}
         self.frames = {}
@@ -126,8 +127,12 @@ class System(object):
         if not existSave:
             os.makedirs(self.savePath)
         
-        self.clog_mgr = CustomLogger(os.path.basename(__file__))
-        self.clog = self.clog_mgr.getCustomLogger() if verbose else self.clog_mgr.getCustomLogger(open(os.devnull, "w"))
+        if redirect is None:
+            self.clog_mgr = CustomLogger(os.path.basename(__file__))
+            self.clog = self.clog_mgr.getCustomLogger() if verbose else self.clog_mgr.getCustomLogger(open(os.devnull, "w"))
+
+        else:
+            self.clog = redirect
 
         self.clog.info("INITIALIZED EMPTY SYSTEM.")
     ##

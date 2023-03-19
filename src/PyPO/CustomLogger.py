@@ -59,8 +59,14 @@ class CustomLogger(object):
         return logger
 
     def getCustomGUILogger(self, TextEditWidget):
-        self.edit = TextEditWidget
-        logging.getLogger().addHandler(self)
+        ch = GUILogger()
+        
+        ch.edit = TextEditWidget
+        ch.setLevel(logging.DEBUG)
+        ch.setFormatter(CustomFormatter())
+        
+        logger = logging.getLogger().addHandler(h)
+        return logger
 
     def getNewStream(self):
         pass

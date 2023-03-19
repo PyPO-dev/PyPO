@@ -995,6 +995,30 @@ def check_runPODict(runPODict, elements, currents, scalarfields):
         raise RunPOError()
 
 ##
+# CHeck if aperture dictionary is valid.
+def check_aperDict(aperDict):
+    errStr = ""
+
+    if "plot" in aperDict:
+        if not isinstance(aperDict["plot"], bool):
+            errStr += errMsg_type("plot", type(aperDict["plot"]), "aperDict", bool)
+
+    else:
+        aperDict["plot"] = True
+
+    if "center" in aperDict:
+        errStr += block_ndarray("center", aperDict, (2,))
+
+    else:
+        aperDict["center"] = np.zeros(2)
+
+    if not "outer" in aperDict:
+        errStr += errMsg_field("outer", "aperDict")
+    
+    if not "inner" in aperDict:
+        errStr += errMsg_field("inner", "aperDict")
+
+##
 # Check if ellipsoid limits are valid points.
 # If not, reduces limits to acceptable values.
 #

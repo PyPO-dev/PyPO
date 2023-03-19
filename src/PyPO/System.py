@@ -1307,6 +1307,8 @@ class System(object):
     # @see aperDict
     def calcSpillover(self, name_field, comp, aperDict):
         check_fieldSystem(name_field, self.fields, extern=True)
+        check_aperDict(aperDict)
+
         field = self.fields[name_field]
         field_comp = getattr(field, comp)
         surfaceObj = self.system[field.surf]
@@ -1328,6 +1330,9 @@ class System(object):
     def calcTaper(self, name_field, comp, aperDict=None):
         check_fieldSystem(name_field, self.fields, extern=True)
         aperDict = {} if aperDict is None else aperDict
+
+        if aperDict:
+            check_aperDict(aperDict)
 
         field = self.fields[name_field]
         field_comp = getattr(field, comp)

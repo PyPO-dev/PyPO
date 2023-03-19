@@ -425,6 +425,16 @@ def allfill_cframe(res, frame_py, size, ct_t):
     res.dy = (ct_t * size)(*(frame_py.dy.tolist()))
     res.dz = (ct_t * size)(*(frame_py.dz.tolist()))
 
+##
+# Allocate and fill an RTDict struct, for generating a tubular ray-trace frame.
+#
+# @param res A RTDict or RTDictf struct.
+# @param rdict_py A TubeRTDict.
+# @param ct_t Type of point in struct.
+#
+# @see RTDict
+# @see RTDictf
+# @see frame
 def allfill_RTDict(res, rdict_py, ct_t):
     res.nRays   = ctypes.c_int(rdict_py["nRays"])
     res.nRing   = ctypes.c_int(rdict_py["nRing"])

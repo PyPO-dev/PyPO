@@ -90,7 +90,7 @@ PSDict = {
         }
 
 ##
-# Template for an aperDic. The aperture dictionary is used for efficiency calculations and plotting purposes.
+# Template for an aperture dictionary. The aperture dictionary is used for efficiency calculations and plotting purposes.
 # Because efficiencies are calculated in the restframe of a surface, the center and radius parameters should be interpreted as
 # laying in the xy plane.
 aperDict = {

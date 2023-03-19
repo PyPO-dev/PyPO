@@ -89,10 +89,10 @@ def initTubeFrameInp():
     return [InputDescription(inType.vectorStrings, "name", label="Name of frame", numFields=1),
             InputDescription(inType.vectorIntegers, "nRays", label="# of rays", hints=[0], numFields=1),
             InputDescription(inType.vectorIntegers, "nRing", label="# of rings", hints=[0], numFields=1),
-            InputDescription(inType.vectorFloats, "angx", label="X-apex angle", hints=[0], numFields=1),
-            InputDescription(inType.vectorFloats, "angy", label="Y-apex angle", hints=[0], numFields=1),
-            InputDescription(inType.vectorFloats, "a", label="X radius of outer ring", hints=[0], numFields=1),
-            InputDescription(inType.vectorFloats, "b", label="Y radius of outer ring", hints=[0], numFields=1)
+            InputDescription(inType.vectorFloats, "angx0", label="X-apex angle", hints=[0], numFields=1),
+            InputDescription(inType.vectorFloats, "angy0", label="Y-apex angle", hints=[0], numFields=1),
+            InputDescription(inType.vectorFloats, "x0", label="X radius of outer ring", hints=[0], numFields=1),
+            InputDescription(inType.vectorFloats, "y0", label="Y radius of outer ring", hints=[0], numFields=1)
             ]
 
 def initGaussianFrameInp():

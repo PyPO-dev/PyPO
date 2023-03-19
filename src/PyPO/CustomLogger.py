@@ -26,10 +26,33 @@ class CustomFormatter(logging.Formatter):
         log_fmt = self.FORMATS.get(record.levelno)
         formatter = logging.Formatter(log_fmt, datefmt="%Y-%m-%d %H:%M:%S")
         return formatter.format(record)
+    
+class CustomGUIFormatter(logging.Formatter):
+
+    #format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)" 
+    #format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s "#(%(filename)s:%(lineno)d)" 
+    format = "%(asctime)s - %(levelname)s - %(message)s "#(%(filename)s:%(lineno)d)" 
+    
+
+    FORMATS = {
+        logging.DEBUG: format,
+        logging.INFO: format,
+        logging.WARNING: format,
+        logging.ERROR: format,
+        logging.CRITICAL: format
+    }
+
+    def format(self, record):
+        log_fmt = self.FORMATS.get(record.levelno)
+        formatter = logging.Formatter(log_fmt, datefmt="%Y-%m-%d %H:%M:%S")
+        return formatter.format(record)
+
 
 class GUILogger(logging.Handler):
     def emit(self, record):
-        self.edit.append_line(self.format(record))
+        # self.edit.textCursor().appendText(self.format(record))
+        print("PP", self.format(record))
+        self.edit.append(self.format(record))
 
 class CustomLogger(object):
     def __init__(self, owner=None):
@@ -63,9 +86,9 @@ class CustomLogger(object):
         
         ch.edit = TextEditWidget
         ch.setLevel(logging.DEBUG)
-        ch.setFormatter(CustomFormatter())
+        ch.setFormatter(CustomGUIFormatter())
         
-        logger = logging.getLogger().addHandler(h)
+        logger = logging.getLogger().addHandler(ch)
         return logger
 
     def getNewStream(self):

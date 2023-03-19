@@ -3,14 +3,11 @@
 
 
 from enum import Enum
-from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar, QPlainTextEdit, QScrollBar
+from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, QTextEdit, QGridLayout, QWidget, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar, QPlainTextEdit, QScrollBar
 
 from datetime import datetime
 
-# global print
-# def print(s):
-#     ConsoleGenerator.get().appendPlainText(s)
-#     ConsoleGenerator.get().repaint()
+
 
 class msgTypes(Enum):
     FormInput_Incorrect = 0,
@@ -32,7 +29,7 @@ class ConsoleGenerator():
             cls._console = Console()
         return cls._console
 
-class Console(QPlainTextEdit):
+class Console(QTextEdit):
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -41,14 +38,14 @@ class Console(QPlainTextEdit):
 
         # self.textCursor().insertText()
 
-    def log(self, msgType, text):
-        # msgType = msgTypes.FormInput_Incorrect
-        now = datetime.now().strftime("[%Y/%m/%d - %H:%M:%S]   ")
-        logitem = now
-        if msgType:
-            logitem += msgType.name
-        logitem += "\n"
-        logitem += text
-        logitem += "\n"
-        self.appendPlainText(logitem)
+    # def log(self, msgType, text):
+    #     # msgType = msgTypes.FormInput_Incorrect
+    #     now = datetime.now().strftime("[%Y/%m/%d - %H:%M:%S]   ")
+    #     logitem = now
+    #     if msgType:
+    #         logitem += msgType.name
+    #     logitem += "\n"
+    #     logitem += text
+    #     logitem += "\n"
+    #     self.appendPlainText(logitem)
 

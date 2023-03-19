@@ -63,7 +63,6 @@ class MainWidget(QWidget):
         self.clog = self.clog_mgr.getCustomGUILogger(self.console)
 
         self.stm = st.System(redirect=self.clog, context="G")
-        self.pyprint = print
         
         # init layout
         self.grid.setContentsMargins(0,0,0,0)
@@ -96,17 +95,8 @@ class MainWidget(QWidget):
         self.addToWindowGrid(self.console, self.GPConsole)
         self.cursor = QTextCursor(self.console.document())
         
-        global print ##TODO: Remove print redefinitions
-        def print(s, end=''):
-            if end == '\r':
-                self.cursor.select(QTextCursor.LineUnderCursor)
-                self.cursor.removeSelectedText()
-                self.console.insertPlainText(str(s))
-            else:
-                self.console.appendPlainText(str(s))
-            self.console.repaint()
         
-        self.console.appendPlainText("********** PyPO Console **********")
+        # self.console.appendPlainText("********** PyPO Console **********")
         self.addToWindowGrid(self.console, self.GPConsole)
     
     ##
@@ -443,10 +433,10 @@ class MainWidget(QWidget):
 
         if transformationType == "Translation":
             self.stm.translateGrids(dd["element"], vector, mode=dd["mode"].lower())
-            print(f'Translated {dd["element"]} by {self._formatVector(vector)} mm')
+            # print(f'Translated {dd["element"]} by {self._formatVector(vector)} mm')
         elif transformationType == "Rotation":
             self.stm.rotateGrids(dd["element"], vector, pivot=dd["pivot"], mode=dd["mode"].lower())
-            print(f'Rotated {dd["element"]} by {self._formatVector(vector)} deg around {self._formatVector(dd["pivot"])}')
+            # print(f'Rotated {dd["element"]} by {self._formatVector(vector)} deg around {self._formatVector(dd["pivot"])}')
         else:
             raise Exception("Transformation type incorrect")
 
@@ -459,10 +449,10 @@ class MainWidget(QWidget):
 
         if transformationType == "Translation":
             self.stm.translateGrids(dd["frame"], vector, mode=dd["mode"].lower(), obj="frame")
-            print(f'Translated {dd["frame"]} by {self._formatVector(vector)} mm')
+            # print(f'Translated {dd["frame"]} by {self._formatVector(vector)} mm')
         elif transformationType == "Rotation":
             self.stm.rotateGrids(dd["frame"], vector, pivot=dd["pivot"], mode=dd["mode"].lower(), obj="frame")
-            print(f'Rotated {dd["frame"]} by {self._formatVector(vector)} deg around {self._formatVector(dd["pivot"])}')
+            # print(f'Rotated {dd["frame"]} by {self._formatVector(vector)} deg around {self._formatVector(dd["pivot"])}')
         else:
             raise Exception("Transformation type incorrect")
     
@@ -486,11 +476,11 @@ class MainWidget(QWidget):
 
         if transfDict["type"] == "Translation":
             self.stm.translateGrids(transfDict["elements"], transfDict["vector"])
-            print(f'Translated {transfDict["elements"]} by {self._formatVector(transfDict["vector"])} mm')
+            # print(f'Translated {transfDict["elements"]} by {self._formatVector(transfDict["vector"])} mm')
 
         if transfDict["type"] == "Rotation":
             self.stm.rotateGrids(transfDict["elements"], transfDict["vector"], transfDict["pivot"])
-            print(f'Translated {transfDict["elements"]} by {self._formatVector(transfDict["vector"])} mm')
+            # print(f'Translated {transfDict["elements"]} by {self._formatVector(transfDict["vector"])} mm')
     
     ### Functionalities: TRFrames 
     #NOTE Raytrace widgets
@@ -739,7 +729,7 @@ class MainWidget(QWidget):
     def calcTaperAction(self):
         TaperDict = self.ParameterWid.read()
         eff_taper = self.stm.calcTaper(TaperDict["f_name"], TaperDict["comp"])
-        print(f'Taper efficiency of {TaperDict["f_name"]}, component {TaperDict["comp"]} = {eff_taper}\n')
+        # print(f'Taper efficiency of {TaperDict["f_name"]}, component {TaperDict["comp"]} = {eff_taper}\n')
     
     ##
     # Reads form and calculates spillover efficientie
@@ -753,21 +743,21 @@ class MainWidget(QWidget):
                 }
 
         eff_spill = self.stm.calcSpillover(SpillDict["f_name"], SpillDict["comp"], aperDict)
-        print(f'Spillover efficiency of {SpillDict["f_name"]}, component {SpillDict["comp"]} = {eff_spill}\n')
+        # print(f'Spillover efficiency of {SpillDict["f_name"]}, component {SpillDict["comp"]} = {eff_spill}\n')
     
     ##
     # Reads form and calculates x-pol efficientie TODO: x-pol?
     def calcXpolAction(self):
         XpolDict = self.ParameterWid.read()
         eff_Xpol = self.stm.calcXpol(XpolDict["f_name"], XpolDict["co_comp"], XpolDict["cr_comp"])
-        print(f'X-pol efficiency of {XpolDict["f_name"]}, co-component {XpolDict["co_comp"]} and X-component {XpolDict["cr_comp"]} = {eff_Xpol}\n')
+        # print(f'X-pol efficiency of {XpolDict["f_name"]}, co-component {XpolDict["co_comp"]} and X-component {XpolDict["cr_comp"]} = {eff_Xpol}\n')
 
     ##
     # Reads form and calculates main beam efficientie
     def calcMBAction(self):
         MBDict = self.ParameterWid.read()
         eff_mb = self.stm.calcMainBeam(MBDict["f_name"], MBDict["comp"], MBDict["thres"], MBDict["mode"])
-        print(f'Main beam efficiency of {MBDict["f_name"]}, component {MBDict["comp"]} = {eff_mb}\n')
+        # print(f'Main beam efficiency of {MBDict["f_name"]}, component {MBDict["comp"]} = {eff_mb}\n')
         self.addSFieldWidget(f"fitGauss_{MBDict['f_name']}")
 
     
@@ -777,16 +767,16 @@ class MainWidget(QWidget):
     # calculates root mean square of a frame
     def calcRMSfromFrame(self, frame):
         rms = self.stm.calcSpotRMS(frame)
-        print(f"RMS value of {frame} = {rms} mm\n")
+        # print(f"RMS value of {frame} = {rms} mm\n")
 
     def setFocusFindForm(self):
         self.setForm(fDataObj.focusFind(list(self.stm.frames.keys())), self.findFocusAction)
 
     def findFocusAction(self):
-        print(self.ParameterWid.read())
+        # print(self.ParameterWid.read())
         findFocusDict = self.ParameterWid.read()
         focus = self.stm.findRTfocus(findFocusDict["name_frame"], verbose=True) 
-        print(f"Focus of {findFocusDict['name_frame']} = {focus}\n")
+        # print(f"Focus of {findFocusDict['name_frame']} = {focus}\n")
 
 class PyPOMainWindow(QMainWindow):
     def __init__(self, parent=None):
@@ -963,10 +953,9 @@ class PyPOMainWindow(QMainWindow):
 
 if __name__ == "__main__":
 
-    print("lala")
+    # print("lala")
     app = QApplication(sys.argv)
     win = PyPOMainWindow(parent=None)
-    # def print(s):
-    #     cons.appendPlainText(s)
+
     win.show()
     app.exec_()

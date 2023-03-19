@@ -27,7 +27,7 @@ class CustomFormatter(logging.Formatter):
         formatter = logging.Formatter(log_fmt, datefmt="%Y-%m-%d %H:%M:%S")
         return formatter.format(record)
 
-class GUILogger(logging.handler):
+class GUILogger(logging.Handler):
     def emit(self, record):
         self.edit.append_line(self.format(record))
 

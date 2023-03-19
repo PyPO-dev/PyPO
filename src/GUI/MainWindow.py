@@ -16,6 +16,7 @@ from src.GUI.TransformationWidget import TransformationWidget
 from src.GUI.Acccordion import Accordion
 from src.GUI.ElementWidget import ReflectorWidget, FrameWidget, FieldsWidget, CurrentWidget, SFieldsWidget, SymDialog
 from src.GUI.Console import ConsoleGenerator
+from src.PyPO.CustomLogger import CustomLogger
 
 # from src.GUI.Console import print
 import numpy as np
@@ -47,27 +48,30 @@ class MainWidget(QWidget):
         # Window settings
         self.setWindowTitle("PyPO")
 
-        # init System
-        self.stm = st.System(redirect=print, context="G")
-        self.pyprint = print
 
 
         # GridParameters
+        self.grid = QGridLayout()
         self.GPElementsColumn = [0, 0, 2, 1]
         self.GPParameterForm  = [0, 1, 2, 1]
         self.GPPlotScreen     = [0, 2, 1, 1]
         self.GPConsole        = [1, 2, 1, 1]
 
+        self._mkConsole()
+        # init System
+        self.clog_mgr = CustomLogger(os.path.basename(__file__))
+        self.clog = self.clog_mgr.getCustomGUILogger(self.console)
+
+        self.stm = st.System(redirect=self.clog, context="G")
+        self.pyprint = print
         
         # init layout
-        self.grid = QGridLayout()
         self.grid.setContentsMargins(0,0,0,0)
         # self.grid.setMargin(0)
         self.grid.setSpacing(0)
 
         self._mkElementsColumn()
         self._mkPlotScreen()
-        self._mkConsole()
         self.setLayout(self.grid)
 
 

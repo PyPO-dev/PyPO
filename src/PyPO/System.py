@@ -782,8 +782,8 @@ class System(object):
     #
     # @param name_group Name of the group to be removed.
     def removeGroup(self, *names):
-        check_groupSystem(name_group, self.groups, extern=True)
         for ng in names:
+            check_groupSystem(ng, self.groups, extern=True)
             del self.groups[ng]
 
     ##
@@ -902,7 +902,7 @@ class System(object):
     # @param curentName Name of current to be removed.
     def removeCurrent(self, *currentName):
         for cn in currentName:
-            check_currentSystem(fn, self.currents, extern=True)
+            check_currentSystem(cn, self.currents, extern=True)
             del self.currents[cn]
         self.clog.info(f"Removed PO current {currentName} from system.")
 
@@ -1631,7 +1631,7 @@ class System(object):
             return fig, ax
         
         elif save:
-            pt.savefig(fname=savePath + '{}.jpg'.format(plotObject["name"]),bbox_inches='tight', dpi=300)
+            pt.savefig(fname=self.savePath + '{}.jpg'.format(plotObject["name"]),bbox_inches='tight', dpi=300)
             pt.close()
 
         elif show:

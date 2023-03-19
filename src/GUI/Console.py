@@ -7,10 +7,10 @@ from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, 
 
 from datetime import datetime
 
-global print
-def print(s):
-    ConsoleGenerator.get().appendPlainText(s)
-    ConsoleGenerator.get().repaint()
+# global print
+# def print(s):
+#     ConsoleGenerator.get().appendPlainText(s)
+#     ConsoleGenerator.get().repaint()
 
 class msgTypes(Enum):
     FormInput_Incorrect = 0,

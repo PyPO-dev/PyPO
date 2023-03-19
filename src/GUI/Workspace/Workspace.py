@@ -27,6 +27,7 @@ class ElementsSpace(QTreeWidget):
         self.plotRefl = lambda:print("plot"),
         self.removeRefl = lambda x :print(f"removed: {x}")
         self.transformRefl = lambda x :print(f"removed: {x}")
+        self.snap = lambda:print("snapped")
         
 
 
@@ -55,7 +56,7 @@ class ElementsSpace(QTreeWidget):
 
 
     def addReflector(self, name):
-        widget = ReflectorWidget(name, self.removeRefl, self.transformRefl, self.plotRefl)
+        widget = ReflectorWidget(name, self.removeRefl, self.transformRefl, self.plotRefl, self.snap)
         widget.setAutoFillBackground(True)
         item = QTreeWidgetItem(["cell"])
         widget.backgroundItem = item

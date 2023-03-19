@@ -17,7 +17,7 @@ from src.GUI.Acccordion import Accordion
 from src.GUI.ElementWidget import ReflectorWidget, FrameWidget, FieldsWidget, CurrentWidget, SFieldsWidget, SymDialog
 from src.GUI.Console import ConsoleGenerator
 
-from src.GUI.Console import print
+# from src.GUI.Console import print
 import numpy as np
 from src.PyPO.Checks import InputReflError, InputRTError
 

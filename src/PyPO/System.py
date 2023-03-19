@@ -907,7 +907,7 @@ class System(object):
     # @param fieldName Name of scalar field to be removed.
     def removeScalarField(self, *fieldName):
         for fn in fieldName:
-            check_scalarfieldSystem(fn, self.scalarfieldss, extern=True)
+            check_scalarfieldSystem(fn, self.scalarfields, extern=True)
             del self.scalarfields[fn]
         self.clog.info(f"Removed scalar PO field {fieldName} from system.")
     

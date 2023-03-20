@@ -127,20 +127,28 @@ class System(object):
         if not existSave:
             os.makedirs(self.savePath)
         
+        #redirect = None
         if redirect is None:
             self.clog_mgr = CustomLogger(os.path.basename(__file__))
             self.clog = self.clog_mgr.getCustomLogger() if verbose else self.clog_mgr.getCustomLogger(open(os.devnull, "w"))
 
         else:
             self.clog = redirect
+        #print(self.clog)
 
-        self.clog.info("INITIALIZED EMPTY SYSTEM.")
+        if context == "S":
+            self.clog.info("INITIALIZED EMPTY SYSTEM.")
+
+       
     ##
     # Destructor. Deletes any reference to the logger assigned to current system.
     def __del__(self):
         self.clog.info("EXITING SYSTEM.")
         del self.clog_mgr
         del self.clog
+
+    def getSystemLogger(self):
+        return self.clog
 
     def __str__(self):
         s = "Reflectors in system:\n"
@@ -992,6 +1000,7 @@ class System(object):
             source = self.system[_runPODict["s_scalarfield"].surf]
             _runPODict["k"] = _runPODict["s_scalarfield"].k
        
+
         target = self.system[_runPODict["t_name"]]
         
         start_time = time.time()

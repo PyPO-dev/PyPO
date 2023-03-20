@@ -5,7 +5,7 @@ import asyncio
 
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar, QScrollArea
 from PyQt5.QtGui import QFont, QIcon, QTextCursor
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QThread
 
 from src.GUI.ParameterForms import formGenerator
 from src.GUI.ParameterForms.InputDescription import InputDescription
@@ -16,7 +16,7 @@ from src.GUI.TransformationWidget import TransformationWidget
 from src.GUI.Acccordion import Accordion
 from src.GUI.ElementWidget import ReflectorWidget, FrameWidget, FieldsWidget, CurrentWidget, SFieldsWidget, SymDialog
 from src.GUI.Console import ConsoleGenerator
-from src.PyPO.CustomLogger import CustomLogger
+from src.PyPO.CustomLogger import CustomGUILogger
 
 # from src.GUI.Console import print
 import numpy as np
@@ -26,9 +26,6 @@ sys.path.append('../')
 sys.path.append('../../')
 import src.PyPO.System as st
 import src.PyPO.Threadmgr as TManager
-
-
-
 
 ##
 # @file 
@@ -59,11 +56,16 @@ class MainWidget(QWidget):
 
         self._mkConsole()
         # init System
-        self.clog_mgr = CustomLogger(os.path.basename(__file__))
+        self.clog_mgr = CustomGUILogger(os.path.basename(__file__))
         self.clog = self.clog_mgr.getCustomGUILogger(self.console)
-
-        self.stm = st.System(redirect=self.clog, context="G")
+        print(self.clog) 
+        #self.clog.info(f"STARTED PyPO GUI SESSION.")
         
+        self.stm = st.System(redirect=self.clog, context="G")
+       
+        self.clog = self.stm.getSystemLogger()
+        self.clog.info(f"STARTED PyPO GUI SESSION.")
+
         # init layout
         self.grid.setContentsMargins(0,0,0,0)
         # self.grid.setMargin(0)
@@ -77,6 +79,9 @@ class MainWidget(QWidget):
         # NOTE Raytrace stuff
         self.frameDict = {}
         # end NOTE
+
+    #def setupLogger(self):
+    #    handler = 
 
     ### Gui setup functions
     ##
@@ -206,13 +211,22 @@ class MainWidget(QWidget):
     def snapAction(self):
         snapDict = self.ParameterWid.read()
         if snapDict["options"] == "Take":
-            self.stm.snapObj(snapDict["name"], snapDict["snap_name"], snapDict["obj"])
+            try:
+                self.stm.snapObj(snapDict["name"], snapDict["snap_name"], snapDict["obj"])
+            except:
+                pass
         
         elif snapDict["options"] == "Revert":
-            self.stm.revertToSnap(snapDict["name"], snapDict["snap_name"], snapDict["obj"])
-        
+            try:
+                self.stm.revertToSnap(snapDict["name"], snapDict["snap_name"], snapDict["obj"])
+            except:
+                pass
+
         elif snapDict["options"] == "Delete":
-            self.stm.deleteSnap(snapDict["name"], snapDict["snap_name"], snapDict["obj"])
+            try:
+                self.stm.deleteSnap(snapDict["name"], snapDict["snap_name"], snapDict["obj"])
+            except:
+                pass
     
     ##
     # plots all elements of the system in one plot
@@ -301,20 +315,25 @@ class MainWidget(QWidget):
     def loadSystemAction(self):
         loadDict = self.ParameterWid.read()
         self._mkElementsColumn()
-        self.stm.loadSystem(loadDict["name"]) 
-        self.refreshColumn(self.stm.system, "elements")
-        self.refreshColumn(self.stm.frames, "frames")
-        self.refreshColumn(self.stm.fields, "fields")
-        self.refreshColumn(self.stm.currents, "currents")
-        self.refreshColumn(self.stm.scalarfields, "scalarfields")
 
+        try:
+            self.stm.loadSystem(loadDict["name"]) 
+            self.refreshColumn(self.stm.system, "elements")
+            self.refreshColumn(self.stm.frames, "frames")
+            self.refreshColumn(self.stm.fields, "fields")
+            self.refreshColumn(self.stm.currents, "currents")
+            self.refreshColumn(self.stm.scalarfields, "scalarfields")
+        except:
+            pass
 
     ##
     # removes an element from the system
     # @param element Name of the element in the system
     def removeElement(self, element):
-        print(f"removed: {element}") # TODO remove print redirection
-        self.stm.removeElement(element)
+        try:
+            self.stm.removeElement(element)
+        except:
+            pass
     
     ##
     # TODO: @Maikel Rename this function and evaluate its nessecity
@@ -349,7 +368,7 @@ class MainWidget(QWidget):
         self.ElementsColumn.POFields.addWidget(FieldsWidget(name,self.stm.removeField, self.plotFieldForm))
 
     def addCurrentWidget(self, name):
-        self.ElementsColumn.POCurrents.addWidget(CurrentWidget(name, self.stm.removeCurrent, self.plotFieldForm))
+        self.ElementsColumn.POCurrents.addWidget(CurrentWidget(name, self.stm.removeCurrent, self.plotCurrentForm))
 
     def addSFieldWidget(self, name):
         self.ElementsColumn.SPOFields.addWidget(SFieldsWidget(name,self.stm.removeScalarField, self.plotSFieldForm))
@@ -366,8 +385,12 @@ class MainWidget(QWidget):
     # Reads form and adds plane to System
     def addPlaneAction(self):
         elementDict = self.ParameterWid.read()
-        self.stm.addPlane(elementDict) 
-        self.addReflectorWidget(elementDict["name"])
+
+        try:
+            self.stm.addPlane(elementDict) 
+            self.addReflectorWidget(elementDict["name"])
+        except:
+            pass
     
     ##
     # Shows from to add a quadric surface
@@ -387,31 +410,42 @@ class MainWidget(QWidget):
                 self.stm.addEllipse(elementDict)
 
             self.addReflectorWidget(elementDict["name"])
-        except InputReflError as e: #TODO: Does this errorCatching work?
-            self.console.appendPlainText("FormInput Incorrect:")
-            self.console.appendPlainText(e.__str__())
+        except:
+            pass
 
     ##
     # Reads form and adds parabola to System
     def addParabolaAction(self):
         elementDict = self.ParameterWid.read()
-        self.stm.addParabola(elementDict) 
-        self.addReflectorWidget(elementDict["name"])
-    
+
+        try:
+            self.stm.addParabola(elementDict) 
+            self.addReflectorWidget(elementDict["name"])
+        except:
+            pass
+
     ##
     # Reads form and adds hyperbola to System
     def addHyperbolaAction(self):
         elementDict = self.ParameterWid.read()
-        self.stm.addHyperbola(elementDict) 
-        self.addReflectorWidget(elementDict["name"])
+        
+        try:
+            self.stm.addHyperbola(elementDict) 
+            self.addReflectorWidget(elementDict["name"])
+        except:
+            pass
 
     ##
     # Reads form and adds ellipse to System
     def addEllipseAction(self):
         elementDict = self.ParameterWid.read()
-        self.stm.addEllipse(elementDict) 
-        self.addReflectorWidget(elementDict["name"])
-    
+        
+        try:
+            self.stm.addEllipse(elementDict) 
+            self.addReflectorWidget(elementDict["name"])
+        except:
+            pass
+
     ### Functionalities: Transforming Elements 
 
     ##
@@ -431,31 +465,32 @@ class MainWidget(QWidget):
         transformationType = dd["type"]
         vector = dd["vector"]
 
-        if transformationType == "Translation":
-            self.stm.translateGrids(dd["element"], vector, mode=dd["mode"].lower())
-            # print(f'Translated {dd["element"]} by {self._formatVector(vector)} mm')
-        elif transformationType == "Rotation":
-            self.stm.rotateGrids(dd["element"], vector, pivot=dd["pivot"], mode=dd["mode"].lower())
-            # print(f'Rotated {dd["element"]} by {self._formatVector(vector)} deg around {self._formatVector(dd["pivot"])}')
-        else:
-            raise Exception("Transformation type incorrect")
-
+        try:
+            if transformationType == "Translation":
+                self.stm.translateGrids(dd["element"], vector, mode=dd["mode"].lower())
+                # print(f'Translated {dd["element"]} by {self._formatVector(vector)} mm')
+            elif transformationType == "Rotation":
+                self.stm.rotateGrids(dd["element"], vector, pivot=dd["pivot"], mode=dd["mode"].lower())
+                # print(f'Rotated {dd["element"]} by {self._formatVector(vector)} deg around {self._formatVector(dd["pivot"])}')
+        except:
+            pass
+    
     ##
     # Applies single frame transformation
     def transformFrameAction(self, frame):
         dd = self.ParameterWid.read()
         transformationType = dd["type"]
         vector = dd["vector"]
-
-        if transformationType == "Translation":
-            self.stm.translateGrids(dd["frame"], vector, mode=dd["mode"].lower(), obj="frame")
-            # print(f'Translated {dd["frame"]} by {self._formatVector(vector)} mm')
-        elif transformationType == "Rotation":
-            self.stm.rotateGrids(dd["frame"], vector, pivot=dd["pivot"], mode=dd["mode"].lower(), obj="frame")
-            # print(f'Rotated {dd["frame"]} by {self._formatVector(vector)} deg around {self._formatVector(dd["pivot"])}')
-        else:
-            raise Exception("Transformation type incorrect")
-    
+        
+        try:
+            if transformationType == "Translation":
+                self.stm.translateGrids(dd["frame"], vector, mode=dd["mode"].lower(), obj="frame")
+                # print(f'Translated {dd["frame"]} by {self._formatVector(vector)} mm')
+            elif transformationType == "Rotation":
+                self.stm.rotateGrids(dd["frame"], vector, pivot=dd["pivot"], mode=dd["mode"].lower(), obj="frame")
+                # print(f'Rotated {dd["frame"]} by {self._formatVector(vector)} deg around {self._formatVector(dd["pivot"])}')
+        except:
+            pass
     ##
     # Shows multiple element transformation form
     def transformationMultipleForm(self):
@@ -494,9 +529,13 @@ class MainWidget(QWidget):
     # Reads form and adds a tube frame to system
     def initTubeFrameAction(self):
         RTDict = self.ParameterWid.read()
-        self.stm.createTubeFrame(RTDict)
-        self.addFrameWidget(RTDict["name"])
-    
+        
+        try:
+            self.stm.createTubeFrame(RTDict)
+            self.addFrameWidget(RTDict["name"])
+        except:
+            pass
+
     ##
     # Shows form to initialize gaussian frame 
     def initGaussianFrameForm(self):
@@ -510,10 +549,25 @@ class MainWidget(QWidget):
 
         if not "seed" in GRTDict.keys():
             GRTDict["seed"] = -1
-
-        self.stm.createGRTFrame(GRTDict)
-        self.addFrameWidget(GRTDict["name"])
         
+        try:
+            dialStr = f"Calculating Gaussian ray-trace frame {GRTDict['name']}..."
+            dial = SymDialog(dialStr)
+
+            self.mgr = TManager.Manager("G", callback=dial.accept)
+            t = self.mgr.new_gthread(target=self.stm.createGRTFrame, args=(GRTDict,))
+            
+            dial.setThread(t)
+
+            if dial.exec_():
+                self.addFrameWidget(GRTDict["name"])
+      
+            del t
+            #self.stm.createGRTFrame(GRTDict)
+            #self.addFrameWidget(GRTDict["name"])
+        except:
+            pass
+
     ##
     # Shows form to propagate rays
     def setPropRaysForm(self):
@@ -523,8 +577,12 @@ class MainWidget(QWidget):
     # Reads form and popagates rays
     def addPropRaysAction(self): 
         propRaysDict = self.ParameterWid.read()
-        self.stm.runRayTracer(propRaysDict)
-        self.addFrameWidget(propRaysDict["fr_out"])
+        
+        try:
+            self.stm.runRayTracer(propRaysDict)
+            self.addFrameWidget(propRaysDict["fr_out"])
+        except:
+            pass
 
     ##
     # Shows form to plot preselected a frame
@@ -552,10 +610,13 @@ class MainWidget(QWidget):
     # Reads form and adds a vectorial gaussian beam to system
     def initGaussBeamAction(self):
         GDict = self.ParameterWid.read()
-        self.stm.createGaussian(GDict, GDict["surface"])
-        self.addFieldWidget(GDict["name"])
-        self.addCurrentWidget(GDict["name"])
-    
+        
+        try:
+            self.stm.createGaussian(GDict, GDict["surface"])
+            self.addFieldWidget(GDict["name"])
+            self.addCurrentWidget(GDict["name"])
+        except:
+            pass
     
     ##
     # Shows form to initialize scalar gaussian beam TODO: klopt dit 
@@ -566,9 +627,12 @@ class MainWidget(QWidget):
     # Reads form and adds a scalar gaussian beam to system
     def initSGaussBeamAction(self):
         GDict = self.ParameterWid.read()
-        self.stm.createScalarGaussian(GDict, GDict["surface"])
-        self.addSFieldWidget(GDict["name"])
-
+        
+        try:
+            self.stm.createScalarGaussian(GDict, GDict["surface"])
+            self.addSFieldWidget(GDict["name"])
+        except:
+            pass
     ##
     # Shows form to initialize a physical optics propagation
     def initPSBeamForm(self):
@@ -579,10 +643,14 @@ class MainWidget(QWidget):
     # Reads form and adds a vectorial point source beam to system
     def initPSBeamAction(self):
         PSDict = self.ParameterWid.read()
-        self.stm.generatePointSource(PSDict, PSDict["surface"])
-        self.addFieldWidget(PSDict["name"])
-        self.addCurrentWidget(PSDict["name"])
-    
+        
+        try:
+            self.stm.generatePointSource(PSDict, PSDict["surface"])
+            self.addFieldWidget(PSDict["name"])
+            self.addCurrentWidget(PSDict["name"])
+        except:
+            pass
+
     ##
     # Shows form to initialize a scalar point source beam
     def initSPSBeamForm(self):
@@ -593,10 +661,12 @@ class MainWidget(QWidget):
     # Reads form and adds a scalar point source beam to system
     def initSPSBeamAction(self):
         SPSDict = self.ParameterWid.read()
-        self.stm.generatePointSourceScalar(SPSDict, SPSDict["surface"])
-        self.addSFieldWidget(SPSDict["name"])
-    
-
+        
+        try:
+            self.stm.generatePointSourceScalar(SPSDict, SPSDict["surface"])
+            self.addSFieldWidget(SPSDict["name"])
+        except:
+            pass
 
     ##
     # Shows form to plot field
@@ -643,7 +713,6 @@ class MainWidget(QWidget):
     def plotCurrentForm(self, current):
         self.setForm(fDataObj.plotCurrentOpt(current), readAction=self.plotCurrentAction)
     
-
     ##
     # Reads form and plots current
     def plotCurrentAction(self):
@@ -670,38 +739,50 @@ class MainWidget(QWidget):
     # Reads form propagates beam, runs calculation on another thread
     def propPOAction(self):
         propBeamDict = self.ParameterWid.read()
+
+        self.stm.setLoggingVerbosity(False)
+
+        self.clog.info("*** Starting PO propagation ***")
       
         if propBeamDict["mode"] == "scalar":
             subStr = "scalar field"
         else:
             subStr = propBeamDict["mode"]
 
-        dialStr = f"Calculating {subStr} on {propBeamDict['t_name']}..."
+        try:
+            dialStr = f"Calculating {subStr} on {propBeamDict['t_name']}..."
+            
+            dial = SymDialog(dialStr) 
+            self.mgr = TManager.Manager("G", callback=dial.accept)
+            
+            t = self.mgr.new_gthread(target=self.stm.runPO, args=(propBeamDict,))
+            self.clog.info("ok")
+            #self.t.start()  
+            dial.setThread(t)
 
-        dial = SymDialog(dialStr)
-
-        self.mgr = TManager.Manager("G", callback=dial.accept)
-        t = self.mgr.new_gthread(target=self.stm.runPO, args=(propBeamDict,), calc_type=propBeamDict["mode"])
+            if dial.exec_():
+                if propBeamDict["mode"] == "JM":
+                    self.addCurrentWidget(propBeamDict["name_JM"])
+            
+                elif propBeamDict["mode"] == "EH" or propBeamDict["mode"] == "FF":
+                    self.addFieldWidget(propBeamDict["name_EH"])
+            
+                elif propBeamDict["mode"] == "JMEH":
+                    self.addCurrentWidget(propBeamDict["name_JM"])
+                    self.addFieldWidget(propBeamDict["name_EH"])
+            
+                elif propBeamDict["mode"] == "EHP":
+                    self.addFieldWidget(propBeamDict["name_EH"])
+                    self.addFrameWidget(propBeamDict["name_P"])
         
-        dial.setThread(t)
-
-        if dial.exec_():
-            if propBeamDict["mode"] == "JM":
-                self.addCurrentWidget(propBeamDict["name_JM"])
+                elif propBeamDict["mode"] == "scalar":
+                    self.addSFieldWidget(propBeamDict["name_field"])
+            
+        except:
+            #self.clog.info("noooo")
+            pass
         
-            elif propBeamDict["mode"] == "EH" or propBeamDict["mode"] == "FF":
-                self.addFieldWidget(propBeamDict["name_EH"])
-        
-            elif propBeamDict["mode"] == "JMEH":
-                self.addCurrentWidget(propBeamDict["name_JM"])
-                self.addFieldWidget(propBeamDict["name_EH"])
-        
-            elif propBeamDict["mode"] == "EHP":
-                self.addFieldWidget(propBeamDict["name_EH"])
-                self.addFrameWidget(propBeamDict["name_P"])
-    
-            elif propBeamDict["mode"] == "scalar":
-                self.addSFieldWidget(propBeamDict["name_field"])
+        self.stm.setLoggingVerbosity(True)
 
     #TODO Unite efficiencies
     ##

@@ -1,6 +1,8 @@
 import sys
 import logging
 
+from PyQt5.QtCore import pyqtSignal
+
 class CustomFormatter(logging.Formatter):
 
     grey = "\x1b[38;20m"
@@ -47,13 +49,6 @@ class CustomGUIFormatter(logging.Formatter):
         formatter = logging.Formatter(log_fmt, datefmt="%Y-%m-%d %H:%M:%S")
         return formatter.format(record)
 
-
-class GUILogger(logging.Handler):
-    def emit(self, record):
-        # self.edit.textCursor().appendText(self.format(record))
-        print("PP", self.format(record))
-        self.edit.append(self.format(record))
-
 class CustomLogger(object):
     def __init__(self, owner=None):
         self.owner = "Logger" if owner is None else owner
@@ -75,20 +70,49 @@ class CustomLogger(object):
         ch.setLevel(logging.DEBUG)
 
         ch.setFormatter(CustomFormatter())
-        #logger.basicConfig(datefmt='%Y-%m-%d %H:%M:%S')
-
         logger.addHandler(ch)
 
         return logger
+
+    def getNewStream(self):
+        pass
+
+class GUILogger(logging.Handler):
+    def __init__(self):
+        logging.Handler.__init__(self)
+
+    def emit(self, record):
+        # self.edit.textCursor().appendText(self.format(record))
+        self.edit.append(self.format(record))
+
+class CustomGUILogger(object):
+    def __init__(self, owner=None):
+        self.owner = "Logger" if owner is None else owner
+
+    def __del__(self):
+        del self
 
     def getCustomGUILogger(self, TextEditWidget):
         ch = GUILogger()
         
         ch.edit = TextEditWidget
-        ch.setLevel(logging.DEBUG)
+        #ch.setLevel(logging.DEBUG)
         ch.setFormatter(CustomGUIFormatter())
         
-        logger = logging.getLogger().addHandler(ch)
+        #logger = logging.getLogger().addHandler(ch)
+        
+        logger = logging.getLogger(self.owner)
+        
+        if logger.hasHandlers():
+            logger.handlers = []
+        
+        logger.setLevel(logging.DEBUG)
+
+        #ch = logging.StreamHandler(stdout)
+        ch.setLevel(logging.DEBUG)
+
+        #ch.setFormatter(CustomFormatter())
+        logger.addHandler(ch)
         return logger
 
     def getNewStream(self):

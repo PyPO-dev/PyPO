@@ -11,9 +11,6 @@ import src.PyPO.WorldParam as world
 
 PO_modelist = ["JM", "EH", "JMEH", "EHP", "FF", "scalar"]
 
-clog_mgr = CustomLogger(os.path.basename(__file__))
-clog = clog_mgr.getCustomLogger()
-
 ##
 # @file
 # File containing all commonly used checks for PyPO user input.

@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.linalg import svd as svd
+import src.PyPO.WorldParam as world
 ##
 # @file
 # Transformation formalism for PyPO.
@@ -17,8 +18,8 @@ from scipy.linalg import svd as svd
 #
 # @returns matOut Full 4D affine transformation matrix.
 def MatRotate(theta, matAppend=None, pivot=None, radians=False):
-    pivot = np.zeros(3) if pivot is None else pivot
-    matAppend = np.eye(4) if matAppend is None else matAppend
+    pivot = world.ORIGIN if pivot is None else pivot
+    matAppend = world.INITM if matAppend is None else matAppend
 
     if radians:
         theta_x, theta_y, theta_z = theta
@@ -66,7 +67,7 @@ def MatRotate(theta, matAppend=None, pivot=None, radians=False):
 #
 # @returns matOut Full 4D affine transformation matrix.
 def MatTranslate(trans, matAppend=None):
-    matAppend = np.eye(4) if matAppend is None else matAppend
+    matAppend = world.INITM if matAppend is None else matAppend
     xt, yt, zt = trans
     trans = np.array([[1, 0, 0, xt],
                     [0, 1, 0, yt],
@@ -87,7 +88,7 @@ def InvertMat(mat):
     R_T = mat[:3, :3].T
     R_Tt = -R_T @ mat[:3, -1]
 
-    matInv = np.eye(4)
+    matInv = world.INITM
     matInv[:3, :3] = R_T
     matInv[:3, -1] = R_Tt
 

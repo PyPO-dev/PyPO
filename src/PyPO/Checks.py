@@ -7,6 +7,7 @@ nThreads_cpu = os.cpu_count()
 
 from src.PyPO.PyPOTypes import *
 from src.PyPO.CustomLogger import CustomLogger
+import src.PyPO.WorldParam as world
 
 PO_modelist = ["JM", "EH", "JMEH", "EHP", "FF", "scalar"]
 
@@ -40,7 +41,7 @@ def has_CUDA():
 # @param extern Whether this function is called from System or from here.
 #
 # @returns errStr The error string with any new entries appended.
-def check_elemSystem(name, elements, errStr="", extern=False):
+def check_elemSystem(name, elements, clog, errStr="", extern=False):
     if name not in elements:
         errStr += errMsg_noelem(name)
 
@@ -64,7 +65,7 @@ def check_elemSystem(name, elements, errStr="", extern=False):
 # @param extern Whether this function is called from System or from here.
 #
 # @returns errStr The error string with any new entries appended.
-def check_fieldSystem(name, fields, errStr="", extern=False):
+def check_fieldSystem(name, fields, clog, errStr="", extern=False):
     if name not in fields:
         errStr += errMsg_nofield(name)
 
@@ -88,7 +89,7 @@ def check_fieldSystem(name, fields, errStr="", extern=False):
 # @param extern Whether this function is called from System or from here.
 #
 # @returns errStr The error string with any new entries appended.
-def check_currentSystem(name, currents, errStr="", extern=False):
+def check_currentSystem(name, currents, clog, errStr="", extern=False):
     if name not in currents:
         errStr += errMsg_nocurrent(name)
 
@@ -112,7 +113,7 @@ def check_currentSystem(name, currents, errStr="", extern=False):
 # @param extern Whether this function is called from System or from here.
 #
 # @returns errStr The error string with any new entries appended.
-def check_scalarfieldSystem(name, scalarfields, errStr="", extern=False):
+def check_scalarfieldSystem(name, scalarfields, clog, errStr="", extern=False):
     if name not in scalarfields:
         errStr += errMsg_noscalarfield(name)
 
@@ -136,7 +137,7 @@ def check_scalarfieldSystem(name, scalarfields, errStr="", extern=False):
 # @param extern Whether this function is called from System or from here.
 #
 # @returns errStr The error string with any new entries appended.
-def check_frameSystem(name, frames, errStr="", extern=False):
+def check_frameSystem(name, frames, clog, errStr="", extern=False):
     if name not in frames:
         errStr += errMsg_noframe(name)
 
@@ -160,7 +161,7 @@ def check_frameSystem(name, frames, errStr="", extern=False):
 # @param extern Whether this function is called from System or from here.
 #
 # @returns errStr The error string with any new entries appended.
-def check_groupSystem(name, groups, errStr="", extern=False):
+def check_groupSystem(name, groups, clog, errStr="", extern=False):
     if name not in groups:
         errStr += errMsg_nogroup(name)
 
@@ -380,20 +381,20 @@ def block_ndarray(fieldName, elemDict, shape):
 # @param elemName Name of element, string.
 # @param nameList List of names in system dictionary.
 # @param num_ref Number of reflectors in System.
-def check_ElemDict(elemDict, nameList, num_ref):
+def check_ElemDict(elemDict, nameList, num_ref, clog):
     
     errStr = ""
    
-    elemDict["transf"] = np.eye(4)
+    elemDict["transf"] = world.INITM 
    
     if not "pos" in elemDict:
-        elemDict["pos"] = np.zeros(3)
+        elemDict["pos"] = world.ORIGIN
 
     else:
         errStr += block_ndarray("pos", elemDict, (3,))
 
     if not "ori" in elemDict:
-        elemDict["ori"] = np.array([0,0,1])
+        elemDict["ori"] = world.IAX
     
     else:
         errStr += block_ndarray("ori", elemDict, (3,))
@@ -570,7 +571,15 @@ def check_ElemDict(elemDict, nameList, num_ref):
 
         if not (isinstance(elemDict["gridsize"][1], np.int64) or isinstance(elemDict["gridsize"][1], np.int32)):
             errStr += errMsg_type("gridsize[1]", type(elemDict["gridsize"][1]), elemDict["name"], [np.int64, np.int32])
-    
+   
+        if elemDict["gridsize"][0] < 0 or elemDict["gridsize"][1] < 0:
+            clog.warning(f"Negative gridsize encountered in {elemDict['name']}. Changing signs.")
+            elemDict["gridsize"] = np.absolute(elemDict["gridsize"])
+
+    else:
+        errStr += errMsg_field("gridsize", elemDict["name"])
+
+
     if elemDict["name"] in nameList:
         elemDict["name"] = elemDict["name"] + "_{}".format(num_ref)
 
@@ -591,7 +600,7 @@ def check_ElemDict(elemDict, nameList, num_ref):
 # @param namelist List containing names of frames in System.
 #
 # @see TubeRTDict
-def check_TubeRTDict(TubeRTDict, nameList):
+def check_TubeRTDict(TubeRTDict, nameList, clog):
     errStr = ""
     
     if TubeRTDict["name"] in nameList:
@@ -665,7 +674,7 @@ def check_TubeRTDict(TubeRTDict, nameList):
 # @param namelist List containing names of frames in System.
 #
 # @see GRTDict
-def check_GRTDict(GRTDict, nameList):
+def check_GRTDict(GRTDict, nameList, clog):
     errStr = ""
     
     if GRTDict["name"] in nameList:
@@ -733,12 +742,12 @@ def check_GRTDict(GRTDict, nameList):
 # @param runRTDict A runRTDict.
 # @param elements List containing names of surfaces in System.
 # @param frames List containing names of frames in System.
-def check_runRTDict(runRTDict, elements, frames):
+def check_runRTDict(runRTDict, elements, frames, clog):
     errStr = ""
    
     cuda = has_CUDA()
-    errStr = check_frameSystem(runRTDict["fr_in"], frames, errStr)
-    errStr = check_elemSystem(runRTDict["t_name"], elements, errStr)
+    errStr = check_frameSystem(runRTDict["fr_in"], frames, clog, errStr)
+    errStr = check_elemSystem(runRTDict["t_name"], elements, clog, errStr)
 
     if "tol" not in runRTDict:
         runRTDict["tol"] = 1e-3
@@ -792,7 +801,7 @@ def check_runRTDict(runRTDict, elements, frames):
 # @param namelist List containing names of fields in System.
 #
 # @see PSDict
-def check_PSDict(PSDict, nameList):
+def check_PSDict(PSDict, nameList, clog):
     errStr = ""
     
     if PSDict["name"] in nameList:
@@ -847,7 +856,7 @@ def check_PSDict(PSDict, nameList):
 # @param namelist List containing names of fields in System.
 #
 # @see GPODict
-def check_GPODict(GPODict, nameList):
+def check_GPODict(GPODict, nameList, clog):
     errStr = ""
     
     if GPODict["name"] in nameList:
@@ -935,7 +944,7 @@ def check_GPODict(GPODict, nameList):
 # @param elements List containing names of surfaces in System.
 # @param currents List containing names of currents in System.
 # @param scalarfields List containing names of scalarfields in System.
-def check_runPODict(runPODict, elements, currents, scalarfields):
+def check_runPODict(runPODict, elements, currents, scalarfields, clog):
     errStr = ""
 
     cuda = has_CUDA()
@@ -951,12 +960,12 @@ def check_runPODict(runPODict, elements, currents, scalarfields):
             errStr += f"{runPODict['mode']} is not a valid propagation mode.\n"
 
         if "s_current" in runPODict:
-            errStr = check_currentSystem(runPODict["s_current"], currents, errStr)
+            errStr = check_currentSystem(runPODict["s_current"], currents, clog, errStr)
         
         if "s_scalarfield" in runPODict:
-            errStr = check_frameSystem(runPODict["s_scalarfield"], scalarfields, errStr)
+            errStr = check_scalarfieldSystem(runPODict["s_scalarfield"], scalarfields, clog, errStr)
     
-    errStr = check_elemSystem(runPODict["t_name"], elements, errStr)
+    errStr = check_elemSystem(runPODict["t_name"], elements, clog, errStr)
    
     if "epsilon" not in runPODict:
         runPODict["epsilon"] = 1
@@ -996,7 +1005,11 @@ def check_runPODict(runPODict, elements, currents, scalarfields):
 
 ##
 # CHeck if aperture dictionary is valid.
-def check_aperDict(aperDict):
+#
+# @param aperDict An aperture dictionary.
+#
+# @see aperDict
+def check_aperDict(aperDict, clog):
     errStr = ""
 
     if "plot" in aperDict:
@@ -1023,7 +1036,7 @@ def check_aperDict(aperDict):
 # If not, reduces limits to acceptable values.
 #
 # @param ellipsoid A reflDict containing description of ellipsoid surface.
-def check_ellipseLimits(ellipsoid):
+def check_ellipseLimits(ellipsoid, clog):
     buff = 1000
     idx_lim = 0
 

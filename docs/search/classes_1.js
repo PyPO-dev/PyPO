@@ -14,5 +14,6 @@ var searchData=
   ['currents_11',['currents',['../classPyPO_1_1PyPOTypes_1_1currents.html',1,'PyPO::PyPOTypes']]],
   ['currentwidget_12',['CurrentWidget',['../classGUI_1_1ElementWidget_1_1CurrentWidget.html',1,'GUI::ElementWidget']]],
   ['customformatter_13',['CustomFormatter',['../classPyPO_1_1CustomLogger_1_1CustomFormatter.html',1,'PyPO::CustomLogger']]],
-  ['customlogger_14',['CustomLogger',['../classPyPO_1_1CustomLogger_1_1CustomLogger.html',1,'PyPO::CustomLogger']]]
+  ['customguiformatter_14',['CustomGUIFormatter',['../classPyPO_1_1CustomLogger_1_1CustomGUIFormatter.html',1,'PyPO::CustomLogger']]],
+  ['customlogger_15',['CustomLogger',['../classPyPO_1_1CustomLogger_1_1CustomLogger.html',1,'PyPO::CustomLogger']]]
 ];

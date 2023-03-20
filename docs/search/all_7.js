@@ -6,7 +6,7 @@ var searchData=
   ['ge_3',['ge',['../KernelsRTf_8cu.html#a350b15b51a4c71456225db25a9fcc604',1,'ge():&#160;KernelsRTf.cu'],['../classRTRefls.html#aba6423f67d87022681cd6fdc35bfbcc5',1,'RTRefls::ge()']]],
   ['general_4',['General',['../md_doxy_General.html',1,'']]],
   ['generategrid_5',['generateGrid',['../BindRefl_8py.html#aa9dfeca7a9859e01ee39da1059f6cc42',1,'PyPO.BindRefl.generateGrid()'],['../InterfaceReflector_8h.html#a594992f45990be7f641bdebe67b86ac5',1,'generateGrid(reflparams refl, reflcontainer *container, bool transform=true, bool spheric=true):&#160;InterfaceReflector.cpp'],['../InterfaceReflector_8cpp.html#a8a80fa7c30c6a5599a71cc0a95e0c89a',1,'generateGrid(reflparams refl, reflcontainer *container, bool transform, bool spheric):&#160;InterfaceReflector.cpp']]],
-  ['generategridf_6',['generateGridf',['../InterfaceReflector_8h.html#a249d2e73bd32bd263541de114deac9b6',1,'generateGridf(reflparamsf refl, reflcontainerf *container, bool transform=true, bool spheric=true):&#160;InterfaceReflector.cpp'],['../InterfaceReflector_8cpp.html#a22344e70eab920880e0bf3a52afdf55e',1,'generateGridf(reflparamsf refl, reflcontainerf *container, bool transform, bool spheric):&#160;InterfaceReflector.cpp'],['../BindRefl_8py.html#a0a78c553e045c302425078722839c002',1,'PyPO.BindRefl.generateGridf()']]],
+  ['generategridf_6',['generateGridf',['../InterfaceReflector_8cpp.html#a22344e70eab920880e0bf3a52afdf55e',1,'generateGridf(reflparamsf refl, reflcontainerf *container, bool transform, bool spheric):&#160;InterfaceReflector.cpp'],['../InterfaceReflector_8h.html#a249d2e73bd32bd263541de114deac9b6',1,'generateGridf(reflparamsf refl, reflcontainerf *container, bool transform=true, bool spheric=true):&#160;InterfaceReflector.cpp'],['../BindRefl_8py.html#a0a78c553e045c302425078722839c002',1,'PyPO.BindRefl.generateGridf()']]],
   ['generategrids_7',['generateGrids',['../classPyPO_1_1System_1_1System.html#a8b0b3786b3e6593c2f77b51dd9909591',1,'PyPO::System::System']]],
   ['generatepointsource_8',['generatePointSource',['../classPyPO_1_1System_1_1System.html#a0a10825940afc7a0c5bdbf68ada670a9',1,'PyPO::System::System']]],
   ['generatepointsourcescalar_9',['generatePointSourceScalar',['../classPyPO_1_1System_1_1System.html#a6b6f9142b2ffbe533427ecfbe1a11818',1,'PyPO::System::System']]],
@@ -32,5 +32,6 @@ var searchData=
   ['grtdict_29',['GRTDict',['../structGRTDict.html',1,'GRTDict'],['../Templates_8py.html#a096dd833d989be8e6a65d56a18831721',1,'PyPO.Templates.GRTDict()'],['../classPyPO_1_1Structs_1_1GRTDict.html',1,'PyPO.Structs.GRTDict']]],
   ['grtdictf_30',['GRTDictf',['../structGRTDictf.html',1,'GRTDictf'],['../classPyPO_1_1Structs_1_1GRTDictf.html',1,'PyPO.Structs.GRTDictf']]],
   ['gthread_31',['GThread',['../classPyPO_1_1Threadmgr_1_1GThread.html',1,'PyPO::Threadmgr']]],
-  ['gutils_2eh_32',['GUtils.h',['../GUtils_8h.html',1,'']]]
+  ['guilogger_32',['GUILogger',['../classPyPO_1_1CustomLogger_1_1GUILogger.html',1,'PyPO::CustomLogger']]],
+  ['gutils_2eh_33',['GUtils.h',['../GUtils_8h.html',1,'']]]
 ];

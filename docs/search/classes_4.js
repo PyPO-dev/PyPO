@@ -6,5 +6,6 @@ var searchData=
   ['groupwidget_3',['GroupWidget',['../classGUI_1_1ElementWidget_1_1GroupWidget.html',1,'GUI::ElementWidget']]],
   ['grtdict_4',['GRTDict',['../structGRTDict.html',1,'GRTDict'],['../classPyPO_1_1Structs_1_1GRTDict.html',1,'PyPO.Structs.GRTDict']]],
   ['grtdictf_5',['GRTDictf',['../structGRTDictf.html',1,'GRTDictf'],['../classPyPO_1_1Structs_1_1GRTDictf.html',1,'PyPO.Structs.GRTDictf']]],
-  ['gthread_6',['GThread',['../classPyPO_1_1Threadmgr_1_1GThread.html',1,'PyPO::Threadmgr']]]
+  ['gthread_6',['GThread',['../classPyPO_1_1Threadmgr_1_1GThread.html',1,'PyPO::Threadmgr']]],
+  ['guilogger_7',['GUILogger',['../classPyPO_1_1CustomLogger_1_1GUILogger.html',1,'PyPO::CustomLogger']]]
 ];

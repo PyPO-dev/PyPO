@@ -96,10 +96,7 @@ class CustomGUILogger(object):
         ch = GUILogger()
         
         ch.edit = TextEditWidget
-        #ch.setLevel(logging.DEBUG)
         ch.setFormatter(CustomGUIFormatter())
-        
-        #logger = logging.getLogger().addHandler(ch)
         
         logger = logging.getLogger(self.owner)
         
@@ -108,10 +105,8 @@ class CustomGUILogger(object):
         
         logger.setLevel(logging.DEBUG)
 
-        #ch = logging.StreamHandler(stdout)
         ch.setLevel(logging.DEBUG)
 
-        #ch.setFormatter(CustomFormatter())
         logger.addHandler(ch)
         return logger
 

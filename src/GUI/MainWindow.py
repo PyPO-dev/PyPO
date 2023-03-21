@@ -58,13 +58,12 @@ class MainWidget(QWidget):
         # init System
         self.clog_mgr = CustomGUILogger(os.path.basename(__file__))
         self.clog = self.clog_mgr.getCustomGUILogger(self.console)
-        print(self.clog) 
         #self.clog.info(f"STARTED PyPO GUI SESSION.")
         
         self.stm = st.System(redirect=self.clog, context="G")
        
         self.clog = self.stm.getSystemLogger()
-        self.clog.info(f"STARTED PyPO GUI SESSION.")
+        self.clog.info(f"STARTED PYPO GUI SESSION.")
 
         # init layout
         self.grid.setContentsMargins(0,0,0,0)
@@ -739,10 +738,6 @@ class MainWidget(QWidget):
     # Reads form propagates beam, runs calculation on another thread
     def propPOAction(self):
         propBeamDict = self.ParameterWid.read()
-
-        self.stm.setLoggingVerbosity(False)
-
-        self.clog.info("*** Starting PO propagation ***")
       
         if propBeamDict["mode"] == "scalar":
             subStr = "scalar field"
@@ -781,8 +776,6 @@ class MainWidget(QWidget):
         except:
             #self.clog.info("noooo")
             pass
-        
-        self.stm.setLoggingVerbosity(True)
 
     #TODO Unite efficiencies
     ##

@@ -2,7 +2,7 @@ import threading
 import time
 import sys
 
-from PyQt5.QtCore import QObject, QThread, pyqtSignal
+#from PyQt5.QtCore import QObject, QThread, pyqtSignal
 
 from src.PyPO.BindUtils import *
 import src.PyPO.Config as Config
@@ -13,13 +13,13 @@ class Manager(object):
         self.context = context
         self.callback = callback
 
-    def new_gthread(self, target, args, calc_type=None):
-        start_time = time.time()
-        t = GThread(target=target, args=args, parent=self)
-        t.daemon = True
-        t.start()
-        
-        return t
+    #def new_gthread(self, target, args, calc_type=None):
+    #    start_time = time.time()
+    #    t = GThread(target=target, args=args, parent=self)
+    #    t.daemon = True
+    #    t.start()
+    #    
+    #    return t
     
     def new_sthread(self, target, args):
         if self.context == "S":
@@ -42,31 +42,31 @@ class Manager(object):
         if self.callback is not None:
             self.callback()
 
-class GWorker(QObject):
-    finished = pyqtSignal()
-    progress = pyqtSignal(int)
-
-    def __init__(self, target, args):
-        self.target = target
-        self.args = args
-
-    def run(self):
-        self.target(*list(self.args))
-        self.finished.emit()
-
-class GThread(QThread):
-    def __init__(self, target, args, parent=None):
-        self.parent = parent
-        self.target = target
-        self.args = args
-        self.event = threading.Event()
-       
-        super(GThread, self).__init__()
-
-    def run(self):
-        #while not self.event:
-        self.target(*list(self.args)) 
-        self.parent.on_thread_finished()
-   
-    def exit(self):
-        return
+#class GWorker(QObject):
+#    finished = pyqtSignal()
+#    progress = pyqtSignal(int)
+#
+#    def __init__(self, target, args):
+#        self.target = target
+#        self.args = args
+#
+#    def run(self):
+#        self.target(*list(self.args))
+#        self.finished.emit()
+#
+#class GThread(QThread):
+#    def __init__(self, target, args, parent=None):
+#        self.parent = parent
+#        self.target = target
+#        self.args = args
+#        self.event = threading.Event()
+#       
+#        super(GThread, self).__init__()
+#
+#    def run(self):
+#        #while not self.event:
+#        self.target(*list(self.args)) 
+#        self.parent.on_thread_finished()
+#   
+#    def exit(self):
+#        return

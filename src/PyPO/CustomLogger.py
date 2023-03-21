@@ -1,8 +1,6 @@
 import sys
 import logging
 
-from PyQt5.QtCore import pyqtSignal
-
 class CustomFormatter(logging.Formatter):
 
     grey = "\x1b[38;20m"
@@ -105,7 +103,7 @@ class CustomGUILogger(object):
         
         logger.setLevel(logging.DEBUG)
 
-        ch.setLevel(logging.DEBUG)
+        #ch.setLevel(logging.DEBUG)
 
         logger.addHandler(ch)
         return logger

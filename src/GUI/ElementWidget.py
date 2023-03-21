@@ -15,23 +15,24 @@ class MyButton(QPushButton):
         super().__init__(s)
 
 class SymDialog(QDialog):
-    def __init__(self, msg=None):
+    def __init__(self, stopSlot, clog, msg=None):
         self.msg = "" if msg is None else msg
         super().__init__()
+
+        self.clog = clog
 
         layout = QGridLayout()
         abortBtn = QPushButton("Abort")
         abortBtn.clicked.connect(self.reject)
+        abortBtn.clicked.connect(stopSlot)
+        
         layout.addWidget(QLabel(self.msg), 0,0)
         layout.addWidget(abortBtn, 1,0)
         self.setLayout(layout)
 
-    def setThread(self, thread):
-        self.thread = thread
-
-    def killThread(self):
-        self.thread.exit()
-        self.reject()
+    def reject(self):
+        self.clog.info("ABORTED.")
+        super().reject()
 
 class RemoveElementDialog(QDialog):
     def __init__(self, elementName):

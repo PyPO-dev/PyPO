@@ -980,7 +980,7 @@ class System(object):
     #
     # @see PODict
     def runPO(self, runPODict):
-        self.clog.info("*** Starting PO propagation ***")
+        #self.clog.info("*** Starting PO propagation ***")
        
         check_runPODict(runPODict, self.system, self.currents, self.scalarfields, self.clog)
 
@@ -989,14 +989,14 @@ class System(object):
         if _runPODict["mode"] != "scalar":
             sc_name = _runPODict["s_current"]
             _runPODict["s_current"] = self.currents[_runPODict["s_current"]]
-            self.clog.info(f"Propagating {sc_name} on {_runPODict['s_current'].surf} to {_runPODict['t_name']}, propagation mode: {_runPODict['mode']}.")
+            #self.clog.info(f"Propagating {sc_name} on {_runPODict['s_current'].surf} to {_runPODict['t_name']}, propagation mode: {_runPODict['mode']}.")
             source = self.system[_runPODict["s_current"].surf]
             _runPODict["k"] = _runPODict["s_current"].k
 
         else:
             sc_name = _runPODict["s_scalarfield"]
             _runPODict["s_scalarfield"] = self.scalarfields[_runPODict["s_scalarfield"]]
-            self.clog.info(f"Propagating {sc_name} on {_runPODict['s_scalarfield'].surf} to {_runPODict['t_name']}, propagation mode: {_runPODict['mode']}.")
+            #self.clog.info(f"Propagating {sc_name} on {_runPODict['s_scalarfield'].surf} to {_runPODict['t_name']}, propagation mode: {_runPODict['mode']}.")
             source = self.system[_runPODict["s_scalarfield"].surf]
             _runPODict["k"] = _runPODict["s_scalarfield"].k
        
@@ -1006,13 +1006,13 @@ class System(object):
         start_time = time.time()
         
         if _runPODict["device"] == "CPU":
-            self.clog.info(f"Hardware: running {_runPODict['nThreads']} CPU threads.")
-            self.clog.info(f"... Calculating ...")
+            #self.clog.info(f"Hardware: running {_runPODict['nThreads']} CPU threads.")
+            #self.clog.info(f"... Calculating ...")
             out = PyPO_CPUd(source, target, _runPODict)
 
         elif _runPODict["device"] == "GPU":
-            self.clog.info(f"Hardware: running {_runPODict['nThreads']} CUDA threads per block.")
-            self.clog.info(f"... Calculating ...")
+            #self.clog.info(f"Hardware: running {_runPODict['nThreads']} CUDA threads per block.")
+            #self.clog.info(f"... Calculating ...")
             out = PyPO_GPUf(source, target, _runPODict)
 
         dtime = time.time() - start_time
@@ -1042,7 +1042,7 @@ class System(object):
             out.setMeta(_runPODict["t_name"], _runPODict["k"])
             self.scalarfields[_runPODict["name_field"]] = out
 
-        self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
+        #self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
         return out
 
     ##

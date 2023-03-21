@@ -570,7 +570,7 @@ def check_ElemDict(elemDict, nameList, num_ref, clog):
             errStr += errMsg_type("gridsize[1]", type(elemDict["gridsize"][1]), elemDict["name"], [np.int64, np.int32])
    
         if elemDict["gridsize"][0] < 0 or elemDict["gridsize"][1] < 0:
-            clog.warning(f"Negative gridsize encountered in {elemDict['name']}. Changing signs.")
+            clog.warning(f"Negative gridsize encountered in {elemDict['name']}. Changing sign.")
             elemDict["gridsize"] = np.absolute(elemDict["gridsize"])
 
     else:
@@ -602,10 +602,17 @@ def check_TubeRTDict(TubeRTDict, nameList, clog):
     
     if TubeRTDict["name"] in nameList:
         errStr += errMsg_name(TubeRTDict["name"])
+    
+    if TubeRTDict["name"] in nameList:
+        TubeRTDict["name"] = TubeRTDict["name"] + "_{}".format(len(namelist))
 
     if "nRays" in TubeRTDict:
         if not isinstance(TubeRTDict["nRays"], int):
             errStr += errMsg_type("nRays", type(TubeRTDict["nRays"]), "TubeRTDict", int)
+        
+        elif TubeRTDict["nRays"] < 0:
+            clog.warning(f"Negative value {TubeRTDict['nRays']} encountered in TubeRTDict. Changing sign")
+            TubeRTDict["nRays"] *= -1
 
     else:
         errStr += errMsg_field("nRays", "TubeRTDict")
@@ -613,9 +620,13 @@ def check_TubeRTDict(TubeRTDict, nameList, clog):
     if "nRing" in TubeRTDict:
         if not isinstance(TubeRTDict["nRing"], int):
             errStr += errMsg_type("nRing", type(TubeRTDict["nRays"]), "TubeRTDict", int)
+        
+        elif TubeRTDict["nRing"] < 0:
+            clog.warning(f"Negative value {TubeRTDict['nRing']} encountered in TubeRTDict. Changing sign")
+            TubeRTDict["nRing"] *= -1
 
     else:
-        errStr += errMsg_field("nRays", "TubeRTDict")
+        errStr += errMsg_field("nRing", "TubeRTDict")
 
 
     if "angx0" in TubeRTDict:
@@ -676,10 +687,17 @@ def check_GRTDict(GRTDict, nameList, clog):
     
     if GRTDict["name"] in nameList:
         errStr += errMsg_name(GRTDict["name"])
+    
+    if GRTDict["name"] in nameList:
+        GRTDict["name"] = GRTDict["name"] + "_{}".format(len(namelist))
 
     if "nRays" in GRTDict:
         if not isinstance(GRTDict["nRays"], int):
             errStr += errMsg_type("nRays", type(GRTDict["nRays"]), "GRTDict", int)
+
+        elif GRTDict["nRays"] < 0:
+            clog.warning(f"Negative value {GRTDict['nRays']} encountered in GRTDict. Changing sign")
+            GRTDict["nRays"] *= -1
 
     else:
         errStr += errMsg_field("nRays", "GRTDict")
@@ -803,6 +821,9 @@ def check_PSDict(PSDict, nameList, clog):
     
     if PSDict["name"] in nameList:
         errStr += errMsg_name(PSDict["name"])
+    
+    if PSDict["name"] in nameList:
+        PSDict["name"] = PSDict["name"] + "_{}".format(len(nameList))
 
     if "lam" in PSDict:
         if PSDict["lam"] == 0 + 0j:
@@ -858,6 +879,9 @@ def check_GPODict(GPODict, nameList, clog):
     
     if GPODict["name"] in nameList:
         errStr += errMsg_name(GPODict["name"])
+    
+    if GPODict["name"] in nameList:
+        GPODict["name"] = GPODict["name"] + "_{}".format(len(nameList))
 
     if "lam" in GPODict:
         if GPODict["lam"] == 0 + 0j:

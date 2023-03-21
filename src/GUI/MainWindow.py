@@ -2,10 +2,12 @@ import os
 import sys
 import shutil
 import asyncio
+import time
+import threading
 
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar, QScrollArea
 from PyQt5.QtGui import QFont, QIcon, QTextCursor
-from PyQt5.QtCore import Qt, QThread
+from PyQt5.QtCore import Qt, QThreadPool, QThread
 
 from src.GUI.ParameterForms import formGenerator
 from src.GUI.ParameterForms.InputDescription import InputDescription
@@ -16,6 +18,8 @@ from src.GUI.TransformationWidget import TransformationWidget
 from src.GUI.Acccordion import Accordion
 from src.GUI.ElementWidget import ReflectorWidget, FrameWidget, FieldsWidget, CurrentWidget, SFieldsWidget, SymDialog
 from src.GUI.Console import ConsoleGenerator
+from src.GUI.Worker import Worker, GWorker
+
 from src.PyPO.CustomLogger import CustomGUILogger
 
 # from src.GUI.Console import print
@@ -60,7 +64,7 @@ class MainWidget(QWidget):
         self.clog = self.clog_mgr.getCustomGUILogger(self.console)
         #self.clog.info(f"STARTED PyPO GUI SESSION.")
         
-        self.stm = st.System(redirect=self.clog, context="G")
+        self.stm = st.System(redirect=self.clog, context="S")
        
         self.clog = self.stm.getSystemLogger()
         self.clog.info(f"STARTED PYPO GUI SESSION.")
@@ -73,7 +77,10 @@ class MainWidget(QWidget):
         self._mkElementsColumn()
         self._mkPlotScreen()
         self.setLayout(self.grid)
+        
+        self.event_stop = threading.Event()
 
+        self.threadpool = QThreadPool()
 
         # NOTE Raytrace stuff
         self.frameDict = {}
@@ -549,21 +556,28 @@ class MainWidget(QWidget):
         if not "seed" in GRTDict.keys():
             GRTDict["seed"] = -1
         
+        #try:
+        #    dial = SymDialog(dialStr)
+
+        #    self.mgr = TManager.Manager("G", callback=dial.accept)
+        #    t = self.mgr.new_gthread(target=self.stm.createGRTFrame, args=(GRTDict,))
+        #    
+        #    dial.setThread(t)
+
+        #    if dial.exec_():
+        #        self.addFrameWidget(GRTDict["name"])
+      
         try:
             dialStr = f"Calculating Gaussian ray-trace frame {GRTDict['name']}..."
-            dial = SymDialog(dialStr)
+            worker = Worker(self.stm.createGRTFrame, GRTDict)
+            dial = SymDialog(worker.kill, self.clog, dialStr) 
 
-            self.mgr = TManager.Manager("G", callback=dial.accept)
-            t = self.mgr.new_gthread(target=self.stm.createGRTFrame, args=(GRTDict,))
-            
-            dial.setThread(t)
+            worker.signal.finished.connect(dial.accept) 
+            worker.signal.finished.connect(lambda : self.addFrameWidget(GRTDict["name"])) 
 
-            if dial.exec_():
-                self.addFrameWidget(GRTDict["name"])
-      
-            del t
-            #self.stm.createGRTFrame(GRTDict)
-            #self.addFrameWidget(GRTDict["name"])
+            self.threadpool.start(worker)
+            dial.exec_()
+        
         except:
             pass
 
@@ -733,7 +747,25 @@ class MainWidget(QWidget):
     # Shows form to propagate physical optics beam far field 
     def propPOFFForm(self):
         self.setForm(fDataObj.propPOFFInp(self.stm.currents, self.stm.system), self.propPOAction)
+   
+    def _addToWidgets(self, propBeamDict):
+        if propBeamDict["mode"] == "JM":
+            self.addCurrentWidget(propBeamDict["name_JM"])
     
+        elif propBeamDict["mode"] == "EH" or propBeamDict["mode"] == "FF":
+            self.addFieldWidget(propBeamDict["name_EH"])
+    
+        elif propBeamDict["mode"] == "JMEH":
+            self.addCurrentWidget(propBeamDict["name_JM"])
+            self.addFieldWidget(propBeamDict["name_EH"])
+    
+        elif propBeamDict["mode"] == "EHP":
+            self.addFieldWidget(propBeamDict["name_EH"])
+            self.addFrameWidget(propBeamDict["name_P"])
+
+        elif propBeamDict["mode"] == "scalar":
+            self.addSFieldWidget(propBeamDict["name_field"])
+
     ##
     # Reads form propagates beam, runs calculation on another thread
     def propPOAction(self):
@@ -744,38 +776,18 @@ class MainWidget(QWidget):
         else:
             subStr = propBeamDict["mode"]
 
-        try:
-            dialStr = f"Calculating {subStr} on {propBeamDict['t_name']}..."
-            
-            dial = SymDialog(dialStr) 
-            self.mgr = TManager.Manager("G", callback=dial.accept)
-            
-            t = self.mgr.new_gthread(target=self.stm.runPO, args=(propBeamDict,))
-            self.clog.info("ok")
-            #self.t.start()  
-            dial.setThread(t)
+        #try:
+        dialStr = f"Calculating {subStr} on {propBeamDict['t_name']}..."
+        worker = Worker(self.stm.runPO, propBeamDict)
+        dial = SymDialog(worker.kill, self.clog, dialStr) 
 
-            if dial.exec_():
-                if propBeamDict["mode"] == "JM":
-                    self.addCurrentWidget(propBeamDict["name_JM"])
-            
-                elif propBeamDict["mode"] == "EH" or propBeamDict["mode"] == "FF":
-                    self.addFieldWidget(propBeamDict["name_EH"])
-            
-                elif propBeamDict["mode"] == "JMEH":
-                    self.addCurrentWidget(propBeamDict["name_JM"])
-                    self.addFieldWidget(propBeamDict["name_EH"])
-            
-                elif propBeamDict["mode"] == "EHP":
-                    self.addFieldWidget(propBeamDict["name_EH"])
-                    self.addFrameWidget(propBeamDict["name_P"])
-        
-                elif propBeamDict["mode"] == "scalar":
-                    self.addSFieldWidget(propBeamDict["name_field"])
-            
-        except:
-            #self.clog.info("noooo")
-            pass
+        worker.signal.finished.connect(dial.accept) 
+        worker.signal.finished.connect(lambda : self._addToWidgets(propBeamDict)) 
+        self.threadpool.start(worker)
+        dial.exec_()
+
+        #except:
+        #    pass
 
     #TODO Unite efficiencies
     ##

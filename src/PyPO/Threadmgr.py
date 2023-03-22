@@ -13,13 +13,12 @@ class Manager(object):
         self.context = context
         self.callback = callback
 
-    #def new_gthread(self, target, args, calc_type=None):
-    #    start_time = time.time()
-    #    t = GThread(target=target, args=args, parent=self)
-    #    t.daemon = True
-    #    t.start()
-    #    
-    #    return t
+    def new_gthread(self, target, args, calc_type=None):
+        t = threading.Thread(target=target, args=args)
+        t.daemon = True
+        t.start()
+        
+        return t
     
     def new_sthread(self, target, args):
         if self.context == "S":

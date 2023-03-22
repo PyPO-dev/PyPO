@@ -76,7 +76,7 @@ class System(object):
     #
     # @param redirect Redirect all print statements within system to given stdout.
     # @param context Whether system is created in script or in GUI.
-    def __init__(self, redirect=None, context=None, verbose=True):
+    def __init__(self, redirect=None, context=None, threadmgr=None, verbose=True):
         self.num_ref = 0
         self.num_cam = 0
         self.nThreads_cpu = os.cpu_count()
@@ -980,7 +980,7 @@ class System(object):
     #
     # @see PODict
     def runPO(self, runPODict):
-        #self.clog.info("*** Starting PO propagation ***")
+        self.clog.info("*** Starting PO propagation ***")
        
         check_runPODict(runPODict, self.system, self.currents, self.scalarfields, self.clog)
 
@@ -989,14 +989,14 @@ class System(object):
         if _runPODict["mode"] != "scalar":
             sc_name = _runPODict["s_current"]
             _runPODict["s_current"] = self.currents[_runPODict["s_current"]]
-            #self.clog.info(f"Propagating {sc_name} on {_runPODict['s_current'].surf} to {_runPODict['t_name']}, propagation mode: {_runPODict['mode']}.")
+            self.clog.info(f"Propagating {sc_name} on {_runPODict['s_current'].surf} to {_runPODict['t_name']}, propagation mode: {_runPODict['mode']}.")
             source = self.system[_runPODict["s_current"].surf]
             _runPODict["k"] = _runPODict["s_current"].k
 
         else:
             sc_name = _runPODict["s_scalarfield"]
             _runPODict["s_scalarfield"] = self.scalarfields[_runPODict["s_scalarfield"]]
-            #self.clog.info(f"Propagating {sc_name} on {_runPODict['s_scalarfield'].surf} to {_runPODict['t_name']}, propagation mode: {_runPODict['mode']}.")
+            self.clog.info(f"Propagating {sc_name} on {_runPODict['s_scalarfield'].surf} to {_runPODict['t_name']}, propagation mode: {_runPODict['mode']}.")
             source = self.system[_runPODict["s_scalarfield"].surf]
             _runPODict["k"] = _runPODict["s_scalarfield"].k
        
@@ -1006,13 +1006,13 @@ class System(object):
         start_time = time.time()
         
         if _runPODict["device"] == "CPU":
-            #self.clog.info(f"Hardware: running {_runPODict['nThreads']} CPU threads.")
-            #self.clog.info(f"... Calculating ...")
+            self.clog.info(f"Hardware: running {_runPODict['nThreads']} CPU threads.")
+            self.clog.info(f"... Calculating ...")
             out = PyPO_CPUd(source, target, _runPODict)
 
         elif _runPODict["device"] == "GPU":
-            #self.clog.info(f"Hardware: running {_runPODict['nThreads']} CUDA threads per block.")
-            #self.clog.info(f"... Calculating ...")
+            self.clog.info(f"Hardware: running {_runPODict['nThreads']} CUDA threads per block.")
+            self.clog.info(f"... Calculating ...")
             out = PyPO_GPUf(source, target, _runPODict)
 
         dtime = time.time() - start_time
@@ -1042,7 +1042,7 @@ class System(object):
             out.setMeta(_runPODict["t_name"], _runPODict["k"])
             self.scalarfields[_runPODict["name_field"]] = out
 
-        #self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
+        self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
         return out
 
     ##
@@ -1843,6 +1843,69 @@ class System(object):
         testM = MatRotate(r, world.INITM, pivot=None, radians=False)
 
         return r#, testM
+    
+    #############################################################
+    #                                                           #
+    #                         GUI METHODS                       #
+    #                                                           #
+    #############################################################
+    
+    ##
+    # Instantiate a GUI PO propagation. Stores desired output in the system.fields and/or system.currents lists.
+    # If the 'EHP' mode is selected, the reflected Poynting frame is stored in system.frames.
+    #
+    # @param PODict Dictionary containing the PO propagation instructions.
+    #
+    # @see PODict
+    def runGUIPO(self, runPODict):
+        _runPODict = self.copyObj(runPODict)
+
+        if _runPODict["mode"] != "scalar":
+            sc_name = _runPODict["s_current"]
+            _runPODict["s_current"] = self.currents[_runPODict["s_current"]]
+            source = self.system[_runPODict["s_current"].surf]
+            _runPODict["k"] = _runPODict["s_current"].k
+
+        else:
+            sc_name = _runPODict["s_scalarfield"]
+            _runPODict["s_scalarfield"] = self.scalarfields[_runPODict["s_scalarfield"]]
+            source = self.system[_runPODict["s_scalarfield"].surf]
+            _runPODict["k"] = _runPODict["s_scalarfield"].k
+       
+        target = self.system[_runPODict["t_name"]]
+        
+        if _runPODict["device"] == "CPU":
+            out = PyPO_CPUd(source, target, _runPODict)
+
+        elif _runPODict["device"] == "GPU":
+            out = PyPO_GPUf(source, target, _runPODict)
+        
+        if _runPODict["mode"] == "JM":
+            out.setMeta(_runPODict["t_name"], _runPODict["k"])
+            self.currents[_runPODict["name_JM"]] = out
+        
+        elif _runPODict["mode"] == "EH" or _runPODict["mode"] == "FF":
+            out.setMeta(_runPODict["t_name"], _runPODict["k"])
+            self.fields[_runPODict["name_EH"]] = out
+        
+        elif _runPODict["mode"] == "JMEH":
+            out[0].setMeta(_runPODict["t_name"], _runPODict["k"])
+            out[1].setMeta(_runPODict["t_name"], _runPODict["k"])
+            self.currents[_runPODict["name_JM"]] = out[0]
+            self.fields[_runPODict["name_EH"]] = out[1]
+        
+        elif _runPODict["mode"] == "EHP":
+            out[0].setMeta(_runPODict["t_name"], _runPODict["k"])
+            self.fields[_runPODict["name_EH"]] = out[0]
+
+            frame = self.loadFramePoynt(out[1], _runPODict["t_name"])
+            self.frames[_runPODict["name_P"]] = frame
+
+        elif _runPODict["mode"] == "scalar":
+            out.setMeta(_runPODict["t_name"], _runPODict["k"])
+            self.scalarfields[_runPODict["name_field"]] = out
+
+        return out
     
     #############################################################
     #                                                           #

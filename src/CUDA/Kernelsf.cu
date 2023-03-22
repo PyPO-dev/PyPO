@@ -154,6 +154,9 @@ __device__ __inline__ cuFloatComplex expCo(cuFloatComplex z)
  * @param d_xs Array containing source points x-coordinate.
  * @param d_ys Array containing source points y-coordinate.
  * @param d_zs Array containing source points z-coordinate.
+ * @param d_nxs Array containing source normals x-component.
+ * @param d_nys Array containing source normals y-component.
+ * @param d_nzs Array containing source normals z-component.
  * @param d_Jx Array containing source J x-component.
  * @param d_Jy Array containing source J y-component.
  * @param d_Jz Array containing source J z-component.
@@ -166,6 +169,7 @@ __device__ __inline__ cuFloatComplex expCo(cuFloatComplex z)
  * @param d_hi Array of 3 cuFloatComplex, to be filled with H-field at point.
  */
 __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
+                    float *d_nxs, float *d_nys, float *d_nzs,
                     cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
                     cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz,
                     float (&point)[3], float *d_A,
@@ -181,6 +185,8 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
 
     // Arrays of floats
     float source_point[3]; // Container for xyz co-ordinates
+    float source_norm[3];  // Container for xyz source normals
+    float norm_dot_k_hat;  // Source normal dotted with wavevector direction
     float r_vec[3];        // Distance vector between source and target points
     float k_hat[3];        // Unit wavevctor
     float k_arr[3];        // Wavevector
@@ -215,6 +221,12 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
         source_point[0] = d_xs[i];
         source_point[1] = d_ys[i];
         source_point[2] = d_zs[i];
+        
+        source_norm[0] = d_nxs[i];
+        source_norm[1] = d_nys[i];
+        source_norm[2] = d_nzs[i];
+
+        //printf("%f\n", source_norm[2]);
 
         diff(point, source_point, r_vec);
         abs(r_vec, r);
@@ -223,6 +235,10 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
         r_inv = 1 / r;
 
         s_mult(r_vec, r_inv, k_hat);
+
+        dot(source_norm, k_hat, norm_dot_k_hat);
+        if (norm_dot_k_hat < 0) {continue;}
+
         s_mult(k_hat, con[0].x, k_arr);
 
         // e-field
@@ -272,6 +288,9 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
  * @param d_xt Array containing target points x-coordinate.
  * @param d_yt Array containing target points y-coordinate.
  * @param d_zt Array containing target points z-coordinate.
+ * @param d_nxs Array containing source normals x-component.
+ * @param d_nys Array containing source normals y-component.
+ * @param d_nzs Array containing source normals z-component.
  * @param d_nxt Array containing target norms x-component.
  * @param d_nyt Array containing target norms y-component.
  * @param d_nzt Array containing target norms z-component.
@@ -290,6 +309,7 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
  */
 __global__ void GpropagateBeam_0(float *d_xs, float *d_ys, float *d_zs,
                                 float *d_A, float *d_xt, float *d_yt, float *d_zt,
+                                float *d_nxs, float *d_nys, float *d_nzs,
                                 float *d_nxt, float *d_nyt, float *d_nzt,
                                 cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
                                 cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz,
@@ -338,6 +358,7 @@ __global__ void GpropagateBeam_0(float *d_xs, float *d_ys, float *d_zs,
 
         // Calculate total incoming E and H field at point on target
         fieldAtPoint(d_xs, d_ys, d_zs,
+                    d_nxs, d_nys, d_nzs,
                     d_Jx, d_Jy, d_Jz,
                     d_Mx, d_My, d_Mz,
                     point, d_A, d_ei, d_hi);
@@ -414,6 +435,9 @@ __global__ void GpropagateBeam_0(float *d_xs, float *d_ys, float *d_zs,
  * @param d_xt Array containing target points x-coordinate.
  * @param d_yt Array containing target points y-coordinate.
  * @param d_zt Array containing target points z-coordinate.
+ * @param d_nxs Array containing source normals x-component.
+ * @param d_nys Array containing source normals y-component.
+ * @param d_nzs Array containing source normals z-component.
  * @param d_Jx Array containing source J x-component.
  * @param d_Jy Array containing source J y-component.
  * @param d_Jz Array containing source J z-component.
@@ -429,6 +453,7 @@ __global__ void GpropagateBeam_0(float *d_xs, float *d_ys, float *d_zs,
  */
 __global__ void GpropagateBeam_1(float* d_xs, float* d_ys, float* d_zs,
                                 float *d_A, float *d_xt, float *d_yt, float *d_zt,
+                                float *d_nxs, float *d_nys, float *d_nzs,
                                 cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
                                 cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz,
                                 cuFloatComplex *d_Ext, cuFloatComplex *d_Eyt, cuFloatComplex *d_Ezt,
@@ -450,6 +475,7 @@ __global__ void GpropagateBeam_1(float* d_xs, float* d_ys, float* d_zs,
 
         // Calculate total incoming E and H field at point on target
         fieldAtPoint(d_xs, d_ys, d_zs,
+                    d_nxs, d_nys, d_nzs,
                     d_Jx, d_Jy, d_Jz,
                     d_Mx, d_My, d_Mz,
                     point, d_A, d_ei, d_hi);
@@ -476,6 +502,9 @@ __global__ void GpropagateBeam_1(float* d_xs, float* d_ys, float* d_zs,
  * @param d_xt Array containing target points x-coordinate.
  * @param d_yt Array containing target points y-coordinate.
  * @param d_zt Array containing target points z-coordinate.
+ * @param d_nxs Array containing source normals x-component.
+ * @param d_nys Array containing source normals y-component.
+ * @param d_nzs Array containing source normals z-component.
  * @param d_nxt Array containing target norms x-component.
  * @param d_nyt Array containing target norms y-component.
  * @param d_nzt Array containing target norms z-component.
@@ -500,6 +529,7 @@ __global__ void GpropagateBeam_1(float* d_xs, float* d_ys, float* d_zs,
  */
 __global__ void GpropagateBeam_2(float *d_xs, float *d_ys, float *d_zs,
                                 float *d_A, float *d_xt, float *d_yt, float *d_zt,
+                                float *d_nxs, float *d_nys, float *d_nzs,
                                 float *d_nxt, float *d_nyt, float *d_nzt,
                                 cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
                                 cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz,
@@ -550,6 +580,7 @@ __global__ void GpropagateBeam_2(float *d_xs, float *d_ys, float *d_zs,
 
         // Calculate total incoming E and H field at point on target
         fieldAtPoint(d_xs, d_ys, d_zs,
+                    d_nxs, d_nys, d_nzs,
                     d_Jx, d_Jy, d_Jz,
                     d_Mx, d_My, d_Mz,
                     point, d_A, d_ei, d_hi);
@@ -634,6 +665,9 @@ __global__ void GpropagateBeam_2(float *d_xs, float *d_ys, float *d_zs,
  * @param d_xt Array containing target points x-coordinate.
  * @param d_yt Array containing target points y-coordinate.
  * @param d_zt Array containing target points z-coordinate.
+ * @param d_nxs Array containing source normals x-component.
+ * @param d_nys Array containing source normals y-component.
+ * @param d_nzs Array containing source normals z-component.
  * @param d_nxt Array containing target norms x-component.
  * @param d_nyt Array containing target norms y-component.
  * @param d_nzt Array containing target norms z-component.
@@ -655,6 +689,7 @@ __global__ void GpropagateBeam_2(float *d_xs, float *d_ys, float *d_zs,
  */
 __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
                                 float *d_A, float *d_xt, float *d_yt, float *d_zt,
+                                float *d_nxs, float *d_nys, float *d_nzs,
                                 float *d_nxt, float *d_nyt, float *d_nzt,
                                 cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
                                 cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz,
@@ -702,6 +737,7 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
 
         // Calculate total incoming E and H field at point on target
         fieldAtPoint(d_xs, d_ys, d_zs,
+                    d_nxs, d_nys, d_nzs,
                     d_Jx, d_Jy, d_Jz,
                     d_Mx, d_My, d_Mz,
                     point, d_A, d_ei, d_hi);
@@ -1122,7 +1158,7 @@ void callKernelf_JM(c2Bundlef *res, reflparamsf source, reflparamsf target,
     gpuErrchk( cudaMemcpy(d_A, cs->area, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
 
     // Create pointers to target grid and normal vectors
-    float *d_xt, *d_yt, *d_zt, *d_nxt, *d_nyt, *d_nzt;
+    float *d_xt, *d_yt, *d_zt, *d_nxt, *d_nyt, *d_nzt, *d_nxs, *d_nys, *d_nzs;
 
     // Allocate target co-ordinate and normal grids
     gpuErrchk( cudaMalloc((void**)&d_xt, ct->size * sizeof(float)) );
@@ -1133,6 +1169,14 @@ void callKernelf_JM(c2Bundlef *res, reflparamsf source, reflparamsf target,
     gpuErrchk( cudaMemcpy(d_yt, ct->y, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
     gpuErrchk( cudaMemcpy(d_zt, ct->z, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
 
+    gpuErrchk( cudaMalloc((void**)&d_nxs, cs->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_nys, cs->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_nzs, cs->size * sizeof(float)) );
+
+    gpuErrchk( cudaMemcpy(d_nxs, cs->nx, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_nys, cs->ny, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_nzs, cs->nz, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    
     gpuErrchk( cudaMalloc((void**)&d_nxt, ct->size * sizeof(float)) );
     gpuErrchk( cudaMalloc((void**)&d_nyt, ct->size * sizeof(float)) );
     gpuErrchk( cudaMalloc((void**)&d_nzt, ct->size * sizeof(float)) );
@@ -1204,6 +1248,7 @@ void callKernelf_JM(c2Bundlef *res, reflparamsf source, reflparamsf target,
     // Call to KERNEL 0
     GpropagateBeam_0<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs,
                                 d_A, d_xt, d_yt, d_zt,
+                                d_nxs, d_nys, d_nzs,
                                 d_nxt, d_nyt, d_nzt,
                                 d_Jx, d_Jy, d_Jz,
                                 d_Mx, d_My, d_Mz,
@@ -1282,7 +1327,7 @@ void callKernelf_EH(c2Bundlef *res, reflparamsf source, reflparamsf target,
     BT = _initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
     //alsd
     // Create pointers to device arrays and allocate/copy source grid and area.
-    float *d_xs, *d_ys, *d_zs, *d_A;
+    float *d_xs, *d_ys, *d_zs, *d_A, *d_nxs, *d_nys, *d_nzs;
 
     gpuErrchk( cudaMalloc((void**)&d_xs, cs->size * sizeof(float)) );
     gpuErrchk( cudaMalloc((void**)&d_ys, cs->size * sizeof(float)) );
@@ -1304,6 +1349,14 @@ void callKernelf_EH(c2Bundlef *res, reflparamsf source, reflparamsf target,
     gpuErrchk( cudaMemcpy(d_yt, ct->y, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
     gpuErrchk( cudaMemcpy(d_zt, ct->z, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
 
+    gpuErrchk( cudaMalloc((void**)&d_nxs, cs->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_nys, cs->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_nzs, cs->size * sizeof(float)) );
+
+    gpuErrchk( cudaMemcpy(d_nxs, cs->nx, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_nys, cs->ny, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_nzs, cs->nz, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    
     cuFloatComplex *h_Jx = new cuFloatComplex[cs->size];
     cuFloatComplex *h_Jy = new cuFloatComplex[cs->size];
     cuFloatComplex *h_Jz = new cuFloatComplex[cs->size];
@@ -1367,6 +1420,7 @@ void callKernelf_EH(c2Bundlef *res, reflparamsf source, reflparamsf target,
     // Call to KERNEL 1
     GpropagateBeam_1<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs,
                                 d_A, d_xt, d_yt, d_zt,
+                                d_nxs, d_nys, d_nzs,
                                 d_Jx, d_Jy, d_Jz,
                                 d_Mx, d_My, d_Mz,
                                 d_Ext, d_Eyt, d_Ezt,
@@ -1445,7 +1499,7 @@ void callKernelf_JMEH(c4Bundlef *res, reflparamsf source, reflparamsf target,
     BT = _initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
 
     // Create pointers to device arrays and allocate/copy source grid and area.
-    float *d_xs, *d_ys, *d_zs, *d_A;
+    float *d_xs, *d_ys, *d_zs, *d_A, *d_nxs, *d_nys, *d_nzs;
 
     gpuErrchk( cudaMalloc((void**)&d_xs, cs->size * sizeof(float)) );
     gpuErrchk( cudaMalloc((void**)&d_ys, cs->size * sizeof(float)) );
@@ -1469,6 +1523,14 @@ void callKernelf_JMEH(c4Bundlef *res, reflparamsf source, reflparamsf target,
     gpuErrchk( cudaMemcpy(d_yt, ct->y, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
     gpuErrchk( cudaMemcpy(d_zt, ct->z, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
 
+    gpuErrchk( cudaMalloc((void**)&d_nxs, cs->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_nys, cs->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_nzs, cs->size * sizeof(float)) );
+
+    gpuErrchk( cudaMemcpy(d_nxs, cs->nx, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_nys, cs->ny, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_nzs, cs->nz, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    
     gpuErrchk( cudaMalloc((void**)&d_nxt, ct->size * sizeof(float)) );
     gpuErrchk( cudaMalloc((void**)&d_nyt, ct->size * sizeof(float)) );
     gpuErrchk( cudaMalloc((void**)&d_nzt, ct->size * sizeof(float)) );
@@ -1550,6 +1612,7 @@ void callKernelf_JMEH(c4Bundlef *res, reflparamsf source, reflparamsf target,
     // Call to KERNEL 2
     GpropagateBeam_2<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs,
                                    d_A, d_xt, d_yt, d_zt,
+                                   d_nxs, d_nys, d_nzs,
                                    d_nxt, d_nyt, d_nzt,
                                    d_Jx, d_Jy, d_Jz,
                                    d_Mx, d_My, d_Mz,
@@ -1660,7 +1723,7 @@ void callKernelf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf target,
     BT = _initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
 
     // Create pointers to device arrays and allocate/copy source grid and area.
-    float *d_xs, *d_ys, *d_zs, *d_A;
+    float *d_xs, *d_ys, *d_zs, *d_A, *d_nxs, *d_nys, *d_nzs;
 
     gpuErrchk( cudaMalloc((void**)&d_xs, cs->size * sizeof(float)) );
     gpuErrchk( cudaMalloc((void**)&d_ys, cs->size * sizeof(float)) );
@@ -1682,6 +1745,14 @@ void callKernelf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf target,
     gpuErrchk( cudaMemcpy(d_yt, ct->y, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
     gpuErrchk( cudaMemcpy(d_zt, ct->z, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
 
+    gpuErrchk( cudaMalloc((void**)&d_nxs, cs->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_nys, cs->size * sizeof(float)) );
+    gpuErrchk( cudaMalloc((void**)&d_nzs, cs->size * sizeof(float)) );
+
+    gpuErrchk( cudaMemcpy(d_nxs, cs->nx, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_nys, cs->ny, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_nzs, cs->nz, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    
     gpuErrchk( cudaMalloc((void**)&d_nxt, ct->size * sizeof(float)) );
     gpuErrchk( cudaMalloc((void**)&d_nyt, ct->size * sizeof(float)) );
     gpuErrchk( cudaMalloc((void**)&d_nzt, ct->size * sizeof(float)) );
@@ -1757,6 +1828,7 @@ void callKernelf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf target,
     // Call to KERNEL 3
     GpropagateBeam_3<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs,
                                 d_A, d_xt, d_yt, d_zt,
+                                d_nxs, d_nys, d_nzs,
                                 d_nxt, d_nyt, d_nzt,
                                 d_Jx, d_Jy, d_Jz,
                                 d_Mx, d_My, d_Mz,

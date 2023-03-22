@@ -734,11 +734,13 @@ std::array<std::array<std::complex<T>, 3>, 2> Propagation<T, U, V, W>::fieldAtPo
     T r;                           // Distance between source and target points
     T r_inv;                       // 1 / r
     T omega;                       // Angular frequency of field
+    T norm_dot_k_hat;              // Source normal dotted with wavevector direction
     std::complex<T> Green;         // Container for Green's function
     std::complex<T> r_in_s;        // Container for inner products between wavevctor and currents
 
     // Arrays of Ts
     std::array<T, 3> source_point; // Container for xyz co-ordinates
+    std::array<T, 3> source_norm;  // Container for xyz normals.
     std::array<T, 3> r_vec;        // Distance vector between source and target points
     std::array<T, 3> k_hat;        // Unit wavevctor
     std::array<T, 3> k_arr;        // Wavevector
@@ -767,6 +769,10 @@ std::array<std::array<std::complex<T>, 3>, 2> Propagation<T, U, V, W>::fieldAtPo
         source_point[0] = cs->x[i];
         source_point[1] = cs->y[i];
         source_point[2] = cs->z[i];
+        
+        source_norm[0] = cs->nx[i];
+        source_norm[1] = cs->ny[i];
+        source_norm[2] = cs->nz[i];
 
         js[0] = {currents->r1x[i], currents->i1x[i]};
         js[1] = {currents->r1y[i], currents->i1y[i]};
@@ -782,6 +788,11 @@ std::array<std::array<std::complex<T>, 3>, 2> Propagation<T, U, V, W>::fieldAtPo
         r_inv = 1 / r;
 
         ut.s_mult(r_vec, r_inv, k_hat);
+
+        // Check if source point illuminates target point or not.
+        ut.dot(source_norm, k_hat, norm_dot_k_hat);
+        if (norm_dot_k_hat < 0) {continue;}
+
         ut.s_mult(k_hat, k, k_arr);
 
         // e-field

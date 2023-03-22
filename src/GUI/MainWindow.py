@@ -30,6 +30,7 @@ sys.path.append('../')
 sys.path.append('../../')
 import src.PyPO.System as st
 import src.PyPO.Threadmgr as TManager
+import src.PyPO.Checks as chk
 
 ##
 # @file 
@@ -768,28 +769,76 @@ class MainWidget(QWidget):
 
     ##
     # Reads form propagates beam, runs calculation on another thread
+    #def propPOAction(self):
+    #    propBeamDict = self.ParameterWid.read()
+    #    
+    #    chk.check_runPODict(propBeamDict, self.stm.system, self.stm.currents, self.stm.scalarfields, self.clog)
+    #  
+    #    if propBeamDict["mode"] == "scalar":
+    #        subStr = "scalar field"
+    #    else:
+    #        subStr = propBeamDict["mode"]
+
+    #    start_time = time.time()
+    #    
+    #    try:
+    #        self.clog.info("*** Starting PO propagation ***")
+    #        
+    #        dialStr = f"Calculating {subStr} on {propBeamDict['t_name']}..."
+    #        worker = Worker(self.stm.runGUIPO, propBeamDict)
+    #        dial = SymDialog(worker.kill, self.clog, dialStr) 
+
+    #        worker.signal.finished.connect(dial.accept) 
+    #        worker.signal.finished.connect(lambda : self._addToWidgets(propBeamDict)) 
+    #        
+    #        
+    #        self.threadpool.start(worker)
+    #        dial.exec_()
+
+    #    except:
+    #        pass
+    #    
+    #    dtime = time.time() - start_time
+    #    self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
+    
     def propPOAction(self):
         propBeamDict = self.ParameterWid.read()
+        chk.check_runPODict(propBeamDict, self.stm.system, self.stm.currents, self.stm.scalarfields, self.clog)
       
         if propBeamDict["mode"] == "scalar":
             subStr = "scalar field"
         else:
             subStr = propBeamDict["mode"]
 
-        #try:
         dialStr = f"Calculating {subStr} on {propBeamDict['t_name']}..."
-        worker = Worker(self.stm.runPO, propBeamDict)
-        dial = SymDialog(worker.kill, self.clog, dialStr) 
 
-        worker.signal.finished.connect(dial.accept) 
-        worker.signal.finished.connect(lambda : self._addToWidgets(propBeamDict)) 
-        self.threadpool.start(worker)
-        dial.exec_()
+        dial = SymDialog(self.clog, dialStr)
 
-        #except:
-        #    pass
+        self.mgr = TManager.Manager("G", callback=dial.accept)
+        t = self.mgr.new_gthread(target=self.stm.runGUIPO, args=(propBeamDict,), calc_type=propBeamDict["mode"])
+        
+        dial.setThread(t)
 
-    #TODO Unite efficiencies
+        if dial.exec_():
+            if propBeamDict["mode"] == "JM":
+                self.ElementsColumn.POCurrents.addWidget(CurrentWidget(propBeamDict["name_JM"], self.stm.removeCurrent, self.setPlotCurrentFormOpt))
+        
+            elif propBeamDict["mode"] == "EH" or propBeamDict["mode"] == "FF":
+                self.ElementsColumn.POFields.addWidget(FieldsWidget(propBeamDict["name_EH"], self.stm.removeField, self.setPlotFieldFormOpt))
+        
+            elif propBeamDict["mode"] == "JMEH":
+                self.ElementsColumn.POCurrents.addWidget(CurrentWidget(propBeamDict["name_JM"], self.stm.removeCurrent, self.setPlotCurrentFormOpt))
+                self.ElementsColumn.POFields.addWidget(FieldsWidget(propBeamDict["name_EH"], self.stm.removeField, self.setPlotFieldFormOpt))
+        
+            elif propBeamDict["mode"] == "EHP":
+                self.ElementsColumn.POFields.addWidget(FieldsWidget(propBeamDict["name_EH"], self.stm.removeField, self.setPlotFieldFormOpt))
+                self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(propBeamDict["name_P"], 
+                                self.stm.removeFrame, self.setPlotFrameFormOpt,self.calcRMSfromFrame))
+    
+            elif propBeamDict["mode"] == "scalar":
+                self.ElementsColumn.SPOFields.addWidget(SFieldsWidget(propBeamDict["name_field"], self.stm.removeScalarField, self.setPlotSFieldFormOpt))
+    #
+    ##TODO Unite efficiencies
     ##
     # Shows form to calculate taper efficientie
     def setTaperEffsForm(self):

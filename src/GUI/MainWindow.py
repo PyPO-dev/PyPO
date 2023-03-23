@@ -213,7 +213,7 @@ class MainWidget(QWidget):
     ##
     # Generate a snapshot form for a group.
     def snapGroupActionForm(self, group):
-        self.setForm(fDataObj.snapForm(element, list(self.stm.groups[group]["snapshots"].keys()), "group"), readAction=self.snapAction)
+        self.setForm(fDataObj.snapForm(group, list(self.stm.groups[group]["snapshots"].keys()), "group"), readAction=self.snapAction)
  
     ##
     # Generate a snapshot form for ray-trace frame.
@@ -346,6 +346,7 @@ class MainWidget(QWidget):
             self.refreshColumn(self.stm.fields, "fields")
             self.refreshColumn(self.stm.currents, "currents")
             self.refreshColumn(self.stm.scalarfields, "scalarfields")
+            self.refreshColumn(self.stm.groups, "groups")
         except Exception as err:
             print(err)
             traceback.print_tb(err.__traceback__)
@@ -370,6 +371,33 @@ class MainWidget(QWidget):
             traceback.print_tb(err.__traceback__)
             self.clog.error(err)
     
+    def addGroupForm(self):
+        elems = []
+        # print(self.stm.system)
+        for element in self.stm.system.values():
+            # print(element)
+            if element["gmode"] != 2:
+                elems.append(element["name"])
+        self.setForm(fDataObj.addGroupForm(elems), self.addGroupAction)
+
+    def addGroupAction(self):
+        try:
+            groupDict = self.ParameterWid.read()
+            self.stm.groupElements(groupDict["name"], *groupDict["selected"])
+
+            self.addGroupWidget(groupDict["name"])
+
+
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err) 
+
+
+
+
+
+
     ##
     # TODO: @Maikel Rename this function and evaluate its nessecity
     def refreshColumn(self, columnDict, columnType):
@@ -390,6 +418,9 @@ class MainWidget(QWidget):
 
             elif columnType == "scalarfields":
                 self.addSFieldWidget(key)
+                
+            elif columnType == "groups":
+                self.addSFieldWidget(key)
 
     ### Functionalities: Adding Elements in gui
     # TODO:doc
@@ -400,7 +431,7 @@ class MainWidget(QWidget):
         # self.ElementsColumn.reflectors.addWidget(ReflectorWidget(name, self.removeElement, self.transformSingleForm, self.plotElement, self.snapActionForm)) 
     
     def addGroupWidget(self, name):
-        self.ElementsColumn.addGroup(name, self.stm.removeGroup, self.plotGroup, self.snapGroupActionForm)
+        self.ElementsColumn.addGroup(name, self.stm.removeGroup, self.plotGroup, self.transformGroupForm, self.snapGroupActionForm)
     
     def addFrameWidget(self, name):
         self.ElementsColumn.addRayTraceFrames(name, self.removeFrame, 
@@ -528,6 +559,30 @@ class MainWidget(QWidget):
             elif transformationType == "Rotation":
                 self.stm.rotateGrids(dd["element"], vector, pivot=dd["pivot"], mode=dd["mode"].lower())
                 # print(f'Rotated {dd["element"]} by {self._formatVector(vector)} deg around {self._formatVector(dd["pivot"])}')
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
+
+    ### Functionalities: Transforming Groups 
+
+    ##
+    # Shows group transformation form
+    def transformGroupForm(self, group):
+        self.setForm(fDataObj.makeTransformationForm(group, obj="group"), self.transformGroupAction)
+    
+    ##
+    # Applies group transformation
+    def transformGroupAction(self, element):
+        dd = self.ParameterWid.read()
+        transformationType = dd["type"]
+        vector = dd["vector"]
+
+        try:
+            if transformationType == "Translation":
+                self.stm.translateGrids(dd["group"], vector, mode=dd["mode"].lower(), obj="group")
+            elif transformationType == "Rotation":
+                self.stm.rotateGrids(dd["group"], vector, pivot=dd["pivot"], mode=dd["mode"].lower(), obj="group")
         except Exception as err:
             print(err)
             traceback.print_tb(err.__traceback__)
@@ -1007,14 +1062,20 @@ class PyPOMainWindow(QMainWindow):
         transformElementsAction.setStatusTip("Transform a group of elements.")
         transformElementsAction.triggered.connect(self.mainWid.transformationMultipleForm)
         ElementsMenu.addAction(transformElementsAction)
-        
 
+        # ElementsMenu.addSeparator()
+        
+        addGroupAction = QAction("Add group", self)
+        addGroupAction.setStatusTip("Adds showsForm to add group")
+        addGroupAction.triggered.connect(self.mainWid.addGroupForm)
+        ElementsMenu.addAction(addGroupAction)
+        
     ### System actions
         # newSystem = QAction('Add System', self)
         # newSystem.triggered.connect(self.mainWid.addSystemAction)
         # SystemsMenu.addAction(newSystem)
 
-        plotSystem = QAction("Plot System", self)
+        plotSystem = QAction("Plot system", self)
         plotSystem.setStatusTip("Plot all elements in the current system.")
         plotSystem.triggered.connect(self.mainWid.plotSystem)
         SystemsMenu.addAction(plotSystem)
@@ -1117,6 +1178,8 @@ class PyPOMainWindow(QMainWindow):
         FocusFind.setToolTip("Calculate the focus co-ordinates of a ray-trace beam.")
         FocusFind.triggered.connect(self.mainWid.setFocusFindForm)
         ToolsMenu.addAction(FocusFind)
+
+
         #findRTfocusAction.triggered.connect(self.mainWid.set)
 
 

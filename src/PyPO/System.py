@@ -1714,7 +1714,7 @@ class System(object):
 
         if ret:
             fig, ax = self.plotSystem(select=select, show=False, ret=True)
-
+            return fig,ax
         else:
             self.plotSystem(select=select, show=show)
 

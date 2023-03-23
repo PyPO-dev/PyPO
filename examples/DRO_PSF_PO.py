@@ -29,7 +29,7 @@ def ex_DRO_PO(device):
     plane = {
             "name"      : "plane1",
             "gmode"     : "xy",
-            "flip"      : False,
+            "flip"      : True,
             "lims_x"    : np.array([-0.1,0.1]),
             "lims_y"    : np.array([-0.1,0.1]),
             "gridsize"  : np.array([3, 3])
@@ -62,8 +62,8 @@ def ex_DRO_PO(device):
     s.generatePointSource(PSDict, "plane1") 
 
     translation = np.array([0, 0, 12e3])# + np.array([210, 210, -210])
-    rotation_plane = np.array([180, 0, 0])
-    s.rotateGrids("plane1", rotation_plane)
+    #rotation_plane = np.array([180, 0, 0])
+    #s.rotateGrids("plane1", rotation_plane)
     s.translateGrids("plane1", translation)
     #s.rotateGrids(["p1", "plane1"], np.array([1, 0, 0]))
 

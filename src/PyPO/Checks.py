@@ -975,7 +975,10 @@ def check_runPODict(runPODict, elements, currents, scalarfields, clog):
 
     if "mode" not in runPODict:
         errStr += f"Please provide propagation mode.\n"
-    
+   
+    if "t_name" in runPODict:
+        check_elemSystem(runPODict["t_name"], elements, clog)
+
     else:
         if runPODict["mode"] not in PO_modelist:
             errStr += f"{runPODict['mode']} is not a valid propagation mode.\n"

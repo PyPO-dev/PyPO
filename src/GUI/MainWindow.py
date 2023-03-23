@@ -769,40 +769,9 @@ class MainWidget(QWidget):
 
     ##
     # Reads form propagates beam, runs calculation on another thread
-    #def propPOAction(self):
-    #    propBeamDict = self.ParameterWid.read()
-    #    
-    #    chk.check_runPODict(propBeamDict, self.stm.system, self.stm.currents, self.stm.scalarfields, self.clog)
-    #  
-    #    if propBeamDict["mode"] == "scalar":
-    #        subStr = "scalar field"
-    #    else:
-    #        subStr = propBeamDict["mode"]
-
-    #    start_time = time.time()
-    #    
-    #    try:
-    #        self.clog.info("*** Starting PO propagation ***")
-    #        
-    #        dialStr = f"Calculating {subStr} on {propBeamDict['t_name']}..."
-    #        worker = Worker(self.stm.runGUIPO, propBeamDict)
-    #        dial = SymDialog(worker.kill, self.clog, dialStr) 
-
-    #        worker.signal.finished.connect(dial.accept) 
-    #        worker.signal.finished.connect(lambda : self._addToWidgets(propBeamDict)) 
-    #        
-    #        
-    #        self.threadpool.start(worker)
-    #        dial.exec_()
-
-    #    except:
-    #        pass
-    #    
-    #    dtime = time.time() - start_time
-    #    self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
-    
     def propPOAction(self):
         propBeamDict = self.ParameterWid.read()
+        
         chk.check_runPODict(propBeamDict, self.stm.system, self.stm.currents, self.stm.scalarfields, self.clog)
       
         if propBeamDict["mode"] == "scalar":
@@ -810,33 +779,64 @@ class MainWidget(QWidget):
         else:
             subStr = propBeamDict["mode"]
 
+        start_time = time.time()
+        
+        #try:
+        self.clog.info("*** Starting PO propagation ***")
+        
         dialStr = f"Calculating {subStr} on {propBeamDict['t_name']}..."
+        worker = Worker(self.stm.runGUIPO, propBeamDict)
+        dial = SymDialog(worker.kill, self.clog, dialStr) 
 
-        dial = SymDialog(self.clog, dialStr)
+        worker.signal.finished.connect(dial.accept) 
+        worker.signal.finished.connect(lambda : self._addToWidgets(propBeamDict)) 
+        
+        
+        self.threadpool.start(worker)
+        dial.exec_()
 
-        self.mgr = TManager.Manager("G", callback=dial.accept)
-        t = self.mgr.new_gthread(target=self.stm.runGUIPO, args=(propBeamDict,), calc_type=propBeamDict["mode"])
+        #except:
+        #    pass
         
-        dial.setThread(t)
-
-        if dial.exec_():
-            if propBeamDict["mode"] == "JM":
-                self.ElementsColumn.POCurrents.addWidget(CurrentWidget(propBeamDict["name_JM"], self.stm.removeCurrent, self.setPlotCurrentFormOpt))
-        
-            elif propBeamDict["mode"] == "EH" or propBeamDict["mode"] == "FF":
-                self.ElementsColumn.POFields.addWidget(FieldsWidget(propBeamDict["name_EH"], self.stm.removeField, self.setPlotFieldFormOpt))
-        
-            elif propBeamDict["mode"] == "JMEH":
-                self.ElementsColumn.POCurrents.addWidget(CurrentWidget(propBeamDict["name_JM"], self.stm.removeCurrent, self.setPlotCurrentFormOpt))
-                self.ElementsColumn.POFields.addWidget(FieldsWidget(propBeamDict["name_EH"], self.stm.removeField, self.setPlotFieldFormOpt))
-        
-            elif propBeamDict["mode"] == "EHP":
-                self.ElementsColumn.POFields.addWidget(FieldsWidget(propBeamDict["name_EH"], self.stm.removeField, self.setPlotFieldFormOpt))
-                self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(propBeamDict["name_P"], 
-                                self.stm.removeFrame, self.setPlotFrameFormOpt,self.calcRMSfromFrame))
+        dtime = time.time() - start_time
+        self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
     
-            elif propBeamDict["mode"] == "scalar":
-                self.ElementsColumn.SPOFields.addWidget(SFieldsWidget(propBeamDict["name_field"], self.stm.removeScalarField, self.setPlotSFieldFormOpt))
+    #def propPOAction(self):
+    #    propBeamDict = self.ParameterWid.read()
+    #    chk.check_runPODict(propBeamDict, self.stm.system, self.stm.currents, self.stm.scalarfields, self.clog)
+    #  
+    #    if propBeamDict["mode"] == "scalar":
+    #        subStr = "scalar field"
+    #    else:
+    #        subStr = propBeamDict["mode"]
+
+    #    dialStr = f"Calculating {subStr} on {propBeamDict['t_name']}..."
+
+    #    dial = SymDialog(self.clog, dialStr)
+
+    #    self.mgr = TManager.Manager("G", callback=dial.accept)
+    #    t = self.mgr.new_gthread(target=self.stm.runGUIPO, args=(propBeamDict,), calc_type=propBeamDict["mode"])
+    #    
+    #    dial.setThread(t)
+
+    #    if dial.exec_():
+    #        if propBeamDict["mode"] == "JM":
+    #            self.ElementsColumn.POCurrents.addWidget(CurrentWidget(propBeamDict["name_JM"], self.stm.removeCurrent, self.setPlotCurrentFormOpt))
+    #    
+    #        elif propBeamDict["mode"] == "EH" or propBeamDict["mode"] == "FF":
+    #            self.ElementsColumn.POFields.addWidget(FieldsWidget(propBeamDict["name_EH"], self.stm.removeField, self.setPlotFieldFormOpt))
+    #    
+    #        elif propBeamDict["mode"] == "JMEH":
+    #            self.ElementsColumn.POCurrents.addWidget(CurrentWidget(propBeamDict["name_JM"], self.stm.removeCurrent, self.setPlotCurrentFormOpt))
+    #            self.ElementsColumn.POFields.addWidget(FieldsWidget(propBeamDict["name_EH"], self.stm.removeField, self.setPlotFieldFormOpt))
+    #    
+    #        elif propBeamDict["mode"] == "EHP":
+    #            self.ElementsColumn.POFields.addWidget(FieldsWidget(propBeamDict["name_EH"], self.stm.removeField, self.setPlotFieldFormOpt))
+    #            self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(propBeamDict["name_P"], 
+    #                            self.stm.removeFrame, self.setPlotFrameFormOpt,self.calcRMSfromFrame))
+    #
+    #        elif propBeamDict["mode"] == "scalar":
+    #            self.ElementsColumn.SPOFields.addWidget(SFieldsWidget(propBeamDict["name_field"], self.stm.removeScalarField, self.setPlotSFieldFormOpt))
     #
     ##TODO Unite efficiencies
     ##
@@ -864,7 +864,7 @@ class MainWidget(QWidget):
     def calcTaperAction(self):
         TaperDict = self.ParameterWid.read()
         eff_taper = self.stm.calcTaper(TaperDict["f_name"], TaperDict["comp"])
-        # print(f'Taper efficiency of {TaperDict["f_name"]}, component {TaperDict["comp"]} = {eff_taper}\n')
+        self.clog.info(f'Taper efficiency of {TaperDict["f_name"]}, component {TaperDict["comp"]} : {eff_taper}')
     
     ##
     # Reads form and calculates spillover efficientie
@@ -878,21 +878,21 @@ class MainWidget(QWidget):
                 }
 
         eff_spill = self.stm.calcSpillover(SpillDict["f_name"], SpillDict["comp"], aperDict)
-        # print(f'Spillover efficiency of {SpillDict["f_name"]}, component {SpillDict["comp"]} = {eff_spill}\n')
+        self.clog.info(f'Spillover efficiency of {SpillDict["f_name"]}, component {SpillDict["comp"]} : {eff_spill}')
     
     ##
     # Reads form and calculates x-pol efficientie TODO: x-pol?
     def calcXpolAction(self):
         XpolDict = self.ParameterWid.read()
         eff_Xpol = self.stm.calcXpol(XpolDict["f_name"], XpolDict["co_comp"], XpolDict["cr_comp"])
-        # print(f'X-pol efficiency of {XpolDict["f_name"]}, co-component {XpolDict["co_comp"]} and X-component {XpolDict["cr_comp"]} = {eff_Xpol}\n')
+        self.clog.info(f'X-pol efficiency of {XpolDict["f_name"]}, co-component {XpolDict["co_comp"]} and X-component {XpolDict["cr_comp"]} : {eff_Xpol}')
 
     ##
     # Reads form and calculates main beam efficientie
     def calcMBAction(self):
         MBDict = self.ParameterWid.read()
         eff_mb = self.stm.calcMainBeam(MBDict["f_name"], MBDict["comp"], MBDict["thres"], MBDict["mode"])
-        # print(f'Main beam efficiency of {MBDict["f_name"]}, component {MBDict["comp"]} = {eff_mb}\n')
+        self.clog.info(f'Main beam efficiency of {MBDict["f_name"]}, component {MBDict["comp"]} : {eff_mb}')
         self.addSFieldWidget(f"fitGauss_{MBDict['f_name']}")
 
     
@@ -902,7 +902,7 @@ class MainWidget(QWidget):
     # calculates root mean square of a frame
     def calcRMSfromFrame(self, frame):
         rms = self.stm.calcSpotRMS(frame)
-        # print(f"RMS value of {frame} = {rms} mm\n")
+        self.clog.info(f"RMS value of {frame} : {rms} mm")
 
     def setFocusFindForm(self):
         self.setForm(fDataObj.focusFind(list(self.stm.frames.keys())), self.findFocusAction)
@@ -911,7 +911,7 @@ class MainWidget(QWidget):
         # print(self.ParameterWid.read())
         findFocusDict = self.ParameterWid.read()
         focus = self.stm.findRTfocus(findFocusDict["name_frame"], verbose=True) 
-        # print(f"Focus of {findFocusDict['name_frame']} = {focus}\n")
+        self.clog.info(f"Focus of {findFocusDict['name_frame']} : {focus}")
 
 class PyPOMainWindow(QMainWindow):
     def __init__(self, parent=None):
@@ -1058,7 +1058,7 @@ class PyPOMainWindow(QMainWindow):
         initPropFFAction.triggered.connect(self.mainWid.propPOFFForm)
         propBeam.addAction(initPropFFAction)
 
-        calcEffs = PhysOptMenu.addMenu("Efficiencies")
+        calcEffs = ToolsMenu.addMenu("Efficiencies")
         calcSpillEffsAction = QAction("Spillover", self)
         calcSpillEffsAction.setStatusTip("Calculate spillover efficiency of a PO field.")
         calcSpillEffsAction.triggered.connect(self.mainWid.setSpillEffsForm)
@@ -1078,11 +1078,10 @@ class PyPOMainWindow(QMainWindow):
         calcMBEffsAction.setStatusTip("Calculate main beam efficiency of a PO field.")
         calcMBEffsAction.triggered.connect(self.mainWid.setMBEffsForm)
         calcEffs.addAction(calcMBEffsAction)
-
-        
+ 
         FocusFind = QAction("Focus finder", self)
         FocusFind.setToolTip("Calculate the focus co-ordinates of a ray-trace beam.")
-        ToolsMenu.triggered.connect(self.mainWid.setFocusFindForm)
+        FocusFind.triggered.connect(self.mainWid.setFocusFindForm)
         ToolsMenu.addAction(FocusFind)
         #findRTfocusAction.triggered.connect(self.mainWid.set)
 

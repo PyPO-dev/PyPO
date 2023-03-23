@@ -2,14 +2,16 @@ from src.GUI.ParameterForms.InputDescription import inType, InputDescription
 
 def xy_opts():
     return [InputDescription(inType.vectorFloats, "lims_x", label="X limits", oArray=True, numFields=2),
-            InputDescription(inType.vectorFloats, "lims_y", label="Y limits", oArray=True, numFields=2)]
+            InputDescription(inType.vectorFloats, "lims_y", label="Y limits", oArray=True, numFields=2),
+            InputDescription(inType.checkbox, "flip", label="Flip Normal Vectors")]
 
 def uv_opts():
     return [InputDescription(inType.vectorFloats, "lims_u", label="U limits", oArray=True, numFields=2),
             InputDescription(inType.vectorFloats, "lims_v", label="V limits", oArray=True, numFields=2),
             InputDescription(inType.vectorFloats, "gcenter", label="XY center", oArray=True, numFields=2),
             InputDescription(inType.vectorFloats, "ecc_uv", label="UV eccentricity", numFields=1),
-            InputDescription(inType.vectorFloats, "rot_uv", label="UV position angle", numFields=1)]
+            InputDescription(inType.vectorFloats, "rot_uv", label="UV position angle", numFields=1),
+            InputDescription(inType.checkbox, "flip", label="Flip Normal Vectors")]
 
 def AoE_opts():
     return [InputDescription(inType.vectorFloats, "lims_Az", label="Azimuth limits", oArray=True, numFields=2),
@@ -45,6 +47,7 @@ def makeHyperbolaEllipseInp():
                 "manual"    : [InputDescription(inType.vectorFloats, "coeffs", label="ABC coefficients", oArray=True, numFields=3)]
                 }),
             InputDescription(inType.vectorIntegers, "gridsize", label="Grid size", hints=[101,101], numFields=2, oArray=True),
+            InputDescription(inType.checkbox, "flip", label="Flip Normal Vectors"),
             InputDescription(inType.dynamicRadio, "gmode", label="Grid mode", subdict={
                 "xy" : xy_opts(),
                 "uv" : uv_opts()

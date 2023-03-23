@@ -5,7 +5,7 @@ from src.GUI.Acccordion import Accordion
 from src.GUI.ElementWidget import ElementWidget
 from src.GUI.ParameterForms.simpleInputWidgets.simpleInputWidgets import ElementSelectionWidget
 
-from src.GUI.Workspace.Workspace import Workspace
+from src.GUI.WorkSpace import Workspace
 # from src.GUI.selfClosingDialog import *
 # from src.GUI.selfClosingDialog_HoverableBtn import *
 # from src.GUI.PlotScreen import *
@@ -90,10 +90,10 @@ app = QApplication(sys.argv)
 # win.reflectors.addWidget(ElementWidget("Refl2", lambda x:0, lambda x:0))
 # win.reflectors.addWidget(ElementWidget("Refl3", lambda x:0, lambda x:0))
 # win.reflectors.addWidget(ElementWidget("Refl4", lambda x:0, lambda x:0))
-# win.RayTraceFrames.addWidget(ElementWidget("Frame1", lambda x:0,lambda x:0,lambda x:0))
 # win.RayTraceFrames.addWidget(ElementWidget("Frame2", lambda x:0,lambda x:0,lambda x:0))
 
 win = Workspace()
+# win.elementSpace.Reflectors.addWidget(ElementWidget("Frame1", lambda x:0,lambda x:0,lambda x:0))
 
 with open('src/GUI/style.css') as f:
     style = f.read()

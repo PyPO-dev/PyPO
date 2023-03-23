@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QLabel, QLineEdit
+from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton
 from PyQt5.QtCore import Qt
 from enum import Enum, auto
 
@@ -17,6 +17,19 @@ class inType(Enum):
     dynamicDropdown = 8
     dynamicRadio = 9
     elementSelector = 10
+
+
+class WSSections(Enum):
+    Element = 0
+    RayTraceFrame = 1
+    POField = 2
+    SPOField = 3
+    POCurrent = 4
+    Group = 5
+    
+class MyButton(QPushButton):
+    def __init__(self, s):
+        super().__init__(s)
 
 class MyLabel(QLabel):
     def __init__ (self, s):

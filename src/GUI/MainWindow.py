@@ -4,6 +4,7 @@ import shutil
 import asyncio
 import time
 import threading
+import traceback
 
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar, QScrollArea
 from PyQt5.QtGui import QFont, QIcon, QTextCursor
@@ -19,6 +20,7 @@ from src.GUI.Acccordion import Accordion
 from src.GUI.ElementWidget import ReflectorWidget, FrameWidget, FieldsWidget, CurrentWidget, SFieldsWidget, SymDialog
 from src.GUI.Console import ConsoleGenerator
 from src.GUI.Worker import Worker, GWorker
+from src.GUI.WorkSpace import Workspace
 
 from src.PyPO.CustomLogger import CustomGUILogger
 
@@ -120,17 +122,8 @@ class MainWidget(QWidget):
         if hasattr(self, "ElementsColumn"):
             self.ElementsColumn.setParent(None)
         # rebuild 
-        self.ElementsColumn = Accordion()
-
-        scroll = QScrollArea()
-        scroll.setWidget(self.ElementsColumn)
-        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        scroll.setWidgetResizable(True)
-        scroll.setContentsMargins(0,0,0,0)
-        scroll.setMinimumWidth(300)
-        scroll.setMaximumWidth(300)
-        self.addToWindowGrid(scroll, self.GPElementsColumn)
+        self.ElementsColumn = Workspace()
+        self.addToWindowGrid(self.ElementsColumn, self.GPElementsColumn)
 
     ##
     # @guiSetup
@@ -220,20 +213,26 @@ class MainWidget(QWidget):
         if snapDict["options"] == "Take":
             try:
                 self.stm.snapObj(snapDict["name"], snapDict["snap_name"], snapDict["obj"])
-            except:
-                pass
+            except Exception as err:
+                print(err)
+                traceback.print_tb(err.__traceback__)
+                self.clog.error(err)
         
         elif snapDict["options"] == "Revert":
             try:
                 self.stm.revertToSnap(snapDict["name"], snapDict["snap_name"], snapDict["obj"])
-            except:
-                pass
+            except Exception as err:
+                print(err)
+                traceback.print_tb(err.__traceback__)
+                self.clog.error(err)
 
         elif snapDict["options"] == "Delete":
             try:
                 self.stm.deleteSnap(snapDict["name"], snapDict["snap_name"], snapDict["obj"])
-            except:
-                pass
+            except Exception as err:
+                print(err)
+                traceback.print_tb(err.__traceback__)
+                self.clog.error(err)
     
     ##
     # plots all elements of the system in one plot
@@ -330,8 +329,10 @@ class MainWidget(QWidget):
             self.refreshColumn(self.stm.fields, "fields")
             self.refreshColumn(self.stm.currents, "currents")
             self.refreshColumn(self.stm.scalarfields, "scalarfields")
-        except:
-            pass
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
 
     ##
     # removes an element from the system
@@ -339,12 +340,24 @@ class MainWidget(QWidget):
     def removeElement(self, element):
         try:
             self.stm.removeElement(element)
-        except:
-            pass
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
+
+    def removeFrame(self, frame):
+        try:
+            self.stm.removeFrame(frame)
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
     
     ##
     # TODO: @Maikel Rename this function and evaluate its nessecity
     def refreshColumn(self, columnDict, columnType):
+        print("refreshColumn")
+        # self._mkElementsColumn()
         for key, item in columnDict.items():
             if columnType == "elements":
                 self.addReflectorWidget(key)
@@ -364,22 +377,28 @@ class MainWidget(QWidget):
     ### Functionalities: Adding Elements in gui
     # TODO:doc
     def addReflectorWidget(self, name):
-        self.ElementsColumn.reflectors.addWidget(ReflectorWidget(name, self.removeElement, self.transformSingleForm, self.plotElement, self.snapActionForm)) 
-
+        print("addREFL")
+        print(f"r {name}")
+        self.ElementsColumn.addReflector(name, self.removeElement, self.transformSingleForm, self.plotElement, self.snapActionForm)
+        # self.ElementsColumn.reflectors.addWidget(ReflectorWidget(name, self.removeElement, self.transformSingleForm, self.plotElement, self.snapActionForm)) 
+    
     def addFrameWidget(self, name):
-        self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(name, self.stm.removeFrame, 
+        self.ElementsColumn.addRayTraceFrames(name, self.removeFrame, 
                                                     self.transformFrameForm, self.plotFrameForm,  
-                                                    self.calcRMSfromFrame, self.snapFrameActionForm))
+                                                    self.calcRMSfromFrame, self.snapFrameActionForm)
+        
 
     def addFieldWidget(self, name):
-        self.ElementsColumn.POFields.addWidget(FieldsWidget(name,self.stm.removeField, self.plotFieldForm))
+        self.ElementsColumn.addFields(name, self.stm.removeField, self.plotFieldForm)
+        # self.ElementsColumn.POFields.addWidget(FieldsWidget(name,self.stm.removeField, self.plotFieldForm))
 
     def addCurrentWidget(self, name):
-        self.ElementsColumn.POCurrents.addWidget(CurrentWidget(name, self.stm.removeCurrent, self.plotCurrentForm))
+        self.ElementsColumn.addCurrent(name, self.stm.removeCurrent, self.plotCurrentForm)
+        # self.ElementsColumn.POCurrents.addWidget(CurrentWidget(name, self.stm.removeCurrent, self.plotCurrentForm))
 
     def addSFieldWidget(self, name):
-        self.ElementsColumn.SPOFields.addWidget(SFieldsWidget(name,self.stm.removeScalarField, self.plotSFieldForm))
-
+        # self.ElementsColumn.SPOFields.addWidget(SFieldsWidget(name,self.stm.removeScalarField, self.plotSFieldForm))
+        self.ElementsColumn.addSPOFields(name, self.stm.removeScalarField, self.plotSFieldForm)
 
     ### Functionalities: Adding Elements 
 
@@ -393,11 +412,13 @@ class MainWidget(QWidget):
     def addPlaneAction(self):
         elementDict = self.ParameterWid.read()
 
-        #try:
-        self.stm.addPlane(elementDict) 
-        self.addReflectorWidget(elementDict["name"])
-        #except:
-        #    pass
+        try:
+            self.stm.addPlane(elementDict) 
+            self.addReflectorWidget(elementDict["name"])
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
     
     ##
     # Shows from to add a quadric surface
@@ -415,10 +436,12 @@ class MainWidget(QWidget):
                 self.stm.addHyperbola(elementDict)
             elif elementDict["type"] == "Ellipse":
                 self.stm.addEllipse(elementDict)
-
+            print(f"r{ elementDict['name'] }")
             self.addReflectorWidget(elementDict["name"])
-        except:
-            pass
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
 
     ##
     # Reads form and adds parabola to System
@@ -428,8 +451,10 @@ class MainWidget(QWidget):
         try:
             self.stm.addParabola(elementDict) 
             self.addReflectorWidget(elementDict["name"])
-        except:
-            pass
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
 
     ##
     # Reads form and adds hyperbola to System
@@ -439,8 +464,10 @@ class MainWidget(QWidget):
         try:
             self.stm.addHyperbola(elementDict) 
             self.addReflectorWidget(elementDict["name"])
-        except:
-            pass
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
 
     ##
     # Reads form and adds ellipse to System
@@ -450,8 +477,10 @@ class MainWidget(QWidget):
         try:
             self.stm.addEllipse(elementDict) 
             self.addReflectorWidget(elementDict["name"])
-        except:
-            pass
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
 
     ### Functionalities: Transforming Elements 
 
@@ -479,8 +508,10 @@ class MainWidget(QWidget):
             elif transformationType == "Rotation":
                 self.stm.rotateGrids(dd["element"], vector, pivot=dd["pivot"], mode=dd["mode"].lower())
                 # print(f'Rotated {dd["element"]} by {self._formatVector(vector)} deg around {self._formatVector(dd["pivot"])}')
-        except:
-            pass
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
     
     ##
     # Applies single frame transformation
@@ -496,8 +527,10 @@ class MainWidget(QWidget):
             elif transformationType == "Rotation":
                 self.stm.rotateGrids(dd["frame"], vector, pivot=dd["pivot"], mode=dd["mode"].lower(), obj="frame")
                 # print(f'Rotated {dd["frame"]} by {self._formatVector(vector)} deg around {self._formatVector(dd["pivot"])}')
-        except:
-            pass
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
     ##
     # Shows multiple element transformation form
     def transformationMultipleForm(self):
@@ -540,8 +573,10 @@ class MainWidget(QWidget):
         try:
             self.stm.createTubeFrame(RTDict)
             self.addFrameWidget(RTDict["name"])
-        except:
-            pass
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
 
     ##
     # Shows form to initialize gaussian frame 
@@ -579,8 +614,10 @@ class MainWidget(QWidget):
             self.threadpool.start(worker)
             dial.exec_()
         
-        except:
-            pass
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
 
     ##
     # Shows form to propagate rays
@@ -595,8 +632,10 @@ class MainWidget(QWidget):
         try:
             self.stm.runRayTracer(propRaysDict)
             self.addFrameWidget(propRaysDict["fr_out"])
-        except:
-            pass
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
 
     ##
     # Shows form to plot preselected a frame
@@ -629,8 +668,10 @@ class MainWidget(QWidget):
             self.stm.createGaussian(GDict, GDict["surface"])
             self.addFieldWidget(GDict["name"])
             self.addCurrentWidget(GDict["name"])
-        except:
-            pass
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
     
     ##
     # Shows form to initialize scalar gaussian beam TODO: klopt dit 
@@ -645,8 +686,10 @@ class MainWidget(QWidget):
         try:
             self.stm.createScalarGaussian(GDict, GDict["surface"])
             self.addSFieldWidget(GDict["name"])
-        except:
-            pass
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
     ##
     # Shows form to initialize a physical optics propagation
     def initPSBeamForm(self):
@@ -662,8 +705,10 @@ class MainWidget(QWidget):
             self.stm.generatePointSource(PSDict, PSDict["surface"])
             self.addFieldWidget(PSDict["name"])
             self.addCurrentWidget(PSDict["name"])
-        except:
-            pass
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
 
     ##
     # Shows form to initialize a scalar point source beam
@@ -679,8 +724,10 @@ class MainWidget(QWidget):
         try:
             self.stm.generatePointSourceScalar(SPSDict, SPSDict["surface"])
             self.addSFieldWidget(SPSDict["name"])
-        except:
-            pass
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
 
     ##
     # Shows form to plot field
@@ -796,7 +843,9 @@ class MainWidget(QWidget):
             self.threadpool.start(worker)
             dial.exec_()
 
-        except:
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
             self.clog.error("PO Propagation did not end successfully.")
         
         dtime = time.time() - start_time
@@ -1050,11 +1099,4 @@ class PyPOMainWindow(QMainWindow):
         ToolsMenu.addAction(FocusFind)
         #findRTfocusAction.triggered.connect(self.mainWid.set)
 
-if __name__ == "__main__":
 
-    # print("lala")
-    app = QApplication(sys.argv)
-    win = PyPOMainWindow(parent=None)
-
-    win.show()
-    app.exec_()

@@ -1703,7 +1703,21 @@ class System(object):
         
         #pt.rcParams['xtick.minor.visible'] = True
         #pt.rcParams['ytick.minor.visible'] = True
-        
+    
+    ##
+    # Plot a group of reflectors.
+    #
+    # @param name_group Name of group to be plotted.
+    def plotGroup(self, name_group, show=True, ret=False):
+        print(self.groups[name_group]["members"])
+        select = [x for x in self.groups[name_group]["members"]]
+
+        if ret:
+            fig, ax = self.plotSystem(select=select, show=False, ret=True)
+
+        else:
+            self.plotSystem(select=select, show=show)
+
     ##
     # Create a spot diagram of a ray-trace frame.
     #

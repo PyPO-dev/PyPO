@@ -192,11 +192,28 @@ class MainWidget(QWidget):
         else :
             figure = None
         self.addPlot(figure, surface)
+    
+    ##
+    # plots a group from the System
+    # 
+    # @param group str Name of the group in system
+    # 
+    def plotGroup(self, group):
+        if self.stm.groups:
+            figure, _ = self.stm.plotGroup(group, show=False, ret=True)
+        else :
+            figure = None
+        self.addPlot(figure, group)
 
     ##
     # Generate a snapshot form.
     def snapActionForm(self, element):
         self.setForm(fDataObj.snapForm(element, list(self.stm.system[element]["snapshots"].keys()), "element"), readAction=self.snapAction)
+    
+    ##
+    # Generate a snapshot form for a group.
+    def snapGroupActionForm(self, group):
+        self.setForm(fDataObj.snapForm(element, list(self.stm.groups[group]["snapshots"].keys()), "group"), readAction=self.snapAction)
  
     ##
     # Generate a snapshot form for ray-trace frame.
@@ -382,6 +399,9 @@ class MainWidget(QWidget):
         self.ElementsColumn.addReflector(name, self.removeElement, self.transformSingleForm, self.plotElement, self.snapActionForm)
         # self.ElementsColumn.reflectors.addWidget(ReflectorWidget(name, self.removeElement, self.transformSingleForm, self.plotElement, self.snapActionForm)) 
     
+    def addGroupWidget(self, name):
+        self.ElementsColumn.addGroup(name, self.stm.removeGroup, self.plotGroup, self.snapGroupActionForm)
+    
     def addFrameWidget(self, name):
         self.ElementsColumn.addRayTraceFrames(name, self.removeFrame, 
                                                     self.transformFrameForm, self.plotFrameForm,  
@@ -399,7 +419,7 @@ class MainWidget(QWidget):
     def addSFieldWidget(self, name):
         # self.ElementsColumn.SPOFields.addWidget(SFieldsWidget(name,self.stm.removeScalarField, self.plotSFieldForm))
         self.ElementsColumn.addSPOFields(name, self.stm.removeScalarField, self.plotSFieldForm)
-
+    
     ### Functionalities: Adding Elements 
 
     ##

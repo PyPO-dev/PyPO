@@ -73,6 +73,7 @@ def ex_ASTE_RT(device):
     s.rotateGrids("start", _rotation, obj="frame", pivot=np.zeros(3))
 
     s.groupElements("ASTE", "pri", "sec", "plane1")
+
     s.rotateGrids("ASTE", _rotation, obj="group", pivot=np.zeros(3))
 
     s.plotSystem()

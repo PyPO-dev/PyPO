@@ -393,11 +393,11 @@ class MainWidget(QWidget):
     def addPlaneAction(self):
         elementDict = self.ParameterWid.read()
 
-        try:
-            self.stm.addPlane(elementDict) 
-            self.addReflectorWidget(elementDict["name"])
-        except:
-            pass
+        #try:
+        self.stm.addPlane(elementDict) 
+        self.addReflectorWidget(elementDict["name"])
+        #except:
+        #    pass
     
     ##
     # Shows from to add a quadric surface

@@ -23,11 +23,16 @@ PO_modelist = ["JM", "EH", "JMEH", "EHP", "FF", "scalar"]
 # @param name Name of object.
 # @param nameList List of names to check.
 #
-# @returns num Number of occurences of name in list.
-def getRegex(name, nameList):
+# @returns num Increment of highest occurence of number.
+def getIndex(name, nameList):
     regex = f"{name}(_(\d*(?![ -~])))*(?![ -~])"
     l = re.compile(regex)
-    num = len(list(filter(l.match, nameList)))
+    match = list(filter(l.match, nameList))
+    match_spl = [int((x.split("_"))[1]) if "_" in x else 0 for x in match]
+    num = 0
+
+    if match_spl:
+        num = max(match_spl) + 1
 
     return num
 
@@ -423,7 +428,7 @@ def check_ElemDict(elemDict, nameList, num_ref, clog):
         if not "name" in elemDict:
             elemDict["name"] = "Parabola"
         
-        num = getRegex(elemDict["name"], nameList)
+        num = getIndex(elemDict["name"], nameList)
 
         if num > 0:
             elemDict["name"] = elemDict["name"] + "_{}".format(num)
@@ -460,7 +465,7 @@ def check_ElemDict(elemDict, nameList, num_ref, clog):
             if not "name" in elemDict:
                 elemDict["name"] = "Hyperbola"
 
-            num = getRegex(elemDict["name"], nameList)
+            num = getIndex(elemDict["name"], nameList)
 
             if num > 0:
                 elemDict["name"] = elemDict["name"] + "_{}".format(num)
@@ -469,7 +474,7 @@ def check_ElemDict(elemDict, nameList, num_ref, clog):
             if not "name" in elemDict:
                 elemDict["name"] = "Ellipse"
             
-            num = getRegex(elemDict["name"], nameList)
+            num = getIndex(elemDict["name"], nameList)
 
             if num > 0:
                 elemDict["name"] = elemDict["name"] + "_{}".format(num)
@@ -515,7 +520,7 @@ def check_ElemDict(elemDict, nameList, num_ref, clog):
         if not "name" in elemDict:
             elemDict["name"] = "plane"
         
-        num = getRegex(elemDict["name"], nameList)
+        num = getIndex(elemDict["name"], nameList)
 
         if num > 0:
             elemDict["name"] = elemDict["name"] + "_{}".format(num)
@@ -636,7 +641,7 @@ def check_TubeRTDict(TubeRTDict, nameList, clog):
     if "name" not in TubeRTDict:
         TubeRTDict["name"] = "TubeFrame"
     
-    num = getRegex(TubeRTDict["name"], nameList)
+    num = getIndex(TubeRTDict["name"], nameList)
 
     if num > 0:
         TubeRTDict["name"] = TubeRTDict["name"] + "_{}".format(num)
@@ -723,7 +728,7 @@ def check_GRTDict(GRTDict, nameList, clog):
     if "name" not in GRTDict:
         GRTDict["name"] = "GaussFrame"
     
-    num = getRegex(GRTDict["name"], nameList)
+    num = getIndex(GRTDict["name"], nameList)
 
     if num > 0:
         GRTDict["name"] = GRTDict["name"] + "_{}".format(num)
@@ -859,7 +864,7 @@ def check_PSDict(PSDict, nameList, clog):
     if "name" not in PSDict:
         PSDict["name"] = "PointSourcePO"
     
-    num = getRegex(PSDict["name"], nameList)
+    num = getIndex(PSDict["name"], nameList)
 
     if num > 0:
         PSDict["name"] = PSDict["name"] + "_{}".format(num)
@@ -919,7 +924,7 @@ def check_GPODict(GPODict, nameList, clog):
     if "name" not in GPODict:
         GPODict["name"] = "GaussianBeamPO"
     
-    num = getRegex(GPODict["name"], nameList)
+    num = getIndex(GPODict["name"], nameList)
 
     if num > 0:
         GPODict["name"] = GPODict["name"] + "_{}".format(num)
@@ -1039,7 +1044,7 @@ def check_runPODict(runPODict, elements, fields, currents, scalarfields, frames,
         if "name_JM" not in runPODict:
             errStr += errMsg_field("name_JM", "runPODict")
         
-        num = getRegex(runPODict["name_JM"], currents)
+        num = getIndex(runPODict["name_JM"], currents)
 
         if num > 0:
             runPODict["name_JM"] = runPODict["name_JM"] + "_{}".format(num)
@@ -1048,7 +1053,7 @@ def check_runPODict(runPODict, elements, fields, currents, scalarfields, frames,
         if "name_EH" not in runPODict:
             errStr += errMsg_field("name_EH", "runPODict")
         
-        num = getRegex(runPODict["name_EH"], fields)
+        num = getIndex(runPODict["name_EH"], fields)
 
         if num > 0:
             runPODict["name_EH"] = runPODict["name_EH"] + "_{}".format(num)
@@ -1057,7 +1062,7 @@ def check_runPODict(runPODict, elements, fields, currents, scalarfields, frames,
         if "name_EH" not in runPODict:
             errStr += errMsg_field("name_EH", "runPODict")
         
-        num = getRegex(runPODict["name_EH"], fields)
+        num = getIndex(runPODict["name_EH"], fields)
 
         if num > 0:
             runPODict["name_EH"] = runPODict["name_EH"] + "_{}".format(num)
@@ -1065,7 +1070,7 @@ def check_runPODict(runPODict, elements, fields, currents, scalarfields, frames,
         if "name_JM" not in runPODict:
             errStr += errMsg_field("name_JM", "runPODict")
         
-        num = getRegex(runPODict["name_JM"], currents)
+        num = getIndex(runPODict["name_JM"], currents)
 
         if num > 0:
             runPODict["name_JM"] = runPODict["name_JM"] + "_{}".format(num)
@@ -1074,7 +1079,7 @@ def check_runPODict(runPODict, elements, fields, currents, scalarfields, frames,
         if "name_EH" not in runPODict:
             errStr += errMsg_field("name_EH", "runPODict")
         
-        num = getRegex(runPODict["name_EH"], fields)
+        num = getIndex(runPODict["name_EH"], fields)
 
         if num > 0:
             runPODict["name_EH"] = runPODict["name_EH"] + "_{}".format(num)
@@ -1082,7 +1087,7 @@ def check_runPODict(runPODict, elements, fields, currents, scalarfields, frames,
         if "name_P" not in runPODict:
             errStr += errMsg_field("name_P", "runPODict")
         
-        num = getRegex(runPODict["name_P"], frames)
+        num = getIndex(runPODict["name_P"], frames)
 
         if num > 0:
             runPODict["name_P"] = runPODict["name_P"] + "_{}".format(num)
@@ -1091,7 +1096,7 @@ def check_runPODict(runPODict, elements, fields, currents, scalarfields, frames,
         if "name_EH" not in runPODict:
             errStr += errMsg_field("name_EH", "runPODict")
         
-        num = getRegex(runPODict["name_EH"], fields)
+        num = getIndex(runPODict["name_EH"], fields)
 
         if num > 0:
             runPODict["name_EH"] = runPODict["name_EH"] + "_{}".format(num)
@@ -1100,7 +1105,7 @@ def check_runPODict(runPODict, elements, fields, currents, scalarfields, frames,
         if "name_field" not in runPODict:
             errStr += errMsg_field("name_field", "runPODict")
         
-        num = getRegex(runPODict["name_field"], fields)
+        num = getIndex(runPODict["name_field"], fields)
 
         if num > 0:
             runPODict["name_field"] = runPODict["name_field"] + "_{}".format(num)

@@ -2,6 +2,7 @@ import numpy as np
 import os
 import ctypes
 import pathlib
+import re
 
 nThreads_cpu = os.cpu_count()
 
@@ -14,6 +15,21 @@ PO_modelist = ["JM", "EH", "JMEH", "EHP", "FF", "scalar"]
 ##
 # @file
 # File containing all commonly used checks for PyPO user input.
+
+##
+# Get the regular expression for checking if an object already exists.
+# Counts the amount of occurences in order to avoid cobflicting names.
+#
+# @param name Name of object.
+# @param nameList List of names to check.
+#
+# @returns num Number of occurences of name in list.
+def getRegex(name, nameList):
+    regex = f"{name}(_(\d*(?![ -~])))*(?![ -~])"
+    l = re.compile(regex)
+    num = len(list(filter(l.match, nameList)))
+
+    return num
 
 ##
 # Check if the CUDA dynamically linked libraries exist.
@@ -407,6 +423,11 @@ def check_ElemDict(elemDict, nameList, num_ref, clog):
         if not "name" in elemDict:
             elemDict["name"] = "Parabola"
         
+        num = getRegex(elemDict["name"], nameList)
+
+        if num > 0:
+            elemDict["name"] = elemDict["name"] + "_{}".format(num)
+        
         if "pmode" in elemDict:
             if elemDict["pmode"] == "focus":
                 if "vertex" in elemDict:
@@ -438,10 +459,20 @@ def check_ElemDict(elemDict, nameList, num_ref, clog):
             
             if not "name" in elemDict:
                 elemDict["name"] = "Hyperbola"
+
+            num = getRegex(elemDict["name"], nameList)
+
+            if num > 0:
+                elemDict["name"] = elemDict["name"] + "_{}".format(num)
         
         else:
             if not "name" in elemDict:
                 elemDict["name"] = "Ellipse"
+            
+            num = getRegex(elemDict["name"], nameList)
+
+            if num > 0:
+                elemDict["name"] = elemDict["name"] + "_{}".format(num)
 
         if "pmode" in elemDict:
             if elemDict["pmode"] == "focus":
@@ -483,6 +514,11 @@ def check_ElemDict(elemDict, nameList, num_ref, clog):
     elif elemDict["type"] == 3:
         if not "name" in elemDict:
             elemDict["name"] = "plane"
+        
+        num = getRegex(elemDict["name"], nameList)
+
+        if num > 0:
+            elemDict["name"] = elemDict["name"] + "_{}".format(num)
 
     if "gmode" in elemDict:
         if elemDict["gmode"] == "xy" or elemDict["gmode"] == 0:
@@ -577,9 +613,6 @@ def check_ElemDict(elemDict, nameList, num_ref, clog):
         errStr += errMsg_field("gridsize", elemDict["name"])
 
 
-    if elemDict["name"] in nameList:
-        elemDict["name"] = elemDict["name"] + "_{}".format(num_ref)
-
     if errStr:
         errList = errStr.split("\n")[:-1]
 
@@ -600,12 +633,14 @@ def check_ElemDict(elemDict, nameList, num_ref, clog):
 def check_TubeRTDict(TubeRTDict, nameList, clog):
     errStr = ""
     
-    if TubeRTDict["name"] in nameList:
-        errStr += errMsg_name(TubeRTDict["name"])
+    if "name" not in TubeRTDict:
+        TubeRTDict["name"] = "TubeFrame"
     
-    if TubeRTDict["name"] in nameList:
-        TubeRTDict["name"] = TubeRTDict["name"] + "_{}".format(len(namelist))
+    num = getRegex(TubeRTDict["name"], nameList)
 
+    if num > 0:
+        TubeRTDict["name"] = TubeRTDict["name"] + "_{}".format(num)
+    
     if "nRays" in TubeRTDict:
         if not isinstance(TubeRTDict["nRays"], int):
             errStr += errMsg_type("nRays", type(TubeRTDict["nRays"]), "TubeRTDict", int)
@@ -685,11 +720,13 @@ def check_TubeRTDict(TubeRTDict, nameList, clog):
 def check_GRTDict(GRTDict, nameList, clog):
     errStr = ""
     
-    if GRTDict["name"] in nameList:
-        errStr += errMsg_name(GRTDict["name"])
+    if "name" not in GRTDict:
+        GRTDict["name"] = "GaussFrame"
     
-    if GRTDict["name"] in nameList:
-        GRTDict["name"] = GRTDict["name"] + "_{}".format(len(namelist))
+    num = getRegex(GRTDict["name"], nameList)
+
+    if num > 0:
+        GRTDict["name"] = GRTDict["name"] + "_{}".format(num)
 
     if "nRays" in GRTDict:
         if not isinstance(GRTDict["nRays"], int):
@@ -819,11 +856,13 @@ def check_runRTDict(runRTDict, elements, frames, clog):
 def check_PSDict(PSDict, nameList, clog):
     errStr = ""
     
-    if PSDict["name"] in nameList:
-        errStr += errMsg_name(PSDict["name"])
+    if "name" not in PSDict:
+        PSDict["name"] = "PointSourcePO"
     
-    if PSDict["name"] in nameList:
-        PSDict["name"] = PSDict["name"] + "_{}".format(len(nameList))
+    num = getRegex(PSDict["name"], nameList)
+
+    if num > 0:
+        PSDict["name"] = PSDict["name"] + "_{}".format(num)
 
     if "lam" in PSDict:
         if PSDict["lam"] == 0 + 0j:
@@ -877,11 +916,13 @@ def check_PSDict(PSDict, nameList, clog):
 def check_GPODict(GPODict, nameList, clog):
     errStr = ""
     
-    if GPODict["name"] in nameList:
-        errStr += errMsg_name(GPODict["name"])
+    if "name" not in GPODict:
+        GPODict["name"] = "GaussianBeamPO"
     
-    if GPODict["name"] in nameList:
-        GPODict["name"] = GPODict["name"] + "_{}".format(len(nameList))
+    num = getRegex(GPODict["name"], nameList)
+
+    if num > 0:
+        GPODict["name"] = GPODict["name"] + "_{}".format(num)
 
     if "lam" in GPODict:
         if GPODict["lam"] == 0 + 0j:
@@ -965,7 +1006,7 @@ def check_GPODict(GPODict, nameList, clog):
 # @param elements List containing names of surfaces in System.
 # @param currents List containing names of currents in System.
 # @param scalarfields List containing names of scalarfields in System.
-def check_runPODict(runPODict, elements, currents, scalarfields, clog):
+def check_runPODict(runPODict, elements, fields, currents, scalarfields, frames, clog):
     errStr = ""
 
     cuda = has_CUDA()
@@ -973,12 +1014,15 @@ def check_runPODict(runPODict, elements, currents, scalarfields, clog):
     if not "exp" in runPODict:
         runPODict["exp"] = "fwd"
 
-    if "mode" not in runPODict:
-        errStr += f"Please provide propagation mode.\n"
-   
     if "t_name" in runPODict:
         check_elemSystem(runPODict["t_name"], elements, clog)
 
+    else:
+        errStr += errMsg_field("t_name", "runPODict")
+    
+    if "mode" not in runPODict:
+        errStr += f"Please provide propagation mode.\n"
+   
     else:
         if runPODict["mode"] not in PO_modelist:
             errStr += f"{runPODict['mode']} is not a valid propagation mode.\n"
@@ -990,7 +1034,77 @@ def check_runPODict(runPODict, elements, currents, scalarfields, clog):
             errStr = check_scalarfieldSystem(runPODict["s_scalarfield"], scalarfields, clog, errStr)
     
     errStr = check_elemSystem(runPODict["t_name"], elements, clog, errStr)
-   
+  
+    if runPODict["mode"] == "JM":
+        if "name_JM" not in runPODict:
+            errStr += errMsg_field("name_JM", "runPODict")
+        
+        num = getRegex(runPODict["name_JM"], currents)
+
+        if num > 0:
+            runPODict["name_JM"] = runPODict["name_JM"] + "_{}".format(num)
+    
+    if runPODict["mode"] == "EH":
+        if "name_EH" not in runPODict:
+            errStr += errMsg_field("name_EH", "runPODict")
+        
+        num = getRegex(runPODict["name_EH"], fields)
+
+        if num > 0:
+            runPODict["name_EH"] = runPODict["name_EH"] + "_{}".format(num)
+    
+    if runPODict["mode"] == "JMEH":
+        if "name_EH" not in runPODict:
+            errStr += errMsg_field("name_EH", "runPODict")
+        
+        num = getRegex(runPODict["name_EH"], fields)
+
+        if num > 0:
+            runPODict["name_EH"] = runPODict["name_EH"] + "_{}".format(num)
+        
+        if "name_JM" not in runPODict:
+            errStr += errMsg_field("name_JM", "runPODict")
+        
+        num = getRegex(runPODict["name_JM"], currents)
+
+        if num > 0:
+            runPODict["name_JM"] = runPODict["name_JM"] + "_{}".format(num)
+    
+    if runPODict["mode"] == "EHP":
+        if "name_EH" not in runPODict:
+            errStr += errMsg_field("name_EH", "runPODict")
+        
+        num = getRegex(runPODict["name_EH"], fields)
+
+        if num > 0:
+            runPODict["name_EH"] = runPODict["name_EH"] + "_{}".format(num)
+        
+        if "name_P" not in runPODict:
+            errStr += errMsg_field("name_P", "runPODict")
+        
+        num = getRegex(runPODict["name_P"], frames)
+
+        if num > 0:
+            runPODict["name_P"] = runPODict["name_P"] + "_{}".format(num)
+
+    if runPODict["mode"] == "FF":
+        if "name_EH" not in runPODict:
+            errStr += errMsg_field("name_EH", "runPODict")
+        
+        num = getRegex(runPODict["name_EH"], fields)
+
+        if num > 0:
+            runPODict["name_EH"] = runPODict["name_EH"] + "_{}".format(num)
+    
+    if runPODict["mode"] == "scalar":
+        if "name_field" not in runPODict:
+            errStr += errMsg_field("name_field", "runPODict")
+        
+        num = getRegex(runPODict["name_field"], fields)
+
+        if num > 0:
+            runPODict["name_field"] = runPODict["name_field"] + "_{}".format(num)
+
     if "epsilon" not in runPODict:
         runPODict["epsilon"] = 1
 

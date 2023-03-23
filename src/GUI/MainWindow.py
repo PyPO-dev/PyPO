@@ -772,7 +772,8 @@ class MainWidget(QWidget):
     def propPOAction(self):
         propBeamDict = self.ParameterWid.read()
         
-        chk.check_runPODict(propBeamDict, self.stm.system, self.stm.currents, self.stm.scalarfields, self.clog)
+        chk.check_runPODict(propBeamDict, self.stm.system.keys(), self.stm.fields.keys(), self.stm.currents.keys(),
+                        self.stm.scalarfields.keys(), self.stm.frames.keys(), self.clog)
       
         if propBeamDict["mode"] == "scalar":
             subStr = "scalar field"
@@ -781,62 +782,26 @@ class MainWidget(QWidget):
 
         start_time = time.time()
         
-        #try:
-        self.clog.info("*** Starting PO propagation ***")
-        
-        dialStr = f"Calculating {subStr} on {propBeamDict['t_name']}..."
-        worker = Worker(self.stm.runGUIPO, propBeamDict)
-        dial = SymDialog(worker.kill, self.clog, dialStr) 
+        try:
+            self.clog.info("*** Starting PO propagation ***")
+            
+            dialStr = f"Calculating {subStr} on {propBeamDict['t_name']}..."
+            worker = Worker(self.stm.runGUIPO, propBeamDict)
+            dial = SymDialog(worker.kill, self.clog, dialStr) 
 
-        worker.signal.finished.connect(dial.accept) 
-        worker.signal.finished.connect(lambda : self._addToWidgets(propBeamDict)) 
-        
-        
-        self.threadpool.start(worker)
-        dial.exec_()
+            worker.signal.finished.connect(dial.accept) 
+            worker.signal.finished.connect(lambda : self._addToWidgets(propBeamDict)) 
+            worker.signal.finished.connect(lambda : self.clog.info("PO propagation ended successfully."))
 
-        #except:
-        #    pass
+            self.threadpool.start(worker)
+            dial.exec_()
+
+        except:
+            self.clog.error("PO Propagation did not end successfully.")
         
         dtime = time.time() - start_time
         self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
     
-    #def propPOAction(self):
-    #    propBeamDict = self.ParameterWid.read()
-    #    chk.check_runPODict(propBeamDict, self.stm.system, self.stm.currents, self.stm.scalarfields, self.clog)
-    #  
-    #    if propBeamDict["mode"] == "scalar":
-    #        subStr = "scalar field"
-    #    else:
-    #        subStr = propBeamDict["mode"]
-
-    #    dialStr = f"Calculating {subStr} on {propBeamDict['t_name']}..."
-
-    #    dial = SymDialog(self.clog, dialStr)
-
-    #    self.mgr = TManager.Manager("G", callback=dial.accept)
-    #    t = self.mgr.new_gthread(target=self.stm.runGUIPO, args=(propBeamDict,), calc_type=propBeamDict["mode"])
-    #    
-    #    dial.setThread(t)
-
-    #    if dial.exec_():
-    #        if propBeamDict["mode"] == "JM":
-    #            self.ElementsColumn.POCurrents.addWidget(CurrentWidget(propBeamDict["name_JM"], self.stm.removeCurrent, self.setPlotCurrentFormOpt))
-    #    
-    #        elif propBeamDict["mode"] == "EH" or propBeamDict["mode"] == "FF":
-    #            self.ElementsColumn.POFields.addWidget(FieldsWidget(propBeamDict["name_EH"], self.stm.removeField, self.setPlotFieldFormOpt))
-    #    
-    #        elif propBeamDict["mode"] == "JMEH":
-    #            self.ElementsColumn.POCurrents.addWidget(CurrentWidget(propBeamDict["name_JM"], self.stm.removeCurrent, self.setPlotCurrentFormOpt))
-    #            self.ElementsColumn.POFields.addWidget(FieldsWidget(propBeamDict["name_EH"], self.stm.removeField, self.setPlotFieldFormOpt))
-    #    
-    #        elif propBeamDict["mode"] == "EHP":
-    #            self.ElementsColumn.POFields.addWidget(FieldsWidget(propBeamDict["name_EH"], self.stm.removeField, self.setPlotFieldFormOpt))
-    #            self.ElementsColumn.RayTraceFrames.addWidget(FrameWidget(propBeamDict["name_P"], 
-    #                            self.stm.removeFrame, self.setPlotFrameFormOpt,self.calcRMSfromFrame))
-    #
-    #        elif propBeamDict["mode"] == "scalar":
-    #            self.ElementsColumn.SPOFields.addWidget(SFieldsWidget(propBeamDict["name_field"], self.stm.removeScalarField, self.setPlotSFieldFormOpt))
     #
     ##TODO Unite efficiencies
     ##

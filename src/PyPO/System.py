@@ -982,7 +982,8 @@ class System(object):
     def runPO(self, runPODict):
         self.clog.info("*** Starting PO propagation ***")
        
-        check_runPODict(runPODict, self.system, self.currents, self.scalarfields, self.clog)
+        check_runPODict(runPODict, self.system.keys(), self.fields.keys(), self.currents.keys(),
+                    self.scalarfields.keys(), self.frames.keys(), self.clog)
 
         _runPODict = self.copyObj(runPODict)
 

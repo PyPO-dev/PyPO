@@ -159,7 +159,6 @@ class SimpleRadio(selectionWidgetInterface):
         if self.inputDescription.outputName is None:
             return {}
         d = {self.inputDescription.outputName : self.inputDescription.options[self.group.checkedId()]}
-        print(d)
         return d
     
     def currentIndex(self):
@@ -205,7 +204,6 @@ class SimpleDropdown(selectionWidgetInterface):
         if self.inputDescription.outputName is None:
             return {}
         d = {self.inputDescription.outputName : self.inputDescription.options[self.comboBox.currentIndex()]}
-        print(d)
         return d
     
 

@@ -7,6 +7,24 @@ from functools import partial
 from src.PyPO.PyPOTypes import *
 from src.PyPO.BindRefl import *
 
+##
+# @file
+# File containing methods for fitting Gaussian distributions to field components.
+
+##
+# Calculate estimates for beam parameters from an input field component.
+# These estimates are used as initial values for Gaussian fitting.
+#
+# @param x Grid of x co-ordinates of input field.
+# @param y Grid of y co-ordinates of input field.
+# @param area Grid of area elements.
+# @param field_norm Normalised input field component.
+#
+# @returns x0 Semi-major axis size of estimate.
+# @returns y0 Semi-minor axis size of estimate.
+# @returns xm Mean x-center of estimate.
+# @returns ym Mean y-center of estimate.
+# @returns theta Position angle of estimate.
 def calcEstimates(x, y, area, field_norm):
 
     M0 = np.sum(field_norm)
@@ -52,6 +70,16 @@ def calcEstimates(x, y, area, field_norm):
 
     return x0, y0, xm, ym, theta
 
+##
+# Fit a Gaussian to an amplitude pattern of a field component.
+#
+# @param field Component of field to fit.
+# @param surfaceObject Surface on which the field is defined.
+# @param thres Threshold for fitting in decibels.
+# @param mode Whether to fit the Gaussian in linear, decibel or logarithmic space.
+#
+# @returns popt Optimal parameters for Gaussian.
+# @returns perr Standard deviations of optimal parameters.
 def fitGaussAbs(field, surfaceObject, thres, mode):
     global thres_g
     thres_g = thres
@@ -99,6 +127,19 @@ def fitGaussAbs(field, surfaceObject, thres, mode):
     #print(f"Fitted shift and rotation:\nmu_x = {popt[-3]}, mu_y = {popt[-2]}\nTheta = {popt[-1]}")
     return popt, perr
 
+##
+# Generate a Gaussian pattern from Gaussian parameters.
+#
+# @param mask Mask to apply to generated Gaussian.
+# @param mode Whether to generate the Gaussian in linear, decibel or logarithmic space.
+# @param xy Tuple containing x and y grids of surface of Gaussian.
+# @param x0 Gaussian beamwidth in x-direction.
+# @param y0 Gaussian beamwidth in y-direction.
+# @param xs Center in x-direction of Gaussian.
+# @param ys Center in y-direction of Gaussian.
+# @param theta Position angle of Gaussian.
+#
+# @returns Psi The Gaussian distribution.
 def GaussAbs(mask, mode, xy, x0, y0, xs, ys, theta):
     x, y = xy
     a = np.cos(theta)**2 / (2 * x0**2) + np.sin(theta)**2 / (2 * y0**2)
@@ -116,6 +157,15 @@ def GaussAbs(mask, mode, xy, x0, y0, xs, ys, theta):
 
     return (Psi).ravel()
 
+##
+# Generate a Gaussian from surface parameters.
+#
+# @param fgs_out Optimal Gaussian parameters.
+# @param surfaceObject Surface on which Gaussian is defined.
+# @param mode Whether to fit Gaussian in linear, decibel or logarithmic space.
+# @param mask Mask to apply to Gaussian distribution.
+#
+# @returns Psi Gaussian distribution.
 def generateGauss(fgs_out, surfaceObject, mode, mask=None):
     grids = generateGrid(surfaceObject, transform=False, spheric=False)
 

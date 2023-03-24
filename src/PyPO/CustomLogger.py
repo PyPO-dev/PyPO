@@ -1,6 +1,14 @@
 import sys
 import logging
 
+##
+# @file
+# This file contains class definitions of the custom logger objects used in PyPO.
+# A distinction is made for logging in the terminal and in the GUI.
+
+##
+# Class for formatting of the logging from the terminal.
+# Has custom colors for different logging levels.
 class CustomFormatter(logging.Formatter):
 
     grey = "\x1b[38;20m"
@@ -9,10 +17,7 @@ class CustomFormatter(logging.Formatter):
     red = "\x1b[31;20m"
     bold_red = "\x1b[31;1m"
     reset = "\x1b[0m"
-    #format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)" 
-    #format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s "#(%(filename)s:%(lineno)d)" 
     format = "%(asctime)s - %(levelname)s - %(message)s "#(%(filename)s:%(lineno)d)" 
-    
 
     FORMATS = {
         logging.DEBUG: grey + format + reset,
@@ -27,10 +32,9 @@ class CustomFormatter(logging.Formatter):
         formatter = logging.Formatter(log_fmt, datefmt="%Y-%m-%d %H:%M:%S")
         return formatter.format(record)
     
+##
+# Class for formatting of the logging to the GUI console.
 class CustomGUIFormatter(logging.Formatter):
-
-    #format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)" 
-    #format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s "#(%(filename)s:%(lineno)d)" 
     format = "%(asctime)s - %(levelname)s - %(message)s "#(%(filename)s:%(lineno)d)" 
     
 
@@ -47,6 +51,8 @@ class CustomGUIFormatter(logging.Formatter):
         formatter = logging.Formatter(log_fmt, datefmt="%Y-%m-%d %H:%M:%S")
         return formatter.format(record)
 
+##
+# Class for instantiating a logger object for the terminal.
 class CustomLogger(object):
     def __init__(self, owner=None):
         self.owner = "Logger" if owner is None else owner
@@ -75,14 +81,18 @@ class CustomLogger(object):
     def getNewStream(self):
         pass
 
+##
+# Utility class for creating GUI loggers.
+# Has emit method which writes the logging output to the console.
 class GUILogger(logging.Handler):
     def __init__(self):
         logging.Handler.__init__(self)
 
     def emit(self, record):
-        # self.edit.textCursor().appendText(self.format(record))
         self.edit.append(self.format(record))
 
+##
+# Class for instantiating a GUI logger.
 class CustomGUILogger(object):
     def __init__(self, owner=None):
         self.owner = "Logger" if owner is None else owner
@@ -102,8 +112,6 @@ class CustomGUILogger(object):
             logger.handlers = []
         
         logger.setLevel(logging.DEBUG)
-
-        #ch.setLevel(logging.DEBUG)
 
         logger.addHandler(ch)
         return logger

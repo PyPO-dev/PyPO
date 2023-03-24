@@ -3,6 +3,20 @@ import matplotlib.pyplot as pt
 from src.PyPO.PyPOTypes import *
 from src.PyPO.BindRefl import *
 
+##
+# @file
+# File containing functions for calculating efficiencies and other metrics.
+
+##
+# Generate an elliptical mask for spillover and taper efficiency calculations.
+# The ellipse has outer and inner axes and can represent a mask that is open in the center.
+# The mask is generated in the xy plane.
+#
+# @param x Grid of x co-ordinates of surface for mask.
+# @param y Grid of y co-ordinates of surface for mask.
+# @param aperDict Dictionary containing ellipse parameters of mask.
+#
+# @returns mask The mask.
 def _generateMask(x, y, aperDict):
     
     t = np.arctan2(y, x) + np.pi
@@ -15,6 +29,12 @@ def _generateMask(x, y, aperDict):
  
     return cond1 & cond2
 
+##
+# Calculate the mean geometric center of a ray-trace frame.
+#
+# @param frame Frame to calculate center of.
+#
+# @returns center Array containing center xyz co-ordinates.
 def calcRTcenter(frame):
     idx_good = np.argwhere((frame.dx**2 + frame.dy**2 + frame.dz**2) > 0.8)
     c_x = np.sum(frame.x[idx_good]) / len(frame.x[idx_good])
@@ -23,6 +43,12 @@ def calcRTcenter(frame):
     
     return np.array([c_x, c_y, c_z])
 
+##
+# Calculate mean tilt of a ray-trace frame.
+#
+# @param frame Frame to calculate tilt of.
+#
+# @returns tilt Array containing xyz tilt components.
 def calcRTtilt(frame):
     idx_good = np.argwhere((frame.dx**2 + frame.dy**2 + frame.dz**2) > 0.8)
     t_x = np.sum(frame.dx[idx_good]) / len(frame.dx[idx_good])
@@ -31,6 +57,12 @@ def calcRTtilt(frame):
     
     return np.array([t_x, t_y, t_z]) / np.linalg.norm(np.array([t_x, t_y, t_z]))
 
+##
+# Calcuate root-mean-square (RMS) of a ray-trace frame.
+#
+# @param frame Frame to calculate RMS of.
+#
+# @returns rms The RMS value of the frame.
 def calcRMS(frame):
     idx_good = np.argwhere((frame.dx**2 + frame.dy**2 + frame.dz**2) > 0.8)
     c_f = calcRTcenter(frame) 
@@ -38,6 +70,14 @@ def calcRMS(frame):
 
     return rms
 
+##
+# Calculate spillover efficiency of a field on an aperture.
+#
+# @param field Component of a fields object.
+# @param surfaceObject Name of surface on which field is defined.
+# @param aperDict Dictionary containing parameters for aperture for calculation.
+#
+# @returns eff_s Spillover efficiency
 def calcSpillover(field, surfaceObject, aperDict):
     # Generate the grid in restframe
     grids = generateGrid(surfaceObject, transform=False, spheric=True)
@@ -52,6 +92,14 @@ def calcSpillover(field, surfaceObject, aperDict):
 
     return eff_s
 
+##
+# Calculate taper efficiency of a field on an aperture.
+#
+# @param field Component of a fields object.
+# @param surfaceObject Name of surface on which field is defined.
+# @param aperDict Dictionary containing parameters for aperture for calculation.
+#
+# @returns eff_t Taper efficiency
 def calcTaper(field, surfaceObject, aperDict):
     grids = generateGrid(surfaceObject, transform=False, spheric=True)
     area = grids.area
@@ -69,11 +117,26 @@ def calcTaper(field, surfaceObject, aperDict):
 
     return eff_t
 
+##
+# Calculate cross-polar efficiency.
+#
+# @param Cofield Co-polarised field component.
+# @param Xfield Cross-polarised field component.
+#
+# @returns eff_Xpol Cross-polar efficiency.
 def calcXpol(Cofield, Xfield):
     eff_Xpol = 1 - np.sum(np.absolute(Xfield)**2) / (np.sum(np.absolute(Cofield)**2)+np.sum(np.absolute(Xfield)**2))
 
     return eff_Xpol
 
+##
+# Calculate main beam efficiency.
+#
+# @param field Component of a fields object.
+# @param surfaceObject Name of surface on which field is defined.
+# @param fitGauss Gaussian fit to field.
+#
+# @returns eff_mb Main beam efficiency.
 def calcMainBeam(field, surfaceObject, fitGauss):
     field_norm = field / np.max(np.absolute(field))
     fitGauss_norm = fitGauss / np.max(np.absolute(fitGauss))

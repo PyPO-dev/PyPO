@@ -41,9 +41,9 @@ class Workspace(QTabWidget):
         scroll.setMaximumWidth(300)
         return scroll
 
-    def addReflector(self, name, removeAction, transformAction, plotAction, snapAction):
+    def addReflector(self, name, removeAction, transformAction, plotAction, snapAction, copyAction):
         print("refl 1")
-        self.elementLayout.addWidget(ReflectorWidget(name, removeAction, transformAction, plotAction, snapAction))
+        self.elementLayout.addWidget(ReflectorWidget(name, removeAction, transformAction, plotAction, snapAction, copyAction))
         print("refl 3")
 
 
@@ -59,13 +59,8 @@ class Workspace(QTabWidget):
     def addCurrent(self, name, removeAction, plotAction):
         self.POLayout.addWidget(CurrentWidget(name, removeAction, plotAction))
 
-    def addGroup(self, name, transformAction, snapAction, plotAction, removeAction):
-        self.groupLayout.addWidget(GroupWidget(name, transformAction, snapAction, plotAction, removeAction))
-
-
-
-
-
+    def addGroup(self, name, transformAction, snapAction, plotAction, removeAction, copyAction):
+        self.groupLayout.addWidget(GroupWidget(name, transformAction, snapAction, plotAction, removeAction, copyAction))
 
 # class ElementsSpace(QTreeWidget):
     # def __init__(self, parent=None):

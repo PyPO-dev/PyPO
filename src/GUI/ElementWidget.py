@@ -64,7 +64,9 @@ class RemoveElementDialog(QDialog):
         self.setLayout(layout)
 
 class ElementWidget(QWidget):
-    def __init__ (self, name, plotAction, removeAction, transformAction = None, RMSAction = None, snapAction = None, removeFromTree = None, p=None):
+    def __init__ (self, name, plotAction, removeAction, transformAction = None, RMSAction = None, 
+                    snapAction = None, copyAction = None, removeFromTree = None, p=None):
+
         super().__init__(parent=p)
         self.plotAction = plotAction
         self.removeAction_ = removeAction
@@ -85,6 +87,10 @@ class ElementWidget(QWidget):
             self.snapAction = snapAction
             self.actions["snapshot"] = self.snap
 
+        if copyAction:
+            self.copyAction = copyAction
+            self.actions["copy"] = self.copy
+        
 
         self.name = name
         self.setupUI()
@@ -150,16 +156,20 @@ class ElementWidget(QWidget):
         self._closeOptionsMenu()        
         self.snapAction(self.name)
     
+    def copy(self):
+        self._closeOptionsMenu()        
+        self.copyAction(self.name)
 
 
 class ReflectorWidget(ElementWidget):
-    def __init__(self, name, removeAction, transformAction, plotAction, snapAction, removeFromTree=None, p=None):
-        super().__init__(name, plotAction, removeAction, transformAction=transformAction, removeFromTree=removeFromTree, snapAction=snapAction, p=p)
+    def __init__(self, name, removeAction, transformAction, plotAction, snapAction, copyAction, removeFromTree=None, p=None):
+        super().__init__(name, plotAction, removeAction, transformAction=transformAction, 
+                removeFromTree=removeFromTree, snapAction=snapAction, copyAction=copyAction, p=p)
         print("refl 2")
 
-# class GroupWidget(ElementWidget):
-#     def __init__(self, name, removeAction, transformAction, plotAction, snapActionp=None, p=None):
-#         super().__init__(name, plotAction, removeAction, transformAction=transformAction, snapAction=self.snapAction, p=p)
+class GroupWidget(ElementWidget):
+    def __init__ (self, name, removeAction, plotAction, transformAction, snapAction, copyAction):
+        super().__init__(name, plotAction, removeAction, transformAction=transformAction, snapAction=snapAction, copyAction=copyAction)
 
 class FrameWidget(ElementWidget):
     def __init__ (self, name, removeAction, transformAction, plotAction, RMSAction, snapAction, p=None ):
@@ -178,9 +188,6 @@ class SFieldsWidget(ElementWidget):
     def __init__ (self, name, removeAction, plotAction, p=None ):
         super().__init__(name, plotAction, removeAction, p=p)
         
-class GroupWidget(ElementWidget):
-    def __init__ (self, name, removeAction, plotAction, transformAction, snapAction):
-        super().__init__(name, plotAction, removeAction, transformAction=transformAction, snapAction=snapAction)
 
 if __name__ == "__main__":
     app = QApplication([])

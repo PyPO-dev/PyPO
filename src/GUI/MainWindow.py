@@ -252,6 +252,46 @@ class MainWidget(QWidget):
                 self.clog.error(err)
     
     ##
+    # Generate a copy form for a element.
+    #
+    # @param element Name of element to be copied.
+    def copyElementActionForm(self, element):
+        self.setForm(fDataObj.copyForm(element), readAction=self.copyElementAction)
+
+    ##
+    # Copy a element in system to a new version.
+    def copyElementAction(self):
+        copyDict = self.ParameterWid.read()
+        
+        try:
+            self.stm.copyElement(copyDict["name"], copyDict["name_copy"])
+            self.addReflectorWidget(copyDict["name_copy"])
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
+    
+    ##
+    # Generate a copy form for a group.
+    #
+    # @param group Name of group to be copied.
+    def copyGroupActionForm(self, group):
+        self.setForm(fDataObj.copyForm(group), readAction=self.copyGroupAction)
+
+    ##
+    # Copy a group in system to a new version.
+    def copyGroupAction(self):
+        copyDict = self.ParameterWid.read()
+        
+        try:
+            self.stm.copyGroup(copyDict["name"], copyDict["name_copy"])
+            self.addGroupWidget(copyDict["name_copy"])
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
+    
+    ##
     # plots all elements of the system in one plot
     def plotSystem(self):
         if self.stm.system:
@@ -427,11 +467,11 @@ class MainWidget(QWidget):
     def addReflectorWidget(self, name):
         print("addREFL")
         print(f"r {name}")
-        self.ElementsColumn.addReflector(name, self.removeElement, self.transformSingleForm, self.plotElement, self.snapActionForm)
+        self.ElementsColumn.addReflector(name, self.removeElement, self.transformSingleForm, self.plotElement, self.snapActionForm, self.copyElementActionForm)
         # self.ElementsColumn.reflectors.addWidget(ReflectorWidget(name, self.removeElement, self.transformSingleForm, self.plotElement, self.snapActionForm)) 
     
     def addGroupWidget(self, name):
-        self.ElementsColumn.addGroup(name, self.stm.removeGroup, self.plotGroup, self.transformGroupForm, self.snapGroupActionForm)
+        self.ElementsColumn.addGroup(name, self.stm.removeGroup, self.plotGroup, self.transformGroupForm, self.snapGroupActionForm, self.copyGroupActionForm)
     
     def addFrameWidget(self, name):
         self.ElementsColumn.addRayTraceFrames(name, self.removeFrame, 
@@ -921,7 +961,7 @@ class MainWidget(QWidget):
         except Exception as err:
             print(err)
             traceback.print_tb(err.__traceback__)
-            self.clog.error("PO Propagation did not end successfully.")
+            self.clog.error(f"PO Propagation did not end successfully: {err}.")
         
         dtime = time.time() - start_time
         self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")

@@ -896,6 +896,17 @@ class System(object):
         self.clog.info(f"Copied element {name} to {name_copy}.")
     
     ##
+    # Copy group.
+    #
+    # @ param name Name of group to be copied.
+    def copyGroup(self, name, name_copy):
+        check_groupSystem(name, self.groups, self.clog, extern=True)
+        self.groups[name_copy] = self.copyObj(self.groups[name])
+        print(id(self.groups[name_copy]))
+        print(id(self.groups[name]))
+        self.clog.info(f"Copied group {name} to {name_copy}.")
+    
+    ##
     # Remove a ray-trace frame from system
     #
     # @param frameName Name of frame to be removed.

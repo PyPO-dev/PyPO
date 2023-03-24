@@ -463,3 +463,7 @@ def addGroupForm(elements):
         InputDescription(inType.vectorStrings, "name", toolTip= "Give the group a name"),
         InputDescription(inType.elementSelector, "selected", "elements", options = elements )
     ]
+
+def copyForm(name):
+    return [InputDescription(inType.static, "name", staticValue=name, hidden=True),
+            InputDescription(inType.vectorStrings, "name_copy", label="Name of copy", numFields=1)]

@@ -695,8 +695,8 @@ class System(object):
             check_groupSystem(name, self.groups, self.clog, extern=True)
             self.groups[name]["snapshots"][snap_name] = []
 
-            for elem in self.groups[name]:
-                self.groups[name]["snapshots"][snap_name].append(self.copyObj(elem["transf"]))
+            for elem in self.groups[name]["members"]:
+                self.groups[name]["snapshots"][snap_name].append(self.copyObj(self.system[elem]["transf"]))
             
             self.clog.info(f"Saved snapshot {snap_name} for group {name}.")
         
@@ -722,8 +722,8 @@ class System(object):
         if obj == "group":
             check_groupSystem(name, self.groups, self.clog, extern=True)
 
-            for elem, snap in zip(self.groups[name], self.groups[name]["snapshots"][snap_name]):
-                elem["transf"] = self.copyObj(snap)
+            for elem, snap in zip(self.groups[name]["members"], self.groups[name]["snapshots"][snap_name]):
+                self.system[elem]["transf"] = self.copyObj(snap)
             
             self.clog.info(f"Reverted group {name} to snapshot {snap_name}.")
 
@@ -785,6 +785,8 @@ class System(object):
                 "ori"       : ori,
                 "snapshots" : {}
                 }
+        self.clog.info(f"Grouped elements {names} into group {name_group}.")
+
     ##
     # Remove a group of elements from system. Note that this does not remove the elements inside the group.
     #
@@ -793,6 +795,7 @@ class System(object):
         for ng in names:
             check_groupSystem(ng, self.groups, self.clog, extern=True)
             del self.groups[ng]
+        self.clog.info(f"Removed group {names} from system.")
 
     ##
     # Generate reflector grids and normals.
@@ -825,6 +828,9 @@ class System(object):
         with open(os.path.join(path, "system.pys"), 'wb') as file: 
             pickle.dump(self.system, file)
         
+        with open(os.path.join(path, "groups.pys"), 'wb') as file: 
+            pickle.dump(self.groups, file)
+        
         with open(os.path.join(path, "frames.pys"), 'wb') as file: 
             pickle.dump(self.frames, file)
         
@@ -836,6 +842,8 @@ class System(object):
         
         with open(os.path.join(path, "scalarfields.pys"), 'wb') as file: 
             pickle.dump(self.scalarfields, file)
+        
+        self.clog.info(f"Saved current system to {name}.")
 
     ##
     # Load a system object from /save/systems/. This loads all reflectors, fields, currents and frames in the system to disk.
@@ -852,6 +860,9 @@ class System(object):
 
         with open(os.path.join(path, "system.pys"), 'rb') as file: 
             self.system = pickle.load(file)
+        
+        with open(os.path.join(path, "groups.pys"), 'rb') as file: 
+            self.groups = pickle.load(file)
         
         with open(os.path.join(path, "frames.pys"), 'rb') as file: 
             self.frames = pickle.load(file)

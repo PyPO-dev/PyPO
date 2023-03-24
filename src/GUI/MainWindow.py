@@ -420,7 +420,7 @@ class MainWidget(QWidget):
                 self.addSFieldWidget(key)
                 
             elif columnType == "groups":
-                self.addSFieldWidget(key)
+                self.addGroupWidget(key)
 
     ### Functionalities: Adding Elements in gui
     # TODO:doc

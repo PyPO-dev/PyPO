@@ -239,9 +239,6 @@ void propagateRays(reflparams ctp, cframe *fr_in, cframe *fr_out,
     int nTot = fr_in->size;
     RayTracer<reflparams, cframe, double> RT(numThreads, nTot, epsilon);
 
-    std::chrono::steady_clock::time_point begin;
-    std::chrono::steady_clock::time_point end;
-
     RT.parallelRays(ctp, fr_in, fr_out, t0);
 }
 

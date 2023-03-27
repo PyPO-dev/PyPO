@@ -20,6 +20,7 @@ from src.PyPO.BindRefl import *
 from src.PyPO.BindGPU import *
 from src.PyPO.BindCPU import *
 from src.PyPO.BindBeam import *
+from src.PyPO.BindTransf import *
 from src.PyPO.MatTransform import *
 from src.PyPO.PyPOTypes import *
 from src.PyPO.Checks import *
@@ -562,7 +563,8 @@ class System(object):
 
                 self.frames[name].transf = Rtot
                 #self.frames[name].transf[:-1, :-1] = (MatRotate(rotation, pivot=pivot))[:-1, :-1]
-                self._transformFrame(self.frames[name])
+                _fr = transformRays(self.frames[name])
+                self.frames[name] = self.copyObj(_fr)
 
                 #print(np.linalg.det(self.frames[name].transf))
 
@@ -572,7 +574,8 @@ class System(object):
 
             elif mode == "relative":
                 self.frames[name].transf = MatRotate(rotation, pivot=pivot)
-                self._transformFrame(self.frames[name])
+                _fr = transformRays(self.frames[name])
+                self.frames[name] = self.copyObj(_fr)
                 #print(np.linalg.det(self.frames[name].transf))
                 
                 self.frames[name].pos = (MatRotate(rotation, pivot=pivot) @ np.append(self.frames[name].pos, 1))[:-1]
@@ -631,7 +634,8 @@ class System(object):
             
 
             self.frames[name].transf = MatTranslate(_translation)
-            self._transformFrame(self.frames[name])
+            _fr = transformRays(self.frames[name])
+            self.frames[name] = self.copyObj(_fr)
             self.frames[name].pos += _translation
             
             if mode == "absolute":
@@ -738,7 +742,8 @@ class System(object):
             check_frameSystem(name, self.frames, self.clog, extern=True)
             self.frames[name].transf = self.copyObj(self.frames[name].snapshots[snap_name])
             
-            self._transformFrame(self.frames[name])
+            _fr = transformRays(self.frames[name])
+            self.frames[name] = self.copyObj(_fr)
             
             self.clog.info(f"Reverted frame {name} to snapshot {snap_name}.")
     
@@ -1087,6 +1092,8 @@ class System(object):
         self.frames[argDict["name"]].pos = world.ORIGIN
         self.frames[argDict["name"]].ori = world.IAX
         self.frames[argDict["name"]].transf = world.INITM
+
+        self.clog.info(f"Added tubular frame {argDict['name']} to system.")
     
     ##
     # Create a Gaussian beam distribution of rays from a GRTDict.
@@ -1116,6 +1123,7 @@ class System(object):
         
         dtime = time.time() - start_time
         self.clog.info(f"Succesfully sampled {argDict['nRays']} rays: {dtime} seconds.")
+        self.clog.info(f"Added Gaussian frame {argDict['name']} to system.")
 
     ##
     # Convert a Poynting vector grid to a frame object. Sort of private method
@@ -2037,27 +2045,6 @@ class System(object):
                     self.currents[current].Mx.ravel()[i] = new[0]
                     self.currents[current].My.ravel()[i] = new[1]
                     self.currents[current].Mz.ravel()[i] = new[2]
-    
-    ##
-    # Transform a ray-trace frame.
-    # The transformation is done according to the internal transformation matrix of frame object.
-    #
-    # @param frame Frame object to be transformed.
-    def _transformFrame(self, frame):
-        for i in range(frame.size):
-            vec = np.array([frame.x[i], frame.y[i], frame.z[i], 1])
-            pos_new = frame.transf @ vec
-
-            frame.x[i] = pos_new[0]
-            frame.y[i] = pos_new[1]
-            frame.z[i] = pos_new[2]
-
-            vec = np.array([frame.dx[i], frame.dy[i], frame.dz[i]])
-            ori_new = frame.transf[:-1, :-1] @ vec
-
-            frame.dx[i] = ori_new[0]
-            frame.dy[i] = ori_new[1]
-            frame.dz[i] = ori_new[2]
    
     ##
     # Transform a single component to a filled fields object by setting all other components to zero.

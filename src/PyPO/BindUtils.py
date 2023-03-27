@@ -498,6 +498,21 @@ def allfill_SGPODict(res, sgdict_py, ct_t):
     res.dxyz = ct_t(gdict_py["dxyz"])
 
 ##
+# Allocate and fill a 4D matrix for transforming frames and fields/currents.
+#
+# @param mat Matrix containing transformation.
+# @param ct_t Type of field in matrix.
+#
+# @returns c_mat The ctypes representation of the matrix.
+def allfill_mat4D(mat, ct_t):
+    c_mat = (ct_t * 16)()
+    
+    for i in range(16):
+        c_mat[i] = ct_t(mat.ravel()[i])
+
+    return c_mat
+
+##
 # Convert a reflector grids struct to a PyPO grids object.
 #
 # @param res A reflcontainer or reflcontainerf struct.
@@ -546,3 +561,4 @@ def frameToObj(res, np_t, shape):
     out = frame(shape[0], x, y, z, dx, dy, dz)
 
     return out 
+

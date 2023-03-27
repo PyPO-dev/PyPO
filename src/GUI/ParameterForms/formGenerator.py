@@ -66,11 +66,15 @@ class FormGenerator(QWidget):
     def setupButtons(self):
         addBtn = QPushButton(self.okText)
         addBtn.clicked.connect(self.readme)
-        canselBtn = QPushButton("Cancel")
-        canselBtn.clicked.connect(self.cancelAction)
+        closeBtn = QPushButton("Close")
+        closeBtn.clicked.connect(self.closeAction)
+        clearBtn = QPushButton("Clear")
+        clearBtn.clicked.connect(self.clearAction)
         btnWidget = QWidget()
-        btnlayout = QFormLayout(btnWidget)
-        btnlayout.addRow(canselBtn, addBtn)
+        btnlayout = QHBoxLayout(btnWidget)
+        btnlayout.addWidget(closeBtn)
+        btnlayout.addWidget(clearBtn)
+        btnlayout.addWidget(addBtn)
         btnWidget.setContentsMargins(0,4,20,0)
         self.layout.addRow(btnWidget)
         spacerWidget = QWidget()
@@ -78,8 +82,12 @@ class FormGenerator(QWidget):
         spacerLayout.addItem(QSpacerItem(0,0, QSizePolicy.Expanding, QSizePolicy.MinimumExpanding))
         self.layout.addRow(spacerWidget)
 
-    def cancelAction(self):
+    def closeAction(self):
         self.setParent(None)
+
+    def clearAction(self):
+        for input in self.inputs:
+            input.clear()
 
     def read(self):
         paramDict = {}
@@ -134,6 +142,9 @@ class DynamicDropdownWidget(QWidget):
         if self.hasChildren:
             self.stackedWidget.setCurrentIndex(index)
             self.currentChild = self.children[index-1]
+
+    def clear(self):
+        self.mode.clear()
 
     def read(self):
         print("reading dynamic dropdown")
@@ -196,6 +207,9 @@ class DynamicRadioWidget(QWidget):
         if self.hasChildren:
             self.stackedWidget.setCurrentIndex(index+1)
             self.currentChild = self.children[index]
+
+    def clear(self):
+        self.mode.clear()
 
     def read(self):
         print("reading dynamic radio")

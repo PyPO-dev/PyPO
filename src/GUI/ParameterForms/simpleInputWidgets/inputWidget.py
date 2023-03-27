@@ -14,10 +14,14 @@ class inputWidgetInterface(QWidget, ABC, metaclass=MetaCombinerInputWidget):
     def read() -> dict:
         """
         subclasses need to reimplement this method and return a dict 
-        containing a string as key. This string should orinate from 
+        containing a string as key. This string should originate from 
         the instances InputDescription.outputName. If outputName is 
         None then it should return an empty dict   
         """
+        pass
+
+    @abstractclassmethod
+    def clear() -> dict:
         pass
 
 class MetaCombinerselectionWidget(type(inputWidgetInterface), type(ABC)): pass

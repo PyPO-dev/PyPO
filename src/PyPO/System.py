@@ -82,7 +82,6 @@ class System(object):
         self.nThreads_cpu = os.cpu_count()
         self.context = context
         
-        # Config.initPrint(None) ##TODO:AREND
         Config.setContext(context)
         
         # Internal dictionaries
@@ -144,7 +143,7 @@ class System(object):
     ##
     # Destructor. Deletes any reference to the logger assigned to current system.
     def __del__(self):
-        if self.context != "S":
+        if self.context != "G":
             self.clog.info("EXITING SYSTEM.")
             del self.clog_mgr
             del self.clog

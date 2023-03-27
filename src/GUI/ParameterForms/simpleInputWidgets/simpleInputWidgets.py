@@ -19,6 +19,9 @@ class StaticInput(inputWidgetInterface):
         
         if self.inputDescription.toolTip:
             self.setToolTip(self.inputDescription.toolTip)
+    
+    def clear(self):
+        pass
 
     def read(self):
         if self.inputDescription.outputName is None:
@@ -44,6 +47,12 @@ class checkbox(inputWidgetInterface):
 
         if self.inputDescription.prefill:
             self.box.setChecked(True)
+    
+    def clear(self):
+        if self.inputDescription.prefill:
+            self.box.setChecked(True)
+        else:
+            self.box.setChecked(False)
 
     def read(self):
         if self.inputDescription.outputName is None:
@@ -100,7 +109,13 @@ class VectorInput(inputWidgetInterface):
             if type(hint) != self.enumToType(self.inputDescription.inType):
                 raise Exception(f"Cannot prefill. Hint has unexpected type {type(hint)}, expected {self.enumToType(self.inputDescription.inType)}")
             self.inputs[i].setText(str(hint))
-    
+
+    def clear(self):
+        for edit in self.inputs:
+            edit.setText("")
+        if self.inputDescription.prefill:
+            self.prefill()
+
     def read(self):
         if self.inputDescription.outputName is None:
             return {}
@@ -154,13 +169,17 @@ class SimpleRadio(selectionWidgetInterface):
         if self.inputDescription.toolTip:
             self.setToolTip(self.inputDescription.toolTip)
 
-
+    
     def read(self):
         if self.inputDescription.outputName is None:
             return {}
         d = {self.inputDescription.outputName : self.inputDescription.options[self.group.checkedId()]}
         return d
     
+    def clear(self):
+        for btn in self.group.buttons():
+            btn.setDown(False)
+        
     def currentIndex(self):
         return self.group.checkedId()
 
@@ -212,6 +231,10 @@ class SimpleDropdown(selectionWidgetInterface):
 
     def currentIndex(self):
         return self.comboBox.currentIndex()
+    
+    def clear(self):
+        self.comboBox.setCurrentIndex(0)
+        self.selectionChanged()
 
 
 class XYZRadio(inputWidgetInterface):
@@ -257,6 +280,11 @@ class XYZRadio(inputWidgetInterface):
                 if btn.text() == s and btn.isChecked(): 
                     btn.toggle()
                     return
+                
+        def clear(self):
+            for btn in self.group.buttons():
+                btn.setChecked(False)
+
         
     def __init__(self, inp, parent=None):
         super().__init__(parent)
@@ -274,6 +302,10 @@ class XYZRadio(inputWidgetInterface):
 
         if self.inputDescription.toolTip:
             self.setToolTip(self.inputDescription.toolTip)
+
+    def clear(self):
+        self.r1.clear()
+        self.r2.clear()
 
     def read(self):
         if self.r1.group.checkedButton()==None or self.r2.group.checkedButton()==None:
@@ -321,9 +353,15 @@ class ElementSelectionWidget(QWidget):
             self.selectedList.setToolTip("Click item to remove")
 
     def removeItem(self, x):
+        print(f"removing item {x = } of type {type(x)}")
         i = self.selectedList.takeItem(self.selectedList.indexFromItem(x).row())
         self.dropdown.addItem(i.text())
         self.selectedElements.remove(i.text())
+
+    def clear(self):
+        while len(self.selectedElements)>0:
+            self.removeItem(self.selectedList.item(0))
+
 
     def read(self):
         return {self.inputDescription.outputName :self.selectedElements}

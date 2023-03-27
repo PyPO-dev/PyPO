@@ -65,7 +65,7 @@ Plane = [
 def reader():
     print(win.read())
 
-win = FormGenerator(Plane, reader)
+win = FormGenerator(Plane, reader,okText="OK")
 
 # +   [InputDescription(inType.vectorStrings, "name", label="Name of frame", numFields=1),
 #             InputDescription(inType.vectorIntegers, "nRays", label="# of rays", hints=[0], numFields=1),

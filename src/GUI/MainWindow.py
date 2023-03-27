@@ -145,31 +145,39 @@ class MainWidget(QWidget):
     # 
     def setForm(self, formData, readAction, okText=None):
         if hasattr(self, "ParameterWid"):
-            self.ParameterWid.setParent(None)
+            try:
+                self.ParameterWid.setParent(None)
+            except:
+                pass
         if okText:
             self.ParameterWid = formGenerator.FormGenerator(formData, readAction, okText=okText)
         else:
             self.ParameterWid = formGenerator.FormGenerator(formData, readAction)
+        self.ParameterWid.closed.connect(self.removeForm)
         self.ParameterWid.setMaximumWidth(400)
         self.ParameterWid.setMinimumWidth(400)
         # self.ParameterWid.setContentsMargins(5,5,5,5)
-        scroll = QScrollArea()
-        scroll.setWidget(self.ParameterWid)
-        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.formScroll = QScrollArea()
+        self.formScroll.setWidget(self.ParameterWid)
+        self.formScroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.formScroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         # scroll.border
-        scroll.setWidgetResizable(True)
-        scroll.setContentsMargins(0,0,0,0)
-        scroll.setMinimumWidth(300)
-        scroll.setMaximumWidth(400)
-        self.addToWindowGrid(scroll,self.GPParameterForm)
+        self.formScroll.setWidgetResizable(True)
+        self.formScroll.setContentsMargins(0,0,0,0)
+        self.formScroll.setMinimumWidth(300)
+        self.formScroll.setMaximumWidth(400)
+        self.addToWindowGrid(self.formScroll,self.GPParameterForm)
     
     ## 
     # removes the form ParameterWid if exists 
     def removeForm(self):
-        if hasattr(self, "ParameterWid"):
-            self.ParameterWid.setParent(None)
+        if hasattr(self, "formScroll"):
+            self.formScroll.setParent(None)
+            self.formScroll.deleteLater()
     
+    def formClosed(self):
+        print("form closed")
+        print(self.formScroll)
     ##
     # TODO: Remove this function from here
     @staticmethod
@@ -259,7 +267,7 @@ class MainWidget(QWidget):
     #
     # @param element Name of element to be copied.
     def copyElementActionForm(self, element):
-        self.setForm(fDataObj.copyForm(element), readAction=self.copyElementAction)
+        self.setForm(fDataObj.copyForm(element), readAction=self.copyElementAction, okText="Make Copy")
 
     ##
     # Copy a element in system to a new version.
@@ -279,7 +287,7 @@ class MainWidget(QWidget):
     #
     # @param group Name of group to be copied.
     def copyGroupActionForm(self, group):
-        self.setForm(fDataObj.copyForm(group), readAction=self.copyGroupAction)
+        self.setForm(fDataObj.copyForm(group), readAction=self.copyGroupAction, okText="Make Copy")
 
     ##
     # Copy a group in system to a new version.
@@ -349,7 +357,7 @@ class MainWidget(QWidget):
     ##
     # opens a form that allows user to save the System
     def saveSystemForm(self):
-        self.setForm(fDataObj.saveSystemForm(), readAction=self.saveSystemAction)
+        self.setForm(fDataObj.saveSystemForm(), readAction=self.saveSystemAction, okText="Save System")
     
     ##
     # Saves the current system state under the name given in form
@@ -362,7 +370,7 @@ class MainWidget(QWidget):
     # opens a form that allows user to delete a saved System
     def deleteSavedSystemForm(self):
         systemList = [os.path.split(x[0])[-1] for x in os.walk(self.stm.savePathSystems) if os.path.split(x[0])[-1] != "systems"]
-        self.setForm(fDataObj.loadSystemForm(systemList), readAction=self.deleteSavedSystemAction)
+        self.setForm(fDataObj.loadSystemForm(systemList), readAction=self.deleteSavedSystemAction, okText="Delete System")
 
     ##
     # Deletes system selected in form
@@ -374,7 +382,7 @@ class MainWidget(QWidget):
     # opens a form that allows user to load a saved System
     def loadSystemForm(self):
         systemList = [os.path.split(x[0])[-1] for x in os.walk(self.stm.savePathSystems) if os.path.split(x[0])[-1] != "systems"]
-        self.setForm(fDataObj.loadSystemForm(systemList), readAction=self.loadSystemAction)
+        self.setForm(fDataObj.loadSystemForm(systemList), readAction=self.loadSystemAction, okText="Load System")
     
     ##
     # Loads system selected in from form
@@ -581,12 +589,12 @@ class MainWidget(QWidget):
     ##
     # Shows single element transformation form
     def transformSingleForm(self, element):
-        self.setForm(fDataObj.makeTransformationForm(element), self.transformAction)
+        self.setForm(fDataObj.makeTransformationForm(element), self.transformAction, okText="Apply transformation")
     
     ##
     # Shows single element transformation form
     def transformFrameForm(self, frame):
-        self.setForm(fDataObj.makeTransformationForm(frame, obj="frame"), self.transformFrameAction)
+        self.setForm(fDataObj.makeTransformationForm(frame, obj="frame"), self.transformFrameAction, okText="Apply transformation")
     
     ##
     # Applies single element transformation
@@ -612,7 +620,7 @@ class MainWidget(QWidget):
     ##
     # Shows group transformation form
     def transformGroupForm(self, group):
-        self.setForm(fDataObj.makeTransformationForm(group, obj="group"), self.transformGroupAction)
+        self.setForm(fDataObj.makeTransformationForm(group, obj="group"), self.transformGroupAction, okText="Apply transformation")
     
     ##
     # Applies group transformation
@@ -660,7 +668,7 @@ class MainWidget(QWidget):
         self.setForm(
             [InputDescription(inType.elementSelector, "elements", options=movableElements)]+
             fDataObj.makeTransformationElementsForm(self.stm.system.keys()), self.transformationMultipleAction
-            )
+            , okText="Apply transformation")
 
     ##
     # Applies multiple element transformation
@@ -681,7 +689,7 @@ class MainWidget(QWidget):
     ##
     # Shows tube frame form
     def initTubeFrameForm(self):
-        self.setForm(fDataObj.initTubeFrameInp(), readAction=self.initTubeFrameAction)
+        self.setForm(fDataObj.initTubeFrameInp(), readAction=self.initTubeFrameAction, okText="Initialize frame")
     
     ##
     # Reads form and adds a tube frame to system
@@ -699,7 +707,7 @@ class MainWidget(QWidget):
     ##
     # Shows form to initialize gaussian frame 
     def initGaussianFrameForm(self):
-        self.setForm(fDataObj.initGaussianFrameInp(), readAction=self.initGaussianFrameAction)
+        self.setForm(fDataObj.initGaussianFrameInp(), readAction=self.initGaussianFrameAction, okText="Initialize frame")
     
 
     ##
@@ -740,7 +748,7 @@ class MainWidget(QWidget):
     ##
     # Shows form to propagate rays
     def setPropRaysForm(self):
-        self.setForm(fDataObj.propRaysInp(self.stm.frames, self.stm.system), self.addPropRaysAction)
+        self.setForm(fDataObj.propRaysInp(self.stm.frames, self.stm.system), self.addPropRaysAction, okText="Propagate rays")
 
     ##
     # Reads form and popagates rays
@@ -760,7 +768,7 @@ class MainWidget(QWidget):
     # 
     # @param frame Frame to plot
     def plotFrameForm(self, frame):
-        self.setForm(fDataObj.plotFrameOpt(frame), readAction=self.addPlotFrameAction)
+        self.setForm(fDataObj.plotFrameOpt(frame), readAction=self.addPlotFrameAction, okText="Plot frame")
 
     ##
     # Reads form and plots frame
@@ -775,7 +783,7 @@ class MainWidget(QWidget):
     ##
     # Shows form to initialize gaussian beam 
     def initGaussBeamForm(self):
-        self.setForm(fDataObj.initGaussianInp(self.stm.system), readAction=self.initGaussBeamAction)
+        self.setForm(fDataObj.initGaussianInp(self.stm.system), readAction=self.initGaussBeamAction, okText="Initialize beam")
 
     ##
     # Reads form and adds a vectorial gaussian beam to system
@@ -794,7 +802,7 @@ class MainWidget(QWidget):
     ##
     # Shows form to initialize scalar gaussian beam TODO: klopt dit 
     def initSGaussBeamForm(self):
-        self.setForm(fDataObj.initSGaussianInp(self.stm.system), readAction=self.initSGaussBeamAction)
+        self.setForm(fDataObj.initSGaussianInp(self.stm.system), readAction=self.initSGaussBeamAction, okText="Initialize beam")
     
     ##
     # Reads form and adds a scalar gaussian beam to system
@@ -811,7 +819,7 @@ class MainWidget(QWidget):
     ##
     # Shows form to initialize a physical optics propagation
     def initPSBeamForm(self):
-        self.setForm(fDataObj.initPSInp(self.stm.system), readAction=self.initPSBeamAction)
+        self.setForm(fDataObj.initPSInp(self.stm.system), readAction=self.initPSBeamAction, okText="Initialize beam")
     
     
     ##
@@ -831,7 +839,7 @@ class MainWidget(QWidget):
     ##
     # Shows form to initialize a scalar point source beam
     def initSPSBeamForm(self):
-        self.setForm(fDataObj.initSPSInp(self.stm.system), readAction=self.initSPSBeamAction)
+        self.setForm(fDataObj.initSPSInp(self.stm.system), readAction=self.initSPSBeamAction, okText="Initialize beam")
     
 
     ##
@@ -853,9 +861,9 @@ class MainWidget(QWidget):
     # @param field Field to plot
     def plotFieldForm(self, field):
         if self.stm.system[self.stm.fields[field].surf]["gmode"] == 2:
-            self.setForm(fDataObj.plotFarField(field), readAction=self.plotFieldAction)
+            self.setForm(fDataObj.plotFarField(field), readAction=self.plotFieldAction, okText="Plot")
         else:
-            self.setForm(fDataObj.plotField(field), readAction=self.plotFieldAction)
+            self.setForm(fDataObj.plotField(field), readAction=self.plotFieldAction, okText="Plot")
 
     ##
     # Reads form and plots field
@@ -872,7 +880,7 @@ class MainWidget(QWidget):
     #
     # @param field Field to plot
     def plotSFieldForm(self, field):
-        self.setForm(fDataObj.plotSField(field, self.stm.system[self.stm.scalarfields[field].surf]["gmode"]), readAction=self.plotSFieldAction)
+        self.setForm(fDataObj.plotSField(field, self.stm.system[self.stm.scalarfields[field].surf]["gmode"]), readAction=self.plotSFieldAction, okText="Plot")
 
     ##
     # Reads form and plots scalar field
@@ -890,7 +898,7 @@ class MainWidget(QWidget):
     #
     # @param current Current to plot
     def plotCurrentForm(self, current):
-        self.setForm(fDataObj.plotCurrentOpt(current), readAction=self.plotCurrentAction)
+        self.setForm(fDataObj.plotCurrentOpt(current), readAction=self.plotCurrentAction, okText="Plot")
     
     ##
     # Reads form and plots current
@@ -907,12 +915,12 @@ class MainWidget(QWidget):
     ##
     # Shows form to propagate physical optics beam to surface 
     def propPOForm(self):
-        self.setForm(fDataObj.propPOInp(self.stm.currents, self.stm.scalarfields, self.stm.system), self.propPOAction)
+        self.setForm(fDataObj.propPOInp(self.stm.currents, self.stm.scalarfields, self.stm.system), self.propPOAction, okText="Propagate beam")
     
     ##
     # Shows form to propagate physical optics beam far field 
     def propPOFFForm(self):
-        self.setForm(fDataObj.propPOFFInp(self.stm.currents, self.stm.system), self.propPOAction)
+        self.setForm(fDataObj.propPOFFInp(self.stm.currents, self.stm.system), self.propPOAction, okText="Propagate beam")
    
     def _addToWidgets(self, propBeamDict):
         if propBeamDict["mode"] == "JM":
@@ -974,22 +982,22 @@ class MainWidget(QWidget):
     ##
     # Shows form to calculate taper efficientie
     def setTaperEffsForm(self):
-        self.setForm(fDataObj.calcTaperEff(self.stm.fields, self.stm.system), self.calcTaperAction)
+        self.setForm(fDataObj.calcTaperEff(self.stm.fields, self.stm.system), self.calcTaperAction, okText="Calculate")
     
     ##
     # Shows form to calculate spillover efficientie
     def setSpillEffsForm(self):
-        self.setForm(fDataObj.calcSpillEff(self.stm.fields, self.stm.system), self.calcSpillAction)
+        self.setForm(fDataObj.calcSpillEff(self.stm.fields, self.stm.system), self.calcSpillAction, okText="Calculate")
 
     ##
     # Shows form to calculate x-pol efficientie TODO: x-pol
     def setXpolEffsForm(self):
-        self.setForm(fDataObj.calcXpolEff(self.stm.fields, self.stm.system), self.calcXpolAction)
+        self.setForm(fDataObj.calcXpolEff(self.stm.fields, self.stm.system), self.calcXpolAction, okText="Calculate")
 
     ##
     # Shows form to calculate main beam efficientie
     def setMBEffsForm(self):
-        self.setForm(fDataObj.calcMBEff(self.stm.fields, self.stm.system), self.calcMBAction)
+        self.setForm(fDataObj.calcMBEff(self.stm.fields, self.stm.system), self.calcMBAction, okText="Calculate")
     
     ##
     # Reads form and calculates taper efficientie
@@ -1037,7 +1045,7 @@ class MainWidget(QWidget):
         self.clog.info(f"RMS value of {frame} : {rms} mm")
 
     def setFocusFindForm(self):
-        self.setForm(fDataObj.focusFind(list(self.stm.frames.keys())), self.findFocusAction)
+        self.setForm(fDataObj.focusFind(list(self.stm.frames.keys())), self.findFocusAction, okText="Find focus")
 
     def findFocusAction(self):
         # print(self.ParameterWid.read())

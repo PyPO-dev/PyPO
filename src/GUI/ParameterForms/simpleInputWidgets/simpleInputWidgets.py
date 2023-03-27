@@ -158,6 +158,7 @@ class SimpleRadio(selectionWidgetInterface):
         else:
             options = self.inputDescription.options
         self.group = QButtonGroup()
+        self.group.setExclusive(False)
         self.group.buttonClicked.connect(self.selectionChanged)
         for i in range(len(options)):
             rb = QRadioButton(options[i])
@@ -177,9 +178,12 @@ class SimpleRadio(selectionWidgetInterface):
         return d
     
     def clear(self):
+        self.group.setExclusive(False)
         for btn in self.group.buttons():
-            btn.setDown(False)
-        
+            btn.setChecked(False)
+        self.group.setExclusive(True)
+        self.selectionChanged()
+    
     def currentIndex(self):
         return self.group.checkedId()
 

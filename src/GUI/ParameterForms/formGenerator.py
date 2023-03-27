@@ -1,11 +1,13 @@
 from PyQt5.QtWidgets import QWidget, QComboBox, QFormLayout, QLabel, QLineEdit, QVBoxLayout, QHBoxLayout, QPushButton, QStackedWidget, QCheckBox, QRadioButton, QButtonGroup, QGridLayout, QSpacerItem, QSizePolicy
-from PyQt5.QtCore import QRegExp, Qt, pyqtSlot
+from PyQt5.QtCore import QRegExp, Qt, pyqtSlot, pyqtSignal
 from PyQt5.QtGui import QRegExpValidator
 from src.GUI.utils import *
 from src.GUI.ParameterForms.simpleInputWidgets.simpleInputWidgets import checkbox, StaticInput, VectorInput, SimpleRadio, SimpleDropdown, XYZRadio, ElementSelectionWidget
 from src.GUI.ParameterForms.InputDescription import *
 
 class FormGenerator(QWidget):
+    closed = pyqtSignal()
+
     def __init__ (self, ElementData, readAction = None, addButtons=True, test=False, okText="Add"):
         super().__init__()
         if addButtons and readAction == None and not test:
@@ -69,7 +71,7 @@ class FormGenerator(QWidget):
         closeBtn = QPushButton("Close")
         closeBtn.clicked.connect(self.closeAction)
         clearBtn = QPushButton("Clear")
-        clearBtn.clicked.connect(self.clearAction)
+        clearBtn.clicked.connect(self.clear)
         btnWidget = QWidget()
         btnlayout = QHBoxLayout(btnWidget)
         btnlayout.addWidget(closeBtn)
@@ -83,9 +85,9 @@ class FormGenerator(QWidget):
         self.layout.addRow(spacerWidget)
 
     def closeAction(self):
-        self.setParent(None)
+        self.closed.emit()
 
-    def clearAction(self):
+    def clear(self):
         for input in self.inputs:
             input.clear()
 
@@ -98,7 +100,7 @@ class FormGenerator(QWidget):
     
 
 
-    
+
 
 class DynamicDropdownWidget(QWidget):
     def __init__ (self, inp):
@@ -145,6 +147,8 @@ class DynamicDropdownWidget(QWidget):
 
     def clear(self):
         self.mode.clear()
+        for child in self.children:
+            child.clear()
 
     def read(self):
         print("reading dynamic dropdown")

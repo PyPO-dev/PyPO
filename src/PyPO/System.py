@@ -1809,7 +1809,7 @@ class System(object):
     def findRTfocus(self, name_frame, f0=None, verbose=False):
         check_frameSystem(name_frame, self.frames, self.clog, extern=True)
         f0 = 0 if f0 is None else f0
-        
+       
         if not verbose:
             self.setLoggingVerbosity(verbose=False)
         

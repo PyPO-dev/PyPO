@@ -1042,7 +1042,10 @@ class MainWidget(QWidget):
     def findFocusAction(self):
         # print(self.ParameterWid.read())
         findFocusDict = self.ParameterWid.read()
-        focus = self.stm.findRTfocus(findFocusDict["name_frame"], verbose=True) 
+        focus = self.stm.findRTfocus(findFocusDict["name_frame"], verbose=True)
+        self.addReflectorWidget(f"focal_plane_{findFocusDict['name_frame']}")
+        self.addFrameWidget(f"focus_{findFocusDict['name_frame']}")
+        
         self.clog.info(f"Focus of {findFocusDict['name_frame']} : {focus}")
 
 class PyPOMainWindow(QMainWindow):

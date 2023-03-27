@@ -66,19 +66,19 @@ template<typename T>
 T pdfGauss(std::vector<T> vars, std::vector<T> scales);
 
 /** 
- * Initialize Gaussian beam from GDict or GDictf.
+ * Initialize Gaussian beam from GPODict or GPODictf.
  *
- * Takes a GDict or GDictf and generates two c2Bundle or c2Bundlef objects, which contain the field and 
+ * Takes a GPODict or GPODictf and generates two c2Bundle or c2Bundlef objects, which contain the field and 
  *      associated currents and are allocated to passed pointer arguments.
  *
- * @param gdict GDict or GDictf object from which to generate a Gaussian beam.
+ * @param gdict GPODict or GPODictf object from which to generate a Gaussian beam.
  * @param refldict reflparams or reflparamsf object corresponding to surface on
  *      which to generate the Gaussian beam.
  * @param res_field Pointer to c2Bundle or c2Bundlef object.
  * @param res_current Pointer to c2Bundle or c2Bundlef object.
  *
- * @see GDict
- * @see GDictf
+ * @see GPODict
+ * @see GPODictf
  * @see reflparams
  * @see reflparamsf
  * @see c2Bundle
@@ -88,17 +88,17 @@ template<typename T, typename U, typename V, typename W, typename G>
 void initGauss(T gdict, U refldict, V *res_field, V *res_current);
 
 /** 
- * Initialize scalar Gaussian beam from GDict or GDictf.
+ * Initialize scalar Gaussian beam from GPODict or GPODictf.
  *
- * Takes a ScalarGDict or ScalarGDictf and generates an arrC1 or arrC1f object.
+ * Takes a ScalarGPODict or ScalarGPODictf and generates an arrC1 or arrC1f object.
  *
- * @param gdict ScalarGDict or ScalarGDictf object from which to generate a Gaussian beam.
+ * @param gdict ScalarGPODict or ScalarGPODictf object from which to generate a Gaussian beam.
  * @param refldict reflparams or reflparamsf object corresponding to surface on
  *      which to generate the Gaussian beam.
  * @param res_field Pointer to arrC1 or arrC1f object.
  *
- * @see ScalarGDict
- * @see ScalarGDictf
+ * @see ScalarGPODict
+ * @see ScalarGPODictf
  * @see reflparams
  * @see reflparamsf
  * @see arrC1

@@ -122,7 +122,7 @@ class cframe(ctypes.Structure):
                 ("dz", ctypes.POINTER(ctypes.c_double))]
 
 ##
-# Parameters for initializing a ray-trace frame.
+# Parameters for initializing a tubular ray-trace frame.
 class RTDict(ctypes.Structure):
     _fields_ = [("nRays", ctypes.c_int),
                 ("nRing", ctypes.c_int),
@@ -131,6 +131,8 @@ class RTDict(ctypes.Structure):
                 ("x0", ctypes.c_double),
                 ("y0", ctypes.c_double)]
 
+##
+# Parameters for initializing a Gaussian ray-trace frame.
 class GRTDict(ctypes.Structure):
     _fields_ = [("nRays", ctypes.c_int),
                 ("angx0", ctypes.c_double),
@@ -140,8 +142,8 @@ class GRTDict(ctypes.Structure):
                 ("seed", ctypes.c_int)]
 
 ##
-# Parameters for initializing a Gaussian beam.
-class GDict(ctypes.Structure):
+# Parameters for initializing a Gaussian PO beam.
+class GPODict(ctypes.Structure):
     _fields_ = [("lam", ctypes.c_double),
                 ("w0x", ctypes.c_double),
                 ("w0y", ctypes.c_double),
@@ -150,7 +152,9 @@ class GDict(ctypes.Structure):
                 ("dxyz", ctypes.c_double),
                 ("pol", ctypes.POINTER(ctypes.c_double))]
 
-class ScalarGDict(ctypes.Structure):
+##
+# Parameters for initializing a scalar Gaussian PO beam.
+class ScalarGPODict(ctypes.Structure):
     _fields_ = [("lam", ctypes.c_double),
                 ("w0x", ctypes.c_double),
                 ("w0y", ctypes.c_double),
@@ -158,16 +162,21 @@ class ScalarGDict(ctypes.Structure):
                 ("E0", ctypes.c_double),
                 ("dxyz", ctypes.c_double)]
 
-# FLOATS
+##
+# Two arrays representing a 1D complex array of floats.
 class arrC1f(ctypes.Structure):
     _fields_ = [("x", ctypes.POINTER(ctypes.c_float)),
                 ("y", ctypes.POINTER(ctypes.c_float))]
 
+##
+# Three arrays representing a 3D array of floats.
 class arrR3f(ctypes.Structure):
     _fields_ = [("x", ctypes.POINTER(ctypes.c_float)),
                 ("y", ctypes.POINTER(ctypes.c_float)),
                 ("z", ctypes.POINTER(ctypes.c_float))]
 
+##
+# Twelve arrays representing two 3D complex arrays of float.
 class c2Bundlef(ctypes.Structure):
     _fields_ = [("r1x", ctypes.POINTER(ctypes.c_float)),
                 ("r1y", ctypes.POINTER(ctypes.c_float)),
@@ -183,6 +192,8 @@ class c2Bundlef(ctypes.Structure):
                 ("i2z", ctypes.POINTER(ctypes.c_float))]
 
 
+##
+# Twenty-four arrays representing four 3D complex arrays of float.
 class c4Bundlef(ctypes.Structure):
     _fields_ = [("r1x", ctypes.POINTER(ctypes.c_float)),
                 ("r1y", ctypes.POINTER(ctypes.c_float)),
@@ -209,6 +220,8 @@ class c4Bundlef(ctypes.Structure):
                 ("i4y", ctypes.POINTER(ctypes.c_float)),
                 ("i4z", ctypes.POINTER(ctypes.c_float))]
 
+##
+# Fifteen arrays representing two 3D complex arrays and one 3D real array of float.
 class c2rBundlef(ctypes.Structure):
     _fields_ = [("r1x", ctypes.POINTER(ctypes.c_float)),
                 ("r1y", ctypes.POINTER(ctypes.c_float)),
@@ -226,6 +239,8 @@ class c2rBundlef(ctypes.Structure):
                 ("r3y", ctypes.POINTER(ctypes.c_float)),
                 ("r3z", ctypes.POINTER(ctypes.c_float))]
 
+##
+# Reflectorparameters used by C++ backend, single precision..
 class reflparamsf(ctypes.Structure):
     _fields_ = [("coeffs", ctypes.POINTER(ctypes.c_float)),
                 ("lxu", ctypes.POINTER(ctypes.c_float)),
@@ -239,6 +254,8 @@ class reflparamsf(ctypes.Structure):
                 ("type", ctypes.c_int),
                 ("transf", ctypes.POINTER(ctypes.c_float))]
 
+##
+# Container for realised reflector grids and normals in single precision.
 class reflcontainerf(ctypes.Structure):
     _fields_ = [("size", ctypes.c_int),
                 ("x", ctypes.POINTER(ctypes.c_float)),
@@ -249,6 +266,8 @@ class reflcontainerf(ctypes.Structure):
                 ("nz", ctypes.POINTER(ctypes.c_float)),
                 ("area", ctypes.POINTER(ctypes.c_float))]
 
+##
+# Container for storing ray-trace frames.
 class cframef(ctypes.Structure):
     _fields_ = [("size", ctypes.c_int),
                 ("x", ctypes.POINTER(ctypes.c_float)),
@@ -258,6 +277,8 @@ class cframef(ctypes.Structure):
                 ("dy", ctypes.POINTER(ctypes.c_float)),
                 ("dz", ctypes.POINTER(ctypes.c_float))]
 
+##
+# Parameters for initializing a tubular ray-trace frame.
 class RTDictf(ctypes.Structure):
     _fields_ = [("nRays", ctypes.c_int),
                 ("nRing", ctypes.c_int),
@@ -266,6 +287,8 @@ class RTDictf(ctypes.Structure):
                 ("x0", ctypes.c_float),
                 ("y0", ctypes.c_float)]
 
+##
+# Parameters for initializing a Gaussian ray-trace frame.
 class GRTDictf(ctypes.Structure):
     _fields_ = [("nRays", ctypes.c_int),
                 ("angx0", ctypes.c_float),
@@ -274,7 +297,9 @@ class GRTDictf(ctypes.Structure):
                 ("y0", ctypes.c_float),
                 ("seed", ctypes.c_int)]
 
-class GDictf(ctypes.Structure):
+##
+# Parameters for initializing a Gaussian PO beam.
+class GPODictf(ctypes.Structure):
     _fields_ = [("lam", ctypes.c_float),
                 ("w0x", ctypes.c_float),
                 ("w0y", ctypes.c_float),
@@ -283,7 +308,9 @@ class GDictf(ctypes.Structure):
                 ("dxyz", ctypes.c_float),
                 ("pol", ctypes.POINTER(ctypes.c_float))]
 
-class ScalarGDictf(ctypes.Structure):
+##
+# Parameters for initializing a scalar Gaussian PO beam.
+class ScalarGPODictf(ctypes.Structure):
     _fields_ = [("lam", ctypes.c_float),
                 ("w0x", ctypes.c_float),
                 ("w0y", ctypes.c_float),

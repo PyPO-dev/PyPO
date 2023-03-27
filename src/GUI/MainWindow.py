@@ -143,10 +143,13 @@ class MainWidget(QWidget):
     # @param formData List of InputDescription objects
     # @param readAction Function to be called when forms ok-button is clicked
     # 
-    def setForm(self, formData, readAction):
+    def setForm(self, formData, readAction, okText=None):
         if hasattr(self, "ParameterWid"):
             self.ParameterWid.setParent(None)
-        self.ParameterWid = formGenerator.FormGenerator(formData, readAction)
+        if okText:
+            self.ParameterWid = formGenerator.FormGenerator(formData, readAction, okText=okText)
+        else:
+            self.ParameterWid = formGenerator.FormGenerator(formData, readAction)
         self.ParameterWid.setMaximumWidth(400)
         self.ParameterWid.setMinimumWidth(400)
         # self.ParameterWid.setContentsMargins(5,5,5,5)
@@ -208,17 +211,17 @@ class MainWidget(QWidget):
     ##
     # Generate a snapshot form.
     def snapActionForm(self, element):
-        self.setForm(fDataObj.snapForm(element, list(self.stm.system[element]["snapshots"].keys()), "element"), readAction=self.snapAction)
+        self.setForm(fDataObj.snapForm(element, list(self.stm.system[element]["snapshots"].keys()), "element"), readAction=self.snapAction, okText="Take snapshot")
     
     ##
     # Generate a snapshot form for a group.
     def snapGroupActionForm(self, group):
-        self.setForm(fDataObj.snapForm(group, list(self.stm.groups[group]["snapshots"].keys()), "group"), readAction=self.snapAction)
+        self.setForm(fDataObj.snapForm(group, list(self.stm.groups[group]["snapshots"].keys()), "group"), readAction=self.snapAction, okText="Take snapshot")
  
     ##
     # Generate a snapshot form for ray-trace frame.
     def snapFrameActionForm(self, frame):
-        self.setForm(fDataObj.snapForm(frame, list(self.stm.frames.snapshots.keys()), "frame"), readAction=self.snapAction)
+        self.setForm(fDataObj.snapForm(frame, list(self.stm.frames.snapshots.keys()), "frame"), readAction=self.snapAction, okText="Take snapshot")
     
     ##
     # Take, revert or delete a snapshot

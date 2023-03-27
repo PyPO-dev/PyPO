@@ -38,10 +38,10 @@ def loadBeamlib():
     lib.makeGRTframe.argtypes = [GRTDict, ctypes.POINTER(cframe)]
     lib.makeGRTframe.restype = None
 
-    lib.makeGauss.argtypes = [GDict, reflparams, ctypes.POINTER(c2Bundle), ctypes.POINTER(c2Bundle)]
+    lib.makeGauss.argtypes = [GPODict, reflparams, ctypes.POINTER(c2Bundle), ctypes.POINTER(c2Bundle)]
     lib.makeGauss.restype = None
 
-    lib.makeScalarGauss.argtypes = [ScalarGDict, reflparams, ctypes.POINTER(arrC1)]
+    lib.makeScalarGauss.argtypes = [ScalarGPODict, reflparams, ctypes.POINTER(arrC1)]
     lib.makeScalarGauss.restype = None
     
     lib.calcCurrents.argtypes = [ctypes.POINTER(c2Bundle), ctypes.POINTER(c2Bundle),
@@ -113,13 +113,13 @@ def makeGRTframe(grdict_py):
 # The beam is always defined parallel to the x, y plane. The z-coordinate can be adjusted.
 # In order to tilt the beam, you have to tilt the underlying plane AFTER defining the beam on it.
 #
-# @param gdict_py A GDict dictionary containing relevant Gaussian beam parameters.
+# @param gdict_py A GPODict dictionary containing relevant Gaussian beam parameters.
 # @param source A reflDict dictionary describing the plane on which the Gaussian is defined.
 #
 # @returns out_field Field object containing the electromagnetic fields associated with the Gaussian.
 # @returns out_current Current object containing the electromagnetic currents associated with the Gaussian.
 #
-# @see GDict
+# @see GPODict
 # @see reflDict
 # @see fields
 # @see currents
@@ -129,10 +129,10 @@ def makeGauss(gdict_py, source):
     source_shape = (source["gridsize"][0], source["gridsize"][1])
     source_size = source["gridsize"][0] * source["gridsize"][1]
 
-    c_gdict = GDict()
+    c_gdict = GPODict()
     c_source = reflparams()
 
-    allfill_GDict(c_gdict, gdict_py, ctypes.c_double)
+    allfill_GPODict(c_gdict, gdict_py, ctypes.c_double)
     allfill_reflparams(c_source, source, ctypes.c_double)
 
     res_field = c2Bundle()
@@ -152,12 +152,12 @@ def makeGauss(gdict_py, source):
 # The beam is always defined parallel to the x, y plane. The z-coordinate can be adjusted.
 # In order to tilt the beam, you have to tilt the underlying plane AFTER defining the beam on it.
 #
-# @param gdict_py A GDict dictionary containing relevant scalar Gaussian beam parameters.
+# @param gdict_py A GPODict dictionary containing relevant scalar Gaussian beam parameters.
 # @param source A reflDict dictionary describing the plane on which the scalar Gaussian is defined.
 #
 # @returns out_field Scalarfield object containing the electric scalar field associated with the Gaussian.
 #
-# @see GDict
+# @see GPODict
 # @see reflDict
 # @see fields
 def makeScalarGauss(gdict_py, source):
@@ -166,10 +166,10 @@ def makeScalarGauss(gdict_py, source):
     source_shape = (source["gridsize"][0], source["gridsize"][1])
     source_size = source["gridsize"][0] * source["gridsize"][1]
 
-    c_gdict = ScalarGDict()
+    c_gdict = ScalarGPODict()
     c_source = reflparams()
 
-    allfill_SGDict(c_gdict, gdict_py, ctypes.c_double)
+    allfill_SGPODict(c_gdict, gdict_py, ctypes.c_double)
     allfill_reflparams(c_source, source, ctypes.c_double)
     
     res_field = arrC1()

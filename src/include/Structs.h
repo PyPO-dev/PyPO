@@ -22,8 +22,8 @@ struct reflcontainer;
 struct cframe;
 struct RTDict;
 struct GRTDict;
-struct GDict;
-struct ScalarGDict;
+struct GPODict;
+struct ScalarGPODict;
 
 /** 1D array of complex numbers.*/
 struct arrC1 {
@@ -179,7 +179,7 @@ struct GRTDict {
 };
 
 /** Object for initializing a Gaussian beam.*/
-struct GDict {
+struct GPODict {
     double lam;     /**<Wavelength of beam, in millimeters.*/
     double w0x;     /**<Beamwaist size along x-direction, in millimeters.*/
     double w0y;     /**<Beamwaist size along y-direction, in millimeters.*/
@@ -190,7 +190,7 @@ struct GDict {
 };
 
 /** Object for initializing a scalar Gaussian beam.*/
-struct ScalarGDict {
+struct ScalarGPODict {
     double lam;     /**<Wavelength of beam, in millimeters.*/
     double w0x;     /**<Beamwaist size along x-direction, in millimeters.*/
     double w0y;     /**<Beamwaist size along y-direction, in millimeters.*/
@@ -211,8 +211,8 @@ struct reflcontainerf;
 struct cframef;
 struct RTDictf;
 struct GRTDictf;
-struct GDictf;
-struct ScalarGDictf;
+struct GPODictf;
+struct ScalarGPODictf;
 
 /** 1D array of complex numbers.*/
 struct arrC1f {
@@ -372,7 +372,7 @@ struct GRTDictf {
 };
 
 /** Object for initializing a Gaussian beam.*/
-struct GDictf {
+struct GPODictf {
     float lam;     /**<Wavelength of beam, in millimeters.*/
     float w0x;     /**<Beamwaist size along x-direction, in millimeters.*/
     float w0y;     /**<Beamwaist size along y-direction, in millimeters.*/
@@ -383,7 +383,7 @@ struct GDictf {
 };
 
 /** Object for initializing a scalar Gaussian beam.*/
-struct ScalarGDictf {
+struct ScalarGPODictf {
     float lam;     /**<Wavelength of beam, in millimeters.*/
     float w0x;     /**<Beamwaist size along x-direction, in millimeters.*/
     float w0y;     /**<Beamwaist size along y-direction, in millimeters.*/

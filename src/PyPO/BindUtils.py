@@ -434,7 +434,6 @@ def allfill_cframe(res, frame_py, size, ct_t):
 #
 # @see RTDict
 # @see RTDictf
-# @see frame
 def allfill_RTDict(res, rdict_py, ct_t):
     res.nRays   = ctypes.c_int(rdict_py["nRays"])
     res.nRing   = ctypes.c_int(rdict_py["nRing"])
@@ -444,6 +443,15 @@ def allfill_RTDict(res, rdict_py, ct_t):
     res.x0      = ct_t(rdict_py["x0"])
     res.y0      = ct_t(rdict_py["y0"])
 
+##
+# Allocate and fill a GRTDict, for generating a Gaussian ray-trace frame.
+#
+# @param res A GRTDict or GRTDictf struct.
+# @param grdict_py A GRTDict.
+# @param ct_t Type of field in struct.
+#
+# @see GRTDict
+# @see GRTDictf
 def allfill_GRTDict(res, grdict_py, ct_t):
     res.nRays = ctypes.c_int(grdict_py["nRays"])
 
@@ -453,7 +461,16 @@ def allfill_GRTDict(res, grdict_py, ct_t):
     res.y0 = ct_t(grdict_py["y0"])
     res.seed = ctypes.c_int(grdict_py["seed"])
 
-def allfill_GDict(res, gdict_py, ct_t):
+##
+# Allocate and fill  a GPODict, for generating a Gaussian beam field and current.
+#
+# @param res A GPODict or GPODictf struct.
+# @param gdict_py A GPODict.
+# @param ct_t Type of field in struct.
+#
+# @see GPODict
+# @see GPODictf
+def allfill_GPODict(res, gdict_py, ct_t):
     res.lam = ct_t(gdict_py["lam"])
     res.w0x = ct_t(gdict_py["w0x"])
     res.w0y = ct_t(gdict_py["w0y"])
@@ -463,7 +480,16 @@ def allfill_GDict(res, gdict_py, ct_t):
 
     res.pol = (ct_t * 3)(*gdict_py["pol"].tolist())
 
-def allfill_SGDict(res, sgdict_py, ct_t):
+##
+# Allocate and fill  a ScalarGPODict, for generating a scalar Gaussian beam field.
+#
+# @param res A ScalarGPODict or ScalarGPODictf struct.
+# @param sgdict_py A GPODict.
+# @param ct_t Type of field in struct.
+#
+# @see ScalarGPODict
+# @see ScalarGPODictf
+def allfill_SGPODict(res, sgdict_py, ct_t):
     res.lam = ct_t(sgdict_py["lam"])
     res.w0x = ct_t(sgdict_py["w0x"])
     res.w0y = ct_t(sgdict_py["w0y"])
@@ -471,6 +497,18 @@ def allfill_SGDict(res, sgdict_py, ct_t):
     res.E0 = ct_t(sgdict_py["E0"])
     res.dxyz = ct_t(gdict_py["dxyz"])
 
+##
+# Convert a reflector grids struct to a PyPO grids object.
+#
+# @param res A reflcontainer or reflcontainerf struct.
+# @param shape Shape of the reflector grid.
+# @param np_t Type of field in PyPO object.
+#
+# @returns out The grids as PyPO object.
+#
+# @see reflcontainer
+# @see reflcontainerf
+# @see reflGrids 
 def creflToObj(res, shape, np_t):
 
     x = np.ctypeslib.as_array(res.x, shape=shape).astype(np_t)
@@ -482,9 +520,20 @@ def creflToObj(res, shape, np_t):
     nz = np.ctypeslib.as_array(res.nz, shape=shape).astype(np_t)
 
     area = np.ctypeslib.as_array(res.area, shape=shape).astype(np_t)
-
-    return reflGrids(x, y, z, nx, ny, nz, area)
-
+    out = reflGrids(x, y, z, nx, ny, nz, area)
+    return out
+##
+# Convert a cframe struct to a PyPO frame object.
+#
+# @param res A cframe or cframef struct.
+# @param np_t Type of field in PyPO frame object.
+# @param shape Shape of resulting PyPO frame.
+#
+# @returns out PyPO frame object.
+#
+# @see cframe
+# @see cframef
+# @see frame
 def frameToObj(res, np_t, shape):
     x = np.ctypeslib.as_array(res.x, shape=shape).astype(np_t)
     y = np.ctypeslib.as_array(res.y, shape=shape).astype(np_t)

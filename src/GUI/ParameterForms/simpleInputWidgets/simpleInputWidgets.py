@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QHBoxLayout, QCheckBox, QFormLayout, QGridLayout, QWidget, QButtonGroup, QRadioButton, QComboBox, QListWidget, QSizePolicy
 from PyQt5.QtCore import pyqtSignal
-from src.GUI.utils import MyLabel, MyEdit, makeLabelFromString, inType
+from src.GUI.utils import MyLabel, MyEdit, makeLabelFromString, inType, getValidator
 from src.GUI.ParameterForms.InputDescription import InputDescription
 from src.GUI.ParameterForms.simpleInputWidgets.inputWidget import inputWidgetInterface, selectionWidgetInterface
 from numpy import array 
@@ -68,24 +68,12 @@ class VectorInput(inputWidgetInterface):
         if self.inputDescription.prefill:
             self.prefill()
 
-    def prefill(self):
-        if len(self.inputDescription.hints) != self.inputDescription.numFields:
-            raise Exception("Cannot prefill field(s). Number of hints doesn't match number of fields")
-        
-        for i in range(len(self.inputs)):
-            hint = self.inputDescription.hints[i]
-            if hint == "":
-                raise Exception(f"Empty hint at outname={self.inputDescription.outputName}")
-            if type(hint) != self.enumToType(self.inputDescription.inType):
-                raise Exception(f"Cannot prefill. Hint has unexpected type {type(hint)}, expected {self.enumToType(self.inputDescription.inType)}")
-            self.inputs[i].setText(str(hint))
-
     def setupUI(self):
         inp = self.inputDescription
         
-        self.inputs = [MyEdit() for k in range(inp.numFields)]
+        self.inputs = [MyEdit() for _ in range(inp.numFields)]
         for edit in self.inputs:
-            edit.setValidator(None)
+            edit.setValidator(getValidator(inp.inType))
         editLayout = QHBoxLayout()
         editLayout.setContentsMargins(5,4,20,0)
         
@@ -100,13 +88,25 @@ class VectorInput(inputWidgetInterface):
         if self.inputDescription.outputName:
             self.label = makeLabelFromString(self.inputDescription.label)
         self.layout.addRow(self.label, self.editsWid)
+
+    def prefill(self):
+        if len(self.inputDescription.hints) != self.inputDescription.numFields:
+            raise Exception("Cannot prefill field(s). Number of hints doesn't match number of fields")
+        
+        for i in range(len(self.inputs)):
+            hint = self.inputDescription.hints[i]
+            if hint == "":
+                raise Exception(f"Empty hint at outname={self.inputDescription.outputName}")
+            if type(hint) != self.enumToType(self.inputDescription.inType):
+                raise Exception(f"Cannot prefill. Hint has unexpected type {type(hint)}, expected {self.enumToType(self.inputDescription.inType)}")
+            self.inputs[i].setText(str(hint))
     
     def read(self):
         if self.inputDescription.outputName is None:
             return {}
         l =[] 
         for i in self.inputs:
-            l.append(self.enumToType(self.inputDescription.inType)(i.text()))###TODO: incomplete Conversion
+            l.append(self.enumToType(self.inputDescription.inType)(i.text().replace(",",".")))###TODO: incomplete Conversion
         if len(l)>1:        
             if self.inputDescription.oArray:
                 l = array(l)

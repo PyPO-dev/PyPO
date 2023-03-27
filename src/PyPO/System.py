@@ -80,8 +80,9 @@ class System(object):
         self.num_ref = 0
         self.num_cam = 0
         self.nThreads_cpu = os.cpu_count()
+        self.context = context
         
-        Config.initPrint(None)
+        # Config.initPrint(None) ##TODO:AREND
         Config.setContext(context)
         
         # Internal dictionaries
@@ -143,9 +144,10 @@ class System(object):
     ##
     # Destructor. Deletes any reference to the logger assigned to current system.
     def __del__(self):
-        self.clog.info("EXITING SYSTEM.")
-        del self.clog_mgr
-        del self.clog
+        if self.context != "S":
+            self.clog.info("EXITING SYSTEM.")
+            del self.clog_mgr
+            del self.clog
 
     def getSystemLogger(self):
         return self.clog

@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QRegExp
+from PyQt5.QtGui import QRegExpValidator
 from enum import Enum, auto
 
 # class validation(Enum):
@@ -43,3 +44,13 @@ class MyEdit(QLineEdit):
 
 def makeLabelFromString(s):
     return MyLabel(s.replace("_"," ").capitalize())
+
+def getValidator(intype):
+    if intype == inType.vectorIntegers:
+        return QRegExpValidator(QRegExp("[-+]?[0-9]*"))
+    elif intype == inType.vectorFloats:
+        return  QRegExpValidator(QRegExp("[-+]?[0-9]*[\.,]?[0-9]*e?[0-9]*"))
+    elif intype == inType.vectorStrings:
+        return  QRegExpValidator(QRegExp("[A-Za-z0-9_]+"))
+    else:
+        raise Exception("No validator available")

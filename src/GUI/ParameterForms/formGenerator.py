@@ -3,24 +3,16 @@ from PyQt5.QtCore import QRegExp, Qt, pyqtSlot
 from PyQt5.QtGui import QRegExpValidator
 from src.GUI.utils import *
 from src.GUI.ParameterForms.simpleInputWidgets.simpleInputWidgets import checkbox, StaticInput, VectorInput, SimpleRadio, SimpleDropdown, XYZRadio, ElementSelectionWidget
-
-
-
 from src.GUI.ParameterForms.InputDescription import *
 
-
-
-# Validator_floats = QRegExpValidator(QRegExp("[-+]?[0-9]*[\.,]?[0-9]*"))
-# Validator_ints = QRegExpValidator(QRegExp("[-+]?[0-9]*"))
-
-
 class FormGenerator(QWidget):
-    def __init__ (self, ElementData, readAction = None, addButtons=True, test=False):
+    def __init__ (self, ElementData, readAction = None, addButtons=True, test=False, okText="Add"):
         super().__init__()
         if addButtons and readAction == None and not test:
             raise Exception("Trying to add buttons with no action provided!")
         self.formData = ElementData
         self.readme = readAction
+        self.okText = okText
 
         self.layout = QFormLayout(self)
         self.layout.setAlignment(Qt.AlignTop)
@@ -72,7 +64,7 @@ class FormGenerator(QWidget):
                 self.layout.addRow(input)
 
     def setupButtons(self):
-        addBtn = QPushButton("Add")
+        addBtn = QPushButton(self.okText)
         addBtn.clicked.connect(self.readme)
         canselBtn = QPushButton("Cancel")
         canselBtn.clicked.connect(self.cancelAction)

@@ -95,7 +95,6 @@ class FormGenerator(QWidget):
         paramDict = {}
         for input in self.inputs:
             paramDict.update(input.read())
-        # print(paramDict)
         return paramDict
     
 
@@ -127,7 +126,7 @@ class DynamicDropdownWidget(QWidget):
             self.makeCildren()
 
         self.setLayout(self.layout)
-        # self.modeUpdate(0)
+        self.modeUpdate(0)
 
     def makeCildren(self):
         self.stackedWidget = QStackedWidget()
@@ -151,20 +150,27 @@ class DynamicDropdownWidget(QWidget):
             child.clear()
 
     def read(self):
-        print("reading dynamic dropdown")
+        try:
+            ind = self.mode.currentIndex()-1
+            if self.hasChildren:
+                modeOut = list(self.inputDescription.subdict.keys())[ind]
+            else: 
+                modeOut = list(self.inputDescription.sublist)[ind]
+            paramDict = {self.inputDescription.outputName: modeOut}
+            # print(f"DynamicDropdownWidget {self.stackedWidget.currentIndex() = }")
 
-        # self.modeUpdate()
-        ind = self.mode.currentIndex()-1
-        if self.hasChildren:
-            modeOut = list(self.inputDescription.subdict.keys())[ind]
-        else: 
-            modeOut = list(self.inputDescription.sublist)[ind]
-        paramDict = {self.inputDescription.outputName: modeOut}
-
+        except:
+            raise Exception(f"Faild to read input: {self.inputDescription.label}")
+        
+        if self.stackedWidget.currentIndex() == 0:
+            raise Exception(f"Faild to read input: {self.inputDescription.label}")
+        
         if self.hasChildren:
             for input in self.currentChild.findChildren(QWidget,options=Qt.FindDirectChildrenOnly):
-               paramDict.update(input.read())
+                paramDict.update(input.read())
         return paramDict
+        
+        
 
 class DynamicRadioWidget(QWidget):
     def __init__ (self, inp):
@@ -192,7 +198,7 @@ class DynamicRadioWidget(QWidget):
             self.makeCildren()
 
         self.setLayout(self.layout)
-        # self.modeUpdate(0)
+        self.modeUpdate(-1)
 
     def makeCildren(self):
         self.stackedWidget = QStackedWidget()
@@ -216,18 +222,22 @@ class DynamicRadioWidget(QWidget):
         self.mode.clear()
 
     def read(self):
-        print("reading dynamic radio")
-        ind = self.mode.currentIndex()
-        if self.hasChildren:
-            modeOut = list(self.inputDescription.subdict.keys())[ind]
-        else: 
-            modeOut = list(self.inputDescription.sublist)[ind]
-        paramDict = {self.inputDescription.outputName: modeOut}
+        try:
+            ind = self.mode.currentIndex()
+            if self.hasChildren:
+                modeOut = list(self.inputDescription.subdict.keys())[ind]
+            else: 
+                modeOut = list(self.inputDescription.sublist)[ind]
+            paramDict = {self.inputDescription.outputName: modeOut}
+            # print(f"DynamicRadioWidget {self.stackedWidget.currentIndex() = }")
+        except:
+            raise Exception(f"Faild to read input: {self.inputDescription.label}")
+        if self.stackedWidget.currentIndex() == 0:
+            raise Exception(f"Faild to read input: {self.inputDescription.label}")
 
         if self.hasChildren:
             for input in self.currentChild.findChildren(QWidget,options=Qt.FindDirectChildrenOnly):
-               paramDict.update(input.read())
+                paramDict.update(input.read())
         return paramDict
-
 
 

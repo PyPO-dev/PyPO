@@ -237,31 +237,23 @@ class MainWidget(QWidget):
     # @param element Name of the surface in system
     # 
     def snapAction(self):
-        snapDict = self.ParameterWid.read()
-        if snapDict["options"] == "Take":
-            try:
+        try:
+            snapDict = self.ParameterWid.read()
+            if snapDict["options"] == "Take":
                 self.stm.snapObj(snapDict["name"], snapDict["snap_name"], snapDict["obj"])
-            except Exception as err:
-                print(err)
-                traceback.print_tb(err.__traceback__)
-                self.clog.error(err)
-        
-        elif snapDict["options"] == "Revert":
-            try:
+            
+            elif snapDict["options"] == "Revert":
                 self.stm.revertToSnap(snapDict["name"], snapDict["snap_name"], snapDict["obj"])
-            except Exception as err:
-                print(err)
-                traceback.print_tb(err.__traceback__)
-                self.clog.error(err)
-
-        elif snapDict["options"] == "Delete":
-            try:
+                
+            elif snapDict["options"] == "Delete":
                 self.stm.deleteSnap(snapDict["name"], snapDict["snap_name"], snapDict["obj"])
-            except Exception as err:
-                print(err)
-                traceback.print_tb(err.__traceback__)
-                self.clog.error(err)
-    
+
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
+
+
     ##
     # Generate a copy form for a element.
     #
@@ -272,16 +264,17 @@ class MainWidget(QWidget):
     ##
     # Copy a element in system to a new version.
     def copyElementAction(self):
-        copyDict = self.ParameterWid.read()
-        
         try:
+            copyDict = self.ParameterWid.read()
+            
             self.stm.copyElement(copyDict["name"], copyDict["name_copy"])
             self.addReflectorWidget(copyDict["name_copy"])
+
+
         except Exception as err:
             print(err)
             traceback.print_tb(err.__traceback__)
             self.clog.error(err)
-    
     ##
     # Generate a copy form for a group.
     #
@@ -292,9 +285,9 @@ class MainWidget(QWidget):
     ##
     # Copy a group in system to a new version.
     def copyGroupAction(self):
-        copyDict = self.ParameterWid.read()
-        
         try:
+            copyDict = self.ParameterWid.read()
+            
             self.stm.copyGroup(copyDict["name"], copyDict["name_copy"])
             self.addGroupWidget(copyDict["name_copy"])
         except Exception as err:
@@ -362,9 +355,13 @@ class MainWidget(QWidget):
     ##
     # Saves the current system state under the name given in form
     def saveSystemAction(self):
-        saveDict = self.ParameterWid.read()
-        self.stm.saveSystem(saveDict["name"]) 
-    
+        try:
+            saveDict = self.ParameterWid.read()
+            self.stm.saveSystem(saveDict["name"]) 
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
     
     ##
     # opens a form that allows user to delete a saved System
@@ -375,9 +372,13 @@ class MainWidget(QWidget):
     ##
     # Deletes system selected in form
     def deleteSavedSystemAction(self):
-        removeDict = self.ParameterWid.read()
-        shutil.rmtree(os.path.join(self.stm.savePathSystems, removeDict["name"]))
-
+        try:
+            removeDict = self.ParameterWid.read()
+            shutil.rmtree(os.path.join(self.stm.savePathSystems, removeDict["name"]))
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
     ##
     # opens a form that allows user to load a saved System
     def loadSystemForm(self):
@@ -387,10 +388,10 @@ class MainWidget(QWidget):
     ##
     # Loads system selected in from form
     def loadSystemAction(self):
-        loadDict = self.ParameterWid.read()
-        self._mkElementsColumn()
-
         try:
+            loadDict = self.ParameterWid.read()
+            self._mkElementsColumn()
+
             self.stm.loadSystem(loadDict["name"]) 
             self.refreshColumn(self.stm.system, "elements")
             self.refreshColumn(self.stm.frames, "frames")
@@ -512,9 +513,9 @@ class MainWidget(QWidget):
     ##
     # Reads form and adds plane to System
     def addPlaneAction(self):
-        elementDict = self.ParameterWid.read()
-
         try:
+            elementDict = self.ParameterWid.read()
+
             self.stm.addPlane(elementDict) 
             self.addReflectorWidget(elementDict["name"])
         except Exception as err:
@@ -548,9 +549,9 @@ class MainWidget(QWidget):
     ##
     # Reads form and adds parabola to System
     def addParabolaAction(self):
-        elementDict = self.ParameterWid.read()
-
         try:
+            elementDict = self.ParameterWid.read()
+
             self.stm.addParabola(elementDict) 
             self.addReflectorWidget(elementDict["name"])
         except Exception as err:
@@ -561,9 +562,9 @@ class MainWidget(QWidget):
     ##
     # Reads form and adds hyperbola to System
     def addHyperbolaAction(self):
-        elementDict = self.ParameterWid.read()
-        
         try:
+            elementDict = self.ParameterWid.read()
+        
             self.stm.addHyperbola(elementDict) 
             self.addReflectorWidget(elementDict["name"])
         except Exception as err:
@@ -574,9 +575,9 @@ class MainWidget(QWidget):
     ##
     # Reads form and adds ellipse to System
     def addEllipseAction(self):
-        elementDict = self.ParameterWid.read()
-        
         try:
+            elementDict = self.ParameterWid.read()
+        
             self.stm.addEllipse(elementDict) 
             self.addReflectorWidget(elementDict["name"])
         except Exception as err:
@@ -599,11 +600,11 @@ class MainWidget(QWidget):
     ##
     # Applies single element transformation
     def transformAction(self, element):
-        dd = self.ParameterWid.read()
-        transformationType = dd["type"]
-        vector = dd["vector"]
-
         try:
+            dd = self.ParameterWid.read()
+            transformationType = dd["type"]
+            vector = dd["vector"]
+
             if transformationType == "Translation":
                 self.stm.translateGrids(dd["element"], vector, mode=dd["mode"].lower())
                 # print(f'Translated {dd["element"]} by {self._formatVector(vector)} mm')
@@ -625,11 +626,11 @@ class MainWidget(QWidget):
     ##
     # Applies group transformation
     def transformGroupAction(self, element):
-        dd = self.ParameterWid.read()
-        transformationType = dd["type"]
-        vector = dd["vector"]
-
         try:
+            dd = self.ParameterWid.read()
+            transformationType = dd["type"]
+            vector = dd["vector"]
+
             if transformationType == "Translation":
                 self.stm.translateGrids(dd["group"], vector, mode=dd["mode"].lower(), obj="group")
             elif transformationType == "Rotation":
@@ -642,11 +643,11 @@ class MainWidget(QWidget):
     ##
     # Applies single frame transformation
     def transformFrameAction(self, frame):
-        dd = self.ParameterWid.read()
-        transformationType = dd["type"]
-        vector = dd["vector"]
-        
         try:
+            dd = self.ParameterWid.read()
+            transformationType = dd["type"]
+            vector = dd["vector"]
+        
             if transformationType == "Translation":
                 self.stm.translateGrids(dd["frame"], vector, mode=dd["mode"].lower(), obj="frame")
                 # print(f'Translated {dd["frame"]} by {self._formatVector(vector)} mm')
@@ -673,15 +674,19 @@ class MainWidget(QWidget):
     ##
     # Applies multiple element transformation
     def transformationMultipleAction(self):
-        transfDict = self.ParameterWid.read()
+        try:
+            transfDict = self.ParameterWid.read()
 
-        if transfDict["type"] == "Translation":
-            self.stm.translateGrids(transfDict["elements"], transfDict["vector"])
-            # print(f'Translated {transfDict["elements"]} by {self._formatVector(transfDict["vector"])} mm')
+            if transfDict["type"] == "Translation":
+                self.stm.translateGrids(transfDict["elements"], transfDict["vector"])
 
-        if transfDict["type"] == "Rotation":
-            self.stm.rotateGrids(transfDict["elements"], transfDict["vector"], transfDict["pivot"])
-            # print(f'Translated {transfDict["elements"]} by {self._formatVector(transfDict["vector"])} mm')
+            if transfDict["type"] == "Rotation":
+                self.stm.rotateGrids(transfDict["elements"], transfDict["vector"], transfDict["pivot"])
+
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
     
     ### Functionalities: TRFrames 
     #NOTE Raytrace widgets
@@ -694,9 +699,9 @@ class MainWidget(QWidget):
     ##
     # Reads form and adds a tube frame to system
     def initTubeFrameAction(self):
-        RTDict = self.ParameterWid.read()
-        
         try:
+            RTDict = self.ParameterWid.read()
+        
             self.stm.createTubeFrame(RTDict)
             self.addFrameWidget(RTDict["name"])
         except Exception as err:
@@ -713,11 +718,12 @@ class MainWidget(QWidget):
     ##
     # Reads form and adds a gaussian frame to system
     def initGaussianFrameAction(self):
-        GRTDict = self.ParameterWid.read()
+        try:
+            GRTDict = self.ParameterWid.read()
 
-        if not "seed" in GRTDict.keys():
-            GRTDict["seed"] = -1
-        
+            if not "seed" in GRTDict.keys():
+                GRTDict["seed"] = -1
+            
         #try:
         #    dial = SymDialog(dialStr)
 
@@ -729,7 +735,6 @@ class MainWidget(QWidget):
         #    if dial.exec_():
         #        self.addFrameWidget(GRTDict["name"])
       
-        try:
             dialStr = f"Calculating Gaussian ray-trace frame {GRTDict['name']}..."
             worker = Worker(self.stm.createGRTFrame, GRTDict)
             dial = SymDialog(worker.kill, self.clog, dialStr) 
@@ -753,9 +758,9 @@ class MainWidget(QWidget):
     ##
     # Reads form and popagates rays
     def addPropRaysAction(self): 
-        propRaysDict = self.ParameterWid.read()
-        
         try:
+            propRaysDict = self.ParameterWid.read()
+        
             self.stm.runRayTracer(propRaysDict)
             self.addFrameWidget(propRaysDict["fr_out"])
         except Exception as err:
@@ -773,11 +778,18 @@ class MainWidget(QWidget):
     ##
     # Reads form and plots frame
     def addPlotFrameAction(self):
-        plotFrameDict = self.ParameterWid.read()
-        fig = self.stm.plotRTframe(plotFrameDict["frame"], project=plotFrameDict["project"], ret=True)
-        self.addPlot(fig, f'{plotFrameDict["frame"]} - {plotFrameDict["project"]}')
+        try:
+            plotFrameDict = self.ParameterWid.read()
+            fig = self.stm.plotRTframe(plotFrameDict["frame"], project=plotFrameDict["project"], ret=True)
+            self.addPlot(fig, f'{plotFrameDict["frame"]} - {plotFrameDict["project"]}')
 
-        self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
+            self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
+
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
+
 
     ### Functionalities: PO 
     ##
@@ -788,9 +800,9 @@ class MainWidget(QWidget):
     ##
     # Reads form and adds a vectorial gaussian beam to system
     def initGaussBeamAction(self):
-        GDict = self.ParameterWid.read()
-        
         try:
+            GDict = self.ParameterWid.read()
+        
             self.stm.createGaussian(GDict, GDict["surface"])
             self.addFieldWidget(GDict["name"])
             self.addCurrentWidget(GDict["name"])
@@ -807,9 +819,9 @@ class MainWidget(QWidget):
     ##
     # Reads form and adds a scalar gaussian beam to system
     def initSGaussBeamAction(self):
-        GDict = self.ParameterWid.read()
-        
         try:
+            GDict = self.ParameterWid.read()
+            
             self.stm.createScalarGaussian(GDict, GDict["surface"])
             self.addSFieldWidget(GDict["name"])
         except Exception as err:
@@ -825,9 +837,9 @@ class MainWidget(QWidget):
     ##
     # Reads form and adds a vectorial point source beam to system
     def initPSBeamAction(self):
-        PSDict = self.ParameterWid.read()
-        
         try:
+            PSDict = self.ParameterWid.read()
+            
             self.stm.generatePointSource(PSDict, PSDict["surface"])
             self.addFieldWidget(PSDict["name"])
             self.addCurrentWidget(PSDict["name"])
@@ -845,9 +857,9 @@ class MainWidget(QWidget):
     ##
     # Reads form and adds a scalar point source beam to system
     def initSPSBeamAction(self):
-        SPSDict = self.ParameterWid.read()
-        
         try:
+            SPSDict = self.ParameterWid.read()
+            
             self.stm.generatePointSourceScalar(SPSDict, SPSDict["surface"])
             self.addSFieldWidget(SPSDict["name"])
         except Exception as err:
@@ -868,13 +880,19 @@ class MainWidget(QWidget):
     ##
     # Reads form and plots field
     def plotFieldAction(self):
-        plotFieldDict = self.ParameterWid.read()
-        fig, _ = self.stm.plotBeam2D(plotFieldDict["field"], plotFieldDict["comp"], 
-                                    project=plotFieldDict["project"], ret=True)
-        self.addPlot(fig, f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
+        try:
+            plotFieldDict = self.ParameterWid.read()
+            fig, _ = self.stm.plotBeam2D(plotFieldDict["field"], plotFieldDict["comp"], 
+                                        project=plotFieldDict["project"], ret=True)
+            self.addPlot(fig, f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
 
-        self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
-                
+            self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
+        
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
+
     ##
     # TODO: whats the difference with above? Perhase we should rename function
     #
@@ -885,12 +903,17 @@ class MainWidget(QWidget):
     ##
     # Reads form and plots scalar field
     def plotSFieldAction(self):
-        plotSFieldDict = self.ParameterWid.read()
-        fig, _ = self.stm.plotBeam2D(plotSFieldDict["field"], 
-                                    project=plotSFieldDict["project"], ret=True)
-        self.addPlot(fig, f'{plotSFieldDict["field"]} - {plotSFieldDict["project"]}')
+        try:
+            plotSFieldDict = self.ParameterWid.read()
+            fig, _ = self.stm.plotBeam2D(plotSFieldDict["field"], 
+                                        project=plotSFieldDict["project"], ret=True)
+            self.addPlot(fig, f'{plotSFieldDict["field"]} - {plotSFieldDict["project"]}')
 
-        self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
+            self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
     
     
     ## 
@@ -903,13 +926,17 @@ class MainWidget(QWidget):
     ##
     # Reads form and plots current
     def plotCurrentAction(self):
-        plotFieldDict = self.ParameterWid.read()
-        fig, _ = self.stm.plotBeam2D(plotFieldDict["field"], 
-                                    plotFieldDict["comp"], project=plotFieldDict["project"], ret=True)
-        self.addPlot(fig, f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
+        try:
+            plotFieldDict = self.ParameterWid.read()
+            fig, _ = self.stm.plotBeam2D(plotFieldDict["field"], 
+                                        plotFieldDict["comp"], project=plotFieldDict["project"], ret=True)
+            self.addPlot(fig, f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
 
-        self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
-    
+            self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
     
     
     ##
@@ -943,19 +970,19 @@ class MainWidget(QWidget):
     ##
     # Reads form propagates beam, runs calculation on another thread
     def propPOAction(self):
-        propBeamDict = self.ParameterWid.read()
-        
-        chk.check_runPODict(propBeamDict, self.stm.system.keys(), self.stm.fields.keys(), self.stm.currents.keys(),
-                        self.stm.scalarfields.keys(), self.stm.frames.keys(), self.clog)
-      
-        if propBeamDict["mode"] == "scalar":
-            subStr = "scalar field"
-        else:
-            subStr = propBeamDict["mode"]
-
-        start_time = time.time()
-        
         try:
+            propBeamDict = self.ParameterWid.read()
+            
+            chk.check_runPODict(propBeamDict, self.stm.system.keys(), self.stm.fields.keys(), self.stm.currents.keys(),
+                            self.stm.scalarfields.keys(), self.stm.frames.keys(), self.clog)
+        
+            if propBeamDict["mode"] == "scalar":
+                subStr = "scalar field"
+            else:
+                subStr = propBeamDict["mode"]
+
+            start_time = time.time()
+        
             self.clog.info("*** Starting PO propagation ***")
             
             dialStr = f"Calculating {subStr} on {propBeamDict['t_name']}..."
@@ -1002,39 +1029,63 @@ class MainWidget(QWidget):
     ##
     # Reads form and calculates taper efficientie
     def calcTaperAction(self):
-        TaperDict = self.ParameterWid.read()
-        eff_taper = self.stm.calcTaper(TaperDict["f_name"], TaperDict["comp"])
-        self.clog.info(f'Taper efficiency of {TaperDict["f_name"]}, component {TaperDict["comp"]} : {eff_taper}')
-    
+        try:
+            TaperDict = self.ParameterWid.read()
+            eff_taper = self.stm.calcTaper(TaperDict["f_name"], TaperDict["comp"])
+            self.clog.info(f'Taper efficiency of {TaperDict["f_name"]}, component {TaperDict["comp"]} : {eff_taper}')
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
+
+
     ##
     # Reads form and calculates spillover efficientie
     def calcSpillAction(self):
-        SpillDict = self.ParameterWid.read()
+        try:
+            SpillDict = self.ParameterWid.read()
 
-        aperDict = {
-                "center"    : SpillDict["center"],
-                "inner"      : SpillDict["inner"],
-                "outer"      : SpillDict["outer"]
-                }
+            aperDict = {
+                    "center"    : SpillDict["center"],
+                    "inner"      : SpillDict["inner"],
+                    "outer"      : SpillDict["outer"]
+                    }
 
-        eff_spill = self.stm.calcSpillover(SpillDict["f_name"], SpillDict["comp"], aperDict)
-        self.clog.info(f'Spillover efficiency of {SpillDict["f_name"]}, component {SpillDict["comp"]} : {eff_spill}')
-    
+            eff_spill = self.stm.calcSpillover(SpillDict["f_name"], SpillDict["comp"], aperDict)
+            self.clog.info(f'Spillover efficiency of {SpillDict["f_name"]}, component {SpillDict["comp"]} : {eff_spill}')
+        
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
+
+
     ##
     # Reads form and calculates x-pol efficientie TODO: x-pol?
     def calcXpolAction(self):
-        XpolDict = self.ParameterWid.read()
-        eff_Xpol = self.stm.calcXpol(XpolDict["f_name"], XpolDict["co_comp"], XpolDict["cr_comp"])
-        self.clog.info(f'X-pol efficiency of {XpolDict["f_name"]}, co-component {XpolDict["co_comp"]} and X-component {XpolDict["cr_comp"]} : {eff_Xpol}')
+        try:
+            XpolDict = self.ParameterWid.read()
+            eff_Xpol = self.stm.calcXpol(XpolDict["f_name"], XpolDict["co_comp"], XpolDict["cr_comp"])
+            self.clog.info(f'X-pol efficiency of {XpolDict["f_name"]}, co-component {XpolDict["co_comp"]} and X-component {XpolDict["cr_comp"]} : {eff_Xpol}')
+        
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
+
 
     ##
     # Reads form and calculates main beam efficientie
     def calcMBAction(self):
-        MBDict = self.ParameterWid.read()
-        eff_mb = self.stm.calcMainBeam(MBDict["f_name"], MBDict["comp"], MBDict["thres"], MBDict["mode"])
-        self.clog.info(f'Main beam efficiency of {MBDict["f_name"]}, component {MBDict["comp"]} : {eff_mb}')
-        self.addSFieldWidget(f"fitGauss_{MBDict['f_name']}")
-
+        try:
+            MBDict = self.ParameterWid.read()
+            eff_mb = self.stm.calcMainBeam(MBDict["f_name"], MBDict["comp"], MBDict["thres"], MBDict["mode"])
+            self.clog.info(f'Main beam efficiency of {MBDict["f_name"]}, component {MBDict["comp"]} : {eff_mb}')
+            self.addSFieldWidget(f"fitGauss_{MBDict['f_name']}")
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
     
     #END NOTE
     
@@ -1048,13 +1099,19 @@ class MainWidget(QWidget):
         self.setForm(fDataObj.focusFind(list(self.stm.frames.keys())), self.findFocusAction, okText="Find focus")
 
     def findFocusAction(self):
-        # print(self.ParameterWid.read())
-        findFocusDict = self.ParameterWid.read()
-        focus = self.stm.findRTfocus(findFocusDict["name_frame"], verbose=True)
-        self.addReflectorWidget(f"focal_plane_{findFocusDict['name_frame']}")
-        self.addFrameWidget(f"focus_{findFocusDict['name_frame']}")
-        
-        self.clog.info(f"Focus of {findFocusDict['name_frame']} : {focus}")
+        try:
+            findFocusDict = self.ParameterWid.read()
+            focus = self.stm.findRTfocus(findFocusDict["name_frame"], verbose=True)
+            self.addReflectorWidget(f"focal_plane_{findFocusDict['name_frame']}")
+            self.addFrameWidget(f"focus_{findFocusDict['name_frame']}")
+            
+            self.clog.info(f"Focus of {findFocusDict['name_frame']} : {focus}")
+
+        except Exception as err:
+            print(err)
+            traceback.print_tb(err.__traceback__)
+            self.clog.error(err)
+
 
 class PyPOMainWindow(QMainWindow):
     def __init__(self, parent=None):

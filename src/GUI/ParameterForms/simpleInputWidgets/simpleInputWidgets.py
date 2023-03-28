@@ -5,6 +5,9 @@ from src.GUI.ParameterForms.InputDescription import InputDescription
 from src.GUI.ParameterForms.simpleInputWidgets.inputWidget import inputWidgetInterface, selectionWidgetInterface
 from numpy import array 
 
+class EmptyFieldException(Exception):
+    pass
+
 class StaticInput(inputWidgetInterface):
     def __init__ (self, inp:InputDescription):
         super().__init__()
@@ -24,10 +27,14 @@ class StaticInput(inputWidgetInterface):
         pass
 
     def read(self):
-        if self.inputDescription.outputName is None:
-            return {}
-        return {self.inputDescription.outputName: self.inputDescription.staticValue}
-
+        try:
+            if self.inputDescription.outputName is None:
+                return {}
+            return {self.inputDescription.outputName: self.inputDescription.staticValue}
+        
+        except:
+            raise Exception(f"Faild to read input: {self.inputDescription.label}")
+        
 
 class checkbox(inputWidgetInterface):
     def __init__ (self, inp:InputDescription):
@@ -55,10 +62,14 @@ class checkbox(inputWidgetInterface):
             self.box.setChecked(False)
 
     def read(self):
-        if self.inputDescription.outputName is None:
-            return {}
-        return{self.inputDescription.outputName: self.box.isChecked()}
-
+        try:
+            if self.inputDescription.outputName is None:
+                return {}
+            return{self.inputDescription.outputName: self.box.isChecked()}
+        
+        except:
+            raise Exception(f"Faild to read input: {self.inputDescription.label}")
+        
 
 class VectorInput(inputWidgetInterface):
     def __init__ (self, inp:InputDescription):
@@ -117,18 +128,25 @@ class VectorInput(inputWidgetInterface):
             self.prefill()
 
     def read(self):
-        if self.inputDescription.outputName is None:
-            return {}
-        l =[] 
-        for i in self.inputs:
-            l.append(self.enumToType(self.inputDescription.inType)(i.text().replace(",",".")))###TODO: incomplete Conversion
-        if len(l)>1:        
-            if self.inputDescription.oArray:
-                l = array(l)
-        else:
-            l = l[0]
-        l = {self.inputDescription.outputName:l}
-        return l ###TODO: Fishy stuff here!!!
+        try:
+            if self.inputDescription.outputName is None:
+                return {}
+            l =[] 
+            for i in self.inputs:
+                if i.text() == "":
+                    raise EmptyFieldException(f"Empty field at {self.inputDescription.label}")
+                l.append(self.enumToType(self.inputDescription.inType)(i.text().replace(",",".")))###TODO: incomplete Conversion
+            if len(l)>1:        
+                if self.inputDescription.oArray:
+                    l = array(l)
+            else:
+                l = l[0]
+            l = {self.inputDescription.outputName:l}
+            return l ###TODO: Fishy stuff here!!!
+        except EmptyFieldException as e:
+            raise e
+        except:
+            raise Exception(f"Faild to read input: {self.inputDescription.label}")
 
     @staticmethod
     def enumToType(intype):
@@ -158,7 +176,7 @@ class SimpleRadio(selectionWidgetInterface):
         else:
             options = self.inputDescription.options
         self.group = QButtonGroup()
-        self.group.setExclusive(False)
+        # self.group.setExclusive(False)
         self.group.buttonClicked.connect(self.selectionChanged)
         for i in range(len(options)):
             rb = QRadioButton(options[i])
@@ -172,10 +190,13 @@ class SimpleRadio(selectionWidgetInterface):
 
     
     def read(self):
-        if self.inputDescription.outputName is None:
-            return {}
-        d = {self.inputDescription.outputName : self.inputDescription.options[self.group.checkedId()]}
-        return d
+        try:
+            if self.inputDescription.outputName is None:
+                return {}
+            d = {self.inputDescription.outputName : self.inputDescription.options[self.group.checkedId()]}
+            return d
+        except:
+            raise Exception(f"Faild to read input: {self.inputDescription.label}")
     
     def clear(self):
         self.group.setExclusive(False)
@@ -224,10 +245,14 @@ class SimpleDropdown(selectionWidgetInterface):
 
 
     def read(self):
-        if self.inputDescription.outputName is None:
-            return {}
-        d = {self.inputDescription.outputName : self.inputDescription.options[self.comboBox.currentIndex()]}
-        return d
+        try:
+            if self.inputDescription.outputName is None:
+                return {}
+            d = {self.inputDescription.outputName : self.inputDescription.options[self.comboBox.currentIndex()]}
+            return d
+        
+        except:
+            raise Exception(f"Faild to read input: {self.inputDescription.label}")
     
 
     def selectionChanged(self):
@@ -312,9 +337,13 @@ class XYZRadio(inputWidgetInterface):
         self.r2.clear()
 
     def read(self):
-        if self.r1.group.checkedButton()==None or self.r2.group.checkedButton()==None:
-            raise Exception("RadioButton no option selected") 
-        return {self.inputDescription.outputName:self.r1.group.checkedButton().text() + self.r2.group.checkedButton().text()}
+        # if self.r1.group.checkedButton()==None or self.r2.group.checkedButton()==None:
+        #     raise Exception("RadioButton no option selected") ##TODO: is this needed 
+        try:
+            return {self.inputDescription.outputName:self.r1.group.checkedButton().text() + self.r2.group.checkedButton().text()}
+        except:
+            raise Exception(f"Faild to read input: {self.inputDescription.label}")
+        
 
 class ElementSelectionWidget(QWidget):
     def __init__ (self, inp: InputDescription):
@@ -368,7 +397,9 @@ class ElementSelectionWidget(QWidget):
 
 
     def read(self):
-        return {self.inputDescription.outputName :self.selectedElements}
-
+        try:
+            return {self.inputDescription.outputName :self.selectedElements}
+        except:
+            raise Exception(f"Faild to read input: {self.inputDescription.label}")
 
 

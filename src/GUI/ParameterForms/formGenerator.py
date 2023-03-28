@@ -5,9 +5,22 @@ from src.GUI.utils import *
 from src.GUI.ParameterForms.simpleInputWidgets.simpleInputWidgets import checkbox, StaticInput, VectorInput, SimpleRadio, SimpleDropdown, XYZRadio, ElementSelectionWidget
 from src.GUI.ParameterForms.InputDescription import *
 
+
+##
+# @file
+# Form generator.
+#
+# This script contains the form generator and dynamic inputWidgets.
 class FormGenerator(QWidget):
     closed = pyqtSignal()
-
+    ##
+    # Constructor. Creates a form widget given a list of InputDescription.
+    #
+    # @param ElementData List of InputDescription objects.
+    # @param readAction Function to be called upon clicking OK button.
+    # @param addButtons Boolean. Determines weather there will be buttons in the bottom of the form.
+    # @param test Boolean. If true you buttons can be added without the need to provide a readAction.
+    # @param okText String. Text used as label for the OK button. Defaults to "add"
     def __init__ (self, ElementData, readAction = None, addButtons=True, test=False, okText="Add"):
         super().__init__()
         if addButtons and readAction == None and not test:
@@ -26,6 +39,9 @@ class FormGenerator(QWidget):
         if addButtons:
             self.setupButtons()
             
+    ##
+    # Calls constructor of inputWidget for each InputDescription depending on its inType.
+    #
     def setupInputs(self):
         for inp in self.formData:
             if inp.inType.value == 0:
@@ -65,6 +81,9 @@ class FormGenerator(QWidget):
                 self.inputs.append(input)
                 self.layout.addRow(input)
 
+    ##
+    # Creates buttons in the bottom of the form.
+    #
     def setupButtons(self):
         addBtn = QPushButton(self.okText)
         addBtn.clicked.connect(self.readme)
@@ -84,13 +103,23 @@ class FormGenerator(QWidget):
         spacerLayout.addItem(QSpacerItem(0,0, QSizePolicy.Expanding, QSizePolicy.MinimumExpanding))
         self.layout.addRow(spacerWidget)
 
+    ##
+    # Close the form.
+    #
     def closeAction(self):
         self.closed.emit()
 
+    ##
+    # Clears all inputs of the form.
+    #
     def clear(self):
         for input in self.inputs:
             input.clear()
 
+    ##
+    # Reads the form.
+    #
+    # @return A dectionary containing the values read form the form.
     def read(self):
         paramDict = {}
         for input in self.inputs:
@@ -100,8 +129,14 @@ class FormGenerator(QWidget):
 
 
 
-
+##
+# Dynamic dropdown.
+#
+# Dropdown followed by a dynamic section that changes depending on users selection in the dropdown
 class DynamicDropdownWidget(QWidget):
+    ##
+    # Constructor. Creates the form section.
+    #
     def __init__ (self, inp):
         super().__init__()
         self.inputDescription = inp
@@ -128,6 +163,9 @@ class DynamicDropdownWidget(QWidget):
         self.setLayout(self.layout)
         self.modeUpdate(0)
 
+    ##
+    # Creates the subforms
+    #
     def makeCildren(self):
         self.stackedWidget = QStackedWidget()
         self.stackedWidget.addWidget(QWidget())
@@ -138,17 +176,28 @@ class DynamicDropdownWidget(QWidget):
             self.stackedWidget.addWidget(child)
             self.children.append(child)
 
+    ##
+    # Updates the dynamic widget according to users selection.
+    #
+    # @param index Index of the option
     @pyqtSlot(int)
     def modeUpdate(self, index):
         if self.hasChildren:
             self.stackedWidget.setCurrentIndex(index)
             self.currentChild = self.children[index-1]
 
+    ##
+    # Clears all inputs of the form.
+    #
     def clear(self):
         self.mode.clear()
         for child in self.children:
             child.clear()
 
+    ##
+    # Reads the inputs.
+    #
+    # @return A dectionary containing the values read form the inputs.
     def read(self):
         try:
             ind = self.mode.currentIndex()-1
@@ -171,8 +220,14 @@ class DynamicDropdownWidget(QWidget):
         return paramDict
         
         
-
+##
+# Dynamic radio button.
+#
+# radio button group followed by a dynamic section that changes depending on users selection in the dropdown
 class DynamicRadioWidget(QWidget):
+    ##
+    # Constructor. Creates the form section.
+    #
     def __init__ (self, inp):
         super().__init__()
         self.inputDescription = inp
@@ -200,6 +255,9 @@ class DynamicRadioWidget(QWidget):
         self.setLayout(self.layout)
         self.modeUpdate(-1)
 
+    ##
+    # Creates the subforms
+    #
     def makeCildren(self):
         self.stackedWidget = QStackedWidget()
         placeholder = QWidget()
@@ -212,15 +270,26 @@ class DynamicRadioWidget(QWidget):
             self.stackedWidget.addWidget(child)
             self.children.append(child)
 
+    ##
+    # Updates the dynamic widget according to users selection.
+    #
+    # @param index Index of the option
     @pyqtSlot(int)
     def modeUpdate(self, index):
         if self.hasChildren:
             self.stackedWidget.setCurrentIndex(index+1)
             self.currentChild = self.children[index]
 
+    ##
+    # Clears all inputs of the form.
+    #
     def clear(self):
         self.mode.clear()
 
+    ##
+    # Reads the inputs.
+    #
+    # @return A dectionary containing the values read form the inputs.
     def read(self):
         try:
             ind = self.mode.currentIndex()

@@ -486,7 +486,7 @@ class System(object):
                 self.system[name]["pos"] = (Rtot @ np.append(self.system[name]["pos"], 1))[:-1]
                 self.system[name]["ori"] = Rtot[:-1, :-1] @ self.system[name]["ori"]
 
-                self._checkBoundPO(name, Rtot[:-1, :-1])
+                self._checkBoundPO(name, Rtot)
 
                 self.clog.info(f"Rotated element {name} to {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
@@ -497,7 +497,7 @@ class System(object):
                 self.system[name]["pos"] = (MatRotate(rotation, pivot=pivot) @ np.append(self.system[name]["pos"], 1))[:-1]
                 self.system[name]["ori"] = MatRotate(rotation)[:-1, :-1] @ self.system[name]["ori"]
                 
-                self._checkBoundPO(name, MatRotate(rotation)[:-1, :-1])
+                self._checkBoundPO(name, MatRotate(rotation))
             
                 self.clog.info(f"Rotated element {name} by {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
@@ -524,7 +524,7 @@ class System(object):
                     self.system[elem]["pos"] = (Rtot @ np.append(self.system[elem]["pos"], 1))[:-1]
                     self.system[elem]["ori"] = Rtot[:-1, :-1] @ self.system[elem]["ori"]
                     
-                    self._checkBoundPO(elem, Rtot[:-1, :-1])
+                    self._checkBoundPO(elem, Rtot)
 
                 self.groups[name]["pos"] = (Rtot @ np.append(self.groups[name]["pos"], 1))[:-1]
                 self.groups[name]["ori"] = Rtot[:-1, :-1] @ self.groups[name]["ori"]
@@ -538,7 +538,7 @@ class System(object):
                     self.system[elem]["pos"] = (MatRotate(rotation, pivot=pivot) @ np.append(self.system[elem]["pos"], 1))[:-1]
                     self.system[elem]["ori"] = MatRotate(rotation)[:-1, :-1] @ self.system[elem]["ori"]
                     
-                    self._checkBoundPO(elem, MatRotate(rotation)[:-1, :-1])
+                    self._checkBoundPO(elem, MatRotate(rotation))
 
                 self.groups[name]["pos"] = (MatRotate(rotation, pivot=pivot) @ np.append(self.groups[name]["pos"], 1))[:-1]
                 self.groups[name]["ori"] = MatRotate(rotation)[:-1, :-1] @ self.groups[name]["ori"]
@@ -2002,49 +2002,15 @@ class System(object):
                     bound_currents.append(key)
 
         if bound_fields:
+            self.clog.debug("hi")
             for field in bound_fields:
-                for i in range(self.fields[field].size):
-                    x = self.fields[field].Ex.ravel()[i]
-                    y = self.fields[field].Ey.ravel()[i]
-                    z = self.fields[field].Ez.ravel()[i]
+                out = transformPO(self.fields[field], transf)
+                self.fields[field] = self.copyObj(out)
 
-                    new = transf @ np.array([x, y, z])
-
-                    self.fields[field].Ex.ravel()[i] = new[0]
-                    self.fields[field].Ey.ravel()[i] = new[1]
-                    self.fields[field].Ez.ravel()[i] = new[2]
-                    
-                    x = self.fields[field].Hx.ravel()[i]
-                    y = self.fields[field].Hy.ravel()[i]
-                    z = self.fields[field].Hz.ravel()[i]
-                    
-                    new = transf @ np.array([x, y, z])
-
-                    self.fields[field].Hx.ravel()[i] = new[0]
-                    self.fields[field].Hy.ravel()[i] = new[1]
-                    self.fields[field].Hz.ravel()[i] = new[2]
-        
         if bound_currents:
             for current in bound_currents:
-                for i in range(self.currents[current].size):
-                    x = self.currents[current].Jx.ravel()[i]
-                    y = self.currents[current].Jy.ravel()[i]
-                    z = self.currents[current].Jz.ravel()[i]
-                    new = transf @ np.array([x, y, z])
-
-                    self.currents[current].Jx.ravel()[i] = new[0]
-                    self.currents[current].Jy.ravel()[i] = new[1]
-                    self.currents[current].Jz.ravel()[i] = new[2]
-                    
-                    x = self.currents[current].Mx.ravel()[i]
-                    y = self.currents[current].My.ravel()[i]
-                    z = self.currents[current].Mz.ravel()[i]
-                    
-                    new = transf @ np.array([x, y, z])
-                    
-                    self.currents[current].Mx.ravel()[i] = new[0]
-                    self.currents[current].My.ravel()[i] = new[1]
-                    self.currents[current].Mz.ravel()[i] = new[2]
+                out = transformPO(self.currents[current], transf)
+                self.currents[current] = self.copyObj(out)
    
     ##
     # Transform a single component to a filled fields object by setting all other components to zero.

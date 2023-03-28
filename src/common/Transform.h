@@ -23,6 +23,7 @@
 extern "C"
 {
     PYPO_DLL void transformRays(cframe *fr, double *mat);
+    PYPO_DLL void transformFields(c2Bundle *fields, double *mat, int nTot);
 }
 
 #endif

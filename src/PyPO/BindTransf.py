@@ -35,6 +35,9 @@ def loadTransflib():
     lib.transformRays.argtypes = [ctypes.POINTER(cframe), ctypes.POINTER(ctypes.c_double)]
     lib.transformRays.restype = None
 
+    lib.transformFields.argtypes = [ctypes.POINTER(c2Bundle), ctypes.POINTER(ctypes.c_double), ctypes.c_int]
+    lib.transformFields.restype = None
+    
     return lib
 
 ##
@@ -57,5 +60,36 @@ def transformRays(fr):
     out = frameToObj(res, np_t=np.float64, shape=shape)
     
     out.setMeta(fr.pos, fr.ori, fr.transf)
+    return out
+
+##
+# Transform a frame of rays. 
+#
+# @param fr A frame object.
+#
+# @see frame
+def transformPO(obj, transf):
+    lib = loadTransflib()
+
+    res = c2Bundle()
+
+    #allocate_c2Bundle(res, obj.size, ctypes.c_double)
+    c_mat = allfill_mat4D(transf, ctypes.c_double)
+
+    if obj.type == "JM":
+        obj_type = "currents"
+        currentConv(obj, res, obj.size, ctypes.c_double)
+    
+    else:
+        obj_type = "fields"
+        fieldConv(obj, res, obj.size, ctypes.c_double)
+   
+    nTot = ctypes.c_int(obj.size)
+
+    lib.transformFields(ctypes.byref(res), c_mat, nTot)
+
+    out = c2BundleToObj(res, shape=obj.shape, obj_t=obj_type, np_t=np.float64)
+    
+    out.setMeta(obj.surf, obj.k)
     return out
 

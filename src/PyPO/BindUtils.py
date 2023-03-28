@@ -426,6 +426,36 @@ def allfill_cframe(res, frame_py, size, ct_t):
     res.dz = (ct_t * size)(*(frame_py.dz.tolist()))
 
 ##
+# Allocate and fill a ctypes c2Bundle or c2Bundleff struct.
+#
+# @param res A ctypes c2Bundle or c2Bundlef struct.
+# @param obj_py a PyPO fields or currents object.
+# @param size Number of points in struct.
+# @param ct_t Type of point in struct.
+#
+# @see c2Bundle
+# @see c2Bundlef
+# @see fields
+# @see currents
+def allfill_c2Bundle(res, obj_py, size, ct_t):
+    #*np.real(field.Ex).ravel().tolist()
+    res.r1x = (ct_t * size)(*np.real(getattr(obj_py, obj_py.memlist[0])).ravel().tolist())
+    res.r1y = (ct_t * size)(*np.real(getattr(obj_py, obj_py.memlist[1])).ravel().tolist())
+    res.r1z = (ct_t * size)(*np.real(getattr(obj_py, obj_py.memlist[2])).ravel().tolist())
+                                       
+    res.i1x = (ct_t * size)(*np.imag(getattr(obj_py, obj_py.memlist[0])).ravel().tolist())
+    res.i1y = (ct_t * size)(*np.imag(getattr(obj_py, obj_py.memlist[1])).ravel().tolist())
+    res.i1z = (ct_t * size)(*np.imag(getattr(obj_py, obj_py.memlist[2])).ravel().tolist())
+    
+    res.r2x = (ct_t * size)(*np.real(getattr(obj_py, obj_py.memlist[3])).ravel().tolist())
+    res.r2y = (ct_t * size)(*np.real(getattr(obj_py, obj_py.memlist[4])).ravel().tolist())
+    res.r2z = (ct_t * size)(*np.real(getattr(obj_py, obj_py.memlist[5])).ravel().tolist())
+                                                                                
+    res.i2x = (ct_t * size)(*np.imag(getattr(obj_py, obj_py.memlist[3])).ravel().tolist())
+    res.i2y = (ct_t * size)(*np.imag(getattr(obj_py, obj_py.memlist[4])).ravel().tolist())
+    res.i2z = (ct_t * size)(*np.imag(getattr(obj_py, obj_py.memlist[5])).ravel().tolist())
+
+##
 # Allocate and fill an RTDict struct, for generating a tubular ray-trace frame.
 #
 # @param res A RTDict or RTDictf struct.

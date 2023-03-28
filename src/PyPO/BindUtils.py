@@ -13,62 +13,6 @@ import src.PyPO.Config as Config
 # After converting to a ctypes struct, the struct is passed to the C/C++ source code and converted to a proper C/C++ struct for further usage.
 
 ##
-# Convert a PyPO currents object to a ctypes struct. 
-#
-# @params currents A PyPO currents object.
-# @params c_currents A ctypes c2Bundle or c2Bundlef struct.
-# @param size Number of points in currents object.
-# @param ct_t Type of the floating point numbers for ctypes.
-#
-# @see currents
-# @see c2Bundle
-# @see c2Bundlef
-def currentConv(currents, c_currents, size, ct_t):
-    c_currents.r1x = (ct_t * size)(*np.real(currents.Jx).ravel().tolist())
-    c_currents.r1y = (ct_t * size)(*np.real(currents.Jy).ravel().tolist())
-    c_currents.r1z = (ct_t * size)(*np.real(currents.Jz).ravel().tolist())
-
-    c_currents.i1x = (ct_t * size)(*np.imag(currents.Jx).ravel().tolist())
-    c_currents.i1y = (ct_t * size)(*np.imag(currents.Jy).ravel().tolist())
-    c_currents.i1z = (ct_t * size)(*np.imag(currents.Jz).ravel().tolist())
-
-    c_currents.r2x = (ct_t * size)(*np.real(currents.Mx).ravel().tolist())
-    c_currents.r2y = (ct_t * size)(*np.real(currents.My).ravel().tolist())
-    c_currents.r2z = (ct_t * size)(*np.real(currents.Mz).ravel().tolist())
-
-    c_currents.i2x = (ct_t * size)(*np.imag(currents.Mx).ravel().tolist())
-    c_currents.i2y = (ct_t * size)(*np.imag(currents.My).ravel().tolist())
-    c_currents.i2z = (ct_t * size)(*np.imag(currents.Mz).ravel().tolist())
-
-##
-# Convert a PyPO fields object to a ctypes struct. 
-#
-# @params fields A PyPO fields object.
-# @params c_fields A ctypes c2Bundle or c2Bundlef struct.
-# @param size Number of points in fields object.
-# @param ct_t Type of the floating point numbers for ctypes.
-#
-# @see fields
-# @see c2Bundle
-# @see c2Bundlef
-def fieldConv(field, c_fields, size, ct_t):
-    c_fields.r1x = (ct_t * size)(*np.real(field.Ex).ravel().tolist())
-    c_fields.r1y = (ct_t * size)(*np.real(field.Ey).ravel().tolist())
-    c_fields.r1z = (ct_t * size)(*np.real(field.Ez).ravel().tolist())
-
-    c_fields.i1x = (ct_t * size)(*np.imag(field.Ex).ravel().tolist())
-    c_fields.i1y = (ct_t * size)(*np.imag(field.Ey).ravel().tolist())
-    c_fields.i1z = (ct_t * size)(*np.imag(field.Ez).ravel().tolist())
-
-    c_fields.r2x = (ct_t * size)(*np.real(field.Hx).ravel().tolist())
-    c_fields.r2y = (ct_t * size)(*np.real(field.Hy).ravel().tolist())
-    c_fields.r2z = (ct_t * size)(*np.real(field.Hz).ravel().tolist())
-
-    c_fields.i2x = (ct_t * size)(*np.imag(field.Hx).ravel().tolist())
-    c_fields.i2y = (ct_t * size)(*np.imag(field.Hy).ravel().tolist())
-    c_fields.i2z = (ct_t * size)(*np.imag(field.Hz).ravel().tolist())
-
-##
 # Convert a PyPO scalarfield object to a ctypes struct. 
 #
 # @params field A PyPO scalarfield object.

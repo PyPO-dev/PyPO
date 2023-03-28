@@ -202,7 +202,7 @@ def calcCurrents(fields, source, mode):
 
     res_field = c2Bundle()
     res_current = c2Bundle()
-    fieldConv(fields, res_field, source_size, ctypes.c_double)
+    allfill_c2Bundle(res_field, fields, fields.size, ctypes.c_double)
     allocate_c2Bundle(res_current, source_size, ctypes.c_double)
 
     if mode == "full":

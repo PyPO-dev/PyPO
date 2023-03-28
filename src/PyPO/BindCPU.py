@@ -134,7 +134,7 @@ def PyPO_CPUd(source, target, runPODict):
 
     else:
         c_currents = c2Bundle()
-        currentConv(runPODict["s_current"], c_currents, gs, ctypes.c_double)
+        allfill_c2Bundle(c_currents, runPODict["s_current"], gs, ctypes.c_double)
         args = [csp, ctp, ctypes.byref(cs), ctypes.byref(ct),
                 ctypes.byref(c_currents), k, nThreads, epsilon,
                 t_direction]

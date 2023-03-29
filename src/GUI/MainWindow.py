@@ -1,10 +1,10 @@
 import os
 import sys
 import shutil
-import asyncio
-import time
-import threading
-import traceback
+from time import time
+from threading import Thread, Event
+from traceback import print_tb
+from multiprocessing import Process, Manager
 
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar, QScrollArea
 from PyQt5.QtGui import QFont, QIcon, QTextCursor
@@ -81,7 +81,7 @@ class MainWidget(QWidget):
         self._mkPlotScreen()
         self.setLayout(self.grid)
         
-        self.event_stop = threading.Event()
+        self.event_stop = Event()
 
         self.threadpool = QThreadPool()
 
@@ -250,7 +250,7 @@ class MainWidget(QWidget):
 
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
 
 
@@ -273,7 +273,7 @@ class MainWidget(QWidget):
 
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
     ##
     # Generate a copy form for a group.
@@ -292,7 +292,7 @@ class MainWidget(QWidget):
             self.addGroupWidget(copyDict["name_copy"])
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
     
     ##
@@ -360,7 +360,7 @@ class MainWidget(QWidget):
             self.stm.saveSystem(saveDict["name"]) 
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
     
     ##
@@ -377,7 +377,7 @@ class MainWidget(QWidget):
             shutil.rmtree(os.path.join(self.stm.savePathSystems, removeDict["name"]))
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
     ##
     # opens a form that allows user to load a saved System
@@ -401,7 +401,7 @@ class MainWidget(QWidget):
             self.refreshColumn(self.stm.groups, "groups")
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
 
     ##
@@ -412,7 +412,7 @@ class MainWidget(QWidget):
             self.stm.removeElement(element)
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
 
     def removeFrame(self, frame):
@@ -420,7 +420,7 @@ class MainWidget(QWidget):
             self.stm.removeFrame(frame)
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
     
     def addGroupForm(self):
@@ -442,7 +442,7 @@ class MainWidget(QWidget):
 
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err) 
 
 
@@ -520,7 +520,7 @@ class MainWidget(QWidget):
             self.addReflectorWidget(elementDict["name"])
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
     
     ##
@@ -543,7 +543,7 @@ class MainWidget(QWidget):
             self.addReflectorWidget(elementDict["name"])
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
 
     ##
@@ -556,7 +556,7 @@ class MainWidget(QWidget):
             self.addReflectorWidget(elementDict["name"])
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
 
     ##
@@ -569,7 +569,7 @@ class MainWidget(QWidget):
             self.addReflectorWidget(elementDict["name"])
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
 
     ##
@@ -582,7 +582,7 @@ class MainWidget(QWidget):
             self.addReflectorWidget(elementDict["name"])
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
 
     ### Functionalities: Transforming Elements 
@@ -613,7 +613,7 @@ class MainWidget(QWidget):
                 # print(f'Rotated {dd["element"]} by {self._formatVector(vector)} deg around {self._formatVector(dd["pivot"])}')
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
 
     ### Functionalities: Transforming Groups 
@@ -637,7 +637,7 @@ class MainWidget(QWidget):
                 self.stm.rotateGrids(dd["group"], vector, pivot=dd["pivot"], mode=dd["mode"].lower(), obj="group")
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
     
     ##
@@ -656,7 +656,7 @@ class MainWidget(QWidget):
                 # print(f'Rotated {dd["frame"]} by {self._formatVector(vector)} deg around {self._formatVector(dd["pivot"])}')
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
     ##
     # Shows multiple element transformation form
@@ -685,7 +685,7 @@ class MainWidget(QWidget):
 
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
     
     ### Functionalities: TRFrames 
@@ -706,7 +706,7 @@ class MainWidget(QWidget):
             self.addFrameWidget(RTDict["name"])
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
 
     ##
@@ -747,7 +747,7 @@ class MainWidget(QWidget):
         
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
 
     ##
@@ -765,7 +765,7 @@ class MainWidget(QWidget):
             self.addFrameWidget(propRaysDict["fr_out"])
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
 
     ##
@@ -787,7 +787,7 @@ class MainWidget(QWidget):
 
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
 
 
@@ -808,7 +808,7 @@ class MainWidget(QWidget):
             self.addCurrentWidget(GDict["name"])
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
     
     ##
@@ -826,7 +826,7 @@ class MainWidget(QWidget):
             self.addSFieldWidget(GDict["name"])
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
     ##
     # Shows form to initialize a physical optics propagation
@@ -845,7 +845,7 @@ class MainWidget(QWidget):
             self.addCurrentWidget(PSDict["name"])
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
 
     ##
@@ -864,7 +864,7 @@ class MainWidget(QWidget):
             self.addSFieldWidget(SPSDict["name"])
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
 
     ##
@@ -890,7 +890,7 @@ class MainWidget(QWidget):
         
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
 
     ##
@@ -912,7 +912,7 @@ class MainWidget(QWidget):
             self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
     
     
@@ -935,7 +935,7 @@ class MainWidget(QWidget):
             self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
     
     
@@ -967,11 +967,23 @@ class MainWidget(QWidget):
         elif propBeamDict["mode"] == "scalar":
             self.addSFieldWidget(propBeamDict["name_field"])
 
+    def runPOWorker(self, s_copy, runPODict, returnDict):
+        s_copy.runPO(runPODict)
+
+        returnDict["system"] = s_copy
+
+    def runPOWaiter(self, process, dial, propBeamDict):
+        process.join()
+
+        dial.accept()
+        self._addToWidgets(propBeamDict)
+
     ##
     # Reads form propagates beam, runs calculation on another thread
     def propPOAction(self):
         try:
             propBeamDict = self.ParameterWid.read()
+            print(propBeamDict)
             
             chk.check_runPODict(propBeamDict, self.stm.system.keys(), self.stm.fields.keys(), self.stm.currents.keys(),
                             self.stm.scalarfields.keys(), self.stm.frames.keys(), self.clog)
@@ -981,27 +993,53 @@ class MainWidget(QWidget):
             else:
                 subStr = propBeamDict["mode"]
 
-            start_time = time.time()
+            start_time = time()
         
             self.clog.info("*** Starting PO propagation ***")
+
+
+            s_copy = st.System(context="G")
             
+            s_copy.system[propBeamDict["t_name"]] = self.stm.system[propBeamDict["t_name"]]
+            if "s_current" in propBeamDict:
+                s_copy.currents[propBeamDict["s_current"]] = self.stm.currents[propBeamDict["s_current"]]
+                s_copy.system[self.stm.currents[propBeamDict["s_current"]].surf] = self.stm.system[self.stm.currents[propBeamDict["s_current"]].surf]
+                print(f"{self.stm.system[self.stm.currents[propBeamDict['s_current']].surf] = }")
+            elif "s_field" in propBeamDict:
+                s_copy.scalarfields[propBeamDict["s_field"]] = self.stm.scalarfields[propBeamDict["s_scalarfield"]]
+                s_copy.system[self.stm.scalarfields[propBeamDict["s_field"]].surf] = self.stm.system[self.stm.scalarfields[propBeamDict["s_field"]].surf]
+
+            mgr = Manager()
+            returnDict = mgr.dict()
+
+            args = (s_copy, propBeamDict, returnDict)
+            process = Process(target = self.runPOWorker, args = args)
+
             dialStr = f"Calculating {subStr} on {propBeamDict['t_name']}..."
-            worker = Worker(self.stm.runGUIPO, propBeamDict)
-            dial = SymDialog(worker.kill, self.clog, dialStr) 
+            dial = SymDialog(process.kill, self.clog, dialStr) 
+            
+            waiterArgs = (process, dial, returnDict)
+            waiter = Thread(target = self.runPOWaiter, args = waiterArgs)
 
-            worker.signal.finished.connect(dial.accept) 
-            worker.signal.finished.connect(lambda : self._addToWidgets(propBeamDict)) 
-            worker.signal.finished.connect(lambda : self.clog.info("PO propagation ended successfully."))
-
-            self.threadpool.start(worker)
+            process.start()
+            waiter.start()
             dial.exec_()
+
+
+            s_copy = returnDict["system"]
+            print(f"{s_copy = }")
+            self.stm.frames.update(s_copy.frames)
+            self.stm.fields.update(s_copy.fields)
+            self.stm.currents.update(s_copy.currents)
+            self.stm.scalarfields.update(s_copy.scalarfields)
+
 
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(f"PO Propagation did not end successfully: {err}.")
         
-        dtime = time.time() - start_time
+        dtime = time() - start_time
         self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
     
     #
@@ -1035,7 +1073,7 @@ class MainWidget(QWidget):
             self.clog.info(f'Taper efficiency of {TaperDict["f_name"]}, component {TaperDict["comp"]} : {eff_taper}')
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
 
 
@@ -1056,7 +1094,7 @@ class MainWidget(QWidget):
         
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
 
 
@@ -1070,7 +1108,7 @@ class MainWidget(QWidget):
         
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
 
 
@@ -1084,7 +1122,7 @@ class MainWidget(QWidget):
             self.addSFieldWidget(f"fitGauss_{MBDict['f_name']}")
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
     
     #END NOTE
@@ -1109,7 +1147,7 @@ class MainWidget(QWidget):
 
         except Exception as err:
             print(err)
-            traceback.print_tb(err.__traceback__)
+            print_tb(err.__traceback__)
             self.clog.error(err)
 
 

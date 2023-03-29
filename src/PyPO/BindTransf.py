@@ -72,17 +72,16 @@ def transformPO(obj, transf):
     lib = loadTransflib()
 
     res = c2Bundle()
-
-    #allocate_c2Bundle(res, obj.size, ctypes.c_double)
+    allfill_c2Bundle(res, obj, obj.size, ctypes.c_double)
     c_mat = allfill_mat4D(transf, ctypes.c_double)
 
+    obj_type = "fields"
+    
     if obj.type == "JM":
         obj_type = "currents"
-        currentConv(obj, res, obj.size, ctypes.c_double)
+        #currentConv(obj, res, obj.size, ctypes.c_double)
     
-    else:
-        obj_type = "fields"
-        fieldConv(obj, res, obj.size, ctypes.c_double)
+        #fieldConv(obj, res, obj.size, ctypes.c_double)
    
     nTot = ctypes.c_int(obj.size)
 

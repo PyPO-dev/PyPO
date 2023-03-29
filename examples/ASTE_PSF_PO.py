@@ -108,6 +108,7 @@ def ex_ASTE_PO(device):
 
     s.runPO(pri_to_planeff)
     
+    s.calcHPBW("ff", "Ex")
     s.plotBeam2D("ff", "Ex", units="as")
 
 if __name__ == "__main__":

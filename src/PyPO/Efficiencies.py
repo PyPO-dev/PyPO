@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as pt
 from src.PyPO.PyPOTypes import *
 from src.PyPO.BindRefl import *
+from src.PyPO.FitGauss import fitGaussAbs
 
 ##
 # @file
@@ -144,6 +145,8 @@ def calcMainBeam(field, surfaceObject, fitGauss):
     eff_mb = np.sum(np.absolute(fitGauss_norm)**2) / np.sum(np.absolute(field_norm)**2)
     
     return eff_mb
+
+
 
 def calcDirectivity(eta_t, surfaceObject, k):
     grids = generateGrid(surfaceObject, transform=False, spheric=True)

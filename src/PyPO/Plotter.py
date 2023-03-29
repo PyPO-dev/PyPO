@@ -27,6 +27,7 @@ from src.PyPO.BindRefl import *
 # @param amp_only Only plot amplitude pattern. Default is False.
 # @param save Save plot to /images/ folder.
 # @param interpolation What interpolation to use for displaying amplitude pattern. Default is None.
+# @param norm Normalise field (only relevant when plotting linear scale).
 # @param aperDict Plot an aperture defined in an aperDict object along with the field or current patterns. Default is None.
 # @param mode Plot amplitude in decibels ("dB") or on a linear scale ("linear"). Default is "dB".
 # @param project Set abscissa and ordinate of plot. Should be given as a string. Default is "xy".
@@ -43,7 +44,7 @@ from src.PyPO.BindRefl import *
 # @see aperDict
 def plotBeam2D(plotObject, field,
                 vmin, vmax, show, amp_only,
-                save, interpolation,
+                save, interpolation, norm,
                 aperDict, mode, project,
                 units, name, titleA, titleP, savePath, unwrap_phase):
 
@@ -98,18 +99,31 @@ def plotBeam2D(plotObject, field,
         fig, ax = pt.subplots(1,2, figsize=(10,5), gridspec_kw={'wspace':0.5})
 
         if mode == 'linear':
-            ampfig = ax[0].pcolormesh(grid_x1 * units[1], grid_x2 * units[1], field,
+            if norm:
+                field_pl = np.absolute(field) / max_field
+            else:
+                field_pl = np.absolute(field)
+
+            vmin = np.min(field_pl) if vmin is None else vmin
+            vmax = np.max(field_pl) if vmax is None else vmax
+            
+            ampfig = ax[0].pcolormesh(grid_x1 * units[1], grid_x2 * units[1], field_pl,
                                     vmin=vmin, vmax=vmax, cmap=cmaps.parula, shading='auto')
-            phasefig = ax[1].pcolormesh(grid_x1 * units[1], grid_x2 * units[1], phase, cmap=cmaps.parula, shading='auto')
+            phasefig = ax[1].pcolormesh(grid_x1 * units[1], grid_x2 * units[1], np.angle(field), cmap=cmaps.parula, shading='auto')
 
         elif mode == 'dB':
+            field_dB = 20 * np.log10(np.absolute(field) / max_field)
+            
+            vmin = np.min(field_dB) if vmin is None else vmin
+            vmax = np.max(field_dB) if vmax is None else vmax
+            
             if unwrap_phase:
                 phase = np.unwrap(np.unwrap(np.angle(field), axis=0), axis=1)
 
             else:
                 phase = np.angle(field)
             
-            ampfig = ax[0].pcolormesh(grid_x1 * units[1], grid_x2 * units[1], 20 * np.log10(np.absolute(field) / max_field),
+            ampfig = ax[0].pcolormesh(grid_x1 * units[1], grid_x2 * units[1], field_dB,
                                     vmin=vmin, vmax=vmax, cmap=cmaps.parula, shading='auto')
             phasefig = ax[1].pcolormesh(grid_x1 * units[1], grid_x2 * units[1], phase, cmap=cmaps.parula, shading='auto')
 

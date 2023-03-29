@@ -1,6 +1,7 @@
 # Standard Python imports
 import numbers
 import scipy.optimize as opt
+from scipy.interpolate import interp1d
 import numpy as np
 import matplotlib.pyplot as pt
 import matplotlib.cm as cm
@@ -728,13 +729,17 @@ class System(object):
             check_groupSystem(name, self.groups, self.clog, extern=True)
 
             for elem, snap in zip(self.groups[name]["members"], self.groups[name]["snapshots"][snap_name]):
+                self._checkBoundPO(elem, InvertMat(self.system[elem]["transf"]))
                 self.system[elem]["transf"] = self.copyObj(snap)
+                self._checkBoundPO(elem, self.system[elem]["transf"])
             
             self.clog.info(f"Reverted group {name} to snapshot {snap_name}.")
 
         elif obj == "element":
             check_elemSystem(name, self.system, self.clog, extern=True)
+            self._checkBoundPO(name, InvertMat(self.system[name]["transf"]))
             self.system[name]["transf"] = self.copyObj(self.system[name]["snapshots"][snap_name])
+            self._checkBoundPO(name, self.system[name]["transf"])
         
             self.clog.info(f"Reverted element {name} to snapshot {snap_name}.")
         
@@ -1287,8 +1292,8 @@ class System(object):
 
         points = (self.frames[name_fr_in].x, self.frames[name_fr_in].y, self.frames[name_fr_in].z)
 
-        rfield = np.real(getattr(self.fields[name_field], comp))
-        ifield = np.imag(getattr(self.fields[name_field], comp))
+        rfield = np.real(getattr(self.fields[name_field], comp)).ravel()
+        ifield = np.imag(getattr(self.fields[name_field], comp)).ravel()
 
         grid_interp = (grids.x, grids.y, grids.z)
 
@@ -1445,6 +1450,63 @@ class System(object):
 
         return eff
     
+    def calcBeamCuts(self, name_field, comp, phi=0, center=True, align=True):
+        check_fieldSystem(name_field, self.fields, self.clog, extern=True)
+        name_surf = self.fields[name_field].surf
+        field = np.absolute(getattr(self.fields[name_field], comp))
+
+        self.snapObj(name_surf, "__pre")
+        
+        if center or align:
+            popt, perr = self.fitGaussAbs(name_field, comp, mode="linear", full_output=True)
+            print(popt) 
+            if popt[0] > popt[1]:
+                angf = 90
+            else:
+                angf = 0
+            
+            if center:
+                self.translateGrids(name_surf, np.array([-popt[2], -popt[3], 0]))
+            
+            if align:
+                self.rotateGrids(name_surf, np.array([0, 0, angf + np.degrees(-popt[4])]), pivot=world.ORIGIN)
+        
+        grids_transf = self.generateGrids(name_surf, spheric=False)
+
+        idx_c = np.unravel_index(np.argmax(field), field.shape)
+        x_cut = self.copyObj(20 * np.log10(field[:, idx_c[1]] / np.max(field)))
+        y_cut = self.copyObj(20 * np.log10(field[idx_c[0], :] / np.max(field)))
+
+        x_strip = self.copyObj(grids_transf.x[:, idx_c[1]])
+        y_strip = self.copyObj(grids_transf.y[idx_c[0], :])
+
+        pt.plot(x_cut)
+        pt.plot(y_cut)
+        pt.show()
+
+        self.revertToSnap(name_surf, "__pre")
+        self.deleteSnap(name_surf, "__pre")
+
+        return x_cut, y_cut, x_strip, y_strip
+    
+    def calcHPBW(self, name_field, comp, interp=50):
+        x_cut, y_cut, x_strip, y_strip = self.calcBeamCuts(name_field, comp, center=False, align=False)
+
+        x_interp = np.linspace(np.min(x_strip), np.max(x_strip), num=len(x_strip) * interp)
+        y_interp = np.linspace(np.min(y_strip), np.max(y_strip), num=len(y_strip) * interp)
+
+        x_cut_interp = interp1d(x_strip, x_cut, kind="cubic")(x_interp)
+        y_cut_interp = interp1d(y_strip, y_cut, kind="cubic")(y_interp)
+
+        mask_x = (x_cut_interp > -3.1) & (x_cut_interp < -2.9)
+        mask_y = (y_cut_interp > -3.1) & (y_cut_interp < -2.9)
+
+        HPBW_E = np.mean(np.absolute(x_interp[mask_x])) * 2 * 3600
+        HPBW_H = np.mean(np.absolute(y_interp[mask_y])) * 2 * 3600
+
+        self.clog.info(f"E-plane HPBW = {HPBW_E} degrees.")
+        self.clog.info(f"H-plane HPBW = {HPBW_H} degrees.")
+
     ##
     # Generate point-source PO fields and currents.
     #
@@ -1571,6 +1633,7 @@ class System(object):
     # @param amp_only Only plot amplitude pattern. Default is False.
     # @param save Save plot to /images/ folder.
     # @param interpolation What interpolation to use for displaying amplitude pattern. Default is None.
+    # @param norm Normalise field (only relevant when plotting linear scale). Default is True.
     # @param aperDict Plot an aperture defined in an aperDict object along with the field or current patterns. Default is None.
     # @param mode Plot amplitude in decibels ("dB") or on a linear scale ("linear"). Default is "dB".
     # @param project Set abscissa and ordinate of plot. Should be given as a string. Default is "xy".
@@ -1583,14 +1646,14 @@ class System(object):
     #
     # @see aperDict
     def plotBeam2D(self, name_obj, comp=None,
-                    vmin=-30, vmax=0, show=True, amp_only=False,
-                    save=False, interpolation=None,
+                    vmin=None, vmax=None, show=True, amp_only=False,
+                    save=False, interpolation=None, norm=True,
                     aperDict=None, mode='dB', project='xy',
                     units="", name="", titleA="Amp", titleP="Phase",
                     unwrap_phase=False, ret=False):
 
         aperDict = {"plot":False} if aperDict is None else aperDict
-        
+
         if comp is None:
             field_comp = self.scalarfields[name_obj].S
             name_surface = self.scalarfields[name_obj].surf
@@ -1622,7 +1685,7 @@ class System(object):
         
         fig, ax = plt.plotBeam2D(plotObject, field_comp,
                         vmin, vmax, show, amp_only,
-                        save, interpolation,
+                        save, interpolation, norm,
                         aperDict, mode, project,
                         unitl, name, titleA, titleP, self.savePath, unwrap_phase)
 

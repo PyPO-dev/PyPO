@@ -1139,11 +1139,11 @@ def check_runPODict(runPODict, elements, fields, currents, scalarfields, frames,
             if "nThreads" not in runPODict:
                 runPODict["nThreads"] = 256
 
-
     if errStr:
         errList = errStr.split("\n")[:-1]
         for err in errList:
             clog.error(err)
+        
         raise RunPOError()
 
 ##

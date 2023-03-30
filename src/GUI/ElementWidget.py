@@ -31,15 +31,6 @@ class SymDialog(QDialog):
         layout.addWidget(abortBtn, 1,0)
         self.setLayout(layout)
         
-        #layout = QGridLayout()
-        #abortBtn = QPushButton("Abort")
-        #abortBtn.clicked.connect(self.reject)
-        #layout.addWidget(QLabel(self.msg), 0,0)
-        #layout.addWidget(abortBtn, 1,0)
-        #self.setLayout(layout)
-        #layout.addWidget(QLabel(self.msg), 0,0)
-        #layout.addWidget(abortBtn, 1,0)
-        #self.setLayout(layout)
     def setThread(self, thread):
         self.thread = thread
 
@@ -173,7 +164,6 @@ class GroupWidget(ElementWidget):
 
 class FrameWidget(ElementWidget):
     def __init__ (self, name, removeAction, transformAction, plotAction, RMSAction, snapAction, p=None ):
-        print("making frm wid")
         super().__init__(name, plotAction, removeAction, transformAction=transformAction, RMSAction=RMSAction, snapAction=snapAction, p=p)
 
 class FieldsWidget(ElementWidget):

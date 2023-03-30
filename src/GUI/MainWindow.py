@@ -20,6 +20,7 @@ from src.GUI.Acccordion import Accordion
 from src.GUI.ElementWidget import ReflectorWidget, FrameWidget, FieldsWidget, CurrentWidget, SFieldsWidget, SymDialog
 from src.GUI.Console import ConsoleGenerator
 from src.GUI.Worker import Worker, GWorker
+from src.GUI.Waiter import Waiter
 from src.GUI.WorkSpace import Workspace
 
 from src.PyPO.CustomLogger import CustomGUILogger
@@ -175,9 +176,6 @@ class MainWidget(QWidget):
             self.formScroll.setParent(None)
             self.formScroll.deleteLater()
     
-    def formClosed(self):
-        print("form closed")
-        print(self.formScroll)
     ##
     # TODO: Remove this function from here
     @staticmethod
@@ -399,6 +397,8 @@ class MainWidget(QWidget):
             self.refreshColumn(self.stm.currents, "currents")
             self.refreshColumn(self.stm.scalarfields, "scalarfields")
             self.refreshColumn(self.stm.groups, "groups")
+
+            self.removeForm()
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -453,7 +453,7 @@ class MainWidget(QWidget):
     ##
     # TODO: @Maikel Rename this function and evaluate its nessecity
     def refreshColumn(self, columnDict, columnType):
-        print("refreshColumn")
+        # print("refreshColumn")
         # self._mkElementsColumn()
         for key, item in columnDict.items():
             if columnType == "elements":
@@ -477,18 +477,17 @@ class MainWidget(QWidget):
     ### Functionalities: Adding Elements in gui
     # TODO:doc
     def addReflectorWidget(self, name):
-        print("addREFL")
-        print(f"r {name}")
-        self.ElementsColumn.addReflector(name, self.removeElement, self.transformSingleForm, self.plotElement, self.snapActionForm, self.copyElementActionForm)
-        # self.ElementsColumn.reflectors.addWidget(ReflectorWidget(name, self.removeElement, self.transformSingleForm, self.plotElement, self.snapActionForm)) 
+        self.ElementsColumn.addReflector(name, self.removeElement, 
+                                         self.transformSingleForm, self.plotElement, 
+                                         self.snapActionForm, self.copyElementActionForm)
     
     def addGroupWidget(self, name):
         self.ElementsColumn.addGroup(name, self.stm.removeGroup, self.plotGroup, self.transformGroupForm, self.snapGroupActionForm, self.copyGroupActionForm)
     
     def addFrameWidget(self, name):
         self.ElementsColumn.addRayTraceFrames(name, self.removeFrame, 
-                                                    self.transformFrameForm, self.plotFrameForm,  
-                                                    self.calcRMSfromFrame, self.snapFrameActionForm)
+                                              self.transformFrameForm, self.plotFrameForm,  
+                                              self.calcRMSfromFrame, self.snapFrameActionForm)
         
 
     def addFieldWidget(self, name):
@@ -950,6 +949,7 @@ class MainWidget(QWidget):
         self.setForm(fDataObj.propPOFFInp(self.stm.currents, self.stm.system), self.propPOAction, okText="Propagate beam")
    
     def _addToWidgets(self, propBeamDict):
+        print(f"{propBeamDict = }")
         if propBeamDict["mode"] == "JM":
             self.addCurrentWidget(propBeamDict["name_JM"])
     
@@ -967,16 +967,21 @@ class MainWidget(QWidget):
         elif propBeamDict["mode"] == "scalar":
             self.addSFieldWidget(propBeamDict["name_field"])
 
+    # def _addToWidgetsOfCalc(self):
+    #     self._addToWidgets()
+
+
     def runPOWorker(self, s_copy, runPODict, returnDict):
         s_copy.runPO(runPODict)
 
         returnDict["system"] = s_copy
 
-    def runPOWaiter(self, process, dial, propBeamDict):
-        process.join()
+    def waiterFinished(self):
+        # process.join()
+        print("waiter: Process joined")
 
-        dial.accept()
-        self._addToWidgets(propBeamDict)
+        self.currentCalculationDialog.accept()
+        self._addToWidgets(self.currentCalculationDict)
 
     ##
     # Reads form propagates beam, runs calculation on another thread
@@ -1016,14 +1021,22 @@ class MainWidget(QWidget):
             process = Process(target = self.runPOWorker, args = args)
 
             dialStr = f"Calculating {subStr} on {propBeamDict['t_name']}..."
-            dial = SymDialog(process.kill, self.clog, dialStr) 
-            
-            waiterArgs = (process, dial, returnDict)
-            waiter = Thread(target = self.runPOWaiter, args = waiterArgs)
+            self.currentCalculationDialog = SymDialog(process.kill, self.clog, dialStr) 
+            self.currentCalculationDict = propBeamDict
+
+            waiterTread = QThread()
+            waiter = Waiter()
+            waiter.setProcess(process)
+            waiter.moveToThread(waiterTread)
+            waiterTread.started.connect(waiter.run)
+            waiter.finished.connect(waiter.deleteLater)
+            waiter.finished.connect(waiterTread.quit)
+            waiter.finished.connect(waiterTread.deleteLater)
+            waiter.finished.connect(self.waiterFinished)
 
             process.start()
-            waiter.start()
-            dial.exec_()
+            waiterTread.start()
+            self.currentCalculationDialog.exec_()
 
 
             s_copy = returnDict["system"]
@@ -1207,10 +1220,10 @@ class PyPOMainWindow(QMainWindow):
         hyperbolaAction.triggered.connect(self.mainWid.addQuadricForm)
         reflectorSelector.addAction(hyperbolaAction)
 
-        transformElementsAction = QAction("Transform elements", self)
-        transformElementsAction.setStatusTip("Transform a group of elements.")
-        transformElementsAction.triggered.connect(self.mainWid.transformationMultipleForm)
-        ElementsMenu.addAction(transformElementsAction)
+        # transformElementsAction = QAction("Transform elements", self) ##TODO depricated? There is no longer a form for this action
+        # transformElementsAction.setStatusTip("Transform a group of elements.")
+        # transformElementsAction.triggered.connect(self.mainWid.transformationMultipleForm)
+        # ElementsMenu.addAction(transformElementsAction)
 
         # ElementsMenu.addSeparator()
         

@@ -107,7 +107,7 @@ def plotBeam2D(plotObject, field,
             vmin = np.min(field_pl) if vmin is None else vmin
             vmax = np.max(field_pl) if vmax is None else vmax
             
-            ampfig = ax[0].pcolormesh(grid_x1 * units[1], grid_x2 * units[1], field_pl,
+            ampfig = ax[0].pcolormesh(grid_x1 * units[1], grid_x2 * units[1], field_pl**2,
                                     vmin=vmin, vmax=vmax, cmap=cmaps.parula, shading='auto')
             phasefig = ax[1].pcolormesh(grid_x1 * units[1], grid_x2 * units[1], np.angle(field), cmap=cmaps.parula, shading='auto')
 

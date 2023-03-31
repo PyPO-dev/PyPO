@@ -8,7 +8,7 @@ from src.GUI.ParameterForms.InputDescription import *
 
 __all__ = [
     'selfClosingDialog',
-    'selfClosingDialog_HoverableBtn',
+    # 'selfClosingDialog_HoverableBtn',
     'PlotScreen',
     'MPLCanvas',
     'MainWindow',

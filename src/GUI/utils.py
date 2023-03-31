@@ -6,6 +6,9 @@ from enum import Enum, auto
 # class validation(Enum):
 #     integers = auto()
 
+class InputDescriptionError(Exception):
+    pass
+
 class inType(Enum):
     static = 0
     vectorStrings = 1
@@ -14,7 +17,7 @@ class inType(Enum):
     checkbox = 4
     dropdown = 5
     radio = 6
-    xyzradio = 7
+    xyzRadio = 7
     dynamicDropdown = 8
     dynamicRadio = 9
     elementSelector = 10

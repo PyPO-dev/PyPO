@@ -39,11 +39,11 @@ import src.PyPO.Checks as chk
 # @file 
 # defines classes PyPOMainWindow and MainWidget
 # PyPOMainWindow is responsible for setting up the window and toolbars
-# MainWidget is responsble for all gui functionalities
+# MainWidget is responsible for all gui functionalities
 #
 class MainWidget(QWidget):
     ##
-    # Constructot. Configures the layout and initializes the underlying systemmlala
+    # Constructor. Configures the layout and initializes the underlying system
     # @see System
     # 
     # 
@@ -71,7 +71,7 @@ class MainWidget(QWidget):
         self.stm = st.System(redirect=self.clog, context="G")
        
         self.clog = self.stm.getSystemLogger()
-        self.clog.info(f"STARTED PYPO GUI SESSION.")
+        self.clog.info(f"STARTED PyPO GUI SESSION.")
 
         # init layout
         self.grid.setContentsMargins(0,0,0,0)
@@ -89,9 +89,6 @@ class MainWidget(QWidget):
         # NOTE Raytrace stuff
         self.frameDict = {}
         # end NOTE
-
-    #def setupLogger(self):
-    #    handler = 
 
     ### Gui setup functions
     ##
@@ -451,7 +448,7 @@ class MainWidget(QWidget):
 
 
     ##
-    # TODO: @Maikel Rename this function and evaluate its nessecity
+    # TODO: @Maikel Rename this function and evaluate its necessity
     def refreshWorkspaceSection(self, columnDict, section):
         for key in columnDict.keys():
             if section == "elements":
@@ -529,11 +526,11 @@ class MainWidget(QWidget):
             elementDict = self.ParameterWid.read()
             if elementDict["type"] == "Parabola":
                 self.stm.addParabola(elementDict)
+                # print(f"PARABOLA{ elementDict['name'] }")
             elif elementDict["type"] == "Hyperbola":
                 self.stm.addHyperbola(elementDict)
             elif elementDict["type"] == "Ellipse":
                 self.stm.addEllipse(elementDict)
-            print(f"r{ elementDict['name'] }")
             self.addReflectorWidget(elementDict["name"])
         except Exception as err:
             print(err)
@@ -750,7 +747,7 @@ class MainWidget(QWidget):
         self.setForm(fData.propRaysInp(self.stm.frames, self.stm.system), self.addPropRaysAction, okText="Propagate rays")
 
     ##
-    # Reads form and popagates rays
+    # Reads form and propagates rays
     def addPropRaysAction(self): 
         try:
             propRaysDict = self.ParameterWid.read()
@@ -888,7 +885,7 @@ class MainWidget(QWidget):
             self.clog.error(err)
 
     ##
-    # TODO: whats the difference with above? Perhase we should rename function
+    # TODO: whats the difference with above? Perhapses we should rename function
     #
     # @param field Field to plot
     def plotSFieldForm(self, field):
@@ -1053,27 +1050,27 @@ class MainWidget(QWidget):
     #
     ##TODO Unite efficiencies
     ##
-    # Shows form to calculate taper efficientie
+    # Shows form to calculate taper efficiencies
     def setTaperEffsForm(self):
         self.setForm(fData.calcTaperEff(self.stm.fields, self.stm.system), self.calcTaperAction, okText="Calculate")
     
     ##
-    # Shows form to calculate spillover efficientie
+    # Shows form to calculate spillover efficiencies
     def setSpillEffsForm(self):
         self.setForm(fData.calcSpillEff(self.stm.fields, self.stm.system), self.calcSpillAction, okText="Calculate")
 
     ##
-    # Shows form to calculate x-pol efficientie TODO: x-pol
+    # Shows form to calculate x-pol efficiencies TODO: x-pol
     def setXpolEffsForm(self):
         self.setForm(fData.calcXpolEff(self.stm.fields, self.stm.system), self.calcXpolAction, okText="Calculate")
 
     ##
-    # Shows form to calculate main beam efficientie
+    # Shows form to calculate main beam efficiencies
     def setMBEffsForm(self):
         self.setForm(fData.calcMBEff(self.stm.fields, self.stm.system), self.calcMBAction, okText="Calculate")
     
     ##
-    # Reads form and calculates taper efficientie
+    # Reads form and calculates taper efficiencies
     def calcTaperAction(self):
         try:
             TaperDict = self.ParameterWid.read()
@@ -1086,7 +1083,7 @@ class MainWidget(QWidget):
 
 
     ##
-    # Reads form and calculates spillover efficientie
+    # Reads form and calculates spillover efficiencies
     def calcSpillAction(self):
         try:
             SpillDict = self.ParameterWid.read()
@@ -1107,7 +1104,7 @@ class MainWidget(QWidget):
 
 
     ##
-    # Reads form and calculates x-pol efficientie TODO: x-pol?
+    # Reads form and calculates x-pol efficiencies TODO: x-pol?
     def calcXpolAction(self):
         try:
             XpolDict = self.ParameterWid.read()
@@ -1121,7 +1118,7 @@ class MainWidget(QWidget):
 
 
     ##
-    # Reads form and calculates main beam efficientie
+    # Reads form and calculates main beam efficiencies
     def calcMBAction(self):
         try:
             MBDict = self.ParameterWid.read()
@@ -1215,7 +1212,7 @@ class PyPOMainWindow(QMainWindow):
         hyperbolaAction.triggered.connect(self.mainWid.addQuadricForm)
         reflectorSelector.addAction(hyperbolaAction)
 
-        # transformElementsAction = QAction("Transform elements", self) ##TODO depricated? There is no longer a form for this action
+        # transformElementsAction = QAction("Transform elements", self) ##TODO deprecated? There is no longer a form for this action
         # transformElementsAction.setStatusTip("Transform a group of elements.")
         # transformElementsAction.triggered.connect(self.mainWid.transformationMultipleForm)
         # ElementsMenu.addAction(transformElementsAction)

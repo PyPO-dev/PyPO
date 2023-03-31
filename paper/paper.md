@@ -48,18 +48,18 @@ This method has been used frequently in fields such as radar engineering, radio 
 
 `PyPO` is a Python interface for end-to-end simulations of general reflector systems using GO/PO.
 It offers the following functionality:
-* Convenient workflow for designing and characterising reflector systems consisting of planar and quadric surfaces. Design and simulation can be done in either a simple Python script or through the built-in graphical user interface (GUI).
-* Common beam patterns, such as point sources and Gaussian beams, that can be used as input for GO/PO propagation. Custom beam patterns, for example measured in a lab, can also be used as input.
-* Efficient C++/CUDA libraries for performing GO and PO calculations.
-* Methods for evaluating common figures of merit such as root-mean-square (RMS) spot values for GO propagation. For PO, commonly used metrics such as spillover, taper, aperture, main beam and cross-polar efficiencies can be calculated.
+- Convenient workflow for designing and characterising reflector systems consisting of planar and quadric surfaces. Design and simulation can be done in either a simple Python script or through the built-in graphical user interface (GUI).
+- Common beam patterns, such as point sources and Gaussian beams, that can be used as input for GO/PO propagation. Custom beam patterns, for example measured in a lab, can also be used as input.
+- Efficient C++/CUDA libraries for performing GO and PO calculations.
+- Methods for evaluating common figures of merit such as root-mean-square (RMS) spot values for GO propagation. For PO, commonly used metrics such as spillover, taper, aperture, main beam and cross-polar efficiencies can be calculated.
 
 Commercial software for these ends, such as OpticStudio [@zemax] and GRASP [@Grasp], has already been developed, but to our knowledge `PyPO` is the first free open-source package that simulates planar and quadric reflector geometries using both GO and PO. 
 Moreover, `PyPO` does not resort to approximations such as the Fresnel and Fraunhofer approximation commonly used in other software packages. Rather, PyPO directly solves the radiation integral, extending the simulation possibilities to cases where the previously mentioned approximations might fail.
 
 Currently, `PyPO` is heavily used in the laboratory verification and characterisation of the DESHIMA 2.0 spectrometer [@Taniguchi:2022]. Specifically, `PyPO` is used for the following purposes:
-* Optimisation of correcting optics using the GO calculations.
-* PO propagation of measured beam patterns through the Cassegrain setup of the ASTE [@ASTE] telescope.
-* Calculation of far-field beam patterns after the ASTE telescope.
+- Optimisation of correcting optics using the GO calculations.
+- PO propagation of measured beam patterns through the Cassegrain setup of the ASTE [@ASTE] telescope.
+- Calculation of far-field beam patterns after the ASTE telescope.
 
 # Availability
 `PyPO` can be found on [Github](https://github.com/arend95/PyPO). Instructions regarding installation and documentation can be found in the [documentation](https://arend95.github.io/PyPO/). The package comes with several examples illustrating the workflow and features, which can be used as building blocks for new reflector systems.

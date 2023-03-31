@@ -135,6 +135,7 @@ class InputDescription:
             if self.inType not in vectorTypes + [inType.checkbox]:
                 raise InputDescriptionError(f"Cannot set prefill for InputDescription of inType:{self.inType}.")
 
+        # Validation for options
         if self.options:
             if self.inType not in selectionTypes + [inType.elementSelector]:
                 raise InputDescriptionError(f"Cannot set options for InputDescription of inType:{self.inType}.")

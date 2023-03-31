@@ -119,7 +119,7 @@ def plotFrameInp(frameDict):
     
     plotFrame = [
             InputDescription(inType.dropdown, "frame", label="Frame", options = sublist_frames),
-            InputDescription(inType.xyzradio, "project", label="Abscissa - ordinate")
+            InputDescription(inType.xyzRadio, "project", label="Abscissa - ordinate")
             ]
 
     return plotFrame
@@ -127,7 +127,7 @@ def plotFrameInp(frameDict):
 def plotFrameOpt(frameName):
     plotFrame = [
             InputDescription(inType.static, "frame", label="Frame", staticValue=frameName),
-            InputDescription(inType.xyzradio, "project", label="Abscissa - ordinate")
+            InputDescription(inType.xyzRadio, "project", label="Abscissa - ordinate")
             ]
 
     return plotFrame
@@ -244,7 +244,7 @@ def plotField(fieldName):
     plotField = [
             InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
             InputDescription(inType.dropdown, "comp", label="Component", options = complist),
-            InputDescription(inType.xyzradio, "project", label="Abscissa - ordinate")
+            InputDescription(inType.xyzRadio, "project", label="Abscissa - ordinate")
             ]
 
     return plotField
@@ -254,7 +254,7 @@ def plotSField(fieldName, gmode):
     if gmode != 2:
         plotSField = [
                InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
-                InputDescription(inType.xyzradio, "project", label="Abscissa - ordinate")
+                InputDescription(inType.xyzRadio, "project", label="Abscissa - ordinate")
                 ]
 
     else:
@@ -281,7 +281,7 @@ def plotCurrentOpt(fieldName):
     plotCurrent = [
             InputDescription(inType.static, "field", label="Current", staticValue=fieldName),
             InputDescription(inType.dropdown, "comp", label="Component", options = complist),
-            InputDescription(inType.xyzradio, "project", label="Abscissa - ordinate")
+            InputDescription(inType.xyzRadio, "project", label="Abscissa - ordinate")
             ]
 
     return plotCurrent

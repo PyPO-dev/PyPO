@@ -1,7 +1,6 @@
 from attr import define, field, Factory
 from src.GUI.utils import inType, InputDescriptionError
 
-
 ##
 # @file 
 # Defines an attr dataclass used to store the data of parameter forms
@@ -81,9 +80,7 @@ class InputDescription:
         # Validation for staticValue
         if self.staticValue and self.inType != inType.static:
             raise InputDescriptionError("Cannot set static value for input of non static type.")
-        
-        ## TODO: add conversion of subDict keys to options??
-        
+                
         # Validation for numFields
         if self.numFields is None:
             if self.inType in vectorTypes:
@@ -119,7 +116,6 @@ class InputDescription:
                     if type(i) != InputDescription:
                         raise InputDescriptionError(f"Unexpected type:{type(i)} Values of subDict must be lists of InputDescription objects.")
                         
-
         # Validation for hidden
         if self.hidden:
             if self.inType != inType.static:
@@ -139,24 +135,3 @@ class InputDescription:
         if self.options:
             if self.inType not in selectionTypes + [inType.elementSelector]:
                 raise InputDescriptionError(f"Cannot set options for InputDescription of inType:{self.inType}.")
-
-
-
-
-
-        
-
-
-
-        # # Validation for oArray
-        # if len(self.hints) > self.numFields and self.inType.value < 4:
-        #     raise Exception(f"Too many hints! at InputDescription with: {self.inType = }, {self.outputName = } \nMake sure to wrap the hints in a list.")
-
-        # if self.inType is inType.radio:
-        #     if self.options == None:
-        #         raise Exception("radio without options.")
-
-
-        
-
-

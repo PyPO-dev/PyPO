@@ -17,7 +17,7 @@ class inType(Enum):
     checkbox = 4
     dropdown = 5
     radio = 6
-    xyzradio = 7
+    xyzRadio = 7
     dynamicDropdown = 8
     dynamicRadio = 9
     elementSelector = 10

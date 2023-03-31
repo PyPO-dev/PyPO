@@ -44,39 +44,39 @@ class FormGenerator(QWidget):
     #
     def setupInputs(self):
         for inp in self.formData:
-            if inp.inType.value == 0:
+            if inp.inType == inType.static:
                 input = StaticInput(inp)
                 self.inputs.append(input)
                 self.layout.addRow(input)
-            elif inp.inType.value < 4:
+            elif inp.inType in [inType.vectorFloats, inType.vectorIntegers, inType.vectorStrings]:
                 input = VectorInput(inp)
                 self.inputs.append(input)
                 self.layout.addRow(input)
-            elif inp.inType.value == 4:
+            elif inp.inType == inType.checkbox:
                 input = checkbox(inp)
                 self.inputs.append(input)
                 self.layout.addRow(input)
-            elif inp.inType.value == 5:
+            elif inp.inType == inType.dropdown:
                 input = SimpleDropdown(inp)
                 self.inputs.append(input)
                 self.layout.addRow(input)
-            elif inp.inType.value == 6:
+            elif inp.inType == inType.radio:
                 input = SimpleRadio(inp)
                 self.inputs.append(input)
                 self.layout.addRow(input)
-            elif inp.inType.value == 7:
+            elif inp.inType == inType.xyzRadio:
                 input = XYZRadio(inp)
                 self.inputs.append(input)
                 self.layout.addRow(input)
-            elif inp.inType.value == 8:
+            elif inp.inType == inType.dynamicDropdown:
                 input = DynamicDropdownWidget(inp)
                 self.inputs.append(input)
                 self.layout.addRow(input)
-            elif inp.inType.value == 9:
+            elif inp.inType == inType.dynamicRadio:
                 input = DynamicRadioWidget(inp)
                 self.inputs.append(input)
                 self.layout.addRow(input)
-            elif inp.inType.value == 10:
+            elif inp.inType == inType.elementSelector:
                 input = ElementSelectionWidget(inp)
                 self.inputs.append(input)
                 self.layout.addRow(input)
@@ -92,10 +92,10 @@ class FormGenerator(QWidget):
         clearBtn = QPushButton("Clear")
         clearBtn.clicked.connect(self.clear)
         btnWidget = QWidget()
-        btnlayout = QHBoxLayout(btnWidget)
-        btnlayout.addWidget(closeBtn)
-        btnlayout.addWidget(clearBtn)
-        btnlayout.addWidget(addBtn)
+        btnLayout = QHBoxLayout(btnWidget)
+        btnLayout.addWidget(closeBtn)
+        btnLayout.addWidget(clearBtn)
+        btnLayout.addWidget(addBtn)
         btnWidget.setContentsMargins(0,4,20,0)
         self.layout.addRow(btnWidget)
         spacerWidget = QWidget()
@@ -119,7 +119,7 @@ class FormGenerator(QWidget):
     ##
     # Reads the form.
     #
-    # @return A dectionary containing the values read form the form.
+    # @return A dictionary containing the values read form the form.
     def read(self):
         paramDict = {}
         for input in self.inputs:
@@ -146,12 +146,11 @@ class DynamicDropdownWidget(QWidget):
         self.layout.setContentsMargins(0,0,0,0)
         self.hasChildren = self.inputDescription.subDict != None
         
-        if self.hasChildren:
-            options = self.inputDescription.subDict.keys()
-        else:
-            raise Exception("NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
+        options = self.inputDescription.subDict.keys()
         
-        self.mode = SimpleDropdown(InputDescription(inType.dropdown, self.inputDescription.outputName, self.inputDescription.label, options=options, toolTip= self.inputDescription.toolTip), dynamic = True)
+        self.mode = SimpleDropdown(InputDescription(inType.dropdown, self.inputDescription.outputName, 
+                                                    self.inputDescription.label, options=options, 
+                                                    toolTip= self.inputDescription.toolTip), dynamic = True)
         self.mode.selectionChangedSignal.connect(self.modeUpdate)
 
         self.layout.addRow(self.mode)
@@ -164,7 +163,7 @@ class DynamicDropdownWidget(QWidget):
         self.modeUpdate(0)
 
     ##
-    # Creates the subforms
+    # Creates the nested forms
     #
     def makeChildren(self):
         self.stackedWidget = QStackedWidget()
@@ -197,7 +196,7 @@ class DynamicDropdownWidget(QWidget):
     ##
     # Reads the inputs.
     #
-    # @return A dectionary containing the values read form the inputs.
+    # @return A dictionary containing the values read form the inputs.
     def read(self):
         try:
             ind = self.mode.currentIndex()-1
@@ -242,7 +241,8 @@ class DynamicRadioWidget(QWidget):
         else:
             options = self.inputDescription.options
         
-        self.mode = SimpleRadio(InputDescription(inType.dropdown, self.inputDescription.outputName, self.inputDescription.label, options=options, toolTip=self.inputDescription.toolTip))
+        self.mode = SimpleRadio(InputDescription(inType.dropdown, self.inputDescription.outputName, self.inputDescription.label, 
+                                                 options=options, toolTip=self.inputDescription.toolTip))
         self.mode.selectionChangedSignal.connect(self.modeUpdate)
         
 
@@ -256,7 +256,7 @@ class DynamicRadioWidget(QWidget):
         self.modeUpdate(-1)
 
     ##
-    # Creates the subforms
+    # Creates the nested forms
     #
     def makeChildren(self):
         self.stackedWidget = QStackedWidget()
@@ -266,7 +266,7 @@ class DynamicRadioWidget(QWidget):
         self.layout.addRow(self.stackedWidget)
         for childInDesList in self.inputDescription.subDict.values():
             child = FormGenerator(childInDesList, addButtons=False, readAction=None)
-            child.setContentsMargins(0,0,0,0) ###TODO: is this necessary??
+            child.setContentsMargins(0,0,0,0)
             self.stackedWidget.addWidget(child)
             self.children.append(child)
 
@@ -310,5 +310,3 @@ class DynamicRadioWidget(QWidget):
             for input in self.currentChild.findChildren(QWidget,options=Qt.FindDirectChildrenOnly):
                 paramDict.update(input.read())
         return paramDict
-
-

@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QApplication
 from src.GUI import *
 from src.GUI.Acccordion import Accordion
 from src.GUI.ElementWidget import ElementWidget
-from src.GUI.ParameterForms.simpleInputWidgets.simpleInputWidgets import ElementSelectionWidget
+from GUI.ParameterForms.simpleInputWidgets import ElementSelectionWidget
 import traceback
 
 from src.GUI.WorkSpace import Workspace

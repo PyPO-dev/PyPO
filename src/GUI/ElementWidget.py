@@ -2,10 +2,8 @@ from PyQt5.QtWidgets import QLabel, QApplication, QWidget, QHBoxLayout, QMainWin
                                     QPushButton, QSizePolicy, QDialog, \
                                     QAction,QVBoxLayout, QGridLayout
                                         
-from PyQt5.QtGui import QFont, QIcon, QCursor 
 from PyQt5.QtCore import Qt
 from src.GUI.selfClosingDialog import selfClosingDialog
-from src.GUI.selfClosingDialog_HoverableBtn import HoverOpenBtn
 from src.GUI.utils import MyButton
 import sys
 sys.path.append('../')
@@ -156,7 +154,6 @@ class ReflectorWidget(ElementWidget):
     def __init__(self, name, removeAction, transformAction, plotAction, snapAction, copyAction, removeFromTree=None, p=None):
         super().__init__(name, plotAction, removeAction, transformAction=transformAction, 
                 removeFromTree=removeFromTree, snapAction=snapAction, copyAction=copyAction, p=p)
-        print("refl 2")
 
 class GroupWidget(ElementWidget):
     def __init__ (self, name, removeAction, plotAction, transformAction, snapAction, copyAction):
@@ -178,12 +175,3 @@ class SFieldsWidget(ElementWidget):
     def __init__ (self, name, removeAction, plotAction, p=None ):
         super().__init__(name, plotAction, removeAction, p=p)
         
-
-if __name__ == "__main__":
-    app = QApplication([])
-    window = QMainWindow()
-    window.resize(500,400)
-    wid = ElementWidget("Parabola_0", window)
-    
-    window.show()
-    app.exec_()

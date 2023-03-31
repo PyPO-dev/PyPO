@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QWidget, QComboBox, QFormLayout, QLabel, QLineEdit, 
 from PyQt5.QtCore import QRegExp, Qt, pyqtSlot, pyqtSignal
 from PyQt5.QtGui import QRegExpValidator
 from src.GUI.utils import *
-from src.GUI.ParameterForms.simpleInputWidgets.simpleInputWidgets import checkbox, StaticInput, VectorInput, SimpleRadio, SimpleDropdown, XYZRadio, ElementSelectionWidget
+from src.GUI.ParameterForms.simpleInputWidgets import checkbox, StaticInput, VectorInput, SimpleRadio, SimpleDropdown, XYZRadio, ElementSelectionWidget
 from src.GUI.ParameterForms.InputDescription import *
 
 

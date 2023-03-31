@@ -1,10 +1,7 @@
-from PyQt5.QtWidgets import QWidget, QListWidgetItem, QListWidget, QTreeWidget, QTreeWidgetItem, QTabWidget, QPushButton, QScrollArea, QApplication, QVBoxLayout, QLabel, QHBoxLayout
-from PyQt5.QtCore import Qt, QPoint
+from PyQt5.QtWidgets import QWidget, QTabWidget, QScrollArea, QVBoxLayout
+from PyQt5.QtCore import Qt
 from src.GUI.ElementWidget import ReflectorWidget, GroupWidget, FrameWidget, CurrentWidget, FieldsWidget, CurrentWidget, SFieldsWidget
-from src.GUI.Acccordion import AccordionSection, Accordion
-from src.GUI.selfClosingDialog import selfClosingDialog
-from src.GUI.utils import WSSections, MyButton
-import sys
+from src.GUI.Acccordion import Accordion
 
 class Workspace(QTabWidget):
     def __init__(self, parent=None):

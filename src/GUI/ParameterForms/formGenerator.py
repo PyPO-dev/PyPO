@@ -144,12 +144,12 @@ class DynamicDropdownWidget(QWidget):
         
         self.layout = QFormLayout()
         self.layout.setContentsMargins(0,0,0,0)
-        self.hasChildren = self.inputDescription.subdict != None
+        self.hasChildren = self.inputDescription.subDict != None
         
         if self.hasChildren:
-            options = self.inputDescription.subdict.keys()
+            options = self.inputDescription.subDict.keys()
         else:
-            options = self.inputDescription.options
+            raise Exception("NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
         
         self.mode = SimpleDropdown(InputDescription(inType.dropdown, self.inputDescription.outputName, self.inputDescription.label, options=options, toolTip= self.inputDescription.toolTip), dynamic = True)
         self.mode.selectionChangedSignal.connect(self.modeUpdate)
@@ -158,7 +158,7 @@ class DynamicDropdownWidget(QWidget):
 
         if self.hasChildren:
             self.children = []
-            self.makeCildren()
+            self.makeChildren()
 
         self.setLayout(self.layout)
         self.modeUpdate(0)
@@ -166,11 +166,11 @@ class DynamicDropdownWidget(QWidget):
     ##
     # Creates the subforms
     #
-    def makeCildren(self):
+    def makeChildren(self):
         self.stackedWidget = QStackedWidget()
         self.stackedWidget.addWidget(QWidget())
         self.layout.addRow(self.stackedWidget)
-        for childInDesList in self.inputDescription.subdict.values():
+        for childInDesList in self.inputDescription.subDict.values():
             child = FormGenerator(childInDesList, addButtons=False, readAction=None)
             child.setContentsMargins(0,0,0,0) ###TODO: is this necessory??
             self.stackedWidget.addWidget(child)
@@ -202,17 +202,17 @@ class DynamicDropdownWidget(QWidget):
         try:
             ind = self.mode.currentIndex()-1
             if self.hasChildren:
-                modeOut = list(self.inputDescription.subdict.keys())[ind]
+                modeOut = list(self.inputDescription.subDict.keys())[ind]
             else: 
                 modeOut = list(self.inputDescription.sublist)[ind]
             paramDict = {self.inputDescription.outputName: modeOut}
             # print(f"DynamicDropdownWidget {self.stackedWidget.currentIndex() = }")
 
         except:
-            raise Exception(f"Faild to read input: {self.inputDescription.label}")
+            raise Exception(f"Failed to read input: {self.inputDescription.label}")
         
         if self.stackedWidget.currentIndex() == 0:
-            raise Exception(f"Faild to read input: {self.inputDescription.label}")
+            raise Exception(f"Failed to read input: {self.inputDescription.label}")
         
         if self.hasChildren:
             for input in self.currentChild.findChildren(QWidget,options=Qt.FindDirectChildrenOnly):
@@ -235,10 +235,10 @@ class DynamicRadioWidget(QWidget):
         
         self.layout = QFormLayout()
         self.layout.setContentsMargins(0,0,0,0)
-        self.hasChildren = self.inputDescription.subdict != None
+        self.hasChildren = self.inputDescription.subDict != None
         
         if self.hasChildren:
-            options = list(self.inputDescription.subdict.keys())
+            options = list(self.inputDescription.subDict.keys())
         else:
             options = self.inputDescription.options
         
@@ -250,7 +250,7 @@ class DynamicRadioWidget(QWidget):
 
         if self.hasChildren:
             self.children = []
-            self.makeCildren()
+            self.makeChildren()
 
         self.setLayout(self.layout)
         self.modeUpdate(-1)
@@ -258,15 +258,15 @@ class DynamicRadioWidget(QWidget):
     ##
     # Creates the subforms
     #
-    def makeCildren(self):
+    def makeChildren(self):
         self.stackedWidget = QStackedWidget()
         placeholder = QWidget()
         placeholder.setFixedSize(0,0)
         self.stackedWidget.addWidget(placeholder)
         self.layout.addRow(self.stackedWidget)
-        for childInDesList in self.inputDescription.subdict.values():
+        for childInDesList in self.inputDescription.subDict.values():
             child = FormGenerator(childInDesList, addButtons=False, readAction=None)
-            child.setContentsMargins(0,0,0,0) ###TODO: is this necessory??
+            child.setContentsMargins(0,0,0,0) ###TODO: is this necessary??
             self.stackedWidget.addWidget(child)
             self.children.append(child)
 
@@ -285,24 +285,26 @@ class DynamicRadioWidget(QWidget):
     #
     def clear(self):
         self.mode.clear()
+        for child in self.children:
+            child.clear()
 
     ##
     # Reads the inputs.
     #
-    # @return A dectionary containing the values read form the inputs.
+    # @return A dictionary containing the values read form the inputs.
     def read(self):
         try:
             ind = self.mode.currentIndex()
             if self.hasChildren:
-                modeOut = list(self.inputDescription.subdict.keys())[ind]
+                modeOut = list(self.inputDescription.subDict.keys())[ind]
             else: 
                 modeOut = list(self.inputDescription.sublist)[ind]
             paramDict = {self.inputDescription.outputName: modeOut}
             # print(f"DynamicRadioWidget {self.stackedWidget.currentIndex() = }")
         except:
-            raise Exception(f"Faild to read input: {self.inputDescription.label}")
+            raise Exception(f"Failed to read input: {self.inputDescription.label}")
         if self.stackedWidget.currentIndex() == 0:
-            raise Exception(f"Faild to read input: {self.inputDescription.label}")
+            raise Exception(f"Failed to read input: {self.inputDescription.label}")
 
         if self.hasChildren:
             for input in self.currentChild.findChildren(QWidget,options=Qt.FindDirectChildrenOnly):

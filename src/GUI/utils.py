@@ -6,6 +6,9 @@ from enum import Enum, auto
 # class validation(Enum):
 #     integers = auto()
 
+class InputDescriptionError(Exception):
+    pass
+
 class inType(Enum):
     static = 0
     vectorStrings = 1

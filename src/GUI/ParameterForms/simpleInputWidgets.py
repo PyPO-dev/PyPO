@@ -5,20 +5,29 @@ from src.GUI.ParameterForms.InputDescription import InputDescription
 from src.GUI.ParameterForms.inputWidgetInterfaces import inputWidgetInterface, selectionWidgetInterface
 from numpy import array 
 
+##
+# @file provides implementation of form inputs
+
+
 class EmptyFieldException(Exception):
     pass
 
+##
+# Input that cannot be edited by user
+# 
+# Can be used to communicate information to user about the form. In this case outputName of the provided InputDescription should be None.
+# Can also be used for adding a prefilled value that is visible or invisible to user depending on the 'hidden' value of provided InputDescription (visible by default).
 class StaticInput(inputWidgetInterface):
-    def __init__ (self, inp:InputDescription):
+    def __init__ (self, inputDescription:InputDescription):
         super().__init__()
-        self.inputDescription = inp
+        self.inputDescription = inputDescription
         self.setSizePolicy(QSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed))
 
-        if not inp.hidden:
+        if not inputDescription.hidden:
             layout = QFormLayout()
             self.setLayout(layout)
             layout.setContentsMargins(5,4,20,0)
-            layout.addRow(MyLabel(inp.label), MyLabel(inp.staticValue))
+            layout.addRow(MyLabel(inputDescription.label), MyLabel(str(inputDescription.staticValue)))
         
         if self.inputDescription.toolTip:
             self.setToolTip(self.inputDescription.toolTip)
@@ -33,13 +42,16 @@ class StaticInput(inputWidgetInterface):
             return {self.inputDescription.outputName: self.inputDescription.staticValue}
         
         except:
-            raise Exception(f"Faild to read input: {self.inputDescription.label}")
+            raise Exception(f"Failed to read input: {self.inputDescription.label}")
         
-
+##
+# Implements a checkbox input.
+# 
+# @param inputDescription.prefill If set to true the checkbox will be checked by default
 class checkbox(inputWidgetInterface):
-    def __init__ (self, inp:InputDescription):
+    def __init__ (self, inputDescription:InputDescription):
         super().__init__()
-        self.inputDescription = inp
+        self.inputDescription = inputDescription
         self.setSizePolicy(QSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed))
         layout = QHBoxLayout()
         layout.setContentsMargins(5,4,20,0)
@@ -68,13 +80,19 @@ class checkbox(inputWidgetInterface):
             return{self.inputDescription.outputName: self.box.isChecked()}
         
         except:
-            raise Exception(f"Faild to read input: {self.inputDescription.label}")
+            raise Exception(f"Failed to read input: {self.inputDescription.label}")
         
+##
+# Implements a single or multiple valued text edit.
+# 
+# @param inputDescription.numFields Determines the number of fields, default = 1.
+# @param inputDescription.hints List of strings to provide hints. The length of this list should match the number of fields If inputDescription.prefill is True the hints will be used as prefilled values. 
+# @param inputDescription.prefill, If set to true the hints will be used as prefilled values.
 
 class VectorInput(inputWidgetInterface):
-    def __init__ (self, inp:InputDescription):
+    def __init__ (self, inputDescription:InputDescription):
         super().__init__()
-        self.inputDescription = inp
+        self.inputDescription = inputDescription
         self.setSizePolicy(QSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed))
 
         self.layout = QFormLayout()
@@ -99,14 +117,15 @@ class VectorInput(inputWidgetInterface):
         
         for i in range(inp.numFields):
             edit = self.inputs[i]
-            edit.setPlaceholderText(str(inp.hints[i]))
+            if inp.hints:
+                edit.setPlaceholderText(str(inp.hints[i]))
             editLayout.addWidget(edit)
         self.editsWid = QWidget()
         self.editsWid.setLayout(editLayout)
 
         self.label = MyLabel("Unnamed")
         if self.inputDescription.outputName:
-            self.label = makeLabelFromString(self.inputDescription.label)
+            self.label = makeLabelFromString(self.inputDescription.label) ##TODO: @Maikel does this work with no outputName?
         self.layout.addRow(self.label, self.editsWid)
 
     def prefill(self):
@@ -116,7 +135,7 @@ class VectorInput(inputWidgetInterface):
         for i in range(len(self.inputs)):
             hint = self.inputDescription.hints[i]
             if hint == "":
-                raise Exception(f"Empty hint at outname={self.inputDescription.outputName}")
+                raise Exception(f"Empty hint at outputName={self.inputDescription.outputName}")
             if type(hint) != self.enumToType(self.inputDescription.inType):
                 raise Exception(f"Cannot prefill. Hint has unexpected type {type(hint)}, expected {self.enumToType(self.inputDescription.inType)}")
             self.inputs[i].setText(str(hint))
@@ -146,7 +165,7 @@ class VectorInput(inputWidgetInterface):
         except EmptyFieldException as e:
             raise e
         except:
-            raise Exception(f"Faild to read input: {self.inputDescription.label}")
+            raise Exception(f"Failed to read input: {self.inputDescription.label}")
 
     @staticmethod
     def enumToType(intype):
@@ -155,14 +174,15 @@ class VectorInput(inputWidgetInterface):
         if intype == inType.vectorStrings: return str
 
 
-
+##
+# Implements a radio button selection widget, used for 'one of many' type of options 
 class SimpleRadio(selectionWidgetInterface):
 
     selectionChangedSignal = pyqtSignal(int)
 
-    def __init__ (self, inp:InputDescription):
+    def __init__ (self, inputDescription:InputDescription):
         super().__init__()
-        self.inputDescription = inp
+        self.inputDescription = inputDescription
         self.setSizePolicy(QSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed))
 
         layout = QFormLayout(self)
@@ -176,7 +196,6 @@ class SimpleRadio(selectionWidgetInterface):
         else:
             options = self.inputDescription.options
         self.group = QButtonGroup()
-        # self.group.setExclusive(False)
         self.group.buttonClicked.connect(self.selectionChanged)
         for i in range(len(options)):
             rb = QRadioButton(options[i])
@@ -196,7 +215,7 @@ class SimpleRadio(selectionWidgetInterface):
             d = {self.inputDescription.outputName : self.inputDescription.options[self.group.checkedId()]}
             return d
         except:
-            raise Exception(f"Faild to read input: {self.inputDescription.label}")
+            raise Exception(f"Failed to read input: {self.inputDescription.label}")
     
     def clear(self):
         self.group.setExclusive(False)
@@ -212,14 +231,18 @@ class SimpleRadio(selectionWidgetInterface):
         self.selectionChangedSignal.emit(self.group.checkedId())
 
 
-
+##
+# Implements a dropdown menu.
+# 
+# @param inputDescription.options list of strings providing the options for the dropdown.
+# @param dynamic Sets "--Select item--" first option. This is used by @see DynamicDropdownWidget to provide a blank form by default
 class SimpleDropdown(selectionWidgetInterface):
     
     selectionChangedSignal = pyqtSignal(int)
 
-    def __init__ (self, inp:InputDescription, dynamic = False):
+    def __init__ (self, inputDescription:InputDescription, dynamic = False):
         super().__init__()
-        self.inputDescription = inp
+        self.inputDescription = inputDescription
         self.setSizePolicy(QSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed))
 
         layout = QFormLayout(self)
@@ -252,7 +275,7 @@ class SimpleDropdown(selectionWidgetInterface):
             return d
         
         except:
-            raise Exception(f"Faild to read input: {self.inputDescription.label}")
+            raise Exception(f"Failed to read input: {self.inputDescription.label}")
     
 
     def selectionChanged(self):
@@ -265,7 +288,10 @@ class SimpleDropdown(selectionWidgetInterface):
         self.comboBox.setCurrentIndex(0)
         self.selectionChanged()
 
-
+##
+# Implements an axes selector.
+# 
+# Implements a widget with two radio button groups where user can select e.g. x and y of y and z but not x and x.
 class XYZRadio(inputWidgetInterface):
     class RadioSubWidget(QWidget):
         def __init__(self, options, name, parent=None):
@@ -315,9 +341,9 @@ class XYZRadio(inputWidgetInterface):
                 btn.setChecked(False)
 
         
-    def __init__(self, inp, parent=None):
+    def __init__(self, inputDescription, parent=None):
         super().__init__(parent)
-        self.inputDescription = inp
+        self.inputDescription = inputDescription
         self.setSizePolicy(QSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed))
 
         layout = QFormLayout(self)
@@ -342,13 +368,18 @@ class XYZRadio(inputWidgetInterface):
         try:
             return {self.inputDescription.outputName:self.r1.group.checkedButton().text() + self.r2.group.checkedButton().text()}
         except:
-            raise Exception(f"Faild to read input: {self.inputDescription.label}")
+            raise Exception(f"Failed to read input: {self.inputDescription.label}")
         
-
+##
+# Implement a widget for 'many of many' type selection is possible.
+# 
+# User can select an option from a dropdown and it will appear in a listView. By clicking on an option in the listView it will disappear and return to the dropdown
+# 
+# @param inputDescription.option List of options 
 class ElementSelectionWidget(QWidget):
-    def __init__ (self, inp: InputDescription):
+    def __init__ (self, inputDescription: InputDescription):
         super().__init__()
-        self.inputDescription = inp
+        self.inputDescription = inputDescription
         self.setSizePolicy(QSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed))
 
         self.layout = QFormLayout(self)
@@ -400,6 +431,6 @@ class ElementSelectionWidget(QWidget):
         try:
             return {self.inputDescription.outputName :self.selectedElements}
         except:
-            raise Exception(f"Faild to read input: {self.inputDescription.label}")
+            raise Exception(f"Failed to read input: {self.inputDescription.label}")
 
 

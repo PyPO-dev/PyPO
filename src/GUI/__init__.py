@@ -1,5 +1,4 @@
 from src.GUI.selfClosingDialog import *
-from src.GUI.selfClosingDialog_HoverableBtn import *
 from src.GUI.PlotScreen import *
 from src.GUI.MPLCanvas import *
 from src.GUI.Acccordion import *

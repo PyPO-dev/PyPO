@@ -5,19 +5,19 @@ from abc import ABC, abstractclassmethod
 from src.GUI.ParameterForms.InputDescription import InputDescription, inType
 
 class MetaCombinerInputWidget(type(QWidget), type(ABC)): pass
+##
+# This is a base class for inputWidgets and should not be instatiated
 class inputWidgetInterface(QWidget, ABC, metaclass=MetaCombinerInputWidget):
-    """This is a base class for inputWidgets and should not be instatiated"""
     def __init__ (self, parent = None):
         super().__init__(parent)
 
     @abstractclassmethod
+    ##
+    # subclasses need to reimplement this method and return a dict 
+    # containing strings as keys. These strings should originate from 
+    # the instances InputDescription.outputName. If outputName is 
+    # None then it should return an empty dict     
     def read() -> dict:
-        """
-        subclasses need to reimplement this method and return a dict 
-        containing a string as key. This string should originate from 
-        the instances InputDescription.outputName. If outputName is 
-        None then it should return an empty dict   
-        """
         pass
 
     @abstractclassmethod

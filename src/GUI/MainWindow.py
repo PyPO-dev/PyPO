@@ -13,13 +13,14 @@ from PyQt5.QtCore import Qt, QThreadPool, QThread
 from src.GUI.ParameterForms import formGenerator
 from src.GUI.ParameterForms.InputDescription import InputDescription
 from src.GUI.utils import inType
-import src.GUI.ParameterForms.formDataObjects as fDataObj
+import src.GUI.ParameterForms.formData as fData
 from src.GUI.PlotScreen import PlotScreen
-from src.GUI.TransformationWidget import TransformationWidget
+from src.GUI.archive.TransformationWidget import TransformationWidget
 from src.GUI.Acccordion import Accordion
 from src.GUI.ElementWidget import ReflectorWidget, FrameWidget, FieldsWidget, CurrentWidget, SFieldsWidget, SymDialog
 from src.GUI.Console import ConsoleGenerator
 from src.GUI.Worker import Worker, GWorker
+from src.GUI.Waiter import Waiter
 from src.GUI.WorkSpace import Workspace
 
 from src.PyPO.CustomLogger import CustomGUILogger
@@ -175,9 +176,6 @@ class MainWidget(QWidget):
             self.formScroll.setParent(None)
             self.formScroll.deleteLater()
     
-    def formClosed(self):
-        print("form closed")
-        print(self.formScroll)
     ##
     # TODO: Remove this function from here
     @staticmethod
@@ -219,17 +217,17 @@ class MainWidget(QWidget):
     ##
     # Generate a snapshot form.
     def snapActionForm(self, element):
-        self.setForm(fDataObj.snapForm(element, list(self.stm.system[element]["snapshots"].keys()), "element"), readAction=self.snapAction, okText="Take snapshot")
+        self.setForm(fData.snapForm(element, list(self.stm.system[element]["snapshots"].keys()), "element"), readAction=self.snapAction, okText="Take snapshot")
     
     ##
     # Generate a snapshot form for a group.
     def snapGroupActionForm(self, group):
-        self.setForm(fDataObj.snapForm(group, list(self.stm.groups[group]["snapshots"].keys()), "group"), readAction=self.snapAction, okText="Take snapshot")
+        self.setForm(fData.snapForm(group, list(self.stm.groups[group]["snapshots"].keys()), "group"), readAction=self.snapAction, okText="Take snapshot")
  
     ##
     # Generate a snapshot form for ray-trace frame.
     def snapFrameActionForm(self, frame):
-        self.setForm(fDataObj.snapForm(frame, list(self.stm.frames.snapshots.keys()), "frame"), readAction=self.snapAction, okText="Take snapshot")
+        self.setForm(fData.snapForm(frame, list(self.stm.frames.snapshots.keys()), "frame"), readAction=self.snapAction, okText="Take snapshot")
     
     ##
     # Take, revert or delete a snapshot
@@ -259,7 +257,7 @@ class MainWidget(QWidget):
     #
     # @param element Name of element to be copied.
     def copyElementActionForm(self, element):
-        self.setForm(fDataObj.copyForm(element), readAction=self.copyElementAction, okText="Make Copy")
+        self.setForm(fData.copyForm(element), readAction=self.copyElementAction, okText="Make Copy")
 
     ##
     # Copy a element in system to a new version.
@@ -280,7 +278,7 @@ class MainWidget(QWidget):
     #
     # @param group Name of group to be copied.
     def copyGroupActionForm(self, group):
-        self.setForm(fDataObj.copyForm(group), readAction=self.copyGroupAction, okText="Make Copy")
+        self.setForm(fData.copyForm(group), readAction=self.copyGroupAction, okText="Make Copy")
 
     ##
     # Copy a group in system to a new version.
@@ -350,7 +348,7 @@ class MainWidget(QWidget):
     ##
     # opens a form that allows user to save the System
     def saveSystemForm(self):
-        self.setForm(fDataObj.saveSystemForm(), readAction=self.saveSystemAction, okText="Save System")
+        self.setForm(fData.saveSystemForm(), readAction=self.saveSystemAction, okText="Save System")
     
     ##
     # Saves the current system state under the name given in form
@@ -367,7 +365,7 @@ class MainWidget(QWidget):
     # opens a form that allows user to delete a saved System
     def deleteSavedSystemForm(self):
         systemList = [os.path.split(x[0])[-1] for x in os.walk(self.stm.savePathSystems) if os.path.split(x[0])[-1] != "systems"]
-        self.setForm(fDataObj.loadSystemForm(systemList), readAction=self.deleteSavedSystemAction, okText="Delete System")
+        self.setForm(fData.loadSystemForm(systemList), readAction=self.deleteSavedSystemAction, okText="Delete System")
 
     ##
     # Deletes system selected in form
@@ -383,7 +381,7 @@ class MainWidget(QWidget):
     # opens a form that allows user to load a saved System
     def loadSystemForm(self):
         systemList = [os.path.split(x[0])[-1] for x in os.walk(self.stm.savePathSystems) if os.path.split(x[0])[-1] != "systems"]
-        self.setForm(fDataObj.loadSystemForm(systemList), readAction=self.loadSystemAction, okText="Load System")
+        self.setForm(fData.loadSystemForm(systemList), readAction=self.loadSystemAction, okText="Load System")
     
     ##
     # Loads system selected in from form
@@ -393,12 +391,14 @@ class MainWidget(QWidget):
             self._mkElementsColumn()
 
             self.stm.loadSystem(loadDict["name"]) 
-            self.refreshColumn(self.stm.system, "elements")
-            self.refreshColumn(self.stm.frames, "frames")
-            self.refreshColumn(self.stm.fields, "fields")
-            self.refreshColumn(self.stm.currents, "currents")
-            self.refreshColumn(self.stm.scalarfields, "scalarfields")
-            self.refreshColumn(self.stm.groups, "groups")
+            self.refreshWorkspaceSection(self.stm.system, "elements")
+            self.refreshWorkspaceSection(self.stm.frames, "frames")
+            self.refreshWorkspaceSection(self.stm.fields, "fields")
+            self.refreshWorkspaceSection(self.stm.currents, "currents")
+            self.refreshWorkspaceSection(self.stm.scalarfields, "scalarfields")
+            self.refreshWorkspaceSection(self.stm.groups, "groups")
+
+            self.removeForm()
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -430,7 +430,7 @@ class MainWidget(QWidget):
             # print(element)
             if element["gmode"] != 2:
                 elems.append(element["name"])
-        self.setForm(fDataObj.addGroupForm(elems), self.addGroupAction)
+        self.setForm(fData.addGroupForm(elems), self.addGroupAction)
 
     def addGroupAction(self):
         try:
@@ -452,55 +452,49 @@ class MainWidget(QWidget):
 
     ##
     # TODO: @Maikel Rename this function and evaluate its nessecity
-    def refreshColumn(self, columnDict, columnType):
-        print("refreshColumn")
-        # self._mkElementsColumn()
-        for key, item in columnDict.items():
-            if columnType == "elements":
+    def refreshWorkspaceSection(self, columnDict, section):
+        for key in columnDict.keys():
+            if section == "elements":
                 self.addReflectorWidget(key)
             
-            elif columnType == "frames":
+            elif section == "frames":
                 self.addFrameWidget(key)
             
-            elif columnType == "fields":
+            elif section == "fields":
                 self.addFieldWidget(key)
             
-            elif columnType == "currents":
+            elif section == "currents":
                 self.addCurrentWidget(key)
 
-            elif columnType == "scalarfields":
+            elif section == "scalarfields":
                 self.addSFieldWidget(key)
                 
-            elif columnType == "groups":
+            elif section == "groups":
                 self.addGroupWidget(key)
 
     ### Functionalities: Adding Elements in gui
     # TODO:doc
     def addReflectorWidget(self, name):
-        print("addREFL")
-        print(f"r {name}")
-        self.ElementsColumn.addReflector(name, self.removeElement, self.transformSingleForm, self.plotElement, self.snapActionForm, self.copyElementActionForm)
-        # self.ElementsColumn.reflectors.addWidget(ReflectorWidget(name, self.removeElement, self.transformSingleForm, self.plotElement, self.snapActionForm)) 
+        self.ElementsColumn.addReflector(name, self.removeElement, 
+                                         self.transformSingleForm, self.plotElement, 
+                                         self.snapActionForm, self.copyElementActionForm)
     
     def addGroupWidget(self, name):
         self.ElementsColumn.addGroup(name, self.stm.removeGroup, self.plotGroup, self.transformGroupForm, self.snapGroupActionForm, self.copyGroupActionForm)
     
     def addFrameWidget(self, name):
         self.ElementsColumn.addRayTraceFrames(name, self.removeFrame, 
-                                                    self.transformFrameForm, self.plotFrameForm,  
-                                                    self.calcRMSfromFrame, self.snapFrameActionForm)
+                                              self.transformFrameForm, self.plotFrameForm,  
+                                              self.calcRMSfromFrame, self.snapFrameActionForm)
         
 
     def addFieldWidget(self, name):
         self.ElementsColumn.addFields(name, self.stm.removeField, self.plotFieldForm)
-        # self.ElementsColumn.POFields.addWidget(FieldsWidget(name,self.stm.removeField, self.plotFieldForm))
 
     def addCurrentWidget(self, name):
         self.ElementsColumn.addCurrent(name, self.stm.removeCurrent, self.plotCurrentForm)
-        # self.ElementsColumn.POCurrents.addWidget(CurrentWidget(name, self.stm.removeCurrent, self.plotCurrentForm))
 
     def addSFieldWidget(self, name):
-        # self.ElementsColumn.SPOFields.addWidget(SFieldsWidget(name,self.stm.removeScalarField, self.plotSFieldForm))
         self.ElementsColumn.addSPOFields(name, self.stm.removeScalarField, self.plotSFieldForm)
     
     ### Functionalities: Adding Elements 
@@ -508,7 +502,7 @@ class MainWidget(QWidget):
     ##
     # Shows form to add a plane
     def addPlaneForm(self):
-        self.setForm(fDataObj.makePlaneInp(), readAction=self.addPlaneAction)
+        self.setForm(fData.makePlaneInp(), readAction=self.addPlaneAction)
 
     ##
     # Reads form and adds plane to System
@@ -526,7 +520,7 @@ class MainWidget(QWidget):
     ##
     # Shows from to add a quadric surface
     def addQuadricForm(self):
-        self.setForm(fDataObj.makeQuadricSurfaceInp(), readAction=self.addQuadricAction)
+        self.setForm(fData.makeQuadricSurfaceInp(), readAction=self.addQuadricAction)
     
     ##
     # Reads quadric form, evaluates surface type and calls corresponding add____Action
@@ -590,12 +584,12 @@ class MainWidget(QWidget):
     ##
     # Shows single element transformation form
     def transformSingleForm(self, element):
-        self.setForm(fDataObj.makeTransformationForm(element), self.transformAction, okText="Apply transformation")
+        self.setForm(fData.makeTransformationForm(element), self.transformAction, okText="Apply transformation")
     
     ##
     # Shows single element transformation form
     def transformFrameForm(self, frame):
-        self.setForm(fDataObj.makeTransformationForm(frame, obj="frame"), self.transformFrameAction, okText="Apply transformation")
+        self.setForm(fData.makeTransformationForm(frame, obj="frame"), self.transformFrameAction, okText="Apply transformation")
     
     ##
     # Applies single element transformation
@@ -621,7 +615,7 @@ class MainWidget(QWidget):
     ##
     # Shows group transformation form
     def transformGroupForm(self, group):
-        self.setForm(fDataObj.makeTransformationForm(group, obj="group"), self.transformGroupAction, okText="Apply transformation")
+        self.setForm(fData.makeTransformationForm(group, obj="group"), self.transformGroupAction, okText="Apply transformation")
     
     ##
     # Applies group transformation
@@ -668,7 +662,7 @@ class MainWidget(QWidget):
 
         self.setForm(
             [InputDescription(inType.elementSelector, "elements", options=movableElements)]+
-            fDataObj.makeTransformationElementsForm(self.stm.system.keys()), self.transformationMultipleAction
+            fData.makeTransformationElementsForm(self.stm.system.keys()), self.transformationMultipleAction
             , okText="Apply transformation")
 
     ##
@@ -694,7 +688,7 @@ class MainWidget(QWidget):
     ##
     # Shows tube frame form
     def initTubeFrameForm(self):
-        self.setForm(fDataObj.initTubeFrameInp(), readAction=self.initTubeFrameAction, okText="Initialize frame")
+        self.setForm(fData.initTubeFrameInp(), readAction=self.initTubeFrameAction, okText="Initialize frame")
     
     ##
     # Reads form and adds a tube frame to system
@@ -712,7 +706,7 @@ class MainWidget(QWidget):
     ##
     # Shows form to initialize gaussian frame 
     def initGaussianFrameForm(self):
-        self.setForm(fDataObj.initGaussianFrameInp(), readAction=self.initGaussianFrameAction, okText="Initialize frame")
+        self.setForm(fData.initGaussianFrameInp(), readAction=self.initGaussianFrameAction, okText="Initialize frame")
     
 
     ##
@@ -753,7 +747,7 @@ class MainWidget(QWidget):
     ##
     # Shows form to propagate rays
     def setPropRaysForm(self):
-        self.setForm(fDataObj.propRaysInp(self.stm.frames, self.stm.system), self.addPropRaysAction, okText="Propagate rays")
+        self.setForm(fData.propRaysInp(self.stm.frames, self.stm.system), self.addPropRaysAction, okText="Propagate rays")
 
     ##
     # Reads form and popagates rays
@@ -773,7 +767,7 @@ class MainWidget(QWidget):
     # 
     # @param frame Frame to plot
     def plotFrameForm(self, frame):
-        self.setForm(fDataObj.plotFrameOpt(frame), readAction=self.addPlotFrameAction, okText="Plot frame")
+        self.setForm(fData.plotFrameOpt(frame), readAction=self.addPlotFrameAction, okText="Plot frame")
 
     ##
     # Reads form and plots frame
@@ -795,7 +789,7 @@ class MainWidget(QWidget):
     ##
     # Shows form to initialize gaussian beam 
     def initGaussBeamForm(self):
-        self.setForm(fDataObj.initGaussianInp(self.stm.system), readAction=self.initGaussBeamAction, okText="Initialize beam")
+        self.setForm(fData.initGaussianInp(self.stm.system), readAction=self.initGaussBeamAction, okText="Initialize beam")
 
     ##
     # Reads form and adds a vectorial gaussian beam to system
@@ -814,7 +808,7 @@ class MainWidget(QWidget):
     ##
     # Shows form to initialize scalar gaussian beam TODO: klopt dit 
     def initSGaussBeamForm(self):
-        self.setForm(fDataObj.initSGaussianInp(self.stm.system), readAction=self.initSGaussBeamAction, okText="Initialize beam")
+        self.setForm(fData.initSGaussianInp(self.stm.system), readAction=self.initSGaussBeamAction, okText="Initialize beam")
     
     ##
     # Reads form and adds a scalar gaussian beam to system
@@ -831,7 +825,7 @@ class MainWidget(QWidget):
     ##
     # Shows form to initialize a physical optics propagation
     def initPSBeamForm(self):
-        self.setForm(fDataObj.initPSInp(self.stm.system), readAction=self.initPSBeamAction, okText="Initialize beam")
+        self.setForm(fData.initPSInp(self.stm.system), readAction=self.initPSBeamAction, okText="Initialize beam")
     
     
     ##
@@ -851,7 +845,7 @@ class MainWidget(QWidget):
     ##
     # Shows form to initialize a scalar point source beam
     def initSPSBeamForm(self):
-        self.setForm(fDataObj.initSPSInp(self.stm.system), readAction=self.initSPSBeamAction, okText="Initialize beam")
+        self.setForm(fData.initSPSInp(self.stm.system), readAction=self.initSPSBeamAction, okText="Initialize beam")
     
 
     ##
@@ -873,9 +867,9 @@ class MainWidget(QWidget):
     # @param field Field to plot
     def plotFieldForm(self, field):
         if self.stm.system[self.stm.fields[field].surf]["gmode"] == 2:
-            self.setForm(fDataObj.plotFarField(field), readAction=self.plotFieldAction, okText="Plot")
+            self.setForm(fData.plotFarField(field), readAction=self.plotFieldAction, okText="Plot")
         else:
-            self.setForm(fDataObj.plotField(field), readAction=self.plotFieldAction, okText="Plot")
+            self.setForm(fData.plotField(field), readAction=self.plotFieldAction, okText="Plot")
 
     ##
     # Reads form and plots field
@@ -898,7 +892,7 @@ class MainWidget(QWidget):
     #
     # @param field Field to plot
     def plotSFieldForm(self, field):
-        self.setForm(fDataObj.plotSField(field, self.stm.system[self.stm.scalarfields[field].surf]["gmode"]), readAction=self.plotSFieldAction, okText="Plot")
+        self.setForm(fData.plotSField(field, self.stm.system[self.stm.scalarfields[field].surf]["gmode"]), readAction=self.plotSFieldAction, okText="Plot")
 
     ##
     # Reads form and plots scalar field
@@ -921,7 +915,7 @@ class MainWidget(QWidget):
     #
     # @param current Current to plot
     def plotCurrentForm(self, current):
-        self.setForm(fDataObj.plotCurrentOpt(current), readAction=self.plotCurrentAction, okText="Plot")
+        self.setForm(fData.plotCurrentOpt(current), readAction=self.plotCurrentAction, okText="Plot")
     
     ##
     # Reads form and plots current
@@ -942,14 +936,15 @@ class MainWidget(QWidget):
     ##
     # Shows form to propagate physical optics beam to surface 
     def propPOForm(self):
-        self.setForm(fDataObj.propPOInp(self.stm.currents, self.stm.scalarfields, self.stm.system), self.propPOAction, okText="Propagate beam")
+        self.setForm(fData.propPOInp(self.stm.currents, self.stm.scalarfields, self.stm.system), self.propPOAction, okText="Propagate beam")
     
     ##
     # Shows form to propagate physical optics beam far field 
     def propPOFFForm(self):
-        self.setForm(fDataObj.propPOFFInp(self.stm.currents, self.stm.system), self.propPOAction, okText="Propagate beam")
+        self.setForm(fData.propPOFFInp(self.stm.currents, self.stm.system), self.propPOAction, okText="Propagate beam")
    
     def _addToWidgets(self, propBeamDict):
+        print(f"{propBeamDict = }")
         if propBeamDict["mode"] == "JM":
             self.addCurrentWidget(propBeamDict["name_JM"])
     
@@ -967,16 +962,21 @@ class MainWidget(QWidget):
         elif propBeamDict["mode"] == "scalar":
             self.addSFieldWidget(propBeamDict["name_field"])
 
+    # def _addToWidgetsOfCalc(self):
+    #     self._addToWidgets()
+
+
     def runPOWorker(self, s_copy, runPODict, returnDict):
         s_copy.runPO(runPODict)
 
         returnDict["system"] = s_copy
 
-    def runPOWaiter(self, process, dial, propBeamDict):
-        process.join()
+    def waiterFinished(self):
+        # process.join()
+        print("waiter: Process joined")
 
-        dial.accept()
-        self._addToWidgets(propBeamDict)
+        self.currentCalculationDialog.accept()
+        self._addToWidgets(self.currentCalculationDict)
 
     ##
     # Reads form propagates beam, runs calculation on another thread
@@ -1016,14 +1016,22 @@ class MainWidget(QWidget):
             process = Process(target = self.runPOWorker, args = args)
 
             dialStr = f"Calculating {subStr} on {propBeamDict['t_name']}..."
-            dial = SymDialog(process.kill, self.clog, dialStr) 
-            
-            waiterArgs = (process, dial, returnDict)
-            waiter = Thread(target = self.runPOWaiter, args = waiterArgs)
+            self.currentCalculationDialog = SymDialog(process.kill, self.clog, dialStr) 
+            self.currentCalculationDict = propBeamDict
+
+            waiterTread = QThread()
+            waiter = Waiter()
+            waiter.setProcess(process)
+            waiter.moveToThread(waiterTread)
+            waiterTread.started.connect(waiter.run)
+            waiter.finished.connect(waiter.deleteLater)
+            waiter.finished.connect(waiterTread.quit)
+            waiter.finished.connect(waiterTread.deleteLater)
+            waiter.finished.connect(self.waiterFinished)
 
             process.start()
-            waiter.start()
-            dial.exec_()
+            waiterTread.start()
+            self.currentCalculationDialog.exec_()
 
 
             s_copy = returnDict["system"]
@@ -1033,36 +1041,36 @@ class MainWidget(QWidget):
             self.stm.currents.update(s_copy.currents)
             self.stm.scalarfields.update(s_copy.scalarfields)
 
+            dtime = time() - start_time
+            self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
 
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
             self.clog.error(f"PO Propagation did not end successfully: {err}.")
         
-        dtime = time() - start_time
-        self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
     
     #
     ##TODO Unite efficiencies
     ##
     # Shows form to calculate taper efficientie
     def setTaperEffsForm(self):
-        self.setForm(fDataObj.calcTaperEff(self.stm.fields, self.stm.system), self.calcTaperAction, okText="Calculate")
+        self.setForm(fData.calcTaperEff(self.stm.fields, self.stm.system), self.calcTaperAction, okText="Calculate")
     
     ##
     # Shows form to calculate spillover efficientie
     def setSpillEffsForm(self):
-        self.setForm(fDataObj.calcSpillEff(self.stm.fields, self.stm.system), self.calcSpillAction, okText="Calculate")
+        self.setForm(fData.calcSpillEff(self.stm.fields, self.stm.system), self.calcSpillAction, okText="Calculate")
 
     ##
     # Shows form to calculate x-pol efficientie TODO: x-pol
     def setXpolEffsForm(self):
-        self.setForm(fDataObj.calcXpolEff(self.stm.fields, self.stm.system), self.calcXpolAction, okText="Calculate")
+        self.setForm(fData.calcXpolEff(self.stm.fields, self.stm.system), self.calcXpolAction, okText="Calculate")
 
     ##
     # Shows form to calculate main beam efficientie
     def setMBEffsForm(self):
-        self.setForm(fDataObj.calcMBEff(self.stm.fields, self.stm.system), self.calcMBAction, okText="Calculate")
+        self.setForm(fData.calcMBEff(self.stm.fields, self.stm.system), self.calcMBAction, okText="Calculate")
     
     ##
     # Reads form and calculates taper efficientie
@@ -1134,7 +1142,7 @@ class MainWidget(QWidget):
         self.clog.info(f"RMS value of {frame} : {rms} mm")
 
     def setFocusFindForm(self):
-        self.setForm(fDataObj.focusFind(list(self.stm.frames.keys())), self.findFocusAction, okText="Find focus")
+        self.setForm(fData.focusFind(list(self.stm.frames.keys())), self.findFocusAction, okText="Find focus")
 
     def findFocusAction(self):
         try:
@@ -1207,10 +1215,10 @@ class PyPOMainWindow(QMainWindow):
         hyperbolaAction.triggered.connect(self.mainWid.addQuadricForm)
         reflectorSelector.addAction(hyperbolaAction)
 
-        transformElementsAction = QAction("Transform elements", self)
-        transformElementsAction.setStatusTip("Transform a group of elements.")
-        transformElementsAction.triggered.connect(self.mainWid.transformationMultipleForm)
-        ElementsMenu.addAction(transformElementsAction)
+        # transformElementsAction = QAction("Transform elements", self) ##TODO depricated? There is no longer a form for this action
+        # transformElementsAction.setStatusTip("Transform a group of elements.")
+        # transformElementsAction.triggered.connect(self.mainWid.transformationMultipleForm)
+        # ElementsMenu.addAction(transformElementsAction)
 
         # ElementsMenu.addSeparator()
         

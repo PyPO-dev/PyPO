@@ -26,12 +26,13 @@ PO_modelist = ["JM", "EH", "JMEH", "EHP", "FF", "scalar"]
 # @returns num Increment of highest occurence of number.
 def getIndex(name, nameList):
     regex = f"(?<!.){name}(_(\d*(?![ -~])))*(?![ -~])"
+    #regex = f"{name}(_(\d*(?![ -~])))*(?![ -~])"
     l = re.compile(regex)
     match = list(filter(l.match, nameList))
-    print(match)
-    match_spl = [int((x.split("_"))[1]) if "_" in x and not "_" in name else 0 for x in match]
-    num = 0
+    #print(match)
 
+    match_spl = [int(x.replace(name + "_", "")) if x != name else 0 for x in match]
+    num = 0
     if match_spl:
         num = max(match_spl) + 1
 

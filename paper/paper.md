@@ -55,7 +55,7 @@ It offers the following functionality:
 - Methods for evaluating common figures of merit such as root-mean-square (RMS) spot values for GO propagation. For PO, commonly used metrics such as spillover, taper, aperture, main beam and cross-polar efficiencies can be calculated.
 
 Commercial software for these ends, such as OpticStudio (Zemax) and GRASP (TICRA), has already been developed, but to our knowledge `PyPO` is the first free open-source package that simulates planar and quadric reflector geometries using both GO and PO. 
-Moreover, `PyPO` does not resort to approximations such as the Fresnel and Fraunhofer approximation commonly used in other software packages such as `POPPy` [Perrin:2012]. Rather, PyPO directly solves the radiation integral, allowing for propagation between multiple reflectors.
+Moreover, `PyPO` does not employ  other software packages such as `POPPy` [@Perrin:2012] and Prysm [@Dube:2019]. Rather, PyPO directly solves the radiation integral, allowing for propagation between multiple reflectors.
 
 Currently, `PyPO` is heavily used in the laboratory verification and characterisation of the DESHIMA 2.0 spectrometer [@Taniguchi:2022]. 
 Specifically, `PyPO` is used for the following purposes:

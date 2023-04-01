@@ -25,14 +25,15 @@ PO_modelist = ["JM", "EH", "JMEH", "EHP", "FF", "scalar"]
 #
 # @returns num Increment of highest occurence of number.
 def getIndex(name, nameList):
-    #regex = f"{name}(_(\d*(?![ -~])))*(?![ -~])"
-    #l = re.compile(regex)
-    #match = list(filter(l.match, nameList))
-    #match_spl = [int((x.split("_"))[1]) if "_" in x else 0 for x in match]
+    regex = f"(?<!.){name}(_(\d*(?![ -~])))*(?![ -~])"
+    l = re.compile(regex)
+    match = list(filter(l.match, nameList))
+    print(match)
+    match_spl = [int((x.split("_"))[1]) if "_" in x and not "_" in name else 0 for x in match]
     num = 0
 
-    #if match_spl:
-    #    num = max(match_spl) + 1
+    if match_spl:
+        num = max(match_spl) + 1
 
     return num
 
@@ -419,6 +420,15 @@ def check_ElemDict(elemDict, nameList, num_ref, clog):
 
     if not "flip" in elemDict:
         elemDict["flip"] = False
+    
+    if not "gcenter" in elemDict:
+        elemDict["gcenter"] = np.zeros(2)
+   
+    if not "ecc_uv" in elemDict:
+        elemDict["ecc_uv"] = 0
+
+    if not "rot_uv" in elemDict:
+        elemDict["rot_uv"] = 0
 
     else:
         if not isinstance(elemDict["flip"], bool):
@@ -538,15 +548,6 @@ def check_ElemDict(elemDict, nameList, num_ref, clog):
                 errStr += errMsg_field("lims_y", elemDict["name"])
 
         elif elemDict["gmode"] == "uv" or elemDict["gmode"] == 1:
-            if not "gcenter" in elemDict:
-                elemDict["gcenter"] = np.zeros(2)
-           
-            if not "ecc_uv" in elemDict:
-                elemDict["ecc_uv"] = 0
-
-            if not "rot_uv" in elemDict:
-                elemDict["rot_uv"] = 0
-
             if "lims_u" in elemDict:
                 errStr += block_ndarray("lims_u", elemDict, (2,))
 

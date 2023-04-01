@@ -262,17 +262,11 @@ class System(object):
             self.system[reflDict["name"]]["coeffs"] = np.array([reflDict["coeffs"][0], reflDict["coeffs"][1], -1])
 
         if reflDict["gmode"] == "xy" or reflDict["gmode"] == 0:
-            self.system[reflDict["name"]]["gcenter"] = np.zeros(2)
-            self.system[reflDict["name"]]["ecc_uv"] = 0
-            self.system[reflDict["name"]]["rot_uv"] = 0
             self.system[reflDict["name"]]["gmode"] = 0
 
         elif reflDict["gmode"] == "uv" or reflDict["gmode"] == 1:
-            # Convert v in degrees to radians
-            self.system[reflDict["name"]]["lims_v"] = [self.system[reflDict["name"]]["lims_v"][0],
-                                                        self.system[reflDict["name"]]["lims_v"][1]]
-
             self.system[reflDict["name"]]["gmode"] = 1
+        
         self.system[reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added paraboloid {reflDict['name']} to system.")
         self.num_ref += 1
@@ -327,15 +321,9 @@ class System(object):
             self.system[reflDict["name"]]["coeffs"][2] = c3
 
         if reflDict["gmode"] == "xy" or reflDict["gmode"] == 0:
-            self.system[reflDict["name"]]["gcenter"] = np.zeros(2)
-            self.system[reflDict["name"]]["ecc_uv"] = 0
-            self.system[reflDict["name"]]["rot_uv"] = 0
             self.system[reflDict["name"]]["gmode"] = 0
 
         elif reflDict["gmode"] == "uv" or reflDict["gmode"] == 1:
-            self.system[reflDict["name"]]["lims_v"] = [self.system[reflDict["name"]]["lims_v"][0],
-                                                        self.system[reflDict["name"]]["lims_v"][1]]
-
             self.system[reflDict["name"]]["gmode"] = 1
 
         self.system[reflDict["name"]]["snapshots"] = {}
@@ -383,15 +371,9 @@ class System(object):
             self.system[reflDict["name"]]["coeffs"][2] = b
 
         if reflDict["gmode"] == "xy" or reflDict["gmode"] == 0:
-            self.system[reflDict["name"]]["gcenter"] = np.zeros(2)
-            self.system[reflDict["name"]]["ecc_uv"] = 0
-            self.system[reflDict["name"]]["rot_uv"] = 0
             self.system[reflDict["name"]]["gmode"] = 0
 
         elif reflDict["gmode"] == "uv" or reflDict["gmode"] == 1:
-            self.system[reflDict["name"]]["lims_v"] = [self.system[reflDict["name"]]["lims_v"][0],
-                                                        self.system[reflDict["name"]]["lims_v"][1]]
-
             self.system[reflDict["name"]]["gmode"] = 1
 
         check_ellipseLimits(self.system[reflDict["name"]], self.clog)
@@ -420,28 +402,12 @@ class System(object):
         self.system[reflDict["name"]]["coeffs"][2] = -1
 
         if reflDict["gmode"] == "xy" or reflDict["gmode"] == 0:
-            self.system[reflDict["name"]]["gcenter"] = np.zeros(2)
-            self.system[reflDict["name"]]["ecc_uv"] = 0
-            self.system[reflDict["name"]]["rot_uv"] = 0
             self.system[reflDict["name"]]["gmode"] = 0
 
         elif reflDict["gmode"] == "uv" or reflDict["gmode"] == 1:
             self.system[reflDict["name"]]["gmode"] = 1
 
         elif reflDict["gmode"] == "AoE" or reflDict["gmode"] == 2:
-            # Assume is given in degrees
-            # Convert Az and El to radians
-            self.system[reflDict["name"]]["gcenter"] = np.zeros(2)
-            self.system[reflDict["name"]]["ecc_uv"] = 0
-            self.system[reflDict["name"]]["rot_uv"] = 0
-            self.system[reflDict["name"]]["gmode"] = 0
-
-            self.system[reflDict["name"]]["lims_Az"] = [self.system[reflDict["name"]]["lims_Az"][0],
-                                                        self.system[reflDict["name"]]["lims_Az"][1]]
-
-            self.system[reflDict["name"]]["lims_El"] = [self.system[reflDict["name"]]["lims_El"][0],
-                                                        self.system[reflDict["name"]]["lims_El"][1]]
-
             self.system[reflDict["name"]]["gmode"] = 2
 
         self.system[reflDict["name"]]["snapshots"] = {}
@@ -1446,13 +1412,23 @@ class System(object):
         check_fieldSystem(name_field, self.fields, self.clog, extern=True)
         thres = -11 if thres is None else thres
         mode = "dB" if mode is None else mode
-        
-        self.fitGaussAbs(name_field, comp, thres, mode)
-        field = getattr(self.fields[name_field], comp)
-        surfaceObj = self.system[self.fields[name_field].surf]
-        
-        eff = effs.calcMainBeam(field, surfaceObj, self.scalarfields[f"fitGauss_{name_field}"].S)
 
+        _thres = self.copyObj(thres)
+
+        eff = 1
+
+        while eff >= 1:
+            if thres > _thres:
+                self.clog.warning(f"Could not fit at {_thres} dB level. Raising by 1 dB.")
+            self.fitGaussAbs(name_field, comp, thres, mode)
+            field = getattr(self.fields[name_field], comp)
+            surfaceObj = self.system[self.fields[name_field].surf]
+
+            #self.plotBeam2D(name_field, comp="Ey", vmin=-30, vmax=0)
+            #self.plotBeam2D(f"fitGauss_{name_field}", vmin=-30, vmax=0)
+            
+            eff = effs.calcMainBeam(field, surfaceObj, self.scalarfields[f"fitGauss_{name_field}"].S)
+            thres += 1
         return eff
     
     def calcBeamCuts(self, name_field, comp, phi=0, center=True, align=True):
@@ -1495,7 +1471,7 @@ class System(object):
         return x_cut, y_cut, x_strip, y_strip
     
     def calcHPBW(self, name_field, comp, interp=50):
-        x_cut, y_cut, x_strip, y_strip = self.calcBeamCuts(name_field, comp, center=False, align=False)
+        x_cut, y_cut, x_strip, y_strip = self.calcBeamCuts(name_field, comp)#, center=False, align=False)
 
         x_interp = np.linspace(np.min(x_strip), np.max(x_strip), num=len(x_strip) * interp)
         y_interp = np.linspace(np.min(y_strip), np.max(y_strip), num=len(y_strip) * interp)
@@ -1764,7 +1740,7 @@ class System(object):
     # @param select A list of names of reflectors to plot. If not given, plot all reflectors.
     # @param RTframes A list of names of frame to plot. If not given, plot no ray-trace frames.
     def plotSystem(self, cmap=cm.cool,
-                norm=False, fine=2, show=True, foc1=False, foc2=False, save=False, ret=False, select=None, RTframes=None):
+                norm=False, fine=2, show=True, foc1=False, foc2=False, save=False, ret=False, select=None, RTframes=None, RTcolor="black"):
 
         select = [] if select is None else select
         RTframes = [] if RTframes is None else RTframes
@@ -1788,13 +1764,13 @@ class System(object):
 
         fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
         plt.plotSystem(plotDict, ax, fine, cmap,norm,
-                    foc1, foc2, _RTframes)
+                    foc1, foc2, _RTframes, RTcolor)
 
         if ret:
             return fig, ax
         
         elif save:
-            pt.savefig(fname=self.savePath + 'system.jpg',bbox_inches='tight', dpi=300)
+            pt.savefig(fname=self.savePath + 'system.pdf',bbox_inches='tight', dpi=300)
             pt.close()
 
         elif show:

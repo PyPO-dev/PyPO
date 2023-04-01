@@ -264,7 +264,7 @@ def plot3D(plotObject, ax, fine, cmap,
 # @param foc2 Plot focus 2.
 # @param RTframes List containing frames to be plotted.
 def plotSystem(systemDict, ax, fine, cmap,norm,
-            foc1, foc2, RTframes):
+            foc1, foc2, RTframes, RTcolor):
 
     for i, (key, refl) in enumerate(systemDict.items()):
         if isinstance(cmap, list):
@@ -296,7 +296,7 @@ def plotSystem(systemDict, ax, fine, cmap,norm,
                 y.append(frame.y[i])
                 z.append(frame.z[i])
 
-            ax.plot(x, y, z, color='grey', zorder=100)
+            ax.plot(x, y, z, color=RTcolor, zorder=100)
 
 
     #set_axes_equal(ax)

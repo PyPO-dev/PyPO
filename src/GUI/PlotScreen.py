@@ -1,24 +1,22 @@
-from PyQt5 import QtWidgets as qtw
+from PyQt5.QtWidgets import  QWidget, QVBoxLayout
+from matplotlib import use
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
-import src.GUI.MPLCanvas as mplc
+
+##
+# @file Defines a matplotlib plot widget that can be placed in the GUI
+use('Qt5Agg')
+class MplCanvas(FigureCanvasQTAgg):
+    def __init__(self, fig):
+        super(MplCanvas, self).__init__(fig)
 
 
-
-class PlotScreen(qtw.QWidget):
+class PlotScreen(QWidget):
     def __init__(self, fig, parent = None):
         super().__init__(parent=parent)
-        self.canvas = mplc.MplCanvas(fig)
-        NavTB = NavigationToolbar(self.canvas, self)
+        canvas = MplCanvas(fig)
+        NavTB = NavigationToolbar(canvas, self)
 
-        # self.setFixedHeight(400)
-
-        layout = qtw.QVBoxLayout(self)
+        layout = QVBoxLayout(self)
         layout.addWidget(NavTB)
-        layout.addWidget(self.canvas)
-if __name__ == "__main__":
-
-    app = qtw.QApplication([])
-    mainwindow = PlotScreen()
-    mainwindow.show()
-    app.exec_()
+        layout.addWidget(canvas)

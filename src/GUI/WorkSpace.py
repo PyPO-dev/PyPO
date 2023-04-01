@@ -1,7 +1,11 @@
-from PyQt5.QtWidgets import QWidget, QTabWidget, QScrollArea, QVBoxLayout
+from PyQt5.QtWidgets import QWidget, QTabWidget, QScrollArea, QVBoxLayout, QSizePolicy
 from PyQt5.QtCore import Qt
 from src.GUI.ElementWidget import ReflectorWidget, GroupWidget, FrameWidget, CurrentWidget, FieldsWidget, CurrentWidget, SFieldsWidget
 from src.GUI.Accordion import Accordion
+
+##
+# @file
+# Defines the workspace widget 
 
 class Workspace(QTabWidget):
     def __init__(self, parent=None):
@@ -32,8 +36,7 @@ class Workspace(QTabWidget):
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         scroll.setWidgetResizable(True)
         scroll.setContentsMargins(0,0,0,0)
-        scroll.setMinimumWidth(300)
-        scroll.setMaximumWidth(300)
+        scroll.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         return scroll
 
     def addReflector(self, name, removeAction, transformAction, plotAction, snapAction, copyAction):
@@ -51,6 +54,7 @@ class Workspace(QTabWidget):
     def addSPOFields(self, name, removeAction, plotAction):
         self.POAccordion.SPOFields.addWidget(SFieldsWidget(name, removeAction, plotAction))
         self.setCurrentIndex(3)
+        
     def addCurrent(self, name, removeAction, plotAction):
         self.POAccordion.POCurrents.addWidget(CurrentWidget(name, removeAction, plotAction))
         self.setCurrentIndex(3)

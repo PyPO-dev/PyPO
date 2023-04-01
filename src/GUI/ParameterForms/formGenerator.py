@@ -19,19 +19,21 @@ class FormGenerator(QWidget):
     # @param ElementData List of InputDescription objects.
     # @param readAction Function to be called upon clicking OK button.
     # @param addButtons Boolean. Determines weather there will be buttons in the bottom of the form.
-    # @param test Boolean. If true you buttons can be added without the need to provide a readAction.
+    # @param test Boolean. If true, buttons can be added without the need to provide a readAction.
     # @param okText String. Text used as label for the OK button. Defaults to "add"
-    def __init__ (self, ElementData, readAction = None, addButtons=True, test=False, okText="Add"):
+    def __init__ (self, ElementData, readAction = None, addButtons=True, test=False, okText=None):
         super().__init__()
         if addButtons and readAction == None and not test:
             raise Exception("Trying to add buttons with no action provided!")
         self.formData = ElementData
         self.readme = readAction
-        self.okText = okText
+        
+        self.okText = okText if okText is not None else "Add"
 
         self.layout = QFormLayout(self)
         self.layout.setAlignment(Qt.AlignTop)
         self.layout.setContentsMargins(0,0,0,0)
+        self.setFixedWidth(390)
         # self.layout.setAlignment(self.layout.formAlignment())
 
         self.inputs = []
@@ -86,18 +88,25 @@ class FormGenerator(QWidget):
     #
     def setupButtons(self):
         addBtn = QPushButton(self.okText)
-        addBtn.clicked.connect(self.readme)
         closeBtn = QPushButton("Close")
-        closeBtn.clicked.connect(self.closeAction)
         clearBtn = QPushButton("Clear")
+
+        addBtn.clicked.connect(self.readme)
+        closeBtn.clicked.connect(self.closeAction)
         clearBtn.clicked.connect(self.clear)
+        
         btnWidget = QWidget()
         btnLayout = QHBoxLayout(btnWidget)
+        
         btnLayout.addWidget(closeBtn)
         btnLayout.addWidget(clearBtn)
         btnLayout.addWidget(addBtn)
-        btnWidget.setContentsMargins(0,4,20,0)
+        
         self.layout.addRow(btnWidget)
+
+        btnWidget.setContentsMargins(0,4,20,30)
+        for btn in [addBtn, closeBtn, clearBtn]:
+            btn.setFixedSize(110, 30)
         spacerWidget = QWidget()
         spacerLayout = QVBoxLayout(spacerWidget)
         spacerLayout.addItem(QSpacerItem(0,0, QSizePolicy.Expanding, QSizePolicy.MinimumExpanding))

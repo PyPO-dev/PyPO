@@ -6,7 +6,7 @@ from threading import Thread, Event
 from traceback import print_tb
 from multiprocessing import Process, Manager
 
-from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar, QScrollArea
+from PyQt5.QtWidgets import QApplication, QLabel, QTextEdit, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar, QScrollArea
 from PyQt5.QtGui import QFont, QIcon, QTextCursor
 from PyQt5.QtCore import Qt, QThreadPool, QThread
 
@@ -16,17 +16,15 @@ from src.GUI.utils import inType
 import src.GUI.ParameterForms.formData as fData
 from src.GUI.PlotScreen import PlotScreen
 from src.GUI.Accordion import Accordion
-from src.GUI.ElementWidget import ReflectorWidget, FrameWidget, FieldsWidget, CurrentWidget, SFieldsWidget, SymDialog
-from src.GUI.Console import ConsoleGenerator
+from src.GUI.Dialogs import SymDialog
 from src.GUI.Worker import Worker, GWorker
 from src.GUI.Waiter import Waiter
 from src.GUI.WorkSpace import Workspace
 
 from src.PyPO.CustomLogger import CustomGUILogger
 
-# from src.GUI.Console import print
-import numpy as np
-from src.PyPO.Checks import InputReflError, InputRTError
+# import numpy as np
+from src.PyPO.Checks import InputReflError, InputRTError ##TODO @arend is this useful?
 
 sys.path.append('../')
 sys.path.append('../../')
@@ -56,7 +54,7 @@ class MainWidget(QWidget):
 
         # GridParameters
         self.grid = QGridLayout()
-        self.GPElementsColumn = [0, 0, 2, 1]
+        self.GPWorkSpace      = [0, 0, 2, 1]
         self.GPParameterForm  = [0, 1, 2, 1]
         self.GPPlotScreen     = [0, 2, 1, 1]
         self.GPConsole        = [1, 2, 1, 1]
@@ -77,7 +75,7 @@ class MainWidget(QWidget):
         # self.grid.setMargin(0)
         self.grid.setSpacing(5)
 
-        self._mkElementsColumn()
+        self._mkWorkSpace()
         self._mkPlotScreen()
         self.setLayout(self.grid)
         
@@ -108,8 +106,9 @@ class MainWidget(QWidget):
     # Configures the console widget
     # 
     def _mkConsole(self):
-        self.console = ConsoleGenerator.get()
-        self.addToWindowGrid(self.console, self.GPConsole,vStretch=1)
+        self.console = QTextEdit()
+        self.console.setReadOnly(True)
+        self.addToWindowGrid(self.console, self.GPConsole, vStretch=1, hStretch=3)
         self.cursor = QTextCursor(self.console.document())
         
         
@@ -120,13 +119,13 @@ class MainWidget(QWidget):
     # @guiSetup
     # constructs the elements column on the left side of the screen
     # 
-    def _mkElementsColumn(self):
+    def _mkWorkSpace(self):
         # delete if exists
-        if hasattr(self, "ElementsColumn"):
-            self.ElementsColumn.setParent(None)
+        if hasattr(self, "WorkSpace"):
+            self.WorkSpace.setParent(None)
         # rebuild 
-        self.ElementsColumn = Workspace()
-        self.addToWindowGrid(self.ElementsColumn, self.GPElementsColumn)
+        self.WorkSpace = Workspace()
+        self.addToWindowGrid(self.WorkSpace, self.GPWorkSpace, hStretch=1)
 
     ##
     # @guiSetup
@@ -137,7 +136,7 @@ class MainWidget(QWidget):
         self.PlotWidget.setTabShape(QTabWidget.Rounded)
         self.PlotWidget.tabCloseRequested.connect(self.closePlotTab)
         # self.PlotWidget.setMaximumHeight(700)
-        self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen,vStretch=2)
+        self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen,vStretch=2, hStretch=3)
 
     ##
     # @guiSetup
@@ -152,31 +151,29 @@ class MainWidget(QWidget):
                 self.ParameterWid.setParent(None)
             except:
                 pass
-        if okText:
-            self.ParameterWid = formGenerator.FormGenerator(formData, readAction, okText=okText)
-        else:
-            self.ParameterWid = formGenerator.FormGenerator(formData, readAction)
+        self.ParameterWid = formGenerator.FormGenerator(formData, readAction, okText=okText)
+
         self.ParameterWid.closed.connect(self.removeForm)
-        self.ParameterWid.setMaximumWidth(400)
-        self.ParameterWid.setMinimumWidth(400)
-        # self.ParameterWid.setContentsMargins(5,5,5,5)
+
         self.formScroll = QScrollArea()
         self.formScroll.setWidget(self.ParameterWid)
         self.formScroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.formScroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         # scroll.border
-        self.formScroll.setWidgetResizable(True)
+        # self.formScroll.setWidgetResizable(True)
         self.formScroll.setContentsMargins(0,0,0,0)
-        self.formScroll.setMinimumWidth(300)
-        self.formScroll.setMaximumWidth(400)
+
         self.addToWindowGrid(self.formScroll,self.GPParameterForm)
     
     ## 
     # removes the form ParameterWid if exists 
     def removeForm(self):
         if hasattr(self, "formScroll"):
+            print("removingForm")
             self.formScroll.setParent(None)
             self.formScroll.deleteLater()
+            self.ParameterWid.setParent(None)
+            self.ParameterWid.deleteLater()
     
     ##
     # TODO: Remove this function from here
@@ -390,7 +387,7 @@ class MainWidget(QWidget):
     def loadSystemAction(self):
         try:
             loadDict = self.ParameterWid.read()
-            self._mkElementsColumn()
+            self._mkWorkSpace()
 
             self.stm.loadSystem(loadDict["name"]) 
             self.refreshWorkspaceSection(self.stm.system, "elements")
@@ -477,27 +474,27 @@ class MainWidget(QWidget):
     ### Functionalities: Adding Elements in gui
     # TODO:doc
     def addReflectorWidget(self, name):
-        self.ElementsColumn.addReflector(name, self.removeElement, 
+        self.WorkSpace.addReflector(name, self.removeElement, 
                                          self.transformSingleForm, self.plotElement, 
                                          self.snapActionForm, self.copyElementActionForm)
     
     def addGroupWidget(self, name):
-        self.ElementsColumn.addGroup(name, self.stm.removeGroup, self.plotGroup, self.transformGroupForm, self.snapGroupActionForm, self.copyGroupActionForm)
+        self.WorkSpace.addGroup(name, self.stm.removeGroup, self.plotGroup, self.transformGroupForm, self.snapGroupActionForm, self.copyGroupActionForm)
     
     def addFrameWidget(self, name):
-        self.ElementsColumn.addRayTraceFrames(name, self.removeFrame, 
+        self.WorkSpace.addRayTraceFrames(name, self.removeFrame, 
                                               self.transformFrameForm, self.plotFrameForm,  
                                               self.calcRMSfromFrame, self.snapFrameActionForm)
         
 
     def addFieldWidget(self, name):
-        self.ElementsColumn.addFields(name, self.stm.removeField, self.plotFieldForm)
+        self.WorkSpace.addFields(name, self.stm.removeField, self.plotFieldForm)
 
     def addCurrentWidget(self, name):
-        self.ElementsColumn.addCurrent(name, self.stm.removeCurrent, self.plotCurrentForm)
+        self.WorkSpace.addCurrent(name, self.stm.removeCurrent, self.plotCurrentForm)
 
     def addSFieldWidget(self, name):
-        self.ElementsColumn.addSPOFields(name, self.stm.removeScalarField, self.plotSFieldForm)
+        self.WorkSpace.addSPOFields(name, self.stm.removeScalarField, self.plotSFieldForm)
     
     ### Functionalities: Adding Elements 
 
@@ -690,7 +687,7 @@ class MainWidget(QWidget):
     ##
     # Shows tube frame form
     def initTubeFrameForm(self):
-        self.setForm(fData.initTubeFrameInp(), readAction=self.initTubeFrameAction, okText="Initialize frame")
+        self.setForm(fData.initTubeFrameInp(), readAction=self.initTubeFrameAction, okText="Add frame")
     
     ##
     # Reads form and adds a tube frame to system
@@ -708,7 +705,7 @@ class MainWidget(QWidget):
     ##
     # Shows form to initialize gaussian frame 
     def initGaussianFrameForm(self):
-        self.setForm(fData.initGaussianFrameInp(), readAction=self.initGaussianFrameAction, okText="Initialize frame")
+        self.setForm(fData.initGaussianFrameInp(), readAction=self.initGaussianFrameAction, okText="Add frame")
     
 
     ##
@@ -719,17 +716,7 @@ class MainWidget(QWidget):
 
             if not "seed" in GRTDict.keys():
                 GRTDict["seed"] = -1
-            
-        #try:
-        #    dial = SymDialog(dialStr)
 
-        #    self.mgr = TManager.Manager("G", callback=dial.accept)
-        #    t = self.mgr.new_gthread(target=self.stm.createGRTFrame, args=(GRTDict,))
-        #    
-        #    dial.setThread(t)
-
-        #    if dial.exec_():
-        #        self.addFrameWidget(GRTDict["name"])
       
             dialStr = f"Calculating Gaussian ray-trace frame {GRTDict['name']}..."
             worker = Worker(self.stm.createGRTFrame, GRTDict)
@@ -791,7 +778,7 @@ class MainWidget(QWidget):
     ##
     # Shows form to initialize gaussian beam 
     def initGaussBeamForm(self):
-        self.setForm(fData.initGaussianInp(self.stm.system), readAction=self.initGaussBeamAction, okText="Initialize beam")
+        self.setForm(fData.initGaussianInp(self.stm.system), readAction=self.initGaussBeamAction, okText="Add beam")
 
     ##
     # Reads form and adds a vectorial gaussian beam to system
@@ -810,7 +797,7 @@ class MainWidget(QWidget):
     ##
     # Shows form to initialize scalar gaussian beam TODO: klopt dit 
     def initSGaussBeamForm(self):
-        self.setForm(fData.initSGaussianInp(self.stm.system), readAction=self.initSGaussBeamAction, okText="Initialize beam")
+        self.setForm(fData.initSGaussianInp(self.stm.system), readAction=self.initSGaussBeamAction, okText="Add beam")
     
     ##
     # Reads form and adds a scalar gaussian beam to system
@@ -827,7 +814,7 @@ class MainWidget(QWidget):
     ##
     # Shows form to initialize a physical optics propagation
     def initPSBeamForm(self):
-        self.setForm(fData.initPSInp(self.stm.system), readAction=self.initPSBeamAction, okText="Initialize beam")
+        self.setForm(fData.initPSInp(self.stm.system), readAction=self.initPSBeamAction, okText="Add beam")
     
     
     ##
@@ -847,7 +834,7 @@ class MainWidget(QWidget):
     ##
     # Shows form to initialize a scalar point source beam
     def initSPSBeamForm(self):
-        self.setForm(fData.initSPSInp(self.stm.system), readAction=self.initSPSBeamAction, okText="Initialize beam")
+        self.setForm(fData.initSPSInp(self.stm.system), readAction=self.initSPSBeamAction, okText="Add beam")
     
 
     ##
@@ -882,8 +869,6 @@ class MainWidget(QWidget):
                                         project=plotFieldDict["project"], ret=True)
             self.addPlot(fig, f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
 
-            self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
-        
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -905,7 +890,6 @@ class MainWidget(QWidget):
                                         project=plotSFieldDict["project"], ret=True)
             self.addPlot(fig, f'{plotSFieldDict["field"]} - {plotSFieldDict["project"]}')
 
-            self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -928,7 +912,6 @@ class MainWidget(QWidget):
                                         plotFieldDict["comp"], project=plotFieldDict["project"], ret=True)
             self.addPlot(fig, f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
 
-            # self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)

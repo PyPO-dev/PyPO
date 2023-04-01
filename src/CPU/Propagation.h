@@ -878,7 +878,7 @@ std::complex<T> Propagation<T, U, V, W>::fieldScalarAtPoint(V *cs,
  *
  * Run the propagateBeam_JM function in parallel blocks.
  *
- * @param cs Pointer to reflcontainer or reflontainerf object containing source grids.
+ * @param cs Pointer to reflcontainer or reflcontainerf object containing source grids.
  * @param ct Pointer to reflcontainer or reflcontainerf object containing target grids.
  * @param currents Pointer to c2Bundle or c2Bundlef object containing source currents.
  * @param res Pointer to c2Bundle or c2Bundlef object to be filled with calculation results.
@@ -921,7 +921,7 @@ void Propagation<T, U, V, W>::parallelProp_JM(V *cs, V *ct,
  *
  * Run the propagateBeam_EH function in parallel blocks.
  *
- * @param cs Pointer to reflcontainer or reflontainerf object containing source grids.
+ * @param cs Pointer to reflcontainer or reflcontainerf object containing source grids.
  * @param ct Pointer to reflcontainer or reflcontainerf object containing target grids.
  * @param currents Pointer to c2Bundle or c2Bundlef object containing source currents.
  * @param res Pointer to c2Bundle or c2Bundlef object to be filled with calculation results.
@@ -964,7 +964,7 @@ void Propagation<T, U, V, W>::parallelProp_EH(V *cs, V *ct,
  *
  * Run the propagateBeam_JMEH function in parallel blocks.
  *
- * @param cs Pointer to reflcontainer or reflontainerf object containing source grids.
+ * @param cs Pointer to reflcontainer or reflcontainerf object containing source grids.
  * @param ct Pointer to reflcontainer or reflcontainerf object containing target grids.
  * @param currents Pointer to c2Bundle or c2Bundlef object containing source currents.
  * @param res Pointer to c4Bundle or c4Bundlef object to be filled with calculation results.
@@ -1006,7 +1006,7 @@ void Propagation<T, U, V, W>::parallelProp_JMEH(V *cs, V *ct,
  *
  * Run the propagateBeam_EHP function in parallel blocks.
  *
- * @param cs Pointer to reflcontainer or reflontainerf object containing source grids.
+ * @param cs Pointer to reflcontainer or reflcontainerf object containing source grids.
  * @param ct Pointer to reflcontainer or reflcontainerf object containing target grids.
  * @param currents Pointer to c2Bundle or c2Bundlef object containing source currents.
  * @param res Pointer to c2rBundle or c2rBundlef object to be filled with calculation results.
@@ -1049,7 +1049,7 @@ void Propagation<T, U, V, W>::parallelProp_EHP(V *cs, V *ct,
  *
  * Run the propagateScalarBeam function in parallel blocks.
  *
- * @param cs Pointer to reflcontainer or reflontainerf object containing source grids.
+ * @param cs Pointer to reflcontainer or reflcontainerf object containing source grids.
  * @param ct Pointer to reflcontainer or reflcontainerf object containing target grids.
  * @param field Pointer to arrC1 or arrC1f object containing source currents.
  * @param res Pointer to arrC1 or arrC1f object to be filled with calculation results.
@@ -1257,7 +1257,7 @@ std::array<std::complex<T>, 3> Propagation<T, U, V, W>::farfieldAtPoint(V *cs,
  *
  * Run the propagateToFarField function in parallel blocks.
  *
- * @param cs Pointer to reflcontainer or reflontainerf object containing source grids.
+ * @param cs Pointer to reflcontainer or reflcontainerf object containing source grids.
  * @param ct Pointer to reflcontainer or reflcontainerf object containing target grids.
  * @param currents Pointer to c2Bundle or c2Bundlef object containing source currents.
  * @param res Pointer to c2Bundle or c2Bundlef object to be filled with calculation results.

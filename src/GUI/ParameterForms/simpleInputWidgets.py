@@ -123,9 +123,8 @@ class VectorInput(inputWidgetInterface):
         self.editsWid = QWidget()
         self.editsWid.setLayout(editLayout)
 
-        self.label = MyLabel("Unnamed")
         if self.inputDescription.outputName:
-            self.label = makeLabelFromString(self.inputDescription.label) ##TODO: @Maikel does this work with no outputName?
+            self.label = makeLabelFromString(self.inputDescription.label) 
         self.layout.addRow(self.label, self.editsWid)
 
     def prefill(self):
@@ -154,14 +153,14 @@ class VectorInput(inputWidgetInterface):
             for i in self.inputs:
                 if i.text() == "":
                     raise EmptyFieldException(f"Empty field at {self.inputDescription.label}")
-                l.append(self.enumToType(self.inputDescription.inType)(i.text().replace(",",".")))###TODO: incomplete Conversion
+                l.append(self.enumToType(self.inputDescription.inType)(i.text().replace(",",".")))###TODO: incomplete Conversion @Maikel
             if len(l)>1:        
                 if self.inputDescription.oArray:
                     l = array(l)
             else:
                 l = l[0]
             l = {self.inputDescription.outputName:l}
-            return l ###TODO: Fishy stuff here!!!
+            return l
         except EmptyFieldException as e:
             raise e
         except:

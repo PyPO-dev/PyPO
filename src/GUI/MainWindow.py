@@ -328,14 +328,14 @@ class MainWidget(QWidget):
     ##
     # plots all elements of the system including ray traces in one plot
     def plotSystemWithRaytrace(self):
-        framelist = []
+        frameList = []
 
         if self.stm.frames:
             for key in self.stm.frames.keys():
-                framelist.append(key)
+                frameList.append(key)
         
         if self.stm.system:
-            figure, _ = self.stm.plotSystem(ret = True, show=False, save=False, RTframes=framelist)
+            figure, _ = self.stm.plotSystem(ret = True, show=False, save=False, RTframes=frameList)
         
         else:
             figure = None
@@ -423,13 +423,13 @@ class MainWidget(QWidget):
             self.clog.error(err)
     
     def addGroupForm(self):
-        elems = []
+        elements = []
         # print(self.stm.system)
         for element in self.stm.system.values():
             # print(element)
             if element["gmode"] != 2:
-                elems.append(element["name"])
-        self.setForm(fData.addGroupForm(elems), self.addGroupAction)
+                elements.append(element["name"])
+        self.setForm(fData.addGroupForm(elements), self.addGroupAction)
 
     def addGroupAction(self):
         try:
@@ -471,7 +471,7 @@ class MainWidget(QWidget):
             elif section == "groups":
                 self.addGroupWidget(key)
 
-    ### Functionalities: Adding Elements in gui
+    ### Functionalities: Adding widgets to workspace
     # TODO:doc
     def addReflectorWidget(self, name):
         self.WorkSpace.addReflector(name, self.removeElement, 
@@ -795,7 +795,7 @@ class MainWidget(QWidget):
             self.clog.error(err)
     
     ##
-    # Shows form to initialize scalar gaussian beam TODO: klopt dit 
+    # Shows form to initialize a scalar gaussian beam TODO: is this correct??
     def initSGaussBeamForm(self):
         self.setForm(fData.initSGaussianInp(self.stm.system), readAction=self.initSGaussBeamAction, okText="Add beam")
     
@@ -1201,7 +1201,7 @@ class PyPOMainWindow(QMainWindow):
         hyperbolaAction.triggered.connect(self.mainWid.addQuadricForm)
         reflectorSelector.addAction(hyperbolaAction)
 
-        # transformElementsAction = QAction("Transform elements", self) ##TODO deprecated? There is no longer a form for this action
+        # transformElementsAction = QAction("Transform elements", self) ##TODO deprecated? There is no longer a form for this action @arend
         # transformElementsAction.setStatusTip("Transform a group of elements.")
         # transformElementsAction.triggered.connect(self.mainWid.transformationMultipleForm)
         # ElementsMenu.addAction(transformElementsAction)

@@ -180,7 +180,7 @@ class DynamicDropdownWidget(QWidget):
         self.layout.addRow(self.stackedWidget)
         for childInDesList in self.inputDescription.subDict.values():
             child = FormGenerator(childInDesList, addButtons=False, readAction=None)
-            child.setContentsMargins(0,0,0,0) ###TODO: is this necessory??
+            child.setContentsMargins(0,0,0,0)
             self.stackedWidget.addWidget(child)
             self.children.append(child)
 

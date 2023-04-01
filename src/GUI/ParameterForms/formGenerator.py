@@ -104,7 +104,7 @@ class FormGenerator(QWidget):
         
         self.layout.addRow(btnWidget)
 
-        btnWidget.setContentsMargins(0,4,20,30)
+        btnWidget.setContentsMargins(0,4,20,10)
         for btn in [addBtn, closeBtn, clearBtn]:
             btn.setFixedSize(110, 30)
         spacerWidget = QWidget()

@@ -34,7 +34,7 @@ class Workspace(QTabWidget):
         scroll.setWidget(wid)
         scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        scroll.setWidgetResizable(True)
+        # scroll.setWidgetResizable(True)
         scroll.setContentsMargins(0,0,0,0)
         scroll.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         return scroll

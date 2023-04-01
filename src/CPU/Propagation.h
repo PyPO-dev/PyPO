@@ -200,7 +200,7 @@ Propagation<T, U, V, W>::Propagation(T k, int numThreads, int gs, int gt, T epsi
  * @param cs Pointer to reflcontainer or reflcontainerf object containing source grids.
  * @param ct Pointer to reflcontainer or reflcontainerf object containing target grids.
  * @param currents Pointer to c2Bundle or c2Bundlef object containing currents on source.
- * @param res Pointer to c2Bundle or c2Bundlef object, to be filled with caculation results.
+ * @param res Pointer to c2Bundle or c2Bundlef object, to be filled with calculation results.
  *
  * @see reflcontainer
  * @see reflcontainerf
@@ -257,7 +257,7 @@ void Propagation<T,U, V, W>::propagateBeam_JM(int start, int stop,
         // Calculate total incoming E and H field at point on target
         beam_e_h = fieldAtPoint(cs, currents, point);
 
-        // Calculate normalised incoming poynting vector.
+        // Calculate normalized incoming poynting vector.
         ut.conj(beam_e_h[1], temp1);                        // h_conj
         ut.ext(beam_e_h[0], temp1, temp2);                  // e_out_h
 

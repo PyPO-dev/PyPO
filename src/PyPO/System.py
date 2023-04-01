@@ -789,9 +789,9 @@ class System(object):
 
         for _name in names:
             check_elemSystem(_name, self.system, self.clog, extern=True)
-        
+
         self.groups[name_group] = {
-                "members"   : names,
+                "members"   : list(names),
                 "pos"       : pos,
                 "ori"       : ori,
                 "snapshots" : {}
@@ -894,6 +894,11 @@ class System(object):
     def removeElement(self, *name):
         for n in name:
             check_elemSystem(n, self.system, self.clog, extern=True)
+            print(self.groups)
+            for group in self.groups.values():
+                print(type(group))
+                if n in group["members"]:
+                    group["members"].remove(n)
             del self.system[n]
         self.clog.info(f"Removed element {name} from system.")
     

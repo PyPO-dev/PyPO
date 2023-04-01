@@ -1,57 +1,20 @@
-from PyQt5.QtWidgets import QLabel, QApplication, QWidget, QHBoxLayout, QMainWindow, \
-                                    QPushButton, QSizePolicy, QDialog, \
-                                    QAction,QVBoxLayout, QGridLayout
-                                        
+from PyQt5.QtWidgets import QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout
 from PyQt5.QtCore import Qt
-from src.GUI.selfClosingDialog import selfClosingDialog
+                                        
+from src.GUI.Dialogs import selfClosingDialog
 from src.GUI.utils import MyButton
-import sys
-sys.path.append('../')
-sys.path.append('../../')
+from src.GUI.Dialogs import RemoveElementDialog
 
+##
+# @file Defines ElementWidget and its subclasses for the workspace.
 
-
-class SymDialog(QDialog):
-    def __init__(self, stopSlot, clog, msg=None):
-        self.msg = "" if msg is None else msg
-        super().__init__()
-
-        self.clog = clog
-
-        layout = QGridLayout()
-        abortBtn = QPushButton("Abort")
-        abortBtn.clicked.connect(self.reject)
-        abortBtn.clicked.connect(stopSlot)
-        layout.addWidget(QLabel(self.msg), 0,0)
-        layout.addWidget(abortBtn, 1,0)
-        self.setLayout(layout)
-        layout.addWidget(QLabel(self.msg), 0,0)
-        layout.addWidget(abortBtn, 1,0)
-        self.setLayout(layout)
-        
-    def setThread(self, thread):
-        self.thread = thread
-
-    def killThread(self):
-        self.thread.exit()
-        self.reject()
-    def reject(self):
-        self.clog.info("ABORTED.")
-        super().reject()
-
-class RemoveElementDialog(QDialog):
-    def __init__(self, elementName):
-        super().__init__()
-        layout = QGridLayout()
-        okBtn = QPushButton("Ok")
-        okBtn.clicked.connect(self.accept)
-        cancelBtn = QPushButton("Cancel")
-        cancelBtn.clicked.connect(self.reject)
-        layout.addWidget(QLabel("Do you want to delete element %s?" %(elementName)), 0,0,1,2)
-        layout.addWidget(cancelBtn, 1,0)
-        layout.addWidget(okBtn, 1,1)
-        self.setLayout(layout)
-
+##
+# Defines elementWidgets form the workspace.
+# 
+# Defines ElementWidgets consisting of a name label and an options button. These element widgets are 
+# subclassed into their own type and styled in a distinct color in style.css. The subclasses handle 
+# passing the required parameters to the parent. The parent accepts all possible option (actions) that 
+# could be given by a subclass. The parent should have a function for each of the possible action.  
 class ElementWidget(QWidget):
     def __init__ (self, name, plotAction, removeAction, transformAction = None, RMSAction = None, 
                     snapAction = None, copyAction = None, removeFromTree = None, p=None):
@@ -62,23 +25,23 @@ class ElementWidget(QWidget):
         self.removeFromTree = removeFromTree
 
         self.actions = {
-            "plot": self.plot,
-            "remove": self.remove
+            "Plot": self.plot,
+            "Remove": self.remove
         }
         if transformAction:
             self.transformAction = transformAction
-            self.actions["transform"] = self.transform
+            self.actions["Transform"] = self.transform
         if RMSAction:
             self.RMSFrameAction = RMSAction
             self.actions["RMS"] = self.RMSFrame
 
         if snapAction:
             self.snapAction = snapAction
-            self.actions["snapshot"] = self.snap
+            self.actions["Snapshot"] = self.snap
 
         if copyAction:
             self.copyAction = copyAction
-            self.actions["copy"] = self.copy
+            self.actions["Copy"] = self.copy
         
 
         self.name = name
@@ -114,8 +77,8 @@ class ElementWidget(QWidget):
             dlgLayout.addWidget(btn)
 
         self.dlg.setWindowFlag(Qt.FramelessWindowHint)
-        posi = self.mapToGlobal(self.btn.pos())
-        self.dlg.setGeometry(posi.x(), posi.y() ,100,80)
+        position = self.mapToGlobal(self.btn.pos())
+        self.dlg.setGeometry(position.x(), position.y() ,100,80)
         self.dlg.show()
         
     def _closeOptionsMenu(self):
@@ -151,7 +114,7 @@ class ElementWidget(QWidget):
 
 
 class ReflectorWidget(ElementWidget):
-    def __init__(self, name, removeAction, transformAction, plotAction, snapAction, copyAction, removeFromTree=None, p=None):
+    def __init__(self, name, removeAction, transformAction, plotAction, snapAction, copyAction, removeFromTree=None, p=None): ##TODO: rename removeFromTree to remove?
         super().__init__(name, plotAction, removeAction, transformAction=transformAction, 
                 removeFromTree=removeFromTree, snapAction=snapAction, copyAction=copyAction, p=p)
 

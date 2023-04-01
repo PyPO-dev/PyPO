@@ -1,21 +1,13 @@
 import sys
 from PyQt5.QtWidgets import QApplication
 from src.GUI import *
-from src.GUI.Acccordion import Accordion
+from src.GUI.Accordion import Accordion
 from src.GUI.ElementWidget import ElementWidget
 from src.GUI.ParameterForms.simpleInputWidgets import ElementSelectionWidget
 import traceback
 
 from src.GUI.WorkSpace import Workspace
-# from src.GUI.selfClosingDialog import *
-# from src.GUI.selfClosingDialog_HoverableBtn import *
-# from src.GUI.PlotScreen import *
-# from src.GUI.parabolaformInWidgets import *
-# from src.GUI.MPLCanvas import *
-# from src.GUI.MainWindow import *
-# from src.GUI.MainWidget import *
-# from src.GUI.ElementWidget_Systems import *
-# from src.GUI.ElementsColumn implambda x :print(x)t *
+
 
 app = QApplication(sys.argv)
 

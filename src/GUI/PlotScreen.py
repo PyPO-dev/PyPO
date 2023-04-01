@@ -11,6 +11,8 @@ class PlotScreen(qtw.QWidget):
         self.canvas = mplc.MplCanvas(fig)
         NavTB = NavigationToolbar(self.canvas, self)
 
+        # self.setFixedHeight(400)
+
         layout = qtw.QVBoxLayout(self)
         layout.addWidget(NavTB)
         layout.addWidget(self.canvas)

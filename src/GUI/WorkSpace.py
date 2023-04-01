@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QTabWidget, QScrollArea, QVBoxLayout
 from PyQt5.QtCore import Qt
 from src.GUI.ElementWidget import ReflectorWidget, GroupWidget, FrameWidget, CurrentWidget, FieldsWidget, CurrentWidget, SFieldsWidget
-from src.GUI.Acccordion import Accordion
+from src.GUI.Accordion import Accordion
 
 class Workspace(QTabWidget):
     def __init__(self, parent=None):

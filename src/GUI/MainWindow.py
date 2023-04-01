@@ -15,8 +15,7 @@ from src.GUI.ParameterForms.InputDescription import InputDescription
 from src.GUI.utils import inType
 import src.GUI.ParameterForms.formData as fData
 from src.GUI.PlotScreen import PlotScreen
-from src.GUI.archive.TransformationWidget import TransformationWidget
-from src.GUI.Acccordion import Accordion
+from src.GUI.Accordion import Accordion
 from src.GUI.ElementWidget import ReflectorWidget, FrameWidget, FieldsWidget, CurrentWidget, SFieldsWidget, SymDialog
 from src.GUI.Console import ConsoleGenerator
 from src.GUI.Worker import Worker, GWorker
@@ -74,9 +73,9 @@ class MainWidget(QWidget):
         self.clog.info(f"STARTED PyPO GUI SESSION.")
 
         # init layout
-        self.grid.setContentsMargins(0,0,0,0)
+        self.grid.setContentsMargins(5,5,5,5)
         # self.grid.setMargin(0)
-        self.grid.setSpacing(0)
+        self.grid.setSpacing(5)
 
         self._mkElementsColumn()
         self._mkPlotScreen()
@@ -94,8 +93,14 @@ class MainWidget(QWidget):
     ##
     # @guiSetup
     # Adds a widget to the layout of PyPOMainWidget
-    def addToWindowGrid(self, widget, param):
+    def addToWindowGrid(self, widget, param, vStretch= 0, hStretch= 0):
+        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.grid.addWidget(widget, param[0], param[1], param[2], param[3])
+
+        if vStretch:
+            self.grid.setRowStretch(param[0], vStretch)
+        if hStretch:
+            self.grid.setColumnStretch(param[1],hStretch)
 
 
     ##  
@@ -104,12 +109,12 @@ class MainWidget(QWidget):
     # 
     def _mkConsole(self):
         self.console = ConsoleGenerator.get()
-        self.addToWindowGrid(self.console, self.GPConsole)
+        self.addToWindowGrid(self.console, self.GPConsole,vStretch=1)
         self.cursor = QTextCursor(self.console.document())
         
         
         # self.console.appendPlainText("********** PyPO Console **********")
-        self.addToWindowGrid(self.console, self.GPConsole)
+        # self.addToWindowGrid(self.console, self.GPConsole)
     
     ##
     # @guiSetup
@@ -131,8 +136,8 @@ class MainWidget(QWidget):
         self.PlotWidget.setTabsClosable(True)
         self.PlotWidget.setTabShape(QTabWidget.Rounded)
         self.PlotWidget.tabCloseRequested.connect(self.closePlotTab)
-        self.PlotWidget.setMaximumHeight(550)
-        self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
+        # self.PlotWidget.setMaximumHeight(700)
+        self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen,vStretch=2)
 
     ##
     # @guiSetup
@@ -923,7 +928,7 @@ class MainWidget(QWidget):
                                         plotFieldDict["comp"], project=plotFieldDict["project"], ret=True)
             self.addPlot(fig, f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
 
-            self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
+            # self.addToWindowGrid(self.PlotWidget, self.GPPlotScreen)
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -1160,6 +1165,7 @@ class PyPOMainWindow(QMainWindow):
     def __init__(self, parent=None):
         """Initializer."""
         super().__init__(parent)
+        self.setWindowTitle("PyPO")
         self.mainWid = MainWidget()
         self.mainWid.setContentsMargins(0,0,0,0)
         # self.setStyleSheet("background:red")

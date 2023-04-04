@@ -865,9 +865,16 @@ class MainWidget(QWidget):
     def plotFieldAction(self):
         try:
             plotFieldDict = self.ParameterWid.read()
-            fig, _ = self.stm.plotBeam2D(plotFieldDict["field"], plotFieldDict["comp"], 
-                                        project=plotFieldDict["project"], ret=True)
-            self.addPlot(fig, f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
+            if plotFieldDict["plot_type"] == "Pattern":
+                fig, _ = self.stm.plotBeam2D(plotFieldDict["field"], plotFieldDict["comp"], 
+                                            project=plotFieldDict["project"], ret=True)
+                self.addPlot(fig, f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
+
+            else:
+                fig, _ = self.stm.plotBeamCut(plotFieldDict["field"], plotFieldDict["comp"], 
+                                             ret=True)
+                self.addPlot(fig, f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}')
+
 
         except Exception as err:
             print(err)
@@ -908,8 +915,8 @@ class MainWidget(QWidget):
     def plotCurrentAction(self):
         try:
             plotFieldDict = self.ParameterWid.read()
-            fig, _ = self.stm.plotBeam2D(plotFieldDict["field"], 
-                                        plotFieldDict["comp"], project=plotFieldDict["project"], ret=True)
+            fig, _ = self.stm.plotBeam2D(plotFieldDict["field"], plotFieldDict["comp"], 
+                                        project=plotFieldDict["project"], ret=True)
             self.addPlot(fig, f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
 
         except Exception as err:
@@ -1322,7 +1329,9 @@ class PyPOMainWindow(QMainWindow):
         FocusFind.triggered.connect(self.mainWid.setFocusFindForm)
         ToolsMenu.addAction(FocusFind)
 
-
+        HPBW = QAction("HPBW", self)
+        ToolsMenu.addAction(HPBW)
+        
         #findRTfocusAction.triggered.connect(self.mainWid.set)
 
 

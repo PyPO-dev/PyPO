@@ -427,7 +427,7 @@ class System(object):
     # @param pivot Numpy ndarray of length 3, containing pivot x, y and z co-ordinates, in mm. Defaults to pos. 
     # @param obj Whether the name corresponds to a single element or group.
     # @param mode Apply rotation relative ('relative') to current orientation, or rotate to specified orientation ('absolute').
-    def rotateGrids(self, name, rotation, obj="element", mode="relative", pivot=None):
+    def rotateGrids(self, name, rotation, obj="element", mode="relative", pivot=None, keep_pol=False):
 
         if obj == "element":
             check_elemSystem(name, self.system, self.clog, extern=True)
@@ -453,7 +453,8 @@ class System(object):
                 self.system[name]["pos"] = (Rtot @ np.append(self.system[name]["pos"], 1))[:-1]
                 self.system[name]["ori"] = Rtot[:-1, :-1] @ self.system[name]["ori"]
 
-                self._checkBoundPO(name, Rtot)
+                if not keep_pol:
+                    self._checkBoundPO(name, Rtot)
 
                 self.clog.info(f"Rotated element {name} to {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
@@ -464,7 +465,8 @@ class System(object):
                 self.system[name]["pos"] = (MatRotate(rotation, pivot=pivot) @ np.append(self.system[name]["pos"], 1))[:-1]
                 self.system[name]["ori"] = MatRotate(rotation)[:-1, :-1] @ self.system[name]["ori"]
                 
-                self._checkBoundPO(name, MatRotate(rotation))
+                if not keep_pol:
+                    self._checkBoundPO(name, MatRotate(rotation))
             
                 self.clog.info(f"Rotated element {name} by {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
@@ -491,7 +493,8 @@ class System(object):
                     self.system[elem]["pos"] = (Rtot @ np.append(self.system[elem]["pos"], 1))[:-1]
                     self.system[elem]["ori"] = Rtot[:-1, :-1] @ self.system[elem]["ori"]
                     
-                    self._checkBoundPO(elem, Rtot)
+                    if not keep_pol:
+                        self._checkBoundPO(elem, Rtot)
 
                 self.groups[name]["pos"] = (Rtot @ np.append(self.groups[name]["pos"], 1))[:-1]
                 self.groups[name]["ori"] = Rtot[:-1, :-1] @ self.groups[name]["ori"]
@@ -505,7 +508,8 @@ class System(object):
                     self.system[elem]["pos"] = (MatRotate(rotation, pivot=pivot) @ np.append(self.system[elem]["pos"], 1))[:-1]
                     self.system[elem]["ori"] = MatRotate(rotation)[:-1, :-1] @ self.system[elem]["ori"]
                     
-                    self._checkBoundPO(elem, MatRotate(rotation))
+                    if not keep_pol:
+                        self._checkBoundPO(elem, MatRotate(rotation))
 
                 self.groups[name]["pos"] = (MatRotate(rotation, pivot=pivot) @ np.append(self.groups[name]["pos"], 1))[:-1]
                 self.groups[name]["ori"] = MatRotate(rotation)[:-1, :-1] @ self.groups[name]["ori"]
@@ -1391,13 +1395,18 @@ class System(object):
     #
     # @returns popt Fitted beam parameters.
     # @returns perr Standard deviation of fitted parameters.
-    def fitGaussAbs(self, name_field, comp, thres=None, mode=None, full_output=False):
-        check_fieldSystem(name_field, self.fields, self.clog, extern=True)
-        thres = -11 if thres is None else thres
-        mode = "dB" if mode is None else mode
+    def fitGaussAbs(self, name_field, comp, objType="fields", thres=None, mode=None, full_output=False):
+        if objType == "fields":
+            check_fieldSystem(name_field, getattr(self, objType), self.clog, extern=True)
+        else:
+            check_currentSystem(name_field, getattr(self, objType), self.clog, extern=True)
 
-        field = getattr(self.fields[name_field], comp)
-        surfaceObj = self.system[self.fields[name_field].surf]
+        thres = -11 if thres is None else thres
+        mode = "linear" if mode is None else mode
+
+        surfaceObj = self.system[getattr(self, objType)[name_field].surf]
+        field = np.absolute(getattr(getattr(self, objType)[name_field], comp))
+
         popt, perr = fgs.fitGaussAbs(field, surfaceObj, thres, mode)
 
         Psi = scalarfield(fgs.generateGauss(popt, surfaceObj, mode="linear"))
@@ -1411,65 +1420,107 @@ class System(object):
     def calcMainBeam(self, name_field, comp, thres=None, mode=None):
         check_fieldSystem(name_field, self.fields, self.clog, extern=True)
         thres = -11 if thres is None else thres
-        mode = "dB" if mode is None else mode
+        mode = "linear" if mode is None else mode
 
         _thres = self.copyObj(thres)
 
-        eff = 1
-
-        while eff >= 1:
-            if thres > _thres:
-                self.clog.warning(f"Could not fit at {_thres} dB level. Raising by 1 dB.")
-            self.fitGaussAbs(name_field, comp, thres, mode)
-            field = getattr(self.fields[name_field], comp)
-            surfaceObj = self.system[self.fields[name_field].surf]
-
-            #self.plotBeam2D(name_field, comp="Ey", vmin=-30, vmax=0)
-            #self.plotBeam2D(f"fitGauss_{name_field}", vmin=-30, vmax=0)
-            
-            eff = effs.calcMainBeam(field, surfaceObj, self.scalarfields[f"fitGauss_{name_field}"].S)
-            thres += 1
+        self.fitGaussAbs(name_field, comp, thres, mode)
+        field = getattr(self.fields[name_field], comp)
+        surfaceObj = self.system[self.fields[name_field].surf]
+        
+        eff = effs.calcMainBeam(field, surfaceObj, self.scalarfields[f"fitGauss_{name_field}"].S)
         return eff
     
-    def calcBeamCuts(self, name_field, comp, phi=0, center=True, align=True):
-        check_fieldSystem(name_field, self.fields, self.clog, extern=True)
-        name_surf = self.fields[name_field].surf
-        field = np.absolute(getattr(self.fields[name_field], comp))
+    def calcBeamCuts(self, name_field, comp, objType="fields", phi=0, center=True, align=True, norm=False):
+        if objType == "fields":
+            check_fieldSystem(name_field, getattr(self, objType), self.clog, extern=True)
+        else:
+            check_currentSystem(name_field, getattr(self, objType), self.clog, extern=True)
+        
+        name_surf = getattr(self, objType)[name_field].surf
+        field = np.absolute(getattr(getattr(self, objType)[name_field], comp))
 
         self.snapObj(name_surf, "__pre")
         
-        if center or align:
-            popt, perr = self.fitGaussAbs(name_field, comp, mode="linear", full_output=True)
-            print(popt) 
+        popt, perr = self.fitGaussAbs(name_field, comp, objType=objType, mode="linear", full_output=True)
+        #print([x * 3600 for x in popt])        
+        
+        if center:
+            self.translateGrids(name_surf, np.array([-popt[2], -popt[3], 0]))
+        
+        grids_orig = self.generateGrids(name_surf, spheric=False)
+            
+        
+        if align:
             if popt[0] > popt[1]:
                 angf = 90
             else:
                 angf = 0
             
-            if center:
-                self.translateGrids(name_surf, np.array([-popt[2], -popt[3], 0]))
-            
             if align:
-                self.rotateGrids(name_surf, np.array([0, 0, angf + np.degrees(-popt[4])]), pivot=world.ORIGIN)
+                self.rotateGrids(name_surf, np.array([0, 0, angf + np.degrees(-popt[4])]), pivot=world.ORIGIN, keep_pol=False)
         
+
+        self.rotateGrids(name_surf, np.array([0, 0, phi]), pivot=world.ORIGIN, keep_pol=False)
+
         grids_transf = self.generateGrids(name_surf, spheric=False)
-
+        
+        middle = lambda x: [int(np.floor(d/2)) for d in x.shape]
+        #idx_c = middle(field)
+        idx_c = np.argwhere(np.isclose(grids_transf.x, 0) & np.isclose(grids_transf.y, 0))
         idx_c = np.unravel_index(np.argmax(field), field.shape)
-        x_cut = self.copyObj(20 * np.log10(field[:, idx_c[1]] / np.max(field)))
-        y_cut = self.copyObj(20 * np.log10(field[idx_c[0], :] / np.max(field)))
+        #print(idx_c)
+        if not norm:
+            x_cut = self.copyObj(20 * np.log10(field[:, idx_c[1]] / np.max(field)))
+            y_cut = self.copyObj(20 * np.log10(field[idx_c[0], :] / np.max(field)))
+            #x_cut = self.copyObj(20 * np.log10(field[idx_c[0], :] / np.max(field)))
+            #y_cut = self.copyObj(20 * np.log10(field[:, idx_c[1]] / np.max(field)))
+        
+        else:
+            x_cut = self.copyObj(20 * np.log10(field[:, idx_c[1]] / np.max(np.absolute(getattr(self.fields[name_field], norm)))))
+            y_cut = self.copyObj(20 * np.log10(field[idx_c[0], :] / np.max(np.absolute(getattr(self.fields[name_field], norm)))))
 
-        x_strip = self.copyObj(grids_transf.x[:, idx_c[1]])
-        y_strip = self.copyObj(grids_transf.y[idx_c[0], :])
+        #pt.plot(grids_transf.x[:,0] * 3600)
+        #pt.imshow(grids_transf.x*3600)
+        #pt.show()
+        #x_strip = self.copyObj(grids_transf.x[idx_c[0], :])
+        #y_strip = self.copyObj(grids_transf.y[:, idx_c[1]])
+        x_strip = self.copyObj(grids_orig.x[:, idx_c[1]])
+        y_strip = self.copyObj(grids_orig.y[idx_c[0], :])
 
-        pt.plot(x_cut)
-        pt.plot(y_cut)
-        pt.show()
+        #print(x_strip*3600)
 
         self.revertToSnap(name_surf, "__pre")
         self.deleteSnap(name_surf, "__pre")
 
         return x_cut, y_cut, x_strip, y_strip
-    
+   
+    def plotBeamCut(self, name_field, comp, objType="fields", comp_cross=None, vmin=None, vmax=None, units='', name="", show=True, save=False, ret=False):
+        E_cut, H_cut, E_strip, H_strip = self.calcBeamCuts(name_field, comp, objType)
+
+        #if comp_cross is not None:
+            #cr45_cut, cr135_cut, cr45_strip, cr135_strip = self.calcBeamCuts(name_field, comp_cross, phi=45, align=False, center=False, norm="Ex")
+
+        default = "deg"
+
+        unitl = self._units(units, default)
+
+        vmin = np.min([np.min(E_cut), np.min(H_cut)]) if vmin is None else vmin
+        vmax = np.max([np.max(E_cut), np.max(H_cut)]) if vmax is None else vmax
+        
+        fig, ax = plt.plotBeamCut(E_cut, H_cut, E_strip, H_strip, vmin, vmax, unitl)
+
+        if ret:
+            return fig, ax
+
+        elif save:
+            pt.savefig(fname=self.savePath + '{}_EH_cut.jpg'.format(name),
+                        bbox_inches='tight', dpi=300)
+            pt.close()
+
+        elif show:
+            pt.show()
+
     def calcHPBW(self, name_field, comp, interp=50):
         x_cut, y_cut, x_strip, y_strip = self.calcBeamCuts(name_field, comp)#, center=False, align=False)
 
@@ -1485,8 +1536,7 @@ class System(object):
         HPBW_E = np.mean(np.absolute(x_interp[mask_x])) * 2 * 3600
         HPBW_H = np.mean(np.absolute(y_interp[mask_y])) * 2 * 3600
 
-        self.clog.info(f"E-plane HPBW = {HPBW_E} degrees.")
-        self.clog.info(f"H-plane HPBW = {HPBW_H} degrees.")
+        return HPBW_E, HPBW_H
 
     ##
     # Generate point-source PO fields and currents.
@@ -1607,9 +1657,12 @@ class System(object):
     # Generate a 2D plot of a field or current.
     #
     # @param name_obj Name of field or current to plot.
-    # @param comp Component of field or current to plot.
+    # @param comp Component of field or current to plot. 
+    # @param contour A PyPO field or current component to plot as contour.
+    # @param contour_comp Component of contour to plot as contour. If None, looks is scalarfields.
     # @param vmin Minimum amplitude value to display. Default is -30.
     # @param vmax Maximum amplitude value to display. Default is 0.
+    # @param levels Levels for contourplot.
     # @param show Show plot. Default is True.
     # @param amp_only Only plot amplitude pattern. Default is False.
     # @param save Save plot to /images/ folder.
@@ -1626,8 +1679,8 @@ class System(object):
     # @param ret Return the Figure and Axis object. Only called by GUI. Default is False.
     #
     # @see aperDict
-    def plotBeam2D(self, name_obj, comp=None,
-                    vmin=None, vmax=None, show=True, amp_only=False,
+    def plotBeam2D(self, name_obj, comp=None, contour=None, contour_comp=None,
+                    vmin=None, vmax=None, levels=None, show=True, amp_only=False,
                     save=False, interpolation=None, norm=True,
                     aperDict=None, mode='dB', project='xy',
                     units="", name="", titleA="Amp", titleP="Phase",
@@ -1654,7 +1707,21 @@ class System(object):
             
             if comp in self.JMcomplist:
                 field_comp = getattr(field, comp)
-
+        
+        if contour is not None:
+            if contour_comp is None:
+                contour_pl = self.scalarfields[contour].S
+            
+            else:
+                if contour_comp[0] == "E" or contour_comp[0] == "H":
+                    check_fieldSystem(contour, self.fields, self.clog, extern=True)
+                    contour_pl = getattr(self.fields[contour], contour_comp)
+            
+                elif contour_comp[0] == "J" or contour_comp[0] == "M":
+                    check_currentSystem(contour, self.currents, self.clog, extern=True)
+                    contour_pl = getattr(self.currents[contour], contour_comp)
+        else:
+            contour_pl = contour
 
         plotObject = self.system[name_surface]
         
@@ -1664,8 +1731,8 @@ class System(object):
 
         unitl = self._units(units, default)
         
-        fig, ax = plt.plotBeam2D(plotObject, field_comp,
-                        vmin, vmax, show, amp_only,
+        fig, ax = plt.plotBeam2D(plotObject, field_comp, contour_pl,
+                        vmin, vmax, levels, show, amp_only,
                         save, interpolation, norm,
                         aperDict, mode, project,
                         unitl, name, titleA, titleP, self.savePath, unwrap_phase)
@@ -2046,7 +2113,6 @@ class System(object):
                     bound_currents.append(key)
 
         if bound_fields:
-            self.clog.debug("hi")
             for field in bound_fields:
                 out = transformPO(self.fields[field], transf)
                 self.fields[field] = self.copyObj(out)

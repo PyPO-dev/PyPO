@@ -240,11 +240,17 @@ def initSGaussianInp(elemDict):
 
 def plotField(fieldName):
     complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
-    
     plotField = [
-            InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
-            InputDescription(inType.dropdown, "comp", label="Component", options = complist),
-            InputDescription(inType.xyzRadio, "project", label="Abscissa - ordinate")
+            InputDescription(inType.dynamicDropdown, "plot_type", label="Type", subDict = {
+                "Pattern" : [
+                    InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
+                    InputDescription(inType.dropdown, "comp", label="Component", options = complist),
+                    InputDescription(inType.xyzRadio, "project", label="Abscissa - ordinate")],
+                "Cross-sections" : [
+                    InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
+                    InputDescription(inType.dropdown, "comp", label="Component", options = complist),
+                    ]
+                })
             ]
 
     return plotField
@@ -253,7 +259,7 @@ def plotSField(fieldName, gmode):
     complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
     if gmode != 2:
         plotSField = [
-               InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
+                InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
                 InputDescription(inType.xyzRadio, "project", label="Abscissa - ordinate")
                 ]
 
@@ -269,9 +275,16 @@ def plotFarField(fieldName):
     complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
     
     plotField = [
-            InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
-            InputDescription(inType.dropdown, "comp", label="Component", options = complist),
-            InputDescription(inType.static, "project", staticValue="xy", hidden=True)
+            InputDescription(inType.dynamicDropdown, "plot_type", label="Type", subDict = {
+                "Pattern" : [
+                    InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
+                    InputDescription(inType.dropdown, "comp", label="Component", options = complist),
+                    InputDescription(inType.static, "project", staticValue="xy", hidden=True)],
+                "Cross-sections" : [
+                    InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
+                    InputDescription(inType.dropdown, "comp", label="Component", options = complist),
+                    ]
+                })
             ]
     return plotField
 
@@ -279,10 +292,9 @@ def plotCurrentOpt(fieldName):
     complist = ["Jx", "Jy", "Jz", "Mx", "My", "Mz"]
     
     plotCurrent = [
-            InputDescription(inType.static, "field", label="Current", staticValue=fieldName),
-            InputDescription(inType.dropdown, "comp", label="Component", options = complist),
-            InputDescription(inType.xyzRadio, "project", label="Abscissa - ordinate")
-            ]
+                    InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
+                    InputDescription(inType.dropdown, "comp", label="Component", options = complist),
+                    InputDescription(inType.xyzRadio, "project", label="Abscissa - ordinate")]
 
     return plotCurrent
 

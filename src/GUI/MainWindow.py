@@ -959,17 +959,26 @@ class MainWidget(QWidget):
 
 
     def runPOWorker(self, s_copy, runPODict, returnDict):
-        s_copy.runPO(runPODict)
+        try:
+            s_copy.runPO(runPODict)
 
-        returnDict["system"] = s_copy
+            returnDict["system"] = s_copy
+        except Exception as err:
+            print(err)
+            print_tb(err.__traceback__)
+            self.clog.error(err)
 
     def waiterFinished(self):
         # process.join()
-        print("waiter: Process joined")
+        try:
+            print("waiter: Process joined")
 
-        self.currentCalculationDialog.accept()
-        self._addToWidgets(self.currentCalculationDict)
-
+            self.currentCalculationDialog.accept()
+            self._addToWidgets(self.currentCalculationDict)
+        except Exception as err:
+            print(err)
+            print_tb(err.__traceback__)
+            self.clog.error(err)
     ##
     # Reads form propagates beam, runs calculation on another thread
     def propPOAction(self):
@@ -1011,30 +1020,28 @@ class MainWidget(QWidget):
             self.currentCalculationDialog = SymDialog(process.kill, self.clog, dialStr) 
             self.currentCalculationDict = propBeamDict
 
-            waiterTread = QThread()
+            waiterTread = QThread(parent=self)
             waiter = Waiter()
             waiter.setProcess(process)
             waiter.moveToThread(waiterTread)
             waiterTread.started.connect(waiter.run)
             waiter.finished.connect(waiter.deleteLater)
-            waiter.finished.connect(waiterTread.quit)
-            waiter.finished.connect(waiterTread.deleteLater)
+            # waiter.finished.connect(waiterTread.quit)
+            # waiter.finished.connect(waiterTread.deleteLater)
             waiter.finished.connect(self.waiterFinished)
 
             process.start()
             waiterTread.start()
-            self.currentCalculationDialog.exec_()
+            if self.currentCalculationDialog.exec_():
+                s_copy = returnDict["system"]
+                print(f"{s_copy = }")
+                self.stm.frames.update(s_copy.frames)
+                self.stm.fields.update(s_copy.fields)
+                self.stm.currents.update(s_copy.currents)
+                self.stm.scalarfields.update(s_copy.scalarfields)
 
-
-            s_copy = returnDict["system"]
-            print(f"{s_copy = }")
-            self.stm.frames.update(s_copy.frames)
-            self.stm.fields.update(s_copy.fields)
-            self.stm.currents.update(s_copy.currents)
-            self.stm.scalarfields.update(s_copy.scalarfields)
-
-            dtime = time() - start_time
-            self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
+                dtime = time() - start_time
+                self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
 
         except Exception as err:
             print(err)

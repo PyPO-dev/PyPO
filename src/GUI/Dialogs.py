@@ -26,7 +26,8 @@ class SymDialog(QDialog):
         self.setLayout(layout)
 
     def reject(self):
-        self.clog.info("ABORTED.")
+        # self.clog.info("ABORTED.")
+        print("ABORTED.")
         super().reject()
 
 

@@ -1,11 +1,13 @@
 import numpy as np
 import scipy.optimize as opt
+from scipy.signal import argrelextrema
 import matplotlib.pyplot as pt
 
 from functools import partial
 
 from src.PyPO.PyPOTypes import *
 from src.PyPO.BindRefl import *
+from src.PyPO.MatUtils import *
 
 ##
 # @file
@@ -26,15 +28,16 @@ from src.PyPO.BindRefl import *
 # @returns ym Mean y-center of estimate.
 # @returns theta Position angle of estimate.
 def calcEstimates(x, y, area, field_norm):
-
     M0 = np.sum(field_norm)
+
+    #print(field_norm)
 
     xm = np.sum(x * field_norm) / M0
     ym = np.sum(y * field_norm) / M0
 
-    Mxx = np.sum(x**2 * field_norm - xm**2) / M0
-    Myy = np.sum(y**2 * field_norm - ym**2) / M0
-    Mxy = np.sum(x*y * field_norm - xm*ym) / M0
+    Mxx = np.sum(x**2 * field_norm) / M0 - xm**2
+    Myy = np.sum(y**2 * field_norm) / M0 - ym**2
+    Mxy = np.sum(x*y * field_norm) / M0 - xm*ym
 
     D = 1 / (2 * (Mxx*Myy - Mxy**2))
 
@@ -45,12 +48,14 @@ def calcEstimates(x, y, area, field_norm):
     Amp = 1 #M0 * np.sqrt(a * b - c**2) * area[0,0]
     theta = 0.5 * np.arctan(2 * c / (a - b))
 
-    if a-b > 0: # Not HW1 but the largest axis corresponds to theta.
-        theta += np.pi/2
-    if theta < 0:
-        theta += np.pi
+    #if a-b > 0: # Not HW1 but the largest axis corresponds to theta.
+    #    theta += np.pi/2
+    #if theta < 0:
+    #    theta += np.pi
     
     p = np.sqrt((a - b)**2 + 4 * c**2)
+
+    #print(M0)
 
     _x0 = 1 / (a + b - p)
     _y0 = 1 / (a + b - p) 
@@ -67,7 +72,7 @@ def calcEstimates(x, y, area, field_norm):
 
     x0 = np.sqrt(_x0)
     y0 = np.sqrt(_y0)
-
+    #print(x0, y0)
     return x0, y0, xm, ym, theta
 
 ##
@@ -85,7 +90,7 @@ def fitGaussAbs(field, surfaceObject, thres, mode):
     thres_g = thres
     
     # Normalize
-    field = np.absolute(field) / np.max(np.absolute(field))
+    _field = np.absolute(field) / np.max(np.absolute(field))
 
     grids = generateGrid(surfaceObject, transform=False, spheric=False)
 
@@ -95,33 +100,78 @@ def fitGaussAbs(field, surfaceObject, thres, mode):
     area = grids.area
 
     if mode == "dB":
-        fit_field = 20 * np.log10(field)
+        fit_field = 20 * np.log10(_field)
         mask_f = fit_field >= thres 
 
     elif mode == "linear":
-        fit_field = field
+        fit_field = _field
         mask_f = fit_field >= 10**(thres/20)
 
     elif mode == "log":
-        fit_field = np.log(field)
+        fit_field = np.log(_field)
         mask_f = fit_field >= np.log(10**(thres/20))
 
-    field_est = fit_field[mask_f]
-    x0, y0, xs, ys, theta = calcEstimates(x[mask_f], y[mask_f], area[mask_f], field_est)
-    #print(f"Initial estimate from image moments:\nmu_x = {xs}, mu_y = {ys}\nTheta = {theta}")
+    #pt.imshow(mask_f, origin="lower")
+    #pt.show()
 
-    p0 = [x0, y0, xs, ys, theta]
+    idx_max = np.unravel_index(np.argmax(fit_field), fit_field.shape)
 
-    xy = (x[mask_f], y[mask_f]) # Independent vars
+    x_max = x[idx_max]
+    y_max = y[idx_max] 
+
+    idx_rows, idx_cols = findConnectedSubsets(mask_f, 1, idx_max)
+   
+    _xmin = x[np.min(idx_cols), idx_max[0]]
+    _xmax = x[np.max(idx_cols), idx_max[0]]
     
-    bounds = ([np.finfo(float).eps, np.finfo(float).eps, -np.inf, -np.inf, theta-np.pi/4], 
-            [np.inf, np.inf, np.inf, np.inf, theta+np.pi/4])
-    couplingMasked = partial(GaussAbs, mask_f, mode)
+    _ymin = y[idx_max[1], np.min(idx_rows)]
+    _ymax = y[idx_max[1], np.max(idx_rows)]
+    
+    x_cond = (x > _xmin) & (x < _xmax)
+    y_cond = (y > _ymin) & (y < _ymax)
+    _mask_f = mask_f & x_cond & y_cond
+    
+    xmask = x[mask_f] - x_max
+    ymask = y[mask_f] - y_max
+    
+    x0, y0, xs, ys, theta = calcEstimates(x[_mask_f], y[_mask_f], area[_mask_f], fit_field[_mask_f])
 
-    popt, pcov = opt.curve_fit(couplingMasked, xy, field_est.ravel(), p0, bounds=bounds, method="dogbox")
-    perr = np.sqrt(np.diag(pcov))
+    p0 = [x0, y0, xs, ys, theta, np.max(fit_field)]
+    
+    ratio = 1
+    num = 0
 
-    popt = np.append(popt, np.max(np.absolute(field)))
+    while ratio >= 1:
+        if mode == "dB":
+            fit_field = 20 * np.log10(_field)
+            mask_f = fit_field >= thres 
+
+        elif mode == "linear":
+            fit_field = _field
+            mask_f = fit_field >= 10**(thres/20)
+
+        elif mode == "log":
+            fit_field = np.log(_field)
+            mask_f = fit_field >= np.log(10**(thres/20))
+        
+        if num >= 1:
+            _mask_f = mask_f & x_cond & y_cond
+        else:
+            _mask_f = mask_f
+
+        args = (surfaceObject, fit_field, _mask_f, mode)
+        popt = opt.fmin(GaussAbs, p0, args, disp=False)
+
+        _Psi = generateGauss(popt, surfaceObject, mode="linear")
+        ratio = np.sum(_Psi**2) / np.sum(_field**2)
+        
+        if num > 1:
+            if thres < -3:
+                thres += 0.5
+        
+        num += 1
+        
+    perr = np.zeros(len(popt))#np.sqrt(np.diag(pcov))
     perr = np.append(perr, 0.0)
 
     #print(f"Fitted shift and rotation:\nmu_x = {popt[-3]}, mu_y = {popt[-2]}\nTheta = {popt[-1]}")
@@ -140,8 +190,55 @@ def fitGaussAbs(field, surfaceObject, thres, mode):
 # @param theta Position angle of Gaussian.
 #
 # @returns Psi The Gaussian distribution.
-def GaussAbs(mask, mode, xy, x0, y0, xs, ys, theta):
-    x, y = xy
+#def GaussAbs(mask, mode, xy, x0, y0, xs, ys, theta):
+#    x, y = xy
+#    a = np.cos(theta)**2 / (2 * x0**2) + np.sin(theta)**2 / (2 * y0**2)
+#    c = np.sin(2 * theta) / (4 * x0**2) - np.sin(2 * theta) / (4 * y0**2)
+#    b = np.sin(theta)**2 / (2 * x0**2) + np.cos(theta)**2 / (2 * y0**2)
+#
+#    if mode == "dB":
+#        Psi = 20*np.log10(np.exp(-(a*(x - xs)**2 + 2*c*(x - xs)*(y - ys) + b*(y - ys)**2)))
+#
+#    elif mode == "linear":
+#        Psi = np.exp(-(a*(x - xs)**2 + 2*c*(x - xs)*(y - ys) + b*(y - ys)**2))
+#
+#    elif mode == "log":
+#        Psi = -(a*(x - xs)**2 + 2*c*(x - xs)*(y - ys) + b*(y - ys)**2)
+#
+#    return (Psi).ravel()
+
+def GaussAbs(p0, *args):
+    surfaceObject, field_est, mask, mode = args
+    Psi = generateGauss(p0, surfaceObject, mode)
+    coup = np.sum(np.absolute(Psi[mask])**2) / np.sum(np.absolute(field_est[mask])**2)
+    epsilon = np.absolute(1 - coup)
+    
+    num = np.sum(field_est[mask] * Psi[mask])**2
+    normE = np.sum(np.absolute(field_est[mask])**2)
+    normP = np.sum(np.absolute(Psi[mask])**2)
+
+    c00 = num / normE / normP
+    
+    eta = np.absolute(c00)
+    epsilon = np.absolute(1 - eta)
+    
+    return epsilon
+##
+# Generate a Gaussian from surface parameters.
+#
+# @param fgs_out Optimal Gaussian parameters.
+# @param surfaceObject Surface on which Gaussian is defined.
+# @param mode Whether to fit Gaussian in linear, decibel or logarithmic space.
+# @param mask Mask to apply to Gaussian distribution.
+#
+# @returns Psi Gaussian distribution.
+def generateGauss(p0, surfaceObject, mode):
+    x0, y0, xs, ys, theta, amp = p0
+    
+    grids = generateGrid(surfaceObject, transform=False, spheric=False)
+    x = grids.x
+    y = grids.y
+    
     a = np.cos(theta)**2 / (2 * x0**2) + np.sin(theta)**2 / (2 * y0**2)
     c = np.sin(2 * theta) / (4 * x0**2) - np.sin(2 * theta) / (4 * y0**2)
     b = np.sin(theta)**2 / (2 * x0**2) + np.cos(theta)**2 / (2 * y0**2)
@@ -154,28 +251,5 @@ def GaussAbs(mask, mode, xy, x0, y0, xs, ys, theta):
 
     elif mode == "log":
         Psi = -(a*(x - xs)**2 + 2*c*(x - xs)*(y - ys) + b*(y - ys)**2)
-
-    return (Psi).ravel()
-
-##
-# Generate a Gaussian from surface parameters.
-#
-# @param fgs_out Optimal Gaussian parameters.
-# @param surfaceObject Surface on which Gaussian is defined.
-# @param mode Whether to fit Gaussian in linear, decibel or logarithmic space.
-# @param mask Mask to apply to Gaussian distribution.
-#
-# @returns Psi Gaussian distribution.
-def generateGauss(fgs_out, surfaceObject, mode, mask=None):
-    grids = generateGrid(surfaceObject, transform=False, spheric=False)
-
-    x = grids.x
-    y = grids.y
-
-    if mask == None:
-        mask = np.ones(x.shape)
-
-    x0, y0, xs, ys, theta, amp = fgs_out
-
-    Psi = GaussAbs(mask, mode, (x, y), x0, y0, xs, ys, theta)
-    return amp * Psi.reshape(x.shape)
+    
+    return Psi.reshape(x.shape)

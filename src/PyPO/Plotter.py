@@ -21,8 +21,10 @@ from src.PyPO.BindRefl import *
 #
 # @param plotObject A reflDict containing surface on which to plot beam. 
 # @param field PyPO field or current component to plot.
+# @param contour A PyPO field or current component to plot as contour.
 # @param vmin Minimum amplitude value to display. Default is -30.
 # @param vmax Maximum amplitude value to display. Default is 0.
+# @param levels Levels for contourplot.
 # @param show Show plot. Default is True.
 # @param amp_only Only plot amplitude pattern. Default is False.
 # @param save Save plot to /images/ folder.
@@ -42,8 +44,8 @@ from src.PyPO.BindRefl import *
 # @returns ax Axes containing the axes of the plot.
 #
 # @see aperDict
-def plotBeam2D(plotObject, field,
-                vmin, vmax, show, amp_only,
+def plotBeam2D(plotObject, field, contour,
+                vmin, vmax, levels, show, amp_only,
                 save, interpolation, norm,
                 aperDict, mode, project,
                 units, name, titleA, titleP, savePath, unwrap_phase):
@@ -101,8 +103,13 @@ def plotBeam2D(plotObject, field,
         if mode == 'linear':
             if norm:
                 field_pl = np.absolute(field) / max_field
+                if contour is not None:
+                    contour = np.absolute(contour) / np.max(np.absolute(contour))
+            
             else:
                 field_pl = np.absolute(field)
+                if contour is not None:
+                    contour = np.absolute(contour)
 
             vmin = np.min(field_pl) if vmin is None else vmin
             vmax = np.max(field_pl) if vmax is None else vmax
@@ -111,8 +118,22 @@ def plotBeam2D(plotObject, field,
                                     vmin=vmin, vmax=vmax, cmap=cmaps.parula, shading='auto')
             phasefig = ax[1].pcolormesh(grid_x1 * units[1], grid_x2 * units[1], np.angle(field), cmap=cmaps.parula, shading='auto')
 
+            if contour is not None:
+                cont0 = ax[0].contour(grid_x1 * units[1], grid_x2 * units[1], contour**2, levels, cmap=cm.binary, linewidths=0.5)
+                cont1 = ax[1].contour(grid_x1 * units[1], grid_x2 * units[1], np.angle(contour), levels, cmap=cm.binary, linewidths=0.5)
+
+                ax[0].clabel(cont0)
+                ax[1].clabel(cont1)
+
         elif mode == 'dB':
+            if titleA == "Amp":
+                titleA += " / dB"
+            if titleP == "Phase":
+                titleP += " / rad"
             field_dB = 20 * np.log10(np.absolute(field) / max_field)
+            
+            if contour is not None:
+                contour_dB = 20 * np.log10(np.absolute(contour) / np.max(np.absolute(contour)))
             
             vmin = np.min(field_dB) if vmin is None else vmin
             vmax = np.max(field_dB) if vmax is None else vmax
@@ -127,6 +148,13 @@ def plotBeam2D(plotObject, field,
                                     vmin=vmin, vmax=vmax, cmap=cmaps.parula, shading='auto')
             phasefig = ax[1].pcolormesh(grid_x1 * units[1], grid_x2 * units[1], phase, cmap=cmaps.parula, shading='auto')
 
+            if contour is not None:
+                cont0 = ax[0].contour(grid_x1 * units[1], grid_x2 * units[1], contour_dB, levels, cmap=cm.binary, linewidths=0.5)
+                cont1 = ax[1].contour(grid_x1 * units[1], grid_x2 * units[1], np.angle(contour), levels, cmap=cm.binary, linewidths=0.5)
+                
+                ax[0].clabel(cont0)
+                ax[1].clabel(cont1)
+        
         divider1 = make_axes_locatable(ax[0])
         divider2 = make_axes_locatable(ax[1])
 
@@ -160,16 +188,46 @@ def plotBeam2D(plotObject, field,
         fig, ax = pt.subplots(1,1, figsize=(5,5))
 
         divider = make_axes_locatable(ax)
-
         cax = divider.append_axes('right', size='5%', pad=0.05)
 
         if mode == 'linear':
-            ampfig = ax.pcolormesh(grid_x1 * units[1], grid_x2 * units[1], np.absolute(field),
+            if norm:
+                field_pl = np.absolute(field) / max_field
+                if contour is not None:
+                    contour_pl = np.absolute(contour) / np.max(np.absolute(contour))
+            
+            else:
+                field_pl = np.absolute(field)
+                if contour is not None:
+                    contour_pl = np.absolute(contour)
+
+            vmin = np.min(field_pl) if vmin is None else vmin
+            vmax = np.max(field_pl) if vmax is None else vmax
+            
+            ampfig = ax.pcolormesh(grid_x1 * units[1], grid_x2 * units[1], field_pl**2,
                                     vmin=vmin, vmax=vmax, cmap=cmaps.parula, shading='auto')
 
+            if contour is not None:
+                cont = ax.contour(grid_x1 * units[1], grid_x2 * units[1], contour_pl**2, levels, cmap=cm.binary, linewidths=0.5)
+                ax.clabel(cont)
+        
         elif mode == 'dB':
-            ampfig = ax.pcolormesh(grid_x1 * units[1], grid_x2 * units[1], 20 * np.log10(np.absolute(field) / max_field),
+            if titleA == "Amp":
+                titleA += " / dB"
+            field_dB = 20 * np.log10(np.absolute(field) / max_field)
+            
+            if contour is not None:
+                contour_dB = 20 * np.log10(np.absolute(contour) / np.max(np.absolute(contour)))
+            
+            vmin = np.min(field_dB) if vmin is None else vmin
+            vmax = np.max(field_dB) if vmax is None else vmax
+            
+            ampfig = ax.pcolormesh(grid_x1 * units[1], grid_x2 * units[1], field_dB,
                                     vmin=vmin, vmax=vmax, cmap=cmaps.parula, shading='auto')
+            
+            if contour is not None:
+                cont = ax.contour(grid_x1 * units[1], grid_x2 * units[1], contour_dB, levels, cmap=cm.binary, linewidths=0.5)
+                ax.clabel(cont)
 
         if ff_flag:
             ax.set_ylabel(r"dEl / {}".format(units[0]))
@@ -305,66 +363,21 @@ def plotSystem(systemDict, ax, fine, cmap,norm,
 
 ##
 # EXPERIMENTAL
-def beamCut(plotObject, field, cross='', units='', vmin=-50, vmax=0, frac=1, show=True, save=False, ret=False):
+def plotBeamCut(x_cut, y_cut, x_strip, y_strip, vmin, vmax, unit):
+    fig, ax = pt.subplots(1,1, figsize=(5,5))
 
-    x_center = int((plotObject["gridsize"][0] - 1) / 2)
-    y_center = int((plotObject["gridsize"][1] - 1) / 2)
+    ax.plot(x_strip * unit[1], x_cut, color="blue", label="E-plane")
+    ax.plot(y_strip * unit[1], y_cut, color="red", ls="dashed", label="H-plane")
 
-    grids = generateGrid(plotObject, spheric=False)
-
-    comp = field[1]
-    field = field[0]
-
-    field_dB = 20 * np.log10(np.absolute(field) / np.max(np.absolute(field)))
-
-    H_cut = field_dB[x_center,:]
-    E_cut = field_dB[:,y_center]
-
-    # TODO: make this nicer
-    if surfaceObject.ff_flag:
-        x_ax = plotObject.grid_Az[:,0] / conv
-
-    elif surfaceObject.fo_flag:
-        x_ax = plotObject.grid_fox[:,0]
-
-    fig, ax = pt.subplots(1,1, figsize=(7,5))
-
-    ax.plot(x_ax, H_cut, color='blue', label='H-plane')
-    ax.plot(x_ax, E_cut, color='red', ls='--', label='E-plane')
-
-    if cross:
-        diago = np.diag(20 * np.log10(np.absolute(cross[0]) / np.max(np.absolute(field))))
-        print(diago.shape)
-        ax.plot(x_ax, diago, color='purple', ls='dashdot', label='X-pol')
-
-    ax.set_xlabel(r'$\theta$ / [{}]'.format(units))
-    ax.set_ylabel(r'Amplitude / [dB]')
-    ax.set_title('Beam cuts')
-    ax.set_box_aspect(1)
+    ax.set_xlim(np.min(x_strip * unit[1]), np.max(x_strip * unit[1]))
     ax.set_ylim(vmin, vmax)
-    ax.set_xlim(x_ax[0], x_ax[-1])
-    ax.legend(frameon=False, prop={'size': 10},handlelength=1)
 
-    if save:
-        pt.savefig(fname=self.savePath + 'EH_cut_{}.jpg'.format(plotObject.name),bbox_inches='tight', dpi=300)
+    ax.set_xlabel(r"$\theta$ / {}".format(unit[0]))
+    ax.set_ylabel("Power / dB")
+    ax.legend(frameon=False, prop={'size': 13},handlelength=1)
 
-    if show:
-        pt.show()
+    return fig, ax
 
-    pt.close()
-
-    diff_abs = np.absolute(field[:,y_center]) - np.absolute(field[x_center,:])
-    diff_ang = np.angle(field[:,y_center]) - np.angle(field[x_center,:])
-
-    fig, ax = pt.subplots(1,3)
-    ax[0].plot(np.absolute(field[:,y_center]))
-    ax[0].plot(np.absolute(field[x_center,:]))
-    ax[1].plot(diff_abs)
-    ax[2].plot(diff_ang)
-    pt.show()
-
-    if ret:
-        return field[:,y_center], field[:,y_center]
 
 ##
 # Plot a ray-trace frame spot diagram.

@@ -40,32 +40,3 @@ class Manager(object):
     def on_thread_finished(self):
         if self.callback is not None:
             self.callback()
-
-#class GWorker(QObject):
-#    finished = pyqtSignal()
-#    progress = pyqtSignal(int)
-#
-#    def __init__(self, target, args):
-#        self.target = target
-#        self.args = args
-#
-#    def run(self):
-#        self.target(*list(self.args))
-#        self.finished.emit()
-#
-#class GThread(QThread):
-#    def __init__(self, target, args, parent=None):
-#        self.parent = parent
-#        self.target = target
-#        self.args = args
-#        self.event = threading.Event()
-#       
-#        super(GThread, self).__init__()
-#
-#    def run(self):
-#        #while not self.event:
-#        self.target(*list(self.args)) 
-#        self.parent.on_thread_finished()
-#   
-#    def exit(self):
-#        return

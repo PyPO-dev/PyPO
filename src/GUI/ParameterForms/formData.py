@@ -446,6 +446,21 @@ def calcMBEff(fieldDict, elemDict):
 
     return formMB
 
+def calcHPBW(fieldDict):
+    complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
+   
+    sublist_fields = []
+    if fieldDict:
+        for key in fieldDict.keys():
+            sublist_fields.append(key)
+
+    formHPBW = [
+        InputDescription(inType.dropdown, "f_name", label="Field", options = sublist_fields),
+        InputDescription(inType.dropdown, "comp", label="Component", options = complist)
+        ]
+
+    return formHPBW
+
 def saveSystemForm():
     return [InputDescription(inType.vectorStrings, "name", label="Name of system", numFields=1)]
 

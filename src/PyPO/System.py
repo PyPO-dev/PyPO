@@ -1395,17 +1395,14 @@ class System(object):
     #
     # @returns popt Fitted beam parameters.
     # @returns perr Standard deviation of fitted parameters.
-    def fitGaussAbs(self, name_field, comp, objType="fields", thres=None, mode=None, full_output=False):
-        if objType == "fields":
-            check_fieldSystem(name_field, getattr(self, objType), self.clog, extern=True)
-        else:
-            check_currentSystem(name_field, getattr(self, objType), self.clog, extern=True)
+    def fitGaussAbs(self, name_field, comp, thres=None, mode=None, full_output=False):
+        check_fieldSystem(name_field, self.fields, self.clog, extern=True)
 
         thres = -11 if thres is None else thres
         mode = "linear" if mode is None else mode
 
-        surfaceObj = self.system[getattr(self, objType)[name_field].surf]
-        field = np.absolute(getattr(getattr(self, objType)[name_field], comp))
+        surfaceObj = self.system[self.fields[name_field].surf]
+        field = self.copyObj(np.absolute(getattr(self.fields[name_field], comp)))
 
         popt, perr = fgs.fitGaussAbs(field, surfaceObj, thres, mode)
 
@@ -1417,6 +1414,18 @@ class System(object):
         if full_output:
             return popt, perr
 
+    ##
+    # Calculate main-beam efficiency of a beam pattern.
+    # The main-beam efficiency is calculated by fitting a Gaussian amplitude profile to the central lobe.
+    # Then, the efficiency is defined as the fraction of power in the Gaussian w.r.t. the full pattern.
+    # Designed for far-field beam patterns, but also applicable to regular fields.
+    #
+    # @param name_field Name of field object.
+    # @param comp Component of field object.
+    # @param thres Threshold to fit to, in decibels.
+    # @param mode Fit to amplitude in decibels, linear or logarithmically.
+    #
+    # @returns eff Main-beam efficiency.
     def calcMainBeam(self, name_field, comp, thres=None, mode=None):
         check_fieldSystem(name_field, self.fields, self.clog, extern=True)
         thres = -11 if thres is None else thres
@@ -1425,25 +1434,36 @@ class System(object):
         _thres = self.copyObj(thres)
 
         self.fitGaussAbs(name_field, comp, thres, mode)
-        field = getattr(self.fields[name_field], comp)
+        field = self.copyObj(getattr(self.fields[name_field], comp))
         surfaceObj = self.system[self.fields[name_field].surf]
         
         eff = effs.calcMainBeam(field, surfaceObj, self.scalarfields[f"fitGauss_{name_field}"].S)
         return eff
     
-    def calcBeamCuts(self, name_field, comp, objType="fields", phi=0, center=True, align=True, norm=False):
-        if objType == "fields":
-            check_fieldSystem(name_field, getattr(self, objType), self.clog, extern=True)
-        else:
-            check_currentSystem(name_field, getattr(self, objType), self.clog, extern=True)
+    ##
+    # Calculate cross sections of a beam pattern.
+    #
+    # @param name_field Name of field object.
+    # @param comp Component of field object.
+    # @param phi Manual rotation of cuts w.r.t. to the x-y cardinal planes.
+    # @param center Whether to center the cardinal planes on the peak of the beam pattern.
+    # @param align Whether to align the cardinal planes to the beam pattern minor and major axes.
+    # @param norm Which component to normalise to. Defaults to comp. 
+    #
+    # @returns x_cut Beam cross section along the E-plane.
+    # @returns y_cut Beam cross section along the H-plane.
+    # @returns x_strip Co-ordinate values for x_cut.
+    # @returns y_strip Co-ordinate values for y_cut.
+    def calcBeamCuts(self, name_field, comp, phi=0, center=True, align=True, norm=False):
+        check_fieldSystem(name_field, self.fields, self.clog, extern=True)
         
-        name_surf = getattr(self, objType)[name_field].surf
-        field = np.absolute(getattr(getattr(self, objType)[name_field], comp))
+        name_surf = self.fields[name_field].surf
+        field = np.absolute(getattr(self.fields[name_field], comp))
+        _field = self.copyObj(self.fields[name_field])
 
         self.snapObj(name_surf, "__pre")
         
-        popt, perr = self.fitGaussAbs(name_field, comp, objType=objType, mode="linear", full_output=True)
-        #print([x * 3600 for x in popt])        
+        popt, perr = self.fitGaussAbs(name_field, comp, mode="linear", full_output=True)
         
         if center:
             self.translateGrids(name_surf, np.array([-popt[2], -popt[3], 0]))
@@ -1466,37 +1486,44 @@ class System(object):
         grids_transf = self.generateGrids(name_surf, spheric=False)
         
         middle = lambda x: [int(np.floor(d/2)) for d in x.shape]
-        #idx_c = middle(field)
         idx_c = np.argwhere(np.isclose(grids_transf.x, 0) & np.isclose(grids_transf.y, 0))
         idx_c = np.unravel_index(np.argmax(field), field.shape)
-        #print(idx_c)
         if not norm:
             x_cut = self.copyObj(20 * np.log10(field[:, idx_c[1]] / np.max(field)))
             y_cut = self.copyObj(20 * np.log10(field[idx_c[0], :] / np.max(field)))
-            #x_cut = self.copyObj(20 * np.log10(field[idx_c[0], :] / np.max(field)))
-            #y_cut = self.copyObj(20 * np.log10(field[:, idx_c[1]] / np.max(field)))
         
         else:
             x_cut = self.copyObj(20 * np.log10(field[:, idx_c[1]] / np.max(np.absolute(getattr(self.fields[name_field], norm)))))
             y_cut = self.copyObj(20 * np.log10(field[idx_c[0], :] / np.max(np.absolute(getattr(self.fields[name_field], norm)))))
 
-        #pt.plot(grids_transf.x[:,0] * 3600)
-        #pt.imshow(grids_transf.x*3600)
-        #pt.show()
-        #x_strip = self.copyObj(grids_transf.x[idx_c[0], :])
-        #y_strip = self.copyObj(grids_transf.y[:, idx_c[1]])
         x_strip = self.copyObj(grids_orig.x[:, idx_c[1]])
         y_strip = self.copyObj(grids_orig.y[idx_c[0], :])
-
-        #print(x_strip*3600)
 
         self.revertToSnap(name_surf, "__pre")
         self.deleteSnap(name_surf, "__pre")
 
+        self.fields[name_field] = _field
+
         return x_cut, y_cut, x_strip, y_strip
    
-    def plotBeamCut(self, name_field, comp, objType="fields", comp_cross=None, vmin=None, vmax=None, units='', name="", show=True, save=False, ret=False):
-        E_cut, H_cut, E_strip, H_strip = self.calcBeamCuts(name_field, comp, objType)
+    ##
+    # Plot beam pattern cross sections.
+    #
+    # @param name_field Name of field object.
+    # @param comp Component of field object.
+    # @param comp_cross Cross-polar component. If given, is plotted as well. Defaults to None.
+    # @param vmin Minimum amplitude value to display. Default is -30.
+    # @param vmax Maximum amplitude value to display. Default is 0.
+    # @param units The units of the axes. Default is "", which is degrees.
+    # @param name Name of .png file where plot is saved. Only when save=True. Default is "".
+    # @param show Show plot. Default is True.
+    # @param save Save plot to savePath.
+    # @param ret Return the Figure and Axis object. Only called by GUI. Default is False.
+    #
+    # @returns fig Figure object.
+    # @returns ax Axes object.
+    def plotBeamCut(self, name_field, comp, comp_cross=None, vmin=None, vmax=None, units='', name="", show=True, save=False, ret=False):
+        E_cut, H_cut, E_strip, H_strip = self.calcBeamCuts(name_field, comp)
 
         #if comp_cross is not None:
             #cr45_cut, cr135_cut, cr45_strip, cr135_strip = self.calcBeamCuts(name_field, comp_cross, phi=45, align=False, center=False, norm="Ex")
@@ -1521,6 +1548,16 @@ class System(object):
         elif show:
             pt.show()
 
+    ##
+    # Calculate half-power beamwidth.
+    # This is done by directly evaluating the -3 dB points along both cardinal planes of the beam pattern.
+    #
+    # @param name_field Name of field object.
+    # @param comp Component of field object.
+    # @param interp Interpolation factor for finding the HPBW. Defaults to 50.
+    #
+    # @returns HPBW_E Half-power beamwidth along E-plane
+    # @returns HPBW_H Half-power beamwidth along H-plane
     def calcHPBW(self, name_field, comp, interp=50):
         x_cut, y_cut, x_strip, y_strip = self.calcBeamCuts(name_field, comp)#, center=False, align=False)
 

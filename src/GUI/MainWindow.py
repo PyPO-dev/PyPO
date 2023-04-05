@@ -1072,6 +1072,11 @@ class MainWidget(QWidget):
         self.setForm(fData.calcMBEff(self.stm.fields, self.stm.system), self.calcMBAction, okText="Calculate")
     
     ##
+    # Shows form to calculate half-power beamwidths.
+    def setHPBWForm(self):
+        self.setForm(fData.calcHPBW(self.stm.fields), self.calcHPBWAction, okText="Calculate")
+    
+    ##
     # Reads form and calculates taper efficiencies
     def calcTaperAction(self):
         try:
@@ -1133,7 +1138,19 @@ class MainWidget(QWidget):
             self.clog.error(err)
     
     #END NOTE
-    
+   
+    ##
+    # Calculates half-power beamwidth along the E and H plane.
+    def calcHPBWAction(self):
+        try:
+            HPBWDict = self.ParameterWid.read()
+            HPBW_E, HPBW_H = self.stm.calcHPBW(HPBWDict["f_name"], HPBWDict["comp"])
+            self.clog.info(f'Half-power beamwidths of {HPBWDict["f_name"]}, component {HPBWDict["comp"]} in arcseconds: {HPBW_E} (E-plane), {HPBW_H} (H-plane)')
+        except Exception as err:
+            print(err)
+            print_tb(err.__traceback__)
+            self.clog.error(err)
+
     ##
     # calculates root mean square of a frame
     def calcRMSfromFrame(self, frame):
@@ -1337,6 +1354,8 @@ class PyPOMainWindow(QMainWindow):
         ToolsMenu.addAction(FocusFind)
 
         HPBW = QAction("HPBW", self)
+        HPBW.setToolTip("Calculate the half-power beamwidth of a PO field in the E and H-planes.")
+        HPBW.triggered.connect(self.mainWid.setHPBWForm)
         ToolsMenu.addAction(HPBW)
         
         #findRTfocusAction.triggered.connect(self.mainWid.set)

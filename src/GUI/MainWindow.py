@@ -968,13 +968,16 @@ class MainWidget(QWidget):
             print_tb(err.__traceback__)
             self.clog.error(err)
 
-    def waiterFinished(self):
+    def waiterFinished(self, success):
         # process.join()
         try:
             print("waiter: Process joined")
+            if success:
+                self.currentCalculationDialog.accept()
+                self._addToWidgets(self.currentCalculationDict)
+            else:
+                self.currentCalculationDialog.reject()
 
-            self.currentCalculationDialog.accept()
-            self._addToWidgets(self.currentCalculationDict)
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -1016,8 +1019,12 @@ class MainWidget(QWidget):
             args = (s_copy, propBeamDict, returnDict)
             process = Process(target = self.runPOWorker, args = args)
 
+            def abort():
+                process.kill()
+                self.currentCalculationDialog.reject()
+
             dialStr = f"Calculating {subStr} on {propBeamDict['t_name']}..."
-            self.currentCalculationDialog = SymDialog(process.kill, self.clog, dialStr) 
+            self.currentCalculationDialog = SymDialog(abort, self.clog, dialStr) 
             self.currentCalculationDict = propBeamDict
 
             waiterTread = QThread(parent=self)
@@ -1032,7 +1039,9 @@ class MainWidget(QWidget):
 
             process.start()
             waiterTread.start()
-            if self.currentCalculationDialog.exec_():
+            d=self.currentCalculationDialog.exec_()
+            print(f"{d = }")
+            if d:
                 s_copy = returnDict["system"]
                 print(f"{s_copy = }")
                 self.stm.frames.update(s_copy.frames)

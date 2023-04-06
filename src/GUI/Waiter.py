@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject
 
 
 class Waiter(QObject):
-    finished = pyqtSignal()
+    finished = pyqtSignal(int)
 
     def setProcess(self, process):
         self.process = process
@@ -12,4 +12,4 @@ class Waiter(QObject):
     def run(self):
         self.process.join()
         print("waiter: Process joined")
-        self.finished.emit()
+        self.finished.emit(self.process.exitcode==0)

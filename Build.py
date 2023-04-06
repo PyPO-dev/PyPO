@@ -31,6 +31,7 @@ def BuildPyPO():
     docs    = sys.argv.count("--docs") or sys.argv.count("-d")
     docsv   = sys.argv.count("--docs-v") or sys.argv.count("-dv")
     tests   = sys.argv.count("--test") or sys.argv.count("-t")
+    full    = sys.argv.count("--full-monty") or sys.argv.count("-fm")
 
     if prereq:
         clog.info("Installing PyPO prerequisites...")

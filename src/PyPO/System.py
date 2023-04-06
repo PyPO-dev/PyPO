@@ -25,7 +25,7 @@ from src.PyPO.BindTransf import *
 from src.PyPO.MatTransform import *
 from src.PyPO.PyPOTypes import *
 from src.PyPO.Checks import *
-#import src.PyPO.Config as Config
+import src.PyPO.Config as Config
 from src.PyPO.CustomLogger import CustomLogger
 import src.PyPO.Plotter as plt
 import src.PyPO.Efficiencies as effs
@@ -78,14 +78,15 @@ class System(object):
     #
     # @param redirect Redirect all print statements within system to given stdout.
     # @param context Whether system is created in script or in GUI.
-    def __init__(self, redirect=None, context=None, threadmgr=None, verbose=True):
+    def __init__(self, redirect=None, context=None, verbose=True, override=True):
         self.num_ref = 0
         self.num_cam = 0
         self.nThreads_cpu = os.cpu_count()
         self.context = context
         
         Config.setContext(context)
-        
+        Config.setOverride(override)
+
         # Internal dictionaries
         self.system = {}
         self.frames = {}
@@ -140,7 +141,9 @@ class System(object):
 
         if context == "S":
             self.clog.info("INITIALIZED EMPTY SYSTEM.")
-
+ 
+        if override == True:
+            self.clog.warning("System override set to True.")
        
     ##
     # Destructor. Deletes any reference to the logger assigned to current system.
@@ -354,8 +357,12 @@ class System(object):
             trans = (f1 + f2) / 2
 
             f_norm = diff / np.linalg.norm(diff)
-
-            R = self.findRotation(np.array([1,0,0]), f_norm)
+            
+            if reflDict["orient"] == "x":
+                R = self.findRotation(np.array([1,0,0]), f_norm)
+            
+            if reflDict["orient"] == "z":
+                R = self.findRotation(np.array([0,0,1]), f_norm)
 
             a = np.sqrt(np.dot(diff, diff)) / (2 * ecc)
             b = a * np.sqrt(1 - ecc**2)
@@ -366,9 +373,15 @@ class System(object):
             self.system[reflDict["name"]]["pos"] = (self.system[reflDict["name"]]["transf"] @ np.append(self.system[reflDict["name"]]["pos"], 1))[:-1]
             self.system[reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[reflDict["name"]]["ori"]
 
-            self.system[reflDict["name"]]["coeffs"][0] = a
-            self.system[reflDict["name"]]["coeffs"][1] = b
-            self.system[reflDict["name"]]["coeffs"][2] = b
+            if reflDict["orient"] == "x":
+                self.system[reflDict["name"]]["coeffs"][0] = a
+                self.system[reflDict["name"]]["coeffs"][1] = b
+                self.system[reflDict["name"]]["coeffs"][2] = b
+            
+            if reflDict["orient"] == "z":
+                self.system[reflDict["name"]]["coeffs"][0] = b
+                self.system[reflDict["name"]]["coeffs"][1] = b
+                self.system[reflDict["name"]]["coeffs"][2] = a
 
         if reflDict["gmode"] == "xy" or reflDict["gmode"] == 0:
             self.system[reflDict["name"]]["gmode"] = 0
@@ -438,13 +451,12 @@ class System(object):
                 match_rot = (MatRotate(rotation))[:-1, :-1] @ match
                 R = self.findRotation(self.system[name]["ori"], match_rot)
 
-                Tp = world.INITM
-                Tpm = world.INITM
+                Tp = self.copyObj(world.INITM)
+                Tpm = self.copyObj(world.INITM)
                 Tp[:-1,-1] = pivot
                 Tpm[:-1,-1] = -pivot
                 
                 Rtot = Tp @ R @ Tpm
-
                 self.system[name]["transf"] = Rtot @ self.system[name]["transf"]
                 self.system[name]["transf"][:-1, :-1] = (MatRotate(rotation, pivot=pivot))[:-1, :-1]
 
@@ -479,8 +491,8 @@ class System(object):
                 match_rot = (MatRotate(rotation))[:-1, :-1] @ match
                 R = self.findRotation(self.system[name]["ori"], match_rot)
 
-                Tp = world.INITM
-                Tpm = world.INITM
+                Tp = self.copyObj(world.INITM)
+                Tpm = self.copyObj(world.INITM)
                 Tp[:-1,-1] = pivot
                 Tpm[:-1,-1] = -pivot
                 
@@ -525,8 +537,8 @@ class System(object):
                 match_rot = (MatRotate(rotation))[:-1, :-1] @ match
                 R = self.findRotation(self.frames[name].ori, match_rot)
 
-                Tp = world.INITM
-                Tpm = world.INITM
+                Tp = self.copyObj(world.INITM)
+                Tpm = self.copyObj(world.INITM)
                 Tp[:-1,-1] = pivot
                 Tpm[:-1,-1] = -pivot
                 
@@ -553,7 +565,9 @@ class System(object):
                 self.frames[name].ori = MatRotate(rotation)[:-1, :-1] @ self.frames[name].ori
             
                 self.clog.info(f"Rotated frame {name} by {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
-    
+   
+        print(world.INITM)
+
     ##
     # Translate reflector grids.
     #
@@ -625,12 +639,12 @@ class System(object):
             check_groupSystem(name, self.groups, self.clog, extern=True)
             if trans:
                 for elem in self.groups[name]:
-                    _transf = world.INITM
+                    _transf = self.copyObj(world.INITM)
                     _transf[:-1, :-1] = elem["transf"][:-1, :-1]
                     elem["transf"] = _transf
-                    elem["pos"] = world.ORIGIN
+                    elem["pos"] = self.copyObj(world.ORIGIN)
 
-                self.groups[name]["pos"] = world.ORIGIN
+                self.groups[name]["pos"] = self.copyObj(world.ORIGIN)
             
             if rot:
                 for elem in self.groups[name]:
@@ -638,7 +652,7 @@ class System(object):
                     _transf[:-1, :-1] = np.eye(3)
                     elem["transf"] = _transf
                 
-                self.groups[name]["ori"] = world.IAX
+                self.groups[name]["ori"] = self.copyObj(world.IAX)
             
             self.clog.info(f"Transforming group {name} to home position.")
 
@@ -646,17 +660,17 @@ class System(object):
         else:
             check_elemSystem(name, self.system, self.clog, extern=True)
             if trans:
-                _transf = world.INITM
+                _transf = self.copyObj(world.INITM)
                 _transf[:-1, :-1] = self.system[name]["transf"][:-1, :-1]
                 self.system[name]["transf"] = _transf
-                self.system[name]["pos"] = world.ORIGIN 
+                self.system[name]["pos"] = self.copyObj(world.ORIGIN)
 
             
             if rot:
                 _transf = self.system[name]["transf"]
                 _transf[:-1, :-1] = np.eye(3)
                 self.system[name]["transf"] = _transf
-                self.system[name]["ori"] = world.IAX
+                self.system[name]["ori"] = self.copyObj(world.IAX)
             
             self.clog.info(f"Transforming element {name} to home position.")
  
@@ -1068,10 +1082,10 @@ class System(object):
         
         self.frames[argDict["name"]] = makeRTframe(argDict)
 
-        self.frames[argDict["name"]].setMeta(world.ORIGIN, world.IAX, world.INITM)
-        self.frames[argDict["name"]].pos = world.ORIGIN
-        self.frames[argDict["name"]].ori = world.IAX
-        self.frames[argDict["name"]].transf = world.INITM
+        self.frames[argDict["name"]].setMeta(self.copyObj(world.ORIGIN), self.copyObj(world.IAX), self.copyObj(world.INITM))
+        #self.frames[argDict["name"]].pos = world.ORIGIN
+        #self.frames[argDict["name"]].ori = world.IAX
+        #self.frames[argDict["name"]].transf = world.INITM
 
         self.clog.info(f"Added tubular frame {argDict['name']} to system.")
     
@@ -1096,10 +1110,11 @@ class System(object):
 
         #check_RTDict(argDict, self.frames.keys())
         self.frames[argDict["name"]] = makeGRTframe(argDict)
+        self.frames[argDict["name"]].setMeta(self.copyObj(world.ORIGIN), self.copyObj(world.IAX), self.copyObj(world.INITM))
         
-        self.frames[argDict["name"]].pos = world.ORIGIN
-        self.frames[argDict["name"]].ori = world.IAX
-        self.frames[argDict["name"]].transf = world.INITM
+        #self.frames[argDict["name"]].pos = world.ORIGIN
+        #self.frames[argDict["name"]].ori = world.IAX
+        #self.frames[argDict["name"]].transf = world.INITM
         
         dtime = time.time() - start_time
         self.clog.info(f"Succesfully sampled {argDict['nRays']} rays: {dtime} seconds.")
@@ -1256,7 +1271,7 @@ class System(object):
         self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
         self.frames[runRTDict["fr_out"]] = frameObj
         
-        self.frames[runRTDict["fr_out"]].setMeta(self.calcRTcenter(runRTDict["fr_out"]), self.calcRTtilt(runRTDict["fr_out"]), world.INITM)
+        self.frames[runRTDict["fr_out"]].setMeta(self.calcRTcenter(runRTDict["fr_out"]), self.calcRTtilt(runRTDict["fr_out"]), self.copyObj(world.INITM))
 
 
     def interpFrame(self, name_fr_in, name_field, name_target, name_out, comp, method="nearest"):
@@ -1408,9 +1423,16 @@ class System(object):
 
         Psi = scalarfield(fgs.generateGauss(popt, surfaceObj, mode="linear"))
         Psi.setMeta(self.fields[name_field].surf, self.fields[name_field].k)
+       
+        _name = f"fitGauss_{name_field}"
 
-        self.scalarfields[f"fitGauss_{name_field}"] = Psi
- 
+        num = getIndex(_name, self.scalarfields)
+        
+        if num > 0:
+            _name = _name + "_{}".format(num)
+
+        self.scalarfields[_name] = Psi
+
         if full_output:
             return popt, perr
 
@@ -1929,7 +1951,7 @@ class System(object):
     def findRotation(self, v, u):
         I = np.eye(3)
         if np.array_equal(v, u):
-            return world.INITM
+            return self.copyObj(world.INITM)
 
         lenv = np.linalg.norm(v)
         lenu = np.linalg.norm(u)
@@ -1946,7 +1968,7 @@ class System(object):
 
         R = I + K + K @ K * (1 - np.dot(v, u)) / lenw**2
 
-        R_transf = world.INITM
+        R_transf = self.copyObj(world.INITM)
         R_transf[:-1, :-1] = R
         
         return R_transf
@@ -1970,7 +1992,7 @@ class System(object):
         
         tilt = self.calcRTtilt(name_frame)
         center = self.calcRTcenter(name_frame)
-        match = world.IAX
+        match = self.copyObj(world.IAX)
 
         R = self.findRotation(match, tilt)
 
@@ -1980,8 +2002,8 @@ class System(object):
         target = {
                 "name"      : t_name,
                 "gmode"     : "xy",
-                "lims_x"    : np.array([-42, 42]),
-                "lims_y"    : np.array([-42, 42]),
+                "lims_x"    : np.array([-4.2, 4.2]),
+                "lims_y"    : np.array([-4.2, 4.2]),
                 "gridsize"  : np.array([3, 3])
                 }
 
@@ -2000,11 +2022,12 @@ class System(object):
         self.clog.info(f"Finding focus of {name_frame}...")
         res = opt.fmin(self._optimiseFocus, f0, args=(runRTDict, tilt), full_output=True, disp=False)
 
-        out = res[0] * tilt + center
-        self.clog.info(f"Focus: {*['{:0.3e}'.format(x) for x in out],}, RMS: {res[1]:.3e}")
-
         if not verbose:
             self.setLoggingVerbosity(verbose=True)
+        
+        out = res[0] * tilt + center
+        self.translateGrids(t_name, out, mode="absolute")
+        self.clog.info(f"Focus: {*['{:0.3e}'.format(x) for x in out],}, RMS: {res[1]:.3e}")
 
         return out
 
@@ -2033,8 +2056,6 @@ class System(object):
             rx = 0
 
         r = np.degrees(np.array([rx, ry, rz]))
-
-        testM = MatRotate(r, world.INITM, pivot=None, radians=False)
 
         return r#, testM
     

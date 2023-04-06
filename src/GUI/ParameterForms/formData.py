@@ -19,8 +19,7 @@ def uv_opts():
             InputDescription(inType.vectorFloats, "lims_v", label="V limits", oArray=True, numFields=2),
             InputDescription(inType.vectorFloats, "gcenter", label="XY center", oArray=True, numFields=2),
             InputDescription(inType.vectorFloats, "ecc_uv", label="UV eccentricity", numFields=1),
-            InputDescription(inType.vectorFloats, "rot_uv", label="UV position angle", numFields=1),
-            InputDescription(inType.checkbox, "flip", label="Flip Normal Vectors")]
+            InputDescription(inType.vectorFloats, "rot_uv", label="UV position angle", numFields=1)]
 
 ##
 # Options for generating a far-field element from an AoE (Azimuth-over-Elevation) grid.
@@ -56,8 +55,8 @@ def makeParabolaInp():
     ]
 
 ##
-# Form for generating a hyperboloid or ellipsoid element.
-def makeHyperbolaEllipseInp():
+# Form for generating a hyperboloid or element.
+def makeHyperbolaInp():
     return [InputDescription(inType.vectorStrings, "name"),
             InputDescription(inType.dynamicRadio, "pmode", label="Parameter mode", subDict={
                 "focus"     : focus_opts_hyp_ell(),
@@ -71,13 +70,28 @@ def makeHyperbolaEllipseInp():
             })]
 
 ##
+# Form for generating a ellipsoid element.
+def makeEllipseInp():
+    return [InputDescription(inType.vectorStrings, "name"),
+            InputDescription(inType.dynamicRadio, "pmode", label="Parameter mode", subDict={
+                "focus"     : focus_opts_hyp_ell(),
+                "manual"    : [InputDescription(inType.vectorFloats, "coeffs", label="ABC coefficients", oArray=True, numFields=3)]
+                }),
+            InputDescription(inType.radio, "orient", label="Major axis orientation", options=["x", "z"]),
+            InputDescription(inType.vectorIntegers, "gridsize", label="Grid size", hints=[101,101], numFields=2, oArray=True),
+            InputDescription(inType.checkbox, "flip", label="Flip Normal Vectors"),
+            InputDescription(inType.dynamicRadio, "gmode", label="Grid mode", subDict={
+                "xy" : xy_opts(),
+                "uv" : uv_opts()
+            })]
+##
 # Menu for generating quadric elements.
 def makeQuadricSurfaceInp():
     return [
         InputDescription(inType.dynamicDropdown, "type", subDict={
             "Parabola": makeParabolaInp(),
-            "Hyperbola": makeHyperbolaEllipseInp(),
-            "Ellipse": makeHyperbolaEllipseInp()
+            "Hyperbola": makeHyperbolaInp(),
+            "Ellipse": makeEllipseInp()
         })
     ]
 

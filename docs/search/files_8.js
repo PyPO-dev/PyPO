@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['structs_2eh_0',['Structs.h',['../Structs_8h.html',1,'']]],
-  ['structs_2epy_1',['Structs.py',['../Structs_8py.html',1,'']]],
-  ['system_2epy_2',['System.py',['../System_8py.html',1,'']]]
+  ['plotter_2epy_0',['Plotter.py',['../Plotter_8py.html',1,'']]],
+  ['propagation_2eh_1',['Propagation.h',['../Propagation_8h.html',1,'']]],
+  ['pypotypes_2epy_2',['PyPOTypes.py',['../PyPOTypes_8py.html',1,'']]]
 ];

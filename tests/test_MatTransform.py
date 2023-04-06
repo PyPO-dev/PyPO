@@ -76,8 +76,8 @@ class Test_MatTransform(unittest.TestCase):
             for a0atest, a0aref in zip(g0atest.area.ravel(), g0aref.area.ravel()):
                 self.assertAlmostEqual(a0atest, a0aref)
         
-            self.s.homeReflector(name_test)
-            self.s.homeReflector(name_ref)
+            #self.s.homeReflector(name_test)
+            #self.s.homeReflector(name_ref)
             del self.s
     
     def _run_translations(self, name_test, name_ref):

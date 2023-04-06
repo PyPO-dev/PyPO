@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['w0x_0',['w0x',['../structGDict.html#afcd46c4031c4f730874f81f3f144cecf',1,'GDict::w0x()'],['../structScalarGDict.html#a2425021fe7c7a319e1e0c285079beef7',1,'ScalarGDict::w0x()'],['../structGDictf.html#afd4a10ea5d742d40404477aabff1088d',1,'GDictf::w0x()'],['../structScalarGDictf.html#aa0f92b151114465e34927a1bfa53350f',1,'ScalarGDictf::w0x()']]],
-  ['w0y_1',['w0y',['../structGDict.html#a759a07d66e39c39d8831ba424f06a468',1,'GDict::w0y()'],['../structScalarGDict.html#aeb7bce6394ce96df981b5a293d9b1243',1,'ScalarGDict::w0y()'],['../structGDictf.html#aecc84d296352ae4a4f83969e7381ac9e',1,'GDictf::w0y()'],['../structScalarGDictf.html#a9c663a4c605e0c083d367a1cd286eaf7',1,'ScalarGDictf::w0y()']]]
+  ['w0x_0',['w0x',['../structGPODict.html#a4bca7dd22fd9d65c27f8c383fca6a07e',1,'GPODict::w0x()'],['../structScalarGPODict.html#a28216534246d76d1b6ac8d876a9893e5',1,'ScalarGPODict::w0x()'],['../structGPODictf.html#a48e64390db74559aeb13f070a44f1d54',1,'GPODictf::w0x()'],['../structScalarGPODictf.html#a07bc06402837c5d6d8091fc581d77e3f',1,'ScalarGPODictf::w0x()']]],
+  ['w0y_1',['w0y',['../structGPODict.html#add702249184a68db5d8efb900f0e3be3',1,'GPODict::w0y()'],['../structScalarGPODict.html#ad2ea6f58f1322c6a239e858451740945',1,'ScalarGPODict::w0y()'],['../structGPODictf.html#a5de635c56c7965028b673b33f235c37c',1,'GPODictf::w0y()'],['../structScalarGPODictf.html#adfb5015f159ce846256631333c514496',1,'ScalarGPODictf::w0y()']]]
 ];

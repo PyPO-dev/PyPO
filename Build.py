@@ -51,7 +51,7 @@ def BuildPyPO():
         clog.info("Succesfully installed PyPO prerequisites.")
         clog.warning("Install CUDA manually to enable PyPO on GPU.")
     
-    if cmakec:
+    if cmakec or full:
         try:
             clog.info("Cleaning build directory...")
             dir_build = os.path.join(os.getcwd(), "out", "build")
@@ -59,10 +59,8 @@ def BuildPyPO():
             clog.info("Succesfully cleaned build directory.")
         except:
             clog.warning("Nothing to clean.")
-        
-        return 0
 
-    if config:
+    if config or full:
         dir_lists = os.path.join(os.getcwd(), "src")
         dir_build = os.path.join(os.getcwd(), "out", "build")
 
@@ -80,10 +78,8 @@ def BuildPyPO():
         
         except:
             clog.error("Could not configure PyPO. Is CMAKE installed?")
-        
-        return 0
 
-    if cmake:
+    if cmake or full:
         try:
             clog.info("Building PyPO...")
             dir_lists = os.path.join(os.getcwd(), "src")
@@ -97,8 +93,6 @@ def BuildPyPO():
 
         except:
             clog.error("Could not build PyPO.")
-        
-        return 0
 
     if docs or docsv:
         try:
@@ -131,7 +125,6 @@ def BuildPyPO():
         
         except:
             clog.error("Failed to generate documentation. Is doxygen installed?")
-        return 0
     
     if tests:
         try:
@@ -142,19 +135,18 @@ def BuildPyPO():
 
         except:
             clog.error("Failed to test PyPO.")
-        
-        return 0
 
     if helpf:
         print("PyPO build interface list of options:")
-        print("'--help',    '-h'            : view build options.")
-        print("'--clean',   '-c'            : remove PyPO objects and libraries.")
-        print("'--prereqs', '-p'            : install PyPO prerequisites.")
-        print("'--config',  '-f'            : configure PyPO.")
-        print("'--make',    '-m'            : build PyPO libraries.")
-        print("'--docs',    '-d'            : generate PyPO documentation. Needs doxygen!")
-        print("'--docs-v',  '-dv'           : generate PyPO documentation with verbose settings. Needs doxygen!")
-        print("'--test',    '-t'            : run the unittests.")
+        print("'--help',        '-h'            : view build options.")
+        print("'--clean',       '-c'            : remove PyPO objects and libraries.")
+        print("'--prereqs',     '-p'            : install PyPO prerequisites.")
+        print("'--config',      '-f'            : configure PyPO.")
+        print("'--make',        '-m'            : build PyPO libraries.")
+        print("'--docs',        '-d'            : generate PyPO documentation. Needs doxygen!")
+        print("'--docs-v',      '-dv'           : generate PyPO documentation with verbose settings. Needs doxygen!")
+        print("'--test',        '-t'            : run the unittests.")
+        print("'--full-monty',  '-fm'           : clean, configure and build PyPO libraries in one go.")
         return 0
  
 if __name__ == "__main__":

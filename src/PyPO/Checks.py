@@ -8,6 +8,7 @@ nThreads_cpu = os.cpu_count()
 
 from src.PyPO.PyPOTypes import *
 from src.PyPO.CustomLogger import CustomLogger
+import src.PyPO.Config as Config
 import src.PyPO.WorldParam as world
 
 PO_modelist = ["JM", "EH", "JMEH", "EHP", "FF", "scalar"]
@@ -26,14 +27,13 @@ PO_modelist = ["JM", "EH", "JMEH", "EHP", "FF", "scalar"]
 # @returns num Increment of highest occurence of number.
 def getIndex(name, nameList):
     regex = f"(?<!.){name}(_(\d*(?![ -~])))*(?![ -~])"
-    #regex = f"{name}(_(\d*(?![ -~])))*(?![ -~])"
     l = re.compile(regex)
     match = list(filter(l.match, nameList))
-    #print(match)
 
     match_spl = [int(x.replace(name + "_", "")) if x != name else 0 for x in match]
     num = 0
-    if match_spl:
+    
+    if match_spl and not Config.override:
         num = max(match_spl) + 1
 
     return num
@@ -64,7 +64,7 @@ def has_CUDA():
 def check_elemSystem(name, elements, clog, errStr="", extern=False):
     if name not in elements:
         errStr += errMsg_noelem(name)
-
+    
     if extern:
         if errStr:
             errList = errStr.split("\n")[:-1]
@@ -489,6 +489,9 @@ def check_ElemDict(elemDict, nameList, num_ref, clog):
 
             if num > 0:
                 elemDict["name"] = elemDict["name"] + "_{}".format(num)
+
+        if "orient" not in elemDict:
+            elemDict["orient"] = "x"
 
         if "pmode" in elemDict:
             if elemDict["pmode"] == "focus":
@@ -1190,20 +1193,24 @@ def check_ellipseLimits(ellipsoid, clog):
 
     if ellipsoid["gmode"] == 0:
         if np.absolute(ellipsoid["lims_x"][0]) > ellipsoid["coeffs"][idx_lim]:
-            clog.warning(f"Lower x-limit of {ellipsoid['lims_x'][0]:.3f} incompatible with ellipsoid {ellipsoid['name']}. Changing to {ellipsoid['coeffs'][idx_lim]}.")
-            ellipsoid["lims_x"][0] = ellipsoid["coeffs"][idx_lim] + ellipsoid["coeffs"][0] / buff
+            sgn = np.sign((ellipsoid["lims_x"][0]))
+            clog.warning(f"Lower x-limit of {ellipsoid['lims_x'][0]:.3f} incompatible with ellipsoid {ellipsoid['name']}. Changing to {sgn*ellipsoid['coeffs'][idx_lim]}.")
+            ellipsoid["lims_x"][0] = sgn * (ellipsoid["coeffs"][idx_lim] + ellipsoid["coeffs"][0] / buff)
         
         if np.absolute(ellipsoid["lims_x"][1]) > ellipsoid["coeffs"][idx_lim]:
-            clog.warning(f"Upper x-limit of {ellipsoid['lims_x'][1]:.3f} incompatible with ellipsoid {ellipsoid['name']}. Changing to {ellipsoid['coeffs'][idx_lim]}.")
-            ellipsoid["lims_x"][1] = ellipsoid["coeffs"][idx_lim] - ellipsoid["lims_x"][1] / buff
+            sgn = np.sign((ellipsoid["lims_x"][1]))
+            clog.warning(f"Upper x-limit of {ellipsoid['lims_x'][1]:.3f} incompatible with ellipsoid {ellipsoid['name']}. Changing to {sgn*ellipsoid['coeffs'][idx_lim]}.")
+            ellipsoid["lims_x"][1] = sgn * (ellipsoid["coeffs"][idx_lim] - ellipsoid["lims_x"][1] / buff)
         
         if np.absolute(ellipsoid["lims_y"][0]) > ellipsoid["coeffs"][idx_lim]:
-            clog.warning(f"Lower y-limit of {ellipsoid['lims_y'][0]:.3f} incompatible with ellipsoid {ellipsoid['name']}. Changing to {ellipsoid['coeffs'][idx_lim]}.")
-            ellipsoid["lims_y"][0] = ellipsoid["coeffs"][idx_lim] + ellipsoid["lims_y"][0] / buff
+            sgn = np.sign((ellipsoid["lims_y"][0]))
+            clog.warning(f"Lower y-limit of {ellipsoid['lims_y'][0]:.3f} incompatible with ellipsoid {ellipsoid['name']}. Changing to {sgn*ellipsoid['coeffs'][idx_lim]}.")
+            ellipsoid["lims_y"][0] = sgn * (ellipsoid["coeffs"][idx_lim] + ellipsoid["lims_y"][0] / buff)
         
         if np.absolute(ellipsoid["lims_y"][1]) > ellipsoid["coeffs"][idx_lim]:
-            clog.warning(f"Upper y-limit of {ellipsoid['lims_y'][1]:.3f} incompatible with ellipsoid {ellipsoid['name']}. Changing to {ellipsoid['coeffs'][idx_lim]}.")
-            ellipsoid["lims_y"][1] = ellipsoid["coeffs"][idx_lim] - ellipsoid["lims_y"][1] / buff
+            sgn = np.sign((ellipsoid["lims_y"][1]))
+            clog.warning(f"Upper y-limit of {ellipsoid['lims_y'][1]:.3f} incompatible with ellipsoid {ellipsoid['name']}. Changing to {sgn*ellipsoid['coeffs'][idx_lim]}.")
+            ellipsoid["lims_y"][1] = sgn * (ellipsoid["coeffs"][idx_lim] - ellipsoid["lims_y"][1] / buff)
 
     elif ellipsoid["gmode"] == 1:
         if np.absolute(ellipsoid["lims_u"][0]) > ellipsoid["coeffs"][idx_lim]:

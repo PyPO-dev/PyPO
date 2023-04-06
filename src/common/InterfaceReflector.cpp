@@ -556,16 +556,16 @@ void Ellipse_uv(T *ellipse, U xu_lo, U xu_up, U yv_lo,
             v = (j * dv + yv_lo) * M_PI/180;
             int idx = i*ncy + j;
 
-            x = u * cos(v);
-            y = u * sin(v) * majmin;
+            x = u * cos(v);// + xcenter;
+            y = u * sin(v) * majmin;// + ycenter;
 
             r = sqrt(x*x + y*y);
 
             xr = x * cos(rot_uv) - y * sin(rot_uv);
             yr = x * sin(rot_uv) + y * cos(rot_uv);
 
-            x = xr + xcenter;
-            y = yr + ycenter;
+            x = xr;// + xcenter;
+            y = yr;// + ycenter;
 
             ellipse->x[idx] = x;
             ellipse->y[idx] = y;

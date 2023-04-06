@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['gutils_2eh_0',['GUtils.h',['../GUtils_8h.html',1,'']]]
+  ['efficiencies_2epy_0',['Efficiencies.py',['../Efficiencies_8py.html',1,'']]]
 ];

@@ -84,12 +84,6 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ad8fbef7a118c3c5634dbad08e64abe21"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BindUtils_8py.html#ad8fbef7a118c3c5634dbad08e64abe21">PyPO.BindUtils.currentConv</a> (currents, c_currents, size, ct_t)</td></tr>
-<tr class="memdesc:ad8fbef7a118c3c5634dbad08e64abe21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a PyPO currents object to a ctypes struct.  <br /></td></tr>
-<tr class="separator:ad8fbef7a118c3c5634dbad08e64abe21"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4b6841d8b6eb58406885a767b7b0391d"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BindUtils_8py.html#a4b6841d8b6eb58406885a767b7b0391d">PyPO.BindUtils.fieldConv</a> (field, c_fields, size, ct_t)</td></tr>
-<tr class="memdesc:a4b6841d8b6eb58406885a767b7b0391d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a PyPO fields object to a ctypes struct.  <br /></td></tr>
-<tr class="separator:a4b6841d8b6eb58406885a767b7b0391d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af1baaa14bc863181d16c46c40315ff56"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BindUtils_8py.html#af1baaa14bc863181d16c46c40315ff56">PyPO.BindUtils.sfieldConv</a> (field, c_field, size, ct_t)</td></tr>
 <tr class="memdesc:af1baaa14bc863181d16c46c40315ff56"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a PyPO scalarfield object to a ctypes struct.  <br /></td></tr>
 <tr class="separator:af1baaa14bc863181d16c46c40315ff56"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -129,29 +123,93 @@ Functions</h2></td></tr>
 <tr class="memitem:a8b6aa299ed4580fd1c092ee52160af60"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BindUtils_8py.html#a8b6aa299ed4580fd1c092ee52160af60">PyPO.BindUtils.allfill_cframe</a> (res, frame_py, size, ct_t)</td></tr>
 <tr class="memdesc:a8b6aa299ed4580fd1c092ee52160af60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate and fill a ctypes cframe or cframef struct.  <br /></td></tr>
 <tr class="separator:a8b6aa299ed4580fd1c092ee52160af60"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf46fcd0ceaf0d6cfd32587b560da971"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BindUtils_8py.html#acf46fcd0ceaf0d6cfd32587b560da971">PyPO.BindUtils.allfill_c2Bundle</a> (res, obj_py, size, ct_t)</td></tr>
+<tr class="memdesc:acf46fcd0ceaf0d6cfd32587b560da971"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate and fill a ctypes <a class="el" href="structc2Bundle.html">c2Bundle</a> or c2Bundleff struct.  <br /></td></tr>
+<tr class="separator:acf46fcd0ceaf0d6cfd32587b560da971"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acc764fd956c5a4af23944c161df7b8dd"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BindUtils_8py.html#acc764fd956c5a4af23944c161df7b8dd">PyPO.BindUtils.allfill_RTDict</a> (res, rdict_py, ct_t)</td></tr>
 <tr class="memdesc:acc764fd956c5a4af23944c161df7b8dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate and fill an <a class="el" href="structRTDict.html">RTDict</a> struct, for generating a tubular ray-trace frame.  <br /></td></tr>
 <tr class="separator:acc764fd956c5a4af23944c161df7b8dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af53e6619f0d1cf77b853392be21d954a"><td class="memItemLeft" align="right" valign="top"><a id="af53e6619f0d1cf77b853392be21d954a" name="af53e6619f0d1cf77b853392be21d954a"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>PyPO.BindUtils.allfill_GRTDict</b> (res, grdict_py, ct_t)</td></tr>
+<tr class="memitem:af53e6619f0d1cf77b853392be21d954a"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BindUtils_8py.html#af53e6619f0d1cf77b853392be21d954a">PyPO.BindUtils.allfill_GRTDict</a> (res, grdict_py, ct_t)</td></tr>
+<tr class="memdesc:af53e6619f0d1cf77b853392be21d954a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate and fill a <a class="el" href="structGRTDict.html">GRTDict</a>, for generating a Gaussian ray-trace frame.  <br /></td></tr>
 <tr class="separator:af53e6619f0d1cf77b853392be21d954a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae72cb575ec8644e91e27ea93958a4213"><td class="memItemLeft" align="right" valign="top"><a id="ae72cb575ec8644e91e27ea93958a4213" name="ae72cb575ec8644e91e27ea93958a4213"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>PyPO.BindUtils.allfill_GDict</b> (res, gdict_py, ct_t)</td></tr>
-<tr class="separator:ae72cb575ec8644e91e27ea93958a4213"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aee0050df43b76f0cf5d6178415fe161b"><td class="memItemLeft" align="right" valign="top"><a id="aee0050df43b76f0cf5d6178415fe161b" name="aee0050df43b76f0cf5d6178415fe161b"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>PyPO.BindUtils.allfill_SGDict</b> (res, sgdict_py, ct_t)</td></tr>
-<tr class="separator:aee0050df43b76f0cf5d6178415fe161b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8b230ef1b9a02ad2311ce7f820cda63a"><td class="memItemLeft" align="right" valign="top"><a id="a8b230ef1b9a02ad2311ce7f820cda63a" name="a8b230ef1b9a02ad2311ce7f820cda63a"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>PyPO.BindUtils.creflToObj</b> (res, shape, np_t)</td></tr>
+<tr class="memitem:a783102a3a0e2493633570d76dbb2f85e"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BindUtils_8py.html#a783102a3a0e2493633570d76dbb2f85e">PyPO.BindUtils.allfill_GPODict</a> (res, gdict_py, ct_t)</td></tr>
+<tr class="memdesc:a783102a3a0e2493633570d76dbb2f85e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate and fill a <a class="el" href="structGPODict.html">GPODict</a>, for generating a Gaussian beam field and current.  <br /></td></tr>
+<tr class="separator:a783102a3a0e2493633570d76dbb2f85e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23f5f6817418c29eb8eda947ce537d11"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BindUtils_8py.html#a23f5f6817418c29eb8eda947ce537d11">PyPO.BindUtils.allfill_SGPODict</a> (res, sgdict_py, ct_t)</td></tr>
+<tr class="memdesc:a23f5f6817418c29eb8eda947ce537d11"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate and fill a <a class="el" href="structScalarGPODict.html">ScalarGPODict</a>, for generating a scalar Gaussian beam field.  <br /></td></tr>
+<tr class="separator:a23f5f6817418c29eb8eda947ce537d11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa8a54dc1920d87466d20a772e4b228dd"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BindUtils_8py.html#aa8a54dc1920d87466d20a772e4b228dd">PyPO.BindUtils.allfill_mat4D</a> (mat, ct_t)</td></tr>
+<tr class="memdesc:aa8a54dc1920d87466d20a772e4b228dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate and fill a 4D matrix for transforming frames and fields/currents.  <br /></td></tr>
+<tr class="separator:aa8a54dc1920d87466d20a772e4b228dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b230ef1b9a02ad2311ce7f820cda63a"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BindUtils_8py.html#a8b230ef1b9a02ad2311ce7f820cda63a">PyPO.BindUtils.creflToObj</a> (res, shape, np_t)</td></tr>
+<tr class="memdesc:a8b230ef1b9a02ad2311ce7f820cda63a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a reflector grids struct to a PyPO grids object.  <br /></td></tr>
 <tr class="separator:a8b230ef1b9a02ad2311ce7f820cda63a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5842bb6b905c02b1c1855b5cbcbb7bac"><td class="memItemLeft" align="right" valign="top"><a id="a5842bb6b905c02b1c1855b5cbcbb7bac" name="a5842bb6b905c02b1c1855b5cbcbb7bac"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>PyPO.BindUtils.frameToObj</b> (res, np_t, shape)</td></tr>
+<tr class="memitem:a5842bb6b905c02b1c1855b5cbcbb7bac"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BindUtils_8py.html#a5842bb6b905c02b1c1855b5cbcbb7bac">PyPO.BindUtils.frameToObj</a> (res, np_t, shape)</td></tr>
+<tr class="memdesc:a5842bb6b905c02b1c1855b5cbcbb7bac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a cframe struct to a PyPO frame object.  <br /></td></tr>
 <tr class="separator:a5842bb6b905c02b1c1855b5cbcbb7bac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Utilities for the ctypes interface. </p>
 <p>These methods are mostly for allocating and deallocating data. Also, Python types and PyPO objects are converted to ctypes structs here and vice versa. After converting to a ctypes struct, the struct is passed to the C/C++ source code and converted to a proper C/C++ struct for further usage. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="acf46fcd0ceaf0d6cfd32587b560da971" name="acf46fcd0ceaf0d6cfd32587b560da971"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acf46fcd0ceaf0d6cfd32587b560da971">&#9670;&#160;</a></span>allfill_c2Bundle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def PyPO.BindUtils.allfill_c2Bundle </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>res</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>obj_py</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>ct_t</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Allocate and fill a ctypes <a class="el" href="structc2Bundle.html">c2Bundle</a> or c2Bundleff struct. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">res</td><td>A ctypes <a class="el" href="structc2Bundle.html">c2Bundle</a> or <a class="el" href="structc2Bundlef.html">c2Bundlef</a> struct. </td></tr>
+    <tr><td class="paramname">obj_py</td><td>a PyPO fields or currents object. </td></tr>
+    <tr><td class="paramname">size</td><td>Number of points in struct. </td></tr>
+    <tr><td class="paramname">ct_t</td><td>Type of point in struct.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="structc2Bundle.html">c2Bundle</a> </dd>
+<dd>
+<a class="el" href="structc2Bundlef.html">c2Bundlef</a> </dd>
+<dd>
+fields </dd>
+<dd>
+currents </dd></dl>
+
+</div>
+</div>
 <a id="a8b6aa299ed4580fd1c092ee52160af60" name="a8b6aa299ed4580fd1c092ee52160af60"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8b6aa299ed4580fd1c092ee52160af60">&#9670;&#160;</a></span>allfill_cframe()</h2>
 
@@ -205,6 +263,138 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>PyPO.BindUtils.frameTo
 <a class="el" href="structcframef.html">cframef</a> </dd>
 <dd>
 frame </dd></dl>
+
+</div>
+</div>
+<a id="a783102a3a0e2493633570d76dbb2f85e" name="a783102a3a0e2493633570d76dbb2f85e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a783102a3a0e2493633570d76dbb2f85e">&#9670;&#160;</a></span>allfill_GPODict()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def PyPO.BindUtils.allfill_GPODict </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>res</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>gdict_py</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>ct_t</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Allocate and fill a <a class="el" href="structGPODict.html">GPODict</a>, for generating a Gaussian beam field and current. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">res</td><td>A <a class="el" href="structGPODict.html">GPODict</a> or <a class="el" href="structGPODictf.html">GPODictf</a> struct. </td></tr>
+    <tr><td class="paramname">gdict_py</td><td>A <a class="el" href="structGPODict.html">GPODict</a>. </td></tr>
+    <tr><td class="paramname">ct_t</td><td>Type of field in struct.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="structGPODict.html">GPODict</a> </dd>
+<dd>
+<a class="el" href="structGPODictf.html">GPODictf</a> </dd></dl>
+
+</div>
+</div>
+<a id="af53e6619f0d1cf77b853392be21d954a" name="af53e6619f0d1cf77b853392be21d954a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af53e6619f0d1cf77b853392be21d954a">&#9670;&#160;</a></span>allfill_GRTDict()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def PyPO.BindUtils.allfill_GRTDict </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>res</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>grdict_py</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>ct_t</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Allocate and fill a <a class="el" href="structGRTDict.html">GRTDict</a>, for generating a Gaussian ray-trace frame. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">res</td><td>A <a class="el" href="structGRTDict.html">GRTDict</a> or <a class="el" href="structGRTDictf.html">GRTDictf</a> struct. </td></tr>
+    <tr><td class="paramname">grdict_py</td><td>A <a class="el" href="structGRTDict.html">GRTDict</a>. </td></tr>
+    <tr><td class="paramname">ct_t</td><td>Type of field in struct.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="structGRTDict.html">GRTDict</a> </dd>
+<dd>
+<a class="el" href="structGRTDictf.html">GRTDictf</a> </dd></dl>
+
+</div>
+</div>
+<a id="aa8a54dc1920d87466d20a772e4b228dd" name="aa8a54dc1920d87466d20a772e4b228dd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa8a54dc1920d87466d20a772e4b228dd">&#9670;&#160;</a></span>allfill_mat4D()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def PyPO.BindUtils.allfill_mat4D </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>mat</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>ct_t</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Allocate and fill a 4D matrix for transforming frames and fields/currents. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mat</td><td>Matrix containing transformation. </td></tr>
+    <tr><td class="paramname">ct_t</td><td>Type of field in matrix.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>c_mat The ctypes representation of the matrix. </dd></dl>
 
 </div>
 </div>
@@ -300,9 +490,54 @@ reflDict </dd></dl>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="structRTDict.html">RTDict</a> </dd>
 <dd>
-<a class="el" href="structRTDictf.html">RTDictf</a> </dd>
+<a class="el" href="structRTDictf.html">RTDictf</a> </dd></dl>
+
+</div>
+</div>
+<a id="a23f5f6817418c29eb8eda947ce537d11" name="a23f5f6817418c29eb8eda947ce537d11"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a23f5f6817418c29eb8eda947ce537d11">&#9670;&#160;</a></span>allfill_SGPODict()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def PyPO.BindUtils.allfill_SGPODict </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>res</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>sgdict_py</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>ct_t</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Allocate and fill a <a class="el" href="structScalarGPODict.html">ScalarGPODict</a>, for generating a scalar Gaussian beam field. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">res</td><td>A <a class="el" href="structScalarGPODict.html">ScalarGPODict</a> or <a class="el" href="structScalarGPODictf.html">ScalarGPODictf</a> struct. </td></tr>
+    <tr><td class="paramname">sgdict_py</td><td>A <a class="el" href="structGPODict.html">GPODict</a>. </td></tr>
+    <tr><td class="paramname">ct_t</td><td>Type of field in struct.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="structScalarGPODict.html">ScalarGPODict</a> </dd>
 <dd>
-frame </dd></dl>
+<a class="el" href="structScalarGPODictf.html">ScalarGPODictf</a> </dd></dl>
 
 </div>
 </div>
@@ -812,35 +1047,29 @@ currents </dd></dl>
 
 </div>
 </div>
-<a id="ad8fbef7a118c3c5634dbad08e64abe21" name="ad8fbef7a118c3c5634dbad08e64abe21"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad8fbef7a118c3c5634dbad08e64abe21">&#9670;&#160;</a></span>currentConv()</h2>
+<a id="a8b230ef1b9a02ad2311ce7f820cda63a" name="a8b230ef1b9a02ad2311ce7f820cda63a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8b230ef1b9a02ad2311ce7f820cda63a">&#9670;&#160;</a></span>creflToObj()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">def PyPO.BindUtils.currentConv </td>
+          <td class="memname">def PyPO.BindUtils.creflToObj </td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>currents</em>, </td>
+          <td class="paramname"><em>res</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>c_currents</em>, </td>
+          <td class="paramname"><em>shape</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>size</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>ct_t</em>&#160;</td>
+          <td class="paramname"><em>np_t</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -850,51 +1079,47 @@ currents </dd></dl>
       </table>
 </div><div class="memdoc">
 
-<p>Convert a PyPO currents object to a ctypes struct. </p>
-<p>@params currents A PyPO currents object. @params c_currents A ctypes <a class="el" href="structc2Bundle.html">c2Bundle</a> or <a class="el" href="structc2Bundlef.html">c2Bundlef</a> struct. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Convert a reflector grids struct to a PyPO grids object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">size</td><td>Number of points in currents object. </td></tr>
-    <tr><td class="paramname">ct_t</td><td>Type of the floating point numbers for ctypes.</td></tr>
+    <tr><td class="paramname">res</td><td>A reflcontainer or reflcontainerf struct. </td></tr>
+    <tr><td class="paramname">shape</td><td>Shape of the reflector grid. </td></tr>
+    <tr><td class="paramname">np_t</td><td>Type of field in PyPO object.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also</dt><dd>currents </dd>
+<dl class="section return"><dt>Returns</dt><dd>out The grids as PyPO object.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="structreflcontainer.html">reflcontainer</a> </dd>
 <dd>
-<a class="el" href="structc2Bundle.html">c2Bundle</a> </dd>
+<a class="el" href="structreflcontainerf.html">reflcontainerf</a> </dd>
 <dd>
-<a class="el" href="structc2Bundlef.html">c2Bundlef</a> </dd></dl>
+reflGrids </dd></dl>
 
 </div>
 </div>
-<a id="a4b6841d8b6eb58406885a767b7b0391d" name="a4b6841d8b6eb58406885a767b7b0391d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4b6841d8b6eb58406885a767b7b0391d">&#9670;&#160;</a></span>fieldConv()</h2>
+<a id="a5842bb6b905c02b1c1855b5cbcbb7bac" name="a5842bb6b905c02b1c1855b5cbcbb7bac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5842bb6b905c02b1c1855b5cbcbb7bac">&#9670;&#160;</a></span>frameToObj()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">def PyPO.BindUtils.fieldConv </td>
+          <td class="memname">def PyPO.BindUtils.frameToObj </td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>field</em>, </td>
+          <td class="paramname"><em>res</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>c_fields</em>, </td>
+          <td class="paramname"><em>np_t</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>size</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>ct_t</em>&#160;</td>
+          <td class="paramname"><em>shape</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -904,19 +1129,21 @@ currents </dd></dl>
       </table>
 </div><div class="memdoc">
 
-<p>Convert a PyPO fields object to a ctypes struct. </p>
-<p>@params fields A PyPO fields object. @params c_fields A ctypes <a class="el" href="structc2Bundle.html">c2Bundle</a> or <a class="el" href="structc2Bundlef.html">c2Bundlef</a> struct. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Convert a cframe struct to a PyPO frame object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">size</td><td>Number of points in fields object. </td></tr>
-    <tr><td class="paramname">ct_t</td><td>Type of the floating point numbers for ctypes.</td></tr>
+    <tr><td class="paramname">res</td><td>A cframe or cframef struct. </td></tr>
+    <tr><td class="paramname">np_t</td><td>Type of field in PyPO frame object. </td></tr>
+    <tr><td class="paramname">shape</td><td>Shape of resulting PyPO frame.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also</dt><dd>fields </dd>
+<dl class="section return"><dt>Returns</dt><dd>out PyPO frame object.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="structcframe.html">cframe</a> </dd>
 <dd>
-<a class="el" href="structc2Bundle.html">c2Bundle</a> </dd>
+<a class="el" href="structcframef.html">cframef</a> </dd>
 <dd>
-<a class="el" href="structc2Bundlef.html">c2Bundlef</a> </dd></dl>
+frame </dd></dl>
 
 </div>
 </div>

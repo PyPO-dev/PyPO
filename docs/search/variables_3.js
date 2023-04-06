@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['e0_0',['E0',['../structGDict.html#aad5588f0d6e2388122431895d44ef07c',1,'GDict::E0()'],['../structScalarGDict.html#a7c266f0929638a69bede15ca8640464d',1,'ScalarGDict::E0()'],['../structGDictf.html#afbc659ddca4bcb03e111b0ce6ea88c19',1,'GDictf::E0()'],['../structScalarGDictf.html#a0af20163a229d19960934880ff22d730',1,'ScalarGDictf::E0()']]],
+  ['e0_0',['E0',['../structGPODict.html#a645913720bcc71df91334a1c05ff9045',1,'GPODict::E0()'],['../structScalarGPODict.html#a001b9447cad35384d1118bcc35a486b2',1,'ScalarGPODict::E0()'],['../structGPODictf.html#a5b1466ca9cbafb7f96bc1cca578ce368',1,'GPODictf::E0()'],['../structScalarGPODictf.html#a709608689cfe99d9b3298adddfae61ad',1,'ScalarGPODictf::E0()']]],
   ['ecc_5fuv_1',['ecc_uv',['../structreflparams.html#a5ccc1216307dc1968f59782a4504f70a',1,'reflparams::ecc_uv()'],['../structreflparamsf.html#a37ae1ab16c231af5e4eb748a2241a91e',1,'reflparamsf::ecc_uv()']]]
 ];

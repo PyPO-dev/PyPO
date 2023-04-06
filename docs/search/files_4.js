@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['kernelsf_2ecu_0',['Kernelsf.cu',['../Kernelsf_8cu.html',1,'']]],
-  ['kernelsrtf_2ecu_1',['KernelsRTf.cu',['../KernelsRTf_8cu.html',1,'']]]
+  ['gutils_2eh_0',['GUtils.h',['../GUtils_8h.html',1,'']]]
 ];

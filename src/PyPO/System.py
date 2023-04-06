@@ -1992,7 +1992,7 @@ class System(object):
         
         tilt = self.calcRTtilt(name_frame)
         center = self.calcRTcenter(name_frame)
-        match = world.IAX
+        match = self.copyObj(world.IAX)
 
         R = self.findRotation(match, tilt)
 
@@ -2002,8 +2002,8 @@ class System(object):
         target = {
                 "name"      : t_name,
                 "gmode"     : "xy",
-                "lims_x"    : np.array([-42, 42]),
-                "lims_y"    : np.array([-42, 42]),
+                "lims_x"    : np.array([-4.2, 4.2]),
+                "lims_y"    : np.array([-4.2, 4.2]),
                 "gridsize"  : np.array([3, 3])
                 }
 
@@ -2026,6 +2026,7 @@ class System(object):
             self.setLoggingVerbosity(verbose=True)
         
         out = res[0] * tilt + center
+        self.translateGrids(t_name, out, mode="absolute")
         self.clog.info(f"Focus: {*['{:0.3e}'.format(x) for x in out],}, RMS: {res[1]:.3e}")
 
         return out

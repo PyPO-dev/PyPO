@@ -405,16 +405,16 @@ def check_ElemDict(elemDict, nameList, num_ref, clog):
     
     errStr = ""
    
-    elemDict["transf"] = world.INITM 
+    elemDict["transf"] = world.INITM() 
    
     if not "pos" in elemDict:
-        elemDict["pos"] = world.ORIGIN
+        elemDict["pos"] = world.ORIGIN()
 
     else:
         errStr += block_ndarray("pos", elemDict, (3,))
 
     if not "ori" in elemDict:
-        elemDict["ori"] = world.IAX
+        elemDict["ori"] = world.IAX()
     
     else:
         errStr += block_ndarray("ori", elemDict, (3,))

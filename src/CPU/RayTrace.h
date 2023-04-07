@@ -427,6 +427,8 @@ void RayTracer<T, U, V>::propagateRaysToPl(int start, int stop,
         V dx = fr_in->dx[i];
         V dy = fr_in->dy[i];
         V dz = fr_in->dz[i];
+        
+        
         while (check > epsilon)
         {
             t1 = refls.gpl(_t, x, y, z, dx, dy, dz);

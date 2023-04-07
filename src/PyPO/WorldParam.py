@@ -13,5 +13,23 @@ IAX       = ZAX
 
 INITM       = np.eye(4)
 
+def ORIGIN():
+    return np.zeros(3)
+
+def XAX():
+    return np.array([1, 0, 0])
+
+def YAX():
+    return np.array([0, 1, 0])
+
+def ZAX():
+    return np.array([0, 0, 1])
+
+def IAX():
+    return ZAX()
+
+def INITM():
+    return np.eye(4)
+
 def writeSettings():
     pass

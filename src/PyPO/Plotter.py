@@ -354,7 +354,7 @@ def plotSystem(systemDict, ax, fine, cmap,norm,
                 y.append(frame.y[i])
                 z.append(frame.z[i])
 
-            ax.plot(x, y, z, color=RTcolor, zorder=100)
+            ax.plot(x, y, z, color=RTcolor, zorder=100, lw=0.1)
 
 
     #set_axes_equal(ax)

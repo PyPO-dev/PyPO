@@ -1212,7 +1212,7 @@ class PyPOMainWindow(QMainWindow):
         # ElementsMenu.addAction(AddTestHyperbola)
 
         ### Add Element
-        reflectorSelector = ElementsMenu.addMenu("Reflector")
+        reflectorSelector = ElementsMenu.addMenu("Add Reflector")
         ### Planar Surface
         planeAction = QAction("Plane", self)
         planeAction.setShortcut("Ctrl+L")

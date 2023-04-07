@@ -1,9 +1,11 @@
 from multiprocessing import Process, Manager
-from PyQt5.QtCore import QThread
+from PyQt5.QtCore import QThread, pyqtSignal, QObject
 from PyQt5.QtWidgets import QWidget, QMainWindow, QApplication, QVBoxLayout, QPushButton, QLabel
-from Dialogs import SymDialog
-from Waiter import Waiter
+from src.GUI.Dialogs import SymDialog
 from time import sleep
+from copy import deepcopy
+import src.PyPO.System as st
+
 
 class SubprocessManager():
     def __init__(self, parentWidget) -> None:
@@ -19,7 +21,7 @@ class SubprocessManager():
         self.subProcessRunning = False
 
 
-    def runInSubprocess(self, work, args, propBeamDict, dialogText = ""):
+    def runInSubprocess(self, work, args, dialogText = ""):
         if self.subProcessRunning:
             return
         self.subProcessRunning = True
@@ -29,7 +31,6 @@ class SubprocessManager():
         if not dialogText:
             dialogText = "Calculating"
         self.currentCalculationDialog = SymDialog(process.kill, None, dialogText) 
-        self.currentCalculationDict = propBeamDict
 
         
         self.waiterThread = QThread(parent=self.parentWidget)
@@ -41,7 +42,47 @@ class SubprocessManager():
 
         process.start()
         self.waiterThread.start()
-        self.currentCalculationDialog.exec_()
+        res = True if self.currentCalculationDialog.exec_() else False
+        self.waiterThread.quit()
+        return res
+            
+
+
+
+class Waiter(QObject):
+    finished = pyqtSignal(int)
+
+    def setProcess(self, process):
+        self.process = process
+
+    def run(self):
+        self.process.join()
+        print("waiter: Process joined")
+        self.finished.emit(self.process.exitcode==0)
+
+
+def copySystem(system :st.System, cSystem = True, cFrames = [], cFields = [], cCurrents = [], cScalarFields = []):
+    s2 = st.System(context="G")
+    if cSystem:
+        s2.system.update(deepcopy(system.system))
+    for frame in cFrames:
+        s2.frames[frame] = system.frames[frame]
+    for field in cFields:
+        s2.fields[field] = system.fields[field]
+    for current in cCurrents:
+        s2.currents[current] = system.currents[current]
+    for sField in cScalarFields:
+        s2.scalarfields[sField] = system.scalarfields[sField]
+    return s2
+    # for k, e in system.system.items():
+    #     print(f"System {k}: {e}")
+        
+
+    # for key, fr in system.frames.items():
+    #     print(f"{key}: {fr}")
+    # for key, fr in s2.frames.items():
+    #     print(f"{key}: {fr}")
+        
 
 
 

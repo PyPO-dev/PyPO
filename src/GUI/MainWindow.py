@@ -17,9 +17,8 @@ import src.GUI.ParameterForms.formData as fData
 from src.GUI.PlotScreen import PlotScreen
 from src.GUI.Accordion import Accordion
 from src.GUI.Dialogs import SymDialog
-from src.GUI.Worker import Worker, GWorker
-from src.GUI.Waiter import Waiter
 from src.GUI.WorkSpace import Workspace
+from src.GUI.SubprocessManager import SubprocessManager, copySystem, Waiter
 
 from src.PyPO.CustomLogger import CustomGUILogger
 
@@ -82,6 +81,7 @@ class MainWidget(QWidget):
         self.event_stop = Event()
 
         self.threadpool = QThreadPool()
+        self.subprocessManager = SubprocessManager(self)
 
         # NOTE Raytrace stuff
         self.frameDict = {}
@@ -169,7 +169,6 @@ class MainWidget(QWidget):
     # removes the form ParameterWid if exists 
     def removeForm(self):
         if hasattr(self, "formScroll"):
-            print("removingForm")
             self.formScroll.setParent(None)
             self.formScroll.deleteLater()
             self.ParameterWid.setParent(None)
@@ -708,6 +707,17 @@ class MainWidget(QWidget):
         self.setForm(fData.initGaussianFrameInp(), readAction=self.initGaussianFrameAction, okText="Add frame")
     
 
+    def initGaussianFrameWorker(self, s_copy: st.System, GRTDict, returnDict):
+        try:
+            s_copy.createGRTFrame(GRTDict)
+
+            returnDict["system"] = s_copy
+        except Exception as err:
+            print(err)
+            print_tb(err.__traceback__)
+            self.clog.error(err)
+
+
     ##
     # Reads form and adds a gaussian frame to system
     def initGaussianFrameAction(self):
@@ -719,14 +729,27 @@ class MainWidget(QWidget):
 
       
             dialStr = f"Calculating Gaussian ray-trace frame {GRTDict['name']}..."
-            worker = Worker(self.stm.createGRTFrame, GRTDict)
-            dial = SymDialog(worker.kill, self.clog, dialStr) 
 
-            worker.signal.finished.connect(dial.accept) 
-            worker.signal.finished.connect(lambda : self.addFrameWidget(GRTDict["name"])) 
+            scopy = st.System()
 
-            self.threadpool.start(worker)
-            dial.exec_()
+            mgr = Manager()
+            returnDict = mgr.dict()
+
+            args = (scopy, GRTDict, returnDict)
+            if self.subprocessManager.runInSubprocess(self.initGaussianFrameWorker, args, dialogText=dialStr):
+                s_copy = returnDict["system"]
+                self.stm.frames.update(s_copy.frames)
+
+                self.addFrameWidget(GRTDict["name"]) 
+
+
+            # dial = SymDialog(worker.kill, self.clog, dialStr) 
+
+            # worker.signal.finished.connect(dial.accept) 
+            # worker.signal.finished.connect(lambda : 
+
+            # self.threadpool.start(worker)
+            # dial.exec_()
         
         except Exception as err:
             print(err)
@@ -756,6 +779,8 @@ class MainWidget(QWidget):
     # 
     # @param frame Frame to plot
     def plotFrameForm(self, frame):
+        # copySystem(self.stm, st.System(), cFrames=[frame])
+
         self.setForm(fData.plotFrameOpt(frame), readAction=self.addPlotFrameAction, okText="Plot frame")
 
     ##
@@ -968,82 +993,42 @@ class MainWidget(QWidget):
             print_tb(err.__traceback__)
             self.clog.error(err)
 
-    def waiterFinished(self, success):
-        # process.join()
-        try:
-            print("waiter: Process joined")
-            if success:
-                self.currentCalculationDialog.accept()
-                self._addToWidgets(self.currentCalculationDict)
-            else:
-                self.currentCalculationDialog.reject()
-
-        except Exception as err:
-            print(err)
-            print_tb(err.__traceback__)
-            self.clog.error(err)
     ##
     # Reads form propagates beam, runs calculation on another thread
     def propPOAction(self):
         try:
             propBeamDict = self.ParameterWid.read()
-            print(propBeamDict)
+            # print(propBeamDict)
             
             chk.check_runPODict(propBeamDict, self.stm.system.keys(), self.stm.fields.keys(), self.stm.currents.keys(),
                             self.stm.scalarfields.keys(), self.stm.frames.keys(), self.clog)
         
-            if propBeamDict["mode"] == "scalar":
-                subStr = "scalar field"
-            else:
-                subStr = propBeamDict["mode"]
+            subStr = "scalar field" if propBeamDict["mode"] == "scalar" else propBeamDict["mode"]
 
             start_time = time()
         
             self.clog.info("*** Starting PO propagation ***")
 
-
-            s_copy = st.System(context="G")
-            
-            s_copy.system[propBeamDict["t_name"]] = self.stm.system[propBeamDict["t_name"]]
+            currents = []
+            sfields = []
             if "s_current" in propBeamDict:
-                s_copy.currents[propBeamDict["s_current"]] = self.stm.currents[propBeamDict["s_current"]]
-                s_copy.system[self.stm.currents[propBeamDict["s_current"]].surf] = self.stm.system[self.stm.currents[propBeamDict["s_current"]].surf]
-                print(f"{self.stm.system[self.stm.currents[propBeamDict['s_current']].surf] = }")
+                currents.append(propBeamDict["s_current"])
             elif "s_field" in propBeamDict:
-                s_copy.scalarfields[propBeamDict["s_field"]] = self.stm.scalarfields[propBeamDict["s_scalarfield"]]
-                s_copy.system[self.stm.scalarfields[propBeamDict["s_field"]].surf] = self.stm.system[self.stm.scalarfields[propBeamDict["s_field"]].surf]
+                sfields.append(propBeamDict["s_field"])
+            dialStr = f"Calculating {subStr} on {propBeamDict['t_name']}..."
+
+
+            s_copy = copySystem(self.stm, cSystem=True, cCurrents = currents, cScalarFields= sfields)
 
             mgr = Manager()
             returnDict = mgr.dict()
 
             args = (s_copy, propBeamDict, returnDict)
-            process = Process(target = self.runPOWorker, args = args)
+            calcSuccess = self.subprocessManager.runInSubprocess(self.runPOWorker, args, dialStr)
 
-            def abort():
-                process.kill()
-                self.currentCalculationDialog.reject()
-
-            dialStr = f"Calculating {subStr} on {propBeamDict['t_name']}..."
-            self.currentCalculationDialog = SymDialog(abort, self.clog, dialStr) 
-            self.currentCalculationDict = propBeamDict
-
-            waiterTread = QThread(parent=self)
-            waiter = Waiter()
-            waiter.setProcess(process)
-            waiter.moveToThread(waiterTread)
-            waiterTread.started.connect(waiter.run)
-            waiter.finished.connect(waiter.deleteLater)
-            # waiter.finished.connect(waiterTread.quit)
-            # waiter.finished.connect(waiterTread.deleteLater)
-            waiter.finished.connect(self.waiterFinished)
-
-            process.start()
-            waiterTread.start()
-            d=self.currentCalculationDialog.exec_()
-            print(f"{d = }")
-            if d:
+            print(f"{calcSuccess = }")
+            if calcSuccess:
                 s_copy = returnDict["system"]
-                print(f"{s_copy = }")
                 self.stm.frames.update(s_copy.frames)
                 self.stm.fields.update(s_copy.fields)
                 self.stm.currents.update(s_copy.currents)
@@ -1051,6 +1036,7 @@ class MainWidget(QWidget):
 
                 dtime = time() - start_time
                 self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
+                self._addToWidgets(propBeamDict)
 
         except Exception as err:
             print(err)

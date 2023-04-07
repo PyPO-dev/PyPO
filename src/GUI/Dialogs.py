@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QDialog, QGridLayout, QPushButton, QLabel
-
+from PyQt5.QtCore import Qt
 
 ##
 # @file Defines dialogs for the GUI.
@@ -13,6 +13,8 @@ class SymDialog(QDialog):
         super().__init__()
 
         self.clog = clog
+        self.setWindowFlag(Qt.FramelessWindowHint)
+
 
         layout = QGridLayout()
         abortBtn = QPushButton("Abort")

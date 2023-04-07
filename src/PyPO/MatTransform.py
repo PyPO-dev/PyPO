@@ -18,8 +18,8 @@ import src.PyPO.WorldParam as world
 #
 # @returns matOut Full 4D affine transformation matrix.
 def MatRotate(theta, matAppend=None, pivot=None, radians=False):
-    pivot = world.ORIGIN if pivot is None else pivot
-    matAppend = world.INITM if matAppend is None else matAppend
+    pivot = world.ORIGIN() if pivot is None else pivot
+    matAppend = world.INITM() if matAppend is None else matAppend
 
     if radians:
         theta_x, theta_y, theta_z = theta
@@ -67,7 +67,7 @@ def MatRotate(theta, matAppend=None, pivot=None, radians=False):
 #
 # @returns matOut Full 4D affine transformation matrix.
 def MatTranslate(trans, matAppend=None):
-    matAppend = world.INITM if matAppend is None else matAppend
+    matAppend = world.INITM() if matAppend is None else matAppend
     xt, yt, zt = trans
     trans = np.array([[1, 0, 0, xt],
                     [0, 1, 0, yt],
@@ -88,7 +88,7 @@ def InvertMat(mat):
     R_T = mat[:3, :3].T
     R_Tt = -R_T @ mat[:3, -1]
 
-    matInv = world.INITM
+    matInv = world.INITM()
     matInv[:3, :3] = R_T
     matInv[:3, -1] = R_Tt
 

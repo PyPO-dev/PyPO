@@ -1971,6 +1971,12 @@ class System(object):
         
         return R_transf
 
+    def findRTcoll(self, name_frame):
+        std = np.mean(effs.calcRTtiltSTD(self.frames[name_frame]))
+        factor = np.log10(1 - std**2)
+
+        self.clog.info(f"Ray-trace beam collimation factor : {factor}.")
+
     ##
     # Find the focus of a ray-trace frame.
     # Adds a new plane to the System, perpendicular to the mean ray-trace tilt of the input frame.

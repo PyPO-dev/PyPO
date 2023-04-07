@@ -59,6 +59,20 @@ def calcRTtilt(frame):
     return np.array([t_x, t_y, t_z]) / np.linalg.norm(np.array([t_x, t_y, t_z]))
 
 ##
+# Calculate standard deviation tilt of a ray-trace frame.
+#
+# @param frame Frame to calculate standard deviation tilt of.
+#
+# @returns tilt Array containing xyz tilt standard deviations components.
+def calcRTtiltSTD(frame):
+    idx_good = np.argwhere((frame.dx**2 + frame.dy**2 + frame.dz**2) > 0.8)
+    stdt_x = np.std(np.absolute(frame.dx[idx_good]))
+    stdt_y = np.std(np.absolute(frame.dy[idx_good]))
+    stdt_z = np.std(np.absolute(frame.dz[idx_good]))
+
+    return np.array([stdt_x, stdt_y, stdt_z])# / np.linalg.norm(np.array([stdt_x, stdt_y, stdt_z]))
+
+##
 # Calcuate root-mean-square (RMS) of a ray-trace frame.
 #
 # @param frame Frame to calculate RMS of.

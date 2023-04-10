@@ -612,7 +612,7 @@ def snapForm(elem, snapList, obj="element"):
 def addGroupForm(elementList):
     return[
         InputDescription(inType.vectorStrings, "name", toolTip= "Give the group a name"),
-        InputDescription(inType.elementSelector, "selected", "elements", options = elements )
+        InputDescription(inType.elementSelector, "selected", "elements", options = elementList)
     ]
 
 ##

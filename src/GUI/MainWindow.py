@@ -582,12 +582,12 @@ class MainWidget(QWidget):
     ##
     # Shows single element transformation form
     def transformSingleForm(self, element):
-        self.setForm(fData.makeTransformationForm(element), self.transformAction, okText="Apply transformation")
+        self.setForm(fData.makeTransformationForm(element), self.transformAction, okText="Apply")
     
     ##
     # Shows single element transformation form
     def transformFrameForm(self, frame):
-        self.setForm(fData.makeTransformationForm(frame, obj="frame"), self.transformFrameAction, okText="Apply transformation")
+        self.setForm(fData.makeTransformationForm(frame, obj="frame"), self.transformFrameAction, okText="Apply")
     
     ##
     # Applies single element transformation
@@ -613,7 +613,7 @@ class MainWidget(QWidget):
     ##
     # Shows group transformation form
     def transformGroupForm(self, group):
-        self.setForm(fData.makeTransformationForm(group, obj="group"), self.transformGroupAction, okText="Apply transformation")
+        self.setForm(fData.makeTransformationForm(group, obj="group"), self.transformGroupAction, okText="Apply")
     
     ##
     # Applies group transformation
@@ -661,7 +661,7 @@ class MainWidget(QWidget):
         self.setForm(
             [InputDescription(inType.elementSelector, "elements", options=movableElements)]+
             fData.makeTransformationElementsForm(self.stm.system.keys()), self.transformationMultipleAction
-            , okText="Apply transformation")
+            , okText="Apply")
 
     ##
     # Applies multiple element transformation

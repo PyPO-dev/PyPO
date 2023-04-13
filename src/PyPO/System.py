@@ -1587,8 +1587,8 @@ class System(object):
         x_cut_interp = interp1d(x_strip, x_cut, kind="cubic")(x_interp)
         y_cut_interp = interp1d(y_strip, y_cut, kind="cubic")(y_interp)
 
-        mask_x = (x_cut_interp > -3.1) & (x_cut_interp < -2.9)
-        mask_y = (y_cut_interp > -3.1) & (y_cut_interp < -2.9)
+        mask_x = (x_cut_interp > -3.01) & (x_cut_interp < -2.99)
+        mask_y = (y_cut_interp > -3.01) & (y_cut_interp < -2.99)
 
         HPBW_E = np.mean(np.absolute(x_interp[mask_x])) * 2 * 3600
         HPBW_H = np.mean(np.absolute(y_interp[mask_y])) * 2 * 3600
@@ -1633,6 +1633,39 @@ class System(object):
         self.fields[PSDict["name"]] = field
         self.currents[PSDict["name"]] = current
 
+    ##
+    # Generate uniform PO fields and currents.
+    #
+    # @param UDict A UDict dictionary, containing parameters for the uniform pattern.
+    # @param name_surface Name of surface on which to define the uniform pattern.
+    #
+    # @see PSDict
+    def generateUniformSource(self, UDict, name_surface):
+        check_elemSystem(name_surface, self.system, self.clog, extern=True)
+        check_PSDict(UDict, self.fields, self.clog)
+
+        surfaceObj = self.system[name_surface]
+        us = np.ones(surfaceObj["gridsize"], dtype=complex) * UDict["E0"] * np.exp(1j * UDict["phase"])
+
+        Ex = us * UDict["pol"][0]
+        Ey = us * UDict["pol"][1]
+        Ez = us * UDict["pol"][2]
+
+        Hx = us * 0
+        Hy = us * 0
+        Hz = us * 0
+
+        field = fields(Ex, Ey, Ez, Hx, Hy, Hz) 
+        current = self.calcCurrents(name_surface, field)
+
+        k =  2 * np.pi / UDict["lam"]
+
+        field.setMeta(name_surface, k)
+        current.setMeta(name_surface, k)
+
+        self.fields[UDict["name"]] = field
+        self.currents[UDict["name"]] = current
+    
     ##
     # Generate point-source scalar PO field.
     #
@@ -1740,7 +1773,7 @@ class System(object):
                     vmin=None, vmax=None, levels=None, show=True, amp_only=False,
                     save=False, interpolation=None, norm=True,
                     aperDict=None, mode='dB', project='xy',
-                    units="", name="", titleA="Amp", titleP="Phase",
+                    units="", name="", titleA="Power", titleP="Phase",
                     unwrap_phase=False, ret=False):
 
         aperDict = {"plot":False} if aperDict is None else aperDict

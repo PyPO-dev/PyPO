@@ -146,7 +146,8 @@ log
 *.pdf
 *.png
 
-!tutorials/*.png
+!*/tutorials/*.png
+!tutorials/Gui/README_Resources/*.png
 !docs/*.png
 
 # Personal projects/files

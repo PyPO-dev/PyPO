@@ -146,6 +146,9 @@ log
 *.pdf
 *.png
 
+!tutorials/*.png
+!docs/*.png
+
 # Personal projects/files
 personal/
 literature/

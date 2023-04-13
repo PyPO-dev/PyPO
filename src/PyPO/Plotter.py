@@ -126,7 +126,7 @@ def plotBeam2D(plotObject, field, contour,
                 ax[1].clabel(cont1)
 
         elif mode == 'dB':
-            if titleA == "Amp":
+            if titleA == "Power":
                 titleA += " / dB"
             if titleP == "Phase":
                 titleP += " / rad"
@@ -212,7 +212,7 @@ def plotBeam2D(plotObject, field, contour,
                 ax.clabel(cont)
         
         elif mode == 'dB':
-            if titleA == "Amp":
+            if titleA == "Power":
                 titleA += " / dB"
             field_dB = 20 * np.log10(np.absolute(field) / max_field)
             

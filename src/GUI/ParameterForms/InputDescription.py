@@ -5,23 +5,28 @@ from src.GUI.utils import inType, InputDescriptionError
 # @file 
 # Defines an attr dataclass used to store the data of parameter forms
 # 
+
+## 
+# @class
 # This data is fed into a form generator to be interpreted and to generate the form. 
 # The data for a form consist of a list of InputDescription objects. If these objects are of a dynamic type 
 # (e.g. dynamicDropdown or dynamicRadio) then they may contain a Dictionary (subDict) storing at each of 
 # the values a list of inputDescriptions. These lists are fed into new form generators allowing for nested forms.   
 @define
 class InputDescription:
-    ##
-    # determines the type of the input
+    ## @var inType: determines the type of the input
+    # 
     # @see inType 
     inType : inType
     ##
-    # string representing the key in the output dictionary 
+    #  @var OutputName: string representing the key in the output dictionary 
     outputName : str = field(default=None)
     ##
-    # Label for the form, if not set then the outputName will be used 
+    #  @var Label for the form, if not set then the outputName will be used 
     label : str = field(default=None)
     ##
+    # @var staticValue
+    #
     # Value to be output if inType is static. In such case the user is not able to interact with the input 
     # field this value represents the predetermined output  
     staticValue : str = field(default=None)

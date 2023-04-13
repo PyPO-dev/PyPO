@@ -15,11 +15,11 @@ def xy_opts():
 ##
 # Options for generating an element from a uv parametrisation.
 def uv_opts():
-    return [InputDescription(inType.vectorFloats, "lims_u", label="U limits", oArray=True, numFields=2),
-            InputDescription(inType.vectorFloats, "lims_v", label="V limits", oArray=True, numFields=2),
-            InputDescription(inType.vectorFloats, "gcenter", label="XY center", oArray=True, numFields=2),
-            InputDescription(inType.vectorFloats, "ecc_uv", label="UV eccentricity", numFields=1),
-            InputDescription(inType.vectorFloats, "rot_uv", label="UV position angle", numFields=1)]
+    return [InputDescription(inType.vectorFloats, "lims_u", label="U limits", oArray=True, numFields=2, toolTip = "U limits: inner and outer diameter."),
+            InputDescription(inType.vectorFloats, "lims_v", label="V limits", prefill = True, hints=[0., 360.], oArray=True, numFields=2, toolTip = "V angle in degrees."),
+            InputDescription(inType.vectorFloats, "gcenter", label="XY center", hints = [0.,0.], oArray=True, numFields=2, prefill = True),
+            InputDescription(inType.vectorFloats, "ecc_uv", label="UV eccentricity", numFields=1, hints = [0.], prefill = True),
+            InputDescription(inType.vectorFloats, "rot_uv", label="UV position angle", numFields=1, hints = [0.], prefill = True)]
 
 ##
 # Options for generating a far-field element from an AoE (Azimuth-over-Elevation) grid.
@@ -40,10 +40,10 @@ def focus_opts_hyp_ell():
 # Form for generating a paraboloid element.
 def makeParabolaInp():
     return [
-        InputDescription(inType.vectorStrings, "name"),
+        InputDescription(inType.vectorStrings, "name", hints = ["Parabola"], prefill = True),
         InputDescription(inType.dynamicRadio, "pmode", label="Parameter mode", subDict={
-            "focus"     : [InputDescription(inType.vectorFloats, "focus_1", label="Focus xyz", oArray=True, numFields=3),
-                            InputDescription(inType.vectorFloats, "vertex", label="Vertex xyz", oArray=True, numFields=3)],
+            "focus"     : [InputDescription(inType.vectorFloats, "focus_1", label="Focus", oArray=True, numFields=3, toolTip = "vector x, y, z"),
+                            InputDescription(inType.vectorFloats, "vertex", label="Vertex", oArray=True, numFields=3, toolTip = "vector x, y, z")],
             "manual"    : [InputDescription(inType.vectorFloats, "coeffs", label="AB coefficients", oArray=True, numFields=2)]
             }),
         InputDescription(inType.vectorIntegers, "gridsize", label="Grid size", hints=[101,101], numFields=2, oArray=True),
@@ -57,7 +57,7 @@ def makeParabolaInp():
 ##
 # Form for generating a hyperboloid or element.
 def makeHyperbolaInp():
-    return [InputDescription(inType.vectorStrings, "name"),
+    return [InputDescription(inType.vectorStrings, "name", hints = ["Hyperbola"], prefill = True),
             InputDescription(inType.dynamicRadio, "pmode", label="Parameter mode", subDict={
                 "focus"     : focus_opts_hyp_ell(),
                 "manual"    : [InputDescription(inType.vectorFloats, "coeffs", label="ABC coefficients", oArray=True, numFields=3)]
@@ -72,7 +72,7 @@ def makeHyperbolaInp():
 ##
 # Form for generating a ellipsoid element.
 def makeEllipseInp():
-    return [InputDescription(inType.vectorStrings, "name"),
+    return [InputDescription(inType.vectorStrings, "name", hints = ["Ellipse"], prefill = True),
             InputDescription(inType.dynamicRadio, "pmode", label="Parameter mode", subDict={
                 "focus"     : focus_opts_hyp_ell(),
                 "manual"    : [InputDescription(inType.vectorFloats, "coeffs", label="ABC coefficients", oArray=True, numFields=3)]
@@ -121,10 +121,10 @@ def makeTransformationForm(name, obj="element"):
             ]),
         InputDescription(inType.dynamicRadio, "type", subDict={
             "Translation":[
-                InputDescription(inType.vectorFloats, "vector", label="Translation Vector", hints=["x","y","z"], numFields=3,oArray=True)],
+                InputDescription(inType.vectorFloats, "vector", label="Translation Vector", hints=[0.,0.,0.], numFields=3,oArray=True, prefill = True)],
             "Rotation": [
-                InputDescription(inType.vectorFloats, "vector", label="Rotation Vector", hints=["x","y","z"], numFields=3,oArray=True),
-                InputDescription(inType.vectorFloats, "pivot", label="Center of Rotation", hints=["x","y","z"], numFields=3,oArray=True)
+                InputDescription(inType.vectorFloats, "vector", label="Rotation Vector", hints=[0.,0.,0.], numFields=3,oArray=True, prefill = True),
+                InputDescription(inType.vectorFloats, "pivot", label="Center of Rotation", hints=[0.,0.,0.], numFields=3,oArray=True, prefill = True)
                 ]
         })
     ]
@@ -612,7 +612,7 @@ def snapForm(elem, snapList, obj="element"):
 def addGroupForm(elementList):
     return[
         InputDescription(inType.vectorStrings, "name", toolTip= "Give the group a name"),
-        InputDescription(inType.elementSelector, "selected", "elements", options = elements )
+        InputDescription(inType.elementSelector, "selected", "elements", options = elementList)
     ]
 
 ##

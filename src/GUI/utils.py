@@ -52,7 +52,7 @@ def getValidator(intype):
     if intype == inType.vectorIntegers:
         return QRegExpValidator(QRegExp("[-+]?[0-9]*"))
     elif intype == inType.vectorFloats:
-        return  QRegExpValidator(QRegExp("[-+]?[0-9]*[\.,]?[0-9]*e?[0-9]*"))
+        return  QRegExpValidator(QRegExp("[-+]?[0-9]*[\.,]?[0-9]*(e-?)?[0-9]*"))
     elif intype == inType.vectorStrings:
         return  QRegExpValidator(QRegExp("[A-Za-z0-9_]+"))
     else:

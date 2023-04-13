@@ -71,18 +71,6 @@ After the rays were propagated onto the paraboloid reflector, they can be propag
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 ## Functionalities
  Defining reflectors
 * Grouping reflectors

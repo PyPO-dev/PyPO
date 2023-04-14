@@ -8,11 +8,12 @@ var searchData=
   ['c4bundlef_5',['c4Bundlef',['../structc4Bundlef.html',1,'c4Bundlef'],['../classPyPO_1_1Structs_1_1c4Bundlef.html',1,'PyPO.Structs.c4Bundlef']]],
   ['cframe_6',['cframe',['../structcframe.html',1,'cframe'],['../classPyPO_1_1Structs_1_1cframe.html',1,'PyPO.Structs.cframe']]],
   ['cframef_7',['cframef',['../structcframef.html',1,'cframef'],['../classPyPO_1_1Structs_1_1cframef.html',1,'PyPO.Structs.cframef']]],
-  ['currentnameerror_8',['CurrentNameError',['../classPyPO_1_1Checks_1_1CurrentNameError.html',1,'PyPO::Checks']]],
-  ['currents_9',['currents',['../classPyPO_1_1PyPOTypes_1_1currents.html',1,'PyPO::PyPOTypes']]],
-  ['currentwidget_10',['CurrentWidget',['../classGUI_1_1ElementWidget_1_1CurrentWidget.html',1,'GUI::ElementWidget']]],
-  ['customformatter_11',['CustomFormatter',['../classPyPO_1_1CustomLogger_1_1CustomFormatter.html',1,'PyPO::CustomLogger']]],
-  ['customguiformatter_12',['CustomGUIFormatter',['../classPyPO_1_1CustomLogger_1_1CustomGUIFormatter.html',1,'PyPO::CustomLogger']]],
-  ['customguilogger_13',['CustomGUILogger',['../classPyPO_1_1CustomLogger_1_1CustomGUILogger.html',1,'PyPO::CustomLogger']]],
-  ['customlogger_14',['CustomLogger',['../classPyPO_1_1CustomLogger_1_1CustomLogger.html',1,'PyPO::CustomLogger']]]
+  ['checkbox_8',['checkbox',['../classGUI_1_1ParameterForms_1_1simpleInputWidgets_1_1checkbox.html',1,'GUI::ParameterForms::simpleInputWidgets']]],
+  ['currentnameerror_9',['CurrentNameError',['../classPyPO_1_1Checks_1_1CurrentNameError.html',1,'PyPO::Checks']]],
+  ['currents_10',['currents',['../classPyPO_1_1PyPOTypes_1_1currents.html',1,'PyPO::PyPOTypes']]],
+  ['currentwidget_11',['CurrentWidget',['../classGUI_1_1ElementWidget_1_1CurrentWidget.html',1,'GUI::ElementWidget']]],
+  ['customformatter_12',['CustomFormatter',['../classPyPO_1_1CustomLogger_1_1CustomFormatter.html',1,'PyPO::CustomLogger']]],
+  ['customguiformatter_13',['CustomGUIFormatter',['../classPyPO_1_1CustomLogger_1_1CustomGUIFormatter.html',1,'PyPO::CustomLogger']]],
+  ['customguilogger_14',['CustomGUILogger',['../classPyPO_1_1CustomLogger_1_1CustomGUILogger.html',1,'PyPO::CustomLogger']]],
+  ['customlogger_15',['CustomLogger',['../classPyPO_1_1CustomLogger_1_1CustomLogger.html',1,'PyPO::CustomLogger']]]
 ];

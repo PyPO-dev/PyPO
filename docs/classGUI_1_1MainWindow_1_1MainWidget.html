@@ -285,6 +285,9 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>initTubeFrameAction</b
 def&#160;</td><td class="memItemRight" valign="bottom"><b>initGaussianFrameForm</b> (self)</td></tr>
 <tr class="memdesc:ab44be45a21744b76ca9544ea88558c6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows form to initialize gaussian frame. <br /></td></tr>
 <tr class="separator:ab44be45a21744b76ca9544ea88558c6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a83ffde8df8d36d30a74e893c6578fd"><td class="memItemLeft" align="right" valign="top"><a id="a5a83ffde8df8d36d30a74e893c6578fd" name="a5a83ffde8df8d36d30a74e893c6578fd"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>initGaussianFrameWorker</b> (self, st.System s_copy, <a class="el" href="structGRTDict.html">GRTDict</a>, returnDict)</td></tr>
+<tr class="separator:a5a83ffde8df8d36d30a74e893c6578fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2860d3e37c58838bf193a9218c92b698"><td class="memItemLeft" align="right" valign="top"><a id="a2860d3e37c58838bf193a9218c92b698" name="a2860d3e37c58838bf193a9218c92b698"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>initGaussianFrameAction</b> (self)</td></tr>
 <tr class="memdesc:a2860d3e37c58838bf193a9218c92b698"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads form and adds a gaussian frame to system. <br /></td></tr>
@@ -367,9 +370,6 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>propPOFFForm</b> (self
 <tr class="memitem:ac5879726b5c0565a37303e186c69a084"><td class="memItemLeft" align="right" valign="top"><a id="ac5879726b5c0565a37303e186c69a084" name="ac5879726b5c0565a37303e186c69a084"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>runPOWorker</b> (self, s_copy, runPODict, returnDict)</td></tr>
 <tr class="separator:ac5879726b5c0565a37303e186c69a084"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af8b54184f05d07249f1f84c074d82ca4"><td class="memItemLeft" align="right" valign="top"><a id="af8b54184f05d07249f1f84c074d82ca4" name="af8b54184f05d07249f1f84c074d82ca4"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>waiterFinished</b> (self, success)</td></tr>
-<tr class="separator:af8b54184f05d07249f1f84c074d82ca4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a601175652e8ff518894781db51858368"><td class="memItemLeft" align="right" valign="top"><a id="a601175652e8ff518894781db51858368" name="a601175652e8ff518894781db51858368"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>propPOAction</b> (self)</td></tr>
 <tr class="memdesc:a601175652e8ff518894781db51858368"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads form propagates beam, runs calculation on another thread. <br /></td></tr>
@@ -456,6 +456,9 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a40527a9288072794e9c2a232554b128c"><td class="memItemLeft" align="right" valign="top"><a id="a40527a9288072794e9c2a232554b128c" name="a40527a9288072794e9c2a232554b128c"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>threadpool</b></td></tr>
 <tr class="separator:a40527a9288072794e9c2a232554b128c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b8f56ba233e471d48163d4e91c8fd0a"><td class="memItemLeft" align="right" valign="top"><a id="a5b8f56ba233e471d48163d4e91c8fd0a" name="a5b8f56ba233e471d48163d4e91c8fd0a"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>subprocessManager</b></td></tr>
+<tr class="separator:a5b8f56ba233e471d48163d4e91c8fd0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1a997a46357547d205dfab7d2e4dd310"><td class="memItemLeft" align="right" valign="top"><a id="a1a997a46357547d205dfab7d2e4dd310" name="a1a997a46357547d205dfab7d2e4dd310"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>frameDict</b></td></tr>
 <tr class="separator:a1a997a46357547d205dfab7d2e4dd310"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -483,12 +486,6 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a55e7ef3a21d5c476136e641a3095629f"><td class="memItemLeft" align="right" valign="top"><a id="a55e7ef3a21d5c476136e641a3095629f" name="a55e7ef3a21d5c476136e641a3095629f"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>rayPlotNr</b></td></tr>
 <tr class="separator:a55e7ef3a21d5c476136e641a3095629f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a921d894b28b85e0541009b1c6b555a2f"><td class="memItemLeft" align="right" valign="top"><a id="a921d894b28b85e0541009b1c6b555a2f" name="a921d894b28b85e0541009b1c6b555a2f"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>currentCalculationDialog</b></td></tr>
-<tr class="separator:a921d894b28b85e0541009b1c6b555a2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac9693593a7df4170670c0ff916cef74f"><td class="memItemLeft" align="right" valign="top"><a id="ac9693593a7df4170670c0ff916cef74f" name="ac9693593a7df4170670c0ff916cef74f"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>currentCalculationDict</b></td></tr>
-<tr class="separator:ac9693593a7df4170670c0ff916cef74f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>

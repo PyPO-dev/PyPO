@@ -16,6 +16,7 @@ From the elements menu select *Add Reflector* > *Quadric surface*.
 
 A form will show up with one dropdown selector. By selecting options, more options will show up. By filling in the parameters and clicking *add*, a reflector has been added to the system. If widget will show up in the workspace as such:
 
+<!--![System with one paraboloid reflector](README_Resources/pri_form.png)-->
 <img src="README_Resources/pri_form.png" alt="System with one paraboloid reflector" width="80%"/>
 
 If adding the reflector did not succeed a message will be logged in the console with information about what went wrong.

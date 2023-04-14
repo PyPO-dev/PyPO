@@ -1,7 +1,7 @@
 import sys
 import random
 
-sys.path.append('../../')
+#sys.path.append('../../')
 
 import unittest
 import numpy as np

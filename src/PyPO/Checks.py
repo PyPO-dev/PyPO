@@ -1119,7 +1119,11 @@ def check_runPODict(runPODict, elements, fields, currents, scalarfields, frames,
         runPODict["epsilon"] = 1
 
     if "device" not in runPODict:
-        runPODict["device"] = "CPU"
+        if cuda:
+            runPODict["device"] = "GPU"
+
+        else:
+            runPODict["device"] = "CPU"
 
     if "device" in runPODict:
         if runPODict["device"] != "CPU" and runPODict["device"] != "GPU":

@@ -2,9 +2,11 @@ import threading
 import time
 import sys
 
-#from src.PyPO.BindUtils import *
-#import src.PyPO.Config as Config
-
+##
+# @file 
+# File containing the threadmanager class for PyPO.
+# This class is responsible for launching heavy calculations on a separate daemon thread,
+# preventing the program from becoming unresponsive.
 class Manager(object):
     def __init__(self, context, callback=None):
         self.context = context

@@ -37,26 +37,6 @@ import src.PyPO.WorldParam as world
 sysPath = Path(__file__).parents[2]
 logging.getLogger(__name__)
 
-@contextmanager
-def suppress_stdout():
-    with open(os.devnull, "w") as devnull:
-        old_stdout = sys.stdout
-        sys.stdout = devnull
-        try:  
-            yield
-        finally:
-            sys.stdout = old_stdout
-
-class NpEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.integer):
-            return int(obj)
-        if isinstance(obj, np.floating):
-            return float(obj)
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        return super(NpEncoder, self).default(obj)
-
 ##
 # @file
 # System interface for PyPO.
@@ -152,7 +132,11 @@ class System(object):
             self.clog.info("EXITING SYSTEM.")
             del self.clog_mgr
             del self.clog
-
+    
+    ##
+    # Obtain a reference to the custom logger used by system.
+    #
+    # @returns clog Reference to system logger.
     def getSystemLogger(self):
         return self.clog
 
@@ -829,7 +813,7 @@ class System(object):
         
         with open(os.path.join(path, "fields.pys"), 'wb') as file: 
             pickle.dump(self.fields, file)
-        
+       
         with open(os.path.join(path, "currents.pys"), 'wb') as file: 
             pickle.dump(self.currents, file)
         
@@ -1110,10 +1094,6 @@ class System(object):
         self.frames[argDict["name"]] = makeGRTframe(argDict)
         self.frames[argDict["name"]].setMeta(self.copyObj(world.ORIGIN()), self.copyObj(world.IAX()), self.copyObj(world.INITM()))
         
-        #self.frames[argDict["name"]].pos = world.ORIGIN()
-        #self.frames[argDict["name"]].ori = world.IAX()
-        #self.frames[argDict["name"]].transf = world.INITM()
-        
         dtime = time.time() - start_time
         self.clog.info(f"Succesfully sampled {argDict['nRays']} rays: {dtime} seconds.")
         self.clog.info(f"Added Gaussian frame {argDict['name']} to system.")
@@ -1271,7 +1251,16 @@ class System(object):
         
         self.frames[runRTDict["fr_out"]].setMeta(self.calcRTcenter(runRTDict["fr_out"]), self.calcRTtilt(runRTDict["fr_out"]), self.copyObj(world.INITM()))
 
-
+    ##
+    # Interpolate a frame and an associated field on a regular surface.
+    # The surface should be the target on which the input frame is calculated.
+    #
+    # @param name_fr_in Name of input frame.
+    # @param name_field Name of field object, propagated along with the frame by multiplication.
+    # @param name_target Name of surface on which to interpolate the field.
+    # @param name_out Name of output field object in target surface.
+    #
+    # @returns out Complex numpy array containing interpolated field.
     def interpFrame(self, name_fr_in, name_field, name_target, name_out, comp, method="nearest"):
         check_frameSystem(name_fr_in, self.frames, self.clog, extern=True)
         check_elemSystem(name_target, self.system, self.clog, extern=True)

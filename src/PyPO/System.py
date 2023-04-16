@@ -1599,7 +1599,7 @@ class System(object):
     # @param name_surface Name of surface on which to define the point-source.
     #
     # @see PSDict
-    def generatePointSource(self, PSDict, name_surface):
+    def createPointSource(self, PSDict, name_surface):
         check_elemSystem(name_surface, self.system, self.clog, extern=True)
         check_PSDict(PSDict, self.fields, self.clog)
 
@@ -1637,7 +1637,7 @@ class System(object):
     # @param name_surface Name of surface on which to define the uniform pattern.
     #
     # @see PSDict
-    def generateUniformSource(self, UDict, name_surface):
+    def createUniformSource(self, UDict, name_surface):
         check_elemSystem(name_surface, self.system, self.clog, extern=True)
         check_PSDict(UDict, self.fields, self.clog)
 
@@ -1670,7 +1670,7 @@ class System(object):
     # @param name_surface Name of surface on which to define the point-source.
     #
     # @see PSDict
-    def generatePointSourceScalar(self, PSDict, name_surface):
+    def createPointSourceScalar(self, PSDict, name_surface):
         check_elemSystem(name_surface, self.system, self.clog, extern=True)
         check_PSDict(PSDict, self.scalarfields, self.clog)
         

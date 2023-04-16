@@ -2053,6 +2053,7 @@ class System(object):
                 "fr_out"    : fr_out,
                 "t_name"    : t_name,
                 "device"    : "CPU",
+                "tol"       : 1e-12,
                 "nThreads"  : 1
                 }
 

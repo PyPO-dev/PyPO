@@ -24,7 +24,7 @@ def BuildPyPO():
 
     pathToBuild = os.path.join("src")
     
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="build and test interface script for PyPO")
     parser.add_argument("-p", "--prereqs", help="install PyPO prerequisites", action="store_true")
     parser.add_argument("-f", "--config", help="configure PyPO build scripts", action="store_true")
     parser.add_argument("-m", "--make", help="build PyPO libraries", action="store_true")

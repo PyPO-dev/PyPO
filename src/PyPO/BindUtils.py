@@ -469,7 +469,7 @@ def allfill_SGPODict(res, sgdict_py, ct_t):
     res.w0y = ct_t(sgdict_py["w0y"])
     res.n = ct_t(sgdict_py["n"])
     res.E0 = ct_t(sgdict_py["E0"])
-    res.dxyz = ct_t(gdict_py["dxyz"])
+    res.dxyz = ct_t(sgdict_py["dxyz"])
 
 ##
 # Allocate and fill a 4D matrix for transforming frames and fields/currents.

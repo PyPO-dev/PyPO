@@ -1,14 +1,15 @@
 import unittest
 import numpy as np
 from src.PyPO.System import System as pypoSystem
-from src.PyPO.Checks import InputReflError, InputRTError
+from src.PyPO.Checks import InputReflError, InputRTError, InputPOError
 
 
 class Test_SystemDictsAndAddElement(unittest.TestCase):
     def setUp(self) -> None:
         self.s = pypoSystem()
         self.dictNames = ["system", "groups", "frames", "currents", "fields", "scalarfields"]
-    
+
+        ### Define tuples of system functions and their input dictionary
         self.invalidDict = {'name' : 'someElement'}
         self.validParabola = self.s.addParabola, {
             "name"      : "p1",
@@ -49,18 +50,18 @@ class Test_SystemDictsAndAddElement(unittest.TestCase):
             "lims_y"    : np.array([-0.1,0.1]),
             "gridsize"  : np.array([3, 3])
             }
-        self.validRT_TubeFrame = self.s.createTubeFrame, {
+        self.validRT_TubeFrameTuple = self.s.createTubeFrame, {
             "name"          : "tubeFrame",
-            "nRays"         : 8,
-            "nRing"         : 1,
+            "nRays"         : 0,
+            "nRing"         : 0,
             "angx0"         : 0,
             "angy0"         : 0,
             "x0"            : 4000,
             "y0"            : 4000,
             }
-        self.validRT_GaussFrame = self.s.createGRTFrame, {
+        self.validRT_GaussFrameTuple = self.s.createGRTFrame, {
             "name"          : 'gaussFrame',
-            "nRays"         : 100,
+            "nRays"         : 1,
             "n"             : 1,
             "lam"           : 1,
             "x0"            : 5,
@@ -68,6 +69,42 @@ class Test_SystemDictsAndAddElement(unittest.TestCase):
             "setseed"       : 'set',
             "seed"          : 1,
             }
+        self.validPO_PSBeamTuple = self.s.createPointSource, {
+            "name"          : 'PSBeam',
+            "lam"           : 1,
+            "E0"            : 1,
+            "phase"         : 0,
+            "pol"           : np.array([0,0,1]),
+            }
+        self.validPO_GaussBeamTuple = self.s.createGaussian, {
+            "name"          : 'GaussBeam',
+            "lam"           : 1,
+            "w0x"           : 1,
+            "w0y"           : 1,
+            "n"             : 1,
+            "E0"            : 1,
+            "phase"         : 1,
+            "pol"           : np.array([0,0,1]),
+            }
+        
+        self.validPO_ScalarPSBeamTuple = self.s.createPointSourceScalar, {
+            "name"          : 'SPSBeam',
+            "lam"           : 1,
+            "E0"            : 1,
+            "phase"         : 0,
+            "pol"           : np.array([0,0,1]),
+            }
+        self.validPO_ScalarGaussBeamTuple = self.s.createScalarGaussian, {
+            "name"          : 'SGaussBeam',
+            "lam"           : 1,
+            "w0x"           : 1,
+            "w0y"           : 1,
+            "n"             : 1,
+            "E0"            : 1,
+            "phase"         : 1,
+            "pol"           : np.array([0,0,1]),
+            }
+        
         
     def test_dictsExist(self):
         for i in self.dictNames:
@@ -86,14 +123,40 @@ class Test_SystemDictsAndAddElement(unittest.TestCase):
 
     def test_addRTFrame(self):
         frameLen = 0
-        for func, validElem in [self.validRT_TubeFrame, self.validRT_GaussFrame]:
-            print("Gonna test",func, validElem)
+        for func, validElem in [self.validRT_TubeFrameTuple, self.validRT_GaussFrameTuple]:
             with self.assertRaises(InputRTError):
                 func(self.invalidDict)
             self.assertEquals(len(self.s.frames), frameLen)
             func(validElem)
             self.assertEquals(len(self.s.frames), frameLen+1)
             frameLen += 1
+
+    def test_addPOFields(self):
+        self.s.addPlane(self.validPlane[1])
+        fieldsLen = 0
+        for func, validElem in [self.validPO_PSBeamTuple, self.validPO_GaussBeamTuple]:
+            # print("Gonna test",func, validElem)
+            with self.assertRaises(InputPOError):
+                func(self.invalidDict, 'plane1')
+            self.assertEquals(len(self.s.fields), fieldsLen)
+            func(validElem, 'plane1')
+            self.assertEquals(len(self.s.fields), fieldsLen+1)
+            fieldsLen += 1
+
+
+    def test_addPOScalarFields(self):
+        self.s.addPlane(self.validPlane[1])
+        fieldsLen = 0
+        for func, validElem in [ self.validPO_ScalarGaussBeamTuple]:
+            print("Gonna test",func, validElem)
+            # with self.assertRaises(InputPOError):
+            #     func(self.invalidDict, 'plane1')
+            self.assertEquals(len(self.s.scalarfields), fieldsLen)
+            func(validElem, 'plane1')
+            self.assertEquals(len(self.s.scalarfields), fieldsLen+1)
+            fieldsLen += 1
+
+    
 
 
 

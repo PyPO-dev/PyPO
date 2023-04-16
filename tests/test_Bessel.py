@@ -71,7 +71,7 @@ class Test_Bessel(unittest.TestCase):
 
         s.addPlane(ring)
         s.addPlane(ff_plane)
-        s.generateUniformSource(UDict, "ring")
+        s.createUniformSource(UDict, "ring")
 
         source_to_ff = {
                 "s_current"    : "source",

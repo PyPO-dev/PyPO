@@ -56,16 +56,113 @@ class Test_SystemSnapAndHome(unittest.TestCase):
             "gridsize"  : np.array([3, 3])
             }
 
+        self.validRT_TubeFrame = {
+            "name"          : "tubeFrame",
+            "nRays"         : 8,
+            "nRing"         : 1,
+            "angx0"         : 0,
+            "angy0"         : 0,
+            "x0"            : 4000,
+            "y0"            : 4000,
+            }
+        
+        self.validRT_GaussFrame = {
+            "name"          : 'gaussFrame',
+            "nRays"         : 100,
+            "n"             : 1,
+            "lam"           : 1,
+            "x0"            : 5,
+            "y0"            : 5,
+            "setseed"       : 'set',
+            "seed"          : 1,
+            }
         self.names = ["par", "hyp", "ell", "plane"]
 
-        self.fr_names = []
+        self.fr_names = ["tubeFrame", "gaussFrame"]
         
         self.s.addParabola(self.validParabola)
         self.s.addHyperbola(self.validHyperbola)
         self.s.addEllipse(self.validEllipse)
         self.s.addPlane(self.validPlane)
 
-        self.groupElements("testgroup", "par", "hyp", "ell", "plane")
+        self.s.createTubeFrame(self.validRT_TubeFrame)
+        self.s.createGRTFrame(self.validRT_GaussFrame)
 
-    def test_sna
+        self.s.groupElements("testgroup", "par", "hyp", "ell", "plane")
 
+    def test_snapObj(self):
+        trans = np.random.rand(3) * 100
+        rot = np.random.rand(3) * 300
+
+        for name in self.names:
+            self.s.translateGrids(name, trans)
+            self.s.rotateGrids(name, rot)
+            self.s.snapObj(name, "test")
+
+            self.assertFalse(id(self.s.system[name]["snapshots"]["test"]) == id(self.s.system[name]["transf"]))
+            for tr, trs in zip(self.s.system[name]["snapshots"]["test"].ravel(), 
+                                self.s.system[name]["transf"].ravel()):
+                
+                self.assertEqual(tr, trs)
+
+        self.s.translateGrids("testgroup", trans, obj="group")
+        self.s.rotateGrids("testgroup", rot, obj="group")
+        
+        self.s.snapObj("testgroup", "test", obj="group")
+
+
+        for transfs, elem_name in zip(self.s.groups["testgroup"]["snapshots"]["test"], self.names):
+            _transf = self.s.system[elem_name]["transf"]
+            self.assertFalse(id(transfs) == id(_transf))
+
+            for tr, trs in zip(transfs.ravel(), _transf.ravel()): 
+                self.assertEqual(tr, trs)
+
+        for fr_n in self.fr_names:
+            self.s.translateGrids(fr_n, trans, obj="frame")
+            self.s.rotateGrids(fr_n, rot, obj="frame")
+            self.s.snapObj(fr_n, "test", obj="frame")
+
+            self.assertFalse(id(self.s.frames[fr_n].snapshots["test"]) == id(self.s.frames[fr_n].transf))
+            for tr, trs in zip(self.s.frames[fr_n].snapshots["test"].ravel(), 
+                                self.s.frames[fr_n].transf.ravel()):
+                
+                self.assertEqual(tr, trs)
+
+        for name in self.names:
+            self.s.translateGrids(name, trans)
+            self.s.rotateGrids(name, rot)
+            self.s.revertToSnap(name, "test")
+
+            for tr, trs in zip(self.s.system[name]["snapshots"]["test"].ravel(), 
+                                self.s.system[name]["transf"].ravel()):
+                
+                self.assertEqual(tr, trs)
+
+        self.s.translateGrids("testgroup", trans, obj="group")
+        self.s.rotateGrids("testgroup", rot, obj="group")
+        
+        self.s.revertToSnap("testgroup", "test", obj="group")
+
+
+        for transfs, elem_name in zip(self.s.groups["testgroup"]["snapshots"]["test"], self.names):
+            _transf = self.s.system[elem_name]["transf"]
+            self.assertFalse(id(transfs) == id(_transf))
+
+            for tr, trs in zip(transfs.ravel(), _transf.ravel()): 
+                self.assertEqual(tr, trs)
+
+        for fr_n in self.fr_names:
+            self.s.translateGrids(fr_n, trans, obj="frame")
+            print(self.s.frames[fr_n].snapshots)
+            self.s.rotateGrids(fr_n, rot, obj="frame")
+            print(self.s.frames[fr_n].snapshots)
+            self.s.revertToSnap(fr_n, "test", obj="frame")
+
+            self.assertFalse(id(self.s.frames[fr_n].snapshots["test"]) == id(self.s.frames[fr_n].transf))
+            for tr, trs in zip(self.s.frames[fr_n].snapshots["test"].ravel(), 
+                                self.s.frames[fr_n].transf.ravel()):
+                
+                self.assertEqual(tr, trs)
+if __name__ == "__main__":
+    unittest.main()

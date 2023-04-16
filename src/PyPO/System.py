@@ -157,9 +157,25 @@ class System(object):
         return self.clog
 
     def __str__(self):
-        s = "Reflectors in system:\n"
-        for key, item in self.system.items():
-            s += f"{key}\n"
+        s = "Contents of system:\n"
+        s += f"Reflectors {len(self.system)}:\n"
+        for key in self.system.keys():
+            s += f"    {key}\n"
+        s += f"Groups {len(self.groups)}:\n"
+        for key in self.groups.keys():
+            s += f"    {key}\n"
+        s += f"Frames {len(self.frames)}:\n"
+        for key in self.frames.keys():
+            s += f"    {key}\n"
+        s += f"Currents {len(self.currents)}:\n"
+        for key in self.currents.keys():
+            s += f"    {key}\n"
+        s += f"Fields {len(self.fields)}:\n"
+        for key in self.fields.keys():
+            s += f"    {key}\n"
+        s += f"Scalar Fields {len(self.scalarfields)}:\n"
+        for key in self.scalarfields.keys():
+            s += f"    {key}\n"
         return s
 
     ##
@@ -193,13 +209,10 @@ class System(object):
     # 
     # @param systems Systems to be merged into current system
     def mergeSystem(self, *systems):
+        if len(set(systems)) < systems:
+            raise Exception("Cannot merge duplicate systems.")
         for sysObject in systems:
             sys_copy = self.copyObj(sysObject.system)
-            fie_copy = self.copyObj(sysObject.fields)
-            cur_copy = self.copyObj(sysObject.currents)
-            fra_copy = self.copyObj(sysObject.frames)
-            gro_copy = self.copyObj(sysObject.groups)
-            sfi_copy = self.copyObj(sysObject.scalarfields)
             
             self.system.update(sys_copy)
             self.fields.update(sys_copy)

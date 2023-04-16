@@ -754,7 +754,7 @@ def check_GRTDict(GRTDict, nameList, clog):
             clog.info(f"Never heard of a complex-valued wavelength of zero, but good try... Therefore changing wavelength now to 'lam' equals {np.pi:.42f}!")
             GRTDict["lam"] = np.pi
 
-        if not isinstance(GRTDict["lam"], float) or isinstance(GRTDict["lam"], int):
+        if not (isinstance(GRTDict["lam"], float) or isinstance(GRTDict["lam"], int)):
             errStr += errMsg_type("lam", type(GRTDict["lam"]), "GRTDict", [float, int])
         
         elif GRTDict["lam"] < 0:

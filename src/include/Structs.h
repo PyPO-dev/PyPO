@@ -197,7 +197,6 @@ struct ScalarGPODict {
     double n;       /**<Refractive index of medium.*/
     double E0;      /**<Peak electric field value.*/
     double dxyz;    /**<Astigmatic distance between x-focus and y-focus, in millimeters.*/
-    double z;       /**<z co-ordinate at which to evaluate Gaussian beam, in millimeters.*/
 };
 
 // Have to write explicit types for float and float: ctypes doesnt support templates
@@ -390,6 +389,5 @@ struct ScalarGPODictf {
     float n;       /**<Refractive index of medium.*/
     float E0;      /**<Peak electric field value.*/
     float dxyz;    /**<Astigmatic distance between x-focus and y-focus, in millimeters.*/
-    float z;       /**<z co-ordinate at which to evaluate Gaussian beam, in millimeters.*/
 };
 #endif

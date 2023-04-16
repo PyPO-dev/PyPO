@@ -168,7 +168,7 @@ def makeScalarGauss(gdict_py, source):
 
     c_gdict = ScalarGPODict()
     c_source = reflparams()
-
+    print(c_source)
     allfill_SGPODict(c_gdict, gdict_py, ctypes.c_double)
     allfill_reflparams(c_source, source, ctypes.c_double)
     

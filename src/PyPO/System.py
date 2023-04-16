@@ -46,10 +46,6 @@ class System(object):
     customBeamPath = os.path.join(sysPath, "custom", "beam")
     customReflPath = os.path.join(sysPath, "custom", "reflector")
 
-    savePathElem = os.path.join(sysPath, "save", "elements")
-    savePathFields = os.path.join(sysPath, "save", "fields")
-    savePathScalarFields = os.path.join(sysPath, "save", "scalarfields")
-    savePathCurrents = os.path.join(sysPath, "save", "currents")
     savePathSystems = os.path.join(sysPath, "save", "systems")
 
 
@@ -82,25 +78,9 @@ class System(object):
         self.cl = 2.99792458e11 # mm / s
         #self.savePathElem = "./save/elements/"
 
-        saveElemExist = os.path.isdir(self.savePathElem)
-        saveFieldsExist = os.path.isdir(self.savePathFields)
-        saveScalarFieldsExist = os.path.isdir(self.savePathScalarFields)
-        saveCurrentsExist = os.path.isdir(self.savePathCurrents)
         saveSystemsExist = os.path.isdir(self.savePathSystems)
 
-        if not saveElemExist:
-            os.makedirs(self.savePathElem)
-
-        elif not saveFieldsExist:
-            os.makedirs(self.savePathFields)
-        
-        elif not saveScalarFieldsExist:
-            os.makedirs(self.savePathScalarFields)
-
-        elif not saveCurrentsExist:
-            os.makedirs(self.savePathCurrents)
-
-        elif not saveSystemsExist:
+        if not saveSystemsExist:
             os.makedirs(self.savePathSystems)
         
         self.savePath = os.path.join(sysPath, "images")
@@ -187,23 +167,21 @@ class System(object):
 
         if not os.path.isdir(self.savePath):
             os.makedirs(self.savePath)
-
+ 
     ##
-    # Merge multiple systems together into current system.
-    # 
-    # @param systems Systems to be merged into current system
-    def mergeSystem(self, *systems):
-        if len(set(systems)) < systems:
-            raise Exception("Cannot merge duplicate systems.")
-        for sysObject in systems:
-            sys_copy = self.copyObj(sysObject.system)
-            
-            self.system.update(sys_copy)
-            self.fields.update(sys_copy)
-            self.currents.update(sys_copy)
-            self.frames.update(sys_copy)
-            self.groups.update(sys_copy)
-            self.scalarfields.update(sys_copy)
+    # Set path to folder were to save systems.
+    #
+    # @param path Path to save directory.
+    # @param append Whether path is relative to ./save/systems/ or absolute.
+    def setSavePathSystems(self, path, append=False):
+        if append:
+            self.savePathSystems = os.path.join(self.savePathSystems, path)
+
+        else:
+            self.savePathSystems = path
+
+        if not os.path.isdir(self.savePathSystems):
+            os.makedirs(self.savePathSystems)
 
     ##
     # Set the verbosity of the logging from within the system.
@@ -865,6 +843,23 @@ class System(object):
         
         with open(os.path.join(path, "scalarfields.pys"), 'rb') as file: 
             self.scalarfields = pickle.load(file)
+
+    ##
+    # Merge multiple systems together into current system.
+    # 
+    # @param systems Systems to be merged into current system
+    def mergeSystem(self, *systems):
+        if len(set(systems)) < len(systems):
+            raise Exception("Cannot merge duplicate systems.")
+        for sysObject in systems:
+            sys_copy = self.copyObj(sysObject)
+            
+            self.system.update(sys_copy.system)
+            self.fields.update(sys_copy.fields)
+            self.currents.update(sys_copy.currents)
+            self.frames.update(sys_copy.frames)
+            self.groups.update(sys_copy.groups)
+            self.scalarfields.update(sys_copy.scalarfields)
     
     ##
     # Remove reflector from system.

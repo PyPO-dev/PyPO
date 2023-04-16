@@ -133,8 +133,8 @@ def makeTransformationForm(name, obj="element"):
 # Options for generating a tubular ray-trace frame.
 def initTubeFrameInp():
     return [InputDescription(inType.vectorStrings, "name", label="Name of frame", numFields=1),
-            InputDescription(inType.vectorIntegers, "nRays", label="# of rays", hints=[0], numFields=1),
-            InputDescription(inType.vectorIntegers, "nRing", label="# of rings", hints=[0], numFields=1),
+            InputDescription(inType.vectorIntegers, "nRays", label="Number of rays", hints=[0], numFields=1),
+            InputDescription(inType.vectorIntegers, "nRing", label="Number of rings", hints=[0], numFields=1),
             InputDescription(inType.vectorFloats, "angx0", label="X-apex angle", hints=[0], numFields=1),
             InputDescription(inType.vectorFloats, "angy0", label="Y-apex angle", hints=[0], numFields=1),
             InputDescription(inType.vectorFloats, "x0", label="X radius of outer ring", hints=[0], numFields=1),
@@ -145,7 +145,7 @@ def initTubeFrameInp():
 # Options for generating a Gaussian ray-trace frame.
 def initGaussianFrameInp():
     return [InputDescription(inType.vectorStrings, "name", label="Name of frame", numFields=1),
-            InputDescription(inType.vectorIntegers, "nRays", label="# of rays", hints=[0], numFields=1),
+            InputDescription(inType.vectorIntegers, "nRays", label="Number of rays", hints=[0], numFields=1),
             InputDescription(inType.vectorFloats, "n", label="Refractive index of medium", hints=[1], numFields=1),
             InputDescription(inType.vectorFloats, "lam", label="Wavelength", hints=[1], numFields=1),
             InputDescription(inType.vectorFloats, "x0", label="X beamwaist", hints=[5], numFields=1),
@@ -191,7 +191,7 @@ def propRaysInp(frameDict, elemDict):
             InputDescription(inType.dropdown, "t_name", label="Target surface", options = sublist_target),
             InputDescription(inType.vectorStrings, "fr_out", label="Name of output frame", numFields=1),
             InputDescription(inType.vectorFloats, "tol", label="Accuracy", hints=[1e-3], numFields=1),
-            InputDescription(inType.vectorIntegers, "nThreads", label="# of threads", hints=[1], numFields=1),
+            InputDescription(inType.vectorIntegers, "nThreads", label="Number of threads", hints=[1], numFields=1),
             InputDescription(inType.vectorFloats, "t0", label="Initial guess", hints=[1], numFields=1),
             InputDescription(inType.dropdown, "device", label="Hardware to use", options = sublist_dev)
             ]
@@ -415,7 +415,7 @@ def propPOInp(currentDict, scalarFieldDict, elemDict):
                     InputDescription(inType.vectorStrings, "name_field", label="Output scalar field", numFields=1)]
                 }),
             InputDescription(inType.vectorFloats, "epsilon", label="Relative permittivity", hints=[1], numFields=1),
-            InputDescription(inType.vectorIntegers, "nThreads", label="# of threads", hints=[1], numFields=1),
+            InputDescription(inType.vectorIntegers, "nThreads", label="Number of threads", hints=[1], numFields=1),
             InputDescription(inType.dropdown, "device", label="Hardware to use", options = sublist_dev)
             ]
 
@@ -447,7 +447,7 @@ def propPOFFInp(currentDict, elemDict):
             InputDescription(inType.static, "mode", label="Propagation mode", staticValue="FF"),
             InputDescription(inType.vectorStrings, "name_EH", label="Output fields"),
             InputDescription(inType.vectorFloats, "epsilon", label="Relative permittivity", hints=[1], numFields=1),
-            InputDescription(inType.vectorIntegers, "nThreads", label="# of threads", hints=[1], numFields=1),
+            InputDescription(inType.vectorIntegers, "nThreads", label="Number of threads", hints=[1], numFields=1),
             InputDescription(inType.dropdown, "device", label="Hardware to use", options = sublist_dev)
             ]
 

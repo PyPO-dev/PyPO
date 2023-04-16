@@ -1,5 +1,4 @@
 import unittest
-from parameterized import parameterized
 import numpy as np
 from src.PyPO.System import System as pypoSystem
 from src.PyPO.Checks import InputReflError, InputRTError

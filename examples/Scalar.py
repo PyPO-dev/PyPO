@@ -8,7 +8,7 @@ def Scalar(device):
             "gmode"     : "xy",
             "lims_x"    : np.array([-1,1]),
             "lims_y"    : np.array([-1,1]),
-            "gridsize"  : np.array([3, 3])
+            "gridsize"  : np.array([301, 301])
             }
 
     plane_eval = {
@@ -32,10 +32,12 @@ def Scalar(device):
             "lam"       : lam,
             "E0"        : 1,
             "phase"     : 0,
+            "w0x"       : 1,
+            "w0y"       : 1,
             "pol"       : np.array([1,0,0])
             }
     
-    s.generatePointSourceScalar(PSDict, "plane_source") 
+    s.createScalarGaussian(PSDict, "plane_source") 
     
     source_to_eval = {
             "t_name"        : "plane_eval",

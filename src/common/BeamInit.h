@@ -375,6 +375,7 @@ void initGauss(T gdict, U refldict, V *res_field, V *res_current)
 template<typename T, typename U, typename V, typename W, typename G>
 void initScalarGauss(T sgdict, U refldict, V *res_field)
 {
+    printf("hi\n");
     int nTot = refldict.n_cells[0] * refldict.n_cells[1];
     W reflc;
 
@@ -403,7 +404,6 @@ void initScalarGauss(T sgdict, U refldict, V *res_field)
     G Rzy_inv;  
     G phizx;    
     G phizy;    
-
     std::complex<G> j(0, 1);
 
     std::complex<G> efield;

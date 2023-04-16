@@ -459,7 +459,7 @@ class System(object):
 
         elif obj == "group":
             check_groupSystem(name, self.groups, self.clog, extern=True)
-            pivot = self.group[name]["pos"] if pivot is None else pivot
+            pivot = self.groups[name]["pos"] if pivot is None else pivot
             
             if mode == "absolute":
                 match = world.IAX()

@@ -60,5 +60,4 @@ class Test_SystemOps(unittest.TestCase):
         self.assertFalse(os.path.exists(os.path.join(self.s0.savePathSystems, "s0"))) 
 
 if __name__ == "__main__":
-    unittest.main()
-        
+    unittest.main() 

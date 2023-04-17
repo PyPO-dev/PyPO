@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.6"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PyPO: src/PyPO/System.py File Reference</title>
+<title>PyPO: src/PyPO/MatUtils.py File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -74,30 +74,70 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
-<a href="#var-members">Variables</a>  </div>
-  <div class="headertitle"><div class="title">System.py File Reference</div></div>
+<a href="#func-members">Functions</a>  </div>
+  <div class="headertitle"><div class="title">MatUtils.py File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>System interface for PyPO.  
+<p>File containing a method for finding a connected subset, centered around a starting index, in a matrix.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1System_1_1System.html">PyPO.System.System</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
-Variables</h2></td></tr>
-<tr class="memitem:ac7c779193c0e45336ee0e77419aae814"><td class="memItemLeft" align="right" valign="top"><a id="ac7c779193c0e45336ee0e77419aae814" name="ac7c779193c0e45336ee0e77419aae814"></a>
-Path&#160;</td><td class="memItemRight" valign="bottom"><b>PyPO.System.sysPath</b> = Path(__file__).parents[2]</td></tr>
-<tr class="separator:ac7c779193c0e45336ee0e77419aae814"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:ae6db24331ae4d7b0f837c9081500686a"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="MatUtils_8py.html#ae6db24331ae4d7b0f837c9081500686a">PyPO.MatUtils.findConnectedSubsets</a> (mat, component, idx_start)</td></tr>
+<tr class="memdesc:ae6db24331ae4d7b0f837c9081500686a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find extent of centered connected subset in a matrix.  <br /></td></tr>
+<tr class="separator:ae6db24331ae4d7b0f837c9081500686a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>System interface for PyPO. </p>
-<p>This script contains the System class definition. </p>
-</div></div><!-- contents -->
+<div class="textblock"><p>File containing a method for finding a connected subset, centered around a starting index, in a matrix. </p>
+<p>Used for creating masks for fitting Gaussians. </p>
+</div><h2 class="groupheader">Function Documentation</h2>
+<a id="ae6db24331ae4d7b0f837c9081500686a" name="ae6db24331ae4d7b0f837c9081500686a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae6db24331ae4d7b0f837c9081500686a">&#9670;&#160;</a></span>findConnectedSubsets()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def PyPO.MatUtils.findConnectedSubsets </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>mat</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>component</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>idx_start</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Find extent of centered connected subset in a matrix. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mat</td><td>Matrix of which to find largest connected subset. </td></tr>
+    <tr><td class="paramname">component</td><td>Value on which to differentiate subset. </td></tr>
+    <tr><td class="paramname">idx_start</td><td>Matrix index on which to center the subset.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Indices of row and column of limits of subset. </dd></dl>
+
+</div>
+</div>
+</div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.6

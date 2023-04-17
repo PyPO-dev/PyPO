@@ -4,9 +4,10 @@
 A fully functioning [Python 3.8](https://docs.python-guide.org/starting/install3/linux/) installation. At the moment, the GUI only supports a Python version of 3.9 or lower.
 If the PIP package manager was not automatically installed with your Python install, it can be installed [manually](https://pip.pypa.io/en/stable/installation/).
 
+`PyPO` and prerequisites are installed through the Build.py script.
 To install the prerequisites for PyPO, navigate to the main folder and run:
 ```
-python Build.py --prereqs
+./Build.py --prereqs
 ```
 Alternatively, the prerequisites can be installed manually on Linux by running:
 ```
@@ -31,26 +32,27 @@ PyPO is capable of producing figures using LaTeX typesetting. For this, a [LaTeX
 sudo apt install cm-super dvipng texlive-latex-extra texlive-fonts-recommended texlive-science
 ```
 The GPU version of PyPO needs a [CUDA installation](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html) and a CUDA-compatible NVIDIA graphics card. 
-These are not installed through the Build.py interface and should be installed manually. Please refer to the NVIDIA documentation on how to install NVIDIA drivers and CUDA on your specific Platform.
+These are not installed through the Build.py interface and should be installed manually. On Linux, it is relatively straightforward to do this using the [apt repository](https://linuxconfig.org/how-to-install-cuda-on-ubuntu-20-04-focal-fossa-linux). 
+For other platforms, please refer to the NVIDIA documentation on how to install NVIDIA drivers and CUDA.
 
 <h2>Installation</h2>
 On Linux and MacOs, the following instructions can be run in the regular terminal.
 On Windows, they should be run in the 'x64_x86 Cross Tools Command Promp for VS <year>'.
 Navigate to the PyPO root folder and configure PyPO by running:
 ```
-python Build.py --config
+./Build.py --config
 ```
-This will check if you have CUDA installed. It will also generate the build instructions.
+This will check if you have CUDA installed. It will also generate the makefiles necessary for the build.
 Then install by running:
 ```
-python Build.py --make
+./Build.py --make
 ```
 For an overview of build options, run:
 ```
-python Build.py --help
+./Build.py --help
 ```
 
-To include PyPO from anywhere, the following two lines should be added to your .bashrc file:
+To include PyPO from anywhere, the following line should be added to your .bashrc file:
 ``` 
 export PYTHONPATH=${PYTHONPATH}:<absolue/path/to/PyPO>
 ```
@@ -72,9 +74,9 @@ export PYTHONPATH
 and source the script.
 
 <h2>Testing</h2>
-To run the Python unittests, go to the main PyPO directory and from there run:
+To run the unittests, go to the PyPO root directory and from there run:
 ```
-nosetests --exe
+./Build.py --test
 ```
 <h2>Documentation</h2>
 The following instructions are for people who would like to develop PyPO and generate documentation along the way.
@@ -87,6 +89,6 @@ sudo apt install bison
 ```
 Generate the documentation by running:
 ```
-python Build.py --docs
+./Build.py --docs
 ```
 which should place the documentation in the docs/ folder.

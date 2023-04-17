@@ -611,19 +611,19 @@ class System(object):
         if obj == "group":
             check_groupSystem(name, self.groups, self.clog, extern=True)
             if trans:
-                for elem in self.groups[name]:
+                for elem in self.groups[name]["members"]:
                     _transf = self.copyObj(world.INITM())
-                    _transf[:-1, :-1] = elem["transf"][:-1, :-1]
-                    elem["transf"] = _transf
-                    elem["pos"] = self.copyObj(world.ORIGIN())
+                    _transf[:-1, :-1] = self.system[elem]["transf"][:-1, :-1]
+                    self.system[elem]["transf"] = _transf
+                    self.system[elem]["pos"] = self.copyObj(world.ORIGIN())
 
                 self.groups[name]["pos"] = self.copyObj(world.ORIGIN())
             
             if rot:
-                for elem in self.groups[name]:
-                    _transf = elem["transf"]
+                for elem in self.groups[name]["members"]:
+                    _transf = self.system[elem]["transf"]
                     _transf[:-1, :-1] = np.eye(3)
-                    elem["transf"] = _transf
+                    self.system[elem]["transf"] = _transf
                 
                 self.groups[name]["ori"] = self.copyObj(world.IAX())
             

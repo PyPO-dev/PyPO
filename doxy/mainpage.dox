@@ -9,13 +9,16 @@
  * For most users of PyPO, the Python interface documentation is a nice reference for quick lookup of available functions. 
  * To get more information on inputs for certain interface functions, the template list is a good starting point.
  * For the user who is planning on getting hands-on with PyPO development, the C/C++ and CUDA documentation should get you started.
+ * \subsection contrib Contributor Guidelines
+ * People wishing to contribute are more than welcome to do so. Contributions can be made by opening a pull request to the main repository from your own fork of `PyPO`,
+ * containing your contributions. These will then be reviewed and considered for addition to `PyPO`. Issues and bugs can be reported in the `PyPO` [issue tracker](https://github.com/arend95/PyPO/issues).
  * \subsection license License
  * This project is released under the [MIT License](https://opensource.org/licenses/MIT).
  * \subsection contact Contact
  * 
- * For inquiries concerning the PyPO backend source code, please contact:
+ * For questions/support concerning the PyPO backend source code, please contact:
  * arendmoerman@gmail.com
  *
- * For inquiries concerning the PyPO GUI, please contact:
+ * For questions/support concerning the PyPO GUI, please contact:
  * maikel.gafaji@gmail.com
  */

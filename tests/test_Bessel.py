@@ -37,8 +37,8 @@ class Test_Bessel(unittest.TestCase):
 
         self.assertTrue(np.all(diff_E))
         self.assertTrue(np.all(diff_H))
-        print(__file__)
-        self._plot_res(lams, E_l, H_l, diff_lim)
+        #print(__file__)
+        #self._plot_res(lams, E_l, H_l, diff_lim)
 
     def _calc_ff(self, lam):
         s = System(override=False, verbose=False)

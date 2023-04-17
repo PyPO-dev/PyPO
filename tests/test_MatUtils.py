@@ -29,13 +29,14 @@ class Test_MatUtils(unittest.TestCase):
         mat[5,3] = 1
         mat[5,2] = 1
         
-        idx_start = [1,2]
         component = 1
+        idx_start = [1,2]
 
         x, y = findConnectedSubsets(mat, component, idx_start)
         for l0, xx in zip(lims_0_check, x):
             self.assertEqual(l0, xx)
         for l1, yy in zip(lims_1_check, y):
             self.assertEqual(l1, yy)
+        
 if __name__ == "__main__":
     unittest.main()

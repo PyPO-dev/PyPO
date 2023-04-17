@@ -164,6 +164,16 @@ class Test_SystemSnapAndHome(unittest.TestCase):
         self.s.deleteSnap("testgroup", "test", obj="group")
         self.assertFalse("test" in self.s.groups["testgroup"]["snapshots"])
         
+        self.s.homeReflector("testgroup", obj="group", rot=False)
+        for mem in self.s.groups["testgroup"]["members"]:
+            for tr, trs in zip([0, 0, 0, 1], self.s.system[mem]["transf"][:,-1]):
+                self.assertEqual(tr, trs)
+        
+        self.s.homeReflector("testgroup", obj="group", trans=False)
+        for mem in self.s.groups["testgroup"]["members"]:
+            for tr, trs in zip(np.eye(4).ravel(), self.s.system[mem]["transf"].ravel()):
+                self.assertEqual(tr, trs)
+
         for fr_n in self.fr_names:
             self.s.translateGrids(fr_n, trans, obj="frame")
             self.s.rotateGrids(fr_n, rot, obj="frame")

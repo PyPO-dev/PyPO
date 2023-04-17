@@ -60,6 +60,7 @@ def transformRays(fr):
     out = frameToObj(res, np_t=np.float64, shape=shape)
     
     out.setMeta(fr.pos, fr.ori, fr.transf)
+    out.snapshots = fr.snapshots
     return out
 
 ##

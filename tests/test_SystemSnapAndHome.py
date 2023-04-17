@@ -139,12 +139,21 @@ class Test_SystemSnapAndHome(unittest.TestCase):
                 
                 self.assertEqual(tr, trs)
 
+            self.s.deleteSnap(name, "test")
+            self.assertFalse("test" in self.s.system[name]["snapshots"])
+
+            self.s.homeReflector(name, rot=False)
+            for tr, trs in zip([0, 0, 0, 1], self.s.system[name]["transf"][:,-1]):
+                self.assertEqual(tr, trs)
+            
+            self.s.homeReflector(name, trans=False)
+            for tr, trs in zip(np.eye(4).ravel(), self.s.system[name]["transf"].ravel()):
+                self.assertEqual(tr, trs)
+
         self.s.translateGrids("testgroup", trans, obj="group")
         self.s.rotateGrids("testgroup", rot, obj="group")
         
         self.s.revertToSnap("testgroup", "test", obj="group")
-
-
         for transfs, elem_name in zip(self.s.groups["testgroup"]["snapshots"]["test"], self.names):
             _transf = self.s.system[elem_name]["transf"]
             self.assertFalse(id(transfs) == id(_transf))
@@ -152,11 +161,12 @@ class Test_SystemSnapAndHome(unittest.TestCase):
             for tr, trs in zip(transfs.ravel(), _transf.ravel()): 
                 self.assertEqual(tr, trs)
 
+        self.s.deleteSnap("testgroup", "test", obj="group")
+        self.assertFalse("test" in self.s.groups["testgroup"]["snapshots"])
+        
         for fr_n in self.fr_names:
             self.s.translateGrids(fr_n, trans, obj="frame")
-            print(self.s.frames[fr_n].snapshots)
             self.s.rotateGrids(fr_n, rot, obj="frame")
-            print(self.s.frames[fr_n].snapshots)
             self.s.revertToSnap(fr_n, "test", obj="frame")
 
             self.assertFalse(id(self.s.frames[fr_n].snapshots["test"]) == id(self.s.frames[fr_n].transf))
@@ -164,5 +174,8 @@ class Test_SystemSnapAndHome(unittest.TestCase):
                                 self.s.frames[fr_n].transf.ravel()):
                 
                 self.assertEqual(tr, trs)
+            
+            self.s.deleteSnap(fr_n, "test", obj="frame")
+            self.assertFalse("test" in self.s.frames[fr_n].snapshots)
 if __name__ == "__main__":
     unittest.main()

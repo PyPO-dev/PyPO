@@ -68,7 +68,6 @@ void makeGRTframe(GRTDict grdict, cframe *fr)
  */
 void makeGauss(GPODict gdict, reflparams plane, c2Bundle *res_field, c2Bundle *res_current)
 {
-    printf("%f\n", gdict.lam);
     initGauss<GPODict, reflparams, c2Bundle, reflcontainer, double>(gdict, plane, res_field ,res_current);
 }
 

@@ -252,6 +252,11 @@ class GroupNameError(Exception):
     pass
 
 ##
+# Merge beamerror. Raised when beams are to be merged but are not on same surface. 
+class MergeBeamError(Exception):
+    pass
+
+##
 # Error message when a frame, field or current already occurs in the System.
 #
 # @param elemName Name of object already in use.
@@ -322,7 +327,7 @@ def errMsg_value(fieldName, value, elemName):
     return f"Incorrect value {value} encountered in field \"{fieldName}\", element {elemName}.\n"
 
 ##
-# Error message when a reflector element is not present in System..
+# Error message when a reflector element is not present in System.
 #
 # @param elemName Name of element.
 #
@@ -331,7 +336,7 @@ def errMsg_noelem(elemName):
     return f"Element {elemName} not in system.\n"
 
 ##
-# Error message when a frame object is not present in System..
+# Error message when a frame object is not present in System.
 #
 # @param frameName Name of frame.
 #
@@ -340,7 +345,7 @@ def errMsg_noframe(frameName):
     return f"Frame {frameName} not in system.\n"
 
 ##
-# Error message when a field object is not present in System..
+# Error message when a field object is not present in System.
 #
 # @param fieldName Name of field.
 #
@@ -349,7 +354,7 @@ def errMsg_nofield(fieldName):
     return f"Field {fieldName} not in system.\n"
 
 ##
-# Error message when a current object is not present in System..
+# Error message when a current object is not present in System.
 #
 # @param currentName Name of current.
 #
@@ -358,7 +363,7 @@ def errMsg_nocurrent(currentName):
     return f"Current {currentName} not in system.\n"
 
 ##
-# Error message when a scalarfield object is not present in System..
+# Error message when a scalarfield object is not present in System.
 #
 # @param scalarfieldName Name of scalarfield.
 #
@@ -367,13 +372,24 @@ def errMsg_noscalarfield(scalarfieldName):
     return f"Scalar field {scalarfieldName} not in system.\n"
 
 ##
-# Error message when a group is not present in System..
+# Error message when a group is not present in System.
 #
 # @param groupName Name of group.
 #
 # @returns errStr The errorstring.
 def errMsg_nogroup(groupName):
     return f"Group {groupName} not in system.\n"
+
+##
+# Error message when beams are to be merged but are not on the same surface.
+#
+# @param beamName Name of field/current that is not on surface.
+# @param surf0 Zeroth surface, taken as the merging surface.
+# @param surfd Surface on which current beam is defined.
+#
+# @returns errStr The errorstring.
+def errMsg_mergebeam(beamName, surf0, surfd):
+    return f"Cannot merge {beamName}, defined on {surfd}, on merging surface {surf0}.\n"
 
 ## 
 # Check if an input array has correct shape.
@@ -751,7 +767,7 @@ def check_GRTDict(GRTDict, nameList, clog):
 
     if "lam" in GRTDict:
         if GRTDict["lam"] == 0 + 0j:
-            clog.info(f"Never heard of a complex-valued wavelength of zero, but good try... Therefore changing wavelength now to 'lam' equals {np.pi:.42f}!")
+            clog.info(f"Never heard of a complex-valued wavelength of zero, but good try.. Therefore changing wavelength now to 'lam' equals {np.pi:.42f}!")
             GRTDict["lam"] = np.pi
 
         if not (isinstance(GRTDict["lam"], float) or isinstance(GRTDict["lam"], int)):
@@ -876,7 +892,7 @@ def check_PSDict(PSDict, nameList, clog):
 
     if "lam" in PSDict:
         if PSDict["lam"] == 0 + 0j:
-            clog.info(f"Never heard of a complex-valued wavelength of zero, but good try... Therefore changing wavelength now to 'lam' equals {np.pi:.42f}!")
+            clog.info(f"Never heard of a complex-valued wavelength of zero, but good try.. Therefore changing wavelength now to 'lam' equals {np.pi:.42f}!")
             PSDict["lam"] = np.pi
 
         if not ((isinstance(PSDict["lam"], float) or isinstance(PSDict["lam"], int))):
@@ -936,7 +952,7 @@ def check_GPODict(GPODict, nameList, clog):
 
     if "lam" in GPODict:
         if GPODict["lam"] == 0 + 0j:
-            clog.info(f"Never heard of a complex-valued wavelength of zero, but good try... Therefore changing wavelength now to 'lam' equals {np.pi:.42f}!")
+            clog.info(f"Never heard of a complex-valued wavelength of zero, but good try.. Therefore changing wavelength now to 'lam' equals {np.pi:.42f}!")
             GPODict["lam"] = np.pi
 
         if not ((isinstance(GPODict["lam"], float) or isinstance(GPODict["lam"], int))):
@@ -1224,4 +1240,32 @@ def check_ellipseLimits(ellipsoid, clog):
         if np.absolute(ellipsoid["lims_u"][1]) > ellipsoid["coeffs"][idx_lim]:
             clog.warning(f"Upper u-limit of {ellipsoid['lims_u'][1]:.3f} incompatible with ellipsoid {ellipsoid['name']}. Changing to {ellipsoid['coeffs'][idx_lim]}.")
             ellipsoid["lims_u"][1] = ellipsoid["coeffs"][idx_lim] - ellipsoid["lims_u"][1] / buff
+
+##
+# Check if beams to be merged are defined on same surface.
+# If not, raise MergeBeam Error.
+#
+# @param beams Fields/currents to be merged.
+# @param checkDict System c=dictionary containing fields/currents.
+def check_sameBound(beams, checkDict, clog):
+    errStr = ""
+    surf0 = checkDict[beams[0]].surf
+    for i in range(len(beams) - 1):
+        if checkDict[beams[i+1]].surf != surf0:
+            errStr += errMsg_mergebeam(beams[i+1], surf0, checkDict[beams[i+1]].surf)
+    
+    if errStr:
+        errList = errStr.split("\n")[:-1]
+        for err in errList:
+            clog.error(err)
+        
+        raise MergeBeamError()
+
+
+
+
+
+
+
+
 

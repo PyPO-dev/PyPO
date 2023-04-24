@@ -1059,6 +1059,45 @@ class System(object):
         return out
 
     ##
+    # Merge multiple beams that are defined on the same surface.
+    #
+    # @param beams Fields or currents objects to merge.
+    def mergeBeams(self, *beams, obj="fields", merged_name="combined"):
+        check_sameBound(beams, checkDict=getattr(self, obj), clog=self.clog) 
+        ex = getattr(self, obj)[beams[0]]
+
+        x1 = np.zeros(ex[0].shape, dtype=complex)
+        x2 = np.zeros(ex[0].shape, dtype=complex)
+        x3 = np.zeros(ex[0].shape, dtype=complex)
+        
+        y1 = np.zeros(ex[0].shape, dtype=complex)
+        y2 = np.zeros(ex[0].shape, dtype=complex)
+        y3 = np.zeros(ex[0].shape, dtype=complex)
+        
+        for beam in beams:
+            if obj == "fields":
+                check_fieldSystem(beam, self.fields, self.clog, extern=True)
+            if obj == "currents":
+                check_currentSystem(beam, self.currents, self.clog, extern=True)
+            
+            beam = getattr(self, obj)[beam]
+            x1 += beam[0]
+            x2 += beam[1]
+            x3 += beam[2]
+            
+            y1 += beam[3]
+            y2 += beam[4]
+            y3 += beam[5]
+
+        if obj == "fields":
+            field = fields(x1, x2, x3, y1, y2, y3)
+        if obj == "currents":
+            field = currents(x1, x2, x3, y1, y2, y3)
+        
+        field.setMeta(ex.surf, ex.k)
+        getattr(self, obj)[merged_name] = field
+
+    ##
     # Create a tube of rays from a TubeRTDict.
     #
     # @param argDict A TubeRTDict, filled. If not filled properly, will raise an exception.

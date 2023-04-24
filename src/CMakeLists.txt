@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.16.3)
 #set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
 project(PyPO 
-    VERSION 0.5.0 
-    DESCRIPTION "Physical OPtics for Python"
+    VERSION 0.9.0 
+    DESCRIPTION "Python Physical Optics"
     LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 11)
@@ -15,6 +15,9 @@ target_include_directories(pyporefl PUBLIC common include)
 
 add_library(pypobeam SHARED common/InterfaceBeam.cpp)
 target_link_libraries(pypobeam PRIVATE pyporefl)
+
+add_library(pypotransf SHARED common/Transform.cpp)
+target_include_directories(pypotransf PRIVATE include)
 
 add_library(pypocpu SHARED CPU/InterfaceCPU.cpp)
 target_include_directories(pypocpu PRIVATE CPU)

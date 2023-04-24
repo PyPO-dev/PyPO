@@ -22,8 +22,8 @@ struct reflcontainer;
 struct cframe;
 struct RTDict;
 struct GRTDict;
-struct GDict;
-struct ScalarGDict;
+struct GPODict;
+struct ScalarGPODict;
 
 /** 1D array of complex numbers.*/
 struct arrC1 {
@@ -162,12 +162,10 @@ struct cframe {
 struct RTDict {
     int nRays;      /**<Number of rays to place in cframe.*/
     int nRing;      /**<Number of concentric rings in ray-trace beam.*/
-    double angx;    /**<Apex angle of beam at focus in x-direction, in degrees.*/
-    double angy;    /**<Apex angle of beam at focus in y-direction, in degrees.*/
-    double a;       /**<Semi-major axis of outer ring, in millimeters.*/
-    double b;       /**<Semi-minor axis of outer ring, in millimeters.*/
-    double *tChief; /**<array of 3 double. Tilt of chief, ray, along x, y or z axis, in degrees.*/
-    double *oChief; /**<array of 3 double. Co-ordinate of chief ray origin.*/
+    double angx0;    /**<Apex angle of beam at focus in x-direction, in degrees.*/
+    double angy0;    /**<Apex angle of beam at focus in y-direction, in degrees.*/
+    double x0;       /**<Semi-major axis of outer ring, in millimeters.*/
+    double y0;       /**<Semi-minor axis of outer ring, in millimeters.*/
 };
 
 /** Object for initializing a Gaussian ray-trace frame object.*/
@@ -178,29 +176,27 @@ struct GRTDict {
     double x0;       /**<Beam waist along x-direction, in millimeters.*/
     double y0;       /**<Beam waist along x-direction, in millimeters.*/
     int seed;
-    double *tChief; /**<array of 3 double. Tilt of chief, ray, along x, y or z axis, in degrees.*/
-    double *oChief; /**<array of 3 double. Co-ordinate of chief ray origin.*/
 };
 
 /** Object for initializing a Gaussian beam.*/
-struct GDict {
+struct GPODict {
     double lam;     /**<Wavelength of beam, in millimeters.*/
     double w0x;     /**<Beamwaist size along x-direction, in millimeters.*/
     double w0y;     /**<Beamwaist size along y-direction, in millimeters.*/
     double n;       /**<Refractive index of medium.*/
     double E0;      /**<Peak electric field value.*/
-    double z;       /**<z co-ordinate at which to evaluate Gaussian beam, in millimeters.*/
+    double dxyz;    /**<Astigmatic distance between x-focus and y-focus, in millimeters.*/
     double *pol;    /**<array of 3 double. Polarization components along x, y and z axes.*/
 };
 
 /** Object for initializing a scalar Gaussian beam.*/
-struct ScalarGDict {
+struct ScalarGPODict {
     double lam;     /**<Wavelength of beam, in millimeters.*/
     double w0x;     /**<Beamwaist size along x-direction, in millimeters.*/
     double w0y;     /**<Beamwaist size along y-direction, in millimeters.*/
     double n;       /**<Refractive index of medium.*/
     double E0;      /**<Peak electric field value.*/
-    double z;       /**<z co-ordinate at which to evaluate Gaussian beam, in millimeters.*/
+    double dxyz;    /**<Astigmatic distance between x-focus and y-focus, in millimeters.*/
 };
 
 // Have to write explicit types for float and float: ctypes doesnt support templates
@@ -214,7 +210,8 @@ struct reflcontainerf;
 struct cframef;
 struct RTDictf;
 struct GRTDictf;
-struct GDictf;
+struct GPODictf;
+struct ScalarGPODictf;
 
 /** 1D array of complex numbers.*/
 struct arrC1f {
@@ -353,10 +350,10 @@ struct cframef {
 struct RTDictf {
     int nRays;      /**<Number of rays to place in cframe.*/
     int nRing;      /**<Number of concentric rings in ray-trace beam.*/
-    float angx;    /**<Apex angle of beam at focus in x-direction, in degrees.*/
-    float angy;    /**<Apex angle of beam at focus in y-direction, in degrees.*/
-    float a;       /**<Semi-major axis of outer ring, in millimeters.*/
-    float b;       /**<Semi-minor axis of outer ring, in millimeters.*/
+    float angx0;    /**<Apex angle of beam at focus in x-direction, in degrees.*/
+    float angy0;    /**<Apex angle of beam at focus in y-direction, in degrees.*/
+    float x0;       /**<Semi-major axis of outer ring, in millimeters.*/
+    float y0;       /**<Semi-minor axis of outer ring, in millimeters.*/
     float *tChief; /**<array of 3 float. Tilt of chief, ray, along x, y or z axis, in degrees.*/
     float *oChief; /**<array of 3 float. Co-ordinate of chief ray origin.*/
 };
@@ -374,14 +371,23 @@ struct GRTDictf {
 };
 
 /** Object for initializing a Gaussian beam.*/
-struct GDictf {
+struct GPODictf {
     float lam;     /**<Wavelength of beam, in millimeters.*/
     float w0x;     /**<Beamwaist size along x-direction, in millimeters.*/
     float w0y;     /**<Beamwaist size along y-direction, in millimeters.*/
     float n;       /**<Refractive index of medium.*/
     float E0;      /**<Peak electric field value.*/
-    float z;       /**<z co-ordinate at which to evaluate Gaussian beam, in millimeters.*/
+    float dxyz;    /**<Astigmatic distance between x-focus and y-focus, in millimeters.*/
     float *pol;    /**<array of 3 float. Polarization components along x, y and z axes.*/
 };
 
+/** Object for initializing a scalar Gaussian beam.*/
+struct ScalarGPODictf {
+    float lam;     /**<Wavelength of beam, in millimeters.*/
+    float w0x;     /**<Beamwaist size along x-direction, in millimeters.*/
+    float w0y;     /**<Beamwaist size along y-direction, in millimeters.*/
+    float n;       /**<Refractive index of medium.*/
+    float E0;      /**<Peak electric field value.*/
+    float dxyz;    /**<Astigmatic distance between x-focus and y-focus, in millimeters.*/
+};
 #endif

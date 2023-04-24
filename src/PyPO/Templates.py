@@ -2,10 +2,11 @@
 # @file
 # Templates for commonly used PyPO dictionaries.
 #
-# Here, the templates for reflDicts, (G)RTDicts and PODicts are provided.
+# For each key, a short summary of the key is given.
 
 ##
-# Template for a reflDict. Note that some fields are only relevent when a certain gmode or 
+# Template for a reflDict, containing reflector parameters. Note that some fields are only relevent when a certain reflectortype, gmode or pmode is chosen.
+# This is signified in the key description.
 reflDict = {
         "name"      : "Reflector name (string)",
         "pmode"     : "Direct abc definition, or vertex & foc(ii) (string). Only for quadric surfaces",
@@ -25,36 +26,82 @@ reflDict = {
         "gridsize"  : "Number of cells along x(u) and y(v) axes (Numpy array of 2 ints)"
         }
 
-# Manual raytracer
+##
+# Template for a TubeRTDict, containing parameters for constructing a tubular ray-trace frame.
+# 
+# Using the tube, one can create any distribution in between a point source and a collimated beam.
+# The tube is cosntructed from concentrical elliptical rings, spaced equally apart. If the number of rings is zero, only the chief ray is generated.
+# The tube can be given a semi-major and semi-minor axis. These are the used to construct the outer ring in the tube. 
+# In addition, opening angles along the semi-major and semi-minor axis can be specified. The
 TubeRTDict = {
+        "name"      : "Name of tubular ray-trace frame (string)",
         "nRays"     : "Number of rays in a ray-trace ring (int)",
         "nRing"     : "Number of concentric ray-trace rings (int)",
-        "angx"      : "Opening angle in x-direction, degrees (real)",
-        "angy"      : "Opening angle in y-direction, degrees (real)",
-        "a"         : "Radius of outer ring along x-axis (real)",
-        "b"         : "Radius of outer ring along y-axis (real)",
-        "tChief"    : "Tilt w.r.t. positive z-axis of chief ray (len-3 Numpy array)",
-        "oChief"    : "origin of chief ray (len-3 Numpy array)"
+        "angx0"     : "Opening angle in x-direction, degrees (real)",
+        "angy0"     : "Opening angle in y-direction, degrees (real)",
+        "x0"        : "Radius of outer ring along x-axis in mm (positive real)",
+        "y0"        : "Radius of outer ring along y-axis in mm (positive real)"
         }
 
-# Gaussian beam dict, contains definitions of beam
-GDict = {
-        "lam"       :       "Wavelength of light (in mm, real)",
-        "w0"        :       4,
-        "n"         :       1,
-        "E0"        :       1,
-        "z"         :       0,
-        "pol"       :       np.array([1, 0, 0])
+##
+# Template for a GRTDict, containing parameters for constructing a Gaussian ray-trace frame.
+# 
+# The Gaussian beam is constructed by rejection sampling of a Gaussian position and direction distribution.
+# The divergence angles are calculated from n, lam, and x0/y0.
+# The focus of the beam is always initialised at z = 0. After generation, the frame can be freely translated and rotated. 
+GRTDict = {
+        "name"      : "Name of Gaussian ray-trace frame (string)",
+        "lam"       : "Wavelength of Gaussian beam in mm (positive real)",
+        "n"         : "Refractive index of medium (positive real)",
+        "nRays"     : "Number of rays in Gaussian beam (positive int)",
+        "x0"        : "Beamwaist along x-axis in mm (positive real)",
+        "y0"        : "Beamwaidt along y-axis in mm (positive real)",
+        "seed"      : "Seed for rejection sampling of Gaussian beam (positive int)"
         }
 
-# Aperture dict, to be passed to plotter.plotBeam2D (or not)
-PlotAper = {
-        "plot"      : False,
-        "center"    : np.zeros(2),
-        "r_out"     : 1,
-        "r_in"      : 0
+##
+# Template for a GPODict, containing parameters for constructing a Gaussian physical optics beam.
+# 
+# The beam is always initialised along the positive z-axis with the x focus at z = 0.
+# Evaluation of the beam, however, can be on an arbitrary oriented/positioned plane along the beam.
+# The beam can have elliptical contours, an arbitrary position angle and general astigmatism.
+# Note that the x focus is always at z = 0, and the y focus is at -dxyz, with dxyz the astigmatic distance. 
+# The template for a scalar beam is similar, except that the polarisation is not needed.
+GPODict = {
+        "name"      : "Name of Gaussian beam",
+        "lam"       : "Wavelength of Gaussian beam in mm (positive real)",
+        "w0x"       : "Focal beamwaist of beam along x-axis in mm (positive real)",
+        "w0y"       : "Focal beamwaist of beam along y-axis in mm (positive real)",
+        "n"         : "Refractive index of medium",
+        "E0"        : "Peak amplitude (real)",
+        "dxyz"      : "Astigmatic distance between x and y focus in mm (real)",
+        "pol"       : "Polarisation of beam (Numpy array of length 3)"
         }
 
+##
+# Template for a point source dictionary. The point source is generated on the accompanying source surface.
+# The template for a scalar beam is similar, except that the polarisation is not needed.
+PSDict = {
+        "name"      : "Name of point source (string)",
+        "lam"       : "Wavelength of pint source in mm (positive real)",
+        "E0"        : "Peak amplitude (real)",
+        "phase"     : "Phase of point source",
+        "pol"       : "Polarisation of point source (Numpy array of length 3)"
+        }
+
+##
+# Template for an aperture dictionary. The aperture dictionary is used for efficiency calculations and plotting purposes.
+# Because efficiencies are calculated in the restframe of a surface, the center and radius parameters should be interpreted as
+# laying in the xy plane.
+aperDict = {
+        "plot"      : "Whether to include the aperDict in a plot or not (boolean)",
+        "center"    : "Center of aperture, with respect to the origin of the xy plane, in mm (Numpy array of length 2)",
+        "outer"     : "Outer semi-major (x) and minor (y) axes of aperture, in mm (Numpy array of length 2)",
+        "inner"     : "Inner semi-major (x) and minor (y) axes of aperture, in mm (Numpy array of length 2)",
+        }
+
+##
+# Template for a physical optics propagation dictionary. The dictionary specifies several important parameters, such as the source currents, target surface and others.
 runPODict = {
         "t_name"    : "Name of target surface (string)",
         "s_current" : "Name of current object in system.currents (string)",
@@ -66,6 +113,8 @@ runPODict = {
         "mode"      : "Determine return object (string)"
         }
 
+##
+# Template for a ray-trace propagation dictionary. The dictionary specifies several important parameters, such as the input frame, target surface and others.
 runRTDict = {
         "fr_in"     : "Name of input frame",
         "fr_out"    : "Name of output frame",
@@ -74,6 +123,5 @@ runRTDict = {
         "nThreads"  : "Number of CPU/GPU threads (int)",
         "t0"        : "Initial guess for propagation",
         "device"    : "Device to use for calculation",
-        "nexus"     : "Reflect or transmit the field at surface"
         "epsilon"   : "Relative permittivity of nexus medium",
         }

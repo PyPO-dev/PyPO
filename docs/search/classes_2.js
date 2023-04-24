@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['fields_0',['fields',['../classPyPO_1_1PyPOTypes_1_1fields.html',1,'PyPO::PyPOTypes']]],
-  ['frame_1',['frame',['../classPyPO_1_1PyPOTypes_1_1frame.html',1,'PyPO::PyPOTypes']]]
+  ['dynamicdropdownwidget_0',['DynamicDropdownWidget',['../classGUI_1_1ParameterForms_1_1formGenerator_1_1DynamicDropdownWidget.html',1,'GUI::ParameterForms::formGenerator']]],
+  ['dynamicradiowidget_1',['DynamicRadioWidget',['../classGUI_1_1ParameterForms_1_1formGenerator_1_1DynamicRadioWidget.html',1,'GUI::ParameterForms::formGenerator']]]
 ];

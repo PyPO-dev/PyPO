@@ -3,6 +3,8 @@ import sys
 import os
 import shutil
 import platform
+import argparse
+
 from src.PyPO.CustomLogger import CustomLogger
 
 ##
@@ -21,17 +23,18 @@ def BuildPyPO():
     clog = clog_mgr.getCustomLogger()
 
     pathToBuild = os.path.join("src")
-    # Parse command line input
+    
+    parser = argparse.ArgumentParser(description="build and test interface script for PyPO")
+    parser.add_argument("-p", "--prereqs", help="install PyPO prerequisites", action="store_true")
+    parser.add_argument("-f", "--config", help="configure PyPO build scripts", action="store_true")
+    parser.add_argument("-m", "--make", help="build PyPO libraries", action="store_true")
+    parser.add_argument("-c", "--clean", help="remove PyPO build directory", action="store_true")
+    parser.add_argument("-d", "--docs", help="generate PyPO documentation with doxygen", action="store_true")
+    parser.add_argument("-t", "--test", help="run PyPO unittests", action="store_true")
+    parser.add_argument("-fm", "--full-monty", help="clean, configure and make PyPO in one go", action="store_true")
+    args = parser.parse_args()
 
-    helpf   = sys.argv.count("--help") or sys.argv.count("-h")
-    prereq  = sys.argv.count("--prereqs") or sys.argv.count("-p")
-    config  = sys.argv.count("--config") or sys.argv.count("-f")
-    cmake   = sys.argv.count("--make") or sys.argv.count("-m")
-    cmakec  = sys.argv.count("--clean") or sys.argv.count("-c")
-    docs    = sys.argv.count("--docs") or sys.argv.count("-d")
-    docsv   = sys.argv.count("--docs-v") or sys.argv.count("-dv")
-
-    if prereq:
+    if args.prereqs:
         clog.info("Installing PyPO prerequisites...")
         if platform.system() == "Linux":
             os.system("sudo apt-get install cm-super dvipng gcc build-essential cmake")
@@ -49,7 +52,7 @@ def BuildPyPO():
         clog.info("Succesfully installed PyPO prerequisites.")
         clog.warning("Install CUDA manually to enable PyPO on GPU.")
     
-    if cmakec:
+    if args.clean or args.full_monty:
         try:
             clog.info("Cleaning build directory...")
             dir_build = os.path.join(os.getcwd(), "out", "build")
@@ -57,10 +60,8 @@ def BuildPyPO():
             clog.info("Succesfully cleaned build directory.")
         except:
             clog.warning("Nothing to clean.")
-        
-        return 0
 
-    if config:
+    if args.config or args.full_monty:
         dir_lists = os.path.join(os.getcwd(), "src")
         dir_build = os.path.join(os.getcwd(), "out", "build")
 
@@ -78,10 +79,8 @@ def BuildPyPO():
         
         except:
             clog.error("Could not configure PyPO. Is CMAKE installed?")
-        
-        return 0
 
-    if cmake:
+    if args.make or args.full_monty:
         try:
             clog.info("Building PyPO...")
             dir_lists = os.path.join(os.getcwd(), "src")
@@ -95,17 +94,15 @@ def BuildPyPO():
 
         except:
             clog.error("Could not build PyPO.")
-        
-        return 0
 
-    if docs or docsv:
+    if args.docs:
         try:
             try:
                 shutil.rmtree("docs")
             except:
                 pass
             clog.info("Generating PyPO documentation...")
-            os.system("doxygen -q doxy/Doxyfile") if not docsv else os.system("doxygen doxy/Doxyfile")
+            os.system("doxygen doxy/Doxyfile")
             
             # Read html to set default detail level of menus
             annotated_path = os.path.join("docs", "annotated.html")
@@ -129,18 +126,17 @@ def BuildPyPO():
         
         except:
             clog.error("Failed to generate documentation. Is doxygen installed?")
-        return 0
+    
+    if args.test:
+        try:
+            clog.info("Running PyPO unittests...")
+            dir_tests = os.path.join(os.getcwd(), "tests")
 
-    if helpf:
-        print("PyPO build interface list of options:")
-        print("'--help',    '-h'            : view build options.")
-        print("'--clean',   '-c'            : remove PyPO objects and libraries.")
-        print("'--prereqs', '-p'            : install PyPO prerequisites.")
-        print("'--config',  '-f'            : configure PyPO.")
-        print("'--make',    '-m'            : build PyPO libraries.")
-        print("'--docs',    '-d'            : generate PyPO documentation. Needs doxygen!")
-        print("'--docs-v',  '-dv'           : generate PyPO documentation with verbose settings. Needs doxygen!")
-        return 0
+            os.system(f"nosetests --exe")
+
+        except:
+            clog.error("Failed to test PyPO.")
+
  
 if __name__ == "__main__":
 	BuildPyPO()

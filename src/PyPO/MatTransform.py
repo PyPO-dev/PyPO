@@ -1,19 +1,25 @@
 import numpy as np
+from scipy.linalg import svd as svd
+import src.PyPO.WorldParam as world
+##
+# @file
+# Transformation formalism for PyPO.
+#
+# This script contains the methods for applying matrix transformations to objects..
 
+##
+# Generate a 3D rotation matrix and append to previous matrix.
+# The appending is done by right matrix multiplication of the old transformation matrix with the rotation matrix.
+#
+# @param theta Numpy array of length 3 containing the xyz rotation angles.
+# @param matAppend The previous matrix. Defaults to identity matrix.
+# @param pivot Pivot for the rotation. Defaults to origin.
+# @param radians Whether theta is in radians or degrees. Defaults to False (degrees).
+#
+# @returns matOut Full 4D affine transformation matrix.
 def MatRotate(theta, matAppend=None, pivot=None, radians=False):
-    """
-    Create 3D rotation matrix and rotate grids of points.
-
-    @param  ->
-        theta       :   Array containing rotations around x,y,z axes in degrees.
-        origin      :   Origin of rotation.
-        radians     :   Whether theta is in degrees or radians.
-
-    @return ->
-        matOut      :   Full affine rotation matrix.
-    """
-    pivot = np.zeros(3) if pivot is None else pivot
-    matAppend = np.eye(4) if matAppend is None else matAppend
+    pivot = world.ORIGIN() if pivot is None else pivot
+    matAppend = world.INITM() if matAppend is None else matAppend
 
     if radians:
         theta_x, theta_y, theta_z = theta
@@ -48,24 +54,41 @@ def MatRotate(theta, matAppend=None, pivot=None, radians=False):
                     [0, 0, 1, oz],
                     [0, 0, 0, 1]])
     
-    matOut = trans2 @ (rotZ @ (rotY @ (rotX @ trans1)))
+    matOut = (trans2 @ (rotZ @ (rotY @ (rotX @ trans1)))) @ matAppend
 
-    return matOut @ matAppend
+    return matOut
 
-def MatTranslate(trans, matAppend):
+##
+# Generate a 3D translation matrix and append to previous matrix.
+# The appending is done by right matrix multiplication of the old transformation matrix with the translation matrix.
+#
+# @param trans Numpy array of length 3 containing the xyz translations, in mm.
+# @param matAppend The previous matrix. Defaults to identity matrix.
+#
+# @returns matOut Full 4D affine transformation matrix.
+def MatTranslate(trans, matAppend=None):
+    matAppend = world.INITM() if matAppend is None else matAppend
     xt, yt, zt = trans
     trans = np.array([[1, 0, 0, xt],
                     [0, 1, 0, yt],
                     [0, 0, 1, zt],
                     [0, 0, 0, 1]])
 
-    return trans @ matAppend
+    matOut = trans @ matAppend
 
+    return matOut
+
+##
+# Invert a transformation matrix, both the rotational and translational part. 
+#
+# @param mat Full 4D affine transformation matrix.
+#
+# @returns matInv Full 4D affine inverse transformation matrix.
 def InvertMat(mat):
     R_T = mat[:3, :3].T
     R_Tt = -R_T @ mat[:3, -1]
 
-    matInv = np.eye(4)
+    matInv = world.INITM()
     matInv[:3, :3] = R_T
     matInv[:3, -1] = R_Tt
 

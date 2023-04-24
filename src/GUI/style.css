@@ -43,6 +43,16 @@ CurrentWidget MyButton{
     border-bottom-left-radius : 0px; 
     border-bottom-right-radius : 15px;
 }
+GroupWidget MyButton{
+    background:#374800;
+    color:#ffc4ae;
+    font-weight: bold;
+    font-size: 1.2em;
+    border-top-left-radius :0px;
+    border-top-right-radius : 15px; 
+    border-bottom-left-radius : 0px; 
+    border-bottom-right-radius : 15px;
+}
 QPushButton:hover{
     background:#a51554;
 }
@@ -51,6 +61,17 @@ ElementWidget QLabel{
     background: #151ca5;
     font-weight: bold;
     color:#f2c50f;
+    border-top-left-radius :15px;
+    border-top-right-radius : 0px; 
+    border-bottom-left-radius : 15px; 
+    border-bottom-right-radius : 0px;
+    padding: 10px;
+}
+
+GroupWidget QLabel{
+    background: #374800;
+    font-weight: bold;
+    color:#ffc4ae;
     border-top-left-radius :15px;
     border-top-right-radius : 0px; 
     border-bottom-left-radius : 15px; 

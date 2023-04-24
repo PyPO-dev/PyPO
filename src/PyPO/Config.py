@@ -1,11 +1,7 @@
-def initPrint(redirect):
-    global print
-    if redirect != None:
-        print = redirect
-
-    else:
-        print = print
-
-def setContext(_context):
+def setContext(_context=None):
     global context
     context = "S" if _context is None else _context
+
+def setOverride(_override=None):
+    global override
+    override = True if _override is None else _override

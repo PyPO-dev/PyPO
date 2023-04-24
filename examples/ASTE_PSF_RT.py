@@ -45,14 +45,12 @@ def ex_ASTE_RT(device):
 
     RTpar = {
             "name"          : "start",
-            "nRays"         : 10,
-            "nRing"         : 10,
-            "angx"          : 0,
-            "angy"          : 0,
-            "a"             : 4000,
-            "b"             : 4000,
-            "tChief"        : np.array([0,0,0]),
-            "oChief"        : np.array([0,0,3.5e3])
+            "nRays"         : 8,
+            "nRing"         : 1,
+            "angx0"         : 0,
+            "angy0"         : 0,
+            "x0"            : 4000,
+            "y0"            : 4000,
             }
 
     rotation = np.array([0, 0, 0])
@@ -68,8 +66,17 @@ def ex_ASTE_RT(device):
     #s.rotateGrids("sec", np.array([1,0,0]), np.array([0,0,3.5e3]))
 
     s.createTubeFrame(argDict=RTpar)
+    s.translateGrids("start", np.array([0,0,3.5e3]), obj="frame")
 
+    #_rotation = np.array([160,45,14])
 
+    #s.rotateGrids("start", _rotation, obj="frame", pivot=np.zeros(3))
+
+    #s.groupElements("ASTE", "pri", "sec", "plane1")
+
+    #s.rotateGrids("ASTE", _rotation, obj="group", pivot=np.zeros(3))
+
+    s.plotSystem()
     start_pri_RT = {
             "fr_in"     : "start",
             "t_name"    : "pri",
@@ -96,7 +103,7 @@ def ex_ASTE_RT(device):
     s.runRayTracer(sec_focus_RT)
     
     s.plotRTframe("focus", project="xy")
-    s.plotSystem(RTframes=["start", "pri", "sec", "focus"])
+    s.plotSystem(RTframes=["start", "pri", "sec", "focus"], RTcolor="orange", save=True)
 
 if __name__ == "__main__":
     ex_ASTE()

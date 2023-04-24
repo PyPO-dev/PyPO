@@ -66,19 +66,19 @@ template<typename T>
 T pdfGauss(std::vector<T> vars, std::vector<T> scales);
 
 /** 
- * Initialize Gaussian beam from GDict or GDictf.
+ * Initialize Gaussian beam from GPODict or GPODictf.
  *
- * Takes a GDict or GDictf and generates two c2Bundle or c2Bundlef objects, which contain the field and 
+ * Takes a GPODict or GPODictf and generates two c2Bundle or c2Bundlef objects, which contain the field and 
  *      associated currents and are allocated to passed pointer arguments.
  *
- * @param gdict GDict or GDictf object from which to generate a Gaussian beam.
+ * @param gdict GPODict or GPODictf object from which to generate a Gaussian beam.
  * @param refldict reflparams or reflparamsf object corresponding to surface on
  *      which to generate the Gaussian beam.
  * @param res_field Pointer to c2Bundle or c2Bundlef object.
  * @param res_current Pointer to c2Bundle or c2Bundlef object.
  *
- * @see GDict
- * @see GDictf
+ * @see GPODict
+ * @see GPODictf
  * @see reflparams
  * @see reflparamsf
  * @see c2Bundle
@@ -88,17 +88,17 @@ template<typename T, typename U, typename V, typename W, typename G>
 void initGauss(T gdict, U refldict, V *res_field, V *res_current);
 
 /** 
- * Initialize scalar Gaussian beam from GDict or GDictf.
+ * Initialize scalar Gaussian beam from GPODict or GPODictf.
  *
- * Takes a ScalarGDict or ScalarGDictf and generates an arrC1 or arrC1f object.
+ * Takes a ScalarGPODict or ScalarGPODictf and generates an arrC1 or arrC1f object.
  *
- * @param gdict ScalarGDict or ScalarGDictf object from which to generate a Gaussian beam.
+ * @param gdict ScalarGPODict or ScalarGPODictf object from which to generate a Gaussian beam.
  * @param refldict reflparams or reflparamsf object corresponding to surface on
  *      which to generate the Gaussian beam.
  * @param res_field Pointer to arrC1 or arrC1f object.
  *
- * @see ScalarGDict
- * @see ScalarGDictf
+ * @see ScalarGPODict
+ * @see ScalarGPODictf
  * @see reflparams
  * @see reflparamsf
  * @see arrC1
@@ -146,51 +146,34 @@ void initFrame(T rdict, U *fr)
 
     int n = 1;
 
-    std::array<V, 3> tChief;
-    std::array<V, 3> oChief;
     std::array<V, 3> rotation;
-    std::array<V, 3> _direction;
     std::array<V, 3> direction;
+    
+    fr->x[0] = 0.;
+    fr->y[0] = 0.;
+    fr->z[0] = 0.;
 
-    for (int n=0; n<3; n++) {tChief[n] = rdict.tChief[n];}
-    for (int n=0; n<3; n++) {oChief[n] = rdict.oChief[n];}
+    fr->dx[0] = 0.;
+    fr->dy[0] = 0.;
+    fr->dz[0] = 1.;
 
-    ut.matRot(tChief, nomChief, zero, direction);
-
-    fr->x[0] = oChief[0];
-    fr->y[0] = oChief[1];
-    fr->z[0] = oChief[2];
-
-    fr->dx[0] = direction[0];
-    fr->dy[0] = direction[1];
-    fr->dz[0] = direction[2];
-
-    std::array<V, 3> _pos;
     std::array<V, 3> pos;
 
     for (int i=1; i<nTot; i++)
     {
-        _pos[0] = rdict.a * cos(alpha) / rdict.nRing * n + rdict.oChief[0];
-        _pos[1] = rdict.b * sin(alpha) / rdict.nRing * n + rdict.oChief[1];
-        _pos[2] = rdict.oChief[2];
+        fr->x[i] = rdict.x0 * cos(alpha) / rdict.nRing * n;
+        fr->y[i] = rdict.y0 * sin(alpha) / rdict.nRing * n;
+        fr->z[i] = 0.;
 
-        rotation[0] = rdict.angy * sin(alpha) / rdict.nRing * n;
-        rotation[1] = rdict.angx * cos(alpha) / rdict.nRing * n;
+        rotation[0] = rdict.angy0 * sin(alpha) / rdict.nRing * n;
+        rotation[1] = rdict.angx0 * cos(alpha) / rdict.nRing * n;
         rotation[2] = 2 * alpha;
 
-        ut.matRot(rotation, nomChief, zero, _direction);
-        ut.matRot(tChief, _direction, zero, direction);
-
-        ut.matRot(tChief, _pos, oChief, pos);
-
-        fr->x[i] = pos[0];
-        fr->y[i] = pos[1];
-        fr->z[i] = pos[2];
+        ut.matRot(rotation, nomChief, zero, direction);
 
         fr->dx[i] = direction[0];
         fr->dy[i] = direction[1];
         fr->dz[i] = direction[2];
-
         alpha += d_alpha;
 
         if (i == int(nTot / rdict.nRing) * n)
@@ -213,31 +196,21 @@ void initRTGauss(T grdict, U *fr)
     if (grdict.seed != -1) {Random<V> rando(grdict.seed);}
 
     fr->size = grdict.nRays;
-
-    std::array<V, 3> tChief;
-    std::array<V, 3> oChief;
+    
     std::array<V, 3> rotation;
     std::array<V, 3> direction;
-    std::array<V, 3> ddirection;
     std::array<V, 3> pos;
-    std::array<V, 3> ppos;
-
-    for (int n=0; n<3; n++) {tChief[n] = grdict.tChief[n];}
-    for (int n=0; n<3; n++) {oChief[n] = grdict.oChief[n];}
 
     // Initialize scale vector
     std::vector<V> scales{grdict.x0, grdict.y0, grdict.angx0, grdict.angy0};
 
-    // Initialize first entry in frame: chief ray
-    ut.matRot(tChief, nomChief, zero, direction);
+    fr->x[0] = 0.;
+    fr->y[0] = 0.;
+    fr->z[0] = 0.;
 
-    fr->x[0] = oChief[0];
-    fr->y[0] = oChief[1];
-    fr->z[0] = oChief[2];
-
-    fr->dx[0] = direction[0];
-    fr->dy[0] = direction[1];
-    fr->dz[0] = direction[2];
+    fr->dx[0] = 0.;
+    fr->dy[0] = 0.;
+    fr->dz[0] = 1.;
 
     // Start rejection sampling. Use n_suc as succes counter
     int n_suc = 1;
@@ -258,11 +231,9 @@ void initRTGauss(T grdict, U *fr)
        {
            // Rotate chief ray by tilt angles found
            rotation  = {xi[3], xi[2], 0};
-           ut.matRot(rotation, nomChief, zero, ddirection);
-           ut.matRot(tChief, ddirection, zero, direction);
+           ut.matRot(rotation, nomChief, zero, direction);
            //std::cout << ddirection[2] << std::endl;
-           ppos = {xi[0] + oChief[0], xi[1] + oChief[1], oChief[2]};
-           ut.matRot(tChief, ppos, oChief, pos);
+           pos = {xi[0], xi[1], 0};
 
            fr->x[n_suc] = pos[0];
            fr->y[n_suc] = pos[1];
@@ -306,21 +277,20 @@ void initGauss(T gdict, U refldict, V *res_field, V *res_current)
 
     Utils<G> ut;
 
-    bool transform = false;
+    bool transform = true;
     generateGrid(refldict, &reflc, transform);
 
 
     G zRx      = M_PI * gdict.w0x*gdict.w0x * gdict.n / gdict.lam;
     G zRy      = M_PI * gdict.w0y*gdict.w0y * gdict.n / gdict.lam;
-    G wzx      = gdict.w0x * sqrt(1 + (gdict.z / zRx)*(gdict.z / zRx));
-    G wzy      = gdict.w0y * sqrt(1 + (gdict.z / zRy)*(gdict.z / zRy));
-    G Rzx_inv  = gdict.z / (gdict.z*gdict.z + zRx*zRx);
-    G Rzy_inv  = gdict.z / (gdict.z*gdict.z + zRy*zRy);
-    G phizx    = atan(gdict.z / zRx);
-    G phizy    = atan(gdict.z / zRy);
-    G k       = 2 * M_PI / gdict.lam;
-
-    G r2;
+    G k        = 2 * M_PI / gdict.lam;
+    
+    G wzx;      
+    G wzy;     
+    G Rzx_inv;  
+    G Rzy_inv;  
+    G phizx;    
+    G phizy;    
 
     std::complex<G> j(0, 1);
 
@@ -331,11 +301,15 @@ void initGauss(T gdict, U refldict, V *res_field, V *res_current)
 
     for (int i=0; i<nTot; i++)
     {
-        r2 = reflc.x[i]*reflc.x[i] + reflc.y[i]*reflc.y[i];
-
-        //field_atPoint = gdict.E0 * gdict.w0/wz * exp(-r2/(wz*wz)) * exp(-j * (k*gdict.z + k*r2*Rz_inv/2 - phiz));
+        wzx      = gdict.w0x * sqrt(1 + (reflc.z[i] / zRx)*(reflc.z[i] / zRx));
+        wzy      = gdict.w0y * sqrt(1 + ((reflc.z[i] - gdict.dxyz) / zRy)*((reflc.z[i] - gdict.dxyz) / zRy));
+        Rzx_inv  = reflc.z[i] / (reflc.z[i]*reflc.z[i] + zRx*zRx);
+        Rzy_inv  = (reflc.z[i] - gdict.dxyz) / ((reflc.z[i] - gdict.dxyz)*(reflc.z[i] - gdict.dxyz) + zRy*zRy);
+        phizx    = atan(reflc.z[i] / zRx);
+        phizy    = atan((reflc.z[i] - gdict.dxyz) / zRy);
+        
         field_atPoint = gdict.E0 * sqrt(2 / (M_PI * wzx * wzy)) * exp(-(reflc.x[i]/wzx)*(reflc.x[i]/wzx) - (reflc.y[i]/wzy)*(reflc.y[i]/wzy) -
-                j*M_PI/gdict.lam * (reflc.x[i]*reflc.x[i]*Rzx_inv + reflc.y[i]*reflc.y[i]*Rzy_inv) - j*k*gdict.z + j*(phizx - phizy)*0.5);
+                j*M_PI/gdict.lam * (reflc.x[i]*reflc.x[i]*Rzx_inv + reflc.y[i]*reflc.y[i]*Rzy_inv) - j*k*reflc.z[i] + j*(phizx - phizy)*0.5);
         
         efield[0] = field_atPoint * gdict.pol[0];
         efield[1] = field_atPoint * gdict.pol[1];
@@ -416,33 +390,34 @@ void initScalarGauss(T sgdict, U refldict, V *res_field)
     reflc.area = new G[nTot];
     Utils<G> ut;
 
-    bool transform = false;
+    bool transform = true;
     generateGrid(refldict, &reflc, transform);
 
     G zRx      = M_PI * sgdict.w0x*sgdict.w0x * sgdict.n / sgdict.lam;
     G zRy      = M_PI * sgdict.w0y*sgdict.w0y * sgdict.n / sgdict.lam;
-    G wzx      = sgdict.w0x * sqrt(1 + (sgdict.z / zRx)*(sgdict.z / zRx));
-    G wzy      = sgdict.w0y * sqrt(1 + (sgdict.z / zRy)*(sgdict.z / zRy));
-    G Rzx_inv  = sgdict.z / (sgdict.z*sgdict.z + zRx*zRx);
-    G Rzy_inv  = sgdict.z / (sgdict.z*sgdict.z + zRy*zRy);
-    G phizx    = atan(sgdict.z / zRx);
-    G phizy    = atan(sgdict.z / zRy);
     G k        = 2 * M_PI / sgdict.lam;
-
-    G r2;
-
+    
+    G wzx;      
+    G wzy;     
+    G Rzx_inv;  
+    G Rzy_inv;  
+    G phizx;    
+    G phizy;    
     std::complex<G> j(0, 1);
 
     std::complex<G> efield;
-    std::array<G, 3> n_source;
 
     for (int i=0; i<nTot; i++)
     {
-        r2 = reflc.x[i]*reflc.x[i] + reflc.y[i]*reflc.y[i];
-
-        //field_atPoint = gdict.E0 * gdict.w0/wz * exp(-r2/(wz*wz)) * exp(-j * (k*gdict.z + k*r2*Rz_inv/2 - phiz));
+        wzx      = sgdict.w0x * sqrt(1 + (reflc.z[i] / zRx)*(reflc.z[i] / zRx));
+        wzy      = sgdict.w0y * sqrt(1 + ((reflc.z[i] - sgdict.dxyz) / zRy)*((reflc.z[i] - sgdict.dxyz) / zRy));
+        Rzx_inv  = reflc.z[i] / (reflc.z[i]*reflc.z[i] + zRx*zRx);
+        Rzy_inv  = (reflc.z[i] - sgdict.dxyz) / ((reflc.z[i] - sgdict.dxyz)*(reflc.z[i] - sgdict.dxyz) + zRy*zRy);
+        phizx    = atan(reflc.z[i] / zRx);
+        phizy    = atan((reflc.z[i] - sgdict.dxyz) / zRy);
+        
         efield = sgdict.E0 * sqrt(2 / (M_PI * wzx * wzy)) * exp(-(reflc.x[i]/wzx)*(reflc.x[i]/wzx) - (reflc.y[i]/wzy)*(reflc.y[i]/wzy) -
-                j*M_PI/sgdict.lam * (reflc.x[i]*reflc.x[i]*Rzx_inv + reflc.y[i]*reflc.y[i]*Rzy_inv) - j*k*sgdict.z + j*(phizx - phizy)*0.5);
+                j*M_PI/sgdict.lam * (reflc.x[i]*reflc.x[i]*Rzx_inv + reflc.y[i]*reflc.y[i]*Rzy_inv) - j*k*reflc.z[i] + j*(phizx - phizy)*0.5);
 
         res_field->x[i] = efield.real();
         res_field->y[i] = efield.imag();

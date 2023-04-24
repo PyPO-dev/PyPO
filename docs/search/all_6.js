@@ -1,10 +1,24 @@
 var searchData=
 [
-  ['farfieldatpoint_0',['farfieldAtPoint',['../classPropagation.html#ad7fb1d172d9c9ff614850d202e0da965',1,'Propagation::farfieldAtPoint()'],['../Kernelsf_8cu.html#a2b2fe507d139af1fc75ec76defbde434',1,'farfieldAtPoint():&#160;Kernelsf.cu']]],
-  ['fieldatpoint_1',['fieldAtPoint',['../classPropagation.html#a624b50b5c7b44511575b290a81b6567a',1,'Propagation::fieldAtPoint()'],['../Kernelsf_8cu.html#a6644ba388248099e486d1304f74c65ae',1,'fieldAtPoint():&#160;Kernelsf.cu']]],
-  ['fields_2',['fields',['../classPyPO_1_1PyPOTypes_1_1fields.html',1,'PyPO::PyPOTypes']]],
-  ['fieldscalaratpoint_3',['fieldScalarAtPoint',['../classPropagation.html#a68b38f577289a8b480597a96991cbb42',1,'Propagation']]],
-  ['findmatrix_4',['findMatrix',['../classPyPO_1_1System_1_1System.html#a10e87d061fb702d942709c0e53f76e29',1,'PyPO::System::System']]],
-  ['flip_5',['flip',['../structreflparams.html#a4386c738c9df82696987dfc73620b408',1,'reflparams::flip()'],['../structreflparamsf.html#a7ce43b7389a7b0e38bdad303a93ceab9',1,'reflparamsf::flip()']]],
-  ['frame_6',['frame',['../classPyPO_1_1PyPOTypes_1_1frame.html',1,'PyPO::PyPOTypes']]]
+  ['farfieldatpoint_0',['farfieldAtPoint',['../Kernelsf_8cu.html#a2b2fe507d139af1fc75ec76defbde434',1,'farfieldAtPoint():&#160;Kernelsf.cu'],['../classPropagation.html#ad7fb1d172d9c9ff614850d202e0da965',1,'Propagation::farfieldAtPoint()']]],
+  ['fieldatpoint_1',['fieldAtPoint',['../Kernelsf_8cu.html#ab22e5a6574f3f494b1c4310706c24ebc',1,'fieldAtPoint():&#160;Kernelsf.cu'],['../classPropagation.html#a624b50b5c7b44511575b290a81b6567a',1,'Propagation::fieldAtPoint()']]],
+  ['fieldnameerror_2',['FieldNameError',['../classPyPO_1_1Checks_1_1FieldNameError.html',1,'PyPO::Checks']]],
+  ['fields_3',['fields',['../classPyPO_1_1PyPOTypes_1_1fields.html',1,'PyPO::PyPOTypes']]],
+  ['fieldscalaratpoint_4',['fieldScalarAtPoint',['../classPropagation.html#a68b38f577289a8b480597a96991cbb42',1,'Propagation']]],
+  ['fieldswidget_5',['FieldsWidget',['../classGUI_1_1ElementWidget_1_1FieldsWidget.html',1,'GUI::ElementWidget']]],
+  ['findconnectedsubsets_6',['findConnectedSubsets',['../MatUtils_8py.html#ae6db24331ae4d7b0f837c9081500686a',1,'PyPO::MatUtils']]],
+  ['findrotation_7',['findRotation',['../classPyPO_1_1System_1_1System.html#a9e58ecbcc82f1e7a7e316a96b3cc8e78',1,'PyPO::System::System']]],
+  ['findrtfocus_8',['findRTfocus',['../classPyPO_1_1System_1_1System.html#a77749b7ba2640d7fa7957eba487f997b',1,'PyPO::System::System']]],
+  ['fitgauss_2epy_9',['FitGauss.py',['../FitGauss_8py.html',1,'']]],
+  ['fitgaussabs_10',['fitGaussAbs',['../FitGauss_8py.html#ab78e0457fa4ffd66309d88bebab5e4fb',1,'PyPO.FitGauss.fitGaussAbs()'],['../classPyPO_1_1System_1_1System.html#a38d0e0128df52d39cb1d5ca3c2814188',1,'PyPO.System.System.fitGaussAbs()']]],
+  ['flip_11',['flip',['../structreflparams.html#a4386c738c9df82696987dfc73620b408',1,'reflparams::flip()'],['../structreflparamsf.html#a7ce43b7389a7b0e38bdad303a93ceab9',1,'reflparamsf::flip()']]],
+  ['focus_5fopts_5fhyp_5fell_12',['focus_opts_hyp_ell',['../formData_8py.html#a1e44da285e7a8c97fc28972fd57f520e',1,'GUI::ParameterForms::formData']]],
+  ['focusfind_13',['focusFind',['../formData_8py.html#ad3c140a4ff929dab67777f30980c3b02',1,'GUI::ParameterForms::formData']]],
+  ['formdata_2epy_14',['formData.py',['../formData_8py.html',1,'']]],
+  ['formgenerator_15',['FormGenerator',['../classGUI_1_1ParameterForms_1_1formGenerator_1_1FormGenerator.html',1,'GUI::ParameterForms::formGenerator']]],
+  ['formgenerator_2epy_16',['formGenerator.py',['../formGenerator_8py.html',1,'']]],
+  ['frame_17',['frame',['../classPyPO_1_1PyPOTypes_1_1frame.html',1,'PyPO::PyPOTypes']]],
+  ['framenameerror_18',['FrameNameError',['../classPyPO_1_1Checks_1_1FrameNameError.html',1,'PyPO::Checks']]],
+  ['frametoobj_19',['frameToObj',['../BindUtils_8py.html#a5842bb6b905c02b1c1855b5cbcbb7bac',1,'PyPO::BindUtils']]],
+  ['framewidget_20',['FrameWidget',['../classGUI_1_1ElementWidget_1_1FrameWidget.html',1,'GUI::ElementWidget']]]
 ];

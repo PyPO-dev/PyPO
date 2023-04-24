@@ -11,12 +11,16 @@ import src.PyPO.Config as Config
 import src.PyPO.Threadmgr as TManager
 
 import threading
-#############################################################################
-#                                                                           #
-#           List of bindings for the beam init interface of PyPO.          #
-#                                                                           #
-#############################################################################
 
+##
+# @file
+# Bindings for the ctypes interface for PyPO. 
+# These bindings are concerned with beam generation for the ray-tracer and the physical optics.
+
+##
+# Load the pypobeam shared library. Will detect the operating system and link the library accordingly.
+#
+# @returns lib The ctypes library containing the C/C++ functions.
 def loadBeamlib():
     try:
         LD_PATH = pathlib.Path(__file__).parents[2]/"out/build/Debug"
@@ -34,22 +38,30 @@ def loadBeamlib():
     lib.makeGRTframe.argtypes = [GRTDict, ctypes.POINTER(cframe)]
     lib.makeGRTframe.restype = None
 
-    lib.makeGauss.argtypes = [GDict, reflparams, ctypes.POINTER(c2Bundle), ctypes.POINTER(c2Bundle)]
+    lib.makeGauss.argtypes = [GPODict, reflparams, ctypes.POINTER(c2Bundle), ctypes.POINTER(c2Bundle)]
     lib.makeGauss.restype = None
 
-    lib.makeScalarGauss.argtypes = [ScalarGDict, reflparams, ctypes.POINTER(arrC1)]
+    lib.makeScalarGauss.argtypes = [ScalarGPODict, reflparams, ctypes.POINTER(arrC1)]
     lib.makeScalarGauss.restype = None
     
     lib.calcCurrents.argtypes = [ctypes.POINTER(c2Bundle), ctypes.POINTER(c2Bundle),
                                 reflparams, ctypes.c_int]
     lib.calcCurrents.restype = None
 
-    ws = WaitSymbol()
+    return lib
 
-    return lib, ws
-
+##
+# Generate a tubular ray-trace frame.
+# The tube consists of annular rings of rays and can be given opening angles and radii.
+#
+# @param rdict_py A filled TubeRTDict.
+#
+# @returns out A frame object containing the ray-trace frame.
+#
+# @see TubeRTDict
+# @see frame
 def makeRTframe(rdict_py):
-    lib, ws = loadBeamlib()
+    lib = loadBeamlib()
 
     nTot = 1 + rdict_py["nRays"] * 4 * rdict_py["nRing"]
 
@@ -66,8 +78,18 @@ def makeRTframe(rdict_py):
 
     return out
 
+##
+# Generate a Gaussian ray-trace frame.
+# The Gaussian ray-trace frame has positions and directions chosen from a Gaussian distribution..
+#
+# @param grdict_py A filled GRTDict.
+#
+# @returns out A frame object containing the ray-trace frame.
+# 
+# @see GRTDict
+# @see frame
 def makeGRTframe(grdict_py):
-    lib, ws = loadBeamlib()
+    lib = loadBeamlib()
     mgr = TManager.Manager(Config.context)
 
     nTot = grdict_py["nRays"]
@@ -86,16 +108,31 @@ def makeGRTframe(grdict_py):
 
     return out
 
+##
+# Generate a polarised Gaussian beam.
+# The beam is always defined parallel to the x, y plane. The z-coordinate can be adjusted.
+# In order to tilt the beam, you have to tilt the underlying plane AFTER defining the beam on it.
+#
+# @param gdict_py A GPODict dictionary containing relevant Gaussian beam parameters.
+# @param source A reflDict dictionary describing the plane on which the Gaussian is defined.
+#
+# @returns out_field Field object containing the electromagnetic fields associated with the Gaussian.
+# @returns out_current Current object containing the electromagnetic currents associated with the Gaussian.
+#
+# @see GPODict
+# @see reflDict
+# @see fields
+# @see currents
 def makeGauss(gdict_py, source):
-    lib, ws = loadBeamlib()
+    lib = loadBeamlib()
 
     source_shape = (source["gridsize"][0], source["gridsize"][1])
     source_size = source["gridsize"][0] * source["gridsize"][1]
 
-    c_gdict = GDict()
+    c_gdict = GPODict()
     c_source = reflparams()
 
-    allfill_GDict(c_gdict, gdict_py, ctypes.c_double)
+    allfill_GPODict(c_gdict, gdict_py, ctypes.c_double)
     allfill_reflparams(c_source, source, ctypes.c_double)
 
     res_field = c2Bundle()
@@ -110,16 +147,29 @@ def makeGauss(gdict_py, source):
 
     return out_field, out_current
 
+##
+# Generate a scalar Gaussian beam.
+# The beam is always defined parallel to the x, y plane. The z-coordinate can be adjusted.
+# In order to tilt the beam, you have to tilt the underlying plane AFTER defining the beam on it.
+#
+# @param gdict_py A GPODict dictionary containing relevant scalar Gaussian beam parameters.
+# @param source A reflDict dictionary describing the plane on which the scalar Gaussian is defined.
+#
+# @returns out_field Scalarfield object containing the electric scalar field associated with the Gaussian.
+#
+# @see GPODict
+# @see reflDict
+# @see fields
 def makeScalarGauss(gdict_py, source):
-    lib, ws = loadBeamlib()
+    lib = loadBeamlib()
 
     source_shape = (source["gridsize"][0], source["gridsize"][1])
     source_size = source["gridsize"][0] * source["gridsize"][1]
 
-    c_gdict = ScalarGDict()
+    c_gdict = ScalarGPODict()
     c_source = reflparams()
-
-    allfill_SGDict(c_gdict, gdict_py, ctypes.c_double)
+    print(c_source)
+    allfill_SGPODict(c_gdict, gdict_py, ctypes.c_double)
     allfill_reflparams(c_source, source, ctypes.c_double)
     
     res_field = arrC1()
@@ -130,8 +180,19 @@ def makeScalarGauss(gdict_py, source):
 
     return out_field
 
+##
+# Calculate electyromagnetic currents from electromagnetic field.
+#
+# @param fields Fields object containing electromagnetic fields.
+# @param source A reflDict dictionary describing the plane on which the Gaussian is defined.
+# @param mode Whether to assume plane is perfect electrical conductor ('PEC'), magnetic conductor ('PMC') or no assumptions ('full').
+#
+# @returns out_current Currents object containing the currents calculated on source.
+#
+# @see fields
+# @see currents
 def calcCurrents(fields, source, mode):
-    lib, ws = loadBeamlib()
+    lib = loadBeamlib()
     source_shape = (source["gridsize"][0], source["gridsize"][1])
     source_size = source["gridsize"][0] * source["gridsize"][1]
 
@@ -141,7 +202,7 @@ def calcCurrents(fields, source, mode):
 
     res_field = c2Bundle()
     res_current = c2Bundle()
-    fieldConv(fields, res_field, source_size, ctypes.c_double)
+    allfill_c2Bundle(res_field, fields, fields.size, ctypes.c_double)
     allocate_c2Bundle(res_current, source_size, ctypes.c_double)
 
     if mode == "full":

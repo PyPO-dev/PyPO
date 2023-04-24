@@ -12,12 +12,15 @@ import src.PyPO.Threadmgr as TManager
 
 import threading
 
-#############################################################################
-#                                                                           #
-#              List of bindings for the CPU interface of PyPO.             #
-#                                                                           #
-#############################################################################
+##
+# @file
+# Bindings for the ctypes interface for PyPO. 
+# These bindings are concerned with propagations for the ray-tracer and the physical optics on the CPU.
 
+##
+# Load the pypocpu shared library. Will detect the operating system and link the library accordingly.
+#
+# @returns lib The ctypes library containing the C/C++ functions.
 def loadCPUlib():
     try:
         LD_PATH = pathlib.Path(__file__).parents[2]/"out/build/Debug"
@@ -76,13 +79,21 @@ def loadCPUlib():
 
     lib.propagateRays.restype = None
 
-    ws = WaitSymbol()
+    return lib
 
-    return lib, ws
-
-# WRAPPER FUNCTIONS DOUBLE PREC
-def PyPO_CPUd(source, target, PODict):
-    lib, ws = loadCPUlib()
+##
+# Perform a PO propagation on the CPU.
+# Note that the calculations are always done in double precision for the CPU.
+# Depending on the 'mode' parameter in the runPODict, this function returns different objects.
+# Please see the dictionary templates for an overview.
+#
+# @param source A reflDict dictionary of the surface on which the source currents/scalarfields are defined.
+# @param target A reflDict dictionary of the target surface on which the results are calculated.
+# @param runPODict A runPODict dictionary containing the relevant propagation parameters.
+#
+# @see runPODict
+def PyPO_CPUd(source, target, runPODict):
+    lib = loadCPUlib()
     mgr = TManager.Manager(Config.context)
 
     # Create structs with pointers for source and target
@@ -103,34 +114,34 @@ def PyPO_CPUd(source, target, PODict):
 
     target_shape = (target["gridsize"][0], target["gridsize"][1])
 
-    if PODict["exp"] == "fwd":
+    if runPODict["exp"] == "fwd":
         exp_prop = -1
 
-    elif PODict["exp"] == "bwd":
+    elif runPODict["exp"] == "bwd":
         exp_prop = 1
 
-    k           = ctypes.c_double(PODict["k"])
-    nThreads    = ctypes.c_int(PODict["nThreads"])
-    epsilon     = ctypes.c_double(PODict["epsilon"])
+    k           = ctypes.c_double(runPODict["k"])
+    nThreads    = ctypes.c_int(runPODict["nThreads"])
+    epsilon     = ctypes.c_double(runPODict["epsilon"])
     t_direction = ctypes.c_double(exp_prop)
     
-    if PODict["mode"] == "scalar":
+    if runPODict["mode"] == "scalar":
         c_field = arrC1()
-        sfieldConv(PODict["s_scalarfield"], c_field, gs, ctypes.c_double)
+        sfieldConv(runPODict["s_scalarfield"], c_field, gs, ctypes.c_double)
         args = [csp, ctp, ctypes.byref(cs), ctypes.byref(ct),
                 ctypes.byref(c_field), k, nThreads, epsilon,
                 t_direction]
 
     else:
         c_currents = c2Bundle()
-        currentConv(PODict["s_current"], c_currents, gs, ctypes.c_double)
+        allfill_c2Bundle(c_currents, runPODict["s_current"], gs, ctypes.c_double)
         args = [csp, ctp, ctypes.byref(cs), ctypes.byref(ct),
                 ctypes.byref(c_currents), k, nThreads, epsilon,
                 t_direction]
 
 
 
-    if PODict["mode"] == "JM":
+    if runPODict["mode"] == "JM":
         res = c2Bundle()
         args.insert(0, res)
 
@@ -143,7 +154,7 @@ def PyPO_CPUd(source, target, PODict):
 
         return JM
 
-    elif PODict["mode"] == "EH":
+    elif runPODict["mode"] == "EH":
         res = c2Bundle()
         args.insert(0, res)
 
@@ -156,7 +167,7 @@ def PyPO_CPUd(source, target, PODict):
 
         return EH
 
-    elif PODict["mode"] == "JMEH":
+    elif runPODict["mode"] == "JMEH":
         res = c4Bundle()
         args.insert(0, res)
 
@@ -169,7 +180,7 @@ def PyPO_CPUd(source, target, PODict):
 
         return [JM, EH]
 
-    elif PODict["mode"] == "EHP":
+    elif runPODict["mode"] == "EHP":
         res = c2rBundle()
         args.insert(0, res)
 
@@ -182,7 +193,7 @@ def PyPO_CPUd(source, target, PODict):
 
         return [EH, Pr]
 
-    elif PODict["mode"] == "scalar":
+    elif runPODict["mode"] == "scalar":
         res = arrC1()
         args.insert(0, res)
 
@@ -195,7 +206,7 @@ def PyPO_CPUd(source, target, PODict):
 
         return S
 
-    elif PODict["mode"] == "FF":
+    elif runPODict["mode"] == "FF":
         res = c2Bundle()
         args.insert(0, res)
 
@@ -208,8 +219,15 @@ def PyPO_CPUd(source, target, PODict):
 
         return EH
 
+##
+# Perform an RT propagation on the CPU.
+# Note that the calculations are always done in double precision for the CPU.
+#
+# @param runRTDict A runRTDict dictionary containing the relevant propagation parameters.
+#
+# @see runRTDict
 def RT_CPUd(runRTDict):
-    lib, ws = loadCPUlib()
+    lib = loadCPUlib()
     mgr = TManager.Manager(Config.context)
 
     inp = cframe()

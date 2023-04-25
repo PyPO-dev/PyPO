@@ -222,6 +222,11 @@ class RunPOError(Exception):
     pass
 
 ##
+# Hybrid propagation error. Raised when an error is encountered in a hybrid propagation dictionary. 
+class HybridPropError(Exception):
+    pass
+
+##
 # Element name error. Raised when specified element cannot be found in the system dictionary. 
 class ElemNameError(Exception):
     pass
@@ -1170,6 +1175,48 @@ def check_runPODict(runPODict, elements, fields, currents, scalarfields, frames,
             clog.error(err)
         
         raise RunPOError()
+
+##
+# Check a hybrid propagation input dictionary.
+#
+# @param hybridDict A hybridDict.
+# @param elements List containing names of surfaces in System.
+# @param frames List containing names of frames in System.
+# @param fields List containing names of frames in System.
+def check_hybridDict(hybridDict, elements, frames, fields, clog):
+    errStr = ""
+   
+    errStr = check_frameSystem(hybridDict["fr_in"], frames, clog, errStr)
+    errStr = check_elemSystem(hybridDict["t_name"], elements, clog, errStr)
+    errStr = check_fieldSystem(hybridDict["field_in"], fields, clog, errStr)
+
+    if "start" not in hybridDict:
+        hybridDict["start"] = None
+
+    elif "start" in hybridDict:
+        errStr += block_ndarray("start", hybridDict, (3,))
+
+
+    if "interp" not in hybridDict:
+        hybridDict["interp"] = True
+        
+    elif "interp" in hybridDict:
+        if not isinstance(hybridDict["interp"], bool):
+            errStr += errMsg_type("interp", type(hybridDict["interp"]), "hybridDict", bool)
+    
+    if "comp" not in hybridDict:
+        hybridDict["comp"] = True
+        
+    elif "comp" in hybridDict:
+        if not isinstance(hybridDict["comp"], str):
+            errStr += errMsg_type("comp", type(hybridDict["comp"]), "hybridDict", str)
+
+    if errStr:
+        errList = errStr.split("\n")[:-1]
+
+        for err in errList:
+            clog.error(err)
+        raise HybridPropError()
 
 ##
 # CHeck if aperture dictionary is valid.

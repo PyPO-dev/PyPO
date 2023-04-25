@@ -1297,6 +1297,55 @@ class System(object):
         self.frames[runRTDict["fr_out"]] = frameObj
         
         self.frames[runRTDict["fr_out"]].setMeta(self.calcRTcenter(runRTDict["fr_out"]), self.calcRTtilt(runRTDict["fr_out"]), self.copyObj(world.INITM()))
+    
+    ##
+    # Perform a hybrid RT/PO propagation, starting from a reflected field and set of Poynting vectors.
+    #
+    # @param hybridDict A hybridDict dictionary.
+    def hybridPropagation(self, hybridDict):
+        self.clog.info("*** Starting hybrid propagation ***")
+        start_time = time.time()
+
+        check_hybridDict(hybridDict, self.system, self.frames, self.fields, self.clog)
+
+        field = self.copyObj(self.fields[hybridDict["field_in"]])
+
+        runRTDict = {
+                "fr_in"     : hybridDict["fr_in"],
+                "t_name"    : hybridDict["t_name"],
+                "fr_out"    : hybridDict["fr_out"],
+                "device"    : "CPU"
+                }
+
+        self.setLoggingVerbosity(verbose=False)
+        self.runRayTracer(runRTDict)
+        self.setLoggingVerbosity(verbose=True)
+
+        stack = self.calcRayLen(hybridDict["fr_in"], hybridDict["fr_out"], start=hybridDict["start"])
+        if hybridDict["start"] is not None:
+            expo = np.exp(1j * field.k * stack[1]) * np.sqrt(stack[0] / (2*stack[1] + stack[0])) # Initial curvature
+
+        else:
+            expo = np.exp(1j * field.k * stack[0])
+
+        _comps = []
+        for i in range(6):
+            _comps.append((expo * field[i].ravel()).reshape(field[i].shape))
+
+        field_prop = fields(*_comps)
+        field_prop.setMeta(hybridDict["t_name"], field.k)
+
+        #fieldObj_prop = (expo * fieldObj.ravel()).reshape(fieldObj.shape)
+        #fieldObj_full = self._compToFields(comp, fieldObj_prop)
+        #fieldObj_full.setMeta(hybridDict["t_name"], field.k)
+        self.fields[hybridDict["field_out"]] = field_prop
+
+        if hybridDict["interp"]:
+            self.interpFrame(hybridDict["fr_out"], hybridDict["field_out"], hybridDict["t_name"], hybridDict["field_out"], comp=hybridDict["comp"])
+        
+        dtime = time.time() - start_time
+        
+        self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
 
     ##
     # Interpolate a frame and an associated field on a regular surface.
@@ -1308,7 +1357,7 @@ class System(object):
     # @param name_out Name of output field object in target surface.
     #
     # @returns out Complex numpy array containing interpolated field.
-    def interpFrame(self, name_fr_in, name_field, name_target, name_out, comp, method="nearest"):
+    def interpFrame(self, name_fr_in, name_field, name_target, name_out, comp=None, method="nearest"):
         check_frameSystem(name_fr_in, self.frames, self.clog, extern=True)
         check_elemSystem(name_target, self.system, self.clog, extern=True)
         
@@ -1316,20 +1365,40 @@ class System(object):
 
         points = (self.frames[name_fr_in].x, self.frames[name_fr_in].y, self.frames[name_fr_in].z)
 
-        rfield = np.real(getattr(self.fields[name_field], comp)).ravel()
-        ifield = np.imag(getattr(self.fields[name_field], comp)).ravel()
+        if comp is None:
+            _comps = []
+            for i in range(6):
+                rfield = np.real(self.fields[name_field][i]).ravel()
+                ifield = np.imag(self.fields[name_field][i]).ravel()
 
-        grid_interp = (grids.x, grids.y, grids.z)
+                grid_interp = (grids.x, grids.y, grids.z)
 
-        rout = griddata(points, rfield, grid_interp, method=method)
-        iout = griddata(points, ifield, grid_interp, method=method)
+                rout = griddata(points, rfield, grid_interp, method=method)
+                iout = griddata(points, ifield, grid_interp, method=method)
 
-        out = rout.reshape(self.system[name_target]["gridsize"]) + 1j * iout.reshape(self.system[name_target]["gridsize"])
+                _comps.append(rout.reshape(self.system[name_target]["gridsize"]) + 1j * iout.reshape(self.system[name_target]["gridsize"]))
 
-        field = self._compToFields(comp, out)
-        field.setMeta(name_target, self.fields[name_field].k)
+            field = fields(*_comps)
+            field.setMeta(name_target, self.fields[name_field].k)
+            self.fields[name_out] = field
 
-        self.fields[name_out] = field 
+            out = field
+       
+        else:
+            rfield = np.real(getattr(self.fields[name_field], comp)).ravel()
+            ifield = np.imag(getattr(self.fields[name_field], comp)).ravel()
+
+            grid_interp = (grids.x, grids.y, grids.z)
+
+            rout = griddata(points, rfield, grid_interp, method=method)
+            iout = griddata(points, ifield, grid_interp, method=method)
+
+            out = rout.reshape(self.system[name_target]["gridsize"]) + 1j * iout.reshape(self.system[name_target]["gridsize"])
+
+            field = self._compToFields(comp, out)
+            field.setMeta(name_target, self.fields[name_field].k)
+
+            self.fields[name_out] = field 
 
         return out
 
@@ -2196,6 +2265,59 @@ class System(object):
 
         return out
     
+    ##
+    # Run a ray-trace propagation from a frame to a surface in the GUI.
+    #
+    # @param runRTDict A runRTDict object specifying the ray-trace.
+    def runGUIRayTracer(self, runRTDict):
+        _runRTDict = self.copyObj(runRTDict)
+
+        _runRTDict["fr_in"] = self.frames[_runRTDict["fr_in"]]
+        _runRTDict["t_name"] = self.system[_runRTDict["t_name"]]
+       
+        if _runRTDict["device"] == "CPU":
+            frameObj = RT_CPUd(_runRTDict)
+
+        elif _runRTDict["device"] == "GPU":
+            frameObj = RT_GPUf(_runRTDict)
+        
+        self.frames[runRTDict["fr_out"]] = frameObj
+        self.frames[runRTDict["fr_out"]].setMeta(self.calcRTcenter(runRTDict["fr_out"]), self.calcRTtilt(runRTDict["fr_out"]), self.copyObj(world.INITM()))
+    
+    ##
+    # Perform a hybrid RT/PO GUI propagation, starting from a reflected field and set of Poynting vectors.
+    #
+    # @param hybridDict A hybridDict dictionary.
+    def hybridGUIPropagation(self, hybridDict):
+        field = self.copyObj(self.fields[hybridDict["field_in"]])
+
+        runRTDict = {
+                "fr_in"     : hybridDict["fr_in"],
+                "t_name"    : hybridDict["t_name"],
+                "fr_out"    : hybridDict["fr_out"],
+                "device"    : "CPU"
+                }
+
+        self.runGUIRayTracer(runRTDict)
+
+        stack = self.calcRayLen(hybridDict["fr_in"], hybridDict["fr_out"], start=hybridDict["start"])
+        if hybridDict["start"] is not None:
+            expo = np.exp(1j * field.k * stack[1]) * np.sqrt(stack[0] / (2*stack[1] + stack[0])) # Initial curvature
+
+        else:
+            expo = np.exp(1j * field.k * stack[0])
+
+        _comps = []
+        for i in range(6):
+            _comps.append((expo * field[i].ravel()).reshape(field[i].shape))
+
+        field_prop = fields(*_comps)
+        field_prop.setMeta(hybridDict["t_name"], field.k)
+
+        self.fields[hybridDict["field_out"]] = field_prop
+
+        if interp:
+            self.interpFrame(hybridDict["fr_out"], hybridDict["field_out"], hybridDict["t_name"], hybridDict["field_out"], comp=hybridDict["comp"])
     #############################################################
     #                                                           #
     #                       PRIVATE METHODS                     #

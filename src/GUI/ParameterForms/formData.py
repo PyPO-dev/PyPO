@@ -454,6 +454,49 @@ def propPOFFInp(currentDict, elemDict):
     return propFields
 
 ##
+# Options for propagating the reflected field using the associated Poynting vectors to a target element.
+#
+# @param fieldDict System dictionary containing all fields.
+# @param frameDict System dictionary containing all frames.
+# @param elemDict System dictionary containing all elements.
+def propPOHybridInp(fieldDict, frameDict, elemDict):
+    sublist_fields = []
+    sublist_frames = []
+    sublist_target = []
+    
+    complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz", "All"]
+    if fieldDict:
+        for key, item in fieldDict.items():
+            sublist_fields.append(key)
+    
+    if frameDict:
+        for key, item in frameDict.items():
+            sublist_frames.append(key)
+    
+    if elemDict:
+        for key, item in elemDict.items():
+            if item["gmode"] != 2:
+                sublist_target.append(key)
+
+    propFields = [
+            InputDescription(inType.dropdown, "fr_in", label="Poynting", options = sublist_frames),
+            InputDescription(inType.dropdown, "field_in", label="Reflected field", options = sublist_fields),
+            InputDescription(inType.dropdown, "t_name", label="Target surface", options = sublist_target),
+            InputDescription(inType.vectorStrings, "fr_out", label="Output frame", numFields=1),
+            InputDescription(inType.vectorStrings, "field_out", label="Output field", numFields=1),
+            InputDescription(inType.dynamicRadio, "_start", label="Use start", subDict={
+                    "yes" : [InputDescription(inType.vectorFloats, "start", oArray=True, label="Start co-ordinate", numFields=3)],
+                    "no" : [InputDescription(inType.static, "start", label="", staticValue=None, hidden=True)]
+                }), 
+            InputDescription(inType.dynamicRadio, "_interp", label="Interpolate", subDict={
+                    "yes" : [InputDescription(inType.dropdown, "comp", label="Component", options = complist)],
+                    "no" : [InputDescription(inType.static, "comp", label="", staticValue=True, hidden=True)]
+                }), 
+            ]
+
+    return propFields
+
+##
 # Options for calculating the spillover efficiency on a surface by using an aperture mask.
 #
 # @param fieldDict System dictionary containing all fields.

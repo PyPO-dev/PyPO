@@ -730,7 +730,7 @@ class MainWidget(QWidget):
       
             dialStr = f"Calculating Gaussian ray-trace frame {GRTDict['name']}..."
 
-            scopy = st.System()
+            scopy = st.System(context="G", override=False)
 
             mgr = Manager()
             returnDict = mgr.dict()
@@ -848,7 +848,7 @@ class MainWidget(QWidget):
         try:
             PSDict = self.ParameterWid.read()
             
-            self.stm.generatePointSource(PSDict, PSDict["surface"])
+            self.stm.createPointSource(PSDict, PSDict["surface"])
             self.addFieldWidget(PSDict["name"])
             self.addCurrentWidget(PSDict["name"])
         except Exception as err:
@@ -868,7 +868,7 @@ class MainWidget(QWidget):
         try:
             SPSDict = self.ParameterWid.read()
             
-            self.stm.generatePointSourceScalar(SPSDict, SPSDict["surface"])
+            self.stm.createPointSourceScalar(SPSDict, SPSDict["surface"])
             self.addSFieldWidget(SPSDict["name"])
         except Exception as err:
             print(err)
@@ -959,9 +959,19 @@ class MainWidget(QWidget):
     # Shows form to propagate physical optics beam far field 
     def propPOFFForm(self):
         self.setForm(fData.propPOFFInp(self.stm.currents, self.stm.system), self.propPOAction, okText="Propagate beam")
-   
+    
+    ##
+    # Shows form to propagate physical optics beam using hybrid approach
+    def propPOHybridForm(self):
+        self.setForm(fData.propPOHybridInp(self.stm.fields, self.stm.frames, self.stm.system), self.propPOHybridAction, okText="Calculate")
+    
+    ##
+    # Add PO calculation results to widget menu
+    #
+    # @param propBeamDict Dictionary containing the names of objects to be put in widgets
     def _addToWidgets(self, propBeamDict):
         print(f"{propBeamDict = }")
+        print(self.stm.frames)
         if propBeamDict["mode"] == "JM":
             self.addCurrentWidget(propBeamDict["name_JM"])
     
@@ -978,14 +988,39 @@ class MainWidget(QWidget):
 
         elif propBeamDict["mode"] == "scalar":
             self.addSFieldWidget(propBeamDict["name_field"])
+        
+        elif propBeamDict["mode"] == "hybrid":
+            self.addFieldWidget(propBeamDict["field_out"])
+            self.addFrameWidget(propBeamDict["fr_out"])
 
     # def _addToWidgetsOfCalc(self):
     #     self._addToWidgets()
 
-
+    ##
+    # Start a worker process for running long calculations.
+    #
+    # @param s_copy Copy of System, containing necessary data for calculation.
+    # @param runPODict Dictionary containing instructions for PO propagation.
+    # @param returnDict Dictionary containing a System filled with the result.
     def runPOWorker(self, s_copy, runPODict, returnDict):
         try:
             s_copy.runPO(runPODict)
+
+            returnDict["system"] = s_copy
+        except Exception as err:
+            print(err)
+            print_tb(err.__traceback__)
+            self.clog.error(err)
+    
+    ##
+    # Start a worker process for running long calculations.
+    #
+    # @param s_copy Copy of System, containing necessary data for calculation.
+    # @param runHybridDict Dictionary containing instructions for hybrid PO propagation.
+    # @param returnDict Dictionary containing a System filled with the result.
+    def runPOHybridWorker(self, s_copy, runHybridDict, returnDict):
+        try:
+            s_copy.runHybridPropagation(runHybridDict)
 
             returnDict["system"] = s_copy
         except Exception as err:
@@ -1033,7 +1068,6 @@ class MainWidget(QWidget):
                 self.stm.fields.update(s_copy.fields)
                 self.stm.currents.update(s_copy.currents)
                 self.stm.scalarfields.update(s_copy.scalarfields)
-
                 dtime = time() - start_time
                 self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
                 self._addToWidgets(propBeamDict)
@@ -1042,7 +1076,66 @@ class MainWidget(QWidget):
             print(err)
             print_tb(err.__traceback__)
             self.clog.error(f"PO Propagation did not end successfully: {err}.")
+       
+    ##
+    # Reads form, propagates hybrid beam, runs calculation on another thread
+    def propPOHybridAction(self):
+        try:
+            propBeamDict = self.ParameterWid.read()
+            
+
+            hybridDict = self.stm.copyObj(propBeamDict)
+            
+            if hybridDict["_interp"] == "yes":
+                hybridDict["interp"] = True
+                
+                if hybridDict["comp"] == "All":
+                    hybridDict["comp"] = True
+            
+            else:
+                hybridDict["interp"] = False
+
+            hybridDict["mode"] = "hybrid"
+            
+            chk.check_hybridDict(hybridDict, self.stm.system.keys(), self.stm.frames.keys(), self.stm.fields.keys(), self.clog)
+
+            start_time = time()
         
+            self.clog.info("*** Starting PO hybrid propagation ***")
+
+            fields = []
+            frames = []
+            
+            fields.append(propBeamDict["field_in"])
+            frames.append(propBeamDict["fr_in"])
+            
+            dialStr = f"Calculating frame and field on {propBeamDict['t_name']}..."
+
+
+            s_copy = copySystem(self.stm, cSystem=True, cFields = fields, cFrames=frames)
+
+            mgr = Manager()
+            returnDict = mgr.dict()
+
+            args = (s_copy, hybridDict, returnDict)
+            calcSuccess = self.subprocessManager.runInSubprocess(self.runPOHybridWorker, args, dialStr)
+
+            print(f"{calcSuccess = }")
+            if calcSuccess:
+                s_copy = returnDict["system"]
+                self.stm.frames.update(s_copy.frames)
+                self.stm.fields.update(s_copy.fields)
+                self.stm.currents.update(s_copy.currents)
+                self.stm.scalarfields.update(s_copy.scalarfields)
+
+                dtime = time() - start_time
+                self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
+                self._addToWidgets(hybridDict)
+
+        except Exception as err:
+            print(err)
+            print_tb(err.__traceback__)
+            self.clog.error(f"PO Hybrid propagation did not end successfully: {err}.")
     
     #
     ##TODO Unite efficiencies
@@ -1321,6 +1414,11 @@ class PyPOMainWindow(QMainWindow):
         initPropSurfAction.setStatusTip("Propagate a PO beam from a source surface to a far-field surface.")
         initPropFFAction.triggered.connect(self.mainWid.propPOFFForm)
         propBeam.addAction(initPropFFAction)
+        
+        propHybrid = QAction("Propagate hybrid", self)
+        propHybrid.setToolTip("Propagate a PO beam from a source surface to a target surface using a hybrid approach.")
+        propHybrid.triggered.connect(self.mainWid.propPOHybridForm)
+        PhysOptMenu.addAction(propHybrid)
 
         calcEffs = ToolsMenu.addMenu("Efficiencies")
         calcSpillEffsAction = QAction("Spillover", self)

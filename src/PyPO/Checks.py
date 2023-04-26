@@ -404,13 +404,19 @@ def errMsg_mergebeam(beamName, surf0, surfd):
 # @param shape Expected shape of input array.
 #
 # @returns errStr The errorstring.
-def block_ndarray(fieldName, elemDict, shape):
+def block_ndarray(fieldName, elemDict, shape, cust_name=False):
     _errStr = ""
+
+    if not cust_name:
+        nameObj = elemDict["name"]
+    else:
+        nameObj = cust_name
+
     if not isinstance(elemDict[fieldName], np.ndarray):
-        _errStr += errMsg_type(fieldName, type(elemDict[fieldName]), elemDict["name"], np.ndarray)
+        _errStr += errMsg_type(fieldName, type(elemDict[fieldName]), nameObj, np.ndarray)
 
     elif not elemDict[fieldName].shape == shape:
-        _errStr += errMsg_shape(fieldName, elemDict[fieldName].shape, elemDict["name"], f"{shape}")
+        _errStr += errMsg_shape(fieldName, elemDict[fieldName].shape, nameObj, f"{shape}")
     
     return _errStr
 
@@ -1194,9 +1200,9 @@ def check_hybridDict(hybridDict, elements, frames, fields, clog):
         hybridDict["start"] = None
 
     elif "start" in hybridDict:
-        errStr += block_ndarray("start", hybridDict, (3,))
-
-
+        if hybridDict["start"] is not None:
+            errStr += block_ndarray("start", hybridDict, (3,), cust_name="hybridDict")
+    
     if "interp" not in hybridDict:
         hybridDict["interp"] = True
         
@@ -1208,9 +1214,19 @@ def check_hybridDict(hybridDict, elements, frames, fields, clog):
         hybridDict["comp"] = True
         
     elif "comp" in hybridDict:
-        if not isinstance(hybridDict["comp"], str):
+        if not isinstance(hybridDict["comp"], str) and hybridDict["comp"] != True:
             errStr += errMsg_type("comp", type(hybridDict["comp"]), "hybridDict", str)
 
+    num = getIndex(hybridDict["fr_out"], frames)
+
+    if num > 0:
+        hybridDict["fr_out"] = hybridDict["fr_out"] + "_{}".format(num)
+    
+    num = getIndex(hybridDict["field_out"], fields)
+
+    if num > 0:
+        hybridDict["field_out"] = hybridDict["field_out"] + "_{}".format(num)
+    
     if errStr:
         errList = errStr.split("\n")[:-1]
 

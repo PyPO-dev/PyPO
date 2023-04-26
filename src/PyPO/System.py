@@ -1302,7 +1302,7 @@ class System(object):
     # Perform a hybrid RT/PO propagation, starting from a reflected field and set of Poynting vectors.
     #
     # @param hybridDict A hybridDict dictionary.
-    def hybridPropagation(self, hybridDict):
+    def runHybridPropagation(self, hybridDict):
         self.clog.info("*** Starting hybrid propagation ***")
         start_time = time.time()
 

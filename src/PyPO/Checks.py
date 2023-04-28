@@ -1,6 +1,5 @@
 import numpy as np
 import os
-import ctypes
 import pathlib
 import re
 

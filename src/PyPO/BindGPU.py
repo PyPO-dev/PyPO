@@ -2,16 +2,12 @@ import ctypes
 import math
 import numpy as np
 import os
-import sys
-import time
 import pathlib
 from src.PyPO.BindUtils import *
 from src.PyPO.Structs import *
 from src.PyPO.PyPOTypes import *
 import src.PyPO.Config as Config
 import src.PyPO.Threadmgr as TManager
-
-import threading
 
 ##
 # @file
@@ -254,8 +250,6 @@ def RT_GPUf(runRTDict):
     args = [ctp, ctypes.byref(inp), ctypes.byref(res),
             tol, t0, nBlocks, nThreads]
 
-    start_time = time.time()
-    
     mgr.new_sthread(target=lib.callRTKernel, args=args)
     
     shape = (runRTDict["fr_in"].size,)

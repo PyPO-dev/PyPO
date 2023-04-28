@@ -1,19 +1,14 @@
 # Standard Python imports
-import numbers
-import scipy.optimize as opt
-from scipy.interpolate import interp1d
-import numpy as np
+from scipy.optimize import fmin
+from scipy.interpolate import interp1d, griddata
 import matplotlib.pyplot as pt
 import matplotlib.cm as cm
+import numpy as np
 import time
 import os
-import sys
 import copy
 import logging
-import json
 from pathlib import Path
-from contextlib import contextmanager
-from scipy.interpolate import griddata, interpn
 import pickle 
 
 # PyPO-specific modules
@@ -2177,7 +2172,7 @@ class System(object):
         verbosity_init = self.verbosity
         self.setLoggingVerbosity(verbose=False)
         
-        res = opt.fmin(self._optimiseFocus, f0, args=(runRTDict, tilt), full_output=True, disp=False)
+        res = fmin(self._optimiseFocus, f0, args=(runRTDict, tilt), full_output=True, disp=False)
 
         self.setLoggingVerbosity(verbose=verbosity_init)
         

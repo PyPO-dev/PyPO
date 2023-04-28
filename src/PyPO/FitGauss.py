@@ -1,9 +1,5 @@
 import numpy as np
-import scipy.optimize as opt
-from scipy.signal import argrelextrema
-import matplotlib.pyplot as pt
-
-from functools import partial
+from scipy.optimize import fmin
 
 from src.PyPO.PyPOTypes import *
 from src.PyPO.BindRefl import *
@@ -111,9 +107,6 @@ def fitGaussAbs(field, surfaceObject, thres, mode):
         fit_field = np.log(_field)
         mask_f = fit_field >= np.log(10**(thres/20))
 
-    #pt.imshow(mask_f, origin="lower")
-    #pt.show()
-
     idx_max = np.unravel_index(np.argmax(fit_field), fit_field.shape)
 
     x_max = x[idx_max]
@@ -160,7 +153,7 @@ def fitGaussAbs(field, surfaceObject, thres, mode):
             _mask_f = mask_f
 
         args = (surfaceObject, fit_field, _mask_f, mode)
-        popt = opt.fmin(GaussAbs, p0, args, disp=False)
+        popt = fmin(GaussAbs, p0, args, disp=False)
 
         _Psi = generateGauss(popt, surfaceObject, mode="linear")
         ratio = np.sum(_Psi**2) / np.sum(_field**2)

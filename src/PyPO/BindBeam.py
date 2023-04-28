@@ -1,16 +1,12 @@
 import ctypes
 import numpy as np
 import os
-import sys
-import time
 import pathlib
 from src.PyPO.BindUtils import *
 from src.PyPO.Structs import *
 from src.PyPO.PyPOTypes import *
 import src.PyPO.Config as Config
 import src.PyPO.Threadmgr as TManager
-
-import threading
 
 ##
 # @file

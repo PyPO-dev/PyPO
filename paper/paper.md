@@ -43,11 +43,12 @@ Input beam patterns can be selected from a range of models, such as Gaussian bea
 Custom beam patterns can also be imported to, for example, model the propagation of a measured beam pattern through a simulated optical system.
 
 `PyPO` can be used through either a scripting-based approach, where simulations are defined in Python scripts, or through the graphical user interface (GUI).
-It carries core dependencies on Numpy [@Harris:2020], matplotlib [@Hunter:2007], scipy [@Virtanen:2020]. The unittesting framework carries a dependency on nose2. The GUI carries an optional dependency on PyQT5.
+It carries core dependencies on NumPy [@Harris:2020], Matplotlib [@Hunter:2007], SciPy [@Virtanen:2020]. The unittesting framework carries a dependency on nose2. The GUI carries dependencies on PyQt5 and attrs. 
 
 # Statement of need
 Development of `PyPO` started with the need for alignment strategies for the wideband sub-mm spectrometer DESHIMA 2.0 [@Taniguchi:2022]. 
-A software package capable of efficient GO and PO calulations through optical systems consisting of quadric surfaces was necessary for calculating the configuration of the corrective optics. Because of the popularity of the Python programming language, it eweas chosen as the interface language for `PyPO`. 
+A software package capable of efficient GO and PO calulations through optical systems consisting of quadric surfaces was necessary for calculating the configuration of the corrective optics. 
+Because of its ubiquity, Python was chosen as the interface language for `PyPO`. 
 Currently, `PyPO` is also being used in simulations of measured beam patterns of DESHIMA 2.0 at the ASTE [@ASTE] telescope for the analysis of instrument performance.
 
 Commercial software for GO and PO calculations, such as OpticStudio (Zemax) and GRASP (TICRA), has already been developed, but to our knowledge `PyPO` is the first free open-source Python package that simulates planar and quadric reflector geometries using both GO and PO. 

@@ -1,6 +1,6 @@
 import numpy as np
-from scipy.linalg import svd as svd
 import src.PyPO.WorldParam as world
+
 ##
 # @file
 # Transformation formalism for PyPO.

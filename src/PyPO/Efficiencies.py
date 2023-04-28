@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as pt
 from src.PyPO.PyPOTypes import *
 from src.PyPO.BindRefl import *
 from src.PyPO.FitGauss import fitGaussAbs

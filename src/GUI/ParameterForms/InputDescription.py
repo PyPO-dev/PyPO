@@ -1,4 +1,4 @@
-from attr import define, field, Factory
+from attrs import define, field, Factory
 from src.GUI.utils import inType, InputDescriptionError
 
 ##

@@ -138,7 +138,7 @@ dmypy.json
 images/
 save/
 custom/
-out/
+out/build/
 
 # User-specific files
 log
@@ -158,6 +158,7 @@ examples/ASTE/
 examples/images/
 tests/Python/datadir/
 datadir/
+Imports.py
 
 # vim stuff
 *.swp

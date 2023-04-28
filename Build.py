@@ -26,33 +26,44 @@ def BuildPyPO():
     
     parser = argparse.ArgumentParser(description="build and test interface script for PyPO")
     parser.add_argument("-p", "--prereqs", help="install PyPO prerequisites", action="store_true")
+    parser.add_argument("-o", "--optional", help="install optional packages", action="store_true")
     parser.add_argument("-f", "--config", help="configure PyPO build scripts", action="store_true")
     parser.add_argument("-m", "--make", help="build PyPO libraries", action="store_true")
     parser.add_argument("-c", "--clean", help="remove PyPO build directory", action="store_true")
     parser.add_argument("-d", "--docs", help="generate PyPO documentation with doxygen", action="store_true")
     parser.add_argument("-t", "--test", help="run PyPO unittests", action="store_true")
-    parser.add_argument("-fm", "--full-monty", help="clean, configure and make PyPO in one go", action="store_true")
     args = parser.parse_args()
 
     if args.prereqs:
         clog.info("Installing PyPO prerequisites...")
+        path_to_reqs = os.path.join("out", "requirements", "requirements.txt")
+        path_to_reqs_opt = os.path.join("out", "requirements", "requirements_opt.txt")
         if platform.system() == "Linux":
-            os.system("sudo apt-get install cm-super dvipng gcc build-essential cmake")
-            os.system("sudo apt install qtbase5-dev qt5-qmake qtbase5-dev-tools")
-            os.system("python3 -m pip install numpy matplotlib scipy setuptools nose PyQt5 tqdm inquirer attrs")
+            os.system("sudo apt install cm-super dvipng gcc build-essential cmake")
+            
+            if args.optional:
+                os.system("sudo apt install qtbase5-dev qt5-qmake qtbase5-dev-tools")
+
         elif platform.system() == "Darwin":
-            os.system("brew install gcc cmake qt5")
-            os.system("brew install qtbase5-dev qt5-qmake qtbase5-dev-tools")
-            os.system("python3 -m pip install numpy matplotlib scipy setuptools nose tqdm inquirer attrs")
             os.system("xcode-select --install")
+            os.system("brew install gcc cmake")
             
-        elif platform.system() == "Windows":
-            os.system("py -m pip install numpy matplotlib scipy setuptools nose PyQt5 tqdm inquirer attrs")
+            if args.optional:
+                os.system("brew install qt5 qtbase5-dev qt5-qmake qtbase5-dev-tools")
             
+        #elif platform.system() == "Windows":
+        #    os.system("py -m pip install numpy matplotlib scipy setuptools nose PyQt5 tqdm inquirer attrs")
+            
+        if args.optional:
+            os.system(f"pip install -U -r {path_to_reqs_opt}")
+        
+        else:
+            os.system(f"pip install -U -r {path_to_reqs}")
+        
         clog.info("Succesfully installed PyPO prerequisites.")
         clog.warning("Install CUDA manually to enable PyPO on GPU.")
     
-    if args.clean or args.full_monty:
+    if args.clean:
         try:
             clog.info("Cleaning build directory...")
             dir_build = os.path.join(os.getcwd(), "out", "build")
@@ -61,7 +72,7 @@ def BuildPyPO():
         except:
             clog.warning("Nothing to clean.")
 
-    if args.config or args.full_monty:
+    if args.config:
         dir_lists = os.path.join(os.getcwd(), "src")
         dir_build = os.path.join(os.getcwd(), "out", "build")
 
@@ -78,9 +89,9 @@ def BuildPyPO():
             clog.info("Succesfully configured PyPO.")
         
         except:
-            clog.error("Could not configure PyPO. Is CMAKE installed?")
+            clog.error("Could not configure PyPO. Is CMake installed?")
 
-    if args.make or args.full_monty:
+    if args.make:
         try:
             clog.info("Building PyPO...")
             dir_lists = os.path.join(os.getcwd(), "src")

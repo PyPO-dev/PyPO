@@ -1251,7 +1251,7 @@ def check_aperDict(aperDict, clog):
         aperDict["plot"] = True
 
     if "center" in aperDict:
-        errStr += block_ndarray("center", aperDict, (2,))
+        errStr += block_ndarray("center", aperDict, (2,), cust_name="aperDict")
 
     else:
         aperDict["center"] = np.zeros(2)

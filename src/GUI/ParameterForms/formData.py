@@ -609,6 +609,41 @@ def calcHPBW(fieldDict):
     return formHPBW
 
 ##
+# Options for merging beams/currents.
+#
+# @param itemDict Dictionary containing fields or currents in system.
+# @param surf Selected surface for beam merging.
+def mergeBeamsForm(itemDict, surf):
+    listBound = _selectBound(itemDict, surf)
+
+    mergeList = [InputDescription(inType.elementSelector, "beams", "Merge", options = listBound),
+                InputDescription(inType.vectorStrings, "merged_name", label="Merged name", numFields=1)]
+
+    return mergeList
+
+##
+# Select a surface and close form.
+# Used for merging beams on a surface.
+#
+# @param elemDict Dictionary containing all elements in system.
+def selectSurface(elemDict):
+    optlist = ["Fields", "Currents"]
+    
+    selectSurf = [InputDescription(inType.dropdown, "surf", label="Merge surface", options=list(elemDict.keys())),
+            InputDescription(inType.radio, "mode", label="Merge object", options = optlist)]
+    return selectSurf
+
+##
+# Private method for finding bound PO fields and currents given a surface.
+def _selectBound(itemDict, surf):
+    listBound = []
+    for key, item in itemDict.items():
+        if item.surf == surf:
+            listBound.append(key)
+
+    return listBound
+
+##
 # Options for saving the current system in the PyPO/save/systems/ folder.
 def saveSystemForm():
     return [InputDescription(inType.vectorStrings, "name", label="Name of system", numFields=1)]

@@ -132,7 +132,7 @@ def BuildPyPO():
             clog.info("Running PyPO unittests...")
             dir_tests = os.path.join(os.getcwd(), "tests")
 
-            os.system(f"nosetests --exe")
+            os.system(f"nose2 -v")
 
         except:
             clog.error("Failed to test PyPO.")

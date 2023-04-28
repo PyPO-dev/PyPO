@@ -43,19 +43,19 @@ Input beam patterns can be selected from a range of models, such as Gaussian bea
 Custom beam patterns can also be imported to, for example, model the propagation of a measured beam pattern through a simulated optical system.
 
 `PyPO` can be used through either a scripting-based approach, where simulations are defined in Python scripts, or through the graphical user interface (GUI).
-It carries core dependencies on Numpy [@Harris:2020], matplotlib [@Hunter:2007], scipy and nose. The GUI carries an optional dependency on PyQT5.
+It carries core dependencies on Numpy [@Harris:2020], matplotlib [@Hunter:2007], scipy [@Virtanen:2020]. The unittesting framework carries a dependency on nose2. The GUI carries an optional dependency on PyQT5.
 
 # Statement of need
-Development of `PyPO` started with the need for alignment of the wideband sub-mm spectrometer DESHIMA 2.0 [@Taniguchi:2022]. 
-A Python package capable of efficient GO and PO calulations through optical systems consisting of quadric surfaces was necessary for calculating the configuration of the corrective optics. 
+Development of `PyPO` started with the need for alignment strategies for the wideband sub-mm spectrometer DESHIMA 2.0 [@Taniguchi:2022]. 
+A software package capable of efficient GO and PO calulations through optical systems consisting of quadric surfaces was necessary for calculating the configuration of the corrective optics. Because of the popularity of the Python programming language, it eweas chosen as the interface language for `PyPO`. 
 Currently, `PyPO` is also being used in simulations of measured beam patterns of DESHIMA 2.0 at the ASTE [@ASTE] telescope for the analysis of instrument performance.
 
 Commercial software for GO and PO calculations, such as OpticStudio (Zemax) and GRASP (TICRA), has already been developed, but to our knowledge `PyPO` is the first free open-source Python package that simulates planar and quadric reflector geometries using both GO and PO. 
 Moreover, `PyPO` does not employ approximations often employed by other software packages such as `POPPy` [@Perrin:2012] and Prysm [@Dube:2019]. Rather, PyPO directly solves the radiation integral, allowing for propagation between multiple (off-axis) reflector surfaces.
 
 # Availability
-`PyPO` can be found on [Github](https://github.com/arend95/PyPO). 
-Software documentation and instructions regarding installation, contribution and issue tracking can be found in the [documentation](https://arend95.github.io/PyPO/). 
+`PyPO` can be found on [Github](https://github.com/arend95/PyPO) and is available for Linux, Windows and MacOS.
+Software documentation and instructions regarding installation, contributing and issue tracking can be found in the [documentation](https://arend95.github.io/PyPO/). 
 The package comes with several tutorials illustrating the workflow and features, and can be used as building blocks for new reflector systems.
 
 # Acknowledgements

@@ -59,7 +59,8 @@ class System(object):
         self.num_cam = 0
         self.nThreads_cpu = os.cpu_count()
         self.context = context
-        
+        self.verbosity = verbose
+
         Config.setContext(context)
         Config.setOverride(override)
 
@@ -93,11 +94,14 @@ class System(object):
         #redirect = None
         if redirect is None:
             self.clog_mgr = CustomLogger(os.path.basename(__file__))
-            self.clog = self.clog_mgr.getCustomLogger() if verbose else self.clog_mgr.getCustomLogger(open(os.devnull, "w"))
+            self.clog = self.clog_mgr.getCustomLogger()
 
         else:
             self.clog = redirect
         #print(self.clog)
+
+        if not verbose:
+            self.clog.setLevel(logging.CRITICAL)
 
         if context == "S":
             self.clog.info("INITIALIZED EMPTY SYSTEM.")
@@ -189,12 +193,18 @@ class System(object):
     # @param verbose Whether to enable logging or not.
     # @param handler If multiple handlers are present, select which handler to adjust.
     def setLoggingVerbosity(self, verbose=True, handler=None):
-        if handler is None:
-            for fstream in self.clog.handlers:
-                fstream.setStream(sys.stdout) if verbose else fstream.setStream(open(os.devnull, "w"))
-
+        self.verbosity = verbose
+        if verbose == True:
+            self.clog.setLevel(logging.DEBUG)
         else:
-            self.clog.handlers[handler].setStream() if verbose else self.clog.handlers[handler].setStream(open(os.devnull, "w"))
+            self.clog.setLevel(logging.CRITICAL)
+
+        #if handler is None:
+        #    for fstream in self.clog.handlers:
+        #        fstream.setStream(sys.stdout) if verbose else fstream.setStream(open(os.devnull, "w"))
+
+        #else:
+        #    self.clog.handlers[handler].setStream() if verbose else self.clog.handlers[handler].setStream(open(os.devnull, "w"))
 
     ##
     # Add a paraboloid reflector to the System.
@@ -1317,9 +1327,11 @@ class System(object):
                 "device"    : "CPU"
                 }
 
+        verbosity_init = self.verbosity
+
         self.setLoggingVerbosity(verbose=False)
         self.runRayTracer(runRTDict)
-        self.setLoggingVerbosity(verbose=True)
+        self.setLoggingVerbosity(verbose=verbosity_init)
 
         stack = self.calcRayLen(hybridDict["fr_in"], hybridDict["fr_out"], start=hybridDict["start"])
         if hybridDict["start"] is not None:
@@ -2125,12 +2137,10 @@ class System(object):
     # @param verbose Allow verbose System logging.
     #
     # @returns out The focus co-ordinate.
-    def findRTfocus(self, name_frame, f0=None, verbose=False):
+    def findRTfocus(self, name_frame, f0=None):
         check_frameSystem(name_frame, self.frames, self.clog, extern=True)
         f0 = 0 if f0 is None else f0
        
-        if not verbose:
-            self.setLoggingVerbosity(verbose=False)
         
         tilt = self.calcRTtilt(name_frame)
         center = self.calcRTcenter(name_frame)
@@ -2163,14 +2173,17 @@ class System(object):
                 }
 
         self.clog.info(f"Finding focus of {name_frame}...")
+        
+        verbosity_init = self.verbosity
+        self.setLoggingVerbosity(verbose=False)
+        
         res = opt.fmin(self._optimiseFocus, f0, args=(runRTDict, tilt), full_output=True, disp=False)
 
-        if not verbose:
-            self.setLoggingVerbosity(verbose=True)
+        self.setLoggingVerbosity(verbose=verbosity_init)
         
         out = res[0] * tilt + center
         self.translateGrids(t_name, out, mode="absolute")
-        self.clog.info(f"Focus: {*['{:0.3e}'.format(x) for x in out],}, RMS: {res[1]:.3e}")
+        self.clog.info(f"Focus of frame {name_frame}: {*['{:0.3e}'.format(x) for x in out],}, RMS: {res[1]:.3e}")
 
         return out
 

@@ -1165,6 +1165,48 @@ class MainWidget(QWidget):
         self.setForm(fData.calcHPBW(self.stm.fields), self.calcHPBWAction, okText="Calculate")
     
     ##
+    # Shows form to select surface for beam merging.
+    def setBMergeSurfForm(self):
+        self.setForm(fData.selectSurface(self.stm.system), self.setBMergeForm, okText="Set")
+    
+    ##
+    # Shows form to select surface for beam merging.
+    def setBMergeForm(self):
+        SurfDict = self.ParameterWid.read()
+        print(SurfDict)
+        if SurfDict["mode"] == "Fields":
+            self.setForm(fData.mergeBeamsForm(self.stm.fields, SurfDict["surf"]), self.BMergeActionFields, okText="Merge")
+        
+        if SurfDict["mode"] == "Currents":
+            self.setForm(fData.mergeBeamsForm(self.stm.currents, SurfDict["surf"]), self.BMergeActionCurrents, okText="Merge")
+   
+    ##
+    # Merge fields on a common surface.
+    def BMergeActionFields(self):
+        try:
+            MergeDict = self.ParameterWid.read()
+            self.stm.mergeBeams(*MergeDict["beams"], obj="fields", merged_name=MergeDict["merged_name"])
+            
+            self.addFieldWidget(MergeDict["merged_name"])
+        except Exception as err:
+            print(err)
+            print_tb(err.__traceback__)
+            self.clog.error(err)
+    
+    ##
+    # Merge currents on a common surface.
+    def BMergeActionCurrents(self):
+        try:
+            MergeDict = self.ParameterWid.read()
+            mergeBeams(*MergeDict["beams"], obj="currents", merged_name=MergeDict["merged_name"])
+            
+            self.addCurrentWidget(MergeDict["merged_name"])
+        except Exception as err:
+            print(err)
+            print_tb(err.__traceback__)
+            self.clog.error(err)
+
+    ##
     # Reads form and calculates taper efficiencies
     def calcTaperAction(self):
         try:
@@ -1251,11 +1293,11 @@ class MainWidget(QWidget):
     def findFocusAction(self):
         try:
             findFocusDict = self.ParameterWid.read()
-            focus = self.stm.findRTfocus(findFocusDict["name_frame"], verbose=True)
+            focus = self.stm.findRTfocus(findFocusDict["name_frame"])
             self.addReflectorWidget(f"focal_plane_{findFocusDict['name_frame']}")
             self.addFrameWidget(f"focus_{findFocusDict['name_frame']}")
             
-            self.clog.info(f"Focus of {findFocusDict['name_frame']} : {focus}")
+            #self.clog.info(f"Focus of {findFocusDict['name_frame']} : {focus}")
 
         except Exception as err:
             print(err)
@@ -1451,6 +1493,10 @@ class PyPOMainWindow(QMainWindow):
         HPBW.triggered.connect(self.mainWid.setHPBWForm)
         ToolsMenu.addAction(HPBW)
         
+        BMerge = QAction("Merge beams", self)
+        BMerge.setToolTip("Merge beams defined on the same surface.")
+        BMerge.triggered.connect(self.mainWid.setBMergeSurfForm)
+        ToolsMenu.addAction(BMerge)
         #findRTfocusAction.triggered.connect(self.mainWid.set)
 
 

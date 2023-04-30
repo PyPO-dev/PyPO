@@ -9,8 +9,7 @@ from src.GUI.ParameterForms.InputDescription import inType, InputDescription
 # Options for generating an element from an xy parametrisation.
 def xy_opts():
     return [InputDescription(inType.vectorFloats, "lims_x", label="X limits", oArray=True, numFields=2),
-            InputDescription(inType.vectorFloats, "lims_y", label="Y limits", oArray=True, numFields=2),
-            InputDescription(inType.checkbox, "flip", label="Flip Normal Vectors")]
+            InputDescription(inType.vectorFloats, "lims_y", label="Y limits", oArray=True, numFields=2)]
 
 ##
 # Options for generating an element from a uv parametrisation.
@@ -211,9 +210,9 @@ def initPSInp(elemDict):
                 sublist_surf.append(key)
 
     initPS = [
-            InputDescription(inType.dropdown, "surface", label="Point source surface", options = sublist_surf),
+            InputDescription(inType.dropdown, "surface", label="Source surface", options = sublist_surf),
             InputDescription(inType.vectorStrings, "name", label="Beam name", numFields=1),
-            InputDescription(inType.vectorFloats, "lam", label="Wavelength of radiation", hints=[1], numFields=1),
+            InputDescription(inType.vectorFloats, "lam", label="Wavelength", hints=[1], numFields=1),
             InputDescription(inType.vectorFloats, "E0", label="Peak value", hints=[1], numFields=1),
             InputDescription(inType.vectorFloats, "phase", label="Phase", hints=[0], numFields=1),
             InputDescription(inType.vectorFloats, "pol", label="Polarization", hints=[1,0,0], numFields=3, oArray=True)
@@ -390,6 +389,8 @@ def propPOInp(currentDict, scalarFieldDict, elemDict):
             if item["gmode"] != 2:
                 sublist_target.append(key)
     
+    sublist_exp = ["forward", "backward"]
+
     sublist_dev = ["CPU", "GPU"]
 
 
@@ -414,6 +415,7 @@ def propPOInp(currentDict, scalarFieldDict, elemDict):
                     InputDescription(inType.dropdown, "s_scalarfield", label="Source scalar field", options = sublist_sfields),
                     InputDescription(inType.vectorStrings, "name_field", label="Output scalar field", numFields=1)]
                 }),
+            InputDescription(inType.radio, "exp", label="Time direction", options = sublist_exp),
             InputDescription(inType.vectorFloats, "epsilon", label="Relative permittivity", hints=[1], numFields=1),
             InputDescription(inType.vectorIntegers, "nThreads", label="Number of threads", hints=[1], numFields=1),
             InputDescription(inType.dropdown, "device", label="Hardware to use", options = sublist_dev)

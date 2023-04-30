@@ -841,6 +841,11 @@ class MainWidget(QWidget):
     def initPSBeamForm(self):
         self.setForm(fData.initPSInp(self.stm.system), readAction=self.initPSBeamAction, okText="Add beam")
     
+    ##
+    # Shows form to initialize a physical optics uniform source.
+    # Because uniform uses same inout as point source, can use same form
+    def initUSBeamForm(self):
+        self.setForm(fData.initPSInp(self.stm.system), readAction=self.initUSBeamAction, okText="Add beam")
     
     ##
     # Reads form and adds a vectorial point source beam to system
@@ -855,12 +860,30 @@ class MainWidget(QWidget):
             print(err)
             print_tb(err.__traceback__)
             self.clog.error(err)
+    
+    ##
+    # Reads form and adds a vectorial uniform source beam to system
+    def initUSBeamAction(self):
+        try:
+            USDict = self.ParameterWid.read()
+            
+            self.stm.createUniformSource(USDict, USDict["surface"])
+            self.addFieldWidget(USDict["name"])
+            self.addCurrentWidget(USDict["name"])
+        except Exception as err:
+            print(err)
+            print_tb(err.__traceback__)
+            self.clog.error(err)
 
     ##
     # Shows form to initialize a scalar point source beam
     def initSPSBeamForm(self):
         self.setForm(fData.initSPSInp(self.stm.system), readAction=self.initSPSBeamAction, okText="Add beam")
     
+    ##
+    # Shows form to initialize a scalar uniform source beam
+    def initSUSBeamForm(self):
+        self.setForm(fData.initSPSInp(self.stm.system), readAction=self.initSPSBeamAction, okText="Add beam")
 
     ##
     # Reads form and adds a scalar point source beam to system
@@ -1034,6 +1057,11 @@ class MainWidget(QWidget):
         try:
             propBeamDict = self.ParameterWid.read()
             # print(propBeamDict)
+            if propBeamDict["exp"] == "forward":
+                propBeamDict["exp"] = "fwd"
+            
+            elif propBeamDict["exp"] == "backward":
+                propBeamDict["exp"] = "bwd"
             
             chk.check_runPODict(propBeamDict, self.stm.system.keys(), self.stm.fields.keys(), self.stm.currents.keys(),
                             self.stm.scalarfields.keys(), self.stm.frames.keys(), self.clog)
@@ -1434,6 +1462,17 @@ class PyPOMainWindow(QMainWindow):
         initPointScalAction.setStatusTip("Initialize a scalar point source.")
         initPointScalAction.triggered.connect(self.mainWid.initSPSBeamForm)
         makeBeamPS.addAction(initPointScalAction)
+        
+        makeBeamUS = makeBeam.addMenu("Uniform source")
+        initUnifVecAction = QAction("Vectorial", self)
+        initUnifVecAction.setStatusTip("Initialize a vectorial uniform source.")
+        initUnifVecAction.triggered.connect(self.mainWid.initUSBeamForm)
+        makeBeamUS.addAction(initUnifVecAction)
+        
+        initUnifScalAction = QAction("Scalar", self)
+        initUnifScalAction.setStatusTip("Initialize a scalar uniform source.")
+        initUnifScalAction.triggered.connect(self.mainWid.initSUSBeamForm)
+        makeBeamUS.addAction(initUnifScalAction)
     
         makeBeamG = makeBeam.addMenu("Gaussian beam")
         initGaussVecAction = QAction("Vectorial", self)#TODO Vectorial?

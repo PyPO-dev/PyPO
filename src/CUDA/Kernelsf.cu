@@ -188,6 +188,7 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
     float source_norm[3];  // Container for xyz source normals
     float norm_dot_k_hat;  // Source normal dotted with wavevector direction
     float r_vec[3];        // Distance vector between source and target points
+    float _r_vec[3];        // Distance vector between source and target points
     float k_hat[3];        // Unit wavevctor
     float k_arr[3];        // Wavevector
 
@@ -210,10 +211,18 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
     for(int i=0; i<g_s; i++)
 
     {
+        //js[0] = cuCmulf(con[6], d_Jx[i]);
+        //js[1] = cuCmulf(con[6], d_Jy[i]);
+        //js[2] = cuCmulf(con[6], d_Jz[i]);
+        
         js[0] = d_Jx[i];
         js[1] = d_Jy[i];
         js[2] = d_Jz[i];
 
+        //ms[0] = cuCmulf(con[6], d_Mx[i]);
+        //ms[1] = cuCmulf(con[6], d_My[i]);
+        //ms[2] = cuCmulf(con[6], d_Mz[i]);
+        
         ms[0] = d_Mx[i];
         ms[1] = d_My[i];
         ms[2] = d_Mz[i];
@@ -229,6 +238,7 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
         //printf("%f\n", source_norm[2]);
 
         diff(point, source_point, r_vec);
+        //s_mult(_r_vec, con[6].x, r_vec);
         abs(r_vec, r);
 
         rc = make_cuFloatComplex(r, 0.);
@@ -238,6 +248,7 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
 
         dot(source_norm, k_hat, norm_dot_k_hat);
         if (norm_dot_k_hat < 0) {continue;}
+        //if ((con[6].x * norm_dot_k_hat) < 0) {continue;}
 
         s_mult(k_hat, con[0].x, k_arr);
 

@@ -1520,7 +1520,7 @@ class System(object):
     #
     # @returns popt Fitted beam parameters.
     # @returns perr Standard deviation of fitted parameters.
-    def fitGaussAbs(self, name_field, comp, thres=None, mode=None, full_output=False):
+    def fitGaussAbs(self, name_field, comp, thres=None, mode=None, full_output=False, ratio=1):
         check_fieldSystem(name_field, self.fields, self.clog, extern=True)
 
         thres = -11 if thres is None else thres
@@ -1529,7 +1529,7 @@ class System(object):
         surfaceObj = self.system[self.fields[name_field].surf]
         field = self.copyObj(np.absolute(getattr(self.fields[name_field], comp)))
 
-        popt, perr = fgs.fitGaussAbs(field, surfaceObj, thres, mode)
+        popt, perr = fgs.fitGaussAbs(field, surfaceObj, thres, mode, ratio)
 
         Psi = scalarfield(fgs.generateGauss(popt, surfaceObj, mode="linear"))
         Psi.setMeta(self.fields[name_field].surf, self.fields[name_field].k)

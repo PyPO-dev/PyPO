@@ -308,7 +308,10 @@ void initGauss(T gdict, U refldict, V *res_field, V *res_current)
         phizx    = atan(reflc.z[i] / zRx);
         phizy    = atan((reflc.z[i] - gdict.dxyz) / zRy);
         
-        field_atPoint = gdict.E0 * sqrt(2 / (M_PI * wzx * wzy)) * exp(-(reflc.x[i]/wzx)*(reflc.x[i]/wzx) - (reflc.y[i]/wzy)*(reflc.y[i]/wzy) -
+        //field_atPoint = gdict.E0 * sqrt(2 / (M_PI * wzx * wzy)) * exp(-(reflc.x[i]/wzx)*(reflc.x[i]/wzx) - (reflc.y[i]/wzy)*(reflc.y[i]/wzy) -
+        //        j*M_PI/gdict.lam * (reflc.x[i]*reflc.x[i]*Rzx_inv + reflc.y[i]*reflc.y[i]*Rzy_inv) - j*k*reflc.z[i] + j*(phizx - phizy)*0.5);
+        
+        field_atPoint = gdict.E0 * exp(-(reflc.x[i]/wzx)*(reflc.x[i]/wzx) - (reflc.y[i]/wzy)*(reflc.y[i]/wzy) -
                 j*M_PI/gdict.lam * (reflc.x[i]*reflc.x[i]*Rzx_inv + reflc.y[i]*reflc.y[i]*Rzy_inv) - j*k*reflc.z[i] + j*(phizx - phizy)*0.5);
         
         efield[0] = field_atPoint * gdict.pol[0];

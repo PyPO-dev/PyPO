@@ -26,8 +26,6 @@ from src.PyPO.MatUtils import *
 def calcEstimates(x, y, area, field_norm):
     M0 = np.sum(field_norm)
 
-    #print(field_norm)
-
     xm = np.sum(x * field_norm) / M0
     ym = np.sum(y * field_norm) / M0
 
@@ -54,8 +52,9 @@ def calcEstimates(x, y, area, field_norm):
     #print(M0)
 
     _x0 = 1 / (a + b - p)
-    _y0 = 1 / (a + b - p) 
+    _y0 = 1 / (a + b + p) 
 
+    """
     if _x0 <= 0 and _y0 > 0:
         _x0 = _y0
 
@@ -65,10 +64,9 @@ def calcEstimates(x, y, area, field_norm):
     elif _y0 <= 0 and _x0 <= 0:
         _x0 *= -1
         _y0 *= -1
-
+    """
     x0 = np.sqrt(_x0)
     y0 = np.sqrt(_y0)
-    #print(x0, y0)
     return x0, y0, xm, ym, theta
 
 ##
@@ -78,17 +76,18 @@ def calcEstimates(x, y, area, field_norm):
 # @param surfaceObject Surface on which the field is defined.
 # @param thres Threshold for fitting in decibels.
 # @param mode Whether to fit the Gaussian in linear, decibel or logarithmic space.
+# @param ratio Allowed maximal ratio of fit to actual beam.
 #
 # @returns popt Optimal parameters for Gaussian.
 # @returns perr Standard deviations of optimal parameters.
-def fitGaussAbs(field, surfaceObject, thres, mode):
+def fitGaussAbs(field, surfaceObject, thres, mode, ratio=1):
     global thres_g
     thres_g = thres
     
     # Normalize
     _field = np.absolute(field) / np.max(np.absolute(field))
-
-    grids = generateGrid(surfaceObject, transform=False, spheric=False)
+    #grids = generateGrid(surfaceObject, transform=True, spheric=False)
+    grids = generateGrid(surfaceObject, transform=True, spheric=False)
 
     x = grids.x
     y = grids.y
@@ -130,40 +129,47 @@ def fitGaussAbs(field, surfaceObject, thres, mode):
     x0, y0, xs, ys, theta = calcEstimates(x[_mask_f], y[_mask_f], area[_mask_f], fit_field[_mask_f])
 
     p0 = [x0, y0, xs, ys, theta, np.max(fit_field)]
-    
-    ratio = 1
+
+
+    _ratio = ratio
     num = 0
 
-    while ratio >= 1:
-        if mode == "dB":
-            fit_field = 20 * np.log10(_field)
-            mask_f = fit_field >= thres 
-
-        elif mode == "linear":
-            fit_field = _field
-            mask_f = fit_field >= 10**(thres/20)
-
-        elif mode == "log":
-            fit_field = np.log(_field)
-            mask_f = fit_field >= np.log(10**(thres/20))
-        
-        if num >= 1:
-            _mask_f = mask_f & x_cond & y_cond
-        else:
-            _mask_f = mask_f
-
+    if ratio is None:
         args = (surfaceObject, fit_field, _mask_f, mode)
         popt = fmin(GaussAbs, p0, args, disp=False)
 
-        _Psi = generateGauss(popt, surfaceObject, mode="linear")
-        ratio = np.sum(_Psi**2) / np.sum(_field**2)
-        
-        if num > 1:
-            if thres < -3:
-                thres += 0.5
-        
-        num += 1
-        
+    else:
+        while _ratio >= ratio:
+            print(num)
+            if mode == "dB":
+                fit_field = 20 * np.log10(_field)
+                mask_f = fit_field >= thres 
+
+            elif mode == "linear":
+                fit_field = _field
+                mask_f = fit_field >= 10**(thres/20)
+
+            elif mode == "log":
+                fit_field = np.log(_field)
+                mask_f = fit_field >= np.log(10**(thres/20))
+            
+            if num >= 1:
+                _mask_f = mask_f & x_cond & y_cond
+            else:
+                _mask_f = mask_f
+
+            args = (surfaceObject, fit_field, _mask_f, mode)
+            popt = fmin(GaussAbs, p0, args, disp=False)
+
+            _Psi = generateGauss(popt, surfaceObject, mode="linear")
+            _ratio = np.sum(_Psi**2) / np.sum(_field**2)
+            
+            if num > 1:
+                if thres < -3:
+                    thres += 0.5
+            
+            num += 1
+    
     perr = np.zeros(len(popt))#np.sqrt(np.diag(pcov))
     perr = np.append(perr, 0.0)
 
@@ -228,7 +234,7 @@ def GaussAbs(p0, *args):
 def generateGauss(p0, surfaceObject, mode):
     x0, y0, xs, ys, theta, amp = p0
     
-    grids = generateGrid(surfaceObject, transform=False, spheric=False)
+    grids = generateGrid(surfaceObject, transform=True, spheric=False)
     x = grids.x
     y = grids.y
     

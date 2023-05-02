@@ -12,27 +12,6 @@ __constant__ float mat[16]; //
 __constant__ int nTot;
 __constant__ int cflip;
 
-#define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
-
-/**
- * Check CUDA call.
- *
- * Wrapper for finding errors in CUDA API calls.
- *
- * @param code The errorcode returned from failed API call.
- * @param file The file in which failure occured.
- * @param line The line in file in which error occured.
- * @param abort Exit code upon error.
- */
-__host__ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
-{
-   if (code != cudaSuccess)
-   {
-      fprintf(stderr,"GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
-      if (abort) exit(code);
-   }
-}
-
 /**
  * Debug real array.
  *

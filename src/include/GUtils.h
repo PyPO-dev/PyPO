@@ -486,3 +486,22 @@ __device__ __inline__ void matVec(float (&m1)[3][3], cuFloatComplex (&cv1)[3], c
                 cuCmulf(make_cuFloatComplex(m1[n][2],0), cv1[2])));
     }
 }
+
+/**
+ * Take complex exponential.
+ *
+ * Take complex exponential by decomposing into sine and cosine.
+ *
+ * @return res cuFloatComplex number.
+ */
+__device__ __inline__ cuFloatComplex expCo(cuFloatComplex z)
+{
+    cuFloatComplex res;
+    float t = exp(z.x);
+    float ys = sin(z.y);
+    float yc = cos(z.y);
+    res.x = t*yc;
+    res.y = t*ys;
+
+    return res;
+}

@@ -74,7 +74,6 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#define-members">Macros</a> &#124;
 <a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">KernelsRTf.cu File Reference</div></div>
@@ -85,18 +84,8 @@ $(function() {
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="InterfaceCUDA_8h_source.html">InterfaceCUDA.h</a>&quot;</code><br />
 </div><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:a3f6ea8e9ef58125936d50d7e1181aa7a"><td class="memItemLeft" align="right" valign="top"><a id="a3f6ea8e9ef58125936d50d7e1181aa7a" name="a3f6ea8e9ef58125936d50d7e1181aa7a"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>gpuErrchk</b>(ans)&#160;&#160;&#160;{ <a class="el" href="Kernelsf_8cu.html#a14ddf96670fa402eda1299ee5a8557cd">gpuAssert</a>((ans), __FILE__, __LINE__); }</td></tr>
-<tr class="separator:a3f6ea8e9ef58125936d50d7e1181aa7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a14ddf96670fa402eda1299ee5a8557cd"><td class="memItemLeft" align="right" valign="top">__host__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="KernelsRTf_8cu.html#a14ddf96670fa402eda1299ee5a8557cd">gpuAssert</a> (cudaError_t code, const char *file, int line, bool abort=true)</td></tr>
-<tr class="separator:a14ddf96670fa402eda1299ee5a8557cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3f20abe1472b3b0065d9be90e5eb961a"><td class="memItemLeft" align="right" valign="top">__host__ __device__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="KernelsRTf_8cu.html#a3f20abe1472b3b0065d9be90e5eb961a">_debugArrayf</a> (float arr[3])</td></tr>
-<tr class="separator:a3f20abe1472b3b0065d9be90e5eb961a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aac840d4bd76922cd0ed1d526ce810fa4"><td class="memItemLeft" align="right" valign="top">__device__ __inline__ float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="KernelsRTf_8cu.html#aac840d4bd76922cd0ed1d526ce810fa4">common1</a> (float t, float xr, float yr, float dxr, float dyr)</td></tr>
 <tr class="separator:aac840d4bd76922cd0ed1d526ce810fa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad3601bc881564bd384f1313a7d36e5c8"><td class="memItemLeft" align="right" valign="top">__device__ __inline__ float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="KernelsRTf_8cu.html#ad3601bc881564bd384f1313a7d36e5c8">common2</a> (float t, float xr, float yr, float dxr, float dyr)</td></tr>
@@ -155,32 +144,6 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>cflip</b>
 <div class="textblock"><p>Kernels for CUDA RT calculations. </p>
 <p>Contains kernels for RT calculations. Multiple kernels are defined, each one optimized for a certain calculation. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="a3f20abe1472b3b0065d9be90e5eb961a" name="a3f20abe1472b3b0065d9be90e5eb961a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3f20abe1472b3b0065d9be90e5eb961a">&#9670;&#160;</a></span>_debugArrayf()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">__host__ __device__ void _debugArrayf </td>
-          <td>(</td>
-          <td class="paramtype">float&#160;</td>
-          <td class="paramname"><em>arr</em>[3]</td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Debug real array.</p>
-<p>Print real valued array of size 3. Useful for debugging.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">arr</td><td>Array of 3 float. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
 <a id="a0b636357371c5f35156792eaac8862ba" name="a0b636357371c5f35156792eaac8862ba"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0b636357371c5f35156792eaac8862ba">&#9670;&#160;</a></span>_initCUDA()</h2>
 
@@ -714,65 +677,6 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>cflip</b>
     <tr><td class="paramname">dxr</td><td>x co-ordinate of ray direction </td></tr>
     <tr><td class="paramname">dyr</td><td>y co-ordinate of ray direction </td></tr>
     <tr><td class="paramname">dzr</td><td>z co-ordinate of ray direction </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a14ddf96670fa402eda1299ee5a8557cd" name="a14ddf96670fa402eda1299ee5a8557cd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a14ddf96670fa402eda1299ee5a8557cd">&#9670;&#160;</a></span>gpuAssert()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">__host__ void gpuAssert </td>
-          <td>(</td>
-          <td class="paramtype">cudaError_t&#160;</td>
-          <td class="paramname"><em>code</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>file</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>line</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>abort</em> = <code>true</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Check CUDA call.</p>
-<p>Wrapper for finding errors in CUDA API calls.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">code</td><td>The errorcode returned from failed API call. </td></tr>
-    <tr><td class="paramname">file</td><td>The file in which failure occured. </td></tr>
-    <tr><td class="paramname">line</td><td>The line in file in which error occured. </td></tr>
-    <tr><td class="paramname">abort</td><td>Exit code upon error. </td></tr>
   </table>
   </dd>
 </dl>

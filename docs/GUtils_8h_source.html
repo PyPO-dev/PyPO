@@ -327,7 +327,20 @@ $(function() {
 <div class="line"><a id="l00486" name="l00486"></a><span class="lineno">  486</span>                cuCmulf(make_cuFloatComplex(m1[n][2],0), cv1[2])));</div>
 <div class="line"><a id="l00487" name="l00487"></a><span class="lineno">  487</span>    }</div>
 <div class="line"><a id="l00488" name="l00488"></a><span class="lineno">  488</span>}</div>
+<div class="line"><a id="l00489" name="l00489"></a><span class="lineno">  489</span> </div>
+<div class="line"><a id="l00497" name="l00497"></a><span class="lineno"><a class="line" href="GUtils_8h.html#a2d622c64cff344e6e8f9bd8013d8c7af">  497</a></span>__device__ __inline__ cuFloatComplex <a class="code hl_function" href="GUtils_8h.html#a2d622c64cff344e6e8f9bd8013d8c7af">expCo</a>(cuFloatComplex z)</div>
+<div class="line"><a id="l00498" name="l00498"></a><span class="lineno">  498</span>{</div>
+<div class="line"><a id="l00499" name="l00499"></a><span class="lineno">  499</span>    cuFloatComplex res;</div>
+<div class="line"><a id="l00500" name="l00500"></a><span class="lineno">  500</span>    <span class="keywordtype">float</span> t = exp(z.x);</div>
+<div class="line"><a id="l00501" name="l00501"></a><span class="lineno">  501</span>    <span class="keywordtype">float</span> ys = sin(z.y);</div>
+<div class="line"><a id="l00502" name="l00502"></a><span class="lineno">  502</span>    <span class="keywordtype">float</span> yc = cos(z.y);</div>
+<div class="line"><a id="l00503" name="l00503"></a><span class="lineno">  503</span>    res.x = t*yc;</div>
+<div class="line"><a id="l00504" name="l00504"></a><span class="lineno">  504</span>    res.y = t*ys;</div>
+<div class="line"><a id="l00505" name="l00505"></a><span class="lineno">  505</span> </div>
+<div class="line"><a id="l00506" name="l00506"></a><span class="lineno">  506</span>    <span class="keywordflow">return</span> res;</div>
+<div class="line"><a id="l00507" name="l00507"></a><span class="lineno">  507</span>}</div>
 <div class="ttc" id="aGUtils_8h_html_a22f4f2be22ec5df28f429890f5880570"><div class="ttname"><a href="GUtils_8h.html#a22f4f2be22ec5df28f429890f5880570">conja</a></div><div class="ttdeci">__device__ __inline__ void conja(cuFloatComplex(&amp;cv)[3], cuFloatComplex(&amp;out)[3])</div><div class="ttdef"><b>Definition:</b> GUtils.h:209</div></div>
+<div class="ttc" id="aGUtils_8h_html_a2d622c64cff344e6e8f9bd8013d8c7af"><div class="ttname"><a href="GUtils_8h.html#a2d622c64cff344e6e8f9bd8013d8c7af">expCo</a></div><div class="ttdeci">__device__ __inline__ cuFloatComplex expCo(cuFloatComplex z)</div><div class="ttdef"><b>Definition:</b> GUtils.h:497</div></div>
 <div class="ttc" id="aGUtils_8h_html_a2dfc51352d5569a3f70d63d99091ae4e"><div class="ttname"><a href="GUtils_8h.html#a2dfc51352d5569a3f70d63d99091ae4e">diff</a></div><div class="ttdeci">__device__ __inline__ void diff(float(&amp;v1)[3], float(&amp;v2)[3], float(&amp;out)[3])</div><div class="ttdef"><b>Definition:</b> GUtils.h:162</div></div>
 <div class="ttc" id="aGUtils_8h_html_a5beb40dc060ea1c2df2955d79605bfe4"><div class="ttname"><a href="GUtils_8h.html#a5beb40dc060ea1c2df2955d79605bfe4">abs</a></div><div class="ttdeci">__device__ __inline__ void abs(float(&amp;v)[3], float &amp;out)</div><div class="ttdef"><b>Definition:</b> GUtils.h:195</div></div>
 <div class="ttc" id="aGUtils_8h_html_a64f93bcbc602b9ad5a7b9b0132655eae"><div class="ttname"><a href="GUtils_8h.html#a64f93bcbc602b9ad5a7b9b0132655eae">s_mult</a></div><div class="ttdeci">__device__ __inline__ void s_mult(float(&amp;v)[3], float &amp;s, float(&amp;out)[3])</div><div class="ttdef"><b>Definition:</b> GUtils.h:286</div></div>

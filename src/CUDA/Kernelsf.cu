@@ -14,52 +14,6 @@ __constant__ float eye[3][3];      // Identity matrix
 __constant__ int g_s;               // Gridsize on source
 __constant__ int g_t;               // Gridsize on target
 
-
-/**
- * Debug complex array.
- *
- * Print complex array of size 3.
- *      Useful for debugging.
-
- * @param arr Array of 3 cuFloatComplex.
- */
-__host__ __device__ void _debugArray(cuFloatComplex arr[3])
-{
-    printf("%e + %ej, %e + %ej, %e + %ej\n", arr[0].x, arr[0].y, arr[1].x, arr[1].y, arr[2].x, arr[2].y);
-}
-
-/**
- * Debug real array.
- *
- * Print real valued array of size 3.
- *      Useful for debugging.
-
- * @param arr Array of 3 float.
- */
-__host__ __device__ void _debugArray(float arr[3])
-{
-    printf("%e, %e, %e\n", arr[0], arr[1], arr[2]);
-}
-
-/**
- * Take complex exponential.
- *
- * Take complex exponential by decomposing into sine and cosine.
- *
- * @return res cuFloatComplex number.
- */
-__device__ __inline__ cuFloatComplex expCo(cuFloatComplex z)
-{
-    cuFloatComplex res;
-    float t = exp(z.x);
-    float ys = sin(z.y);
-    float yc = cos(z.y);
-    res.x = t*yc;
-    res.y = t*ys;
-
-    return res;
-}
-
 /**
  * Initialize CUDA.
  *
@@ -76,7 +30,7 @@ __device__ __inline__ cuFloatComplex expCo(cuFloatComplex z)
  * @return BT Array of two dim3 objects, containing number of blocks per grid and number of threads per block.
  */
 
- __host__ std::array<dim3, 2> _initCUDA(float k, float epsilon, int gt, int gs, float t_direction, int nBlocks, int nThreads)
+ __host__ std::array<dim3, 2> initCUDA(float k, float epsilon, int gt, int gs, float t_direction, int nBlocks, int nThreads)
  {
      // Calculate nr of blocks per grid and nr of threads per block
      dim3 nrb(nBlocks); dim3 nrt(nThreads);
@@ -168,7 +122,6 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
     float source_norm[3];  // Container for xyz source normals
     float norm_dot_k_hat;  // Source normal dotted with wavevector direction
     float r_vec[3];        // Distance vector between source and target points
-    float _r_vec[3];        // Distance vector between source and target points
     float k_hat[3];        // Unit wavevctor
     float k_arr[3];        // Wavevector
 
@@ -191,18 +144,10 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
     for(int i=0; i<g_s; i++)
 
     {
-        //js[0] = cuCmulf(con[6], d_Jx[i]);
-        //js[1] = cuCmulf(con[6], d_Jy[i]);
-        //js[2] = cuCmulf(con[6], d_Jz[i]);
-        
         js[0] = d_Jx[i];
         js[1] = d_Jy[i];
         js[2] = d_Jz[i];
 
-        //ms[0] = cuCmulf(con[6], d_Mx[i]);
-        //ms[1] = cuCmulf(con[6], d_My[i]);
-        //ms[2] = cuCmulf(con[6], d_Mz[i]);
-        
         ms[0] = d_Mx[i];
         ms[1] = d_My[i];
         ms[2] = d_Mz[i];
@@ -215,10 +160,8 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
         source_norm[1] = d_nys[i];
         source_norm[2] = d_nzs[i];
 
-        //printf("%f\n", source_norm[2]);
 
         diff(point, source_point, r_vec);
-        //s_mult(_r_vec, con[6].x, r_vec);
         abs(r_vec, r);
 
         rc = make_cuFloatComplex(r, 0.);
@@ -228,7 +171,6 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
 
         dot(source_norm, k_hat, norm_dot_k_hat);
         if (norm_dot_k_hat < 0) {continue;}
-        //if ((con[6].x * norm_dot_k_hat) < 0) {continue;}
 
         s_mult(k_hat, con[0].x, k_arr);
 
@@ -1133,7 +1075,7 @@ void callKernelf_JM(c2Bundlef *res, reflparamsf source, reflparamsf target,
 
     // Initialize and copy constant memory to device
     std::array<dim3, 2> BT;
-    BT = _initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
+    BT = initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
 
     MemUtils memutil;
 
@@ -1224,7 +1166,7 @@ void callKernelf_EH(c2Bundlef *res, reflparamsf source, reflparamsf target,
 
     // Initialize and copy constant memory to device
     std::array<dim3, 2> BT;
-    BT = _initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
+    BT = initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
 
     MemUtils memutil;
 
@@ -1314,7 +1256,7 @@ void callKernelf_JMEH(c4Bundlef *res, reflparamsf source, reflparamsf target,
 
     // Initialize and copy constant memory to device
     std::array<dim3, 2> BT;
-    BT = _initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
+    BT = initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
 
     MemUtils memutil;
 
@@ -1410,7 +1352,7 @@ void callKernelf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf target,
 
     // Initialize and copy constant memory to device
     std::array<dim3, 2> BT;
-    BT = _initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
+    BT = initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
 
     MemUtils memutil;
 
@@ -1512,7 +1454,7 @@ void callKernelf_FF(c2Bundlef *res, reflparamsf source, reflparamsf target,
 
     // Initialize and copy constant memory to device
     std::array<dim3, 2> BT;
-    BT = _initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
+    BT = initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
 
     MemUtils memutil;
 
@@ -1600,30 +1542,22 @@ void callKernelf_scalar(arrC1f *res, reflparamsf source, reflparamsf target,
 
     // Initialize and copy constant memory to device
     std::array<dim3, 2> BT;
-    BT = _initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
+    BT = initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
     //alsd
     // Create pointers to device arrays and allocate/copy source grid and area.
-    float *d_xs, *d_ys, *d_zs, *d_A;
+    MemUtils memutil;
 
-    gpuErrchk( cudaMalloc((void**)&d_xs, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_ys, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_zs, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_A, cs->size * sizeof(float)) );
+    int n_ds = 4;
+    int n_dt = 3;
+     
+    std::vector<float*> vec_csdat = {cs->x, cs->y, cs->z, cs->area};
+    std::vector<float*> vec_ctdat = {ct->x, ct->y, ct->z};
 
-    gpuErrchk( cudaMemcpy(d_xs, cs->x, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_ys, cs->y, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_zs, cs->z, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_A, cs->area, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-
-    // Create pointers to target grid
-    float *d_xt, *d_yt, *d_zt;
-    gpuErrchk( cudaMalloc((void**)&d_xt, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_yt, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_zt, ct->size * sizeof(float)) );
-
-    gpuErrchk( cudaMemcpy(d_xt, ct->x, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_yt, ct->y, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_zt, ct->z, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
+    std::vector<float*> vec_ds = memutil.cuMallFloat(n_ds, cs->size);
+    memutil.cuMemCpFloat(vec_ds, vec_csdat, cs->size); 
+    
+    std::vector<float*> vec_dt = memutil.cuMallFloat(n_dt, ct->size);
+    memutil.cuMemCpFloat(vec_dt, vec_ctdat, ct->size); 
     
     cuFloatComplex *h_sfs = new cuFloatComplex[cs->size];
 
@@ -1631,45 +1565,27 @@ void callKernelf_scalar(arrC1f *res, reflparamsf source, reflparamsf target,
 
     cuFloatComplex *d_sfs;
 
-    // Allocate and copy scalar input field
     gpuErrchk( cudaMalloc((void**)&d_sfs, cs->size * sizeof(cuFloatComplex)) );
-
     gpuErrchk( cudaMemcpy(d_sfs, h_sfs, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
 
-    // Delete host arrays for source currents - not needed anymore
     delete h_sfs;
     
     cuFloatComplex *d_sft;
 
     gpuErrchk( cudaMalloc((void**)&d_sft, ct->size * sizeof(cuFloatComplex)) );
 
-    // Create stopping event for kernel
-    cudaEvent_t event;
-    gpuErrchk( cudaEventCreateWithFlags(&event, cudaEventDisableTiming) );
-
-    // Call to KERNEL 5
-    GpropagateBeam_5<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs,
-                                d_A, d_xt, d_yt, d_zt,
-                                d_sfs, d_sft);
+    GpropagateBeam_5<<<BT[0], BT[1]>>>(vec_ds[0], vec_ds[1], vec_ds[2], vec_ds[3],
+                                       vec_dt[0], vec_dt[1], vec_dt[2],
+                                       d_sfs, d_sft);
 
     gpuErrchk( cudaDeviceSynchronize() );
 
-    // Allocate Host arrays for scalar res
     cuFloatComplex *h_sft = new cuFloatComplex[ct->size];
-
-    // Copy data back from Device to Host
     gpuErrchk( cudaMemcpy(h_sft, d_sft, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
 
-    // Free Device memory
     gpuErrchk( cudaDeviceReset() );
 
     _arrCUDACToC1(h_sft, res->x, res->y, ct->size);
 
-    // Delete host arrays for target fields
     delete h_sft;
 }
-//__host__ getComputeCapability
-
-//cudaDeviceProp deviceProp;
-//cudaGetDeviceProperties(&deviceProp, dev);
-//std::printf("%d.%d\n", deviceProp.major, deviceProp.minor);

@@ -141,6 +141,8 @@ Functions</h2></td></tr>
 <tr class="separator:af13c9edaa1b77c7d7cb29a79d59a1614"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1ee6e7a65edc366a218bcf1bd7138942"><td class="memItemLeft" align="right" valign="top">__device__ __inline__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="GUtils_8h.html#a1ee6e7a65edc366a218bcf1bd7138942">matVec</a> (float(&amp;m1)[3][3], cuFloatComplex(&amp;cv1)[3], cuFloatComplex(&amp;out)[3])</td></tr>
 <tr class="separator:a1ee6e7a65edc366a218bcf1bd7138942"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d622c64cff344e6e8f9bd8013d8c7af"><td class="memItemLeft" align="right" valign="top">__device__ __inline__ cuFloatComplex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="GUtils_8h.html#a2d622c64cff344e6e8f9bd8013d8c7af">expCo</a> (cuFloatComplex z)</td></tr>
+<tr class="separator:a2d622c64cff344e6e8f9bd8013d8c7af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Linear algebra functions for the CUDA version of PyPO. </p>
@@ -562,6 +564,27 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="a2d622c64cff344e6e8f9bd8013d8c7af" name="a2d622c64cff344e6e8f9bd8013d8c7af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d622c64cff344e6e8f9bd8013d8c7af">&#9670;&#160;</a></span>expCo()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">__device__ __inline__ cuFloatComplex expCo </td>
+          <td>(</td>
+          <td class="paramtype">cuFloatComplex&#160;</td>
+          <td class="paramname"><em>z</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Take complex exponential.</p>
+<p>Take complex exponential by decomposing into sine and cosine.</p>
+<dl class="section return"><dt>Returns</dt><dd>res cuFloatComplex number. </dd></dl>
 
 </div>
 </div>

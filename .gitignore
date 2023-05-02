@@ -137,7 +137,13 @@ dmypy.json
 # User-specific folders
 images/
 save/
-custom/
+
+custom/*
+!custom/beam
+
+custom/beam/*
+!custom/beam/tutorial
+
 out/build/
 
 # User-specific files

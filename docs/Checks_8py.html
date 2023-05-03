@@ -101,6 +101,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1Checks_1_1RunPOError.html">PyPO.Checks.RunPOError</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Propagate physical optics error.  <a href="classPyPO_1_1Checks_1_1RunPOError.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1Checks_1_1HybridPropError.html">PyPO.Checks.HybridPropError</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hybrid propagation error.  <a href="classPyPO_1_1Checks_1_1HybridPropError.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1Checks_1_1ElemNameError.html">PyPO.Checks.ElemNameError</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Element name error.  <a href="classPyPO_1_1Checks_1_1ElemNameError.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -118,6 +121,9 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1Checks_1_1GroupNameError.html">PyPO.Checks.GroupNameError</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Group name error.  <a href="classPyPO_1_1Checks_1_1GroupNameError.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPyPO_1_1Checks_1_1MergeBeamError.html">PyPO.Checks.MergeBeamError</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Merge beamerror.  <a href="classPyPO_1_1Checks_1_1MergeBeamError.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
@@ -182,9 +188,12 @@ Functions</h2></td></tr>
 <tr class="memitem:ace853b4915277586a887b4f37ced3ec3"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Checks_8py.html#ace853b4915277586a887b4f37ced3ec3">PyPO.Checks.errMsg_nogroup</a> (groupName)</td></tr>
 <tr class="memdesc:ace853b4915277586a887b4f37ced3ec3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error message when a group is not present in System.  <br /></td></tr>
 <tr class="separator:ace853b4915277586a887b4f37ced3ec3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab584ba0a98af2bd7077f396c5c9b68b2"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Checks_8py.html#ab584ba0a98af2bd7077f396c5c9b68b2">PyPO.Checks.block_ndarray</a> (fieldName, elemDict, shape)</td></tr>
-<tr class="memdesc:ab584ba0a98af2bd7077f396c5c9b68b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if an input array has correct shape.  <br /></td></tr>
-<tr class="separator:ab584ba0a98af2bd7077f396c5c9b68b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a432d8fb77cf7c1e5de6ff68ef65eca0c"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Checks_8py.html#a432d8fb77cf7c1e5de6ff68ef65eca0c">PyPO.Checks.errMsg_mergebeam</a> (beamName, surf0, surfd)</td></tr>
+<tr class="memdesc:a432d8fb77cf7c1e5de6ff68ef65eca0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error message when beams are to be merged but are not on the same surface.  <br /></td></tr>
+<tr class="separator:a432d8fb77cf7c1e5de6ff68ef65eca0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9305da8cbf3348e2028ff6e31f388be2"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Checks_8py.html#a9305da8cbf3348e2028ff6e31f388be2">PyPO.Checks.block_ndarray</a> (fieldName, elemDict, shape, cust_name=False)</td></tr>
+<tr class="memdesc:a9305da8cbf3348e2028ff6e31f388be2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if an input array has correct shape.  <br /></td></tr>
+<tr class="separator:a9305da8cbf3348e2028ff6e31f388be2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a65058cbd29081003c6f018eb55fa2181"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Checks_8py.html#a65058cbd29081003c6f018eb55fa2181">PyPO.Checks.check_ElemDict</a> (elemDict, nameList, num_ref, clog)</td></tr>
 <tr class="memdesc:a65058cbd29081003c6f018eb55fa2181"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check element input dictionary.  <br /></td></tr>
 <tr class="separator:a65058cbd29081003c6f018eb55fa2181"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -206,12 +215,18 @@ Functions</h2></td></tr>
 <tr class="memitem:a52625a4598363eeafbc54bf9ed2428b1"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Checks_8py.html#a52625a4598363eeafbc54bf9ed2428b1">PyPO.Checks.check_runPODict</a> (runPODict, elements, fields, currents, scalarfields, frames, clog)</td></tr>
 <tr class="memdesc:a52625a4598363eeafbc54bf9ed2428b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check a physical optics propagation input dictionary.  <br /></td></tr>
 <tr class="separator:a52625a4598363eeafbc54bf9ed2428b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a59e3cbf4c8e1b4ec4cdbc60b2a061a24"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Checks_8py.html#a59e3cbf4c8e1b4ec4cdbc60b2a061a24">PyPO.Checks.check_hybridDict</a> (hybridDict, elements, frames, fields, clog)</td></tr>
+<tr class="memdesc:a59e3cbf4c8e1b4ec4cdbc60b2a061a24"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check a hybrid propagation input dictionary.  <br /></td></tr>
+<tr class="separator:a59e3cbf4c8e1b4ec4cdbc60b2a061a24"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a826dac4603f6bd595b7d70758b0dc648"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Checks_8py.html#a826dac4603f6bd595b7d70758b0dc648">PyPO.Checks.check_aperDict</a> (aperDict, clog)</td></tr>
 <tr class="memdesc:a826dac4603f6bd595b7d70758b0dc648"><td class="mdescLeft">&#160;</td><td class="mdescRight">CHeck if aperture dictionary is valid.  <br /></td></tr>
 <tr class="separator:a826dac4603f6bd595b7d70758b0dc648"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4fb1c9c5841eca4b080a4daa346db136"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Checks_8py.html#a4fb1c9c5841eca4b080a4daa346db136">PyPO.Checks.check_ellipseLimits</a> (ellipsoid, clog)</td></tr>
 <tr class="memdesc:a4fb1c9c5841eca4b080a4daa346db136"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if ellipsoid limits are valid points.  <br /></td></tr>
 <tr class="separator:a4fb1c9c5841eca4b080a4daa346db136"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0cf68c62705381dd6fc39d4ddc823414"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Checks_8py.html#a0cf68c62705381dd6fc39d4ddc823414">PyPO.Checks.check_sameBound</a> (beams, checkDict, clog)</td></tr>
+<tr class="memdesc:a0cf68c62705381dd6fc39d4ddc823414"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if beams to be merged are defined on same surface.  <br /></td></tr>
+<tr class="separator:a0cf68c62705381dd6fc39d4ddc823414"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
@@ -225,8 +240,8 @@ list&#160;</td><td class="memItemRight" valign="bottom"><b>PyPO.Checks.PO_modeli
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>File containing all commonly used checks for PyPO user input. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="ab584ba0a98af2bd7077f396c5c9b68b2" name="ab584ba0a98af2bd7077f396c5c9b68b2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab584ba0a98af2bd7077f396c5c9b68b2">&#9670;&#160;</a></span>block_ndarray()</h2>
+<a id="a9305da8cbf3348e2028ff6e31f388be2" name="a9305da8cbf3348e2028ff6e31f388be2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9305da8cbf3348e2028ff6e31f388be2">&#9670;&#160;</a></span>block_ndarray()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -247,7 +262,13 @@ list&#160;</td><td class="memItemRight" valign="bottom"><b>PyPO.Checks.PO_modeli
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>shape</em>&#160;</td>
+          <td class="paramname"><em>shape</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>cust_name</em> = <code>False</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -773,6 +794,63 @@ list&#160;</td><td class="memItemRight" valign="bottom"><b>PyPO.Checks.PO_modeli
 
 </div>
 </div>
+<a id="a59e3cbf4c8e1b4ec4cdbc60b2a061a24" name="a59e3cbf4c8e1b4ec4cdbc60b2a061a24"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59e3cbf4c8e1b4ec4cdbc60b2a061a24">&#9670;&#160;</a></span>check_hybridDict()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def PyPO.Checks.check_hybridDict </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>hybridDict</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>elements</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>frames</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>fields</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>clog</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Check a hybrid propagation input dictionary. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">hybridDict</td><td>A hybridDict. </td></tr>
+    <tr><td class="paramname">elements</td><td>List containing names of surfaces in System. </td></tr>
+    <tr><td class="paramname">frames</td><td>List containing names of frames in System. </td></tr>
+    <tr><td class="paramname">fields</td><td>List containing names of frames in System. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a489859d98a7a986586b0ac5229e64338" name="a489859d98a7a986586b0ac5229e64338"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a489859d98a7a986586b0ac5229e64338">&#9670;&#160;</a></span>check_PSDict()</h2>
 
@@ -936,6 +1014,50 @@ list&#160;</td><td class="memItemRight" valign="bottom"><b>PyPO.Checks.PO_modeli
 
 </div>
 </div>
+<a id="a0cf68c62705381dd6fc39d4ddc823414" name="a0cf68c62705381dd6fc39d4ddc823414"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0cf68c62705381dd6fc39d4ddc823414">&#9670;&#160;</a></span>check_sameBound()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def PyPO.Checks.check_sameBound </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>beams</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>checkDict</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>clog</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Check if beams to be merged are defined on same surface. </p>
+<p>If not, raise MergeBeam Error.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">beams</td><td>Fields/currents to be merged. </td></tr>
+    <tr><td class="paramname">checkDict</td><td>System c=dictionary containing fields/currents. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="ad774037b792002ccbf4549db188e12a3" name="ad774037b792002ccbf4549db188e12a3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad774037b792002ccbf4549db188e12a3">&#9670;&#160;</a></span>check_scalarfieldSystem()</h2>
 
@@ -1069,6 +1191,51 @@ list&#160;</td><td class="memItemRight" valign="bottom"><b>PyPO.Checks.PO_modeli
   <table class="params">
     <tr><td class="paramname">fieldName</td><td>Name of field in dictionary that is not filled. </td></tr>
     <tr><td class="paramname">elemName</td><td>Name of dictionary where error occured.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>errStr The errorstring. </dd></dl>
+
+</div>
+</div>
+<a id="a432d8fb77cf7c1e5de6ff68ef65eca0c" name="a432d8fb77cf7c1e5de6ff68ef65eca0c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a432d8fb77cf7c1e5de6ff68ef65eca0c">&#9670;&#160;</a></span>errMsg_mergebeam()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def PyPO.Checks.errMsg_mergebeam </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>beamName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>surf0</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>surfd</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Error message when beams are to be merged but are not on the same surface. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">beamName</td><td>Name of field/current that is not on surface. </td></tr>
+    <tr><td class="paramname">surf0</td><td>Zeroth surface, taken as the merging surface. </td></tr>
+    <tr><td class="paramname">surfd</td><td>Surface on which current beam is defined.</td></tr>
   </table>
   </dd>
 </dl>

@@ -108,6 +108,9 @@ Variables</h2></td></tr>
 <tr class="memitem:a0edac691aeddf4a56b236758cc8d7b7e"><td class="memItemLeft" align="right" valign="top">dict&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Templates_8py.html#a0edac691aeddf4a56b236758cc8d7b7e">PyPO.Templates.runRTDict</a></td></tr>
 <tr class="memdesc:a0edac691aeddf4a56b236758cc8d7b7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Template for a ray-trace propagation dictionary.  <br /></td></tr>
 <tr class="separator:a0edac691aeddf4a56b236758cc8d7b7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af71ae22b35bbb255db8d65437e9dd3d0"><td class="memItemLeft" align="right" valign="top">dict&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Templates_8py.html#af71ae22b35bbb255db8d65437e9dd3d0">PyPO.Templates.hybridDict</a></td></tr>
+<tr class="memdesc:af71ae22b35bbb255db8d65437e9dd3d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Template for a hybrid RT/PO propagation.  <br /></td></tr>
+<tr class="separator:af71ae22b35bbb255db8d65437e9dd3d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Templates for commonly used PyPO dictionaries. </p>
@@ -186,6 +189,32 @@ Variables</h2></td></tr>
 </div><!-- fragment -->
 <p>Template for a <a class="el" href="structGRTDict.html">GRTDict</a>, containing parameters for constructing a Gaussian ray-trace frame. </p>
 <p>The Gaussian beam is constructed by rejection sampling of a Gaussian position and direction distribution. The divergence angles are calculated from n, lam, and x0/y0. The focus of the beam is always initialised at z = 0. After generation, the frame can be freely translated and rotated. </p>
+
+</div>
+</div>
+<a id="af71ae22b35bbb255db8d65437e9dd3d0" name="af71ae22b35bbb255db8d65437e9dd3d0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af71ae22b35bbb255db8d65437e9dd3d0">&#9670;&#160;</a></span>hybridDict</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">dict PyPO.Templates.hybridDict</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line"><span class="lineno">    1</span>=  {</div>
+<div class="line"><span class="lineno">    2</span>        <span class="stringliteral">&quot;fr_in&quot;</span>     : <span class="stringliteral">&quot;Name of input frame&quot;</span>,</div>
+<div class="line"><span class="lineno">    3</span>        <span class="stringliteral">&quot;field_in&quot;</span>  : <span class="stringliteral">&quot;Source reflected fields&quot;</span>,</div>
+<div class="line"><span class="lineno">    4</span>        <span class="stringliteral">&quot;t_name&quot;</span>    : <span class="stringliteral">&quot;Name of target surface&quot;</span>,</div>
+<div class="line"><span class="lineno">    5</span>        <span class="stringliteral">&quot;fr_out&quot;</span>    : <span class="stringliteral">&quot;Name of output frame&quot;</span>,</div>
+<div class="line"><span class="lineno">    6</span>        <span class="stringliteral">&quot;field_out&quot;</span> : <span class="stringliteral">&quot;Name of output field&quot;</span>,</div>
+<div class="line"><span class="lineno">    7</span>        <span class="stringliteral">&quot;start&quot;</span>     : <span class="stringliteral">&quot;Starting point of rays, for spherical attenuation&quot;</span>,</div>
+<div class="line"><span class="lineno">    8</span>        <span class="stringliteral">&quot;interp&quot;</span>    : <span class="stringliteral">&quot;Whether to interpolate resulting field on surface&quot;</span>,</div>
+<div class="line"><span class="lineno">    9</span>        <span class="stringliteral">&quot;comp&quot;</span>      : <span class="stringliteral">&quot;If interp is True, which component to interpolate&quot;</span></div>
+<div class="line"><span class="lineno">   10</span>        }</div>
+</div><!-- fragment -->
+<p>Template for a hybrid RT/PO propagation. </p>
 
 </div>
 </div>

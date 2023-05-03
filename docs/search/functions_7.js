@@ -21,6 +21,6 @@ var searchData=
   ['gpropagatebeam_5f3_18',['GpropagateBeam_3',['../Kernelsf_8cu.html#a02659619500ae56f94e67aab87875ddf',1,'Kernelsf.cu']]],
   ['gpropagatebeam_5f4_19',['GpropagateBeam_4',['../Kernelsf_8cu.html#a17d7044786124f00cc30b2be01a9d91f',1,'Kernelsf.cu']]],
   ['gpropagatebeam_5f5_20',['GpropagateBeam_5',['../Kernelsf_8cu.html#ac63efbfa4cb6c7f63ed98f0137184ed3',1,'Kernelsf.cu']]],
-  ['gpuassert_21',['gpuAssert',['../Kernelsf_8cu.html#a14ddf96670fa402eda1299ee5a8557cd',1,'gpuAssert(cudaError_t code, const char *file, int line, bool abort=true):&#160;Kernelsf.cu'],['../KernelsRTf_8cu.html#a14ddf96670fa402eda1299ee5a8557cd',1,'gpuAssert(cudaError_t code, const char *file, int line, bool abort=true):&#160;KernelsRTf.cu']]],
+  ['gpuassert_21',['gpuAssert',['../MemUtils_8h.html#ab3e90881a2476fd461eb2bcfcaa7cf63',1,'MemUtils.h']]],
   ['groupelements_22',['groupElements',['../classPyPO_1_1System_1_1System.html#a7f67ad168a475e769364cd0dd8fb5c5a',1,'PyPO::System::System']]]
 ];

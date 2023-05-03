@@ -6,6 +6,8 @@
 #include "GUtils.h"
 #include "Structs.h"
 #include "InterfaceReflector.h"
+#include "MemUtils.h"
+#include "Debug.h"
 
 #define CSIZE 10
 #define CSIZERT 5

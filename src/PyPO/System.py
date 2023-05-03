@@ -946,14 +946,14 @@ class System(object):
     #
     # @param name_beam Name of the beam (without the 'r' or 'i' prefixes or '.txt' suffix).
     # @param name_source Name of source surface on which to define the beam. 
-    # @param comp Polarisation of beam.
-    # @param convert_to_current Whether or not to also calculate PO currents associated with the beam.
+    # @param comp Polarisation component of beam.
+    # @param lam Wavelength of beam, in mm.
     # @param normalise Whether or not to normalise beam to its maximum amplitude.
     # @para mode Which approximation to use. Can choose between Perfect Electrical Conductor ('PEC'), Perfect Magnetic Conductor ('PMC') or full calculation ('full'). Defaults to 'PMC'.
     # @param scale Scale factor for beam. Defaults to 1.
     #
     # @see setCustomBeamPath
-    def readCustomBeam(self, name_beam, name_source, comp, convert_to_current=True, normalise=True, mode="PMC", scale=1):
+    def readCustomBeam(self, name_beam, name_source, comp, lam, normalise=True, mode="PMC", scale=1):
         check_elemSystem(name_source, self.system, self.clog, extern=True)
         
         rfield = np.loadtxt(os.path.join(self.customBeamPath, "r" + name_beam + ".txt"))
@@ -966,12 +966,15 @@ class System(object):
             field /= maxf
             field *= scale
 
+        k = 2 * np.pi / lam
  
         shape = self.system[name_source]["gridsize"]
 
         fields_c = self._compToFields(comp, field)
+        fields_c.setMeta(name_source, k)
         self.fields[name_beam] = fields_c#.H()
         currents_c = calcCurrents(fields_c, self.system[name_source], mode)
+        currents_c.setMeta(name_source, k)
 
         self.currents[name_beam] = currents_c
 

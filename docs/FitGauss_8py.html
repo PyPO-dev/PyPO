@@ -87,9 +87,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a9104adc8fbdcc2620bb978710d3b5c2e"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="FitGauss_8py.html#a9104adc8fbdcc2620bb978710d3b5c2e">PyPO.FitGauss.calcEstimates</a> (x, y, area, field_norm)</td></tr>
 <tr class="memdesc:a9104adc8fbdcc2620bb978710d3b5c2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate estimates for beam parameters from an input field component.  <br /></td></tr>
 <tr class="separator:a9104adc8fbdcc2620bb978710d3b5c2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab78e0457fa4ffd66309d88bebab5e4fb"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="FitGauss_8py.html#ab78e0457fa4ffd66309d88bebab5e4fb">PyPO.FitGauss.fitGaussAbs</a> (field, surfaceObject, thres, mode)</td></tr>
-<tr class="memdesc:ab78e0457fa4ffd66309d88bebab5e4fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fit a Gaussian to an amplitude pattern of a field component.  <br /></td></tr>
-<tr class="separator:ab78e0457fa4ffd66309d88bebab5e4fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aac22ffeb325de0d11a18708d526e7d81"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="FitGauss_8py.html#aac22ffeb325de0d11a18708d526e7d81">PyPO.FitGauss.fitGaussAbs</a> (field, surfaceObject, thres, mode, ratio=1)</td></tr>
+<tr class="memdesc:aac22ffeb325de0d11a18708d526e7d81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fit a Gaussian to an amplitude pattern of a field component.  <br /></td></tr>
+<tr class="separator:aac22ffeb325de0d11a18708d526e7d81"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a747fa766ecc3242b4f32e586df1267de"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="FitGauss_8py.html#a747fa766ecc3242b4f32e586df1267de">PyPO.FitGauss.GaussAbs</a> (p0, *args)</td></tr>
 <tr class="memdesc:a747fa766ecc3242b4f32e586df1267de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a Gaussian pattern from Gaussian parameters.  <br /></td></tr>
 <tr class="separator:a747fa766ecc3242b4f32e586df1267de"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -161,8 +161,8 @@ theta Position angle of estimate. </dd></dl>
 
 </div>
 </div>
-<a id="ab78e0457fa4ffd66309d88bebab5e4fb" name="ab78e0457fa4ffd66309d88bebab5e4fb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab78e0457fa4ffd66309d88bebab5e4fb">&#9670;&#160;</a></span>fitGaussAbs()</h2>
+<a id="aac22ffeb325de0d11a18708d526e7d81" name="aac22ffeb325de0d11a18708d526e7d81"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aac22ffeb325de0d11a18708d526e7d81">&#9670;&#160;</a></span>fitGaussAbs()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -189,7 +189,13 @@ theta Position angle of estimate. </dd></dl>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>mode</em>&#160;</td>
+          <td class="paramname"><em>mode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>ratio</em> = <code>1</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -205,7 +211,8 @@ theta Position angle of estimate. </dd></dl>
     <tr><td class="paramname">field</td><td>Component of field to fit. </td></tr>
     <tr><td class="paramname">surfaceObject</td><td>Surface on which the field is defined. </td></tr>
     <tr><td class="paramname">thres</td><td>Threshold for fitting in decibels. </td></tr>
-    <tr><td class="paramname">mode</td><td>Whether to fit the Gaussian in linear, decibel or logarithmic space.</td></tr>
+    <tr><td class="paramname">mode</td><td>Whether to fit the Gaussian in linear, decibel or logarithmic space. </td></tr>
+    <tr><td class="paramname">ratio</td><td>Allowed maximal ratio of fit to actual beam.</td></tr>
   </table>
   </dd>
 </dl>

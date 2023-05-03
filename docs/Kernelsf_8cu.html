@@ -74,7 +74,6 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#define-members">Macros</a> &#124;
 <a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">Kernelsf.cu File Reference</div></div>
@@ -85,24 +84,10 @@ $(function() {
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="InterfaceCUDA_8h_source.html">InterfaceCUDA.h</a>&quot;</code><br />
 </div><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:a3f6ea8e9ef58125936d50d7e1181aa7a"><td class="memItemLeft" align="right" valign="top"><a id="a3f6ea8e9ef58125936d50d7e1181aa7a" name="a3f6ea8e9ef58125936d50d7e1181aa7a"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>gpuErrchk</b>(ans)&#160;&#160;&#160;{ <a class="el" href="Kernelsf_8cu.html#a14ddf96670fa402eda1299ee5a8557cd">gpuAssert</a>((ans), __FILE__, __LINE__); }</td></tr>
-<tr class="separator:a3f6ea8e9ef58125936d50d7e1181aa7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a14ddf96670fa402eda1299ee5a8557cd"><td class="memItemLeft" align="right" valign="top">__host__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a14ddf96670fa402eda1299ee5a8557cd">gpuAssert</a> (cudaError_t code, const char *file, int line, bool abort=true)</td></tr>
-<tr class="separator:a14ddf96670fa402eda1299ee5a8557cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a146353674497932b6434be2591778540"><td class="memItemLeft" align="right" valign="top">__host__ __device__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a146353674497932b6434be2591778540">_debugArray</a> (cuFloatComplex arr[3])</td></tr>
-<tr class="separator:a146353674497932b6434be2591778540"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a56648675fedf659b1009262b556ca444"><td class="memItemLeft" align="right" valign="top">__host__ __device__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a56648675fedf659b1009262b556ca444">_debugArray</a> (float arr[3])</td></tr>
-<tr class="separator:a56648675fedf659b1009262b556ca444"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d622c64cff344e6e8f9bd8013d8c7af"><td class="memItemLeft" align="right" valign="top">__device__ __inline__ cuFloatComplex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a2d622c64cff344e6e8f9bd8013d8c7af">expCo</a> (cuFloatComplex z)</td></tr>
-<tr class="separator:a2d622c64cff344e6e8f9bd8013d8c7af"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1017001a73590b48a00c0183812154a1"><td class="memItemLeft" align="right" valign="top">__host__ std::array&lt; dim3, 2 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a1017001a73590b48a00c0183812154a1">_initCUDA</a> (float k, float epsilon, int gt, int gs, float t_direction, int nBlocks, int nThreads)</td></tr>
-<tr class="separator:a1017001a73590b48a00c0183812154a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a570d4df3c5990feaab80053b0c1a8a6e"><td class="memItemLeft" align="right" valign="top">__host__ std::array&lt; dim3, 2 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a570d4df3c5990feaab80053b0c1a8a6e">initCUDA</a> (float k, float epsilon, int gt, int gs, float t_direction, int nBlocks, int nThreads)</td></tr>
+<tr class="separator:a570d4df3c5990feaab80053b0c1a8a6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab22e5a6574f3f494b1c4310706c24ebc"><td class="memItemLeft" align="right" valign="top">__device__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#ab22e5a6574f3f494b1c4310706c24ebc">fieldAtPoint</a> (float *d_xs, float *d_ys, float *d_zs, float *d_nxs, float *d_nys, float *d_nzs, cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz, cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz, float(&amp;point)[3], float *d_A, cuFloatComplex(&amp;d_ei)[3], cuFloatComplex(&amp;d_hi)[3])</td></tr>
 <tr class="separator:ab22e5a6574f3f494b1c4310706c24ebc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a817a0f3da2b844d700e54b5e5efe97c2"><td class="memItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a817a0f3da2b844d700e54b5e5efe97c2">GpropagateBeam_0</a> (float *d_xs, float *d_ys, float *d_zs, float *d_A, float *d_xt, float *d_yt, float *d_zt, float *d_nxs, float *d_nys, float *d_nzs, float *d_nxt, float *d_nyt, float *d_nzt, cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz, cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz, cuFloatComplex *d_Jxt, cuFloatComplex *d_Jyt, cuFloatComplex *d_Jzt, cuFloatComplex *d_Mxt, cuFloatComplex *d_Myt, cuFloatComplex *d_Mzt)</td></tr>
@@ -443,131 +428,6 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
   </table>
   </dd>
 </dl>
-
-</div>
-</div>
-<a id="a146353674497932b6434be2591778540" name="a146353674497932b6434be2591778540"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a146353674497932b6434be2591778540">&#9670;&#160;</a></span>_debugArray() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">__host__ __device__ void _debugArray </td>
-          <td>(</td>
-          <td class="paramtype">cuFloatComplex&#160;</td>
-          <td class="paramname"><em>arr</em>[3]</td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Debug complex array.</p>
-<p>Print complex array of size 3. Useful for debugging.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">arr</td><td>Array of 3 cuFloatComplex. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a56648675fedf659b1009262b556ca444" name="a56648675fedf659b1009262b556ca444"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a56648675fedf659b1009262b556ca444">&#9670;&#160;</a></span>_debugArray() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">__host__ __device__ void _debugArray </td>
-          <td>(</td>
-          <td class="paramtype">float&#160;</td>
-          <td class="paramname"><em>arr</em>[3]</td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Debug real array.</p>
-<p>Print real valued array of size 3. Useful for debugging.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">arr</td><td>Array of 3 float. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a1017001a73590b48a00c0183812154a1" name="a1017001a73590b48a00c0183812154a1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1017001a73590b48a00c0183812154a1">&#9670;&#160;</a></span>_initCUDA()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">__host__ std::array&lt; dim3, 2 &gt; _initCUDA </td>
-          <td>(</td>
-          <td class="paramtype">float&#160;</td>
-          <td class="paramname"><em>k</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">float&#160;</td>
-          <td class="paramname"><em>epsilon</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>gt</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>gs</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">float&#160;</td>
-          <td class="paramname"><em>t_direction</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>nBlocks</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>nThreads</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Initialize CUDA.</p>
-<p>Instantiate program and populate constant memory.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">k</td><td>Wavenumber of incoming field in 1 / mm. </td></tr>
-    <tr><td class="paramname">epsilon</td><td>Relative electric permittivity of source. </td></tr>
-    <tr><td class="paramname">gt</td><td>Number of cells on target. </td></tr>
-    <tr><td class="paramname">gs</td><td>Number of cells on source. </td></tr>
-    <tr><td class="paramname">t_direction</td><td>Time direction (experimental!). </td></tr>
-    <tr><td class="paramname">nBlocks</td><td>Number of blocks per grid. </td></tr>
-    <tr><td class="paramname">nThreads</td><td>Number of threads per block.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>BT Array of two dim3 objects, containing number of blocks per grid and number of threads per block. </dd></dl>
 
 </div>
 </div>
@@ -1202,27 +1062,6 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
 <a class="el" href="structreflparamsf.html">reflparamsf</a> </dd>
 <dd>
 <a class="el" href="structreflcontainerf.html">reflcontainerf</a> </dd></dl>
-
-</div>
-</div>
-<a id="a2d622c64cff344e6e8f9bd8013d8c7af" name="a2d622c64cff344e6e8f9bd8013d8c7af"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2d622c64cff344e6e8f9bd8013d8c7af">&#9670;&#160;</a></span>expCo()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">__device__ __inline__ cuFloatComplex expCo </td>
-          <td>(</td>
-          <td class="paramtype">cuFloatComplex&#160;</td>
-          <td class="paramname"><em>z</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Take complex exponential.</p>
-<p>Take complex exponential by decomposing into sine and cosine.</p>
-<dl class="section return"><dt>Returns</dt><dd>res cuFloatComplex number. </dd></dl>
 
 </div>
 </div>
@@ -2535,38 +2374,53 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
 
 </div>
 </div>
-<a id="a14ddf96670fa402eda1299ee5a8557cd" name="a14ddf96670fa402eda1299ee5a8557cd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a14ddf96670fa402eda1299ee5a8557cd">&#9670;&#160;</a></span>gpuAssert()</h2>
+<a id="a570d4df3c5990feaab80053b0c1a8a6e" name="a570d4df3c5990feaab80053b0c1a8a6e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a570d4df3c5990feaab80053b0c1a8a6e">&#9670;&#160;</a></span>initCUDA()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">__host__ void gpuAssert </td>
+          <td class="memname">__host__ std::array&lt; dim3, 2 &gt; initCUDA </td>
           <td>(</td>
-          <td class="paramtype">cudaError_t&#160;</td>
-          <td class="paramname"><em>code</em>, </td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>k</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>file</em>, </td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>epsilon</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>line</em>, </td>
+          <td class="paramname"><em>gt</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>abort</em> = <code>true</code>&#160;</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>gs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>t_direction</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nBlocks</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nThreads</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -2574,23 +2428,22 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
-<p>Check CUDA call.</p>
-<p>Wrapper for finding errors in CUDA API calls.</p>
+<p>Initialize CUDA.</p>
+<p>Instantiate program and populate constant memory.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">code</td><td>The errorcode returned from failed API call. </td></tr>
-    <tr><td class="paramname">file</td><td>The file in which failure occured. </td></tr>
-    <tr><td class="paramname">line</td><td>The line in file in which error occured. </td></tr>
-    <tr><td class="paramname">abort</td><td>Exit code upon error. </td></tr>
+    <tr><td class="paramname">k</td><td>Wavenumber of incoming field in 1 / mm. </td></tr>
+    <tr><td class="paramname">epsilon</td><td>Relative electric permittivity of source. </td></tr>
+    <tr><td class="paramname">gt</td><td>Number of cells on target. </td></tr>
+    <tr><td class="paramname">gs</td><td>Number of cells on source. </td></tr>
+    <tr><td class="paramname">t_direction</td><td>Time direction (experimental!). </td></tr>
+    <tr><td class="paramname">nBlocks</td><td>Number of blocks per grid. </td></tr>
+    <tr><td class="paramname">nThreads</td><td>Number of threads per block.</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>BT Array of two dim3 objects, containing number of blocks per grid and number of threads per block. </dd></dl>
 
 </div>
 </div>

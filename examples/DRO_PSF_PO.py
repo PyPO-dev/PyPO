@@ -59,7 +59,7 @@ def ex_DRO_PO(device):
 
     s.plotSystem()
 
-    s.generatePointSource(PSDict, "plane1") 
+    s.createPointSource(PSDict, "plane1") 
 
     translation = np.array([0, 0, 12e3])# + np.array([210, 210, -210])
     #rotation_plane = np.array([180, 0, 0])
@@ -72,12 +72,14 @@ def ex_DRO_PO(device):
             "t_name"    : "p1",
             "s_current" : "ps1",
             "name_JM"   : "JM",
+            "name_EH"   : "EH",
             "epsilon"   : 10,
             "device"    : device,
-            "mode"      : "JM"
+            "mode"      : "JMEH"
             }
 
     s.runPO(plane1_to_p1)
+    s.plotBeam2D("EH", "Ex")
 
     p1_to_planeff = {
             "t_name"    : "planeff",

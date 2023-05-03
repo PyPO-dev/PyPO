@@ -3,6 +3,10 @@
 #ifndef __Debug_h
 #define __Debug_h
 
+/*! \file Debug.h
+    \brief Methods for printing complex or real arrays of length 3 for GPU.
+*/
+
 __host__ __device__ inline void _debugArray(cuFloatComplex arr[3]);
 __host__ __device__ inline void _debugArray(float arr[3]);
 

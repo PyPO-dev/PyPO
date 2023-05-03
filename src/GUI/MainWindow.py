@@ -6,9 +6,9 @@ from threading import Thread, Event
 from traceback import print_tb
 from multiprocessing import Process, Manager
 
-from PyQt5.QtWidgets import QApplication, QLabel, QTextEdit, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar, QScrollArea
-from PyQt5.QtGui import QFont, QIcon, QTextCursor
-from PyQt5.QtCore import Qt, QThreadPool, QThread
+from PySide2.QtWidgets import QApplication, QLabel, QTextEdit, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar, QScrollArea
+from PySide2.QtGui import QFont, QIcon, QTextCursor
+from PySide2.QtCore import Qt, QThreadPool, QThread
 
 from src.GUI.ParameterForms import formGenerator
 from src.GUI.ParameterForms.InputDescription import InputDescription

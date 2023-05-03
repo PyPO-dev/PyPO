@@ -43,7 +43,7 @@ Input beam patterns can be selected from a range of models, such as Gaussian bea
 Custom beam patterns can also be imported to, for example, model the propagation of a measured beam pattern through a simulated optical system.
 
 `PyPO` can be used through either a scripting-based approach, where simulations are defined in Python scripts, or through the graphical user interface (GUI).
-It carries core dependencies on NumPy [@Harris:2020], Matplotlib [@Hunter:2007], SciPy [@Virtanen:2020]. The unittesting framework carries a dependency on nose2. The GUI carries dependencies on PyQt5 and attrs. 
+It carries core dependencies on NumPy [@Harris:2020], Matplotlib [@Hunter:2007], SciPy [@Virtanen:2020]. The unittesting framework carries a dependency on nose2. The GUI carries dependencies on PySide2 and attrs. 
 
 # Statement of need
 Development of `PyPO` started with the need for alignment strategies for the wideband sub-mm spectrometer DESHIMA 2.0 [@Taniguchi:2022]. 

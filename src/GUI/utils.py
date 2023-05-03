@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton
-from PyQt5.QtCore import Qt, QRegExp
-from PyQt5.QtGui import QRegExpValidator
+from PySide2.QtWidgets import QLabel, QLineEdit, QPushButton
+from PySide2.QtCore import Qt, QRegExp
+from PySide2.QtGui import QRegExpValidator
 from enum import Enum, auto
 
 # class validation(Enum):

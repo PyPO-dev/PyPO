@@ -1,6 +1,6 @@
 # from __future__ import print_function
 import sys
-from PyQt5.QtWidgets import QApplication
+from PySide2.QtWidgets import QApplication
 from src.GUI.MainWindow import PyPOMainWindow
 
 app = QApplication(sys.argv)

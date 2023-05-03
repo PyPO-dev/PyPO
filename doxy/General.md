@@ -14,7 +14,7 @@ To install the prerequisites for PyPO, navigate to the main folder and run:
 ```
 ./Build.py -p
 ```
-To install the optional packages, such as nose2 for the unittests, or PyQt5 for the GUI, run
+To install the optional packages, such as nose2 for the unittests, or PySide2 for the GUI, run
 ```
 ./Build.py -po
 ```

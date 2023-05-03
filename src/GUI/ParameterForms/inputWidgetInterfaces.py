@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QWidget
-# from PyQt5.QtCore import pyqtSignal
+from PySide2.QtWidgets import QWidget
+# from PySide2.QtCore import Signal
 from abc import ABC, abstractclassmethod
 
 from src.GUI.ParameterForms.InputDescription import InputDescription, inType

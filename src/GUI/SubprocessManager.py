@@ -1,6 +1,6 @@
 from multiprocessing import Process, Manager
-from PyQt5.QtCore import QThread, pyqtSignal, QObject
-from PyQt5.QtWidgets import QWidget, QMainWindow, QApplication, QVBoxLayout, QPushButton, QLabel
+from PySide2.QtCore import QThread, Signal, QObject
+from PySide2.QtWidgets import QWidget, QMainWindow, QApplication, QVBoxLayout, QPushButton, QLabel
 from src.GUI.Dialogs import SymDialog
 from time import sleep
 from copy import deepcopy
@@ -50,7 +50,7 @@ class SubprocessManager():
 
 
 class Waiter(QObject):
-    finished = pyqtSignal(int)
+    finished = Signal(int)
 
     def setProcess(self, process):
         self.process = process

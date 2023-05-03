@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QHBoxLayout, QCheckBox, QFormLayout, QGridLayout, QWidget, QButtonGroup, QRadioButton, QComboBox, QListWidget, QSizePolicy
-from PyQt5.QtCore import pyqtSignal
+from PySide2.QtWidgets import QHBoxLayout, QCheckBox, QFormLayout, QGridLayout, QWidget, QButtonGroup, QRadioButton, QComboBox, QListWidget, QSizePolicy
+from PySide2.QtCore import Signal
 from src.GUI.utils import MyLabel, MyEdit, makeLabelFromString, inType, getValidator
 from src.GUI.ParameterForms.InputDescription import InputDescription
 from src.GUI.ParameterForms.inputWidgetInterfaces import inputWidgetInterface, selectionWidgetInterface
@@ -177,7 +177,7 @@ class VectorInput(inputWidgetInterface):
 # Implements a radio button selection widget, used for 'one of many' type of options 
 class SimpleRadio(selectionWidgetInterface):
 
-    selectionChangedSignal = pyqtSignal(int)
+    selectionChangedSignal = Signal(int)
 
     def __init__ (self, inputDescription:InputDescription):
         super().__init__()
@@ -237,7 +237,7 @@ class SimpleRadio(selectionWidgetInterface):
 # @param dynamic Sets "--Select item--" first option. This is used by @see DynamicDropdownWidget to provide a blank form by default
 class SimpleDropdown(selectionWidgetInterface):
     
-    selectionChangedSignal = pyqtSignal(int)
+    selectionChangedSignal = Signal(int)
 
     def __init__ (self, inputDescription:InputDescription, dynamic = False):
         super().__init__()

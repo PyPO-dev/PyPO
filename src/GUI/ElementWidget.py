@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout
-from PyQt5.QtCore import Qt
+from PySide2.QtWidgets import QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout
+from PySide2.QtCore import Qt
                                         
 from src.GUI.Dialogs import selfClosingDialog
 from src.GUI.utils import MyButton

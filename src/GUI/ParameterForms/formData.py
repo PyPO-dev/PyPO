@@ -314,7 +314,8 @@ def plotField(fieldName):
                 "Pattern" : [
                     InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
                     InputDescription(inType.dropdown, "comp", label="Component", options = complist),
-                    InputDescription(inType.xyzRadio, "project", label="Abscissa - ordinate")],
+                    InputDescription(inType.xyzRadio, "project", label="Abscissa - ordinate"),
+                    InputDescription(inType.checkbox, "phase", label="Exclude phase", prefill=False)],
                 "Cross-sections" : [
                     InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
                     InputDescription(inType.dropdown, "comp", label="Component", options = complist),

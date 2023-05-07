@@ -837,6 +837,11 @@ def check_runRTDict(runRTDict, elements, frames, clog):
     errStr = check_frameSystem(runRTDict["fr_in"], frames, clog, errStr)
     errStr = check_elemSystem(runRTDict["t_name"], elements, clog, errStr)
 
+    num = getIndex(runRTDict["fr_out"], frames)
+
+    if num > 0:
+        runRTDict["fr_out"] = runRTDict["fr_out"] + "_{}".format(num)
+
     if "tol" not in runRTDict:
         runRTDict["tol"] = 1e-3
 

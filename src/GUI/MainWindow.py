@@ -780,10 +780,11 @@ class MainWidget(QWidget):
     def initGaussianFrameAction(self):
         try:
             GRTDict = self.ParameterWid.read()
-
+            
+            chk.check_GRTDict(GRTDict, self.stm.frames, self.clog)
+            
             if not "seed" in GRTDict.keys():
                 GRTDict["seed"] = -1
-
       
             dialStr = f"Calculating Gaussian ray-trace frame {GRTDict['name']}..."
 
@@ -823,6 +824,7 @@ class MainWidget(QWidget):
     def addPropRaysAction(self): 
         try:
             propRaysDict = self.ParameterWid.read()
+            chk.check_runRTDict(propRaysDict, self.stm, self.stm.frames, self.clog)
         
             self.stm.runRayTracer(propRaysDict)
             self.addFrameWidget(propRaysDict["fr_out"])
@@ -972,7 +974,7 @@ class MainWidget(QWidget):
             plotFieldDict = self.ParameterWid.read()
             if plotFieldDict["plot_type"] == "Pattern":
                 fig, _ = self.stm.plotBeam2D(plotFieldDict["field"], plotFieldDict["comp"], 
-                                            project=plotFieldDict["project"], ret=True)
+                                            project=plotFieldDict["project"], amp_only=plotFieldDict["phase"], ret=True)
                 self.addPlot(fig, f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
 
             else:

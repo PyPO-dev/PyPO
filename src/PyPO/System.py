@@ -93,7 +93,6 @@ class System(object):
 
         else:
             self.clog = redirect
-        #print(self.clog)
 
         if not verbose:
             self.clog.setLevel(logging.CRITICAL)
@@ -440,8 +439,6 @@ class System(object):
                 self.system[name]["transf"] = Rtot @ self.system[name]["transf"]
                 self.system[name]["transf"][:-1, :-1] = (MatRotate(rotation, pivot=pivot))[:-1, :-1]
 
-                #print(np.linalg.det(self.system[name]["transf"]))
-
                 self.system[name]["pos"] = (Rtot @ np.append(self.system[name]["pos"], 1))[:-1]
                 self.system[name]["ori"] = Rtot[:-1, :-1] @ self.system[name]["ori"]
 
@@ -452,7 +449,6 @@ class System(object):
 
             elif mode == "relative":
                 self.system[name]["transf"] = MatRotate(rotation, self.system[name]["transf"], pivot)
-                #print(np.linalg.det(self.system[name]["transf"]))
                 
                 self.system[name]["pos"] = (MatRotate(rotation, pivot=pivot) @ np.append(self.system[name]["pos"], 1))[:-1]
                 self.system[name]["ori"] = MatRotate(rotation)[:-1, :-1] @ self.system[name]["ori"]
@@ -529,8 +525,6 @@ class System(object):
                 _fr = transformRays(self.frames[name])
                 self.frames[name] = self.copyObj(_fr)
 
-                #print(np.linalg.det(self.frames[name].transf))
-
                 self.frames[name].pos = (Rtot @ np.append(self.frames[name].pos, 1))[:-1]
                 self.frames[name].ori = Rtot[:-1, :-1] @ self.frames[name].ori
                 self.clog.info(f"Rotated element {name} to {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
@@ -539,7 +533,6 @@ class System(object):
                 self.frames[name].transf = MatRotate(rotation, pivot=pivot)
                 _fr = transformRays(self.frames[name])
                 self.frames[name] = self.copyObj(_fr)
-                #print(np.linalg.det(self.frames[name].transf))
                 
                 self.frames[name].pos = (MatRotate(rotation, pivot=pivot) @ np.append(self.frames[name].pos, 1))[:-1]
                 self.frames[name].ori = MatRotate(rotation)[:-1, :-1] @ self.frames[name].ori
@@ -873,9 +866,7 @@ class System(object):
     def removeElement(self, *name):
         for n in name:
             check_elemSystem(n, self.system, self.clog, extern=True)
-            print(self.groups)
             for group in self.groups.values():
-                print(type(group))
                 if n in group["members"]:
                     group["members"].remove(n)
             del self.system[n]
@@ -897,8 +888,6 @@ class System(object):
     def copyGroup(self, name, name_copy):
         check_groupSystem(name, self.groups, self.clog, extern=True)
         self.groups[name_copy] = self.copyObj(self.groups[name])
-        print(id(self.groups[name_copy]))
-        print(id(self.groups[name]))
         self.clog.info(f"Copied group {name} to {name_copy}.")
     
     ##
@@ -1345,9 +1334,6 @@ class System(object):
         field_prop = fields(*_comps)
         field_prop.setMeta(hybridDict["t_name"], field.k)
 
-        #fieldObj_prop = (expo * fieldObj.ravel()).reshape(fieldObj.shape)
-        #fieldObj_full = self._compToFields(comp, fieldObj_prop)
-        #fieldObj_full.setMeta(hybridDict["t_name"], field.k)
         self.fields[hybridDict["field_out"]] = field_prop
 
         if hybridDict["interp"]:
@@ -1806,6 +1792,28 @@ class System(object):
         sfield.setMeta(name_surface, k)
 
         self.scalarfields[PSDict["name"]] = sfield
+    
+    ##
+    # Generate scalar uniform PO fields and currents.
+    #
+    # @param UDict A UDict dictionary, containing parameters for the uniform pattern.
+    # @param name_surface Name of surface on which to define the uniform pattern.
+    #
+    # @see UDict
+    def createUniformSourceScalar(self, UDict, name_surface):
+        check_elemSystem(name_surface, self.system, self.clog, extern=True)
+        check_PSDict(UDict, self.fields, self.clog)
+
+        surfaceObj = self.system[name_surface]
+        us = np.ones(surfaceObj["gridsize"], dtype=complex) * UDict["E0"] * np.exp(1j * UDict["phase"])
+
+        sfield = scalarfield(us)
+
+        k =  2 * np.pi / UDict["lam"]
+
+        sfield.setMeta(name_surface, k)
+
+        self.scalarfields[UDict["name"]] = sfield
    
     ##
     # Interpolate a PO beam. Only for beams defined on planar surfaces.
@@ -2056,7 +2064,6 @@ class System(object):
     #
     # @param name_group Name of group to be plotted.
     def plotGroup(self, name_group, show=True, ret=False):
-        print(self.groups[name_group]["members"])
         select = [x for x in self.groups[name_group]["members"]]
 
         if ret:
@@ -2118,12 +2125,6 @@ class System(object):
         R_transf[:-1, :-1] = R
         
         return R_transf
-
-    def findRTcoll(self, name_frame):
-        std = np.mean(effs.calcRTtiltSTD(self.frames[name_frame]))
-        factor = np.log10(1 - std**2)
-
-        self.clog.info(f"Ray-trace beam collimation factor : {factor}.")
 
     ##
     # Find the focus of a ray-trace frame.

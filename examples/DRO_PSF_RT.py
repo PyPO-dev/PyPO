@@ -36,7 +36,7 @@ def ex_DRO_RT(device):
 
     s = System()
     s.addParabola(parabola)
-
+    s.clog.kontseks("geil man")
     s.plotSystem()
 
     s.createTubeFrame(RTpar)

@@ -29,29 +29,29 @@ Plane = [
     # InputDescription(inType.radio, "radio buttons", options= ["a", "b", "c"], hints= ["A", "B", "C"]),
     # InputDescription(inType.dropdown, "dropdown", options= ["a", "b", "c"]),
     # InputDescription(inType.xyzradio, "Axes selector"),
-    # InputDescription(inType.elementSelector, "outname", options= ["parabola1", "frame1", "other object", "frame1", "other object", "frame1", "other object", "frame1", "other object"],toolTip="Select elements to apply transformations on."),
-    InputDescription(inType.dynamicRadio, "ddout", toolTip="tt: dropdown", subDict={
-        "a" : [
-            InputDescription(inType.vectorStrings, "s1", hints=["Enter name"], toolTip="tt: 0"),
-            InputDescription(inType.vectorIntegers, "i1", hints=[2], toolTip="tt: 1"),
-        ],
-        "b" : [
-            InputDescription(inType.static, label = "static no output", staticValue="code Filled Value", toolTip="tt: 2"),
-            InputDescription(inType.vectorStrings, "s2", hints=["Enter name"], toolTip="tt: 3"),
-            InputDescription(inType.vectorFloats, "f2", label="f2", numFields=3, oArray=True, toolTip="tt: 3"),
-            InputDescription(inType.dynamicRadio, "ddIn", toolTip="tt: radio", subDict={
-                "a" : [
-                    InputDescription(inType.vectorStrings, "s3", hints=["Enter name"], toolTip="tt: 5"),
-                    InputDescription(inType.vectorIntegers, "i3", hints=[2], toolTip="tt: 6")
-                ],
-                "b" : [
-                    InputDescription(inType.static, label = "static no output2", staticValue="code Filled Value", toolTip="tt: 7"),
-                    InputDescription(inType.vectorStrings, "s4", hints=["Enter name"], toolTip="tt: 8"),
-                    InputDescription(inType.vectorFloats, "f4", hints=[1,2,3], numFields=3, toolTip="tt: 9", oArray=True)
-                ]
-            })
-        ],
-    })
+    InputDescription(inType.elementSelector, "outname", options= ["parabola1", "frame1", "other object", "frame1", "other object", "frame1", "other object", "frame1", "other object"],toolTip="Select elements to apply transformations on."),
+    # InputDescription(inType.dynamicRadio, "ddout", toolTip="tt: dropdown", subDict={
+    #     "a" : [
+    #         InputDescription(inType.vectorStrings, "s1", hints=["Enter name"], toolTip="tt: 0"),
+    #         InputDescription(inType.vectorIntegers, "i1", hints=[2], toolTip="tt: 1"),
+    #     ],
+    #     "b" : [
+    #         InputDescription(inType.static, label = "static no output", staticValue="code Filled Value", toolTip="tt: 2"),
+    #         InputDescription(inType.vectorStrings, "s2", hints=["Enter name"], toolTip="tt: 3"),
+    #         InputDescription(inType.vectorFloats, "f2", label="f2", numFields=3, oArray=True, toolTip="tt: 3"),
+    #         InputDescription(inType.dynamicRadio, "ddIn", toolTip="tt: radio", subDict={
+    #             "a" : [
+    #                 InputDescription(inType.vectorStrings, "s3", hints=["Enter name"], toolTip="tt: 5"),
+    #                 InputDescription(inType.vectorIntegers, "i3", hints=[2], toolTip="tt: 6")
+    #             ],
+    #             "b" : [
+    #                 InputDescription(inType.static, label = "static no output2", staticValue="code Filled Value", toolTip="tt: 7"),
+    #                 InputDescription(inType.vectorStrings, "s4", hints=["Enter name"], toolTip="tt: 8"),
+    #                 InputDescription(inType.vectorFloats, "f4", hints=[1,2,3], numFields=3, toolTip="tt: 9", oArray=True)
+    #             ]
+    #         })
+    #     ],
+    # })
 ]
 
 

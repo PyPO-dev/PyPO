@@ -953,7 +953,7 @@ class MainWidget(QWidget):
             plotFieldDict = self.ParameterWid.read()
             if plotFieldDict["plot_type"] == "Pattern":
                 fig, _ = self.stm.plotBeam2D(plotFieldDict["field"], plotFieldDict["comp"], 
-                                            project=plotFieldDict["project"], ret=True)
+                                            project=plotFieldDict["project"], amp_only=plotFieldDict["phase"], ret=True)
                 self.addPlot(fig, f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
 
             else:

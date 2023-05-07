@@ -20,24 +20,9 @@ class Test_FitGauss(unittest.TestCase):
         for i in range(100):
             w0x, w0y, rot, tx, ty = self._makeRandomGauss()
             popt, perr = self.s.fitGaussAbs("Gauss", "Ex", thres=-11, mode="linear", full_output=True, ratio=None)
-            
-            #self.s.plotBeam2D("Gauss", "Ex", contour="fitGauss_Gauss", vmin=-30, levels=[-30, -11, -3])
-            #self.s.plotBeam2D("fitGauss_Gauss", vmin=-30)
-
-            #x0, y0, xs, ys, theta, np.max(fit_field)
-
-            #print(self.s.scalarfields["fitGauss_Gauss"].S)
-            #print(self.s.fields["Gauss"].Ex)
-            #print(np.max(np.absolute(self.s.scalarfields["fitGauss_Gauss"].S)))
-            #print(np.max(np.absolute(self.s.fields["Gauss"].Ex)))
 
             total_field = np.sqrt(np.absolute(self.s.fields["Gauss"].Ey)**2 + np.absolute(self.s.fields["Gauss"].Ex)**2)
 
-            #strip_cg = total_field[:,50]
-            #strip_fg = np.absolute(self.s.scalarfields["fitGauss_Gauss"].S[:,50])
-            #pt.plot(strip_cg)
-            #pt.plot(strip_fg)
-            #pt.show()
             for fg, cg in zip(np.absolute(self.s.scalarfields["fitGauss_Gauss"].S).ravel(), total_field.ravel()): 
                 self.assertAlmostEqual(fg, cg, delta=1e-3)
 

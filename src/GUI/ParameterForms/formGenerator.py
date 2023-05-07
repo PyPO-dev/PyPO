@@ -315,7 +315,7 @@ class DynamicRadioWidget(inputWidgetInterface):
             raise Exception(f"Failed to read input: {self.inputDescription.label}")
 
         if self.hasChildren:
-            for input in self.currentChild.findChildren(inputWidgetInterface, options=Qt.FindChildOption.FindDirectChildrenOnly):
+            for input in self.currentChild.findChildren(inputWidgetInterface):
                 if input.parent().parent() == self.stackedWidget:
                     paramDict.update(input.read())
         return paramDict

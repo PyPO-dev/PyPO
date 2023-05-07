@@ -29,7 +29,7 @@ Plane = [
     # InputDescription(inType.radio, "radio buttons", options= ["a", "b", "c"], hints= ["A", "B", "C"]),
     # InputDescription(inType.dropdown, "dropdown", options= ["a", "b", "c"]),
     # InputDescription(inType.xyzradio, "Axes selector"),
-    InputDescription(inType.elementSelector, "outname", options= ["parabola1", "frame1", "other object", "frame1", "other object", "frame1", "other object", "frame1", "other object"],toolTip="Select elements to apply transformations on."),
+    # InputDescription(inType.elementSelector, "outname", options= ["parabola1", "frame1", "other object", "frame1", "other object", "frame1", "other object", "frame1", "other object"],toolTip="Select elements to apply transformations on."),
     # InputDescription(inType.dynamicRadio, "ddout", toolTip="tt: dropdown", subDict={
     #     "a" : [
     #         InputDescription(inType.vectorStrings, "s1", hints=["Enter name"], toolTip="tt: 0"),
@@ -52,6 +52,10 @@ Plane = [
     #         })
     #     ],
     # })
+    InputDescription(inType.dynamicRadio, "frames", subDict = {
+            "All" : [],
+            "Select":[InputDescription(inType.elementSelector, "selection", options = ['frame1', 'frame2', 'frame3'])]
+        }),
 ]
 
 

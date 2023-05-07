@@ -38,7 +38,7 @@ Plane = [
         "b" : [
             InputDescription(inType.static, label = "static no output", staticValue="code Filled Value", toolTip="tt: 2"),
             InputDescription(inType.vectorStrings, "s2", hints=["Enter name"], toolTip="tt: 3"),
-            InputDescription(inType.vectorFloats, "f2", label="f2", hints=[1,2,3], numFields=3, oArray=True, toolTip="tt: 3"),
+            InputDescription(inType.vectorFloats, "f2", label="f2", numFields=3, oArray=True, toolTip="tt: 3"),
             InputDescription(inType.dynamicRadio, "ddIn", toolTip="tt: radio", subDict={
                 "a" : [
                     InputDescription(inType.vectorStrings, "s3", hints=["Enter name"], toolTip="tt: 5"),

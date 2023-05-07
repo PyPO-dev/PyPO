@@ -454,7 +454,32 @@ class MainWidget(QWidget):
             print_tb(err.__traceback__)
             self.clog.error(err) 
 
+    def printGroup(self, name_group):
+        try:
+            infoString = "Group information"
+            if len(self.stm.groups[name_group]['members']) == 0:
+                infoString += f"Group {name_group} is empty\n"
+            else:
+                infoString += f"Group {name_group} contains the following elements:\n"
+                for n in self.stm.groups[name_group]['members']:
+                    infoString += f"{n}\n"
 
+            infoString += f"Group {name_group} has the following position:\n"
+            infoString += f"{self.stm.groups[name_group]['pos']}\n"
+            
+            infoString += f"Group {name_group} has the following orientation:\n"
+            infoString += f"{self.stm.groups[name_group]['ori']}\n"
+            
+            infoString += f"Group {name_group} has the following snapshots:\n"
+            infoString += f"{self.stm.groups[name_group]['snapshots']}\n"
+
+            self.clog.info(infoString)
+            
+            
+        except Exception as err:
+            print(err)
+            print_tb(err.__traceback__)
+            self.clog.error(err)
 
 
 
@@ -489,7 +514,7 @@ class MainWidget(QWidget):
                                          self.snapActionForm, self.copyElementActionForm)
     
     def addGroupWidget(self, name):
-        self.WorkSpace.addGroup(name, self.stm.removeGroup, self.plotGroup, self.transformGroupForm, self.snapGroupActionForm, self.copyGroupActionForm)
+        self.WorkSpace.addGroup(name, self.stm.removeGroup, self.plotGroup, self.transformGroupForm, self.snapGroupActionForm, self.copyGroupActionForm, self.printGroup)
     
     def addFrameWidget(self, name):
         self.WorkSpace.addRayTraceFrames(name, self.removeFrame, 

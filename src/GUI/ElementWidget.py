@@ -17,7 +17,7 @@ from src.GUI.Dialogs import RemoveElementDialog
 # could be given by a subclass. The parent should have a function for each of the possible action.  
 class ElementWidget(QWidget):
     def __init__ (self, name, plotAction, removeAction, transformAction = None, RMSAction = None, 
-                    snapAction = None, copyAction = None, removeFromTree = None, p=None):
+                    snapAction = None, copyAction = None, removeFromTree = None, infoAction = None, p=None):
 
         super().__init__(parent=p)
         self.plotAction = plotAction
@@ -42,6 +42,10 @@ class ElementWidget(QWidget):
         if copyAction:
             self.copyAction = copyAction
             self.actions["Copy"] = self.copy
+
+        if infoAction:
+            self.infoAction = infoAction
+            self.actions["Info"] = self.info
         
 
         self.name = name
@@ -112,6 +116,9 @@ class ElementWidget(QWidget):
         self._closeOptionsMenu()        
         self.copyAction(self.name)
 
+    def info(self):
+        self.infoAction(self.name)
+
 
 class ReflectorWidget(ElementWidget):
     def __init__(self, name, removeAction, transformAction, plotAction, snapAction, copyAction, removeFromTree=None, p=None): ##TODO: rename removeFromTree to remove?
@@ -119,8 +126,8 @@ class ReflectorWidget(ElementWidget):
                 removeFromTree=removeFromTree, snapAction=snapAction, copyAction=copyAction, p=p)
 
 class GroupWidget(ElementWidget):
-    def __init__ (self, name, removeAction, plotAction, transformAction, snapAction, copyAction):
-        super().__init__(name, plotAction, removeAction, transformAction=transformAction, snapAction=snapAction, copyAction=copyAction)
+    def __init__ (self, name, removeAction, plotAction, transformAction, snapAction, copyAction, infoAction):
+        super().__init__(name, plotAction, removeAction, transformAction=transformAction, snapAction=snapAction, copyAction=copyAction, infoAction=infoAction)
 
 class FrameWidget(ElementWidget):
     def __init__ (self, name, removeAction, transformAction, plotAction, RMSAction, snapAction, p=None ):

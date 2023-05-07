@@ -59,6 +59,6 @@ class Workspace(QTabWidget):
         self.POAccordion.POCurrents.addWidget(CurrentWidget(name, removeAction, plotAction))
         self.setCurrentIndex(3)
 
-    def addGroup(self, name, transformAction, snapAction, plotAction, removeAction, copyAction):
-        self.groupLayout.addWidget(GroupWidget(name, transformAction, snapAction, plotAction, removeAction, copyAction))
+    def addGroup(self, name, transformAction, snapAction, plotAction, removeAction, copyAction, infoAction):
+        self.groupLayout.addWidget(GroupWidget(name, transformAction, snapAction, plotAction, removeAction, copyAction, infoAction))
         self.setCurrentIndex(1)

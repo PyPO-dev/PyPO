@@ -1,4 +1,4 @@
-from PySide2.QtWidgets import QHBoxLayout, QCheckBox, QFormLayout, QGridLayout, QWidget, QButtonGroup, QRadioButton, QComboBox, QListWidget, QSizePolicy
+from PySide2.QtWidgets import QHBoxLayout, QCheckBox, QFormLayout, QGridLayout, QWidget, QButtonGroup, QRadioButton, QComboBox, QListWidget, QSizePolicy, QLabel
 from PySide2.QtCore import Signal
 from src.GUI.utils import MyLabel, MyEdit, makeLabelFromString, inType, getValidator
 from src.GUI.ParameterForms.InputDescription import InputDescription
@@ -395,38 +395,41 @@ class ElementSelectionWidget(QWidget):
         self.selectedElements = []
 
         ### make dropdown
-        self.dropdown = QComboBox()
-        self.dropdown.addItems(["--select element--"]+elements)
-        self.dropdown.currentIndexChanged.connect(self.addElement)
-        label = MyLabel("addElement")
-        if self.inputDescription.toolTip:
-            label.setToolTip(self.inputDescription.toolTip)
-            self.dropdown.setToolTip(self.inputDescription.toolTip)
-        self.layout.addRow(label, self.dropdown)
+        # self.dropdown = QComboBox()
+        # self.dropdown.addItems(["--select element--"]+elements)
+        # self.dropdown.currentIndexChanged.connect(self.addElement)
+        # label = MyLabel("addElement")
+        # if self.inputDescription.toolTip:
+        #     label.setToolTip(self.inputDescription.toolTip)
+        #     self.dropdown.setToolTip(self.inputDescription.toolTip)
+        # self.layout.addRow(label, self.dropdown)
 
         ### make list
         self.selectedList = QListWidget()
         self.selectedList.itemClicked.connect(self.removeItem)
 
-        self.layout.addRow(self.selectedList)
+        self.deselectedList = QListWidget()
+        self.deselectedList.itemClicked.connect(self.addItem)
+        for e in elements:
+            self.deselectedList.addItem(e)
 
-        self.setFixedHeight(150)
+        self.layout.addRow(QLabel('Not selected'), QLabel('Selected'))
+        self.layout.addRow(self.deselectedList, self.selectedList)
 
+        self.selectedList.setFixedWidth(180)
+        self.deselectedList.setFixedWidth(180)
+        self.selectedList.setToolTip("Click item to remove")
+        self.deselectedList.setToolTip("Click item to add")
+        self.setFixedHeight(200)
 
-    def addElement(self):
-        index = self.dropdown.currentIndex()
-        if index != 0:
-            element = self.dropdown.currentText()
-            self.dropdown.setCurrentIndex(0)
-            self.dropdown.removeItem(index)
-            self.selectedList.addItem(element)
-            self.selectedElements.append(element)
-            self.selectedList.setToolTip("Click item to remove")
+    def addItem(self, x):
+        i = self.deselectedList.takeItem(self.deselectedList.indexFromItem(x).row())
+        self.selectedList.addItem(i.text())
+        self.selectedElements.append(i.text())
 
     def removeItem(self, x):
-        print(f"removing item {x = } of type {type(x)}")
         i = self.selectedList.takeItem(self.selectedList.indexFromItem(x).row())
-        self.dropdown.addItem(i.text())
+        self.deselectedList.addItem(i.text())
         self.selectedElements.remove(i.text())
 
     def clear(self):

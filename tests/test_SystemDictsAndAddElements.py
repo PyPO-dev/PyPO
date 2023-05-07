@@ -176,6 +176,13 @@ class Test_SystemDictsAndAddElement(unittest.TestCase):
             "phase"         : 0,
             "pol"           : np.array([0,0,1]),
             }
+        validPO_USBeamTuple = {
+            "name"          : 'USBeam',
+            "lam"           : 1,
+            "E0"            : 1,
+            "phase"         : 0,
+            "pol"           : np.array([0,0,1]),
+            }
         validPO_GaussBeamTuple = {
             "name"          : 'GaussBeam',
             "lam"           : 1,
@@ -190,6 +197,7 @@ class Test_SystemDictsAndAddElement(unittest.TestCase):
         fieldsLen = 0
         for func, validElem in [
             (self.s.createPointSource, validPO_PSBeamTuple), 
+            (self.s.createUniformSource, validPO_USBeamTuple), 
             (self.s.createGaussian, validPO_GaussBeamTuple)
             ]:
             with self.assertRaises(InputPOError):
@@ -216,6 +224,13 @@ class Test_SystemDictsAndAddElement(unittest.TestCase):
             "phase"         : 0,
             "pol"           : np.array([0,0,1]),
             }
+        validPO_ScalarUSBeamTuple = {
+            "name"          : 'SUSBeam',
+            "lam"           : 1,
+            "E0"            : 1,
+            "phase"         : 0,
+            "pol"           : np.array([0,0,1]),
+            }
         validPO_ScalarGaussBeamTuple = {
             "name"          : 'SGaussBeam',
             "lam"           : 1,
@@ -230,6 +245,7 @@ class Test_SystemDictsAndAddElement(unittest.TestCase):
         fieldsLen = 0
         for func, validElem in [
             (self.s.createPointSourceScalar, validPO_ScalarPSBeamTuple),
+            (self.s.createUniformSourceScalar, validPO_ScalarUSBeamTuple),
             (self.s.createScalarGaussian, validPO_ScalarGaussBeamTuple)
             ]: ##TODO: uncomment once segmentation fault is resolved
             ##Fails

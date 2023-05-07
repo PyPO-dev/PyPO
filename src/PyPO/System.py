@@ -1806,7 +1806,7 @@ class System(object):
     # @see UDict
     def createUniformSourceScalar(self, UDict, name_surface):
         check_elemSystem(name_surface, self.system, self.clog, extern=True)
-        check_PSDict(UDict, self.fields, self.clog)
+        check_PSDict(UDict, self.scalarfields, self.clog)
 
         surfaceObj = self.system[name_surface]
         us = np.ones(surfaceObj["gridsize"], dtype=complex) * UDict["E0"] * np.exp(1j * UDict["phase"])

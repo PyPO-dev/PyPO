@@ -51,7 +51,7 @@ class CustomFormatter(logging.Formatter):
         logging.WORK: blue + format + reset,
         logging.RESULT: purple + format + reset,
         logging.WARNING: yellow + format + reset,
-        logging.ERROR: red + format + reset,
+        logging.ERROR: bold_red + format + reset,
         logging.CRITICAL: bold_red + format + reset
     }
 

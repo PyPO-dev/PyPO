@@ -37,7 +37,7 @@ def BuildPyPO():
     if args.prereqs:
         clog.info("Installing PyPO prerequisites...")
         path_to_reqs = os.path.join("out", "requirements", "requirements.txt")
-        path_to_reqs_opt = os.path.join("out", "requirements", "requirements_opt.txt")
+        path_to_reqs_opt = os.path.join("out", "requirements", "requirements_gui.txt")
         if platform.system() == "Linux":
             os.system("sudo apt install cm-super dvipng gcc build-essential cmake")
             

@@ -759,10 +759,11 @@ class MainWidget(QWidget):
     def initGaussianFrameAction(self):
         try:
             GRTDict = self.ParameterWid.read()
-
+            
+            chk.check_GRTDict(GRTDict, self.stm.frames, self.clog)
+            
             if not "seed" in GRTDict.keys():
                 GRTDict["seed"] = -1
-
       
             dialStr = f"Calculating Gaussian ray-trace frame {GRTDict['name']}..."
 

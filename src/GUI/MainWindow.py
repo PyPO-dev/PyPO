@@ -7,7 +7,7 @@ from traceback import print_tb
 from multiprocessing import Process, Manager
 
 from PySide2.QtWidgets import QApplication, QLabel, QTextEdit, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar, QScrollArea
-from PySide2.QtGui import QFont, QIcon, QTextCursor
+from PySide2.QtGui import QFont, QIcon, QTextCursor, QPixmap
 from PySide2.QtCore import Qt, QThreadPool, QThread
 
 from src.GUI.ParameterForms import formGenerator
@@ -124,8 +124,19 @@ class MainWidget(QWidget):
         if hasattr(self, "WorkSpace"):
             self.WorkSpace.setParent(None)
         # rebuild 
+        logo = QLabel()
+        pixmap = QPixmap('src/GUI/resources/logo.png')
+        pixmap = pixmap.scaledToWidth(250)
+        logo.setPixmap(pixmap)
+        logo.resize(300, 150)
         self.WorkSpace = Workspace()
-        self.addToWindowGrid(self.WorkSpace, self.GPWorkSpace, hStretch=1)
+        leftPane =  QWidget()
+        leftPane.setFixedWidth(300)
+        leftPane.setContentsMargins(0,0,0,0)
+        leftPandLayout = QVBoxLayout(leftPane)
+        leftPandLayout.addWidget(logo)
+        leftPandLayout.addWidget(self.WorkSpace)
+        self.addToWindowGrid(leftPane, self.GPWorkSpace, hStretch=1)
 
     ##
     # @guiSetup

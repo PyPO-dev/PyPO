@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout
-from PyQt5.QtCore import Qt
+from PySide2.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout
+from PySide2.QtCore import Qt
 
 ##
 # @file An implementation of an accordion component

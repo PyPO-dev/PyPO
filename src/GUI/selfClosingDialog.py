@@ -1,3 +1,3 @@
-from PyQt5.QtWidgets import QDialog
-from PyQt5.QtCore import QEvent
+from PySide2.QtWidgets import QDialog
+from PySide2.QtCore import QEvent
 

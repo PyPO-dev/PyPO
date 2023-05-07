@@ -440,6 +440,7 @@ def propPOFFInp(currentDict, elemDict):
             if item["gmode"] == 2:
                 sublist_target.append(key)
     
+    sublist_exp = ["forward", "backward"]
     sublist_dev = ["CPU", "GPU"]
 
 
@@ -448,6 +449,7 @@ def propPOFFInp(currentDict, elemDict):
             InputDescription(inType.dropdown, "t_name", label="Target surface", options = sublist_target),
             InputDescription(inType.static, "mode", label="Propagation mode", staticValue="FF"),
             InputDescription(inType.vectorStrings, "name_EH", label="Output fields"),
+            InputDescription(inType.radio, "exp", label="Time direction", options = sublist_exp),
             InputDescription(inType.vectorFloats, "epsilon", label="Relative permittivity", hints=[1], numFields=1),
             InputDescription(inType.vectorIntegers, "nThreads", label="Number of threads", hints=[1], numFields=1),
             InputDescription(inType.dropdown, "device", label="Hardware to use", options = sublist_dev)

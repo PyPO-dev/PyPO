@@ -154,6 +154,9 @@ log
 
 !*/tutorials/*.png
 !tutorials/Gui/README_Resources/*.png
+!tutorials/Gui/README_Resources/ResourcesT2/*.png
+!tutorials/Gui/README_Resources/ResourcesT3/*.png
+!src/GUI/resources/*.png
 !docs/*.png
 
 # Personal projects/files
@@ -181,3 +184,4 @@ Imports.py
 fromDesigner.py
 src/GUI/fromDesigner.ui
 src/GUI/Tests
+.GUIWidgetTester.py

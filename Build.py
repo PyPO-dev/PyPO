@@ -52,7 +52,7 @@ def BuildPyPO():
                 os.system("brew install qt5 qtbase5-dev qt5-qmake qtbase5-dev-tools")
             
         #elif platform.system() == "Windows":
-        #    os.system("py -m pip install numpy matplotlib scipy setuptools nose PyQt5 tqdm inquirer attrs")
+        #    os.system("py -m pip install numpy matplotlib scipy setuptools nose PySide2 tqdm inquirer attrs")
             
         if args.optional:
             os.system(f"pip install -U -r {path_to_reqs_opt}")

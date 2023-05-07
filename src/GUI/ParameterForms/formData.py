@@ -343,6 +343,7 @@ def plotFarField(fieldName):
                     InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
                     InputDescription(inType.dropdown, "comp", label="Component", options = complist),
                     InputDescription(inType.static, "project", staticValue="xy", hidden=True)],
+                    InputDescription(inType.checkbox, "phase", label="Exclude phase", prefill=False)],
                 "Cross-sections" : [
                     InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
                     InputDescription(inType.dropdown, "comp", label="Component", options = complist),

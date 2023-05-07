@@ -140,7 +140,6 @@ def fitGaussAbs(field, surfaceObject, thres, mode, ratio=1):
 
     else:
         while _ratio >= ratio:
-            print(num)
             if mode == "dB":
                 fit_field = 20 * np.log10(_field)
                 mask_f = fit_field >= thres 

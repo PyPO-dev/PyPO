@@ -150,10 +150,17 @@ class VectorInput(inputWidgetInterface):
             if self.inputDescription.outputName is None:
                 return {}
             l =[] 
-            for i in self.inputs:
-                if i.text() == "":
+            for i in range(len(self.inputs)):
+                val = self.inputs[i].text()
+                ### Uncomment this block to default hints. Not compatible with prefilled values
+                # if val == "":
+                #     try:
+                #         val = str(self.inputDescription.hints[i])
+                #     except IndexError:
+                #         pass
+                if val == "":
                     raise EmptyFieldException(f"Empty field at {self.inputDescription.label}")
-                l.append(self.enumToType(self.inputDescription.inType)(i.text().replace(",",".")))###TODO: incomplete Conversion @Maikel
+                l.append(self.enumToType(self.inputDescription.inType)(val.replace(",",".")))
             if len(l)>1:        
                 if self.inputDescription.oArray:
                     l = array(l)
@@ -163,7 +170,8 @@ class VectorInput(inputWidgetInterface):
             return l
         except EmptyFieldException as e:
             raise e
-        except:
+        except Exception as e:
+            print(e, type(e))
             raise Exception(f"Failed to read input: {self.inputDescription.label}")
 
     @staticmethod

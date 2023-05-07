@@ -60,4 +60,14 @@ We can create a far-field element by adding a plane and setting its grid-mode pa
 |<img src="README_Resources/ResourcesT3/planeFF.png" alt="" width="300px"/>|<img src="README_Resources/ResourcesT3/propFF.png" alt="" width="300"/>|
 |Creating a far-field object| Propagating to far-field|
 
-Now we can plot the 
+If we now plot the generated *EH_FF* field it looks like this:   
+<img src="README_Resources/ResourcesT3/noisyField.png" alt="" width="600"/> 
+
+Note that this image is noisy. You would expect something like this:
+
+<img src="README_Resources/ResourcesT3/ffAmpOnly.png" alt="" width="300"/> 
+
+This is due to th low resolution in the reflectors. 
+
+## Challenge
+Note that for doing PO propagation the software has to do the calculations for every pixel in the source for every pixel in the target. The complexity of these operations is Big-oh(n^4). The challenge is to find the right resolutions so the image is reasonably accurate while the runtime is doable. See Tutorial3.ipynb for the resolutions we used to generate the last image. 

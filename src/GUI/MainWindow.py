@@ -335,22 +335,43 @@ class MainWidget(QWidget):
         self.rayPlotNr+=1
         return self.rayPlotNr
 
+    def plotSystemWithRaytraceForm(self):
+        frames = self.stm.frames.keys()
+        self.setForm(fData.plotRayTraceForm(frames), readAction=self.plotSystemWithRaytrace, okText="Plot")
+        if len(frames) == 0:
+            self.clog.warning("No ray trace frames defined.")    
+        self.clog.warning("Plot raytrace allows you to plot lines between any two frames in the system. It is up to the user to make sure frames are entered in chronological order.")
+
+
+
     ##
     # plots all elements of the system including ray traces in one plot
     def plotSystemWithRaytrace(self):
-        frameList = []
+        try:
+            plotDict = self.ParameterWid.read()
+            print(plotDict)
 
-        if self.stm.frames:
-            for key in self.stm.frames.keys():
-                frameList.append(key)
-        
-        if self.stm.system:
-            figure, _ = self.stm.plotSystem(ret = True, show=False, save=False, RTframes=frameList)
-        
-        else:
-            figure = None
-        self.addPlot(figure,"Ray Trace Frame %d" %(self.getRayPlotNr()))
+            if plotDict['frames']=='All':
+                frameList = []
+                if self.stm.frames:
+                    for key in self.stm.frames.keys():
+                        frameList.append(key)
 
+            else:
+                frameList = plotDict['selection']
+
+            
+            if self.stm.system:
+                figure, _ = self.stm.plotSystem(ret = True, show=False, save=False, RTframes=frameList)
+            
+            else:
+                figure = None
+            self.addPlot(figure,"Ray Trace Frame %d" %(self.getRayPlotNr()))
+
+        except Exception as err:
+            print(type(err))
+            print_tb(err.__traceback__)
+            self.clog.error(err)
     ### Functionalities: Systems 
 
 
@@ -471,7 +492,7 @@ class MainWidget(QWidget):
             infoString += f"{self.stm.groups[name_group]['ori']}\n"
             
             infoString += f"Group {name_group} has the following snapshots:\n"
-            infoString += f"{self.stm.groups[name_group]['snapshots']}\n"
+            infoString += f"{self.stm.groups[name_group]['snapshots']}"
 
             self.clog.info(infoString)
             
@@ -1449,8 +1470,8 @@ class PyPOMainWindow(QMainWindow):
         SystemsMenu.addAction(plotSystem)
 
         plotRaytrace = QAction("Plot ray-trace", self)
-        plotSystem.setStatusTip("Plot all elements in the current system, including ray-traces.")
-        plotRaytrace.triggered.connect(self.mainWid.plotSystemWithRaytrace)
+        plotSystem.setStatusTip("Plot selected elements in the current system, including ray-traces.")
+        plotRaytrace.triggered.connect(self.mainWid.plotSystemWithRaytraceForm)
         SystemsMenu.addAction(plotRaytrace)
         
         saveSystem = QAction("Save system", self)

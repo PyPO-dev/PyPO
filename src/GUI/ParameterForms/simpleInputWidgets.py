@@ -383,7 +383,7 @@ class XYZRadio(inputWidgetInterface):
 # User can select an option from a dropdown and it will appear in a listView. By clicking on an option in the listView it will disappear and return to the dropdown
 # 
 # @param inputDescription.option List of options 
-class ElementSelectionWidget(QWidget):
+class ElementSelectionWidget(inputWidgetInterface):
     def __init__ (self, inputDescription: InputDescription):
         super().__init__()
         self.inputDescription = inputDescription

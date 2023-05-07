@@ -166,6 +166,16 @@ def plotFrameOpt(frameName):
 
     return plotFrame
 
+def plotRayTraceForm(frames):
+    return [
+        InputDescription(inType.dynamicRadio, "frames", subDict = {
+            "All" : [],
+            "Select":[InputDescription(inType.elementSelector, "selection", options = frames)]
+        }),
+        
+    ]
+
+
 ##
 # Options for propagating a frame of rays to a target element.
 #

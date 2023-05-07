@@ -54,11 +54,18 @@ In the *Ray-tracer* menu we select *Propagate rays* and we do the following prop
 |<img  width="400px" src="README_Resources/ResourcesT2/prop1.png" alt="" />|<img  width="400px" src="README_Resources/ResourcesT2/prop2.png" alt="" />|
 |<img  width="400px" src="README_Resources/ResourcesT2/prop3.png" alt="" />|<img  width="400px" src="README_Resources/ResourcesT2/prop4.png" alt="" />| 
 
-Now plotting the rayTrace will show the following plot:
+To plot the rays we select *Plot ray-trace* from the *Systems menu* and select *All*. Note that a warning shows up in the console when opening this form. This will be explained at the end of this tutorial.
 
 <img  width="600" src="README_Resources/ResourcesT2/rePlot.png" alt="" />
 
+## Focus finding
 
-<!-- TODO: focus finder did not generate the same image so I left it out -->
+Next we will use the focus finder to determine where the focus is. From the *Tools* menu we select *Focus finder* and select *fr_plane_t* to find the focus of the rays going out of this frame. This will generate a plane and a frame. To plot the whole image we select *Plot ray-trace* from the *Systems* menu and fill the form as such. 
+
+<img  width="300" src="README_Resources/ResourcesT2/focusFound.png" alt="" />
+
+### Warning
+The warning in the console tells us that the order in which we select the frames matters. It is possible to plot rays in a different order than the propagation order. This could show misleading or confusing plots. 
+
 
 

@@ -61,7 +61,7 @@ We can create a far-field element by adding a plane and setting its grid-mode pa
 |Creating a far-field object| Propagating to far-field|
 
 If we now plot the generated *EH_FF* field it looks like this:   
-<img src="README_Resources/ResourcesT3/noisyField.png" alt="" width="600"/> 
+<img src="README_Resources/ResourcesT3/last.png" alt="" width="600"/> 
 
 Note that this image is noisy. You would expect something like this:
 

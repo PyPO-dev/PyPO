@@ -315,7 +315,7 @@ def plotField(fieldName):
                     InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
                     InputDescription(inType.dropdown, "comp", label="Component", options = complist),
                     InputDescription(inType.xyzRadio, "project", label="Abscissa - ordinate"),
-                    InputDescription(inType.checkbox, "phase", label="Exclude phase", prefill=False)],
+                    InputDescription(inType.checkbox, "phase", label="Include phase", prefill=True)],
                 "Cross-sections" : [
                     InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
                     InputDescription(inType.dropdown, "comp", label="Component", options = complist),
@@ -352,8 +352,8 @@ def plotFarField(fieldName):
                 "Pattern" : [
                     InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
                     InputDescription(inType.dropdown, "comp", label="Component", options = complist),
-                    InputDescription(inType.static, "project", staticValue="xy", hidden=True)],
-                    InputDescription(inType.checkbox, "phase", label="Exclude phase", prefill=False)],
+                    InputDescription(inType.static, "project", staticValue="xy", hidden=True),
+                    InputDescription(inType.checkbox, "phase", label="Include phase", prefill=False)],
                 "Cross-sections" : [
                     InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
                     InputDescription(inType.dropdown, "comp", label="Component", options = complist),
@@ -452,7 +452,6 @@ def propPOFFInp(currentDict, elemDict):
             if item["gmode"] == 2:
                 sublist_target.append(key)
     
-    sublist_exp = ["forward", "backward"]
     sublist_dev = ["CPU", "GPU"]
 
 
@@ -461,7 +460,6 @@ def propPOFFInp(currentDict, elemDict):
             InputDescription(inType.dropdown, "t_name", label="Target surface", options = sublist_target),
             InputDescription(inType.static, "mode", label="Propagation mode", staticValue="FF"),
             InputDescription(inType.vectorStrings, "name_EH", label="Output fields"),
-            InputDescription(inType.radio, "exp", label="Time direction", options = sublist_exp),
             InputDescription(inType.vectorFloats, "epsilon", label="Relative permittivity", hints=[1], numFields=1),
             InputDescription(inType.vectorIntegers, "nThreads", label="Number of threads", hints=[1], numFields=1),
             InputDescription(inType.dropdown, "device", label="Hardware to use", options = sublist_dev)

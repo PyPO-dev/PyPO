@@ -739,6 +739,10 @@ class System(object):
     # @param pos Position tracer for the group.
     # @param ori Orientation tracker for group.
     def groupElements(self, name_group, *names, pos=None, ori=None):
+        num = getIndex(name_group, self.groups.keys())
+
+        if num > 0:
+            name_group = name_group + "_{}".format(num)
         pos = world.ORIGIN() if pos is None else pos
         ori = world.IAX() if ori is None else ori
 

@@ -974,7 +974,7 @@ class MainWidget(QWidget):
             plotFieldDict = self.ParameterWid.read()
             if plotFieldDict["plot_type"] == "Pattern":
                 fig, _ = self.stm.plotBeam2D(plotFieldDict["field"], plotFieldDict["comp"], 
-                                            project=plotFieldDict["project"], amp_only=plotFieldDict["phase"], ret=True)
+                                            project=plotFieldDict["project"], amp_only=not plotFieldDict["phase"], ret=True)
                 self.addPlot(fig, f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
 
             else:
@@ -1116,11 +1116,12 @@ class MainWidget(QWidget):
         try:
             propBeamDict = self.ParameterWid.read()
             # print(propBeamDict)
-            if propBeamDict["exp"] == "forward":
-                propBeamDict["exp"] = "fwd"
-            
-            elif propBeamDict["exp"] == "backward":
-                propBeamDict["exp"] = "bwd"
+            if "exp" in propBeamDict:
+                if propBeamDict["exp"] == "forward":
+                    propBeamDict["exp"] = "fwd"
+                
+                elif propBeamDict["exp"] == "backward":
+                    propBeamDict["exp"] = "bwd"
             
             chk.check_runPODict(propBeamDict, self.stm.system.keys(), self.stm.fields.keys(), self.stm.currents.keys(),
                             self.stm.scalarfields.keys(), self.stm.frames.keys(), self.clog)

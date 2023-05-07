@@ -1000,7 +1000,7 @@ class System(object):
     #
     # @see PODict
     def runPO(self, runPODict):
-        self.clog.info("*** Starting PO propagation ***")
+        self.clog.work("*** Starting PO propagation ***")
        
         check_runPODict(runPODict, self.system.keys(), self.fields.keys(), self.currents.keys(),
                     self.scalarfields.keys(), self.frames.keys(), self.clog)
@@ -1010,14 +1010,14 @@ class System(object):
         if _runPODict["mode"] != "scalar":
             sc_name = _runPODict["s_current"]
             _runPODict["s_current"] = self.currents[_runPODict["s_current"]]
-            self.clog.info(f"Propagating {sc_name} on {_runPODict['s_current'].surf} to {_runPODict['t_name']}, propagation mode: {_runPODict['mode']}.")
+            self.clog.work(f"Propagating {sc_name} on {_runPODict['s_current'].surf} to {_runPODict['t_name']}, propagation mode: {_runPODict['mode']}.")
             source = self.system[_runPODict["s_current"].surf]
             _runPODict["k"] = _runPODict["s_current"].k
 
         else:
             sc_name = _runPODict["s_scalarfield"]
             _runPODict["s_scalarfield"] = self.scalarfields[_runPODict["s_scalarfield"]]
-            self.clog.info(f"Propagating {sc_name} on {_runPODict['s_scalarfield'].surf} to {_runPODict['t_name']}, propagation mode: {_runPODict['mode']}.")
+            self.clog.work(f"Propagating {sc_name} on {_runPODict['s_scalarfield'].surf} to {_runPODict['t_name']}, propagation mode: {_runPODict['mode']}.")
             source = self.system[_runPODict["s_scalarfield"].surf]
             _runPODict["k"] = _runPODict["s_scalarfield"].k
        
@@ -1027,13 +1027,13 @@ class System(object):
         start_time = time.time()
         
         if _runPODict["device"] == "CPU":
-            self.clog.info(f"Hardware: running {_runPODict['nThreads']} CPU threads.")
-            self.clog.info(f"... Calculating ...")
+            self.clog.work(f"Hardware: running {_runPODict['nThreads']} CPU threads.")
+            self.clog.work(f"... Calculating ...")
             out = PyPO_CPUd(source, target, _runPODict)
 
         elif _runPODict["device"] == "GPU":
-            self.clog.info(f"Hardware: running {_runPODict['nThreads']} CUDA threads per block.")
-            self.clog.info(f"... Calculating ...")
+            self.clog.work(f"Hardware: running {_runPODict['nThreads']} CUDA threads per block.")
+            self.clog.work(f"... Calculating ...")
             out = PyPO_GPUf(source, target, _runPODict)
 
         dtime = time.time() - start_time
@@ -1063,7 +1063,7 @@ class System(object):
             out.setMeta(_runPODict["t_name"], _runPODict["k"])
             self.scalarfields[_runPODict["name_field"]] = out
 
-        self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
+        self.clog.work(f"*** Finished: {dtime:.3f} seconds ***")
         return out
 
     ##
@@ -1135,8 +1135,8 @@ class System(object):
     def createGRTFrame(self, argDict):
         check_GRTDict(argDict, self.frames.keys(), self.clog)
         
-        self.clog.info(f"Generating Gaussian ray-trace beam.")
-        self.clog.info(f"... Sampling ...")
+        self.clog.work(f"Generating Gaussian ray-trace beam.")
+        self.clog.work(f"... Sampling ...")
         
         if not argDict["name"]:
             argDict["name"] = f"Frame_{len(self.frames)}"
@@ -1150,7 +1150,7 @@ class System(object):
         self.frames[argDict["name"]].setMeta(self.copyObj(world.ORIGIN()), self.copyObj(world.IAX()), self.copyObj(world.INITM()))
         
         dtime = time.time() - start_time
-        self.clog.info(f"Succesfully sampled {argDict['nRays']} rays: {dtime} seconds.")
+        self.clog.work(f"Succesfully sampled {argDict['nRays']} rays: {dtime} seconds.")
         self.clog.info(f"Added Gaussian frame {argDict['name']} to system.")
 
     ##
@@ -1278,7 +1278,7 @@ class System(object):
     #
     # @param runRTDict A runRTDict object specifying the ray-trace.
     def runRayTracer(self, runRTDict):
-        self.clog.info("*** Starting RT propagation ***")
+        self.clog.work("*** Starting RT propagation ***")
         
         _runRTDict = self.copyObj(runRTDict)
 
@@ -1290,18 +1290,18 @@ class System(object):
         start_time = time.time()
        
         if _runRTDict["device"] == "CPU":
-            self.clog.info(f"Hardware: running {_runRTDict['nThreads']} CPU threads.")
-            self.clog.info(f"... Calculating ...")
+            self.clog.work(f"Hardware: running {_runRTDict['nThreads']} CPU threads.")
+            self.clog.work(f"... Calculating ...")
             frameObj = RT_CPUd(_runRTDict)
 
         elif _runRTDict["device"] == "GPU":
-            self.clog.info(f"Hardware: running {_runRTDict['nThreads']} CUDA threads per block.")
-            self.clog.info(f"... Calculating ...")
+            self.clog.work(f"Hardware: running {_runRTDict['nThreads']} CUDA threads per block.")
+            self.clog.work(f"... Calculating ...")
             frameObj = RT_GPUf(_runRTDict)
         
         dtime = time.time() - start_time
         
-        self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
+        self.clog.work(f"*** Finished: {dtime:.3f} seconds ***")
         self.frames[runRTDict["fr_out"]] = frameObj
         
         self.frames[runRTDict["fr_out"]].setMeta(self.calcRTcenter(runRTDict["fr_out"]), self.calcRTtilt(runRTDict["fr_out"]), self.copyObj(world.INITM()))
@@ -1311,7 +1311,7 @@ class System(object):
     #
     # @param hybridDict A hybridDict dictionary.
     def runHybridPropagation(self, hybridDict):
-        self.clog.info("*** Starting hybrid propagation ***")
+        self.clog.work("*** Starting hybrid propagation ***")
         start_time = time.time()
 
         check_hybridDict(hybridDict, self.system, self.frames, self.fields, self.clog)
@@ -1355,7 +1355,7 @@ class System(object):
         
         dtime = time.time() - start_time
         
-        self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
+        self.clog.work(f"*** Finished: {dtime:.3f} seconds ***")
 
     ##
     # Interpolate a frame and an associated field on a regular surface.
@@ -2143,9 +2143,7 @@ class System(object):
         tilt = self.calcRTtilt(name_frame)
         center = self.calcRTcenter(name_frame)
         match = self.copyObj(world.IAX())
-
         R = self.findRotation(match, tilt)
-
         t_name = f"focal_plane_{name_frame}"
         fr_out = f"focus_{name_frame}"
 
@@ -2170,18 +2168,18 @@ class System(object):
                 "nThreads"  : 1
                 }
 
-        self.clog.info(f"Finding focus of {name_frame}...")
+        self.clog.work(f"Finding focus of {name_frame}...")
         
         verbosity_init = self.verbosity
         self.setLoggingVerbosity(verbose=False)
         
         res = fmin(self._optimiseFocus, f0, args=(runRTDict, tilt), full_output=True, disp=False)
-
-        self.setLoggingVerbosity(verbose=verbosity_init)
-        
+ 
         out = res[0] * tilt + center
         self.translateGrids(t_name, out, mode="absolute")
-        self.clog.info(f"Focus of frame {name_frame}: {*['{:0.3e}'.format(x) for x in out],}, RMS: {res[1]:.3e}")
+        
+        self.setLoggingVerbosity(verbose=verbosity_init)
+        self.clog.result(f"Focus of frame {name_frame}: {*['{:0.3e}'.format(x) for x in out],}, RMS: {res[1]:.3e}")
 
         return out
 
@@ -2351,6 +2349,7 @@ class System(object):
         self.translateGrids(f"focal_plane_{runRTDict['fr_in']}", trans)
         
         self.runRayTracer(runRTDict)
+        #self.plotSystem(RTframes=["start", "pri", f"focus_{runRTDict['fr_in']}"])
         RMS = self.calcSpotRMS(f"focus_{runRTDict['fr_in']}")
         self.translateGrids(f"focal_plane_{runRTDict['fr_in']}", -trans)
         #self.removeFrame() 

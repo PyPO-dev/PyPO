@@ -90,6 +90,7 @@ class GUILogger(logging.Handler):
 
     def emit(self, record):
         self.edit.append(self.format(record))
+        self.edit.ensureCursorVisible()
 
 ##
 # Class for instantiating a GUI logger.

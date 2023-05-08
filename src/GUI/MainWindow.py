@@ -467,7 +467,9 @@ class MainWidget(QWidget):
             groupDict = self.ParameterWid.read()
             self.stm.groupElements(groupDict["name"], *groupDict["selected"])
 
-            self.addGroupWidget(groupDict["name"])
+            self.addGroupWidget(list(self.stm.groups.keys())[-1])
+            # self.refreshWorkspaceSection(self.stm.groups, "groups")
+
 
 
         except Exception as err:
@@ -942,7 +944,7 @@ class MainWidget(QWidget):
     ##
     # Shows form to initialize a scalar uniform source beam
     def initSUSBeamForm(self):
-        self.setForm(fData.initSPSInp(self.stm.system), readAction=self.initSPSBeamAction, okText="Add beam")
+        self.setForm(fData.initSPSInp(self.stm.system), readAction=self.initSUPSBeamAction, okText="Add beam")
 
     ##
     # Reads form and adds a scalar point source beam to system
@@ -951,6 +953,20 @@ class MainWidget(QWidget):
             SPSDict = self.ParameterWid.read()
             
             self.stm.createPointSourceScalar(SPSDict, SPSDict["surface"])
+            self.addSFieldWidget(SPSDict["name"])
+        except Exception as err:
+            print(err)
+            print_tb(err.__traceback__)
+            self.clog.error(err)
+
+  
+    ##
+    # Reads form and adds a scalar point source beam to system
+    def initSUPSBeamAction(self):
+        try:
+            SPSDict = self.ParameterWid.read()
+            
+            self.stm.createUniformSourceScalar(SPSDict, SPSDict["surface"])
             self.addSFieldWidget(SPSDict["name"])
         except Exception as err:
             print(err)

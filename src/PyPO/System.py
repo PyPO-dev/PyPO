@@ -739,6 +739,10 @@ class System(object):
     # @param pos Position tracer for the group.
     # @param ori Orientation tracker for group.
     def groupElements(self, name_group, *names, pos=None, ori=None):
+        num = getIndex(name_group, self.groups.keys())
+
+        if num > 0:
+            name_group = name_group + "_{}".format(num)
         pos = world.ORIGIN() if pos is None else pos
         ori = world.IAX() if ori is None else ori
 
@@ -1802,7 +1806,7 @@ class System(object):
     # @see UDict
     def createUniformSourceScalar(self, UDict, name_surface):
         check_elemSystem(name_surface, self.system, self.clog, extern=True)
-        check_PSDict(UDict, self.fields, self.clog)
+        check_PSDict(UDict, self.scalarfields, self.clog)
 
         surfaceObj = self.system[name_surface]
         us = np.ones(surfaceObj["gridsize"], dtype=complex) * UDict["E0"] * np.exp(1j * UDict["phase"])

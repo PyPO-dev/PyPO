@@ -105,8 +105,14 @@ str&#160;</td><td class="memItemRight" valign="bottom"><b>grey</b> = &quot;\x1b[
 str&#160;</td><td class="memItemRight" valign="bottom"><b>green</b> = &quot;\x1b[32;20m&quot;</td></tr>
 <tr class="separator:abe3646976c55ebf71ee55d45dd422de8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7056be52b2cec78a197fc5a6d6446d60"><td class="memItemLeft" align="right" valign="top"><a id="a7056be52b2cec78a197fc5a6d6446d60" name="a7056be52b2cec78a197fc5a6d6446d60"></a>
-str&#160;</td><td class="memItemRight" valign="bottom"><b>yellow</b> = &quot;\x1b[33;20m&quot;</td></tr>
+str&#160;</td><td class="memItemRight" valign="bottom"><b>yellow</b> = &quot;\x1b[33;1m&quot;</td></tr>
 <tr class="separator:a7056be52b2cec78a197fc5a6d6446d60"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a2281ca650db82f86ed0429914bc5a5"><td class="memItemLeft" align="right" valign="top"><a id="a6a2281ca650db82f86ed0429914bc5a5" name="a6a2281ca650db82f86ed0429914bc5a5"></a>
+str&#160;</td><td class="memItemRight" valign="bottom"><b>blue</b> = &quot;\x1b[34;1m&quot;</td></tr>
+<tr class="separator:a6a2281ca650db82f86ed0429914bc5a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4b4e520d7b6be0e48fc0bd1ad3135378"><td class="memItemLeft" align="right" valign="top"><a id="a4b4e520d7b6be0e48fc0bd1ad3135378" name="a4b4e520d7b6be0e48fc0bd1ad3135378"></a>
+str&#160;</td><td class="memItemRight" valign="bottom"><b>purple</b> = &quot;\x1b[35;1m&quot;</td></tr>
+<tr class="separator:a4b4e520d7b6be0e48fc0bd1ad3135378"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa1268a60876f0a02b5ea766b00f8daae"><td class="memItemLeft" align="right" valign="top"><a id="aa1268a60876f0a02b5ea766b00f8daae" name="aa1268a60876f0a02b5ea766b00f8daae"></a>
 str&#160;</td><td class="memItemRight" valign="bottom"><b>red</b> = &quot;\x1b[31;20m&quot;</td></tr>
 <tr class="separator:aa1268a60876f0a02b5ea766b00f8daae"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -148,8 +154,10 @@ str&#160;</td><td class="memItemRight" valign="bottom"><b>format</b> = &quot;%(a
 <b>Initial value:</b><div class="fragment"><div class="line">=  {</div>
 <div class="line">        logging.DEBUG: grey + format + reset,</div>
 <div class="line">        logging.INFO: green + format + reset,</div>
+<div class="line">        logging.WORK: blue + format + reset,</div>
+<div class="line">        logging.RESULT: purple + format + reset,</div>
 <div class="line">        logging.WARNING: yellow + format + reset,</div>
-<div class="line">        logging.ERROR: red + format + reset,</div>
+<div class="line">        logging.ERROR: bold_red + format + reset,</div>
 <div class="line">        logging.CRITICAL: bold_red + format + reset</div>
 <div class="line">    }</div>
 </div><!-- fragment -->

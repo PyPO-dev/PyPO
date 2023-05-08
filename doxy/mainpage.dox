@@ -9,6 +9,10 @@
  * For most users of PyPO, the Python interface documentation is a nice reference for quick lookup of available functions. 
  * To get more information on inputs for certain interface functions, the template list is a good starting point.
  * For the user who is planning on getting hands-on with PyPO development, the C/C++ and CUDA documentation should get you started.
+ * \subsection guitut Tutorials
+ * Several tutorials have been developed in order to demonstrate the usage and functionality of `PyPO`.
+ * The general tutorials on using `PyPO` through the scripting interface can be found in the tutorials folder in the `PyPO` root directory.
+ * The tutorials on how to use the GUI can be found [here](Tutorial.md).
  * \subsection contrib Contributor Guidelines
  * People wishing to contribute are more than welcome to do so. Contributions can be made by opening a pull request to the main repository from your own fork of `PyPO`,
  * containing your contributions. These will then be reviewed and considered for addition to `PyPO`. Issues and bugs can be reported in the `PyPO` [issue tracker](https://github.com/arend95/PyPO/issues).

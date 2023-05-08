@@ -115,6 +115,24 @@ def BuildPyPO():
             clog.info("Generating PyPO documentation...")
             os.system("doxygen doxy/Doxyfile")
             
+            # Convert md for GUI tutorials to html and copy to /docs
+            guitut_path = os.path.join("tutorials", "Gui")
+            
+            file_md = []
+            for (dirpath, dirnames, filenames) in os.walk(guitut_path):
+                for file in filenames:
+                    if file.split(".")[1] == "md":
+                        file_md.append(file)
+                break
+            for file in file_md:
+                filename = file.split(".")[0]
+                filename_html = filename + ".html"
+
+                os.system(f"pandoc {os.path.join(guitut_path, file)} -t html -o {os.path.join(guitut_path, filename_html)}")
+
+            dest_path = os.path.join("docs", "Gui")
+            shutil.copytree(guitut_path, dest_path, ignore=shutil.ignore_patterns("*.md"))
+
             # Read html to set default detail level of menus
             annotated_path = os.path.join("docs", "annotated.html")
             filelist_path = os.path.join("docs", "files.html")

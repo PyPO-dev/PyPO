@@ -23,5 +23,6 @@ var searchData=
   ['transfrays_20',['transfRays',['../classRayTracer.html#a54308039ddbee81e5c2d2cb0cc7f992f',1,'RayTracer::transfRays()'],['../KernelsRTf_8cu.html#a8e11820281e7691d1ebe20e66176bb53',1,'transfRays():&#160;KernelsRTf.cu']]],
   ['translategrids_21',['translateGrids',['../classPyPO_1_1System_1_1System.html#af59ae2a54a32de1ce547b21a6eb2fb30',1,'PyPO::System::System']]],
   ['tubertdict_22',['TubeRTDict',['../Templates_8py.html#a14d4e4e0e7614d86723a063101b9589c',1,'PyPO::Templates']]],
-  ['type_23',['type',['../structreflparams.html#a8ac54ddf87ce608439170fc70bbddb4d',1,'reflparams::type()'],['../structreflparamsf.html#aee4936b839c62673c1d12a2924579e32',1,'reflparamsf::type()']]]
+  ['tutorial_23',['Tutorial',['../md_doxy_Tutorial.html',1,'']]],
+  ['type_24',['type',['../structreflparams.html#a8ac54ddf87ce608439170fc70bbddb4d',1,'reflparams::type()'],['../structreflparamsf.html#aee4936b839c62673c1d12a2924579e32',1,'reflparamsf::type()']]]
 ];

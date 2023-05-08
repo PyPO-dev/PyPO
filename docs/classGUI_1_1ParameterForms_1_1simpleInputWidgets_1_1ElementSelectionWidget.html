@@ -95,9 +95,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:abbc286c3748e26604b45192407c8ba88"><td class="memItemLeft" align="right" valign="top"><a id="abbc286c3748e26604b45192407c8ba88" name="abbc286c3748e26604b45192407c8ba88"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>__init__</b> (self, InputDescription inputDescription)</td></tr>
 <tr class="separator:abbc286c3748e26604b45192407c8ba88"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6ad5560fb7caf75fa39099e7c8217ce8"><td class="memItemLeft" align="right" valign="top"><a id="a6ad5560fb7caf75fa39099e7c8217ce8" name="a6ad5560fb7caf75fa39099e7c8217ce8"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>addElement</b> (self)</td></tr>
-<tr class="separator:a6ad5560fb7caf75fa39099e7c8217ce8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af294c34cea5fe4a2bc881480c8e02aa9"><td class="memItemLeft" align="right" valign="top"><a id="af294c34cea5fe4a2bc881480c8e02aa9" name="af294c34cea5fe4a2bc881480c8e02aa9"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>addItem</b> (self, x)</td></tr>
+<tr class="separator:af294c34cea5fe4a2bc881480c8e02aa9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a80b1ca4cef10c8770c46b0e29e6da0f6"><td class="memItemLeft" align="right" valign="top"><a id="a80b1ca4cef10c8770c46b0e29e6da0f6" name="a80b1ca4cef10c8770c46b0e29e6da0f6"></a>
 def&#160;</td><td class="memItemRight" valign="bottom"><b>removeItem</b> (self, x)</td></tr>
 <tr class="separator:a80b1ca4cef10c8770c46b0e29e6da0f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -119,14 +119,12 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a96c3fb082d14ce2daacee9bb83d44677"><td class="memItemLeft" align="right" valign="top"><a id="a96c3fb082d14ce2daacee9bb83d44677" name="a96c3fb082d14ce2daacee9bb83d44677"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>selectedElements</b></td></tr>
 <tr class="separator:a96c3fb082d14ce2daacee9bb83d44677"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a805afc97014f88c469520fb1f8feaf0e"><td class="memItemLeft" align="right" valign="top"><a id="a805afc97014f88c469520fb1f8feaf0e" name="a805afc97014f88c469520fb1f8feaf0e"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>dropdown</b></td></tr>
-<tr class="memdesc:a805afc97014f88c469520fb1f8feaf0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">make dropdown <br /></td></tr>
-<tr class="separator:a805afc97014f88c469520fb1f8feaf0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2e75c60a2a9f6d7feba472d75bebf040"><td class="memItemLeft" align="right" valign="top"><a id="a2e75c60a2a9f6d7feba472d75bebf040" name="a2e75c60a2a9f6d7feba472d75bebf040"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>selectedList</b></td></tr>
-<tr class="memdesc:a2e75c60a2a9f6d7feba472d75bebf040"><td class="mdescLeft">&#160;</td><td class="mdescRight">make list <br /></td></tr>
+<tr class="memitem:a2e75c60a2a9f6d7feba472d75bebf040"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1ParameterForms_1_1simpleInputWidgets_1_1ElementSelectionWidget.html#a2e75c60a2a9f6d7feba472d75bebf040">selectedList</a></td></tr>
+<tr class="memdesc:a2e75c60a2a9f6d7feba472d75bebf040"><td class="mdescLeft">&#160;</td><td class="mdescRight">make dropdown self.dropdown = QComboBox() self.dropdown.addItems(["--select element--"]+elements) self.dropdown.currentIndexChanged.connect(self.addElement) label = MyLabel("addElement") if self.inputDescription.toolTip: label.setToolTip(self.inputDescription.toolTip) self.dropdown.setToolTip(self.inputDescription.toolTip) self.layout.addRow(label, self.dropdown)  <br /></td></tr>
 <tr class="separator:a2e75c60a2a9f6d7feba472d75bebf040"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a953ad317e56929024263b05455877c43"><td class="memItemLeft" align="right" valign="top"><a id="a953ad317e56929024263b05455877c43" name="a953ad317e56929024263b05455877c43"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>deselectedList</b></td></tr>
+<tr class="separator:a953ad317e56929024263b05455877c43"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Implement a widget for 'many of many' type selection is possible. </p>
@@ -137,7 +135,25 @@ Public Attributes</h2></td></tr>
   </table>
   </dd>
 </dl>
-</div><hr/>The documentation for this class was generated from the following file:<ul>
+</div><h2 class="groupheader">Member Data Documentation</h2>
+<a id="a2e75c60a2a9f6d7feba472d75bebf040" name="a2e75c60a2a9f6d7feba472d75bebf040"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2e75c60a2a9f6d7feba472d75bebf040">&#9670;&#160;</a></span>selectedList</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GUI.ParameterForms.simpleInputWidgets.ElementSelectionWidget.selectedList</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>make dropdown self.dropdown = QComboBox() self.dropdown.addItems(["--select element--"]+elements) self.dropdown.currentIndexChanged.connect(self.addElement) label = MyLabel("addElement") if self.inputDescription.toolTip: label.setToolTip(self.inputDescription.toolTip) self.dropdown.setToolTip(self.inputDescription.toolTip) self.layout.addRow(label, self.dropdown) </p>
+<p>make list </p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
 <li>src/GUI/ParameterForms/simpleInputWidgets.py</li>
 </ul>
 </div><!-- contents -->

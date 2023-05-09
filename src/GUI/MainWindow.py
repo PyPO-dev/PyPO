@@ -568,7 +568,8 @@ class MainWidget(QWidget):
             elementDict = self.ParameterWid.read()
 
             self.stm.addPlane(elementDict) 
-            self.addReflectorWidget(elementDict["name"])
+            name = list(self.stm.system.keys())[-1]
+            self.addReflectorWidget(name)
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -591,7 +592,8 @@ class MainWidget(QWidget):
                 self.stm.addHyperbola(elementDict)
             elif elementDict["type"] == "Ellipse":
                 self.stm.addEllipse(elementDict)
-            self.addReflectorWidget(elementDict["name"])
+            name = list(self.stm.system.keys())[-1]
+            self.addReflectorWidget(name)
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -754,7 +756,8 @@ class MainWidget(QWidget):
             RTDict = self.ParameterWid.read()
         
             self.stm.createTubeFrame(RTDict)
-            self.addFrameWidget(RTDict["name"])
+            name = list(self.stm.frames.keys())[-1]
+            self.addFrameWidget(name)
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -800,7 +803,8 @@ class MainWidget(QWidget):
                 s_copy = returnDict["system"]
                 self.stm.frames.update(s_copy.frames)
 
-                self.addFrameWidget(GRTDict["name"]) 
+                name = list(self.stm.frames.keys())[-1]
+                self.addFrameWidget(name) 
 
 
             # dial = SymDialog(worker.kill, self.clog, dialStr) 
@@ -873,8 +877,10 @@ class MainWidget(QWidget):
             GDict = self.ParameterWid.read()
         
             self.stm.createGaussian(GDict, GDict["surface"])
-            self.addFieldWidget(GDict["name"])
-            self.addCurrentWidget(GDict["name"])
+            namef = list(self.stm.fields.keys())[-1]
+            namec = list(self.stm.currents.keys())[-1]
+            self.addFieldWidget(namef)
+            self.addCurrentWidget(namec)
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -892,7 +898,8 @@ class MainWidget(QWidget):
             GDict = self.ParameterWid.read()
             
             self.stm.createScalarGaussian(GDict, GDict["surface"])
-            self.addSFieldWidget(GDict["name"])
+            name = list(self.stm.scalarfields.keys())[-1]
+            self.addSFieldWidget(name)
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -915,8 +922,10 @@ class MainWidget(QWidget):
             PSDict = self.ParameterWid.read()
             
             self.stm.createPointSource(PSDict, PSDict["surface"])
-            self.addFieldWidget(PSDict["name"])
-            self.addCurrentWidget(PSDict["name"])
+            namef = list(self.stm.fields.keys())[-1]
+            namec = list(self.stm.currents.keys())[-1]
+            self.addFieldWidget(namef)
+            self.addCurrentWidget(namec)
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -929,8 +938,10 @@ class MainWidget(QWidget):
             USDict = self.ParameterWid.read()
             
             self.stm.createUniformSource(USDict, USDict["surface"])
-            self.addFieldWidget(USDict["name"])
-            self.addCurrentWidget(USDict["name"])
+            namef = list(self.stm.fields.keys())[-1]
+            namec = list(self.stm.currents.keys())[-1]
+            self.addFieldWidget(namef)
+            self.addCurrentWidget(namec)
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -953,7 +964,8 @@ class MainWidget(QWidget):
             SPSDict = self.ParameterWid.read()
             
             self.stm.createPointSourceScalar(SPSDict, SPSDict["surface"])
-            self.addSFieldWidget(SPSDict["name"])
+            namef = list(self.stm.scalarfields.keys())[-1]
+            self.addSFieldWidget(namef)
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -967,7 +979,8 @@ class MainWidget(QWidget):
             SPSDict = self.ParameterWid.read()
             
             self.stm.createUniformSourceScalar(SPSDict, SPSDict["surface"])
-            self.addSFieldWidget(SPSDict["name"])
+            name = list(self.stm.scalarfields.keys())[-1]
+            self.addSFieldWidget(name)
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -1051,12 +1064,12 @@ class MainWidget(QWidget):
     ##
     # Shows form to propagate physical optics beam to surface 
     def propPOForm(self):
-        self.setForm(fData.propPOInp(self.stm.currents, self.stm.scalarfields, self.stm.system), self.propPOAction, okText="Propagate beam")
+        self.setForm(fData.propPOInp(self.stm.currents, self.stm.scalarfields, self.stm.system), self.propPOAction, okText="Propagate")
     
     ##
     # Shows form to propagate physical optics beam far field 
     def propPOFFForm(self):
-        self.setForm(fData.propPOFFInp(self.stm.currents, self.stm.system), self.propPOAction, okText="Propagate beam")
+        self.setForm(fData.propPOFFInp(self.stm.currents, self.stm.system), self.propPOAction, okText="Propagate")
     
     ##
     # Shows form to propagate physical optics beam using hybrid approach

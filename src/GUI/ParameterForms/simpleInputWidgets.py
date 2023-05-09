@@ -370,8 +370,10 @@ class XYZRadio(inputWidgetInterface):
         self.r2.clear()
 
     def read(self):
-        # if self.r1.group.checkedButton()==None or self.r2.group.checkedButton()==None:
-        #     raise Exception("RadioButton no option selected") ##TODO: is this needed 
+        if self.r1.group.checkedButton()==None :
+            raise EmptyFieldException("Empty field at Abscissa") 
+        if self.r2.group.checkedButton()==None:
+            raise EmptyFieldException("Empty field at Ordinate") 
         try:
             return {self.inputDescription.outputName:self.r1.group.checkedButton().text() + self.r2.group.checkedButton().text()}
         except:
@@ -393,16 +395,6 @@ class ElementSelectionWidget(inputWidgetInterface):
         elements = self.inputDescription.options
 
         self.selectedElements = []
-
-        ### make dropdown
-        # self.dropdown = QComboBox()
-        # self.dropdown.addItems(["--select element--"]+elements)
-        # self.dropdown.currentIndexChanged.connect(self.addElement)
-        # label = MyLabel("addElement")
-        # if self.inputDescription.toolTip:
-        #     label.setToolTip(self.inputDescription.toolTip)
-        #     self.dropdown.setToolTip(self.inputDescription.toolTip)
-        # self.layout.addRow(label, self.dropdown)
 
         ### make list
         self.selectedList = QListWidget()

@@ -211,9 +211,9 @@ class System(object):
 
         reflDict["type"] = 0
 
-        check_ElemDict(reflDict, self.system.keys(), self.num_ref, self.clog) 
-
-        self.system[reflDict["name"]] = self.copyObj(reflDict)
+        _reflDict = self.copyObj(reflDict)
+        check_ElemDict(_reflDict, self.system.keys(), self.num_ref, self.clog) 
+        self.system[_reflDict["name"]] = _reflDict
 
         if reflDict["pmode"] == "focus":
             self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
@@ -263,8 +263,9 @@ class System(object):
     def addHyperbola(self, reflDict):
 
         reflDict["type"] = 1
-        check_ElemDict(reflDict, self.system.keys(), self.num_ref, self.clog) 
-        self.system[reflDict["name"]] = self.copyObj(reflDict)
+        _reflDict = self.copyObj(reflDict)
+        check_ElemDict(_reflDict, self.system.keys(), self.num_ref, self.clog) 
+        self.system[_reflDict["name"]] = _reflDict
         
         if reflDict["pmode"] == "focus":
             self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
@@ -322,9 +323,10 @@ class System(object):
     def addEllipse(self, reflDict):
 
         reflDict["type"] = 2
-        check_ElemDict(reflDict, self.system.keys(), self.num_ref, self.clog) 
-        self.system[reflDict["name"]] = self.copyObj(reflDict)
-
+        _reflDict = self.copyObj(reflDict)
+        check_ElemDict(_reflDict, self.system.keys(), self.num_ref, self.clog) 
+        self.system[_reflDict["name"]] = _reflDict
+        
         if reflDict["pmode"] == "focus":
             self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
             f1 = reflDict["focus_1"]
@@ -384,9 +386,10 @@ class System(object):
     def addPlane(self, reflDict):
 
         reflDict["type"] = 3
-        check_ElemDict(reflDict, self.system.keys(), self.num_ref, self.clog) 
-
-        self.system[reflDict["name"]] = self.copyObj(reflDict)
+        _reflDict = self.copyObj(reflDict)
+        check_ElemDict(_reflDict, self.system.keys(), self.num_ref, self.clog) 
+        
+        self.system[_reflDict["name"]] = _reflDict
         self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
 
         self.system[reflDict["name"]]["coeffs"][0] = -1

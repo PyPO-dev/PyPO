@@ -6,8 +6,7 @@ from src.PyPO.Checks import InputReflError, InputRTError, InputPOError
 
 class Test_SystemDictsAndAddElement(unittest.TestCase):
     def setUp(self) -> None:
-        self.s = pypoSystem(override=False)
-        self.s.setLoggingVerbosity(True)
+        self.s = pypoSystem(override=False, verbose=False)
 
     def test_namingReflector(self):
         validParabola = {
@@ -56,12 +55,23 @@ class Test_SystemDictsAndAddElement(unittest.TestCase):
             (self.s.addHyperbola, validHyperbola),
             (self.s.addEllipse, validEllipse)
             ]:
+            
+            func(validElem)
+            func(validElem)
+            func(validElem)
+            func(validElem)
+            func(validElem)
+            
             name = validElem['name']+"_1"
-            func(validElem)
-            func(validElem)
             self.assertTrue(name in self.s.system)
+            
+            name = validElem['name']+"_2"
             self.assertTrue(name in self.s.system)
+            
+            name = validElem['name']+"_3"
             self.assertTrue(name in self.s.system)
+            
+            name = validElem['name']+"_4"
             self.assertTrue(name in self.s.system)
 
     def test_namingGroup(self):

@@ -2128,7 +2128,7 @@ class System(object):
 
         if lenv == 0 or lenu == 0:
             self.clog.error("Encountered 0-length vector. Cannot proceed.")
-            exit(0)
+            return None
 
         w = np.cross(v/lenv, u/lenu)
 
@@ -2200,10 +2200,11 @@ class System(object):
         self.clog.result(f"Focus of frame {name_frame}: {*['{:0.3e}'.format(x) for x in out],}, RMS: {res[1]:.3e}")
 
         return out
-
         
     ##
     # Find x, y and z rotation angles from general rotation matrix.
+    # Note that the angles are not necessarily the same as the original angles of the matrix.
+    # However, the matrix constructed by the found angles applies the same 3D rotation as the input matrix.
     #
     # @param M Numpy array of shape (3,3) containg a general rotation matrix.
     #

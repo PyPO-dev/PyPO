@@ -1,16 +1,18 @@
 import sys
 import random
+from scipy.stats import special_ortho_group
 
 import unittest
 import numpy as np
 
 from src.PyPO.System import System
+import src.PyPO.MatTransform as mt
 ##
 # @file
 # 
-# Script for testing the focus finding functionality of PyPO.
+# Script for testing the ray-trace functionalities of PyPO.
 
-class Test_FocusFind(unittest.TestCase):
+class Test_RayTraceUtils(unittest.TestCase):
     def test_FocusFind_parabola(self):
         runRTDict = {
                 "fr_in"     : "start",
@@ -143,6 +145,43 @@ class Test_FocusFind(unittest.TestCase):
         
         #self.s.rotateGrids("start", tilt_frame, obj="frame")
         self.s.translateGrids("start", focus1, obj="frame")
+    
+    def test_findRotation(self):
+        for i in range(100):
+            self.s = System(verbose=False)
+            R = special_ortho_group.rvs(dim=3)
+
+            v = np.random.rand(3) * 2 - 1
+
+            v = v / np.linalg.norm(v) if np.linalg.norm(v) > 0 else np.array([0, 0, 1])
+
+            u = R @ v
+
+            R_find = self.s.findRotation(v, u)
+            _u = R_find[:-1, :-1] @ v
+            
+            for ri, ro in zip(u, _u):
+                self.assertAlmostEqual(ri, ro)
+    
+    def test_getAnglesFromMatrix(self):
+        for i in range(100):
+            self.s = System(verbose=False)
+            R = special_ortho_group.rvs(dim=3)
+
+            angles = self.s.getAnglesFromMatrix(R)
+            
+            R_find = mt.MatRotate(angles)
+            
+            v = np.random.rand(3) * 2 - 1
+
+            v = v / np.linalg.norm(v) if np.linalg.norm(v) > 0 else np.array([0, 0, 1])
+
+            u = R @ v
+            _u = R_find[:-1, :-1] @ v
+
+            for ri, ro in zip(u, _u):
+                self.assertAlmostEqual(ri, ro)
+            
 
 if __name__ == "__main__":
     unittest.main()

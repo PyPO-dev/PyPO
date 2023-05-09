@@ -187,5 +187,34 @@ class Test_SystemSnapAndHome(unittest.TestCase):
             
             self.s.deleteSnap(fr_n, "test", obj="frame")
             self.assertFalse("test" in self.s.frames[fr_n].snapshots)
+
+    def test_homeReflector(self):
+        trans = np.random.rand(3) * 100
+        rot = np.random.rand(3) * 300
+
+        for name in self.names:
+            self.s.translateGrids(name, trans)
+            self.s.rotateGrids(name, rot)
+    
+            self.s.homeReflector(name, trans=False, rot=True)
+            
+            check_trans = self.s.copyObj(self.s.system[name]["transf"][:-1, -1])
+            for ti, te in zip(self.s.system[name]["transf"][:-1, :-1].ravel(), np.eye(3).ravel()):
+                self.assertEqual(ti, te)
+    
+            for ti, te in zip(self.s.system[name]["transf"][:-1, -1], check_trans):
+                self.assertEqual(ti, te)
+            
+            self.s.rotateGrids(name, rot)
+
+            self.s.homeReflector(name, trans=True, rot=False)
+
+            check_rot = self.s.copyObj(self.s.system[name]["transf"][:-1, :-1]).ravel()
+            for ti, te in zip(self.s.system[name]["transf"][:-1, :-1].ravel(), check_rot):
+                self.assertEqual(ti, te)
+            
+            for ti, te in zip(self.s.system[name]["transf"][:-1, -1], np.zeros(3)):
+                self.assertEqual(ti, te)
+
 if __name__ == "__main__":
     unittest.main()

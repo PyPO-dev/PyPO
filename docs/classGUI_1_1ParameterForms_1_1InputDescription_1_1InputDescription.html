@@ -82,6 +82,8 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>__attrs_post_init__</b
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
+<tr class="memitem:a494f36de93d83d79efb1f77f3e959641"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1ParameterForms_1_1InputDescription_1_1InputDescription.html#a494f36de93d83d79efb1f77f3e959641">inType</a></td></tr>
+<tr class="separator:a494f36de93d83d79efb1f77f3e959641"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6292058bbd6220daf6ddec39dc4dc73d"><td class="memItemLeft" align="right" valign="top"><a id="a6292058bbd6220daf6ddec39dc4dc73d"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>outputName</b> = field(default=None)</td></tr>
 <tr class="separator:a6292058bbd6220daf6ddec39dc4dc73d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -91,7 +93,7 @@ Static Public Attributes</h2></td></tr>
 <tr class="memitem:af98fe6fbfbc8f619d680a00974daeeaf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1ParameterForms_1_1InputDescription_1_1InputDescription.html#af98fe6fbfbc8f619d680a00974daeeaf">staticValue</a> = field(default=None)</td></tr>
 <tr class="memdesc:af98fe6fbfbc8f619d680a00974daeeaf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Value to be output if inType is static.  <a href="classGUI_1_1ParameterForms_1_1InputDescription_1_1InputDescription.html#af98fe6fbfbc8f619d680a00974daeeaf">More...</a><br /></td></tr>
 <tr class="separator:af98fe6fbfbc8f619d680a00974daeeaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5ea7dc065ceef49c145d9978d79e3a7e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1ParameterForms_1_1InputDescription_1_1InputDescription.html#a5ea7dc065ceef49c145d9978d79e3a7e">hints</a> = Factory(list)</td></tr>
+<tr class="memitem:a5ea7dc065ceef49c145d9978d79e3a7e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1ParameterForms_1_1InputDescription_1_1InputDescription.html#a5ea7dc065ceef49c145d9978d79e3a7e">hints</a> = field(default=Factory(list))</td></tr>
 <tr class="memdesc:a5ea7dc065ceef49c145d9978d79e3a7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">List of values, used if inType is a vector type.  <a href="classGUI_1_1ParameterForms_1_1InputDescription_1_1InputDescription.html#a5ea7dc065ceef49c145d9978d79e3a7e">More...</a><br /></td></tr>
 <tr class="separator:a5ea7dc065ceef49c145d9978d79e3a7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a677c9198d6fbf0279991ce7a0bc6f7d9"><td class="memItemLeft" align="right" valign="top"><a id="a677c9198d6fbf0279991ce7a0bc6f7d9"></a>
@@ -114,7 +116,7 @@ Static Public Attributes</h2></td></tr>
 <tr class="separator:a853faa7a727671e763d84019d3013757"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6941caa34f25af064d90027cb8cd756d"><td class="memItemLeft" align="right" valign="top"><a id="a6941caa34f25af064d90027cb8cd756d"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1ParameterForms_1_1InputDescription_1_1InputDescription.html#a6941caa34f25af064d90027cb8cd756d">toolTip</a> = field(default=None)</td></tr>
-<tr class="memdesc:a6941caa34f25af064d90027cb8cd756d"><td class="mdescLeft">&#160;</td><td class="mdescRight">used by all inputs to provide a tooltip ##TODO: is this true? <br /></td></tr>
+<tr class="memdesc:a6941caa34f25af064d90027cb8cd756d"><td class="mdescLeft">&#160;</td><td class="mdescRight">used by all inputs to provide a tooltip <br /></td></tr>
 <tr class="separator:a6941caa34f25af064d90027cb8cd756d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8ef593aa6f7935ccfc449051a494d492"><td class="memItemLeft" align="right" valign="top"><a id="a8ef593aa6f7935ccfc449051a494d492"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGUI_1_1ParameterForms_1_1InputDescription_1_1InputDescription.html#a8ef593aa6f7935ccfc449051a494d492">prefill</a> = field(default=False)</td></tr>
@@ -132,7 +134,7 @@ Static Public Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">GUI.ParameterForms.InputDescription.InputDescription.hints = Factory(list)</td>
+          <td class="memname">GUI.ParameterForms.InputDescription.InputDescription.hints = field(default=Factory(list))</td>
         </tr>
       </table>
   </td>
@@ -145,6 +147,29 @@ Static Public Attributes</h2></td></tr>
 <p>List of values, used if inType is a vector type. </p>
 <p>Can be used as hints or as prefilled values if 'prefill' is True Also used in 'SimpleRadio', 'SimpleDropdown' and 'ElementSelectionWidget' to display in stead of options. In such case options are still used to read the form but this way you can make a difference between what the user sees and how the choice is interpreted. <br  />
  </p>
+
+</div>
+</div>
+<a id="a494f36de93d83d79efb1f77f3e959641"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a494f36de93d83d79efb1f77f3e959641">&#9670;&nbsp;</a></span>inType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">def GUI.ParameterForms.InputDescription.InputDescription.inType</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classGUI_1_1ParameterForms_1_1InputDescription_1_1InputDescription.html#a494f36de93d83d79efb1f77f3e959641">inType</a> </dd></dl>
 
 </div>
 </div>

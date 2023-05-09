@@ -6,8 +6,7 @@ from src.PyPO.Checks import InputReflError, InputRTError, InputPOError
 
 class Test_SystemDictsAndAddElement(unittest.TestCase):
     def setUp(self) -> None:
-        self.s = pypoSystem(override=False)
-        self.s.setLoggingVerbosity(True)
+        self.s = pypoSystem(override=False, verbose=False)
 
     def test_namingReflector(self):
         validParabola = {
@@ -56,18 +55,31 @@ class Test_SystemDictsAndAddElement(unittest.TestCase):
             (self.s.addHyperbola, validHyperbola),
             (self.s.addEllipse, validEllipse)
             ]:
+            
+            func(validElem)
+            func(validElem)
+            func(validElem)
+            func(validElem)
+            func(validElem)
+            
             name = validElem['name']+"_1"
-            func(validElem)
-            func(validElem)
             self.assertTrue(name in self.s.system)
+            
+            name = validElem['name']+"_2"
             self.assertTrue(name in self.s.system)
+            
+            name = validElem['name']+"_3"
             self.assertTrue(name in self.s.system)
+            
+            name = validElem['name']+"_4"
             self.assertTrue(name in self.s.system)
 
     def test_namingGroup(self):
         self.s.groupElements('g')
         self.s.groupElements('g')
         self.assertTrue("g_1" in self.s.groups)
+        self.s.groupElements('g')
+        self.assertTrue("g_2" in self.s.groups)
 
     def test_namingFrames(self):
         tubeFrameDict = {
@@ -92,10 +104,18 @@ class Test_SystemDictsAndAddElement(unittest.TestCase):
         self.s.createTubeFrame(tubeFrameDict)
         self.s.createTubeFrame(tubeFrameDict)
         self.assertTrue("tf_1" in self.s.frames)
+        self.s.createTubeFrame(tubeFrameDict)
+        self.assertTrue("tf_2" in self.s.frames)
+        self.s.createTubeFrame(tubeFrameDict)
+        self.assertTrue("tf_3" in self.s.frames)
 
         self.s.createGRTFrame(gaussFrame)
         self.s.createGRTFrame(gaussFrame)
         self.assertTrue("gf_1" in self.s.frames)
+        self.s.createGRTFrame(gaussFrame)
+        self.assertTrue("gf_2" in self.s.frames)
+        self.s.createGRTFrame(gaussFrame)
+        self.assertTrue("gf_3" in self.s.frames)
 
 
     def test_addPOFields(self):
@@ -160,22 +180,38 @@ class Test_SystemDictsAndAddElement(unittest.TestCase):
             (self.s.createGaussian, GaussBeam),
             ]:
             name = validElem['name'] + '_1'
-            # self.s.addPlane(validPlane)
             func(validElem, "plane")
             func(validElem, "plane")
             self.assertTrue(name in self.s.fields)
             self.assertTrue(name in self.s.currents)
             
+            func(validElem, "plane")
+            name = validElem['name'] + '_2'
+            self.assertTrue(name in self.s.fields)
+            self.assertTrue(name in self.s.currents)
+            
+            func(validElem, "plane")
+            name = validElem['name'] + '_3'
+            self.assertTrue(name in self.s.fields)
+            self.assertTrue(name in self.s.currents)
+            
         for func, validElem in [
             (self.s.createPointSourceScalar, ScalarPSBeam),
-            # (self.s.createUniformSourceScalar, ScalarUPSBeam),
+            (self.s.createUniformSourceScalar, ScalarUPSBeam),
             (self.s.createScalarGaussian, ScalarGaussBeam),
             ]:
             name = validElem['name'] + '_1'
-            # self.s.addPlane(validPlane)
             func(validElem, "plane")
             func(validElem, "plane")
 
+            self.assertTrue(name in self.s.scalarfields)
+            
+            func(validElem, "plane")
+            name = validElem['name'] + '_2'
+            self.assertTrue(name in self.s.scalarfields)
+            
+            func(validElem, "plane")
+            name = validElem['name'] + '_3'
             self.assertTrue(name in self.s.scalarfields)
 
 if __name__ == "__main__":

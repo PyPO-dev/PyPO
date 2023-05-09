@@ -28,10 +28,8 @@ def getIndex(name, nameList):
     regex = f"(?<!.){name}(_(\d*(?![ -~])))*(?![ -~])"
     l = re.compile(regex)
     match = list(filter(l.match, nameList))
-
     match_spl = [int(x.replace(name + "_", "")) if x != name else 0 for x in match]
     num = 0
-    
     if match_spl and not Config.override:
         num = max(match_spl) + 1
 
@@ -465,11 +463,6 @@ def check_ElemDict(elemDict, nameList, num_ref, clog):
         if not "name" in elemDict:
             elemDict["name"] = "Parabola"
         
-        num = getIndex(elemDict["name"], nameList)
-
-        if num > 0:
-            elemDict["name"] = elemDict["name"] + "_{}".format(num)
-        
         if "pmode" in elemDict:
             if elemDict["pmode"] == "focus":
                 if "vertex" in elemDict:
@@ -502,19 +495,9 @@ def check_ElemDict(elemDict, nameList, num_ref, clog):
             if not "name" in elemDict:
                 elemDict["name"] = "Hyperbola"
 
-            num = getIndex(elemDict["name"], nameList)
-
-            if num > 0:
-                elemDict["name"] = elemDict["name"] + "_{}".format(num)
-        
         else:
             if not "name" in elemDict:
                 elemDict["name"] = "Ellipse"
-            
-            num = getIndex(elemDict["name"], nameList)
-
-            if num > 0:
-                elemDict["name"] = elemDict["name"] + "_{}".format(num)
 
         if "orient" not in elemDict:
             elemDict["orient"] = "x"
@@ -558,13 +541,12 @@ def check_ElemDict(elemDict, nameList, num_ref, clog):
 
     elif elemDict["type"] == 3:
         if not "name" in elemDict:
-            elemDict["name"] = "plane"
+            elemDict["name"] = "Plane"
         
-        num = getIndex(elemDict["name"], nameList)
-
-        if num > 0:
-            elemDict["name"] = elemDict["name"] + "_{}".format(num)
-
+    num = getIndex(elemDict["name"], nameList)
+    if num > 0:
+        elemDict["name"] = elemDict["name"] + "_{}".format(num)
+    
     if "gmode" in elemDict:
         if elemDict["gmode"] == "xy" or elemDict["gmode"] == 0:
             if "lims_x" in elemDict:

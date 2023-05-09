@@ -211,15 +211,15 @@ class System(object):
 
         reflDict["type"] = 0
 
-        check_ElemDict(reflDict, self.system.keys(), self.num_ref, self.clog) 
+        _reflDict = self.copyObj(reflDict)
+        check_ElemDict(_reflDict, self.system.keys(), self.num_ref, self.clog) 
+        self.system[_reflDict["name"]] = _reflDict
 
-        self.system[reflDict["name"]] = self.copyObj(reflDict)
+        if _reflDict["pmode"] == "focus":
+            self.system[_reflDict["name"]]["coeffs"] = np.zeros(3)
 
-        if reflDict["pmode"] == "focus":
-            self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
-
-            ve = reflDict["vertex"] # Vertex point position
-            f1 = reflDict["focus_1"] # Focal point position
+            ve = _reflDict["vertex"] # Vertex point position
+            f1 = _reflDict["focus_1"] # Focal point position
 
             diff = f1 - ve
 
@@ -232,25 +232,25 @@ class System(object):
 
             R = self.findRotation(world.IAX(), orientation)
             
-            self.system[reflDict["name"]]["transf"] = MatTranslate(offTrans, R)
-            self.system[reflDict["name"]]["pos"] = (self.system[reflDict["name"]]["transf"] @ np.append(self.system[reflDict["name"]]["pos"], 1))[:-1]
-            self.system[reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[reflDict["name"]]["ori"]
+            self.system[_reflDict["name"]]["transf"] = MatTranslate(offTrans, R)
+            self.system[_reflDict["name"]]["pos"] = (self.system[_reflDict["name"]]["transf"] @ np.append(self.system[_reflDict["name"]]["pos"], 1))[:-1]
+            self.system[_reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[_reflDict["name"]]["ori"]
 
-            self.system[reflDict["name"]]["coeffs"][0] = a
-            self.system[reflDict["name"]]["coeffs"][1] = b
-            self.system[reflDict["name"]]["coeffs"][2] = -1
+            self.system[_reflDict["name"]]["coeffs"][0] = a
+            self.system[_reflDict["name"]]["coeffs"][1] = b
+            self.system[_reflDict["name"]]["coeffs"][2] = -1
 
-        elif reflDict["pmode"] == "manual":
-            self.system[reflDict["name"]]["coeffs"] = np.array([reflDict["coeffs"][0], reflDict["coeffs"][1], -1])
+        elif _reflDict["pmode"] == "manual":
+            self.system[_reflDict["name"]]["coeffs"] = np.array([_reflDict["coeffs"][0], _reflDict["coeffs"][1], -1])
 
-        if reflDict["gmode"] == "xy" or reflDict["gmode"] == 0:
-            self.system[reflDict["name"]]["gmode"] = 0
+        if _reflDict["gmode"] == "xy" or _reflDict["gmode"] == 0:
+            self.system[_reflDict["name"]]["gmode"] = 0
 
-        elif reflDict["gmode"] == "uv" or reflDict["gmode"] == 1:
-            self.system[reflDict["name"]]["gmode"] = 1
+        elif _reflDict["gmode"] == "uv" or _reflDict["gmode"] == 1:
+            self.system[_reflDict["name"]]["gmode"] = 1
         
-        self.system[reflDict["name"]]["snapshots"] = {}
-        self.clog.info(f"Added paraboloid {reflDict['name']} to system.")
+        self.system[_reflDict["name"]]["snapshots"] = {}
+        self.clog.info(f"Added paraboloid {_reflDict['name']} to system.")
         self.num_ref += 1
 
     ##
@@ -263,15 +263,16 @@ class System(object):
     def addHyperbola(self, reflDict):
 
         reflDict["type"] = 1
-        check_ElemDict(reflDict, self.system.keys(), self.num_ref, self.clog) 
-        self.system[reflDict["name"]] = self.copyObj(reflDict)
+        _reflDict = self.copyObj(reflDict)
+        check_ElemDict(_reflDict, self.system.keys(), self.num_ref, self.clog) 
+        self.system[_reflDict["name"]] = _reflDict
         
-        if reflDict["pmode"] == "focus":
-            self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
+        if _reflDict["pmode"] == "focus":
+            self.system[_reflDict["name"]]["coeffs"] = np.zeros(3)
             # Calculate a, b, c of hyperbola
-            f1 = reflDict["focus_1"] # Focal point 1 position
-            f2 = reflDict["focus_2"] # Focal point 2 position
-            ecc = reflDict["ecc"] # Eccentricity of hyperbola
+            f1 = _reflDict["focus_1"] # Focal point 1 position
+            f2 = _reflDict["focus_2"] # Focal point 2 position
+            ecc = _reflDict["ecc"] # Eccentricity of hyperbola
 
             diff = f1 - f2
             c = np.sqrt(np.dot(diff, diff)) / 2
@@ -293,23 +294,23 @@ class System(object):
             # Find rotation in frame of center
             R = self.findRotation(world.IAX(), orientation)
             
-            self.system[reflDict["name"]]["transf"] = MatTranslate(offTrans, R)
+            self.system[_reflDict["name"]]["transf"] = MatTranslate(offTrans, R)
 
-            self.system[reflDict["name"]]["pos"] = (self.system[reflDict["name"]]["transf"] @ np.append(self.system[reflDict["name"]]["pos"], 1))[:-1]
-            self.system[reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[reflDict["name"]]["ori"]
+            self.system[_reflDict["name"]]["pos"] = (self.system[_reflDict["name"]]["transf"] @ np.append(self.system[_reflDict["name"]]["pos"], 1))[:-1]
+            self.system[_reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[_reflDict["name"]]["ori"]
 
-            self.system[reflDict["name"]]["coeffs"][0] = a3
-            self.system[reflDict["name"]]["coeffs"][1] = b3
-            self.system[reflDict["name"]]["coeffs"][2] = c3
+            self.system[_reflDict["name"]]["coeffs"][0] = a3
+            self.system[_reflDict["name"]]["coeffs"][1] = b3
+            self.system[_reflDict["name"]]["coeffs"][2] = c3
 
-        if reflDict["gmode"] == "xy" or reflDict["gmode"] == 0:
-            self.system[reflDict["name"]]["gmode"] = 0
+        if _reflDict["gmode"] == "xy" or _reflDict["gmode"] == 0:
+            self.system[_reflDict["name"]]["gmode"] = 0
 
-        elif reflDict["gmode"] == "uv" or reflDict["gmode"] == 1:
-            self.system[reflDict["name"]]["gmode"] = 1
+        elif _reflDict["gmode"] == "uv" or _reflDict["gmode"] == 1:
+            self.system[_reflDict["name"]]["gmode"] = 1
 
-        self.system[reflDict["name"]]["snapshots"] = {}
-        self.clog.info(f"Added hyperboloid {reflDict['name']} to system.")
+        self.system[_reflDict["name"]]["snapshots"] = {}
+        self.clog.info(f"Added hyperboloid {_reflDict['name']} to system.")
         self.num_ref += 1
 
     ##
@@ -322,14 +323,15 @@ class System(object):
     def addEllipse(self, reflDict):
 
         reflDict["type"] = 2
-        check_ElemDict(reflDict, self.system.keys(), self.num_ref, self.clog) 
-        self.system[reflDict["name"]] = self.copyObj(reflDict)
-
-        if reflDict["pmode"] == "focus":
-            self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
-            f1 = reflDict["focus_1"]
-            f2 = reflDict["focus_2"]
-            ecc = reflDict["ecc"]
+        _reflDict = self.copyObj(reflDict)
+        check_ElemDict(_reflDict, self.system.keys(), self.num_ref, self.clog) 
+        self.system[_reflDict["name"]] = _reflDict
+        
+        if _reflDict["pmode"] == "focus":
+            self.system[_reflDict["name"]]["coeffs"] = np.zeros(3)
+            f1 = _reflDict["focus_1"]
+            f2 = _reflDict["focus_2"]
+            ecc = _reflDict["ecc"]
 
             diff = f1 - f2
 
@@ -337,41 +339,41 @@ class System(object):
 
             f_norm = diff / np.linalg.norm(diff)
             
-            if reflDict["orient"] == "x":
+            if _reflDict["orient"] == "x":
                 R = self.findRotation(np.array([1,0,0]), f_norm)
             
-            if reflDict["orient"] == "z":
+            if _reflDict["orient"] == "z":
                 R = self.findRotation(np.array([0,0,1]), f_norm)
 
             a = np.sqrt(np.dot(diff, diff)) / (2 * ecc)
             b = a * np.sqrt(1 - ecc**2)
             
-            #_transf = MatRotate(rotation, reflDict["transf"])
-            self.system[reflDict["name"]]["transf"] = MatTranslate(trans, R)
+            #_transf = MatRotate(rotation, _reflDict["transf"])
+            self.system[_reflDict["name"]]["transf"] = MatTranslate(trans, R)
             
-            self.system[reflDict["name"]]["pos"] = (self.system[reflDict["name"]]["transf"] @ np.append(self.system[reflDict["name"]]["pos"], 1))[:-1]
-            self.system[reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[reflDict["name"]]["ori"]
+            self.system[_reflDict["name"]]["pos"] = (self.system[_reflDict["name"]]["transf"] @ np.append(self.system[_reflDict["name"]]["pos"], 1))[:-1]
+            self.system[_reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[_reflDict["name"]]["ori"]
 
-            if reflDict["orient"] == "x":
-                self.system[reflDict["name"]]["coeffs"][0] = a
-                self.system[reflDict["name"]]["coeffs"][1] = b
-                self.system[reflDict["name"]]["coeffs"][2] = b
+            if _reflDict["orient"] == "x":
+                self.system[_reflDict["name"]]["coeffs"][0] = a
+                self.system[_reflDict["name"]]["coeffs"][1] = b
+                self.system[_reflDict["name"]]["coeffs"][2] = b
             
-            if reflDict["orient"] == "z":
-                self.system[reflDict["name"]]["coeffs"][0] = b
-                self.system[reflDict["name"]]["coeffs"][1] = b
-                self.system[reflDict["name"]]["coeffs"][2] = a
+            if _reflDict["orient"] == "z":
+                self.system[_reflDict["name"]]["coeffs"][0] = b
+                self.system[_reflDict["name"]]["coeffs"][1] = b
+                self.system[_reflDict["name"]]["coeffs"][2] = a
 
-        if reflDict["gmode"] == "xy" or reflDict["gmode"] == 0:
-            self.system[reflDict["name"]]["gmode"] = 0
+        if _reflDict["gmode"] == "xy" or _reflDict["gmode"] == 0:
+            self.system[_reflDict["name"]]["gmode"] = 0
 
-        elif reflDict["gmode"] == "uv" or reflDict["gmode"] == 1:
-            self.system[reflDict["name"]]["gmode"] = 1
+        elif _reflDict["gmode"] == "uv" or _reflDict["gmode"] == 1:
+            self.system[_reflDict["name"]]["gmode"] = 1
 
-        check_ellipseLimits(self.system[reflDict["name"]], self.clog)
+        check_ellipseLimits(self.system[_reflDict["name"]], self.clog)
 
-        self.system[reflDict["name"]]["snapshots"] = {}
-        self.clog.info(f"Added ellipsoid {reflDict['name']} to system.")
+        self.system[_reflDict["name"]]["snapshots"] = {}
+        self.clog.info(f"Added ellipsoid {_reflDict['name']} to system.")
         self.num_ref += 1
 
     ##
@@ -384,26 +386,27 @@ class System(object):
     def addPlane(self, reflDict):
 
         reflDict["type"] = 3
-        check_ElemDict(reflDict, self.system.keys(), self.num_ref, self.clog) 
+        _reflDict = self.copyObj(reflDict)
+        check_ElemDict(_reflDict, self.system.keys(), self.num_ref, self.clog) 
+        
+        self.system[_reflDict["name"]] = _reflDict
+        self.system[_reflDict["name"]]["coeffs"] = np.zeros(3)
 
-        self.system[reflDict["name"]] = self.copyObj(reflDict)
-        self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
+        self.system[_reflDict["name"]]["coeffs"][0] = -1
+        self.system[_reflDict["name"]]["coeffs"][1] = -1
+        self.system[_reflDict["name"]]["coeffs"][2] = -1
 
-        self.system[reflDict["name"]]["coeffs"][0] = -1
-        self.system[reflDict["name"]]["coeffs"][1] = -1
-        self.system[reflDict["name"]]["coeffs"][2] = -1
+        if _reflDict["gmode"] == "xy" or _reflDict["gmode"] == 0:
+            self.system[_reflDict["name"]]["gmode"] = 0
 
-        if reflDict["gmode"] == "xy" or reflDict["gmode"] == 0:
-            self.system[reflDict["name"]]["gmode"] = 0
+        elif _reflDict["gmode"] == "uv" or _reflDict["gmode"] == 1:
+            self.system[_reflDict["name"]]["gmode"] = 1
 
-        elif reflDict["gmode"] == "uv" or reflDict["gmode"] == 1:
-            self.system[reflDict["name"]]["gmode"] = 1
+        elif _reflDict["gmode"] == "AoE" or _reflDict["gmode"] == 2:
+            self.system[_reflDict["name"]]["gmode"] = 2
 
-        elif reflDict["gmode"] == "AoE" or reflDict["gmode"] == 2:
-            self.system[reflDict["name"]]["gmode"] = 2
-
-        self.system[reflDict["name"]]["snapshots"] = {}
-        self.clog.info(f"Added plane {reflDict['name']} to system.")
+        self.system[_reflDict["name"]]["snapshots"] = {}
+        self.clog.info(f"Added plane {_reflDict['name']} to system.")
         self.num_ref += 1
    
 
@@ -1106,18 +1109,18 @@ class System(object):
     # @see TubeRTDict
     def createTubeFrame(self, argDict):
         if not argDict["name"]:
-            argDict["name"] = f"Frame_{len(self.frames)}"
+            argDict["name"] = f"Frame"
+        _argDict = self.copyObj(argDict) 
+        check_TubeRTDict(_argDict, self.frames.keys(), self.clog)
         
-        check_TubeRTDict(argDict, self.frames.keys(), self.clog)
-        
-        self.frames[argDict["name"]] = makeRTframe(argDict)
+        self.frames[_argDict["name"]] = makeRTframe(_argDict)
 
-        self.frames[argDict["name"]].setMeta(self.copyObj(world.ORIGIN()), self.copyObj(world.IAX()), self.copyObj(world.INITM()))
+        self.frames[_argDict["name"]].setMeta(self.copyObj(world.ORIGIN()), self.copyObj(world.IAX()), self.copyObj(world.INITM()))
         #self.frames[argDict["name"]].pos = world.ORIGIN()
         #self.frames[argDict["name"]].ori = world.IAX()
         #self.frames[argDict["name"]].transf = world.INITM()
 
-        self.clog.info(f"Added tubular frame {argDict['name']} to system.")
+        self.clog.info(f"Added tubular frame {_argDict['name']} to system.")
     
     ##
     # Create a Gaussian beam distribution of rays from a GRTDict.
@@ -1125,26 +1128,27 @@ class System(object):
     # @param argDict A GRTDict, filled. If not filled properly, will raise an exception.
     #
     # @see GRTDict
-    def createGRTFrame(self, argDict):
-        check_GRTDict(argDict, self.frames.keys(), self.clog)
+    def createGRTFrame(self, argDict): 
+        if not argDict["name"]:
+            argDict["name"] = f"Frame"
+        
+        _argDict = self.copyObj(argDict) 
+        check_GRTDict(_argDict, self.frames.keys(), self.clog)
         
         self.clog.work(f"Generating Gaussian ray-trace beam.")
         self.clog.work(f"... Sampling ...")
-        
-        if not argDict["name"]:
-            argDict["name"] = f"Frame_{len(self.frames)}"
        
         start_time = time.time()
-        argDict["angx0"] = np.degrees(argDict["lam"] / (np.pi * argDict["n"] * argDict["x0"]))
-        argDict["angy0"] = np.degrees(argDict["lam"] / (np.pi * argDict["n"] * argDict["y0"]))
+        _argDict["angx0"] = np.degrees(_argDict["lam"] / (np.pi * _argDict["n"] * _argDict["x0"]))
+        _argDict["angy0"] = np.degrees(_argDict["lam"] / (np.pi * _argDict["n"] * _argDict["y0"]))
 
-        #check_RTDict(argDict, self.frames.keys())
-        self.frames[argDict["name"]] = makeGRTframe(argDict)
-        self.frames[argDict["name"]].setMeta(self.copyObj(world.ORIGIN()), self.copyObj(world.IAX()), self.copyObj(world.INITM()))
+        #check_RTDict(_argDict, self.frames.keys())
+        self.frames[_argDict["name"]] = makeGRTframe(_argDict)
+        self.frames[_argDict["name"]].setMeta(self.copyObj(world.ORIGIN()), self.copyObj(world.IAX()), self.copyObj(world.INITM()))
         
         dtime = time.time() - start_time
-        self.clog.work(f"Succesfully sampled {argDict['nRays']} rays: {dtime} seconds.")
-        self.clog.info(f"Added Gaussian frame {argDict['name']} to system.")
+        self.clog.work(f"Succesfully sampled {_argDict['nRays']} rays: {dtime} seconds.")
+        self.clog.info(f"Added Gaussian frame {_argDict['name']} to system.")
 
     ##
     # Convert a Poynting vector grid to a frame object. Sort of private method
@@ -1236,16 +1240,18 @@ class System(object):
     # @see GDict
     def createGaussian(self, gaussDict, name_source):
         check_elemSystem(name_source, self.system, self.clog, extern=True)
-        check_GPODict(gaussDict, self.fields, self.clog)
-        
-        gauss_in = makeGauss(gaussDict, self.system[name_source])
 
-        k = 2 * np.pi / gaussDict["lam"]
+        _gaussDict = self.copyObj(gaussDict)
+        check_GPODict(_gaussDict, self.fields, self.clog)
+        
+        gauss_in = makeGauss(_gaussDict, self.system[name_source])
+
+        k = 2 * np.pi / _gaussDict["lam"]
         gauss_in[0].setMeta(name_source, k)
         gauss_in[1].setMeta(name_source, k)
 
-        self.fields[gaussDict["name"]] = gauss_in[0]
-        self.currents[gaussDict["name"]] = gauss_in[1]
+        self.fields[_gaussDict["name"]] = gauss_in[0]
+        self.currents[_gaussDict["name"]] = gauss_in[1]
         #return gauss_in
     
     ##
@@ -1257,14 +1263,16 @@ class System(object):
     # @see GDict
     def createScalarGaussian(self, gaussDict, name_source):
         check_elemSystem(name_source, self.system, self.clog, extern=True)
-        check_GPODict(gaussDict, self.scalarfields, self.clog)
         
-        gauss_in = makeScalarGauss(gaussDict, self.system[name_source])
+        _gaussDict = self.copyObj(gaussDict)
+        check_GPODict(_gaussDict, self.scalarfields, self.clog)
+        
+        gauss_in = makeScalarGauss(_gaussDict, self.system[name_source])
 
-        k = 2 * np.pi / gaussDict["lam"]
+        k = 2 * np.pi / _gaussDict["lam"]
         gauss_in.setMeta(name_source, k)
 
-        self.scalarfields[gaussDict["name"]] = gauss_in
+        self.scalarfields[_gaussDict["name"]] = gauss_in
 
     ##
     # Run a ray-trace propagation from a frame to a surface.
@@ -1709,7 +1717,8 @@ class System(object):
     # @see PSDict
     def createPointSource(self, PSDict, name_surface):
         check_elemSystem(name_surface, self.system, self.clog, extern=True)
-        check_PSDict(PSDict, self.fields, self.clog)
+        _PSDict = self.copyObj(PSDict)
+        check_PSDict(_PSDict, self.fields, self.clog)
 
         surfaceObj = self.system[name_surface]
         ps = np.zeros(surfaceObj["gridsize"], dtype=complex)
@@ -1717,11 +1726,11 @@ class System(object):
         xs_idx = int((surfaceObj["gridsize"][0] - 1) / 2)
         ys_idx = int((surfaceObj["gridsize"][1] - 1) / 2)
 
-        ps[xs_idx, ys_idx] = PSDict["E0"] * np.exp(1j * PSDict["phase"])
+        ps[xs_idx, ys_idx] = _PSDict["E0"] * np.exp(1j * _PSDict["phase"])
 
-        Ex = ps * PSDict["pol"][0]
-        Ey = ps * PSDict["pol"][1]
-        Ez = ps * PSDict["pol"][2]
+        Ex = ps * _PSDict["pol"][0]
+        Ey = ps * _PSDict["pol"][1]
+        Ez = ps * _PSDict["pol"][2]
 
         Hx = ps * 0
         Hy = ps * 0
@@ -1730,13 +1739,13 @@ class System(object):
         field = fields(Ex, Ey, Ez, Hx, Hy, Hz) 
         current = self.calcCurrents(name_surface, field)
 
-        k =  2 * np.pi / PSDict["lam"]
+        k =  2 * np.pi / _PSDict["lam"]
 
         field.setMeta(name_surface, k)
         current.setMeta(name_surface, k)
 
-        self.fields[PSDict["name"]] = field
-        self.currents[PSDict["name"]] = current
+        self.fields[_PSDict["name"]] = field
+        self.currents[_PSDict["name"]] = current
 
     ##
     # Generate uniform PO fields and currents.
@@ -1747,14 +1756,15 @@ class System(object):
     # @see PSDict
     def createUniformSource(self, UDict, name_surface):
         check_elemSystem(name_surface, self.system, self.clog, extern=True)
-        check_PSDict(UDict, self.fields, self.clog)
+        _UDict = self.copyObj(UDict)
+        check_PSDict(_UDict, self.fields, self.clog)
 
         surfaceObj = self.system[name_surface]
-        us = np.ones(surfaceObj["gridsize"], dtype=complex) * UDict["E0"] * np.exp(1j * UDict["phase"])
+        us = np.ones(surfaceObj["gridsize"], dtype=complex) * _UDict["E0"] * np.exp(1j * _UDict["phase"])
 
-        Ex = us * UDict["pol"][0]
-        Ey = us * UDict["pol"][1]
-        Ez = us * UDict["pol"][2]
+        Ex = us * _UDict["pol"][0]
+        Ey = us * _UDict["pol"][1]
+        Ez = us * _UDict["pol"][2]
 
         Hx = us * 0
         Hy = us * 0
@@ -1763,13 +1773,13 @@ class System(object):
         field = fields(Ex, Ey, Ez, Hx, Hy, Hz) 
         current = self.calcCurrents(name_surface, field)
 
-        k =  2 * np.pi / UDict["lam"]
+        k =  2 * np.pi / _UDict["lam"]
 
         field.setMeta(name_surface, k)
         current.setMeta(name_surface, k)
 
-        self.fields[UDict["name"]] = field
-        self.currents[UDict["name"]] = current
+        self.fields[_UDict["name"]] = field
+        self.currents[_UDict["name"]] = current
     
     ##
     # Generate point-source scalar PO field.
@@ -1780,7 +1790,9 @@ class System(object):
     # @see PSDict
     def createPointSourceScalar(self, PSDict, name_surface):
         check_elemSystem(name_surface, self.system, self.clog, extern=True)
-        check_PSDict(PSDict, self.scalarfields, self.clog)
+        
+        _PSDict = self.copyObj(PSDict)
+        check_PSDict(_PSDict, self.scalarfields, self.clog)
         
         surfaceObj = self.system[name_surface]
         ps = np.zeros(surfaceObj["gridsize"], dtype=complex)
@@ -1788,14 +1800,14 @@ class System(object):
         xs_idx = int((surfaceObj["gridsize"][0] - 1) / 2)
         ys_idx = int((surfaceObj["gridsize"][1] - 1) / 2)
 
-        ps[xs_idx, ys_idx] = PSDict["E0"] * np.exp(1j * PSDict["phase"])
+        ps[xs_idx, ys_idx] = _PSDict["E0"] * np.exp(1j * _PSDict["phase"])
         sfield = scalarfield(ps)
 
-        k =  2 * np.pi / PSDict["lam"]
+        k =  2 * np.pi / _PSDict["lam"]
 
         sfield.setMeta(name_surface, k)
 
-        self.scalarfields[PSDict["name"]] = sfield
+        self.scalarfields[_PSDict["name"]] = sfield
     
     ##
     # Generate scalar uniform PO fields and currents.
@@ -1806,18 +1818,19 @@ class System(object):
     # @see UDict
     def createUniformSourceScalar(self, UDict, name_surface):
         check_elemSystem(name_surface, self.system, self.clog, extern=True)
-        check_PSDict(UDict, self.scalarfields, self.clog)
+        _UDict = self.copyObj(UDict)
+        check_PSDict(_UDict, self.scalarfields, self.clog)
 
         surfaceObj = self.system[name_surface]
-        us = np.ones(surfaceObj["gridsize"], dtype=complex) * UDict["E0"] * np.exp(1j * UDict["phase"])
+        us = np.ones(surfaceObj["gridsize"], dtype=complex) * _UDict["E0"] * np.exp(1j * _UDict["phase"])
 
         sfield = scalarfield(us)
 
-        k =  2 * np.pi / UDict["lam"]
+        k =  2 * np.pi / _UDict["lam"]
 
         sfield.setMeta(name_surface, k)
 
-        self.scalarfields[UDict["name"]] = sfield
+        self.scalarfields[_UDict["name"]] = sfield
    
     ##
     # Interpolate a PO beam. Only for beams defined on planar surfaces.

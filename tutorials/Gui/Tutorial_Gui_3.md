@@ -38,27 +38,21 @@ Now we can translate our *plane_focus* to position at (0, 0, 100).
 
 ## Propagation
 Now we can propagate our beam through the system. From the *Physical-optics* menu we select *Propagate beam > To surface*. The we do the following propagations  
-|||
-|-|-|
-|<img src="README_Resources/ResourcesT3/poProp1.png" alt="" width="300px"/>|<img src="README_Resources/ResourcesT3/poProp2.png" alt="" width="300px"/>|
-|<img src="README_Resources/ResourcesT3/poProp3.png" alt="" width="300px"/>||
+<img src="README_Resources/ResourcesT3/poProp1.png" alt="" width="300px"/><img src="README_Resources/ResourcesT3/poProp2.png" alt="" width="300px"/>
+<img src="README_Resources/ResourcesT3/poProp3.png" alt="" width="300px"/>
 
 We set, for the first two propagations, the 'mode' parameter to 'JM'. This means we only store the calculated JM currents on the target surface. If we specify 'EH', such as for the last propagation, we only save the illuminating field on the target surface. If we want both, we specify 'mode' as 'JMEH'. Another option, 'FF' for far-field, will be explained in more detail below. The last option, 'EHP', stores the reflected field and corresponding Poynting vectors. With this option it is possible to do a combined ray-trace and PO approach. This will be introduced in a later tutorial.
 
 Now we can plot the beam that we propagated through the system onto the paraboloid. 
 
-||
-|-|
-|<img src="README_Resources/ResourcesT3/fieldPlot.png" alt="" width="300px"/>|
-|<img src="README_Resources/ResourcesT3/EH_plot.png" alt="" width="500px"/>|
+<img src="README_Resources/ResourcesT3/fieldPlot.png" alt="" width="300px"/>
+<img src="README_Resources/ResourcesT3/EH_plot.png" alt="" width="500px"/>
 
 ## Propagation to the far-field
 We can create a far-field element by adding a plane and setting its grid-mode parametrization to AoE (Azimuth-over-Elevation). Then we propagate the field from our field EH_par to this far-field element. This can be done from the *Physical-optics* menu by selecting *Propagate Beam > To far-field*.
 
-|||
-|-|-|
-|<img src="README_Resources/ResourcesT3/planeFF.png" alt="" width="300px"/>|<img src="README_Resources/ResourcesT3/propFF.png" alt="" width="300"/>|
-|Creating a far-field object| Propagating to far-field|
+<img src="README_Resources/ResourcesT3/planeFF.png" alt="" width="300px"/><img src="README_Resources/ResourcesT3/propFF.png" alt="" width="300"/>
+Creating a far-field object Propagating to far-field
 
 If we now plot the generated *EH_FF* field it looks like this:   
 <img src="README_Resources/ResourcesT3/last.png" alt="" width="600"/> 

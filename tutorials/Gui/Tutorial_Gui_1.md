@@ -1,8 +1,11 @@
 # PyPO GUI Manual
 
 ## 
-![Blank app](README_Resources/blankGui.png)
-The gui consists of 3 widgets
+<img src="README_Resources/blankGui.png" alt="A blank GUI window at startup" width="80%"/>
+<!--![Blank app](README_Resources/blankGui.png)-->
+
+The gui consists of 3 widgets:
+
 * Workspace (left)
 * Plot screen
 * Console
@@ -17,21 +20,21 @@ From the elements menu select *Add Reflector* > *Quadric surface*.
 A form will show up with one dropdown selector. By selecting options, more options will show up. By filling in the parameters and clicking *add*, a reflector has been added to the system. If widget will show up in the workspace as such:
 
 <!--![System with one paraboloid reflector](README_Resources/pri_form.png)-->
-<img src="README_Resources/pri_form.png" alt="System with one paraboloid reflector" width="80%"/>
+<img src="README_Resources/pri_form.png" alt="System with one paraboloid reflector" width="30%"/>
 
 If adding the reflector did not succeed a message will be logged in the console with information about what went wrong.
 
-<img src="README_Resources/emptyFieldErr.png" alt="text saying: Error - Empty field at Focus xyz" width="55%"/>
+<img src="README_Resources/emptyFieldErr.png" alt="text saying: Error - Empty field at Focus xyz" width="30%"/>
 
 ## Plotting
 Now to see the reflector we just defined we need to plot it. 
 By clicking on the three dots on the right side of the element widget the element options menu will open. The first option is plot. 
 
-<img src="README_Resources/options_plot.png" alt="text saying: Error - Empty field at Focus xyz" width="40%"/>
+<img src="README_Resources/options_plot.png" alt="text saying: Error - Empty field at Focus xyz" width="30%"/>
 
 This will show the plot on the plot screen.
 
-<img src="README_Resources/pri_plot.png" alt="text saying: Error - Empty field at Focus xyz" width="80%"/>
+<img src="README_Resources/pri_plot.png" alt="text saying: Error - Empty field at Focus xyz" width="50%"/>
 
 ## Defining ray trace frames
 Now we will define a ray trace frame. We can do that from the menu bar by selecting Ray-trace > Make frame > Tube.
@@ -66,16 +69,16 @@ This will create a new frame *fr_pri*. If we plot this frame in th xy plane, it 
 
 ## Focus Finding
 
-After the rays were propagated onto the paraboloid reflector, they can be propagated propagated to the focus of the parabola. This can be done with the *focus finder*. In the menubar select Tools > focus finder. We select the frame we want to find the focus of the click *find focus*. This will automatically generate a new frame. If we plot this frame in xy, we see that the numbers along the axes are very small. The frame has been propagated
+After the rays were propagated onto the paraboloid reflector, they can be propagated propagated to the focus of the parabola. This can be done with the *focus finder*. In the menubar select Tools > focus finder. We select the frame we want to find the focus of the click *find focus*. This will automatically generate a new frame. If we plot this frame in xy, we see that the numbers along the axes are very small. The frame has been propagated to the focal plane.
 
 <img src="README_Resources/foc_frame_plot.png" alt="Selecting make tube frame" />
 
 
 
 ## Functionalities
- Defining reflectors
+
+* Defining reflectors
 * Grouping reflectors
 * Transforming reflectors and groups
-* Defining ray trace frames
-* 
+* Defining ray trace frames 
 * Defining physical optics beams

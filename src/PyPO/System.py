@@ -215,11 +215,11 @@ class System(object):
         check_ElemDict(_reflDict, self.system.keys(), self.num_ref, self.clog) 
         self.system[_reflDict["name"]] = _reflDict
 
-        if reflDict["pmode"] == "focus":
-            self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
+        if _reflDict["pmode"] == "focus":
+            self.system[_reflDict["name"]]["coeffs"] = np.zeros(3)
 
-            ve = reflDict["vertex"] # Vertex point position
-            f1 = reflDict["focus_1"] # Focal point position
+            ve = _reflDict["vertex"] # Vertex point position
+            f1 = _reflDict["focus_1"] # Focal point position
 
             diff = f1 - ve
 
@@ -232,25 +232,25 @@ class System(object):
 
             R = self.findRotation(world.IAX(), orientation)
             
-            self.system[reflDict["name"]]["transf"] = MatTranslate(offTrans, R)
-            self.system[reflDict["name"]]["pos"] = (self.system[reflDict["name"]]["transf"] @ np.append(self.system[reflDict["name"]]["pos"], 1))[:-1]
-            self.system[reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[reflDict["name"]]["ori"]
+            self.system[_reflDict["name"]]["transf"] = MatTranslate(offTrans, R)
+            self.system[_reflDict["name"]]["pos"] = (self.system[_reflDict["name"]]["transf"] @ np.append(self.system[_reflDict["name"]]["pos"], 1))[:-1]
+            self.system[_reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[_reflDict["name"]]["ori"]
 
-            self.system[reflDict["name"]]["coeffs"][0] = a
-            self.system[reflDict["name"]]["coeffs"][1] = b
-            self.system[reflDict["name"]]["coeffs"][2] = -1
+            self.system[_reflDict["name"]]["coeffs"][0] = a
+            self.system[_reflDict["name"]]["coeffs"][1] = b
+            self.system[_reflDict["name"]]["coeffs"][2] = -1
 
-        elif reflDict["pmode"] == "manual":
-            self.system[reflDict["name"]]["coeffs"] = np.array([reflDict["coeffs"][0], reflDict["coeffs"][1], -1])
+        elif _reflDict["pmode"] == "manual":
+            self.system[_reflDict["name"]]["coeffs"] = np.array([_reflDict["coeffs"][0], _reflDict["coeffs"][1], -1])
 
-        if reflDict["gmode"] == "xy" or reflDict["gmode"] == 0:
-            self.system[reflDict["name"]]["gmode"] = 0
+        if _reflDict["gmode"] == "xy" or _reflDict["gmode"] == 0:
+            self.system[_reflDict["name"]]["gmode"] = 0
 
-        elif reflDict["gmode"] == "uv" or reflDict["gmode"] == 1:
-            self.system[reflDict["name"]]["gmode"] = 1
+        elif _reflDict["gmode"] == "uv" or _reflDict["gmode"] == 1:
+            self.system[_reflDict["name"]]["gmode"] = 1
         
-        self.system[reflDict["name"]]["snapshots"] = {}
-        self.clog.info(f"Added paraboloid {reflDict['name']} to system.")
+        self.system[_reflDict["name"]]["snapshots"] = {}
+        self.clog.info(f"Added paraboloid {_reflDict['name']} to system.")
         self.num_ref += 1
 
     ##
@@ -267,12 +267,12 @@ class System(object):
         check_ElemDict(_reflDict, self.system.keys(), self.num_ref, self.clog) 
         self.system[_reflDict["name"]] = _reflDict
         
-        if reflDict["pmode"] == "focus":
-            self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
+        if _reflDict["pmode"] == "focus":
+            self.system[_reflDict["name"]]["coeffs"] = np.zeros(3)
             # Calculate a, b, c of hyperbola
-            f1 = reflDict["focus_1"] # Focal point 1 position
-            f2 = reflDict["focus_2"] # Focal point 2 position
-            ecc = reflDict["ecc"] # Eccentricity of hyperbola
+            f1 = _reflDict["focus_1"] # Focal point 1 position
+            f2 = _reflDict["focus_2"] # Focal point 2 position
+            ecc = _reflDict["ecc"] # Eccentricity of hyperbola
 
             diff = f1 - f2
             c = np.sqrt(np.dot(diff, diff)) / 2
@@ -294,23 +294,23 @@ class System(object):
             # Find rotation in frame of center
             R = self.findRotation(world.IAX(), orientation)
             
-            self.system[reflDict["name"]]["transf"] = MatTranslate(offTrans, R)
+            self.system[_reflDict["name"]]["transf"] = MatTranslate(offTrans, R)
 
-            self.system[reflDict["name"]]["pos"] = (self.system[reflDict["name"]]["transf"] @ np.append(self.system[reflDict["name"]]["pos"], 1))[:-1]
-            self.system[reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[reflDict["name"]]["ori"]
+            self.system[_reflDict["name"]]["pos"] = (self.system[_reflDict["name"]]["transf"] @ np.append(self.system[_reflDict["name"]]["pos"], 1))[:-1]
+            self.system[_reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[_reflDict["name"]]["ori"]
 
-            self.system[reflDict["name"]]["coeffs"][0] = a3
-            self.system[reflDict["name"]]["coeffs"][1] = b3
-            self.system[reflDict["name"]]["coeffs"][2] = c3
+            self.system[_reflDict["name"]]["coeffs"][0] = a3
+            self.system[_reflDict["name"]]["coeffs"][1] = b3
+            self.system[_reflDict["name"]]["coeffs"][2] = c3
 
-        if reflDict["gmode"] == "xy" or reflDict["gmode"] == 0:
-            self.system[reflDict["name"]]["gmode"] = 0
+        if _reflDict["gmode"] == "xy" or _reflDict["gmode"] == 0:
+            self.system[_reflDict["name"]]["gmode"] = 0
 
-        elif reflDict["gmode"] == "uv" or reflDict["gmode"] == 1:
-            self.system[reflDict["name"]]["gmode"] = 1
+        elif _reflDict["gmode"] == "uv" or _reflDict["gmode"] == 1:
+            self.system[_reflDict["name"]]["gmode"] = 1
 
-        self.system[reflDict["name"]]["snapshots"] = {}
-        self.clog.info(f"Added hyperboloid {reflDict['name']} to system.")
+        self.system[_reflDict["name"]]["snapshots"] = {}
+        self.clog.info(f"Added hyperboloid {_reflDict['name']} to system.")
         self.num_ref += 1
 
     ##
@@ -327,11 +327,11 @@ class System(object):
         check_ElemDict(_reflDict, self.system.keys(), self.num_ref, self.clog) 
         self.system[_reflDict["name"]] = _reflDict
         
-        if reflDict["pmode"] == "focus":
-            self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
-            f1 = reflDict["focus_1"]
-            f2 = reflDict["focus_2"]
-            ecc = reflDict["ecc"]
+        if _reflDict["pmode"] == "focus":
+            self.system[_reflDict["name"]]["coeffs"] = np.zeros(3)
+            f1 = _reflDict["focus_1"]
+            f2 = _reflDict["focus_2"]
+            ecc = _reflDict["ecc"]
 
             diff = f1 - f2
 
@@ -339,41 +339,41 @@ class System(object):
 
             f_norm = diff / np.linalg.norm(diff)
             
-            if reflDict["orient"] == "x":
+            if _reflDict["orient"] == "x":
                 R = self.findRotation(np.array([1,0,0]), f_norm)
             
-            if reflDict["orient"] == "z":
+            if _reflDict["orient"] == "z":
                 R = self.findRotation(np.array([0,0,1]), f_norm)
 
             a = np.sqrt(np.dot(diff, diff)) / (2 * ecc)
             b = a * np.sqrt(1 - ecc**2)
             
-            #_transf = MatRotate(rotation, reflDict["transf"])
-            self.system[reflDict["name"]]["transf"] = MatTranslate(trans, R)
+            #_transf = MatRotate(rotation, _reflDict["transf"])
+            self.system[_reflDict["name"]]["transf"] = MatTranslate(trans, R)
             
-            self.system[reflDict["name"]]["pos"] = (self.system[reflDict["name"]]["transf"] @ np.append(self.system[reflDict["name"]]["pos"], 1))[:-1]
-            self.system[reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[reflDict["name"]]["ori"]
+            self.system[_reflDict["name"]]["pos"] = (self.system[_reflDict["name"]]["transf"] @ np.append(self.system[_reflDict["name"]]["pos"], 1))[:-1]
+            self.system[_reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[_reflDict["name"]]["ori"]
 
-            if reflDict["orient"] == "x":
-                self.system[reflDict["name"]]["coeffs"][0] = a
-                self.system[reflDict["name"]]["coeffs"][1] = b
-                self.system[reflDict["name"]]["coeffs"][2] = b
+            if _reflDict["orient"] == "x":
+                self.system[_reflDict["name"]]["coeffs"][0] = a
+                self.system[_reflDict["name"]]["coeffs"][1] = b
+                self.system[_reflDict["name"]]["coeffs"][2] = b
             
-            if reflDict["orient"] == "z":
-                self.system[reflDict["name"]]["coeffs"][0] = b
-                self.system[reflDict["name"]]["coeffs"][1] = b
-                self.system[reflDict["name"]]["coeffs"][2] = a
+            if _reflDict["orient"] == "z":
+                self.system[_reflDict["name"]]["coeffs"][0] = b
+                self.system[_reflDict["name"]]["coeffs"][1] = b
+                self.system[_reflDict["name"]]["coeffs"][2] = a
 
-        if reflDict["gmode"] == "xy" or reflDict["gmode"] == 0:
-            self.system[reflDict["name"]]["gmode"] = 0
+        if _reflDict["gmode"] == "xy" or _reflDict["gmode"] == 0:
+            self.system[_reflDict["name"]]["gmode"] = 0
 
-        elif reflDict["gmode"] == "uv" or reflDict["gmode"] == 1:
-            self.system[reflDict["name"]]["gmode"] = 1
+        elif _reflDict["gmode"] == "uv" or _reflDict["gmode"] == 1:
+            self.system[_reflDict["name"]]["gmode"] = 1
 
-        check_ellipseLimits(self.system[reflDict["name"]], self.clog)
+        check_ellipseLimits(self.system[_reflDict["name"]], self.clog)
 
-        self.system[reflDict["name"]]["snapshots"] = {}
-        self.clog.info(f"Added ellipsoid {reflDict['name']} to system.")
+        self.system[_reflDict["name"]]["snapshots"] = {}
+        self.clog.info(f"Added ellipsoid {_reflDict['name']} to system.")
         self.num_ref += 1
 
     ##
@@ -390,23 +390,23 @@ class System(object):
         check_ElemDict(_reflDict, self.system.keys(), self.num_ref, self.clog) 
         
         self.system[_reflDict["name"]] = _reflDict
-        self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
+        self.system[_reflDict["name"]]["coeffs"] = np.zeros(3)
 
-        self.system[reflDict["name"]]["coeffs"][0] = -1
-        self.system[reflDict["name"]]["coeffs"][1] = -1
-        self.system[reflDict["name"]]["coeffs"][2] = -1
+        self.system[_reflDict["name"]]["coeffs"][0] = -1
+        self.system[_reflDict["name"]]["coeffs"][1] = -1
+        self.system[_reflDict["name"]]["coeffs"][2] = -1
 
-        if reflDict["gmode"] == "xy" or reflDict["gmode"] == 0:
-            self.system[reflDict["name"]]["gmode"] = 0
+        if _reflDict["gmode"] == "xy" or _reflDict["gmode"] == 0:
+            self.system[_reflDict["name"]]["gmode"] = 0
 
-        elif reflDict["gmode"] == "uv" or reflDict["gmode"] == 1:
-            self.system[reflDict["name"]]["gmode"] = 1
+        elif _reflDict["gmode"] == "uv" or _reflDict["gmode"] == 1:
+            self.system[_reflDict["name"]]["gmode"] = 1
 
-        elif reflDict["gmode"] == "AoE" or reflDict["gmode"] == 2:
-            self.system[reflDict["name"]]["gmode"] = 2
+        elif _reflDict["gmode"] == "AoE" or _reflDict["gmode"] == 2:
+            self.system[_reflDict["name"]]["gmode"] = 2
 
-        self.system[reflDict["name"]]["snapshots"] = {}
-        self.clog.info(f"Added plane {reflDict['name']} to system.")
+        self.system[_reflDict["name"]]["snapshots"] = {}
+        self.clog.info(f"Added plane {_reflDict['name']} to system.")
         self.num_ref += 1
    
 

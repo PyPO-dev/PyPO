@@ -1051,12 +1051,12 @@ class MainWidget(QWidget):
     ##
     # Shows form to propagate physical optics beam to surface 
     def propPOForm(self):
-        self.setForm(fData.propPOInp(self.stm.currents, self.stm.scalarfields, self.stm.system), self.propPOAction, okText="Propagate beam")
+        self.setForm(fData.propPOInp(self.stm.currents, self.stm.scalarfields, self.stm.system), self.propPOAction, okText="Propagate")
     
     ##
     # Shows form to propagate physical optics beam far field 
     def propPOFFForm(self):
-        self.setForm(fData.propPOFFInp(self.stm.currents, self.stm.system), self.propPOAction, okText="Propagate beam")
+        self.setForm(fData.propPOFFInp(self.stm.currents, self.stm.system), self.propPOAction, okText="Propagate")
     
     ##
     # Shows form to propagate physical optics beam using hybrid approach

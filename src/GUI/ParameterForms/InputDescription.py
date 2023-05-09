@@ -17,7 +17,7 @@ class InputDescription:
     ## @var inType: determines the type of the input
     # 
     # @see inType 
-    inType : inType
+    inType : inType= field()
     ##
     #  @var OutputName: string representing the key in the output dictionary 
     outputName = field(default=None)
@@ -35,7 +35,7 @@ class InputDescription:
     # Also used in 'SimpleRadio', 'SimpleDropdown' and 'ElementSelectionWidget' to display in stead of options. In such
     # case options are still used to read the form but this way you can make a difference between what the user sees and 
     # how the choice is interpreted.  
-    hints = Factory(list)
+    hints = field(default=Factory(list))
     ##
     # Number of input fields, used if inType is a vector type. 
     numFields = field(default=None)
@@ -55,7 +55,7 @@ class InputDescription:
     # Used in case of a static input to hide the input
     hidden = field(default=False)
     ##
-    # used by all inputs to provide a tooltip ##TODO: is this true?
+    # used by all inputs to provide a tooltip
     toolTip = field(default=None)
     ##
     # If true a vector type input will use the hints as prefilled values

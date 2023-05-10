@@ -1083,26 +1083,31 @@ class MainWidget(QWidget):
     def _addToWidgets(self, propBeamDict):
         print(f"{propBeamDict = }")
         print(self.stm.frames)
-        if propBeamDict["mode"] == "JM":
-            self.addCurrentWidget(propBeamDict["name_JM"])
-    
-        elif propBeamDict["mode"] == "EH" or propBeamDict["mode"] == "FF":
-            self.addFieldWidget(propBeamDict["name_EH"])
-    
-        elif propBeamDict["mode"] == "JMEH":
-            self.addCurrentWidget(propBeamDict["name_JM"])
-            self.addFieldWidget(propBeamDict["name_EH"])
-    
-        elif propBeamDict["mode"] == "EHP":
-            self.addFieldWidget(propBeamDict["name_EH"])
-            self.addFrameWidget(propBeamDict["name_P"])
-
-        elif propBeamDict["mode"] == "scalar":
-            self.addSFieldWidget(propBeamDict["name_field"])
+        try:
+            if propBeamDict["mode"] == "JM":
+                self.addCurrentWidget(propBeamDict["name_JM"])
         
-        elif propBeamDict["mode"] == "hybrid":
-            self.addFieldWidget(propBeamDict["field_out"])
-            self.addFrameWidget(propBeamDict["fr_out"])
+            elif propBeamDict["mode"] == "EH" or propBeamDict["mode"] == "FF":
+                self.addFieldWidget(propBeamDict["name_EH"])
+        
+            elif propBeamDict["mode"] == "JMEH":
+                self.addCurrentWidget(propBeamDict["name_JM"])
+                self.addFieldWidget(propBeamDict["name_EH"])
+        
+            elif propBeamDict["mode"] == "EHP":
+                self.addFieldWidget(propBeamDict["name_EH"])
+                self.addFrameWidget(propBeamDict["name_P"])
+
+            elif propBeamDict["mode"] == "scalar":
+                self.addSFieldWidget(propBeamDict["name_field"])
+            
+            elif propBeamDict["mode"] == "hybrid":
+                self.addFieldWidget(propBeamDict["field_out"])
+                self.addFrameWidget(propBeamDict["fr_out"])
+        except Exception as err:
+            print(err)
+            print_tb(err.__traceback__)
+            self.clog.error(err)
 
     # def _addToWidgetsOfCalc(self):
     #     self._addToWidgets()

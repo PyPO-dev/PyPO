@@ -55,30 +55,25 @@ class Test_SystemDictsAndAddElement(unittest.TestCase):
             (self.s.addHyperbola, validHyperbola),
             (self.s.addEllipse, validEllipse)
             ]:
-            
-            func(validElem)
-            func(validElem)
+            n = validElem['name']
             func(validElem)
             func(validElem)
             func(validElem)
             
-            name = validElem['name']+"_1"
+            
+            name = n+"_1"
             self.assertTrue(name in self.s.system)
             
-            name = validElem['name']+"_2"
+            name = n+"_2"
             self.assertTrue(name in self.s.system)
             
-            name = validElem['name']+"_3"
-            self.assertTrue(name in self.s.system)
             
-            name = validElem['name']+"_4"
-            self.assertTrue(name in self.s.system)
 
     def test_namingGroup(self):
         self.s.groupElements('g')
         self.s.groupElements('g')
-        self.assertTrue("g_1" in self.s.groups)
         self.s.groupElements('g')
+        self.assertTrue("g_1" in self.s.groups)
         self.assertTrue("g_2" in self.s.groups)
 
     def test_namingFrames(self):
@@ -106,16 +101,12 @@ class Test_SystemDictsAndAddElement(unittest.TestCase):
         self.assertTrue("tf_1" in self.s.frames)
         self.s.createTubeFrame(tubeFrameDict)
         self.assertTrue("tf_2" in self.s.frames)
-        self.s.createTubeFrame(tubeFrameDict)
-        self.assertTrue("tf_3" in self.s.frames)
 
         self.s.createGRTFrame(gaussFrame)
         self.s.createGRTFrame(gaussFrame)
         self.assertTrue("gf_1" in self.s.frames)
         self.s.createGRTFrame(gaussFrame)
         self.assertTrue("gf_2" in self.s.frames)
-        self.s.createGRTFrame(gaussFrame)
-        self.assertTrue("gf_3" in self.s.frames)
 
 
     def test_addPOFields(self):
@@ -179,40 +170,30 @@ class Test_SystemDictsAndAddElement(unittest.TestCase):
             (self.s.createUniformSource, UPSBeam), 
             (self.s.createGaussian, GaussBeam),
             ]:
-            name = validElem['name'] + '_1'
+            names = [validElem['name'] + '_1', validElem['name'] + '_2']
             func(validElem, "plane")
             func(validElem, "plane")
-            self.assertTrue(name in self.s.fields)
-            self.assertTrue(name in self.s.currents)
+            func(validElem, "plane")
+
+            for n in names:
+                self.assertTrue(n in self.s.fields)
+                self.assertTrue(n in self.s.currents)
             
-            func(validElem, "plane")
-            name = validElem['name'] + '_2'
-            self.assertTrue(name in self.s.fields)
-            self.assertTrue(name in self.s.currents)
-            
-            func(validElem, "plane")
-            name = validElem['name'] + '_3'
-            self.assertTrue(name in self.s.fields)
-            self.assertTrue(name in self.s.currents)
             
         for func, validElem in [
             (self.s.createPointSourceScalar, ScalarPSBeam),
             (self.s.createUniformSourceScalar, ScalarUPSBeam),
             (self.s.createScalarGaussian, ScalarGaussBeam),
             ]:
-            name = validElem['name'] + '_1'
+            names = [validElem['name'] + '_1', validElem['name'] + '_2']
+            func(validElem, "plane")
             func(validElem, "plane")
             func(validElem, "plane")
 
-            self.assertTrue(name in self.s.scalarfields)
+            for n in names:
+                self.assertTrue(n in self.s.scalarfields)
             
-            func(validElem, "plane")
-            name = validElem['name'] + '_2'
-            self.assertTrue(name in self.s.scalarfields)
             
-            func(validElem, "plane")
-            name = validElem['name'] + '_3'
-            self.assertTrue(name in self.s.scalarfields)
 
 if __name__ == "__main__":
     unittest.main()

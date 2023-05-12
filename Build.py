@@ -153,6 +153,7 @@ def BuildPyPO():
                 file.write(filedata)
 
             shutil.move("docs", "../PyPO-docs/docs")
+
             clog.info("Succesfully generated PyPO documentation.")
         
         except:

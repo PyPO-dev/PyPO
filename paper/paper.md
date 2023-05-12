@@ -52,8 +52,8 @@ Commercial software for GO and PO calculations, such as OpticStudio (Zemax) and 
 Moreover, `PyPO` does not employ approximations often employed by other software packages such as `POPPy` [@Perrin:2012] and Prysm [@Dube:2019]. Rather, PyPO directly solves the radiation integral, allowing for propagation between multiple (off-axis) reflector surfaces.
 
 # Availability
-`PyPO` can be found on [Github](https://github.com/arend95/PyPO) and is available for Linux, Windows and MacOS.
-Software documentation and instructions regarding installation, contributing and issue tracking can be found in the [documentation](https://arend95.github.io/PyPO/). 
+`PyPO` can be found on [Github](https://github.com/PyPO-dev/PyPO) and is available for Linux, Windows and MacOS.
+Software documentation and instructions regarding installation, contributing and issue tracking can be found in the [documentation](https://pypo-dev.github.io/PyPO-docs/). 
 The package comes with several Jupyter Notebook tutorials illustrating the workflow and features, and can be used as building blocks for new reflector systems.
 
 # Acknowledgements

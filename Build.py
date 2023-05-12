@@ -110,6 +110,7 @@ def BuildPyPO():
         try:
             try:
                 shutil.rmtree("docs")
+                shutil.rmtree("../PyPO-docs/docs")
             except:
                 pass
             clog.info("Generating PyPO documentation...")
@@ -151,6 +152,7 @@ def BuildPyPO():
             with open(filelist_path, 'w') as file:
                 file.write(filedata)
 
+            shutil.move("docs", "../PyPO-docs/docs")
             clog.info("Succesfully generated PyPO documentation.")
         
         except:

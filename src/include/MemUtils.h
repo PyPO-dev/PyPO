@@ -32,6 +32,7 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort =
 }
 
 /**
+ * @class
  * Utility class for memory allocations/copies between CUDA and host.
  */
 class MemUtils

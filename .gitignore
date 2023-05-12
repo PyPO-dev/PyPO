@@ -168,7 +168,7 @@ examples/images/
 tests/Python/datadir/
 datadir/
 Imports.py
-
+tutorials/
 # vim stuff
 *.swp
 *.swo
@@ -185,4 +185,3 @@ fromDesigner.py
 src/GUI/fromDesigner.ui
 src/GUI/Tests
 .GUIWidgetTester.py
-

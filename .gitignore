@@ -139,6 +139,7 @@ images/
 save/
 custom/
 out/
+docs/
 
 # User-specific files
 log
@@ -148,7 +149,6 @@ log
 
 !*/tutorials/*.png
 !tutorials/Gui/README_Resources/*.png
-!docs/*.png
 
 # Personal projects/files
 personal/

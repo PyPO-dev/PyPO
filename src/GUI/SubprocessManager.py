@@ -1,6 +1,6 @@
 from multiprocessing import Process, Manager
-from PyQt5.QtCore import QThread, pyqtSignal, QObject
-from PyQt5.QtWidgets import QWidget, QMainWindow, QApplication, QVBoxLayout, QPushButton, QLabel
+from PySide2.QtCore import QThread, Signal, QObject
+from PySide2.QtWidgets import QWidget, QMainWindow, QApplication, QVBoxLayout, QPushButton, QLabel
 from src.GUI.Dialogs import SymDialog
 from time import sleep
 from copy import deepcopy
@@ -50,7 +50,7 @@ class SubprocessManager():
 
 
 class Waiter(QObject):
-    finished = pyqtSignal(int)
+    finished = Signal(int)
 
     def setProcess(self, process):
         self.process = process
@@ -61,8 +61,13 @@ class Waiter(QObject):
         self.finished.emit(self.process.exitcode==0)
 
 
-def copySystem(system :st.System, cSystem = True, cFrames = [], cFields = [], cCurrents = [], cScalarFields = []):
-    s2 = st.System(context="G")
+def copySystem(system :st.System, cSystem = True, cFrames = None, cFields = None, cCurrents = None, cScalarFields = None):
+    cFrames = [] if cFrames is None else cFrames
+    cFields = [] if cFields is None else cFields
+    cCurrents = [] if cCurrents is None else cCurrents
+    cScalarFields = [] if cScalarFields is None else cScalarFields
+    
+    s2 = st.System(context="G", override=False)
     if cSystem:
         s2.system.update(deepcopy(system.system))
     for frame in cFrames:

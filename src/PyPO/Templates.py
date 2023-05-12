@@ -125,3 +125,16 @@ runRTDict = {
         "device"    : "Device to use for calculation",
         "epsilon"   : "Relative permittivity of nexus medium",
         }
+
+##
+# Template for a hybrid RT/PO propagation.
+hybridDict = {
+        "fr_in"     : "Name of input frame",
+        "field_in"  : "Source reflected fields",
+        "t_name"    : "Name of target surface",
+        "fr_out"    : "Name of output frame",
+        "field_out" : "Name of output field",
+        "start"     : "Starting point of rays, for spherical attenuation",
+        "interp"    : "Whether to interpolate resulting field on surface",
+        "comp"      : "If interp is True, which component to interpolate"
+        }

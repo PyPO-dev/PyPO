@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QFormLayout, QLineEdit, QLabel, QPushButton, QComboBox, QHBoxLayout, QApplication
+from PySide2.QtWidgets import QWidget, QFormLayout, QLineEdit, QLabel, QPushButton, QComboBox, QHBoxLayout, QApplication
 import sys
 import numpy as np
 

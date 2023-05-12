@@ -43,7 +43,7 @@ if(CMAKE_CUDA_COMPILER)
     set_target_properties(pypogpu PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
     set_property(TARGET pypogpu PROPERTY CUDA_ARCHITECTURES OFF)
 else()
-    message(STATUS "WARNING: no CUDA compiler detected.")
+    message(STATUS "WARNING: no CUDA compiler detected. Not building CUDA libraries")
 endif()
 
 

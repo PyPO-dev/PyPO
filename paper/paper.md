@@ -1,28 +1,24 @@
 ---
 title: 'PyPO: a Python package for Physical Optics'
 tags:
+  - Physical Optics
+  - Geometrical Optics
+  - Reflectors
   - Python
   - C++
   - CUDA
-  - Reflectors
-  - Physical Optics
-  - Geometrical Optics
 authors:
   - name: Arend Moerman
     orcid: 0000-0002-0475-6134
-    equal-contrib: true
     corresponding: true
     affiliation: 1
   - name: Maikel H. Gafaji
-    equal-contrib: true
     affiliation: 2
   - name: Kenichi Karatsu
-    orcid: 0000-0002-0475-6134
-    equal-contrib: False
+    orcid: 0000-0003-4562-5584
     affiliation: [1,3]
   - name: Akira Endo
-    orcid: 0000-0002-0475-6134
-    equal-contrib: False
+    orcid: 0000-0003-0379-2341
     affiliation: 1
 affiliations:
   - name: Faculty of Electrical Engineering, Mathematics and Computer Science, Delft University of Technology, Mekelweg 4, 2628 CD, Delft, The Netherlands
@@ -31,39 +27,34 @@ affiliations:
     index: 2
   - name: SRON—Netherlands Institute for Space Research, Niels Bohrweg 4, 2333 CA, Leiden, The Netherlands
     index: 3
-date: 28 February 2023
+date: 26 April 2023
 bibliography: paper.bib
 ---
 
 # Summary
+`PyPO` is a Python interface for end-to-end design, simulation and analysis of (quasi-)optical reflector systems. 
+It can model the forward and backward propagation of electromagnetic field distributions between multiple planar and (off-axis) quadric surfaces, as well as far-field propagation.
+Simulations are performed using either geometrical optics (GO) or the equivalent surface current approach, belonging to the field of physical optics (PO) [@Balanis:1989].
+The GO and PO calculations are performed using libraries written in C++ and CUDA, allowing for multi-threading and GPU acceleration.
+Common figures of merit, such as aperture efficiency and half-power beamwidth, can be calculated and used for quantitative analysis of the designed system.
+Input beam patterns can be selected from a range of models, such as Gaussian beams, point sources and uniform sources. 
+Custom beam patterns can also be imported to, for example, model the propagation of a measured beam pattern through a simulated optical system.
 
-`PyPO` is a Python interface for end-to-end simulations of (quasi-)optical reflector systems. Using `PyPO`, it is possible to simulate electromagnetic field propagation between multiple reflector surfaces. As numerical methods, `PyPO` can use a geometrical optics (GO) approach using ray-tracing, or the equivalent surface current approach, belonging to the field of physical optics (PO) [@Balanis:1989]. 
-After propagation of electromagnetic fields, `PyPO` can calculate a multitude of efficiencies and other figures of merit, allowing for quantitative analysis of the designed (quasi-)optical systems.
+`PyPO` can be used through either a scripting-based approach, where simulations are defined in Python scripts, or through the graphical user interface (GUI).
+It only carries core dependencies on NumPy [@Harris:2020], Matplotlib [@Hunter:2007], SciPy [@Virtanen:2020]. The unittesting framework carries a dependency on nose2. The GUI carries dependencies on PyQt5 and attrs. 
 
 # Statement of need
+Development of `PyPO` started with the need for alignment strategies for the wideband sub-mm spectrometer DESHIMA 2.0 [@Taniguchi:2022]. 
+A software package capable of efficient GO and PO calulations through optical systems consisting of quadric surfaces was necessary for calculating the configuration of the corrective optics. 
+Currently, `PyPO` is also being used in simulations of measured beam patterns of DESHIMA 2.0 at the ASTE [@ASTE] telescope for the analysis of instrument performance.
 
-`PyPO` offers the following functionality:
-
-- Convenient workflow for designing and characterising reflector systems consisting of planar and quadric surfaces. Design and simulation can be done in either a simple Python script or through the built-in graphical user interface (GUI).
-- Common beam patterns, such as point sources and Gaussian beams, that can be used as input for GO/PO propagation. Custom beam patterns, for example measured in a lab, can also be used as input.
-- Efficient multi-threaded C++ libraries for performing GO and PO calculations. If an Nvidia GPU is present, the calculations can be accelerated even more using CUDA.
-- Methods for evaluating common figures of merit such as root-mean-square (RMS) spot values for GO propagation. For PO, commonly used metrics such as spillover, taper, aperture, main beam and cross-polar efficiencies can be calculated.
-
-Commercial software for these ends, such as OpticStudio (Zemax) and GRASP (TICRA), has already been developed, but to our knowledge `PyPO` is the first free open-source package that simulates planar and quadric reflector geometries using both GO and PO. 
-Moreover, `PyPO` does not employ approximations often employed by other software packages such as `POPPy` [@Perrin:2012] and Prysm [@Dube:2019]. Rather, PyPO directly solves the radiation integral, allowing for propagation between multiple reflector surfaces.
-
-Currently, `PyPO` is heavily used in the laboratory verification and characterisation of the DESHIMA 2.0 spectrometer [@Taniguchi:2022]. 
-Specifically, `PyPO` is used for the following purposes:
-
-- Optimisation of correcting optics using the GO calculations.
-- PO propagation of measured beam patterns through the Cassegrain setup of the ASTE [@ASTE] telescope.
-- Calculation of far-field beam patterns after the ASTE telescope.
-- Evaluation of the instrument efficiencies at the ASTE telescope.
+Commercial software for GO and PO calculations, such as OpticStudio (Zemax) and GRASP (TICRA), has already been developed, but to our knowledge `PyPO` is the first free open-source Python package that simulates planar and quadric (off-axis) reflector geometries using both GO and PO. 
+Moreover, `PyPO` does not employ approximations often employed by other software packages such as `POPPy` [@Perrin:2012] and Prysm [@Dube:2019]. Rather, PyPO directly solves the radiation integral, allowing for propagation between multiple (off-axis) reflector surfaces.
 
 # Availability
-`PyPO` can be found on [Github](https://github.com/arend95/PyPO). 
-Software documentation and instructions regarding installation, contribution and issue tracking can be found in the [documentation](https://arend95.github.io/PyPO/). 
-The package comes with several worked examples illustrating the workflow and features, which can be used as building blocks for new reflector systems.
+`PyPO` can be found on [Github](https://github.com/arend95/PyPO) and is available for Linux, Windows and MacOS.
+Software documentation and instructions regarding installation, contributing and issue tracking can be found in the [documentation](https://arend95.github.io/PyPO/). 
+The package comes with several Jupyter Notebook tutorials illustrating the workflow and features, and can be used as building blocks for new reflector systems.
 
 # Acknowledgements
 This work is supported by the European Union (ERC Consolidator Grant No. 101043486 TIFUUN). Views and opinions expressed are however those of the authors only and do not necessarily reflect those of the European Union or the European Research Council Executive Agency. Neither the European Union nor the granting authority can be held responsible for them.

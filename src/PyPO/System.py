@@ -1,19 +1,14 @@
 # Standard Python imports
-import numbers
-import scipy.optimize as opt
-from scipy.interpolate import interp1d
-import numpy as np
+from scipy.optimize import fmin
+from scipy.interpolate import interp1d, griddata
 import matplotlib.pyplot as pt
 import matplotlib.cm as cm
+import numpy as np
 import time
 import os
-import sys
 import copy
 import logging
-import json
 from pathlib import Path
-from contextlib import contextmanager
-from scipy.interpolate import griddata, interpn
 import pickle 
 
 # PyPO-specific modules
@@ -59,7 +54,8 @@ class System(object):
         self.num_cam = 0
         self.nThreads_cpu = os.cpu_count()
         self.context = context
-        
+        self.verbosity = verbose
+
         Config.setContext(context)
         Config.setOverride(override)
 
@@ -93,11 +89,13 @@ class System(object):
         #redirect = None
         if redirect is None:
             self.clog_mgr = CustomLogger(os.path.basename(__file__))
-            self.clog = self.clog_mgr.getCustomLogger() if verbose else self.clog_mgr.getCustomLogger(open(os.devnull, "w"))
+            self.clog = self.clog_mgr.getCustomLogger()
 
         else:
             self.clog = redirect
-        #print(self.clog)
+
+        if not verbose:
+            self.clog.setLevel(logging.CRITICAL)
 
         if context == "S":
             self.clog.info("INITIALIZED EMPTY SYSTEM.")
@@ -189,12 +187,18 @@ class System(object):
     # @param verbose Whether to enable logging or not.
     # @param handler If multiple handlers are present, select which handler to adjust.
     def setLoggingVerbosity(self, verbose=True, handler=None):
-        if handler is None:
-            for fstream in self.clog.handlers:
-                fstream.setStream(sys.stdout) if verbose else fstream.setStream(open(os.devnull, "w"))
-
+        self.verbosity = verbose
+        if verbose == True:
+            self.clog.setLevel(logging.DEBUG)
         else:
-            self.clog.handlers[handler].setStream() if verbose else self.clog.handlers[handler].setStream(open(os.devnull, "w"))
+            self.clog.setLevel(logging.CRITICAL)
+
+        #if handler is None:
+        #    for fstream in self.clog.handlers:
+        #        fstream.setStream(sys.stdout) if verbose else fstream.setStream(open(os.devnull, "w"))
+
+        #else:
+        #    self.clog.handlers[handler].setStream() if verbose else self.clog.handlers[handler].setStream(open(os.devnull, "w"))
 
     ##
     # Add a paraboloid reflector to the System.
@@ -207,15 +211,15 @@ class System(object):
 
         reflDict["type"] = 0
 
-        check_ElemDict(reflDict, self.system.keys(), self.num_ref, self.clog) 
+        _reflDict = self.copyObj(reflDict)
+        check_ElemDict(_reflDict, self.system.keys(), self.num_ref, self.clog) 
+        self.system[_reflDict["name"]] = _reflDict
 
-        self.system[reflDict["name"]] = self.copyObj(reflDict)
+        if _reflDict["pmode"] == "focus":
+            self.system[_reflDict["name"]]["coeffs"] = np.zeros(3)
 
-        if reflDict["pmode"] == "focus":
-            self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
-
-            ve = reflDict["vertex"] # Vertex point position
-            f1 = reflDict["focus_1"] # Focal point position
+            ve = _reflDict["vertex"] # Vertex point position
+            f1 = _reflDict["focus_1"] # Focal point position
 
             diff = f1 - ve
 
@@ -228,25 +232,25 @@ class System(object):
 
             R = self.findRotation(world.IAX(), orientation)
             
-            self.system[reflDict["name"]]["transf"] = MatTranslate(offTrans, R)
-            self.system[reflDict["name"]]["pos"] = (self.system[reflDict["name"]]["transf"] @ np.append(self.system[reflDict["name"]]["pos"], 1))[:-1]
-            self.system[reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[reflDict["name"]]["ori"]
+            self.system[_reflDict["name"]]["transf"] = MatTranslate(offTrans, R)
+            self.system[_reflDict["name"]]["pos"] = (self.system[_reflDict["name"]]["transf"] @ np.append(self.system[_reflDict["name"]]["pos"], 1))[:-1]
+            self.system[_reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[_reflDict["name"]]["ori"]
 
-            self.system[reflDict["name"]]["coeffs"][0] = a
-            self.system[reflDict["name"]]["coeffs"][1] = b
-            self.system[reflDict["name"]]["coeffs"][2] = -1
+            self.system[_reflDict["name"]]["coeffs"][0] = a
+            self.system[_reflDict["name"]]["coeffs"][1] = b
+            self.system[_reflDict["name"]]["coeffs"][2] = -1
 
-        elif reflDict["pmode"] == "manual":
-            self.system[reflDict["name"]]["coeffs"] = np.array([reflDict["coeffs"][0], reflDict["coeffs"][1], -1])
+        elif _reflDict["pmode"] == "manual":
+            self.system[_reflDict["name"]]["coeffs"] = np.array([_reflDict["coeffs"][0], _reflDict["coeffs"][1], -1])
 
-        if reflDict["gmode"] == "xy" or reflDict["gmode"] == 0:
-            self.system[reflDict["name"]]["gmode"] = 0
+        if _reflDict["gmode"] == "xy" or _reflDict["gmode"] == 0:
+            self.system[_reflDict["name"]]["gmode"] = 0
 
-        elif reflDict["gmode"] == "uv" or reflDict["gmode"] == 1:
-            self.system[reflDict["name"]]["gmode"] = 1
+        elif _reflDict["gmode"] == "uv" or _reflDict["gmode"] == 1:
+            self.system[_reflDict["name"]]["gmode"] = 1
         
-        self.system[reflDict["name"]]["snapshots"] = {}
-        self.clog.info(f"Added paraboloid {reflDict['name']} to system.")
+        self.system[_reflDict["name"]]["snapshots"] = {}
+        self.clog.info(f"Added paraboloid {_reflDict['name']} to system.")
         self.num_ref += 1
 
     ##
@@ -259,15 +263,16 @@ class System(object):
     def addHyperbola(self, reflDict):
 
         reflDict["type"] = 1
-        check_ElemDict(reflDict, self.system.keys(), self.num_ref, self.clog) 
-        self.system[reflDict["name"]] = self.copyObj(reflDict)
+        _reflDict = self.copyObj(reflDict)
+        check_ElemDict(_reflDict, self.system.keys(), self.num_ref, self.clog) 
+        self.system[_reflDict["name"]] = _reflDict
         
-        if reflDict["pmode"] == "focus":
-            self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
+        if _reflDict["pmode"] == "focus":
+            self.system[_reflDict["name"]]["coeffs"] = np.zeros(3)
             # Calculate a, b, c of hyperbola
-            f1 = reflDict["focus_1"] # Focal point 1 position
-            f2 = reflDict["focus_2"] # Focal point 2 position
-            ecc = reflDict["ecc"] # Eccentricity of hyperbola
+            f1 = _reflDict["focus_1"] # Focal point 1 position
+            f2 = _reflDict["focus_2"] # Focal point 2 position
+            ecc = _reflDict["ecc"] # Eccentricity of hyperbola
 
             diff = f1 - f2
             c = np.sqrt(np.dot(diff, diff)) / 2
@@ -289,23 +294,23 @@ class System(object):
             # Find rotation in frame of center
             R = self.findRotation(world.IAX(), orientation)
             
-            self.system[reflDict["name"]]["transf"] = MatTranslate(offTrans, R)
+            self.system[_reflDict["name"]]["transf"] = MatTranslate(offTrans, R)
 
-            self.system[reflDict["name"]]["pos"] = (self.system[reflDict["name"]]["transf"] @ np.append(self.system[reflDict["name"]]["pos"], 1))[:-1]
-            self.system[reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[reflDict["name"]]["ori"]
+            self.system[_reflDict["name"]]["pos"] = (self.system[_reflDict["name"]]["transf"] @ np.append(self.system[_reflDict["name"]]["pos"], 1))[:-1]
+            self.system[_reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[_reflDict["name"]]["ori"]
 
-            self.system[reflDict["name"]]["coeffs"][0] = a3
-            self.system[reflDict["name"]]["coeffs"][1] = b3
-            self.system[reflDict["name"]]["coeffs"][2] = c3
+            self.system[_reflDict["name"]]["coeffs"][0] = a3
+            self.system[_reflDict["name"]]["coeffs"][1] = b3
+            self.system[_reflDict["name"]]["coeffs"][2] = c3
 
-        if reflDict["gmode"] == "xy" or reflDict["gmode"] == 0:
-            self.system[reflDict["name"]]["gmode"] = 0
+        if _reflDict["gmode"] == "xy" or _reflDict["gmode"] == 0:
+            self.system[_reflDict["name"]]["gmode"] = 0
 
-        elif reflDict["gmode"] == "uv" or reflDict["gmode"] == 1:
-            self.system[reflDict["name"]]["gmode"] = 1
+        elif _reflDict["gmode"] == "uv" or _reflDict["gmode"] == 1:
+            self.system[_reflDict["name"]]["gmode"] = 1
 
-        self.system[reflDict["name"]]["snapshots"] = {}
-        self.clog.info(f"Added hyperboloid {reflDict['name']} to system.")
+        self.system[_reflDict["name"]]["snapshots"] = {}
+        self.clog.info(f"Added hyperboloid {_reflDict['name']} to system.")
         self.num_ref += 1
 
     ##
@@ -318,14 +323,15 @@ class System(object):
     def addEllipse(self, reflDict):
 
         reflDict["type"] = 2
-        check_ElemDict(reflDict, self.system.keys(), self.num_ref, self.clog) 
-        self.system[reflDict["name"]] = self.copyObj(reflDict)
-
-        if reflDict["pmode"] == "focus":
-            self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
-            f1 = reflDict["focus_1"]
-            f2 = reflDict["focus_2"]
-            ecc = reflDict["ecc"]
+        _reflDict = self.copyObj(reflDict)
+        check_ElemDict(_reflDict, self.system.keys(), self.num_ref, self.clog) 
+        self.system[_reflDict["name"]] = _reflDict
+        
+        if _reflDict["pmode"] == "focus":
+            self.system[_reflDict["name"]]["coeffs"] = np.zeros(3)
+            f1 = _reflDict["focus_1"]
+            f2 = _reflDict["focus_2"]
+            ecc = _reflDict["ecc"]
 
             diff = f1 - f2
 
@@ -333,41 +339,41 @@ class System(object):
 
             f_norm = diff / np.linalg.norm(diff)
             
-            if reflDict["orient"] == "x":
+            if _reflDict["orient"] == "x":
                 R = self.findRotation(np.array([1,0,0]), f_norm)
             
-            if reflDict["orient"] == "z":
+            if _reflDict["orient"] == "z":
                 R = self.findRotation(np.array([0,0,1]), f_norm)
 
             a = np.sqrt(np.dot(diff, diff)) / (2 * ecc)
             b = a * np.sqrt(1 - ecc**2)
             
-            #_transf = MatRotate(rotation, reflDict["transf"])
-            self.system[reflDict["name"]]["transf"] = MatTranslate(trans, R)
+            #_transf = MatRotate(rotation, _reflDict["transf"])
+            self.system[_reflDict["name"]]["transf"] = MatTranslate(trans, R)
             
-            self.system[reflDict["name"]]["pos"] = (self.system[reflDict["name"]]["transf"] @ np.append(self.system[reflDict["name"]]["pos"], 1))[:-1]
-            self.system[reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[reflDict["name"]]["ori"]
+            self.system[_reflDict["name"]]["pos"] = (self.system[_reflDict["name"]]["transf"] @ np.append(self.system[_reflDict["name"]]["pos"], 1))[:-1]
+            self.system[_reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[_reflDict["name"]]["ori"]
 
-            if reflDict["orient"] == "x":
-                self.system[reflDict["name"]]["coeffs"][0] = a
-                self.system[reflDict["name"]]["coeffs"][1] = b
-                self.system[reflDict["name"]]["coeffs"][2] = b
+            if _reflDict["orient"] == "x":
+                self.system[_reflDict["name"]]["coeffs"][0] = a
+                self.system[_reflDict["name"]]["coeffs"][1] = b
+                self.system[_reflDict["name"]]["coeffs"][2] = b
             
-            if reflDict["orient"] == "z":
-                self.system[reflDict["name"]]["coeffs"][0] = b
-                self.system[reflDict["name"]]["coeffs"][1] = b
-                self.system[reflDict["name"]]["coeffs"][2] = a
+            if _reflDict["orient"] == "z":
+                self.system[_reflDict["name"]]["coeffs"][0] = b
+                self.system[_reflDict["name"]]["coeffs"][1] = b
+                self.system[_reflDict["name"]]["coeffs"][2] = a
 
-        if reflDict["gmode"] == "xy" or reflDict["gmode"] == 0:
-            self.system[reflDict["name"]]["gmode"] = 0
+        if _reflDict["gmode"] == "xy" or _reflDict["gmode"] == 0:
+            self.system[_reflDict["name"]]["gmode"] = 0
 
-        elif reflDict["gmode"] == "uv" or reflDict["gmode"] == 1:
-            self.system[reflDict["name"]]["gmode"] = 1
+        elif _reflDict["gmode"] == "uv" or _reflDict["gmode"] == 1:
+            self.system[_reflDict["name"]]["gmode"] = 1
 
-        check_ellipseLimits(self.system[reflDict["name"]], self.clog)
+        check_ellipseLimits(self.system[_reflDict["name"]], self.clog)
 
-        self.system[reflDict["name"]]["snapshots"] = {}
-        self.clog.info(f"Added ellipsoid {reflDict['name']} to system.")
+        self.system[_reflDict["name"]]["snapshots"] = {}
+        self.clog.info(f"Added ellipsoid {_reflDict['name']} to system.")
         self.num_ref += 1
 
     ##
@@ -380,26 +386,27 @@ class System(object):
     def addPlane(self, reflDict):
 
         reflDict["type"] = 3
-        check_ElemDict(reflDict, self.system.keys(), self.num_ref, self.clog) 
+        _reflDict = self.copyObj(reflDict)
+        check_ElemDict(_reflDict, self.system.keys(), self.num_ref, self.clog) 
+        
+        self.system[_reflDict["name"]] = _reflDict
+        self.system[_reflDict["name"]]["coeffs"] = np.zeros(3)
 
-        self.system[reflDict["name"]] = self.copyObj(reflDict)
-        self.system[reflDict["name"]]["coeffs"] = np.zeros(3)
+        self.system[_reflDict["name"]]["coeffs"][0] = -1
+        self.system[_reflDict["name"]]["coeffs"][1] = -1
+        self.system[_reflDict["name"]]["coeffs"][2] = -1
 
-        self.system[reflDict["name"]]["coeffs"][0] = -1
-        self.system[reflDict["name"]]["coeffs"][1] = -1
-        self.system[reflDict["name"]]["coeffs"][2] = -1
+        if _reflDict["gmode"] == "xy" or _reflDict["gmode"] == 0:
+            self.system[_reflDict["name"]]["gmode"] = 0
 
-        if reflDict["gmode"] == "xy" or reflDict["gmode"] == 0:
-            self.system[reflDict["name"]]["gmode"] = 0
+        elif _reflDict["gmode"] == "uv" or _reflDict["gmode"] == 1:
+            self.system[_reflDict["name"]]["gmode"] = 1
 
-        elif reflDict["gmode"] == "uv" or reflDict["gmode"] == 1:
-            self.system[reflDict["name"]]["gmode"] = 1
+        elif _reflDict["gmode"] == "AoE" or _reflDict["gmode"] == 2:
+            self.system[_reflDict["name"]]["gmode"] = 2
 
-        elif reflDict["gmode"] == "AoE" or reflDict["gmode"] == 2:
-            self.system[reflDict["name"]]["gmode"] = 2
-
-        self.system[reflDict["name"]]["snapshots"] = {}
-        self.clog.info(f"Added plane {reflDict['name']} to system.")
+        self.system[_reflDict["name"]]["snapshots"] = {}
+        self.clog.info(f"Added plane {_reflDict['name']} to system.")
         self.num_ref += 1
    
 
@@ -435,8 +442,6 @@ class System(object):
                 self.system[name]["transf"] = Rtot @ self.system[name]["transf"]
                 self.system[name]["transf"][:-1, :-1] = (MatRotate(rotation, pivot=pivot))[:-1, :-1]
 
-                #print(np.linalg.det(self.system[name]["transf"]))
-
                 self.system[name]["pos"] = (Rtot @ np.append(self.system[name]["pos"], 1))[:-1]
                 self.system[name]["ori"] = Rtot[:-1, :-1] @ self.system[name]["ori"]
 
@@ -447,7 +452,6 @@ class System(object):
 
             elif mode == "relative":
                 self.system[name]["transf"] = MatRotate(rotation, self.system[name]["transf"], pivot)
-                #print(np.linalg.det(self.system[name]["transf"]))
                 
                 self.system[name]["pos"] = (MatRotate(rotation, pivot=pivot) @ np.append(self.system[name]["pos"], 1))[:-1]
                 self.system[name]["ori"] = MatRotate(rotation)[:-1, :-1] @ self.system[name]["ori"]
@@ -524,8 +528,6 @@ class System(object):
                 _fr = transformRays(self.frames[name])
                 self.frames[name] = self.copyObj(_fr)
 
-                #print(np.linalg.det(self.frames[name].transf))
-
                 self.frames[name].pos = (Rtot @ np.append(self.frames[name].pos, 1))[:-1]
                 self.frames[name].ori = Rtot[:-1, :-1] @ self.frames[name].ori
                 self.clog.info(f"Rotated element {name} to {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
@@ -534,7 +536,6 @@ class System(object):
                 self.frames[name].transf = MatRotate(rotation, pivot=pivot)
                 _fr = transformRays(self.frames[name])
                 self.frames[name] = self.copyObj(_fr)
-                #print(np.linalg.det(self.frames[name].transf))
                 
                 self.frames[name].pos = (MatRotate(rotation, pivot=pivot) @ np.append(self.frames[name].pos, 1))[:-1]
                 self.frames[name].ori = MatRotate(rotation)[:-1, :-1] @ self.frames[name].ori
@@ -741,6 +742,10 @@ class System(object):
     # @param pos Position tracer for the group.
     # @param ori Orientation tracker for group.
     def groupElements(self, name_group, *names, pos=None, ori=None):
+        num = getIndex(name_group, self.groups.keys())
+
+        if num > 0:
+            name_group = name_group + "_{}".format(num)
         pos = world.ORIGIN() if pos is None else pos
         ori = world.IAX() if ori is None else ori
 
@@ -868,9 +873,7 @@ class System(object):
     def removeElement(self, *name):
         for n in name:
             check_elemSystem(n, self.system, self.clog, extern=True)
-            print(self.groups)
             for group in self.groups.values():
-                print(type(group))
                 if n in group["members"]:
                     group["members"].remove(n)
             del self.system[n]
@@ -892,8 +895,6 @@ class System(object):
     def copyGroup(self, name, name_copy):
         check_groupSystem(name, self.groups, self.clog, extern=True)
         self.groups[name_copy] = self.copyObj(self.groups[name])
-        print(id(self.groups[name_copy]))
-        print(id(self.groups[name]))
         self.clog.info(f"Copied group {name} to {name_copy}.")
     
     ##
@@ -941,14 +942,14 @@ class System(object):
     #
     # @param name_beam Name of the beam (without the 'r' or 'i' prefixes or '.txt' suffix).
     # @param name_source Name of source surface on which to define the beam. 
-    # @param comp Polarisation of beam.
-    # @param convert_to_current Whether or not to also calculate PO currents associated with the beam.
+    # @param comp Polarisation component of beam.
+    # @param lam Wavelength of beam, in mm.
     # @param normalise Whether or not to normalise beam to its maximum amplitude.
     # @para mode Which approximation to use. Can choose between Perfect Electrical Conductor ('PEC'), Perfect Magnetic Conductor ('PMC') or full calculation ('full'). Defaults to 'PMC'.
     # @param scale Scale factor for beam. Defaults to 1.
     #
     # @see setCustomBeamPath
-    def readCustomBeam(self, name_beam, name_source, comp, convert_to_current=True, normalise=True, mode="PMC", scale=1):
+    def readCustomBeam(self, name_beam, name_source, comp, lam, normalise=True, mode="PMC", scale=1):
         check_elemSystem(name_source, self.system, self.clog, extern=True)
         
         rfield = np.loadtxt(os.path.join(self.customBeamPath, "r" + name_beam + ".txt"))
@@ -961,12 +962,15 @@ class System(object):
             field /= maxf
             field *= scale
 
+        k = 2 * np.pi / lam
  
         shape = self.system[name_source]["gridsize"]
 
         fields_c = self._compToFields(comp, field)
+        fields_c.setMeta(name_source, k)
         self.fields[name_beam] = fields_c#.H()
         currents_c = calcCurrents(fields_c, self.system[name_source], mode)
+        currents_c.setMeta(name_source, k)
 
         self.currents[name_beam] = currents_c
 
@@ -992,7 +996,7 @@ class System(object):
     #
     # @see PODict
     def runPO(self, runPODict):
-        self.clog.info("*** Starting PO propagation ***")
+        self.clog.work("*** Starting PO propagation ***")
        
         check_runPODict(runPODict, self.system.keys(), self.fields.keys(), self.currents.keys(),
                     self.scalarfields.keys(), self.frames.keys(), self.clog)
@@ -1002,14 +1006,14 @@ class System(object):
         if _runPODict["mode"] != "scalar":
             sc_name = _runPODict["s_current"]
             _runPODict["s_current"] = self.currents[_runPODict["s_current"]]
-            self.clog.info(f"Propagating {sc_name} on {_runPODict['s_current'].surf} to {_runPODict['t_name']}, propagation mode: {_runPODict['mode']}.")
+            self.clog.work(f"Propagating {sc_name} on {_runPODict['s_current'].surf} to {_runPODict['t_name']}, propagation mode: {_runPODict['mode']}.")
             source = self.system[_runPODict["s_current"].surf]
             _runPODict["k"] = _runPODict["s_current"].k
 
         else:
             sc_name = _runPODict["s_scalarfield"]
             _runPODict["s_scalarfield"] = self.scalarfields[_runPODict["s_scalarfield"]]
-            self.clog.info(f"Propagating {sc_name} on {_runPODict['s_scalarfield'].surf} to {_runPODict['t_name']}, propagation mode: {_runPODict['mode']}.")
+            self.clog.work(f"Propagating {sc_name} on {_runPODict['s_scalarfield'].surf} to {_runPODict['t_name']}, propagation mode: {_runPODict['mode']}.")
             source = self.system[_runPODict["s_scalarfield"].surf]
             _runPODict["k"] = _runPODict["s_scalarfield"].k
        
@@ -1019,13 +1023,13 @@ class System(object):
         start_time = time.time()
         
         if _runPODict["device"] == "CPU":
-            self.clog.info(f"Hardware: running {_runPODict['nThreads']} CPU threads.")
-            self.clog.info(f"... Calculating ...")
+            self.clog.work(f"Hardware: running {_runPODict['nThreads']} CPU threads.")
+            self.clog.work(f"... Calculating ...")
             out = PyPO_CPUd(source, target, _runPODict)
 
         elif _runPODict["device"] == "GPU":
-            self.clog.info(f"Hardware: running {_runPODict['nThreads']} CUDA threads per block.")
-            self.clog.info(f"... Calculating ...")
+            self.clog.work(f"Hardware: running {_runPODict['nThreads']} CUDA threads per block.")
+            self.clog.work(f"... Calculating ...")
             out = PyPO_GPUf(source, target, _runPODict)
 
         dtime = time.time() - start_time
@@ -1055,7 +1059,7 @@ class System(object):
             out.setMeta(_runPODict["t_name"], _runPODict["k"])
             self.scalarfields[_runPODict["name_field"]] = out
 
-        self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
+        self.clog.work(f"*** Finished: {dtime:.3f} seconds ***")
         return out
 
     ##
@@ -1105,18 +1109,18 @@ class System(object):
     # @see TubeRTDict
     def createTubeFrame(self, argDict):
         if not argDict["name"]:
-            argDict["name"] = f"Frame_{len(self.frames)}"
+            argDict["name"] = f"Frame"
+        _argDict = self.copyObj(argDict) 
+        check_TubeRTDict(_argDict, self.frames.keys(), self.clog)
         
-        check_TubeRTDict(argDict, self.frames.keys(), self.clog)
-        
-        self.frames[argDict["name"]] = makeRTframe(argDict)
+        self.frames[_argDict["name"]] = makeRTframe(_argDict)
 
-        self.frames[argDict["name"]].setMeta(self.copyObj(world.ORIGIN()), self.copyObj(world.IAX()), self.copyObj(world.INITM()))
+        self.frames[_argDict["name"]].setMeta(self.copyObj(world.ORIGIN()), self.copyObj(world.IAX()), self.copyObj(world.INITM()))
         #self.frames[argDict["name"]].pos = world.ORIGIN()
         #self.frames[argDict["name"]].ori = world.IAX()
         #self.frames[argDict["name"]].transf = world.INITM()
 
-        self.clog.info(f"Added tubular frame {argDict['name']} to system.")
+        self.clog.info(f"Added tubular frame {_argDict['name']} to system.")
     
     ##
     # Create a Gaussian beam distribution of rays from a GRTDict.
@@ -1124,26 +1128,27 @@ class System(object):
     # @param argDict A GRTDict, filled. If not filled properly, will raise an exception.
     #
     # @see GRTDict
-    def createGRTFrame(self, argDict):
-        check_GRTDict(argDict, self.frames.keys(), self.clog)
-        
-        self.clog.info(f"Generating Gaussian ray-trace beam.")
-        self.clog.info(f"... Sampling ...")
-        
+    def createGRTFrame(self, argDict): 
         if not argDict["name"]:
-            argDict["name"] = f"Frame_{len(self.frames)}"
+            argDict["name"] = f"Frame"
+        
+        _argDict = self.copyObj(argDict) 
+        check_GRTDict(_argDict, self.frames.keys(), self.clog)
+        
+        self.clog.work(f"Generating Gaussian ray-trace beam.")
+        self.clog.work(f"... Sampling ...")
        
         start_time = time.time()
-        argDict["angx0"] = np.degrees(argDict["lam"] / (np.pi * argDict["n"] * argDict["x0"]))
-        argDict["angy0"] = np.degrees(argDict["lam"] / (np.pi * argDict["n"] * argDict["y0"]))
+        _argDict["angx0"] = np.degrees(_argDict["lam"] / (np.pi * _argDict["n"] * _argDict["x0"]))
+        _argDict["angy0"] = np.degrees(_argDict["lam"] / (np.pi * _argDict["n"] * _argDict["y0"]))
 
-        #check_RTDict(argDict, self.frames.keys())
-        self.frames[argDict["name"]] = makeGRTframe(argDict)
-        self.frames[argDict["name"]].setMeta(self.copyObj(world.ORIGIN()), self.copyObj(world.IAX()), self.copyObj(world.INITM()))
+        #check_RTDict(_argDict, self.frames.keys())
+        self.frames[_argDict["name"]] = makeGRTframe(_argDict)
+        self.frames[_argDict["name"]].setMeta(self.copyObj(world.ORIGIN()), self.copyObj(world.IAX()), self.copyObj(world.INITM()))
         
         dtime = time.time() - start_time
-        self.clog.info(f"Succesfully sampled {argDict['nRays']} rays: {dtime} seconds.")
-        self.clog.info(f"Added Gaussian frame {argDict['name']} to system.")
+        self.clog.work(f"Succesfully sampled {_argDict['nRays']} rays: {dtime} seconds.")
+        self.clog.info(f"Added Gaussian frame {_argDict['name']} to system.")
 
     ##
     # Convert a Poynting vector grid to a frame object. Sort of private method
@@ -1235,16 +1240,18 @@ class System(object):
     # @see GDict
     def createGaussian(self, gaussDict, name_source):
         check_elemSystem(name_source, self.system, self.clog, extern=True)
-        check_GPODict(gaussDict, self.fields, self.clog)
-        
-        gauss_in = makeGauss(gaussDict, self.system[name_source])
 
-        k = 2 * np.pi / gaussDict["lam"]
+        _gaussDict = self.copyObj(gaussDict)
+        check_GPODict(_gaussDict, self.fields, self.clog)
+        
+        gauss_in = makeGauss(_gaussDict, self.system[name_source])
+
+        k = 2 * np.pi / _gaussDict["lam"]
         gauss_in[0].setMeta(name_source, k)
         gauss_in[1].setMeta(name_source, k)
 
-        self.fields[gaussDict["name"]] = gauss_in[0]
-        self.currents[gaussDict["name"]] = gauss_in[1]
+        self.fields[_gaussDict["name"]] = gauss_in[0]
+        self.currents[_gaussDict["name"]] = gauss_in[1]
         #return gauss_in
     
     ##
@@ -1256,21 +1263,23 @@ class System(object):
     # @see GDict
     def createScalarGaussian(self, gaussDict, name_source):
         check_elemSystem(name_source, self.system, self.clog, extern=True)
-        check_GPODict(gaussDict, self.scalarfields, self.clog)
         
-        gauss_in = makeScalarGauss(gaussDict, self.system[name_source])
+        _gaussDict = self.copyObj(gaussDict)
+        check_GPODict(_gaussDict, self.scalarfields, self.clog)
+        
+        gauss_in = makeScalarGauss(_gaussDict, self.system[name_source])
 
-        k = 2 * np.pi / gaussDict["lam"]
+        k = 2 * np.pi / _gaussDict["lam"]
         gauss_in.setMeta(name_source, k)
 
-        self.scalarfields[gaussDict["name"]] = gauss_in
+        self.scalarfields[_gaussDict["name"]] = gauss_in
 
     ##
     # Run a ray-trace propagation from a frame to a surface.
     #
     # @param runRTDict A runRTDict object specifying the ray-trace.
     def runRayTracer(self, runRTDict):
-        self.clog.info("*** Starting RT propagation ***")
+        self.clog.work("*** Starting RT propagation ***")
         
         _runRTDict = self.copyObj(runRTDict)
 
@@ -1282,21 +1291,69 @@ class System(object):
         start_time = time.time()
        
         if _runRTDict["device"] == "CPU":
-            self.clog.info(f"Hardware: running {_runRTDict['nThreads']} CPU threads.")
-            self.clog.info(f"... Calculating ...")
+            self.clog.work(f"Hardware: running {_runRTDict['nThreads']} CPU threads.")
+            self.clog.work(f"... Calculating ...")
             frameObj = RT_CPUd(_runRTDict)
 
         elif _runRTDict["device"] == "GPU":
-            self.clog.info(f"Hardware: running {_runRTDict['nThreads']} CUDA threads per block.")
-            self.clog.info(f"... Calculating ...")
+            self.clog.work(f"Hardware: running {_runRTDict['nThreads']} CUDA threads per block.")
+            self.clog.work(f"... Calculating ...")
             frameObj = RT_GPUf(_runRTDict)
         
         dtime = time.time() - start_time
         
-        self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
+        self.clog.work(f"*** Finished: {dtime:.3f} seconds ***")
         self.frames[runRTDict["fr_out"]] = frameObj
         
         self.frames[runRTDict["fr_out"]].setMeta(self.calcRTcenter(runRTDict["fr_out"]), self.calcRTtilt(runRTDict["fr_out"]), self.copyObj(world.INITM()))
+    
+    ##
+    # Perform a hybrid RT/PO propagation, starting from a reflected field and set of Poynting vectors.
+    #
+    # @param hybridDict A hybridDict dictionary.
+    def runHybridPropagation(self, hybridDict):
+        self.clog.work("*** Starting hybrid propagation ***")
+        start_time = time.time()
+
+        check_hybridDict(hybridDict, self.system, self.frames, self.fields, self.clog)
+
+        field = self.copyObj(self.fields[hybridDict["field_in"]])
+
+        runRTDict = {
+                "fr_in"     : hybridDict["fr_in"],
+                "t_name"    : hybridDict["t_name"],
+                "fr_out"    : hybridDict["fr_out"],
+                "device"    : "CPU"
+                }
+
+        verbosity_init = self.verbosity
+
+        self.setLoggingVerbosity(verbose=False)
+        self.runRayTracer(runRTDict)
+        self.setLoggingVerbosity(verbose=verbosity_init)
+
+        stack = self.calcRayLen(hybridDict["fr_in"], hybridDict["fr_out"], start=hybridDict["start"])
+        if hybridDict["start"] is not None:
+            expo = np.exp(1j * field.k * stack[1]) * np.sqrt(stack[0] / (2*stack[1] + stack[0])) # Initial curvature
+
+        else:
+            expo = np.exp(1j * field.k * stack[0])
+
+        _comps = []
+        for i in range(6):
+            _comps.append((expo * field[i].ravel()).reshape(field[i].shape))
+
+        field_prop = fields(*_comps)
+        field_prop.setMeta(hybridDict["t_name"], field.k)
+
+        self.fields[hybridDict["field_out"]] = field_prop
+
+        if hybridDict["interp"]:
+            self.interpFrame(hybridDict["fr_out"], hybridDict["field_out"], hybridDict["t_name"], hybridDict["field_out"], comp=hybridDict["comp"])
+        
+        dtime = time.time() - start_time
+        
+        self.clog.work(f"*** Finished: {dtime:.3f} seconds ***")
 
     ##
     # Interpolate a frame and an associated field on a regular surface.
@@ -1308,7 +1365,7 @@ class System(object):
     # @param name_out Name of output field object in target surface.
     #
     # @returns out Complex numpy array containing interpolated field.
-    def interpFrame(self, name_fr_in, name_field, name_target, name_out, comp, method="nearest"):
+    def interpFrame(self, name_fr_in, name_field, name_target, name_out, comp=None, method="nearest"):
         check_frameSystem(name_fr_in, self.frames, self.clog, extern=True)
         check_elemSystem(name_target, self.system, self.clog, extern=True)
         
@@ -1316,20 +1373,40 @@ class System(object):
 
         points = (self.frames[name_fr_in].x, self.frames[name_fr_in].y, self.frames[name_fr_in].z)
 
-        rfield = np.real(getattr(self.fields[name_field], comp)).ravel()
-        ifield = np.imag(getattr(self.fields[name_field], comp)).ravel()
+        if comp is None:
+            _comps = []
+            for i in range(6):
+                rfield = np.real(self.fields[name_field][i]).ravel()
+                ifield = np.imag(self.fields[name_field][i]).ravel()
 
-        grid_interp = (grids.x, grids.y, grids.z)
+                grid_interp = (grids.x, grids.y, grids.z)
 
-        rout = griddata(points, rfield, grid_interp, method=method)
-        iout = griddata(points, ifield, grid_interp, method=method)
+                rout = griddata(points, rfield, grid_interp, method=method)
+                iout = griddata(points, ifield, grid_interp, method=method)
 
-        out = rout.reshape(self.system[name_target]["gridsize"]) + 1j * iout.reshape(self.system[name_target]["gridsize"])
+                _comps.append(rout.reshape(self.system[name_target]["gridsize"]) + 1j * iout.reshape(self.system[name_target]["gridsize"]))
 
-        field = self._compToFields(comp, out)
-        field.setMeta(name_target, self.fields[name_field].k)
+            field = fields(*_comps)
+            field.setMeta(name_target, self.fields[name_field].k)
+            self.fields[name_out] = field
 
-        self.fields[name_out] = field 
+            out = field
+       
+        else:
+            rfield = np.real(getattr(self.fields[name_field], comp)).ravel()
+            ifield = np.imag(getattr(self.fields[name_field], comp)).ravel()
+
+            grid_interp = (grids.x, grids.y, grids.z)
+
+            rout = griddata(points, rfield, grid_interp, method=method)
+            iout = griddata(points, ifield, grid_interp, method=method)
+
+            out = rout.reshape(self.system[name_target]["gridsize"]) + 1j * iout.reshape(self.system[name_target]["gridsize"])
+
+            field = self._compToFields(comp, out)
+            field.setMeta(name_target, self.fields[name_field].k)
+
+            self.fields[name_out] = field 
 
         return out
 
@@ -1444,7 +1521,7 @@ class System(object):
     #
     # @returns popt Fitted beam parameters.
     # @returns perr Standard deviation of fitted parameters.
-    def fitGaussAbs(self, name_field, comp, thres=None, mode=None, full_output=False):
+    def fitGaussAbs(self, name_field, comp, thres=None, mode=None, full_output=False, ratio=1):
         check_fieldSystem(name_field, self.fields, self.clog, extern=True)
 
         thres = -11 if thres is None else thres
@@ -1453,7 +1530,7 @@ class System(object):
         surfaceObj = self.system[self.fields[name_field].surf]
         field = self.copyObj(np.absolute(getattr(self.fields[name_field], comp)))
 
-        popt, perr = fgs.fitGaussAbs(field, surfaceObj, thres, mode)
+        popt, perr = fgs.fitGaussAbs(field, surfaceObj, thres, mode, ratio)
 
         Psi = scalarfield(fgs.generateGauss(popt, surfaceObj, mode="linear"))
         Psi.setMeta(self.fields[name_field].surf, self.fields[name_field].k)
@@ -1640,7 +1717,8 @@ class System(object):
     # @see PSDict
     def createPointSource(self, PSDict, name_surface):
         check_elemSystem(name_surface, self.system, self.clog, extern=True)
-        check_PSDict(PSDict, self.fields, self.clog)
+        _PSDict = self.copyObj(PSDict)
+        check_PSDict(_PSDict, self.fields, self.clog)
 
         surfaceObj = self.system[name_surface]
         ps = np.zeros(surfaceObj["gridsize"], dtype=complex)
@@ -1648,11 +1726,11 @@ class System(object):
         xs_idx = int((surfaceObj["gridsize"][0] - 1) / 2)
         ys_idx = int((surfaceObj["gridsize"][1] - 1) / 2)
 
-        ps[xs_idx, ys_idx] = PSDict["E0"] * np.exp(1j * PSDict["phase"])
+        ps[xs_idx, ys_idx] = _PSDict["E0"] * np.exp(1j * _PSDict["phase"])
 
-        Ex = ps * PSDict["pol"][0]
-        Ey = ps * PSDict["pol"][1]
-        Ez = ps * PSDict["pol"][2]
+        Ex = ps * _PSDict["pol"][0]
+        Ey = ps * _PSDict["pol"][1]
+        Ez = ps * _PSDict["pol"][2]
 
         Hx = ps * 0
         Hy = ps * 0
@@ -1661,13 +1739,13 @@ class System(object):
         field = fields(Ex, Ey, Ez, Hx, Hy, Hz) 
         current = self.calcCurrents(name_surface, field)
 
-        k =  2 * np.pi / PSDict["lam"]
+        k =  2 * np.pi / _PSDict["lam"]
 
         field.setMeta(name_surface, k)
         current.setMeta(name_surface, k)
 
-        self.fields[PSDict["name"]] = field
-        self.currents[PSDict["name"]] = current
+        self.fields[_PSDict["name"]] = field
+        self.currents[_PSDict["name"]] = current
 
     ##
     # Generate uniform PO fields and currents.
@@ -1678,14 +1756,15 @@ class System(object):
     # @see PSDict
     def createUniformSource(self, UDict, name_surface):
         check_elemSystem(name_surface, self.system, self.clog, extern=True)
-        check_PSDict(UDict, self.fields, self.clog)
+        _UDict = self.copyObj(UDict)
+        check_PSDict(_UDict, self.fields, self.clog)
 
         surfaceObj = self.system[name_surface]
-        us = np.ones(surfaceObj["gridsize"], dtype=complex) * UDict["E0"] * np.exp(1j * UDict["phase"])
+        us = np.ones(surfaceObj["gridsize"], dtype=complex) * _UDict["E0"] * np.exp(1j * _UDict["phase"])
 
-        Ex = us * UDict["pol"][0]
-        Ey = us * UDict["pol"][1]
-        Ez = us * UDict["pol"][2]
+        Ex = us * _UDict["pol"][0]
+        Ey = us * _UDict["pol"][1]
+        Ez = us * _UDict["pol"][2]
 
         Hx = us * 0
         Hy = us * 0
@@ -1694,13 +1773,13 @@ class System(object):
         field = fields(Ex, Ey, Ez, Hx, Hy, Hz) 
         current = self.calcCurrents(name_surface, field)
 
-        k =  2 * np.pi / UDict["lam"]
+        k =  2 * np.pi / _UDict["lam"]
 
         field.setMeta(name_surface, k)
         current.setMeta(name_surface, k)
 
-        self.fields[UDict["name"]] = field
-        self.currents[UDict["name"]] = current
+        self.fields[_UDict["name"]] = field
+        self.currents[_UDict["name"]] = current
     
     ##
     # Generate point-source scalar PO field.
@@ -1711,7 +1790,9 @@ class System(object):
     # @see PSDict
     def createPointSourceScalar(self, PSDict, name_surface):
         check_elemSystem(name_surface, self.system, self.clog, extern=True)
-        check_PSDict(PSDict, self.scalarfields, self.clog)
+        
+        _PSDict = self.copyObj(PSDict)
+        check_PSDict(_PSDict, self.scalarfields, self.clog)
         
         surfaceObj = self.system[name_surface]
         ps = np.zeros(surfaceObj["gridsize"], dtype=complex)
@@ -1719,14 +1800,37 @@ class System(object):
         xs_idx = int((surfaceObj["gridsize"][0] - 1) / 2)
         ys_idx = int((surfaceObj["gridsize"][1] - 1) / 2)
 
-        ps[xs_idx, ys_idx] = PSDict["E0"] * np.exp(1j * PSDict["phase"])
+        ps[xs_idx, ys_idx] = _PSDict["E0"] * np.exp(1j * _PSDict["phase"])
         sfield = scalarfield(ps)
 
-        k =  2 * np.pi / PSDict["lam"]
+        k =  2 * np.pi / _PSDict["lam"]
 
         sfield.setMeta(name_surface, k)
 
-        self.scalarfields[PSDict["name"]] = sfield
+        self.scalarfields[_PSDict["name"]] = sfield
+    
+    ##
+    # Generate scalar uniform PO fields and currents.
+    #
+    # @param UDict A UDict dictionary, containing parameters for the uniform pattern.
+    # @param name_surface Name of surface on which to define the uniform pattern.
+    #
+    # @see UDict
+    def createUniformSourceScalar(self, UDict, name_surface):
+        check_elemSystem(name_surface, self.system, self.clog, extern=True)
+        _UDict = self.copyObj(UDict)
+        check_PSDict(_UDict, self.scalarfields, self.clog)
+
+        surfaceObj = self.system[name_surface]
+        us = np.ones(surfaceObj["gridsize"], dtype=complex) * _UDict["E0"] * np.exp(1j * _UDict["phase"])
+
+        sfield = scalarfield(us)
+
+        k =  2 * np.pi / _UDict["lam"]
+
+        sfield.setMeta(name_surface, k)
+
+        self.scalarfields[_UDict["name"]] = sfield
    
     ##
     # Interpolate a PO beam. Only for beams defined on planar surfaces.
@@ -1977,7 +2081,6 @@ class System(object):
     #
     # @param name_group Name of group to be plotted.
     def plotGroup(self, name_group, show=True, ret=False):
-        print(self.groups[name_group]["members"])
         select = [x for x in self.groups[name_group]["members"]]
 
         if ret:
@@ -2025,7 +2128,7 @@ class System(object):
 
         if lenv == 0 or lenu == 0:
             self.clog.error("Encountered 0-length vector. Cannot proceed.")
-            exit(0)
+            return None
 
         w = np.cross(v/lenv, u/lenu)
 
@@ -2040,12 +2143,6 @@ class System(object):
         
         return R_transf
 
-    def findRTcoll(self, name_frame):
-        std = np.mean(effs.calcRTtiltSTD(self.frames[name_frame]))
-        factor = np.log10(1 - std**2)
-
-        self.clog.info(f"Ray-trace beam collimation factor : {factor}.")
-
     ##
     # Find the focus of a ray-trace frame.
     # Adds a new plane to the System, perpendicular to the mean ray-trace tilt of the input frame.
@@ -2056,19 +2153,15 @@ class System(object):
     # @param verbose Allow verbose System logging.
     #
     # @returns out The focus co-ordinate.
-    def findRTfocus(self, name_frame, f0=None, verbose=False):
+    def findRTfocus(self, name_frame, f0=None):
         check_frameSystem(name_frame, self.frames, self.clog, extern=True)
         f0 = 0 if f0 is None else f0
        
-        if not verbose:
-            self.setLoggingVerbosity(verbose=False)
         
         tilt = self.calcRTtilt(name_frame)
         center = self.calcRTcenter(name_frame)
         match = self.copyObj(world.IAX())
-
         R = self.findRotation(match, tilt)
-
         t_name = f"focal_plane_{name_frame}"
         fr_out = f"focus_{name_frame}"
 
@@ -2093,21 +2186,25 @@ class System(object):
                 "nThreads"  : 1
                 }
 
-        self.clog.info(f"Finding focus of {name_frame}...")
-        res = opt.fmin(self._optimiseFocus, f0, args=(runRTDict, tilt), full_output=True, disp=False)
-
-        if not verbose:
-            self.setLoggingVerbosity(verbose=True)
+        self.clog.work(f"Finding focus of {name_frame}...")
         
+        verbosity_init = self.verbosity
+        self.setLoggingVerbosity(verbose=False)
+        
+        res = fmin(self._optimiseFocus, f0, args=(runRTDict, tilt), full_output=True, disp=False)
+ 
         out = res[0] * tilt + center
         self.translateGrids(t_name, out, mode="absolute")
-        self.clog.info(f"Focus: {*['{:0.3e}'.format(x) for x in out],}, RMS: {res[1]:.3e}")
+        
+        self.setLoggingVerbosity(verbose=verbosity_init)
+        self.clog.result(f"Focus of frame {name_frame}: {*['{:0.3e}'.format(x) for x in out],}, RMS: {res[1]:.3e}")
 
         return out
-
         
     ##
     # Find x, y and z rotation angles from general rotation matrix.
+    # Note that the angles are not necessarily the same as the original angles of the matrix.
+    # However, the matrix constructed by the found angles applies the same 3D rotation as the input matrix.
     #
     # @param M Numpy array of shape (3,3) containg a general rotation matrix.
     #
@@ -2196,6 +2293,59 @@ class System(object):
 
         return out
     
+    ##
+    # Run a ray-trace propagation from a frame to a surface in the GUI.
+    #
+    # @param runRTDict A runRTDict object specifying the ray-trace.
+    def runGUIRayTracer(self, runRTDict):
+        _runRTDict = self.copyObj(runRTDict)
+
+        _runRTDict["fr_in"] = self.frames[_runRTDict["fr_in"]]
+        _runRTDict["t_name"] = self.system[_runRTDict["t_name"]]
+       
+        if _runRTDict["device"] == "CPU":
+            frameObj = RT_CPUd(_runRTDict)
+
+        elif _runRTDict["device"] == "GPU":
+            frameObj = RT_GPUf(_runRTDict)
+        
+        self.frames[runRTDict["fr_out"]] = frameObj
+        self.frames[runRTDict["fr_out"]].setMeta(self.calcRTcenter(runRTDict["fr_out"]), self.calcRTtilt(runRTDict["fr_out"]), self.copyObj(world.INITM()))
+    
+    ##
+    # Perform a hybrid RT/PO GUI propagation, starting from a reflected field and set of Poynting vectors.
+    #
+    # @param hybridDict A hybridDict dictionary.
+    def hybridGUIPropagation(self, hybridDict):
+        field = self.copyObj(self.fields[hybridDict["field_in"]])
+
+        runRTDict = {
+                "fr_in"     : hybridDict["fr_in"],
+                "t_name"    : hybridDict["t_name"],
+                "fr_out"    : hybridDict["fr_out"],
+                "device"    : "CPU"
+                }
+
+        self.runGUIRayTracer(runRTDict)
+
+        stack = self.calcRayLen(hybridDict["fr_in"], hybridDict["fr_out"], start=hybridDict["start"])
+        if hybridDict["start"] is not None:
+            expo = np.exp(1j * field.k * stack[1]) * np.sqrt(stack[0] / (2*stack[1] + stack[0])) # Initial curvature
+
+        else:
+            expo = np.exp(1j * field.k * stack[0])
+
+        _comps = []
+        for i in range(6):
+            _comps.append((expo * field[i].ravel()).reshape(field[i].shape))
+
+        field_prop = fields(*_comps)
+        field_prop.setMeta(hybridDict["t_name"], field.k)
+
+        self.fields[hybridDict["field_out"]] = field_prop
+
+        if interp:
+            self.interpFrame(hybridDict["fr_out"], hybridDict["field_out"], hybridDict["t_name"], hybridDict["field_out"], comp=hybridDict["comp"])
     #############################################################
     #                                                           #
     #                       PRIVATE METHODS                     #
@@ -2218,6 +2368,7 @@ class System(object):
         self.translateGrids(f"focal_plane_{runRTDict['fr_in']}", trans)
         
         self.runRayTracer(runRTDict)
+        #self.plotSystem(RTframes=["start", "pri", f"focus_{runRTDict['fr_in']}"])
         RMS = self.calcSpotRMS(f"focus_{runRTDict['fr_in']}")
         self.translateGrids(f"focal_plane_{runRTDict['fr_in']}", -trans)
         #self.removeFrame() 

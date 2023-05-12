@@ -1,6 +1,5 @@
 import numpy as np
 import os
-import ctypes
 import pathlib
 import re
 
@@ -29,10 +28,8 @@ def getIndex(name, nameList):
     regex = f"(?<!.){name}(_(\d*(?![ -~])))*(?![ -~])"
     l = re.compile(regex)
     match = list(filter(l.match, nameList))
-
     match_spl = [int(x.replace(name + "_", "")) if x != name else 0 for x in match]
     num = 0
-    
     if match_spl and not Config.override:
         num = max(match_spl) + 1
 
@@ -222,6 +219,11 @@ class RunPOError(Exception):
     pass
 
 ##
+# Hybrid propagation error. Raised when an error is encountered in a hybrid propagation dictionary. 
+class HybridPropError(Exception):
+    pass
+
+##
 # Element name error. Raised when specified element cannot be found in the system dictionary. 
 class ElemNameError(Exception):
     pass
@@ -399,13 +401,19 @@ def errMsg_mergebeam(beamName, surf0, surfd):
 # @param shape Expected shape of input array.
 #
 # @returns errStr The errorstring.
-def block_ndarray(fieldName, elemDict, shape):
+def block_ndarray(fieldName, elemDict, shape, cust_name=False):
     _errStr = ""
+
+    if not cust_name:
+        nameObj = elemDict["name"]
+    else:
+        nameObj = cust_name
+
     if not isinstance(elemDict[fieldName], np.ndarray):
-        _errStr += errMsg_type(fieldName, type(elemDict[fieldName]), elemDict["name"], np.ndarray)
+        _errStr += errMsg_type(fieldName, type(elemDict[fieldName]), nameObj, np.ndarray)
 
     elif not elemDict[fieldName].shape == shape:
-        _errStr += errMsg_shape(fieldName, elemDict[fieldName].shape, elemDict["name"], f"{shape}")
+        _errStr += errMsg_shape(fieldName, elemDict[fieldName].shape, nameObj, f"{shape}")
     
     return _errStr
 
@@ -455,11 +463,6 @@ def check_ElemDict(elemDict, nameList, num_ref, clog):
         if not "name" in elemDict:
             elemDict["name"] = "Parabola"
         
-        num = getIndex(elemDict["name"], nameList)
-
-        if num > 0:
-            elemDict["name"] = elemDict["name"] + "_{}".format(num)
-        
         if "pmode" in elemDict:
             if elemDict["pmode"] == "focus":
                 if "vertex" in elemDict:
@@ -492,19 +495,9 @@ def check_ElemDict(elemDict, nameList, num_ref, clog):
             if not "name" in elemDict:
                 elemDict["name"] = "Hyperbola"
 
-            num = getIndex(elemDict["name"], nameList)
-
-            if num > 0:
-                elemDict["name"] = elemDict["name"] + "_{}".format(num)
-        
         else:
             if not "name" in elemDict:
                 elemDict["name"] = "Ellipse"
-            
-            num = getIndex(elemDict["name"], nameList)
-
-            if num > 0:
-                elemDict["name"] = elemDict["name"] + "_{}".format(num)
 
         if "orient" not in elemDict:
             elemDict["orient"] = "x"
@@ -548,13 +541,12 @@ def check_ElemDict(elemDict, nameList, num_ref, clog):
 
     elif elemDict["type"] == 3:
         if not "name" in elemDict:
-            elemDict["name"] = "plane"
+            elemDict["name"] = "Plane"
         
-        num = getIndex(elemDict["name"], nameList)
-
-        if num > 0:
-            elemDict["name"] = elemDict["name"] + "_{}".format(num)
-
+    num = getIndex(elemDict["name"], nameList)
+    if num > 0:
+        elemDict["name"] = elemDict["name"] + "_{}".format(num)
+    
     if "gmode" in elemDict:
         if elemDict["gmode"] == "xy" or elemDict["gmode"] == 0:
             if "lims_x" in elemDict:
@@ -826,6 +818,11 @@ def check_runRTDict(runRTDict, elements, frames, clog):
     cuda = has_CUDA()
     errStr = check_frameSystem(runRTDict["fr_in"], frames, clog, errStr)
     errStr = check_elemSystem(runRTDict["t_name"], elements, clog, errStr)
+
+    num = getIndex(runRTDict["fr_out"], frames)
+
+    if num > 0:
+        runRTDict["fr_out"] = runRTDict["fr_out"] + "_{}".format(num)
 
     if "tol" not in runRTDict:
         runRTDict["tol"] = 1e-3
@@ -1172,6 +1169,58 @@ def check_runPODict(runPODict, elements, fields, currents, scalarfields, frames,
         raise RunPOError()
 
 ##
+# Check a hybrid propagation input dictionary.
+#
+# @param hybridDict A hybridDict.
+# @param elements List containing names of surfaces in System.
+# @param frames List containing names of frames in System.
+# @param fields List containing names of frames in System.
+def check_hybridDict(hybridDict, elements, frames, fields, clog):
+    errStr = ""
+   
+    errStr = check_frameSystem(hybridDict["fr_in"], frames, clog, errStr)
+    errStr = check_elemSystem(hybridDict["t_name"], elements, clog, errStr)
+    errStr = check_fieldSystem(hybridDict["field_in"], fields, clog, errStr)
+
+    if "start" not in hybridDict:
+        hybridDict["start"] = None
+
+    elif "start" in hybridDict:
+        if hybridDict["start"] is not None:
+            errStr += block_ndarray("start", hybridDict, (3,), cust_name="hybridDict")
+    
+    if "interp" not in hybridDict:
+        hybridDict["interp"] = True
+        
+    elif "interp" in hybridDict:
+        if not isinstance(hybridDict["interp"], bool):
+            errStr += errMsg_type("interp", type(hybridDict["interp"]), "hybridDict", bool)
+    
+    if "comp" not in hybridDict:
+        hybridDict["comp"] = True
+        
+    elif "comp" in hybridDict:
+        if not isinstance(hybridDict["comp"], str) and hybridDict["comp"] != True:
+            errStr += errMsg_type("comp", type(hybridDict["comp"]), "hybridDict", str)
+
+    num = getIndex(hybridDict["fr_out"], frames)
+
+    if num > 0:
+        hybridDict["fr_out"] = hybridDict["fr_out"] + "_{}".format(num)
+    
+    num = getIndex(hybridDict["field_out"], fields)
+
+    if num > 0:
+        hybridDict["field_out"] = hybridDict["field_out"] + "_{}".format(num)
+    
+    if errStr:
+        errList = errStr.split("\n")[:-1]
+
+        for err in errList:
+            clog.error(err)
+        raise HybridPropError()
+
+##
 # CHeck if aperture dictionary is valid.
 #
 # @param aperDict An aperture dictionary.
@@ -1188,7 +1237,7 @@ def check_aperDict(aperDict, clog):
         aperDict["plot"] = True
 
     if "center" in aperDict:
-        errStr += block_ndarray("center", aperDict, (2,))
+        errStr += block_ndarray("center", aperDict, (2,), cust_name="aperDict")
 
     else:
         aperDict["center"] = np.zeros(2)

@@ -1,6 +1,6 @@
-from PyQt5 import QtWidgets as qtw
-from PyQt5 import QtCore
-from PyQt5.QtGui import QFont, QIcon
+from PySide2 import QtWidgets as qtw
+from PySide2 import QtCore
+from PySide2.QtGui import QFont, QIcon
 
 
 from src.GUI.ElementWidget import ElementWidget

@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import QApplication, QWidget, QHBoxLayout, QLineEdit, QPushButton, QFormLayout , QLabel, QVBoxLayout, QComboBox, QGridLayout
-from PyQt5.QtGui import QRegExpValidator
-from PyQt5.QtCore import QRegExp, Qt
+from PySide2.QtWidgets import QApplication, QWidget, QHBoxLayout, QLineEdit, QPushButton, QFormLayout , QLabel, QVBoxLayout, QComboBox, QGridLayout
+from PySide2.QtGui import QRegExpValidator
+from PySide2.QtCore import QRegExp, Qt
 
 import numpy as np
 

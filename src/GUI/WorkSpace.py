@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QWidget, QTabWidget, QScrollArea, QVBoxLayout, QSizePolicy
-from PyQt5.QtCore import Qt
+from PySide2.QtWidgets import QWidget, QTabWidget, QScrollArea, QVBoxLayout, QSizePolicy
+from PySide2.QtCore import Qt
 from src.GUI.ElementWidget import ReflectorWidget, GroupWidget, FrameWidget, CurrentWidget, FieldsWidget, CurrentWidget, SFieldsWidget
 from src.GUI.Accordion import Accordion
 
@@ -59,6 +59,6 @@ class Workspace(QTabWidget):
         self.POAccordion.POCurrents.addWidget(CurrentWidget(name, removeAction, plotAction))
         self.setCurrentIndex(3)
 
-    def addGroup(self, name, transformAction, snapAction, plotAction, removeAction, copyAction):
-        self.groupLayout.addWidget(GroupWidget(name, transformAction, snapAction, plotAction, removeAction, copyAction))
+    def addGroup(self, name, transformAction, snapAction, plotAction, removeAction, copyAction, infoAction):
+        self.groupLayout.addWidget(GroupWidget(name, transformAction, snapAction, plotAction, removeAction, copyAction, infoAction))
         self.setCurrentIndex(1)

@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as pt
 from src.PyPO.PyPOTypes import *
 from src.PyPO.BindRefl import *
 from src.PyPO.FitGauss import fitGaussAbs
@@ -105,6 +104,9 @@ def calcSpillover(field, surfaceObject, aperDict):
     area_m = area * mask.astype(int)
     eff_s = np.absolute(np.sum(np.conj(field_ap) * field * area))**2 / (np.sum(np.absolute(field)**2 * area) * np.sum(np.absolute(field_ap)**2 *area_m))
 
+    if np.isnan(eff_s):
+        eff_s = 0
+
     return eff_s
 
 ##
@@ -129,6 +131,9 @@ def calcTaper(field, surfaceObject, aperDict):
         area = area[mask]
 
     eff_t = np.absolute(np.sum(field * area))**2 / np.sum(np.absolute(field)**2 * area) / np.sum(area)
+    
+    if np.isnan(eff_t):
+        eff_t = 0
 
     return eff_t
 

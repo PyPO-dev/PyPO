@@ -16,7 +16,7 @@ def ex_DRO_RT(device):
             "name"      : "p1",
             "pmode"     : "focus",
             "gmode"     : "uv",
-            "flip"      : False,
+            #"flip"      : True,
             "vertex"    : np.zeros(3),
             "focus_1"   : np.array([0,0,12e3]),
             "lims_u"    : np.array([200,12.5e3]),
@@ -30,13 +30,13 @@ def ex_DRO_RT(device):
             "nRing"     : 10,
             "angx0"     : 0,
             "angy0"     : 0,
-            "x0"        : 10000,
-            "y0"        : 10000
+            "x0"        : 5000,
+            "y0"        : 5000
             }
 
     s = System()
     s.addParabola(parabola)
-
+    s.clog.kontseks("geil man")
     s.plotSystem()
 
     s.createTubeFrame(RTpar)
@@ -52,6 +52,7 @@ def ex_DRO_RT(device):
             }
 
     s.runRayTracer(start_pri_RT)
+    #s.plotSystem(RTframes=["start", "pri"])
     s.findRTfocus("pri")
 
     s.plotRTframe("focus_pri")

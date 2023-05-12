@@ -14,72 +14,6 @@ __constant__ float eye[3][3];      // Identity matrix
 __constant__ int g_s;               // Gridsize on source
 __constant__ int g_t;               // Gridsize on target
 
-#define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
-
-/**
- * Check CUDA call.
- *
- * Wrapper for finding errors in CUDA API calls.
- *
- * @param code The errorcode returned from failed API call.
- * @param file The file in which failure occured.
- * @param line The line in file in which error occured.
- * @param abort Exit code upon error.
- */
-__host__ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
-{
-   if (code != cudaSuccess)
-   {
-      fprintf(stderr,"GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
-      if (abort) exit(code);
-   }
-}
-
-/**
- * Debug complex array.
- *
- * Print complex array of size 3.
- *      Useful for debugging.
-
- * @param arr Array of 3 cuFloatComplex.
- */
-__host__ __device__ void _debugArray(cuFloatComplex arr[3])
-{
-    printf("%e + %ej, %e + %ej, %e + %ej\n", arr[0].x, arr[0].y, arr[1].x, arr[1].y, arr[2].x, arr[2].y);
-}
-
-/**
- * Debug real array.
- *
- * Print real valued array of size 3.
- *      Useful for debugging.
-
- * @param arr Array of 3 float.
- */
-__host__ __device__ void _debugArray(float arr[3])
-{
-    printf("%e, %e, %e\n", arr[0], arr[1], arr[2]);
-}
-
-/**
- * Take complex exponential.
- *
- * Take complex exponential by decomposing into sine and cosine.
- *
- * @return res cuFloatComplex number.
- */
-__device__ __inline__ cuFloatComplex expCo(cuFloatComplex z)
-{
-    cuFloatComplex res;
-    float t = exp(z.x);
-    float ys = sin(z.y);
-    float yc = cos(z.y);
-    res.x = t*yc;
-    res.y = t*ys;
-
-    return res;
-}
-
 /**
  * Initialize CUDA.
  *
@@ -96,7 +30,7 @@ __device__ __inline__ cuFloatComplex expCo(cuFloatComplex z)
  * @return BT Array of two dim3 objects, containing number of blocks per grid and number of threads per block.
  */
 
- __host__ std::array<dim3, 2> _initCUDA(float k, float epsilon, int gt, int gs, float t_direction, int nBlocks, int nThreads)
+ __host__ std::array<dim3, 2> initCUDA(float k, float epsilon, int gt, int gs, float t_direction, int nBlocks, int nThreads)
  {
      // Calculate nr of blocks per grid and nr of threads per block
      dim3 nrb(nBlocks); dim3 nrt(nThreads);
@@ -226,7 +160,6 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
         source_norm[1] = d_nys[i];
         source_norm[2] = d_nzs[i];
 
-        //printf("%f\n", source_norm[2]);
 
         diff(point, source_point, r_vec);
         abs(r_vec, r);
@@ -1142,153 +1075,62 @@ void callKernelf_JM(c2Bundlef *res, reflparamsf source, reflparamsf target,
 
     // Initialize and copy constant memory to device
     std::array<dim3, 2> BT;
-    BT = _initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
+    BT = initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
 
-    // Create pointers to device arrays and allocate/copy source grid and area.
-    float *d_xs, *d_ys, *d_zs, *d_A;
+    MemUtils memutil;
 
-    gpuErrchk( cudaMalloc((void**)&d_xs, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_ys, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_zs, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_A, cs->size * sizeof(float)) );
+    int n_ds = 7;
+    int n_dt = 6;
+     
+    std::vector<float*> vec_csdat = {cs->x, cs->y, cs->z, cs->area, cs->nx, cs->ny, cs->nz};
+    std::vector<float*> vec_ctdat = {ct->x, ct->y, ct->z, ct->nx, ct->ny, ct->nz};
 
-    gpuErrchk( cudaMemcpy(d_xs, cs->x, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_ys, cs->y, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_zs, cs->z, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_A, cs->area, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-
-    // Create pointers to target grid and normal vectors
-    float *d_xt, *d_yt, *d_zt, *d_nxt, *d_nyt, *d_nzt, *d_nxs, *d_nys, *d_nzs;
-
-    // Allocate target co-ordinate and normal grids
-    gpuErrchk( cudaMalloc((void**)&d_xt, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_yt, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_zt, ct->size * sizeof(float)) );
-
-    gpuErrchk( cudaMemcpy(d_xt, ct->x, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_yt, ct->y, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_zt, ct->z, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-
-    gpuErrchk( cudaMalloc((void**)&d_nxs, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_nys, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_nzs, cs->size * sizeof(float)) );
-
-    gpuErrchk( cudaMemcpy(d_nxs, cs->nx, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_nys, cs->ny, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_nzs, cs->nz, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    std::vector<float*> vec_ds = memutil.cuMallFloat(n_ds, cs->size);
+    memutil.cuMemCpFloat(vec_ds, vec_csdat, cs->size); 
     
-    gpuErrchk( cudaMalloc((void**)&d_nxt, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_nyt, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_nzt, ct->size * sizeof(float)) );
+    std::vector<float*> vec_dt = memutil.cuMallFloat(n_dt, ct->size);
+    memutil.cuMemCpFloat(vec_dt, vec_ctdat, ct->size); 
 
-    gpuErrchk( cudaMemcpy(d_nxt, ct->nx, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_nyt, ct->ny, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_nzt, ct->nz, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-
-    cuFloatComplex *h_Jx = new cuFloatComplex[cs->size];
-    cuFloatComplex *h_Jy = new cuFloatComplex[cs->size];
-    cuFloatComplex *h_Jz = new cuFloatComplex[cs->size];
-
-    cuFloatComplex *h_Mx = new cuFloatComplex[cs->size];
-    cuFloatComplex *h_My = new cuFloatComplex[cs->size];
-    cuFloatComplex *h_Mz = new cuFloatComplex[cs->size];
-
-    cuFloatComplex *d_Jx, *d_Jy, *d_Jz;
-    cuFloatComplex *d_Mx, *d_My, *d_Mz;
+    int n_in = 6;
+    int n_out = 6;
+    
+    std::vector<cuFloatComplex*> vec_hin = memutil.cuMallComplexStack(n_in, cs->size);
 
     _arrC3ToCUDAC(currents->r1x, currents->r1y, currents->r1z,
                   currents->i1x, currents->i1y, currents->i1z,
-                  h_Jx, h_Jy, h_Jz, cs->size);
+                  vec_hin[0], vec_hin[1], vec_hin[2], cs->size);
 
     _arrC3ToCUDAC(currents->r2x, currents->r2y, currents->r2z,
                   currents->i2x, currents->i2y, currents->i2z,
-                  h_Mx, h_My, h_Mz, cs->size);
-
-    // Allocate and copy J and M currents
-    gpuErrchk( cudaMalloc((void**)&d_Jx, cs->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Jy, cs->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Jz, cs->size * sizeof(cuFloatComplex)) );
-
-    gpuErrchk( cudaMemcpy(d_Jx, h_Jx, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_Jy, h_Jy, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_Jz, h_Jz, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-
-    gpuErrchk( cudaMalloc((void**)&d_Mx, cs->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_My, cs->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Mz, cs->size * sizeof(cuFloatComplex)) );
-
-    gpuErrchk( cudaMemcpy(d_Mx, h_Mx, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_My, h_My, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_Mz, h_Mz, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-
-    // Delete host arrays for source currents - not needed anymore
-    delete h_Jx;
-    delete h_Jy;
-    delete h_Jz;
-
-    delete h_Mx;
-    delete h_My;
-    delete h_Mz;
-
-    cuFloatComplex *d_Jxt, *d_Jyt, *d_Jzt;
-    cuFloatComplex *d_Mxt, *d_Myt, *d_Mzt;
-
-    gpuErrchk( cudaMalloc((void**)&d_Jxt, ct->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Jyt, ct->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Jzt, ct->size * sizeof(cuFloatComplex)) );
-
-    gpuErrchk( cudaMalloc((void**)&d_Mxt, ct->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Myt, ct->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Mzt, ct->size * sizeof(cuFloatComplex)) );
-
-    // Create stopping event for kernel
-    cudaEvent_t event;
-    gpuErrchk( cudaEventCreateWithFlags(&event, cudaEventDisableTiming) );
+                  vec_hin[3], vec_hin[4], vec_hin[5], cs->size);
+     
+    std::vector<cuFloatComplex*> vec_din = memutil.cuMallComplex(n_in, cs->size);
+    std::vector<cuFloatComplex*> vec_dout = memutil.cuMallComplex(n_out, ct->size);
+    
+    memutil.cuMemCpComplex(vec_din, vec_hin, cs->size); 
+    memutil.deallocComplexHost(vec_hin);
 
     // Call to KERNEL 0
-    GpropagateBeam_0<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs,
-                                d_A, d_xt, d_yt, d_zt,
-                                d_nxs, d_nys, d_nzs,
-                                d_nxt, d_nyt, d_nzt,
-                                d_Jx, d_Jy, d_Jz,
-                                d_Mx, d_My, d_Mz,
-                                d_Jxt, d_Jyt, d_Jzt,
-                                d_Mxt, d_Myt, d_Mzt);
+    GpropagateBeam_0<<<BT[0], BT[1]>>>(vec_ds[0], vec_ds[1], vec_ds[2], vec_ds[3],
+                                       vec_dt[0], vec_dt[1], vec_dt[2],
+                                       vec_ds[4], vec_ds[5], vec_ds[6],
+                                       vec_dt[3], vec_dt[4], vec_dt[5],
+                                       vec_din[0], vec_din[1], vec_din[2],
+                                       vec_din[3], vec_din[4], vec_din[5],
+                                       vec_dout[0], vec_dout[1], vec_dout[2],
+                                       vec_dout[3], vec_dout[4], vec_dout[5]);
     
     gpuErrchk( cudaDeviceSynchronize() );
+    
+    std::vector<cuFloatComplex*> vec_hout = memutil.cuMallComplexStack(n_out, ct->size);
+    memutil.cuMemCpComplex(vec_hout, vec_dout, ct->size, false);
 
-    // Allocate Host arrays for J and M
-    cuFloatComplex *h_Jxt = new cuFloatComplex[ct->size];
-    cuFloatComplex *h_Jyt = new cuFloatComplex[ct->size];
-    cuFloatComplex *h_Jzt = new cuFloatComplex[ct->size];
-
-    cuFloatComplex *h_Mxt = new cuFloatComplex[ct->size];
-    cuFloatComplex *h_Myt = new cuFloatComplex[ct->size];
-    cuFloatComplex *h_Mzt = new cuFloatComplex[ct->size];
-
-    // Copy data back from Device to Host
-    gpuErrchk( cudaMemcpy(h_Jxt, d_Jxt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Jyt, d_Jyt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Jzt, d_Jzt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-
-    gpuErrchk( cudaMemcpy(h_Mxt, d_Mxt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Myt, d_Myt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Mzt, d_Mzt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-
-    // Free Device memory
     gpuErrchk( cudaDeviceReset() );
 
-    _arrCUDACToC3(h_Jxt, h_Jyt, h_Jzt, res->r1x, res->r1y, res->r1z, res->i1x, res->i1y, res->i1z, ct->size);
-    _arrCUDACToC3(h_Mxt, h_Myt, h_Mzt, res->r2x, res->r2y, res->r2z, res->i2x, res->i2y, res->i2z, ct->size);
+    _arrCUDACToC3(vec_hout[0], vec_hout[1], vec_hout[2], res->r1x, res->r1y, res->r1z, res->i1x, res->i1y, res->i1z, ct->size);
+    _arrCUDACToC3(vec_hout[3], vec_hout[4], vec_hout[5], res->r2x, res->r2y, res->r2z, res->i2x, res->i2y, res->i2z, ct->size);
 
-    // Delete host arrays for target currents
-    delete h_Jxt;
-    delete h_Jyt;
-    delete h_Jzt;
-
-    delete h_Mxt;
-    delete h_Myt;
-    delete h_Mzt;
+    memutil.deallocComplexHost(vec_hout);
 }
 
 /**
@@ -1324,142 +1166,60 @@ void callKernelf_EH(c2Bundlef *res, reflparamsf source, reflparamsf target,
 
     // Initialize and copy constant memory to device
     std::array<dim3, 2> BT;
-    BT = _initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
-    //alsd
-    // Create pointers to device arrays and allocate/copy source grid and area.
-    float *d_xs, *d_ys, *d_zs, *d_A, *d_nxs, *d_nys, *d_nzs;
+    BT = initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
 
-    gpuErrchk( cudaMalloc((void**)&d_xs, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_ys, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_zs, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_A, cs->size * sizeof(float)) );
+    MemUtils memutil;
 
-    gpuErrchk( cudaMemcpy(d_xs, cs->x, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_ys, cs->y, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_zs, cs->z, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_A, cs->area, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    int n_ds = 7;
+    int n_dt = 3;
+     
+    std::vector<float*> vec_csdat = {cs->x, cs->y, cs->z, cs->area, cs->nx, cs->ny, cs->nz};
+    std::vector<float*> vec_ctdat = {ct->x, ct->y, ct->z};
 
-    // Create pointers to target grid
-    float *d_xt, *d_yt, *d_zt;
-    gpuErrchk( cudaMalloc((void**)&d_xt, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_yt, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_zt, ct->size * sizeof(float)) );
-
-    gpuErrchk( cudaMemcpy(d_xt, ct->x, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_yt, ct->y, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_zt, ct->z, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-
-    gpuErrchk( cudaMalloc((void**)&d_nxs, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_nys, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_nzs, cs->size * sizeof(float)) );
-
-    gpuErrchk( cudaMemcpy(d_nxs, cs->nx, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_nys, cs->ny, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_nzs, cs->nz, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    std::vector<float*> vec_ds = memutil.cuMallFloat(n_ds, cs->size);
+    memutil.cuMemCpFloat(vec_ds, vec_csdat, cs->size); 
     
-    cuFloatComplex *h_Jx = new cuFloatComplex[cs->size];
-    cuFloatComplex *h_Jy = new cuFloatComplex[cs->size];
-    cuFloatComplex *h_Jz = new cuFloatComplex[cs->size];
+    std::vector<float*> vec_dt = memutil.cuMallFloat(n_dt, ct->size);
+    memutil.cuMemCpFloat(vec_dt, vec_ctdat, ct->size); 
 
-    cuFloatComplex *h_Mx = new cuFloatComplex[cs->size];
-    cuFloatComplex *h_My = new cuFloatComplex[cs->size];
-    cuFloatComplex *h_Mz = new cuFloatComplex[cs->size];
+    int n_in = 6;
+    int n_out = 6;
+    
+    std::vector<cuFloatComplex*> vec_hin = memutil.cuMallComplexStack(n_in, cs->size);
 
     _arrC3ToCUDAC(currents->r1x, currents->r1y, currents->r1z,
                   currents->i1x, currents->i1y, currents->i1z,
-                  h_Jx, h_Jy, h_Jz, cs->size);
+                  vec_hin[0], vec_hin[1], vec_hin[2], cs->size);
 
     _arrC3ToCUDAC(currents->r2x, currents->r2y, currents->r2z,
                   currents->i2x, currents->i2y, currents->i2z,
-                  h_Mx, h_My, h_Mz, cs->size);
+                  vec_hin[3], vec_hin[4], vec_hin[5], cs->size);
+     
+    std::vector<cuFloatComplex*> vec_din = memutil.cuMallComplex(n_in, cs->size);
+    std::vector<cuFloatComplex*> vec_dout = memutil.cuMallComplex(n_out, ct->size);
+    
+    memutil.cuMemCpComplex(vec_din, vec_hin, cs->size); 
+    memutil.deallocComplexHost(vec_hin);
 
-    cuFloatComplex *d_Jx, *d_Jy, *d_Jz;
-    cuFloatComplex *d_Mx, *d_My, *d_Mz;
-
-    // Allocate and copy J and M currents
-    gpuErrchk( cudaMalloc((void**)&d_Jx, cs->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Jy, cs->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Jz, cs->size * sizeof(cuFloatComplex)) );
-
-    gpuErrchk( cudaMemcpy(d_Jx, h_Jx, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_Jy, h_Jy, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_Jz, h_Jz, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-
-    gpuErrchk( cudaMalloc((void**)&d_Mx, cs->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_My, cs->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Mz, cs->size * sizeof(cuFloatComplex)) );
-
-    gpuErrchk( cudaMemcpy(d_Mx, h_Mx, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_My, h_My, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_Mz, h_Mz, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-
-    // Delete host arrays for source currents - not needed anymore
-    delete h_Jx;
-    delete h_Jy;
-    delete h_Jz;
-
-    delete h_Mx;
-    delete h_My;
-    delete h_Mz;
-
-    cuFloatComplex *d_Ext, *d_Eyt, *d_Ezt;
-    cuFloatComplex *d_Hxt, *d_Hyt, *d_Hzt;
-
-    gpuErrchk( cudaMalloc((void**)&d_Ext, ct->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Eyt, ct->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Ezt, ct->size * sizeof(cuFloatComplex)) );
-
-    gpuErrchk( cudaMalloc((void**)&d_Hxt, ct->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Hyt, ct->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Hzt, ct->size * sizeof(cuFloatComplex)) );
-
-    // Create stopping event for kernel
-    cudaEvent_t event;
-    gpuErrchk( cudaEventCreateWithFlags(&event, cudaEventDisableTiming) );
-
-    // Call to KERNEL 1
-    GpropagateBeam_1<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs,
-                                d_A, d_xt, d_yt, d_zt,
-                                d_nxs, d_nys, d_nzs,
-                                d_Jx, d_Jy, d_Jz,
-                                d_Mx, d_My, d_Mz,
-                                d_Ext, d_Eyt, d_Ezt,
-                                d_Hxt, d_Hyt, d_Hzt);
-
+    GpropagateBeam_1<<<BT[0], BT[1]>>>(vec_ds[0], vec_ds[1], vec_ds[2], vec_ds[3],
+                                       vec_dt[0], vec_dt[1], vec_dt[2],
+                                       vec_ds[4], vec_ds[5], vec_ds[6],
+                                       vec_din[0], vec_din[1], vec_din[2],
+                                       vec_din[3], vec_din[4], vec_din[5],
+                                       vec_dout[0], vec_dout[1], vec_dout[2],
+                                       vec_dout[3], vec_dout[4], vec_dout[5]);
+    
     gpuErrchk( cudaDeviceSynchronize() );
+    
+    std::vector<cuFloatComplex*> vec_hout = memutil.cuMallComplexStack(n_out, ct->size);
+    memutil.cuMemCpComplex(vec_hout, vec_dout, ct->size, false);
 
-    // Allocate Host arrays for E and H
-    cuFloatComplex *h_Ext = new cuFloatComplex[ct->size];
-    cuFloatComplex *h_Eyt = new cuFloatComplex[ct->size];
-    cuFloatComplex *h_Ezt = new cuFloatComplex[ct->size];
-
-    cuFloatComplex *h_Hxt = new cuFloatComplex[ct->size];
-    cuFloatComplex *h_Hyt = new cuFloatComplex[ct->size];
-    cuFloatComplex *h_Hzt = new cuFloatComplex[ct->size];
-
-    // Copy data back from Device to Host
-    gpuErrchk( cudaMemcpy(h_Ext, d_Ext, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Eyt, d_Eyt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Ezt, d_Ezt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-
-    gpuErrchk( cudaMemcpy(h_Hxt, d_Hxt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Hyt, d_Hyt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Hzt, d_Hzt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-
-    // Free Device memory
     gpuErrchk( cudaDeviceReset() );
 
-    _arrCUDACToC3(h_Ext, h_Eyt, h_Ezt, res->r1x, res->r1y, res->r1z, res->i1x, res->i1y, res->i1z, ct->size);
-    _arrCUDACToC3(h_Hxt, h_Hyt, h_Hzt, res->r2x, res->r2y, res->r2z, res->i2x, res->i2y, res->i2z, ct->size);
+    _arrCUDACToC3(vec_hout[0], vec_hout[1], vec_hout[2], res->r1x, res->r1y, res->r1z, res->i1x, res->i1y, res->i1z, ct->size);
+    _arrCUDACToC3(vec_hout[3], vec_hout[4], vec_hout[5], res->r2x, res->r2y, res->r2z, res->i2x, res->i2y, res->i2z, ct->size);
 
-    // Delete host arrays for target fields
-    delete h_Ext;
-    delete h_Eyt;
-    delete h_Ezt;
-
-    delete h_Hxt;
-    delete h_Hyt;
-    delete h_Hzt;
+    memutil.deallocComplexHost(vec_hout);
 }
 
 /**
@@ -1496,194 +1256,66 @@ void callKernelf_JMEH(c4Bundlef *res, reflparamsf source, reflparamsf target,
 
     // Initialize and copy constant memory to device
     std::array<dim3, 2> BT;
-    BT = _initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
+    BT = initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
 
-    // Create pointers to device arrays and allocate/copy source grid and area.
-    float *d_xs, *d_ys, *d_zs, *d_A, *d_nxs, *d_nys, *d_nzs;
+    MemUtils memutil;
 
-    gpuErrchk( cudaMalloc((void**)&d_xs, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_ys, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_zs, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_A, cs->size * sizeof(float)) );
+    int n_ds = 7;
+    int n_dt = 6;
+     
+    std::vector<float*> vec_csdat = {cs->x, cs->y, cs->z, cs->area, cs->nx, cs->ny, cs->nz};
+    std::vector<float*> vec_ctdat = {ct->x, ct->y, ct->z, ct->nx, ct->ny, ct->nz};
 
-    gpuErrchk( cudaMemcpy(d_xs, cs->x, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_ys, cs->y, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_zs, cs->z, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_A, cs->area, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-
-    // Create pointers to target grid and normal vectors
-    float *d_xt, *d_yt, *d_zt, *d_nxt, *d_nyt, *d_nzt;
-
-    // Allocate target co-ordinate and normal grids
-    gpuErrchk( cudaMalloc((void**)&d_xt, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_yt, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_zt, ct->size * sizeof(float)) );
-
-    gpuErrchk( cudaMemcpy(d_xt, ct->x, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_yt, ct->y, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_zt, ct->z, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-
-    gpuErrchk( cudaMalloc((void**)&d_nxs, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_nys, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_nzs, cs->size * sizeof(float)) );
-
-    gpuErrchk( cudaMemcpy(d_nxs, cs->nx, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_nys, cs->ny, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_nzs, cs->nz, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    std::vector<float*> vec_ds = memutil.cuMallFloat(n_ds, cs->size);
+    memutil.cuMemCpFloat(vec_ds, vec_csdat, cs->size); 
     
-    gpuErrchk( cudaMalloc((void**)&d_nxt, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_nyt, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_nzt, ct->size * sizeof(float)) );
+    std::vector<float*> vec_dt = memutil.cuMallFloat(n_dt, ct->size);
+    memutil.cuMemCpFloat(vec_dt, vec_ctdat, ct->size); 
 
-    gpuErrchk( cudaMemcpy(d_nxt, ct->nx, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_nyt, ct->ny, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_nzt, ct->nz, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-
-    cuFloatComplex *h_Jx = new cuFloatComplex[cs->size];
-    cuFloatComplex *h_Jy = new cuFloatComplex[cs->size];
-    cuFloatComplex *h_Jz = new cuFloatComplex[cs->size];
-
-    cuFloatComplex *h_Mx = new cuFloatComplex[cs->size];
-    cuFloatComplex *h_My = new cuFloatComplex[cs->size];
-    cuFloatComplex *h_Mz = new cuFloatComplex[cs->size];
-
-    cuFloatComplex *d_Jx, *d_Jy, *d_Jz;
-    cuFloatComplex *d_Mx, *d_My, *d_Mz;
+    int n_in = 6;
+    int n_out = 12;
+    
+    std::vector<cuFloatComplex*> vec_hin = memutil.cuMallComplexStack(n_in, cs->size);
 
     _arrC3ToCUDAC(currents->r1x, currents->r1y, currents->r1z,
                   currents->i1x, currents->i1y, currents->i1z,
-                  h_Jx, h_Jy, h_Jz, cs->size);
+                  vec_hin[0], vec_hin[1], vec_hin[2], cs->size);
 
     _arrC3ToCUDAC(currents->r2x, currents->r2y, currents->r2z,
                   currents->i2x, currents->i2y, currents->i2z,
-                  h_Mx, h_My, h_Mz, cs->size);
-
-    // Allocate and copy J and M currents
-    gpuErrchk( cudaMalloc((void**)&d_Jx, cs->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Jy, cs->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Jz, cs->size * sizeof(cuFloatComplex)) );
-
-    gpuErrchk( cudaMemcpy(d_Jx, h_Jx, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_Jy, h_Jy, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_Jz, h_Jz, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-
-    gpuErrchk( cudaMalloc((void**)&d_Mx, cs->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_My, cs->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Mz, cs->size * sizeof(cuFloatComplex)) );
-
-    gpuErrchk( cudaMemcpy(d_Mx, h_Mx, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_My, h_My, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_Mz, h_Mz, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-
-    // Delete host arrays for source currents - not needed anymore
-    delete h_Jx;
-    delete h_Jy;
-    delete h_Jz;
-
-    delete h_Mx;
-    delete h_My;
-    delete h_Mz;
-
-    cuFloatComplex *d_Jxt, *d_Jyt, *d_Jzt;
-    cuFloatComplex *d_Mxt, *d_Myt, *d_Mzt;
-    cuFloatComplex *d_Ext, *d_Eyt, *d_Ezt;
-    cuFloatComplex *d_Hxt, *d_Hyt, *d_Hzt;
-
-    gpuErrchk( cudaMalloc((void**)&d_Ext, ct->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Eyt, ct->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Ezt, ct->size * sizeof(cuFloatComplex)) );
-
-    gpuErrchk( cudaMalloc((void**)&d_Hxt, ct->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Hyt, ct->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Hzt, ct->size * sizeof(cuFloatComplex)) );
-
-    gpuErrchk( cudaMalloc((void**)&d_Jxt, ct->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Jyt, ct->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Jzt, ct->size * sizeof(cuFloatComplex)) );
-
-    gpuErrchk( cudaMalloc((void**)&d_Mxt, ct->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Myt, ct->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Mzt, ct->size * sizeof(cuFloatComplex)) );
-
-    // Create stopping event for kernel
-    cudaEvent_t event;
-    gpuErrchk( cudaEventCreateWithFlags(&event, cudaEventDisableTiming) );
+                  vec_hin[3], vec_hin[4], vec_hin[5], cs->size);
+     
+    std::vector<cuFloatComplex*> vec_din = memutil.cuMallComplex(n_in, cs->size);
+    std::vector<cuFloatComplex*> vec_dout = memutil.cuMallComplex(n_out, ct->size);
+    
+    memutil.cuMemCpComplex(vec_din, vec_hin, cs->size); 
+    memutil.deallocComplexHost(vec_hin);
 
     // Call to KERNEL 2
-    GpropagateBeam_2<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs,
-                                   d_A, d_xt, d_yt, d_zt,
-                                   d_nxs, d_nys, d_nzs,
-                                   d_nxt, d_nyt, d_nzt,
-                                   d_Jx, d_Jy, d_Jz,
-                                   d_Mx, d_My, d_Mz,
-                                   d_Jxt, d_Jyt, d_Jzt,
-                                   d_Mxt, d_Myt, d_Mzt,
-                                   d_Ext, d_Eyt, d_Ezt,
-                                   d_Hxt, d_Hyt, d_Hzt);
-
+    GpropagateBeam_2<<<BT[0], BT[1]>>>(vec_ds[0], vec_ds[1], vec_ds[2], vec_ds[3],
+                                       vec_dt[0], vec_dt[1], vec_dt[2],
+                                       vec_ds[4], vec_ds[5], vec_ds[6],
+                                       vec_dt[3], vec_dt[4], vec_dt[5],
+                                       vec_din[0], vec_din[1], vec_din[2],
+                                       vec_din[3], vec_din[4], vec_din[5],
+                                       vec_dout[0], vec_dout[1], vec_dout[2],
+                                       vec_dout[3], vec_dout[4], vec_dout[5],
+                                       vec_dout[6], vec_dout[7], vec_dout[8],
+                                       vec_dout[9], vec_dout[10], vec_dout[11]);
+    
     gpuErrchk( cudaDeviceSynchronize() );
+    
+    std::vector<cuFloatComplex*> vec_hout = memutil.cuMallComplexStack(n_out, ct->size);
+    memutil.cuMemCpComplex(vec_hout, vec_dout, ct->size, false);
 
-    // Allocate Host arrays for J and M
-    cuFloatComplex *h_Jxt = new cuFloatComplex[ct->size];
-    cuFloatComplex *h_Jyt = new cuFloatComplex[ct->size];
-    cuFloatComplex *h_Jzt = new cuFloatComplex[ct->size];
-
-    cuFloatComplex *h_Mxt = new cuFloatComplex[ct->size];
-    cuFloatComplex *h_Myt = new cuFloatComplex[ct->size];
-    cuFloatComplex *h_Mzt = new cuFloatComplex[ct->size];
-
-    // Allocate Host arrays for E and H
-    cuFloatComplex *h_Ext = new cuFloatComplex[ct->size];
-    cuFloatComplex *h_Eyt = new cuFloatComplex[ct->size];
-    cuFloatComplex *h_Ezt = new cuFloatComplex[ct->size];
-
-    cuFloatComplex *h_Hxt = new cuFloatComplex[ct->size];
-    cuFloatComplex *h_Hyt = new cuFloatComplex[ct->size];
-    cuFloatComplex *h_Hzt = new cuFloatComplex[ct->size];
-
-    // Copy data back from Device to Host
-    gpuErrchk( cudaMemcpy(h_Jxt, d_Jxt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Jyt, d_Jyt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Jzt, d_Jzt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-
-    gpuErrchk( cudaMemcpy(h_Mxt, d_Mxt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Myt, d_Myt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Mzt, d_Mzt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-
-    gpuErrchk( cudaMemcpy(h_Ext, d_Ext, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Eyt, d_Eyt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Ezt, d_Ezt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-
-    gpuErrchk( cudaMemcpy(h_Hxt, d_Hxt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Hyt, d_Hyt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Hzt, d_Hzt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-
-    // Free Device memory
     gpuErrchk( cudaDeviceReset() );
 
-    _arrCUDACToC3(h_Jxt, h_Jyt, h_Jzt, res->r1x, res->r1y, res->r1z, res->i1x, res->i1y, res->i1z, ct->size);
-    _arrCUDACToC3(h_Mxt, h_Myt, h_Mzt, res->r2x, res->r2y, res->r2z, res->i2x, res->i2y, res->i2z, ct->size);
+    _arrCUDACToC3(vec_hout[0], vec_hout[1], vec_hout[2], res->r1x, res->r1y, res->r1z, res->i1x, res->i1y, res->i1z, ct->size);
+    _arrCUDACToC3(vec_hout[3], vec_hout[4], vec_hout[5], res->r2x, res->r2y, res->r2z, res->i2x, res->i2y, res->i2z, ct->size);
+    _arrCUDACToC3(vec_hout[6], vec_hout[7], vec_hout[8], res->r3x, res->r3y, res->r3z, res->i3x, res->i3y, res->i3z, ct->size);
+    _arrCUDACToC3(vec_hout[9], vec_hout[10], vec_hout[11], res->r4x, res->r4y, res->r4z, res->i4x, res->i4y, res->i4z, ct->size);
 
-    _arrCUDACToC3(h_Ext, h_Eyt, h_Ezt, res->r3x, res->r3y, res->r3z, res->i3x, res->i3y, res->i3z, ct->size);
-    _arrCUDACToC3(h_Hxt, h_Hyt, h_Hzt, res->r4x, res->r4y, res->r4z, res->i4x, res->i4y, res->i4z, ct->size);
-
-    // Delete host arrays for target currents
-    delete h_Jxt;
-    delete h_Jyt;
-    delete h_Jzt;
-
-    delete h_Mxt;
-    delete h_Myt;
-    delete h_Mzt;
-
-    // Delete host arrays for target fields
-    delete h_Ext;
-    delete h_Eyt;
-    delete h_Ezt;
-
-    delete h_Hxt;
-    delete h_Hyt;
-    delete h_Hzt;
+    memutil.deallocComplexHost(vec_hout);
 }
 
 /**
@@ -1720,175 +1352,73 @@ void callKernelf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf target,
 
     // Initialize and copy constant memory to device
     std::array<dim3, 2> BT;
-    BT = _initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
+    BT = initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
 
-    // Create pointers to device arrays and allocate/copy source grid and area.
-    float *d_xs, *d_ys, *d_zs, *d_A, *d_nxs, *d_nys, *d_nzs;
+    MemUtils memutil;
 
-    gpuErrchk( cudaMalloc((void**)&d_xs, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_ys, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_zs, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_A, cs->size * sizeof(float)) );
+    int n_ds = 7;
+    int n_dt = 6;
+     
+    std::vector<float*> vec_csdat = {cs->x, cs->y, cs->z, cs->area, cs->nx, cs->ny, cs->nz};
+    std::vector<float*> vec_ctdat = {ct->x, ct->y, ct->z, ct->nx, ct->ny, ct->nz};
 
-    gpuErrchk( cudaMemcpy(d_xs, cs->x, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_ys, cs->y, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_zs, cs->z, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_A, cs->area, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-
-    // Create pointers to target grid and normal vectors
-    float *d_xt, *d_yt, *d_zt, *d_nxt, *d_nyt, *d_nzt;
-    gpuErrchk( cudaMalloc((void**)&d_xt, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_yt, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_zt, ct->size * sizeof(float)) );
-
-    gpuErrchk( cudaMemcpy(d_xt, ct->x, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_yt, ct->y, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_zt, ct->z, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-
-    gpuErrchk( cudaMalloc((void**)&d_nxs, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_nys, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_nzs, cs->size * sizeof(float)) );
-
-    gpuErrchk( cudaMemcpy(d_nxs, cs->nx, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_nys, cs->ny, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_nzs, cs->nz, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    std::vector<float*> vec_ds = memutil.cuMallFloat(n_ds, cs->size);
+    memutil.cuMemCpFloat(vec_ds, vec_csdat, cs->size); 
     
-    gpuErrchk( cudaMalloc((void**)&d_nxt, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_nyt, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_nzt, ct->size * sizeof(float)) );
+    std::vector<float*> vec_dt = memutil.cuMallFloat(n_dt, ct->size);
+    memutil.cuMemCpFloat(vec_dt, vec_ctdat, ct->size); 
 
-    gpuErrchk( cudaMemcpy(d_nxt, ct->nx, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_nyt, ct->ny, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_nzt, ct->nz, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-
-    cuFloatComplex *h_Jx = new cuFloatComplex[cs->size];
-    cuFloatComplex *h_Jy = new cuFloatComplex[cs->size];
-    cuFloatComplex *h_Jz = new cuFloatComplex[cs->size];
-
-    cuFloatComplex *h_Mx = new cuFloatComplex[cs->size];
-    cuFloatComplex *h_My = new cuFloatComplex[cs->size];
-    cuFloatComplex *h_Mz = new cuFloatComplex[cs->size];
-
-    cuFloatComplex *d_Jx, *d_Jy, *d_Jz;
-    cuFloatComplex *d_Mx, *d_My, *d_Mz;
+    int n_in = 6;
+    int n_out = 6;
+    int n_out_poynt = 3;
+    
+    std::vector<cuFloatComplex*> vec_hin = memutil.cuMallComplexStack(n_in, cs->size);
 
     _arrC3ToCUDAC(currents->r1x, currents->r1y, currents->r1z,
                   currents->i1x, currents->i1y, currents->i1z,
-                  h_Jx, h_Jy, h_Jz, cs->size);
+                  vec_hin[0], vec_hin[1], vec_hin[2], cs->size);
 
     _arrC3ToCUDAC(currents->r2x, currents->r2y, currents->r2z,
                   currents->i2x, currents->i2y, currents->i2z,
-                  h_Mx, h_My, h_Mz, cs->size);
-
-    gpuErrchk( cudaMalloc((void**)&d_Jx, cs->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Jy, cs->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Jz, cs->size * sizeof(cuFloatComplex)) );
-
-    gpuErrchk( cudaMemcpy(d_Jx, h_Jx, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_Jy, h_Jy, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_Jz, h_Jz, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-
-    gpuErrchk( cudaMalloc((void**)&d_Mx, cs->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_My, cs->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Mz, cs->size * sizeof(cuFloatComplex)) );
-
-    gpuErrchk( cudaMemcpy(d_Mx, h_Mx, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_My, h_My, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_Mz, h_Mz, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-
-    // Delete host arrays for source currents
-    delete h_Jx;
-    delete h_Jy;
-    delete h_Jz;
-
-    delete h_Mx;
-    delete h_My;
-    delete h_Mz;
-
-    cuFloatComplex *d_Ext, *d_Eyt, *d_Ezt;
-    cuFloatComplex *d_Hxt, *d_Hyt, *d_Hzt;
-    float *d_Prxt, *d_Pryt, *d_Przt;
-
-    gpuErrchk( cudaMalloc((void**)&d_Ext, ct->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Eyt, ct->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Ezt, ct->size * sizeof(cuFloatComplex)) );
-
-    gpuErrchk( cudaMalloc((void**)&d_Hxt, ct->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Hyt, ct->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Hzt, ct->size * sizeof(cuFloatComplex)) );
-
-    gpuErrchk( cudaMalloc((void**)&d_Prxt, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_Pryt, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_Przt, ct->size * sizeof(float)) );
-
-    // Create stopping event for kernel
-    cudaEvent_t event;
-    gpuErrchk( cudaEventCreateWithFlags(&event, cudaEventDisableTiming) );
+                  vec_hin[3], vec_hin[4], vec_hin[5], cs->size);
+     
+    std::vector<cuFloatComplex*> vec_din = memutil.cuMallComplex(n_in, cs->size);
+    std::vector<cuFloatComplex*> vec_dout = memutil.cuMallComplex(n_out, ct->size);
+    std::vector<float*> vec_dpoynt = memutil.cuMallFloat(n_out_poynt, ct->size);
+    
+    memutil.cuMemCpComplex(vec_din, vec_hin, cs->size); 
+    memutil.deallocComplexHost(vec_hin);
 
     // Call to KERNEL 3
-    GpropagateBeam_3<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs,
-                                d_A, d_xt, d_yt, d_zt,
-                                d_nxs, d_nys, d_nzs,
-                                d_nxt, d_nyt, d_nzt,
-                                d_Jx, d_Jy, d_Jz,
-                                d_Mx, d_My, d_Mz,
-                                d_Ext, d_Eyt, d_Ezt,
-                                d_Hxt, d_Hyt, d_Hzt,
-                                d_Prxt, d_Pryt, d_Przt);
+    GpropagateBeam_3<<<BT[0], BT[1]>>>(vec_ds[0], vec_ds[1], vec_ds[2], vec_ds[3],
+                                       vec_dt[0], vec_dt[1], vec_dt[2],
+                                       vec_ds[4], vec_ds[5], vec_ds[6],
+                                       vec_dt[3], vec_dt[4], vec_dt[5],
+                                       vec_din[0], vec_din[1], vec_din[2],
+                                       vec_din[3], vec_din[4], vec_din[5],
+                                       vec_dout[0], vec_dout[1], vec_dout[2],
+                                       vec_dout[3], vec_dout[4], vec_dout[5],
+                                       vec_dpoynt[0], vec_dpoynt[1], vec_dpoynt[2]);
 
-    gpuErrchk( cudaDeviceSynchronize() );
+    std::vector<cuFloatComplex*> vec_hout = memutil.cuMallComplexStack(n_out, ct->size);
+    std::vector<float*> vec_hpoynt = memutil.cuMallFloatStack(n_out_poynt, ct->size);
+    memutil.cuMemCpComplex(vec_hout, vec_dout, ct->size, false);
+    memutil.cuMemCpFloat(vec_hpoynt, vec_dpoynt, ct->size, false);
 
-    // Allocate Host arrays for E, H and P
-    cuFloatComplex *h_Ext = new cuFloatComplex[ct->size];
-    cuFloatComplex *h_Eyt = new cuFloatComplex[ct->size];
-    cuFloatComplex *h_Ezt = new cuFloatComplex[ct->size];
-
-    cuFloatComplex *h_Hxt = new cuFloatComplex[ct->size];
-    cuFloatComplex *h_Hyt = new cuFloatComplex[ct->size];
-    cuFloatComplex *h_Hzt = new cuFloatComplex[ct->size];
-
-    float *h_Prxt = new float[ct->size];
-    float *h_Pryt = new float[ct->size];
-    float *h_Przt = new float[ct->size];
-
-    // Copy data back from Device to Host
-    gpuErrchk( cudaMemcpy(h_Ext, d_Ext, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Eyt, d_Eyt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Ezt, d_Ezt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-
-    gpuErrchk( cudaMemcpy(h_Hxt, d_Hxt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Hyt, d_Hyt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Hzt, d_Hzt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-
-    gpuErrchk( cudaMemcpy(h_Prxt, d_Prxt, ct->size * sizeof(float), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Pryt, d_Pryt, ct->size * sizeof(float), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Przt, d_Przt, ct->size * sizeof(float), cudaMemcpyDeviceToHost) );
-
-    // Free Device memory
     gpuErrchk( cudaDeviceReset() );
 
-    _arrCUDACToC3(h_Ext, h_Eyt, h_Ezt, res->r1x, res->r1y, res->r1z, res->i1x, res->i1y, res->i1z, ct->size);
-    _arrCUDACToC3(h_Hxt, h_Hyt, h_Hzt, res->r2x, res->r2y, res->r2z, res->i2x, res->i2y, res->i2z, ct->size);
+    _arrCUDACToC3(vec_hout[0], vec_hout[1], vec_hout[2], res->r1x, res->r1y, res->r1z, res->i1x, res->i1y, res->i1z, ct->size);
+    _arrCUDACToC3(vec_hout[3], vec_hout[4], vec_hout[5], res->r2x, res->r2y, res->r2z, res->i2x, res->i2y, res->i2z, ct->size);
 
     for (int i=0; i<ct->size; i++)
     {
-        res->r3x[i] = h_Prxt[i];
-        res->r3y[i] = h_Pryt[i];
-        res->r3z[i] = h_Przt[i];
+        res->r3x[i] = vec_hpoynt[0][i];
+        res->r3y[i] = vec_hpoynt[1][i];
+        res->r3z[i] = vec_hpoynt[2][i];
     }
 
-    // Delete host arrays for target fields
-    delete h_Ext;
-    delete h_Eyt;
-    delete h_Ezt;
-
-    delete h_Hxt;
-    delete h_Hyt;
-    delete h_Hzt;
-
-    delete h_Prxt;
-    delete h_Pryt;
-    delete h_Przt;
+    memutil.deallocComplexHost(vec_hout);
+    memutil.deallocFloatHost(vec_hpoynt);
 }
 
 /**
@@ -1924,131 +1454,59 @@ void callKernelf_FF(c2Bundlef *res, reflparamsf source, reflparamsf target,
 
     // Initialize and copy constant memory to device
     std::array<dim3, 2> BT;
-    BT = _initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
-    //alsd
-    // Create pointers to device arrays and allocate/copy source grid and area.
-    float *d_xs, *d_ys, *d_zs, *d_A;
+    BT = initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
 
-    gpuErrchk( cudaMalloc((void**)&d_xs, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_ys, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_zs, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_A, cs->size * sizeof(float)) );
+    MemUtils memutil;
 
-    gpuErrchk( cudaMemcpy(d_xs, cs->x, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_ys, cs->y, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_zs, cs->z, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_A, cs->area, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
+    int n_ds = 4;
+    int n_dt = 2;
+     
+    std::vector<float*> vec_csdat = {cs->x, cs->y, cs->z, cs->area};
+    std::vector<float*> vec_ctdat = {ct->x, ct->y};
 
-    // Create pointers to target grid
-    float *d_xt, *d_yt;
-    gpuErrchk( cudaMalloc((void**)&d_xt, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_yt, ct->size * sizeof(float)) );
+    std::vector<float*> vec_ds = memutil.cuMallFloat(n_ds, cs->size);
+    memutil.cuMemCpFloat(vec_ds, vec_csdat, cs->size); 
+    
+    std::vector<float*> vec_dt = memutil.cuMallFloat(n_dt, ct->size);
+    memutil.cuMemCpFloat(vec_dt, vec_ctdat, ct->size); 
 
-    gpuErrchk( cudaMemcpy(d_xt, ct->x, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_yt, ct->y, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-
-    cuFloatComplex *h_Jx = new cuFloatComplex[cs->size];
-    cuFloatComplex *h_Jy = new cuFloatComplex[cs->size];
-    cuFloatComplex *h_Jz = new cuFloatComplex[cs->size];
-
-    cuFloatComplex *h_Mx = new cuFloatComplex[cs->size];
-    cuFloatComplex *h_My = new cuFloatComplex[cs->size];
-    cuFloatComplex *h_Mz = new cuFloatComplex[cs->size];
+    int n_in = 6;
+    int n_out = 6;
+    
+    std::vector<cuFloatComplex*> vec_hin = memutil.cuMallComplexStack(n_in, cs->size);
 
     _arrC3ToCUDAC(currents->r1x, currents->r1y, currents->r1z,
                   currents->i1x, currents->i1y, currents->i1z,
-                  h_Jx, h_Jy, h_Jz, cs->size);
+                  vec_hin[0], vec_hin[1], vec_hin[2], cs->size);
 
     _arrC3ToCUDAC(currents->r2x, currents->r2y, currents->r2z,
                   currents->i2x, currents->i2y, currents->i2z,
-                  h_Mx, h_My, h_Mz, cs->size);
+                  vec_hin[3], vec_hin[4], vec_hin[5], cs->size);
+     
+    std::vector<cuFloatComplex*> vec_din = memutil.cuMallComplex(n_in, cs->size);
+    std::vector<cuFloatComplex*> vec_dout = memutil.cuMallComplex(n_out, ct->size);
+    
+    memutil.cuMemCpComplex(vec_din, vec_hin, cs->size); 
+    memutil.deallocComplexHost(vec_hin);
 
-    cuFloatComplex *d_Jx, *d_Jy, *d_Jz;
-    cuFloatComplex *d_Mx, *d_My, *d_Mz;
-
-    // Allocate and copy J and M currents
-    gpuErrchk( cudaMalloc((void**)&d_Jx, cs->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Jy, cs->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Jz, cs->size * sizeof(cuFloatComplex)) );
-
-    gpuErrchk( cudaMemcpy(d_Jx, h_Jx, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_Jy, h_Jy, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_Jz, h_Jz, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-
-    gpuErrchk( cudaMalloc((void**)&d_Mx, cs->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_My, cs->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Mz, cs->size * sizeof(cuFloatComplex)) );
-
-    gpuErrchk( cudaMemcpy(d_Mx, h_Mx, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_My, h_My, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_Mz, h_Mz, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
-
-    // Delete host arrays for source currents - not needed anymore
-    delete h_Jx;
-    delete h_Jy;
-    delete h_Jz;
-
-    delete h_Mx;
-    delete h_My;
-    delete h_Mz;
-
-    cuFloatComplex *d_Ext, *d_Eyt, *d_Ezt;
-    cuFloatComplex *d_Hxt, *d_Hyt, *d_Hzt;
-
-    gpuErrchk( cudaMalloc((void**)&d_Ext, ct->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Eyt, ct->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Ezt, ct->size * sizeof(cuFloatComplex)) );
-
-    gpuErrchk( cudaMalloc((void**)&d_Hxt, ct->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Hyt, ct->size * sizeof(cuFloatComplex)) );
-    gpuErrchk( cudaMalloc((void**)&d_Hzt, ct->size * sizeof(cuFloatComplex)) );
-
-    // Create stopping event for kernel
-    cudaEvent_t event;
-    gpuErrchk( cudaEventCreateWithFlags(&event, cudaEventDisableTiming) );
-
-    // Call to KERNEL 1
-    GpropagateBeam_4<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs,
-                                d_A, d_xt, d_yt,
-                                d_Jx, d_Jy, d_Jz,
-                                d_Mx, d_My, d_Mz,
-                                d_Ext, d_Eyt, d_Ezt,
-                                d_Hxt, d_Hyt, d_Hzt);
+    GpropagateBeam_4<<<BT[0], BT[1]>>>(vec_ds[0], vec_ds[1], vec_ds[2], vec_ds[3],
+                                       vec_dt[0], vec_dt[1],
+                                       vec_din[0], vec_din[1], vec_din[2],
+                                       vec_din[3], vec_din[4], vec_din[5],
+                                       vec_dout[0], vec_dout[1], vec_dout[2],
+                                       vec_dout[3], vec_dout[4], vec_dout[5]);
 
     gpuErrchk( cudaDeviceSynchronize() );
+    
+    std::vector<cuFloatComplex*> vec_hout = memutil.cuMallComplexStack(n_out, ct->size);
+    memutil.cuMemCpComplex(vec_hout, vec_dout, ct->size, false);
 
-    // Allocate Host arrays for E and H
-    cuFloatComplex *h_Ext = new cuFloatComplex[ct->size];
-    cuFloatComplex *h_Eyt = new cuFloatComplex[ct->size];
-    cuFloatComplex *h_Ezt = new cuFloatComplex[ct->size];
-
-    cuFloatComplex *h_Hxt = new cuFloatComplex[ct->size];
-    cuFloatComplex *h_Hyt = new cuFloatComplex[ct->size];
-    cuFloatComplex *h_Hzt = new cuFloatComplex[ct->size];
-
-    // Copy data back from Device to Host
-    gpuErrchk( cudaMemcpy(h_Ext, d_Ext, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Eyt, d_Eyt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Ezt, d_Ezt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-
-    gpuErrchk( cudaMemcpy(h_Hxt, d_Hxt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Hyt, d_Hyt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(h_Hzt, d_Hzt, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
-
-    // Free Device memory
     gpuErrchk( cudaDeviceReset() );
 
-    _arrCUDACToC3(h_Ext, h_Eyt, h_Ezt, res->r1x, res->r1y, res->r1z, res->i1x, res->i1y, res->i1z, ct->size);
-    _arrCUDACToC3(h_Hxt, h_Hyt, h_Hzt, res->r2x, res->r2y, res->r2z, res->i2x, res->i2y, res->i2z, ct->size);
+    _arrCUDACToC3(vec_hout[0], vec_hout[1], vec_hout[2], res->r1x, res->r1y, res->r1z, res->i1x, res->i1y, res->i1z, ct->size);
+    _arrCUDACToC3(vec_hout[3], vec_hout[4], vec_hout[5], res->r2x, res->r2y, res->r2z, res->i2x, res->i2y, res->i2z, ct->size);
 
-    // Delete host arrays for target fields
-    delete h_Ext;
-    delete h_Eyt;
-    delete h_Ezt;
-
-    delete h_Hxt;
-    delete h_Hyt;
-    delete h_Hzt;
+    memutil.deallocComplexHost(vec_hout);
 }
 
 /**
@@ -2084,30 +1542,22 @@ void callKernelf_scalar(arrC1f *res, reflparamsf source, reflparamsf target,
 
     // Initialize and copy constant memory to device
     std::array<dim3, 2> BT;
-    BT = _initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
+    BT = initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
     //alsd
     // Create pointers to device arrays and allocate/copy source grid and area.
-    float *d_xs, *d_ys, *d_zs, *d_A;
+    MemUtils memutil;
 
-    gpuErrchk( cudaMalloc((void**)&d_xs, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_ys, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_zs, cs->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_A, cs->size * sizeof(float)) );
+    int n_ds = 4;
+    int n_dt = 3;
+     
+    std::vector<float*> vec_csdat = {cs->x, cs->y, cs->z, cs->area};
+    std::vector<float*> vec_ctdat = {ct->x, ct->y, ct->z};
 
-    gpuErrchk( cudaMemcpy(d_xs, cs->x, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_ys, cs->y, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_zs, cs->z, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_A, cs->area, cs->size * sizeof(float), cudaMemcpyHostToDevice) );
-
-    // Create pointers to target grid
-    float *d_xt, *d_yt, *d_zt;
-    gpuErrchk( cudaMalloc((void**)&d_xt, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_yt, ct->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_zt, ct->size * sizeof(float)) );
-
-    gpuErrchk( cudaMemcpy(d_xt, ct->x, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_yt, ct->y, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_zt, ct->z, ct->size * sizeof(float), cudaMemcpyHostToDevice) );
+    std::vector<float*> vec_ds = memutil.cuMallFloat(n_ds, cs->size);
+    memutil.cuMemCpFloat(vec_ds, vec_csdat, cs->size); 
+    
+    std::vector<float*> vec_dt = memutil.cuMallFloat(n_dt, ct->size);
+    memutil.cuMemCpFloat(vec_dt, vec_ctdat, ct->size); 
     
     cuFloatComplex *h_sfs = new cuFloatComplex[cs->size];
 
@@ -2115,45 +1565,27 @@ void callKernelf_scalar(arrC1f *res, reflparamsf source, reflparamsf target,
 
     cuFloatComplex *d_sfs;
 
-    // Allocate and copy scalar input field
     gpuErrchk( cudaMalloc((void**)&d_sfs, cs->size * sizeof(cuFloatComplex)) );
-
     gpuErrchk( cudaMemcpy(d_sfs, h_sfs, cs->size * sizeof(cuFloatComplex), cudaMemcpyHostToDevice) );
 
-    // Delete host arrays for source currents - not needed anymore
     delete h_sfs;
     
     cuFloatComplex *d_sft;
 
     gpuErrchk( cudaMalloc((void**)&d_sft, ct->size * sizeof(cuFloatComplex)) );
 
-    // Create stopping event for kernel
-    cudaEvent_t event;
-    gpuErrchk( cudaEventCreateWithFlags(&event, cudaEventDisableTiming) );
-
-    // Call to KERNEL 5
-    GpropagateBeam_5<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs,
-                                d_A, d_xt, d_yt, d_zt,
-                                d_sfs, d_sft);
+    GpropagateBeam_5<<<BT[0], BT[1]>>>(vec_ds[0], vec_ds[1], vec_ds[2], vec_ds[3],
+                                       vec_dt[0], vec_dt[1], vec_dt[2],
+                                       d_sfs, d_sft);
 
     gpuErrchk( cudaDeviceSynchronize() );
 
-    // Allocate Host arrays for scalar res
     cuFloatComplex *h_sft = new cuFloatComplex[ct->size];
-
-    // Copy data back from Device to Host
     gpuErrchk( cudaMemcpy(h_sft, d_sft, ct->size * sizeof(cuFloatComplex), cudaMemcpyDeviceToHost) );
 
-    // Free Device memory
     gpuErrchk( cudaDeviceReset() );
 
     _arrCUDACToC1(h_sft, res->x, res->y, ct->size);
 
-    // Delete host arrays for target fields
     delete h_sft;
 }
-//__host__ getComputeCapability
-
-//cudaDeviceProp deviceProp;
-//cudaGetDeviceProperties(&deviceProp, dev);
-//std::printf("%d.%d\n", deviceProp.major, deviceProp.minor);

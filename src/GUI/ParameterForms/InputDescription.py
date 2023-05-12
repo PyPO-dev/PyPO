@@ -1,4 +1,4 @@
-from attr import define, field, Factory
+from attrs import define, field, Factory
 from src.GUI.utils import inType, InputDescriptionError
 
 ##
@@ -17,50 +17,50 @@ class InputDescription:
     ## @var inType: determines the type of the input
     # 
     # @see inType 
-    inType : inType
+    inType : inType= field()
     ##
     #  @var OutputName: string representing the key in the output dictionary 
-    outputName : str = field(default=None)
+    outputName = field(default=None)
     ##
     #  @var Label for the form, if not set then the outputName will be used 
-    label : str = field(default=None)
+    label = field(default=None)
     ##
     # @var staticValue
     #
     # Value to be output if inType is static. In such case the user is not able to interact with the input 
     # field this value represents the predetermined output  
-    staticValue : str = field(default=None)
+    staticValue = field(default=None)
     ##
     # List of values, used if inType is a vector type. Can be used as hints or as prefilled values if 'prefill' is True
     # Also used in 'SimpleRadio', 'SimpleDropdown' and 'ElementSelectionWidget' to display in stead of options. In such
     # case options are still used to read the form but this way you can make a difference between what the user sees and 
     # how the choice is interpreted.  
-    hints : list = Factory(list)
+    hints = field(default=Factory(list))
     ##
     # Number of input fields, used if inType is a vector type. 
-    numFields : int = field(default=None)
+    numFields = field(default=None)
     ##
     # Determines wether the output will be converted to a numpy array, used if inType is a vector type 
-    oArray: bool = field(default=None)
+    oArray = field(default=None)
     ##
     # Dictionary containing strings as keys and lists of inputDescriptions as values. Used to nest 
     # forms if inType is a dynamic type 
-    subDict: dict = field(default=None)
+    subDict = field(default=None)
     ##
     # List of options used in 'SimpleRadio', 'SimpleDropdown' and 'ElementSelectionWidget' to provide options
     # @see hints 
-    options: list = field(default=None)
+    options = field(default=None)
     ##
     # Hides the input 
     # Used in case of a static input to hide the input
-    hidden: bool = field(default=False)
+    hidden = field(default=False)
     ##
-    # used by all inputs to provide a tooltip ##TODO: is this true?
-    toolTip: str = field(default=None)
+    # used by all inputs to provide a tooltip
+    toolTip = field(default=None)
     ##
     # If true a vector type input will use the hints as prefilled values
     # If true a checkbox input will be checked by default
-    prefill : bool = field(default=False)
+    prefill = field(default=False)
 
 
     def __attrs_post_init__(self):

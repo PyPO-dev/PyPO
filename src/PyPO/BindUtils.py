@@ -1,8 +1,6 @@
 import ctypes
 import numpy as np
 
-import matplotlib.pyplot as pt
-
 from src.PyPO.PyPOTypes import *
 import src.PyPO.Config as Config
 

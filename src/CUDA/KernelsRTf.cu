@@ -12,40 +12,6 @@ __constant__ float mat[16]; //
 __constant__ int nTot;
 __constant__ int cflip;
 
-#define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
-
-/**
- * Check CUDA call.
- *
- * Wrapper for finding errors in CUDA API calls.
- *
- * @param code The errorcode returned from failed API call.
- * @param file The file in which failure occured.
- * @param line The line in file in which error occured.
- * @param abort Exit code upon error.
- */
-__host__ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
-{
-   if (code != cudaSuccess)
-   {
-      fprintf(stderr,"GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
-      if (abort) exit(code);
-   }
-}
-
-/**
- * Debug real array.
- *
- * Print real valued array of size 3.
- *      Useful for debugging.
-
- * @param arr Array of 3 float.
- */
-__host__ __device__ void _debugArrayf(float arr[3])
-{
-    printf("%f, %f, %f\n", arr[0], arr[1], arr[2]);
-}
-
 /**
   Calculate common factor 1.
 
@@ -719,70 +685,47 @@ void callRTKernel(reflparamsf ctp, cframef *fr_in,
 {
     std::array<dim3, 2> BT;
     BT = _initCUDA(ctp, epsilon, t0, fr_in->size, nBlocks, nThreads);
+    
+    MemUtils memutil;
 
-    float *d_xs, *d_ys, *d_zs;
-    gpuErrchk( cudaMalloc((void**)&d_xs, fr_in->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_ys, fr_in->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_zs, fr_in->size * sizeof(float)) );
+    int n_ds = 6;
+    int n_dt = 6;
+     
+    std::vector<float*> vec_frdat = {fr_in->x, fr_in->y, fr_in->z, fr_in->dx, fr_in->dy, fr_in->dz};
+    std::vector<float*> vec_frout = {fr_out->x, fr_out->y, fr_out->z, fr_out->dx, fr_out->dy, fr_out->dz};
 
-    gpuErrchk( cudaMemcpy(d_xs, fr_in->x, fr_in->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_ys, fr_in->y, fr_in->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_zs, fr_in->z, fr_in->size * sizeof(float), cudaMemcpyHostToDevice) );
-
-    float *d_dxs, *d_dys, *d_dzs;
-    gpuErrchk( cudaMalloc((void**)&d_dxs, fr_in->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_dys, fr_in->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_dzs, fr_in->size * sizeof(float)) );
-
-    gpuErrchk( cudaMemcpy(d_dxs, fr_in->dx, fr_in->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_dys, fr_in->dy, fr_in->size * sizeof(float), cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpy(d_dzs, fr_in->dz, fr_in->size * sizeof(float), cudaMemcpyHostToDevice) );
-
-    float *d_xt, *d_yt, *d_zt;
-    gpuErrchk( cudaMalloc((void**)&d_xt, fr_in->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_yt, fr_in->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_zt, fr_in->size * sizeof(float)) );
-
-    float *d_dxt, *d_dyt, *d_dzt;
-    gpuErrchk( cudaMalloc((void**)&d_dxt, fr_in->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_dyt, fr_in->size * sizeof(float)) );
-    gpuErrchk( cudaMalloc((void**)&d_dzt, fr_in->size * sizeof(float)) );
+    std::vector<float*> vec_frs = memutil.cuMallFloat(n_ds, fr_in->size);
+    memutil.cuMemCpFloat(vec_frs, vec_frdat, fr_in->size); 
+    
+    std::vector<float*> vec_fro = memutil.cuMallFloat(n_dt, fr_in->size);
 
     if (ctp.type == 0)
     {
-        propagateRaysToP<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs, d_dxs, d_dys, d_dzs,
-                                          d_xt, d_yt, d_zt, d_dxt, d_dyt, d_dzt);
-        gpuErrchk( cudaDeviceSynchronize() );
+        propagateRaysToP<<<BT[0], BT[1]>>>(vec_frs[0], vec_frs[1], vec_frs[2], vec_frs[3], vec_frs[4], vec_frs[5],
+                                           vec_fro[0], vec_fro[1], vec_fro[2], vec_fro[3], vec_fro[4], vec_fro[5]);
     }
 
     else if (ctp.type == 1)
     {
-        propagateRaysToH<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs, d_dxs, d_dys, d_dzs,
-                                          d_xt, d_yt, d_zt, d_dxt, d_dyt, d_dzt);
-        gpuErrchk( cudaDeviceSynchronize() );
+        propagateRaysToH<<<BT[0], BT[1]>>>(vec_frs[0], vec_frs[1], vec_frs[2], vec_frs[3], vec_frs[4], vec_frs[5],
+                                           vec_fro[0], vec_fro[1], vec_fro[2], vec_fro[3], vec_fro[4], vec_fro[5]);
     }
 
     else if (ctp.type == 2)
     {
-        propagateRaysToE<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs, d_dxs, d_dys, d_dzs,
-                                          d_xt, d_yt, d_zt, d_dxt, d_dyt, d_dzt);
-        gpuErrchk( cudaDeviceSynchronize() );
+        propagateRaysToE<<<BT[0], BT[1]>>>(vec_frs[0], vec_frs[1], vec_frs[2], vec_frs[3], vec_frs[4], vec_frs[5],
+                                           vec_fro[0], vec_fro[1], vec_fro[2], vec_fro[3], vec_fro[4], vec_fro[5]);
     }
 
     else if (ctp.type == 3)
     {
-        propagateRaysToPl<<<BT[0], BT[1]>>>(d_xs, d_ys, d_zs, d_dxs, d_dys, d_dzs,
-                                          d_xt, d_yt, d_zt, d_dxt, d_dyt, d_dzt);
-        gpuErrchk( cudaDeviceSynchronize() );
+        propagateRaysToPl<<<BT[0], BT[1]>>>(vec_frs[0], vec_frs[1], vec_frs[2], vec_frs[3], vec_frs[4], vec_frs[5],
+                                            vec_fro[0], vec_fro[1], vec_fro[2], vec_fro[3], vec_fro[4], vec_fro[5]);
     }
+    
+    gpuErrchk( cudaDeviceSynchronize() );
 
-    gpuErrchk( cudaMemcpy(fr_out->x, d_xt, fr_in->size * sizeof(float), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(fr_out->y, d_yt, fr_in->size * sizeof(float), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(fr_out->z, d_zt, fr_in->size * sizeof(float), cudaMemcpyDeviceToHost) );
-
-    gpuErrchk( cudaMemcpy(fr_out->dx, d_dxt, fr_in->size * sizeof(float), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(fr_out->dy, d_dyt, fr_in->size * sizeof(float), cudaMemcpyDeviceToHost) );
-    gpuErrchk( cudaMemcpy(fr_out->dz, d_dzt, fr_in->size * sizeof(float), cudaMemcpyDeviceToHost) );
+    memutil.cuMemCpFloat(vec_frout, vec_fro, fr_in->size, false);
     
     gpuErrchk( cudaDeviceReset() );
 }

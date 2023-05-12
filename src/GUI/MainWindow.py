@@ -6,9 +6,9 @@ from threading import Thread, Event
 from traceback import print_tb
 from multiprocessing import Process, Manager
 
-from PyQt5.QtWidgets import QApplication, QLabel, QTextEdit, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar, QScrollArea
-from PyQt5.QtGui import QFont, QIcon, QTextCursor
-from PyQt5.QtCore import Qt, QThreadPool, QThread
+from PySide2.QtWidgets import QApplication, QLabel, QTextEdit, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar, QScrollArea
+from PySide2.QtGui import QFont, QIcon, QTextCursor, QPixmap
+from PySide2.QtCore import Qt, QThreadPool, QThread
 
 from src.GUI.ParameterForms import formGenerator
 from src.GUI.ParameterForms.InputDescription import InputDescription
@@ -124,8 +124,19 @@ class MainWidget(QWidget):
         if hasattr(self, "WorkSpace"):
             self.WorkSpace.setParent(None)
         # rebuild 
+        logo = QLabel()
+        pixmap = QPixmap('src/GUI/resources/logo.png')
+        pixmap = pixmap.scaledToWidth(250)
+        logo.setPixmap(pixmap)
+        logo.resize(300, 150)
         self.WorkSpace = Workspace()
-        self.addToWindowGrid(self.WorkSpace, self.GPWorkSpace, hStretch=1)
+        leftPane =  QWidget()
+        leftPane.setFixedWidth(300)
+        leftPandLayout = QVBoxLayout(leftPane)
+        leftPandLayout.setContentsMargins(0,0,0,0)
+        leftPandLayout.addWidget(logo)
+        leftPandLayout.addWidget(self.WorkSpace)
+        self.addToWindowGrid(leftPane, self.GPWorkSpace, hStretch=1)
 
     ##
     # @guiSetup
@@ -324,22 +335,43 @@ class MainWidget(QWidget):
         self.rayPlotNr+=1
         return self.rayPlotNr
 
+    def plotSystemWithRaytraceForm(self):
+        frames = self.stm.frames.keys()
+        self.setForm(fData.plotRayTraceForm(frames), readAction=self.plotSystemWithRaytrace, okText="Plot")
+        if len(frames) == 0:
+            self.clog.warning("No ray trace frames defined.")    
+        self.clog.warning("Plot raytrace allows you to plot lines between any two frames in the system. It is up to the user to make sure frames are entered in chronological order.")
+
+
+
     ##
     # plots all elements of the system including ray traces in one plot
     def plotSystemWithRaytrace(self):
-        frameList = []
+        try:
+            plotDict = self.ParameterWid.read()
+            print(plotDict)
 
-        if self.stm.frames:
-            for key in self.stm.frames.keys():
-                frameList.append(key)
-        
-        if self.stm.system:
-            figure, _ = self.stm.plotSystem(ret = True, show=False, save=False, RTframes=frameList)
-        
-        else:
-            figure = None
-        self.addPlot(figure,"Ray Trace Frame %d" %(self.getRayPlotNr()))
+            if plotDict['frames']=='All':
+                frameList = []
+                if self.stm.frames:
+                    for key in self.stm.frames.keys():
+                        frameList.append(key)
 
+            else:
+                frameList = plotDict['selection']
+
+            
+            if self.stm.system:
+                figure, _ = self.stm.plotSystem(ret = True, show=False, save=False, RTframes=frameList)
+            
+            else:
+                figure = None
+            self.addPlot(figure,"Ray Trace Frame %d" %(self.getRayPlotNr()))
+
+        except Exception as err:
+            print(type(err))
+            print_tb(err.__traceback__)
+            self.clog.error(err)
     ### Functionalities: Systems 
 
 
@@ -435,7 +467,9 @@ class MainWidget(QWidget):
             groupDict = self.ParameterWid.read()
             self.stm.groupElements(groupDict["name"], *groupDict["selected"])
 
-            self.addGroupWidget(groupDict["name"])
+            self.addGroupWidget(list(self.stm.groups.keys())[-1])
+            # self.refreshWorkspaceSection(self.stm.groups, "groups")
+
 
 
         except Exception as err:
@@ -443,7 +477,32 @@ class MainWidget(QWidget):
             print_tb(err.__traceback__)
             self.clog.error(err) 
 
+    def printGroup(self, name_group):
+        try:
+            infoString = "Group information"
+            if len(self.stm.groups[name_group]['members']) == 0:
+                infoString += f"Group {name_group} is empty\n"
+            else:
+                infoString += f"Group {name_group} contains the following elements:\n"
+                for n in self.stm.groups[name_group]['members']:
+                    infoString += f"{n}\n"
 
+            infoString += f"Group {name_group} has the following position:\n"
+            infoString += f"{self.stm.groups[name_group]['pos']}\n"
+            
+            infoString += f"Group {name_group} has the following orientation:\n"
+            infoString += f"{self.stm.groups[name_group]['ori']}\n"
+            
+            infoString += f"Group {name_group} has the following snapshots:\n"
+            infoString += f"{self.stm.groups[name_group]['snapshots']}"
+
+            self.clog.info(infoString)
+            
+            
+        except Exception as err:
+            print(err)
+            print_tb(err.__traceback__)
+            self.clog.error(err)
 
 
 
@@ -478,7 +537,7 @@ class MainWidget(QWidget):
                                          self.snapActionForm, self.copyElementActionForm)
     
     def addGroupWidget(self, name):
-        self.WorkSpace.addGroup(name, self.stm.removeGroup, self.plotGroup, self.transformGroupForm, self.snapGroupActionForm, self.copyGroupActionForm)
+        self.WorkSpace.addGroup(name, self.stm.removeGroup, self.plotGroup, self.transformGroupForm, self.snapGroupActionForm, self.copyGroupActionForm, self.printGroup)
     
     def addFrameWidget(self, name):
         self.WorkSpace.addRayTraceFrames(name, self.removeFrame, 
@@ -509,7 +568,8 @@ class MainWidget(QWidget):
             elementDict = self.ParameterWid.read()
 
             self.stm.addPlane(elementDict) 
-            self.addReflectorWidget(elementDict["name"])
+            name = list(self.stm.system.keys())[-1]
+            self.addReflectorWidget(name)
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -532,7 +592,8 @@ class MainWidget(QWidget):
                 self.stm.addHyperbola(elementDict)
             elif elementDict["type"] == "Ellipse":
                 self.stm.addEllipse(elementDict)
-            self.addReflectorWidget(elementDict["name"])
+            name = list(self.stm.system.keys())[-1]
+            self.addReflectorWidget(name)
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -695,7 +756,8 @@ class MainWidget(QWidget):
             RTDict = self.ParameterWid.read()
         
             self.stm.createTubeFrame(RTDict)
-            self.addFrameWidget(RTDict["name"])
+            name = list(self.stm.frames.keys())[-1]
+            self.addFrameWidget(name)
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -723,14 +785,15 @@ class MainWidget(QWidget):
     def initGaussianFrameAction(self):
         try:
             GRTDict = self.ParameterWid.read()
-
+            
+            chk.check_GRTDict(GRTDict, self.stm.frames, self.clog)
+            
             if not "seed" in GRTDict.keys():
                 GRTDict["seed"] = -1
-
       
             dialStr = f"Calculating Gaussian ray-trace frame {GRTDict['name']}..."
 
-            scopy = st.System()
+            scopy = st.System(context="G", override=False)
 
             mgr = Manager()
             returnDict = mgr.dict()
@@ -740,7 +803,8 @@ class MainWidget(QWidget):
                 s_copy = returnDict["system"]
                 self.stm.frames.update(s_copy.frames)
 
-                self.addFrameWidget(GRTDict["name"]) 
+                name = list(self.stm.frames.keys())[-1]
+                self.addFrameWidget(name) 
 
 
             # dial = SymDialog(worker.kill, self.clog, dialStr) 
@@ -766,6 +830,7 @@ class MainWidget(QWidget):
     def addPropRaysAction(self): 
         try:
             propRaysDict = self.ParameterWid.read()
+            chk.check_runRTDict(propRaysDict, self.stm, self.stm.frames, self.clog)
         
             self.stm.runRayTracer(propRaysDict)
             self.addFrameWidget(propRaysDict["fr_out"])
@@ -812,8 +877,10 @@ class MainWidget(QWidget):
             GDict = self.ParameterWid.read()
         
             self.stm.createGaussian(GDict, GDict["surface"])
-            self.addFieldWidget(GDict["name"])
-            self.addCurrentWidget(GDict["name"])
+            namef = list(self.stm.fields.keys())[-1]
+            namec = list(self.stm.currents.keys())[-1]
+            self.addFieldWidget(namef)
+            self.addCurrentWidget(namec)
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -831,7 +898,8 @@ class MainWidget(QWidget):
             GDict = self.ParameterWid.read()
             
             self.stm.createScalarGaussian(GDict, GDict["surface"])
-            self.addSFieldWidget(GDict["name"])
+            name = list(self.stm.scalarfields.keys())[-1]
+            self.addSFieldWidget(name)
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -841,6 +909,11 @@ class MainWidget(QWidget):
     def initPSBeamForm(self):
         self.setForm(fData.initPSInp(self.stm.system), readAction=self.initPSBeamAction, okText="Add beam")
     
+    ##
+    # Shows form to initialize a physical optics uniform source.
+    # Because uniform uses same inout as point source, can use same form
+    def initUSBeamForm(self):
+        self.setForm(fData.initPSInp(self.stm.system), readAction=self.initUSBeamAction, okText="Add beam")
     
     ##
     # Reads form and adds a vectorial point source beam to system
@@ -848,9 +921,27 @@ class MainWidget(QWidget):
         try:
             PSDict = self.ParameterWid.read()
             
-            self.stm.generatePointSource(PSDict, PSDict["surface"])
-            self.addFieldWidget(PSDict["name"])
-            self.addCurrentWidget(PSDict["name"])
+            self.stm.createPointSource(PSDict, PSDict["surface"])
+            namef = list(self.stm.fields.keys())[-1]
+            namec = list(self.stm.currents.keys())[-1]
+            self.addFieldWidget(namef)
+            self.addCurrentWidget(namec)
+        except Exception as err:
+            print(err)
+            print_tb(err.__traceback__)
+            self.clog.error(err)
+    
+    ##
+    # Reads form and adds a vectorial uniform source beam to system
+    def initUSBeamAction(self):
+        try:
+            USDict = self.ParameterWid.read()
+            
+            self.stm.createUniformSource(USDict, USDict["surface"])
+            namef = list(self.stm.fields.keys())[-1]
+            namec = list(self.stm.currents.keys())[-1]
+            self.addFieldWidget(namef)
+            self.addCurrentWidget(namec)
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -861,6 +952,10 @@ class MainWidget(QWidget):
     def initSPSBeamForm(self):
         self.setForm(fData.initSPSInp(self.stm.system), readAction=self.initSPSBeamAction, okText="Add beam")
     
+    ##
+    # Shows form to initialize a scalar uniform source beam
+    def initSUSBeamForm(self):
+        self.setForm(fData.initSPSInp(self.stm.system), readAction=self.initSUPSBeamAction, okText="Add beam")
 
     ##
     # Reads form and adds a scalar point source beam to system
@@ -868,8 +963,24 @@ class MainWidget(QWidget):
         try:
             SPSDict = self.ParameterWid.read()
             
-            self.stm.generatePointSourceScalar(SPSDict, SPSDict["surface"])
-            self.addSFieldWidget(SPSDict["name"])
+            self.stm.createPointSourceScalar(SPSDict, SPSDict["surface"])
+            namef = list(self.stm.scalarfields.keys())[-1]
+            self.addSFieldWidget(namef)
+        except Exception as err:
+            print(err)
+            print_tb(err.__traceback__)
+            self.clog.error(err)
+
+  
+    ##
+    # Reads form and adds a scalar point source beam to system
+    def initSUPSBeamAction(self):
+        try:
+            SPSDict = self.ParameterWid.read()
+            
+            self.stm.createUniformSourceScalar(SPSDict, SPSDict["surface"])
+            name = list(self.stm.scalarfields.keys())[-1]
+            self.addSFieldWidget(name)
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -892,7 +1003,7 @@ class MainWidget(QWidget):
             plotFieldDict = self.ParameterWid.read()
             if plotFieldDict["plot_type"] == "Pattern":
                 fig, _ = self.stm.plotBeam2D(plotFieldDict["field"], plotFieldDict["comp"], 
-                                            project=plotFieldDict["project"], ret=True)
+                                            project=plotFieldDict["project"], amp_only=not plotFieldDict["phase"], ret=True)
                 self.addPlot(fig, f'{plotFieldDict["field"]} - {plotFieldDict["comp"]}  - {plotFieldDict["project"]}')
 
             else:
@@ -953,39 +1064,79 @@ class MainWidget(QWidget):
     ##
     # Shows form to propagate physical optics beam to surface 
     def propPOForm(self):
-        self.setForm(fData.propPOInp(self.stm.currents, self.stm.scalarfields, self.stm.system), self.propPOAction, okText="Propagate beam")
+        self.setForm(fData.propPOInp(self.stm.currents, self.stm.scalarfields, self.stm.system), self.propPOAction, okText="Propagate")
     
     ##
     # Shows form to propagate physical optics beam far field 
     def propPOFFForm(self):
-        self.setForm(fData.propPOFFInp(self.stm.currents, self.stm.system), self.propPOAction, okText="Propagate beam")
-   
+        self.setForm(fData.propPOFFInp(self.stm.currents, self.stm.system), self.propPOAction, okText="Propagate")
+    
+    ##
+    # Shows form to propagate physical optics beam using hybrid approach
+    def propPOHybridForm(self):
+        self.setForm(fData.propPOHybridInp(self.stm.fields, self.stm.frames, self.stm.system), self.propPOHybridAction, okText="Calculate")
+    
+    ##
+    # Add PO calculation results to widget menu
+    #
+    # @param propBeamDict Dictionary containing the names of objects to be put in widgets
     def _addToWidgets(self, propBeamDict):
         print(f"{propBeamDict = }")
-        if propBeamDict["mode"] == "JM":
-            self.addCurrentWidget(propBeamDict["name_JM"])
-    
-        elif propBeamDict["mode"] == "EH" or propBeamDict["mode"] == "FF":
-            self.addFieldWidget(propBeamDict["name_EH"])
-    
-        elif propBeamDict["mode"] == "JMEH":
-            self.addCurrentWidget(propBeamDict["name_JM"])
-            self.addFieldWidget(propBeamDict["name_EH"])
-    
-        elif propBeamDict["mode"] == "EHP":
-            self.addFieldWidget(propBeamDict["name_EH"])
-            self.addFrameWidget(propBeamDict["name_P"])
+        print(self.stm.frames)
+        try:
+            if propBeamDict["mode"] == "JM":
+                self.addCurrentWidget(propBeamDict["name_JM"])
+        
+            elif propBeamDict["mode"] == "EH" or propBeamDict["mode"] == "FF":
+                self.addFieldWidget(propBeamDict["name_EH"])
+        
+            elif propBeamDict["mode"] == "JMEH":
+                self.addCurrentWidget(propBeamDict["name_JM"])
+                self.addFieldWidget(propBeamDict["name_EH"])
+        
+            elif propBeamDict["mode"] == "EHP":
+                self.addFieldWidget(propBeamDict["name_EH"])
+                self.addFrameWidget(propBeamDict["name_P"])
 
-        elif propBeamDict["mode"] == "scalar":
-            self.addSFieldWidget(propBeamDict["name_field"])
+            elif propBeamDict["mode"] == "scalar":
+                self.addSFieldWidget(propBeamDict["name_field"])
+            
+            elif propBeamDict["mode"] == "hybrid":
+                self.addFieldWidget(propBeamDict["field_out"])
+                self.addFrameWidget(propBeamDict["fr_out"])
+        except Exception as err:
+            print(err)
+            print_tb(err.__traceback__)
+            self.clog.error(err)
 
     # def _addToWidgetsOfCalc(self):
     #     self._addToWidgets()
 
-
+    ##
+    # Start a worker process for running long calculations.
+    #
+    # @param s_copy Copy of System, containing necessary data for calculation.
+    # @param runPODict Dictionary containing instructions for PO propagation.
+    # @param returnDict Dictionary containing a System filled with the result.
     def runPOWorker(self, s_copy, runPODict, returnDict):
         try:
             s_copy.runPO(runPODict)
+
+            returnDict["system"] = s_copy
+        except Exception as err:
+            print(err)
+            print_tb(err.__traceback__)
+            self.clog.error(err)
+    
+    ##
+    # Start a worker process for running long calculations.
+    #
+    # @param s_copy Copy of System, containing necessary data for calculation.
+    # @param runHybridDict Dictionary containing instructions for hybrid PO propagation.
+    # @param returnDict Dictionary containing a System filled with the result.
+    def runPOHybridWorker(self, s_copy, runHybridDict, returnDict):
+        try:
+            s_copy.runHybridPropagation(runHybridDict)
 
             returnDict["system"] = s_copy
         except Exception as err:
@@ -999,6 +1150,12 @@ class MainWidget(QWidget):
         try:
             propBeamDict = self.ParameterWid.read()
             # print(propBeamDict)
+            if "exp" in propBeamDict:
+                if propBeamDict["exp"] == "forward":
+                    propBeamDict["exp"] = "fwd"
+                
+                elif propBeamDict["exp"] == "backward":
+                    propBeamDict["exp"] = "bwd"
             
             chk.check_runPODict(propBeamDict, self.stm.system.keys(), self.stm.fields.keys(), self.stm.currents.keys(),
                             self.stm.scalarfields.keys(), self.stm.frames.keys(), self.clog)
@@ -1033,7 +1190,6 @@ class MainWidget(QWidget):
                 self.stm.fields.update(s_copy.fields)
                 self.stm.currents.update(s_copy.currents)
                 self.stm.scalarfields.update(s_copy.scalarfields)
-
                 dtime = time() - start_time
                 self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
                 self._addToWidgets(propBeamDict)
@@ -1042,7 +1198,66 @@ class MainWidget(QWidget):
             print(err)
             print_tb(err.__traceback__)
             self.clog.error(f"PO Propagation did not end successfully: {err}.")
+       
+    ##
+    # Reads form, propagates hybrid beam, runs calculation on another thread
+    def propPOHybridAction(self):
+        try:
+            propBeamDict = self.ParameterWid.read()
+            
+
+            hybridDict = self.stm.copyObj(propBeamDict)
+            
+            if hybridDict["_interp"] == "yes":
+                hybridDict["interp"] = True
+                
+                if hybridDict["comp"] == "All":
+                    hybridDict["comp"] = True
+            
+            else:
+                hybridDict["interp"] = False
+
+            hybridDict["mode"] = "hybrid"
+            
+            chk.check_hybridDict(hybridDict, self.stm.system.keys(), self.stm.frames.keys(), self.stm.fields.keys(), self.clog)
+
+            start_time = time()
         
+            self.clog.info("*** Starting PO hybrid propagation ***")
+
+            fields = []
+            frames = []
+            
+            fields.append(propBeamDict["field_in"])
+            frames.append(propBeamDict["fr_in"])
+            
+            dialStr = f"Calculating frame and field on {propBeamDict['t_name']}..."
+
+
+            s_copy = copySystem(self.stm, cSystem=True, cFields = fields, cFrames=frames)
+
+            mgr = Manager()
+            returnDict = mgr.dict()
+
+            args = (s_copy, hybridDict, returnDict)
+            calcSuccess = self.subprocessManager.runInSubprocess(self.runPOHybridWorker, args, dialStr)
+
+            print(f"{calcSuccess = }")
+            if calcSuccess:
+                s_copy = returnDict["system"]
+                self.stm.frames.update(s_copy.frames)
+                self.stm.fields.update(s_copy.fields)
+                self.stm.currents.update(s_copy.currents)
+                self.stm.scalarfields.update(s_copy.scalarfields)
+
+                dtime = time() - start_time
+                self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
+                self._addToWidgets(hybridDict)
+
+        except Exception as err:
+            print(err)
+            print_tb(err.__traceback__)
+            self.clog.error(f"PO Hybrid propagation did not end successfully: {err}.")
     
     #
     ##TODO Unite efficiencies
@@ -1071,6 +1286,48 @@ class MainWidget(QWidget):
     def setHPBWForm(self):
         self.setForm(fData.calcHPBW(self.stm.fields), self.calcHPBWAction, okText="Calculate")
     
+    ##
+    # Shows form to select surface for beam merging.
+    def setBMergeSurfForm(self):
+        self.setForm(fData.selectSurface(self.stm.system), self.setBMergeForm, okText="Set")
+    
+    ##
+    # Shows form to select surface for beam merging.
+    def setBMergeForm(self):
+        SurfDict = self.ParameterWid.read()
+        print(SurfDict)
+        if SurfDict["mode"] == "Fields":
+            self.setForm(fData.mergeBeamsForm(self.stm.fields, SurfDict["surf"]), self.BMergeActionFields, okText="Merge")
+        
+        if SurfDict["mode"] == "Currents":
+            self.setForm(fData.mergeBeamsForm(self.stm.currents, SurfDict["surf"]), self.BMergeActionCurrents, okText="Merge")
+   
+    ##
+    # Merge fields on a common surface.
+    def BMergeActionFields(self):
+        try:
+            MergeDict = self.ParameterWid.read()
+            self.stm.mergeBeams(*MergeDict["beams"], obj="fields", merged_name=MergeDict["merged_name"])
+            
+            self.addFieldWidget(MergeDict["merged_name"])
+        except Exception as err:
+            print(err)
+            print_tb(err.__traceback__)
+            self.clog.error(err)
+    
+    ##
+    # Merge currents on a common surface.
+    def BMergeActionCurrents(self):
+        try:
+            MergeDict = self.ParameterWid.read()
+            mergeBeams(*MergeDict["beams"], obj="currents", merged_name=MergeDict["merged_name"])
+            
+            self.addCurrentWidget(MergeDict["merged_name"])
+        except Exception as err:
+            print(err)
+            print_tb(err.__traceback__)
+            self.clog.error(err)
+
     ##
     # Reads form and calculates taper efficiencies
     def calcTaperAction(self):
@@ -1158,11 +1415,11 @@ class MainWidget(QWidget):
     def findFocusAction(self):
         try:
             findFocusDict = self.ParameterWid.read()
-            focus = self.stm.findRTfocus(findFocusDict["name_frame"], verbose=True)
+            focus = self.stm.findRTfocus(findFocusDict["name_frame"])
             self.addReflectorWidget(f"focal_plane_{findFocusDict['name_frame']}")
             self.addFrameWidget(f"focus_{findFocusDict['name_frame']}")
             
-            self.clog.info(f"Focus of {findFocusDict['name_frame']} : {focus}")
+            #self.clog.info(f"Focus of {findFocusDict['name_frame']} : {focus}")
 
         except Exception as err:
             print(err)
@@ -1250,8 +1507,8 @@ class PyPOMainWindow(QMainWindow):
         SystemsMenu.addAction(plotSystem)
 
         plotRaytrace = QAction("Plot ray-trace", self)
-        plotSystem.setStatusTip("Plot all elements in the current system, including ray-traces.")
-        plotRaytrace.triggered.connect(self.mainWid.plotSystemWithRaytrace)
+        plotSystem.setStatusTip("Plot selected elements in the current system, including ray-traces.")
+        plotRaytrace.triggered.connect(self.mainWid.plotSystemWithRaytraceForm)
         SystemsMenu.addAction(plotRaytrace)
         
         saveSystem = QAction("Save system", self)
@@ -1299,6 +1556,17 @@ class PyPOMainWindow(QMainWindow):
         initPointScalAction.setStatusTip("Initialize a scalar point source.")
         initPointScalAction.triggered.connect(self.mainWid.initSPSBeamForm)
         makeBeamPS.addAction(initPointScalAction)
+        
+        makeBeamUS = makeBeam.addMenu("Uniform source")
+        initUnifVecAction = QAction("Vectorial", self)
+        initUnifVecAction.setStatusTip("Initialize a vectorial uniform source.")
+        initUnifVecAction.triggered.connect(self.mainWid.initUSBeamForm)
+        makeBeamUS.addAction(initUnifVecAction)
+        
+        initUnifScalAction = QAction("Scalar", self)
+        initUnifScalAction.setStatusTip("Initialize a scalar uniform source.")
+        initUnifScalAction.triggered.connect(self.mainWid.initSUSBeamForm)
+        makeBeamUS.addAction(initUnifScalAction)
     
         makeBeamG = makeBeam.addMenu("Gaussian beam")
         initGaussVecAction = QAction("Vectorial", self)#TODO Vectorial?
@@ -1321,6 +1589,11 @@ class PyPOMainWindow(QMainWindow):
         initPropSurfAction.setStatusTip("Propagate a PO beam from a source surface to a far-field surface.")
         initPropFFAction.triggered.connect(self.mainWid.propPOFFForm)
         propBeam.addAction(initPropFFAction)
+        
+        propHybrid = QAction("Propagate hybrid", self)
+        propHybrid.setToolTip("Propagate a PO beam from a source surface to a target surface using a hybrid approach.")
+        propHybrid.triggered.connect(self.mainWid.propPOHybridForm)
+        PhysOptMenu.addAction(propHybrid)
 
         calcEffs = ToolsMenu.addMenu("Efficiencies")
         calcSpillEffsAction = QAction("Spillover", self)
@@ -1353,6 +1626,10 @@ class PyPOMainWindow(QMainWindow):
         HPBW.triggered.connect(self.mainWid.setHPBWForm)
         ToolsMenu.addAction(HPBW)
         
+        BMerge = QAction("Merge beams", self)
+        BMerge.setToolTip("Merge beams defined on the same surface.")
+        BMerge.triggered.connect(self.mainWid.setBMergeSurfForm)
+        ToolsMenu.addAction(BMerge)
         #findRTfocusAction.triggered.connect(self.mainWid.set)
 
 

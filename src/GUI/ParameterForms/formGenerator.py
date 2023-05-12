@@ -1,9 +1,10 @@
-from PyQt5.QtWidgets import QWidget, QComboBox, QFormLayout, QLabel, QLineEdit, QVBoxLayout, QHBoxLayout, QPushButton, QStackedWidget, QCheckBox, QRadioButton, QButtonGroup, QGridLayout, QSpacerItem, QSizePolicy
-from PyQt5.QtCore import QRegExp, Qt, pyqtSlot, pyqtSignal
-from PyQt5.QtGui import QRegExpValidator
+from PySide2.QtWidgets import QWidget, QComboBox, QFormLayout, QLabel, QLineEdit, QVBoxLayout, QHBoxLayout, QPushButton, QStackedWidget, QCheckBox, QRadioButton, QButtonGroup, QGridLayout, QSpacerItem, QSizePolicy
+from PySide2.QtCore import QRegExp, Qt, Slot, Signal
+from PySide2.QtGui import QRegExpValidator
 from src.GUI.utils import *
 from src.GUI.ParameterForms.simpleInputWidgets import checkbox, StaticInput, VectorInput, SimpleRadio, SimpleDropdown, XYZRadio, ElementSelectionWidget
 from src.GUI.ParameterForms.InputDescription import *
+from src.GUI.ParameterForms.inputWidgetInterfaces import *
 
 
 ##
@@ -12,7 +13,7 @@ from src.GUI.ParameterForms.InputDescription import *
 #
 # This script contains the form generator and dynamic inputWidgets.
 class FormGenerator(QWidget):
-    closed = pyqtSignal()
+    closed = Signal()
     ##
     # Constructor. Creates a form widget given a list of InputDescription.
     #
@@ -142,7 +143,7 @@ class FormGenerator(QWidget):
 # Dynamic dropdown.
 #
 # Dropdown followed by a dynamic section that changes depending on users selection in the dropdown
-class DynamicDropdownWidget(QWidget):
+class DynamicDropdownWidget(inputWidgetInterface):
     ##
     # Constructor. Creates the form section.
     #
@@ -188,7 +189,7 @@ class DynamicDropdownWidget(QWidget):
     # Updates the dynamic widget according to users selection.
     #
     # @param index Index of the option
-    @pyqtSlot(int)
+    @Slot(int)
     def modeUpdate(self, index):
         if self.hasChildren:
             self.stackedWidget.setCurrentIndex(index)
@@ -214,8 +215,6 @@ class DynamicDropdownWidget(QWidget):
             else: 
                 modeOut = list(self.inputDescription.sublist)[ind]
             paramDict = {self.inputDescription.outputName: modeOut}
-            # print(f"DynamicDropdownWidget {self.stackedWidget.currentIndex() = }")
-
         except:
             raise Exception(f"Failed to read input: {self.inputDescription.label}")
         
@@ -223,8 +222,9 @@ class DynamicDropdownWidget(QWidget):
             raise Exception(f"Failed to read input: {self.inputDescription.label}")
         
         if self.hasChildren:
-            for input in self.currentChild.findChildren(QWidget,options=Qt.FindDirectChildrenOnly):
-                paramDict.update(input.read())
+            for input in self.currentChild.findChildren(inputWidgetInterface, options=Qt.FindChildOption.FindDirectChildrenOnly):
+                if input.parent().parent() == self.stackedWidget:
+                    paramDict.update(input.read())
         return paramDict
         
         
@@ -232,7 +232,7 @@ class DynamicDropdownWidget(QWidget):
 # Dynamic radio button.
 #
 # radio button group followed by a dynamic section that changes depending on users selection in the dropdown
-class DynamicRadioWidget(QWidget):
+class DynamicRadioWidget(inputWidgetInterface):
     ##
     # Constructor. Creates the form section.
     #
@@ -283,7 +283,7 @@ class DynamicRadioWidget(QWidget):
     # Updates the dynamic widget according to users selection.
     #
     # @param index Index of the option
-    @pyqtSlot(int)
+    @Slot(int)
     def modeUpdate(self, index):
         if self.hasChildren:
             self.stackedWidget.setCurrentIndex(index+1)
@@ -309,13 +309,13 @@ class DynamicRadioWidget(QWidget):
             else: 
                 modeOut = list(self.inputDescription.sublist)[ind]
             paramDict = {self.inputDescription.outputName: modeOut}
-            # print(f"DynamicRadioWidget {self.stackedWidget.currentIndex() = }")
         except:
             raise Exception(f"Failed to read input: {self.inputDescription.label}")
         if self.stackedWidget.currentIndex() == 0:
             raise Exception(f"Failed to read input: {self.inputDescription.label}")
 
         if self.hasChildren:
-            for input in self.currentChild.findChildren(QWidget,options=Qt.FindDirectChildrenOnly):
-                paramDict.update(input.read())
+            for input in self.currentChild.findChildren(inputWidgetInterface):
+                if input.parent().parent() == self.stackedWidget:
+                    paramDict.update(input.read())
         return paramDict

@@ -1,7 +1,7 @@
-from PyQt5.QtCore import QRunnable, QObject, pyqtSlot, pyqtSignal
+from PySide2.QtCore import QRunnable, QObject, Slot, Signal
 
 class Signals(QObject):
-    finished = pyqtSignal()
+    finished = Signal()
 
 class Worker(QRunnable):
     def __init__(self, task, *args):
@@ -12,12 +12,12 @@ class Worker(QRunnable):
 
         self.aborted = False
 
-    @pyqtSlot()
+    @Slot()
     def run(self):
         self.task(*list(self.args))
         self.signal.finished.emit()
 
-    #@pyqtSlot()
+    #@Slot()
     def abort(self):
         self.aborted = True
 
@@ -28,14 +28,14 @@ class Worker(QRunnable):
         self.is_killed = True
 
 class GWorker(QObject):
-    finished = pyqtSignal()
+    finished = Signal()
 
     def __init__(self, task, *args):
         super(GWorker, self).__init__()
         self.task = task
         self.args = args
 
-    #@pyqtSlot()
+    #@Slot()
     def run(self):
         self.task(*list(self.args))
         self.finished.emit()

@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QWidget, QLineEdit, QPushButton, QFormLayout , QLabel, QTabBar, QTabWidget
+from PySide2.QtWidgets import QApplication, QWidget, QLineEdit, QPushButton, QFormLayout , QLabel, QTabBar, QTabWidget
 import numpy as np
 
 

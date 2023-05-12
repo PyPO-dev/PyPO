@@ -1,16 +1,12 @@
 import ctypes
 import numpy as np
 import os
-import sys
-import time
 import pathlib
 from src.PyPO.BindUtils import *
 from src.PyPO.Structs import *
 from src.PyPO.PyPOTypes import *
 import src.PyPO.Config as Config
 import src.PyPO.Threadmgr as TManager
-
-import threading
 
 ##
 # @file
@@ -168,7 +164,6 @@ def makeScalarGauss(gdict_py, source):
 
     c_gdict = ScalarGPODict()
     c_source = reflparams()
-    print(c_source)
     allfill_SGPODict(c_gdict, gdict_py, ctypes.c_double)
     allfill_reflparams(c_source, source, ctypes.c_double)
     

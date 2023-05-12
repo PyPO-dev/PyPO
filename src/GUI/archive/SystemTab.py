@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import QWidget, QGridLayout, QVBoxLayout, QPushButton, QApplication
+from PySide2.QtWidgets import QWidget, QGridLayout, QVBoxLayout, QPushButton, QApplication
 from src.GUI.archive.ElementsColumn import ElementsWindow
-from PyQt5 import QtCore
+from PySide2 import QtCore
 from src.GUI.archive.ParabolaForm import ParabolaFormLayout
 import PlotScreen as PS
 from src.GUI.archive.TransformationWidget import TransformationWidget

@@ -9,8 +9,7 @@ from src.GUI.ParameterForms.InputDescription import inType, InputDescription
 # Options for generating an element from an xy parametrisation.
 def xy_opts():
     return [InputDescription(inType.vectorFloats, "lims_x", label="X limits", oArray=True, numFields=2),
-            InputDescription(inType.vectorFloats, "lims_y", label="Y limits", oArray=True, numFields=2),
-            InputDescription(inType.checkbox, "flip", label="Flip Normal Vectors")]
+            InputDescription(inType.vectorFloats, "lims_y", label="Y limits", oArray=True, numFields=2)]
 
 ##
 # Options for generating an element from a uv parametrisation.
@@ -167,6 +166,16 @@ def plotFrameOpt(frameName):
 
     return plotFrame
 
+def plotRayTraceForm(frames):
+    return [
+        InputDescription(inType.dynamicRadio, "frames", subDict = {
+            "All" : [],
+            "Select":[InputDescription(inType.elementSelector, "selection", options = frames)]
+        }),
+        
+    ]
+
+
 ##
 # Options for propagating a frame of rays to a target element.
 #
@@ -211,9 +220,9 @@ def initPSInp(elemDict):
                 sublist_surf.append(key)
 
     initPS = [
-            InputDescription(inType.dropdown, "surface", label="Point source surface", options = sublist_surf),
+            InputDescription(inType.dropdown, "surface", label="Source surface", options = sublist_surf),
             InputDescription(inType.vectorStrings, "name", label="Beam name", numFields=1),
-            InputDescription(inType.vectorFloats, "lam", label="Wavelength of radiation", hints=[1], numFields=1),
+            InputDescription(inType.vectorFloats, "lam", label="Wavelength", hints=[1], numFields=1),
             InputDescription(inType.vectorFloats, "E0", label="Peak value", hints=[1], numFields=1),
             InputDescription(inType.vectorFloats, "phase", label="Phase", hints=[0], numFields=1),
             InputDescription(inType.vectorFloats, "pol", label="Polarization", hints=[1,0,0], numFields=3, oArray=True)
@@ -305,7 +314,8 @@ def plotField(fieldName):
                 "Pattern" : [
                     InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
                     InputDescription(inType.dropdown, "comp", label="Component", options = complist),
-                    InputDescription(inType.xyzRadio, "project", label="Abscissa - ordinate")],
+                    InputDescription(inType.xyzRadio, "project", label="Abscissa - ordinate"),
+                    InputDescription(inType.checkbox, "phase", label="Include phase", prefill=True)],
                 "Cross-sections" : [
                     InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
                     InputDescription(inType.dropdown, "comp", label="Component", options = complist),
@@ -342,7 +352,8 @@ def plotFarField(fieldName):
                 "Pattern" : [
                     InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
                     InputDescription(inType.dropdown, "comp", label="Component", options = complist),
-                    InputDescription(inType.static, "project", staticValue="xy", hidden=True)],
+                    InputDescription(inType.static, "project", staticValue="xy", hidden=True),
+                    InputDescription(inType.checkbox, "phase", label="Include phase", prefill=False)],
                 "Cross-sections" : [
                     InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
                     InputDescription(inType.dropdown, "comp", label="Component", options = complist),
@@ -390,6 +401,8 @@ def propPOInp(currentDict, scalarFieldDict, elemDict):
             if item["gmode"] != 2:
                 sublist_target.append(key)
     
+    sublist_exp = ["forward", "backward"]
+
     sublist_dev = ["CPU", "GPU"]
 
 
@@ -414,6 +427,7 @@ def propPOInp(currentDict, scalarFieldDict, elemDict):
                     InputDescription(inType.dropdown, "s_scalarfield", label="Source scalar field", options = sublist_sfields),
                     InputDescription(inType.vectorStrings, "name_field", label="Output scalar field", numFields=1)]
                 }),
+            InputDescription(inType.radio, "exp", label="Time direction", options = sublist_exp),
             InputDescription(inType.vectorFloats, "epsilon", label="Relative permittivity", hints=[1], numFields=1),
             InputDescription(inType.vectorIntegers, "nThreads", label="Number of threads", hints=[1], numFields=1),
             InputDescription(inType.dropdown, "device", label="Hardware to use", options = sublist_dev)
@@ -449,6 +463,49 @@ def propPOFFInp(currentDict, elemDict):
             InputDescription(inType.vectorFloats, "epsilon", label="Relative permittivity", hints=[1], numFields=1),
             InputDescription(inType.vectorIntegers, "nThreads", label="Number of threads", hints=[1], numFields=1),
             InputDescription(inType.dropdown, "device", label="Hardware to use", options = sublist_dev)
+            ]
+
+    return propFields
+
+##
+# Options for propagating the reflected field using the associated Poynting vectors to a target element.
+#
+# @param fieldDict System dictionary containing all fields.
+# @param frameDict System dictionary containing all frames.
+# @param elemDict System dictionary containing all elements.
+def propPOHybridInp(fieldDict, frameDict, elemDict):
+    sublist_fields = []
+    sublist_frames = []
+    sublist_target = []
+    
+    complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz", "All"]
+    if fieldDict:
+        for key, item in fieldDict.items():
+            sublist_fields.append(key)
+    
+    if frameDict:
+        for key, item in frameDict.items():
+            sublist_frames.append(key)
+    
+    if elemDict:
+        for key, item in elemDict.items():
+            if item["gmode"] != 2:
+                sublist_target.append(key)
+
+    propFields = [
+            InputDescription(inType.dropdown, "fr_in", label="Poynting", options = sublist_frames),
+            InputDescription(inType.dropdown, "field_in", label="Reflected field", options = sublist_fields),
+            InputDescription(inType.dropdown, "t_name", label="Target surface", options = sublist_target),
+            InputDescription(inType.vectorStrings, "fr_out", label="Output frame", numFields=1),
+            InputDescription(inType.vectorStrings, "field_out", label="Output field", numFields=1),
+            InputDescription(inType.dynamicRadio, "_start", label="Use start", subDict={
+                    "yes" : [InputDescription(inType.vectorFloats, "start", oArray=True, label="Start co-ordinate", numFields=3)],
+                    "no" : [InputDescription(inType.static, "start", label="", staticValue=None, hidden=True)]
+                }), 
+            InputDescription(inType.dynamicRadio, "_interp", label="Interpolate", subDict={
+                    "yes" : [InputDescription(inType.dropdown, "comp", label="Component", options = complist)],
+                    "no" : [InputDescription(inType.static, "comp", label="", staticValue=True, hidden=True)]
+                }), 
             ]
 
     return propFields
@@ -564,6 +621,41 @@ def calcHPBW(fieldDict):
         ]
 
     return formHPBW
+
+##
+# Options for merging beams/currents.
+#
+# @param itemDict Dictionary containing fields or currents in system.
+# @param surf Selected surface for beam merging.
+def mergeBeamsForm(itemDict, surf):
+    listBound = _selectBound(itemDict, surf)
+
+    mergeList = [InputDescription(inType.elementSelector, "beams", "Merge", options = listBound),
+                InputDescription(inType.vectorStrings, "merged_name", label="Merged name", numFields=1)]
+
+    return mergeList
+
+##
+# Select a surface and close form.
+# Used for merging beams on a surface.
+#
+# @param elemDict Dictionary containing all elements in system.
+def selectSurface(elemDict):
+    optlist = ["Fields", "Currents"]
+    
+    selectSurf = [InputDescription(inType.dropdown, "surf", label="Merge surface", options=list(elemDict.keys())),
+            InputDescription(inType.radio, "mode", label="Merge object", options = optlist)]
+    return selectSurf
+
+##
+# Private method for finding bound PO fields and currents given a surface.
+def _selectBound(itemDict, surf):
+    listBound = []
+    for key, item in itemDict.items():
+        if item.surf == surf:
+            listBound.append(key)
+
+    return listBound
 
 ##
 # Options for saving the current system in the PyPO/save/systems/ folder.

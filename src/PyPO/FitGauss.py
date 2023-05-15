@@ -49,12 +49,9 @@ def calcEstimates(x, y, area, field_norm):
     
     p = np.sqrt((a - b)**2 + 4 * c**2)
 
-    #print(M0)
-
     _x0 = 1 / (a + b - p)
     _y0 = 1 / (a + b + p) 
 
-    """
     if _x0 <= 0 and _y0 > 0:
         _x0 = _y0
 
@@ -64,7 +61,7 @@ def calcEstimates(x, y, area, field_norm):
     elif _y0 <= 0 and _x0 <= 0:
         _x0 *= -1
         _y0 *= -1
-    """
+    
     x0 = np.sqrt(_x0)
     y0 = np.sqrt(_y0)
     return x0, y0, xm, ym, theta
@@ -172,7 +169,6 @@ def fitGaussAbs(field, surfaceObject, thres, mode, ratio=1):
     perr = np.zeros(len(popt))#np.sqrt(np.diag(pcov))
     perr = np.append(perr, 0.0)
 
-    #print(f"Fitted shift and rotation:\nmu_x = {popt[-3]}, mu_y = {popt[-2]}\nTheta = {popt[-1]}")
     return popt, perr
 
 ##
@@ -205,6 +201,14 @@ def fitGaussAbs(field, surfaceObject, thres, mode, ratio=1):
 #
 #    return (Psi).ravel()
 
+## 
+# Generate Absolute Gaussian from parameters.
+# Called in optimalisation.
+#
+# @param p0 Array containing parameters for Gaussian.
+# @param args Extra arguments for defining Gaussian and fit.
+#
+# @returns epsilon Coupling of field with Gaussian.
 def GaussAbs(p0, *args):
     surfaceObject, field_est, mask, mode = args
     Psi = generateGauss(p0, surfaceObject, mode)
@@ -221,6 +225,7 @@ def GaussAbs(p0, *args):
     epsilon = np.absolute(1 - eta)
     
     return epsilon
+
 ##
 # Generate a Gaussian from surface parameters.
 #

@@ -361,7 +361,18 @@ def plotSystem(systemDict, ax, fine, cmap,norm,
     ax.set_box_aspect((world_limits[1]-world_limits[0],world_limits[3]-world_limits[2],world_limits[5]-world_limits[4]))
 
 ##
-# EXPERIMENTAL
+# Plot two beam cuts in the same figure.
+#
+# @param x_cut E-plane.
+# @param y_cut H-plane.
+# @param x_strip Co-ordinates for plotting E-plane.
+# @param y_strip Co-ordinates for plotting H-plane.
+# @param vmin Minimum for plot range.
+# @param vmax Maximum for plot range.
+# @param unit for x-axis.
+#
+# @returns fig Plot figure.
+# @returns ax Plot axis.
 def plotBeamCut(x_cut, y_cut, x_strip, y_strip, vmin, vmax, unit):
     fig, ax = pt.subplots(1,1, figsize=(5,5))
 

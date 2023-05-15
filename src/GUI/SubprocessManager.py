@@ -79,18 +79,6 @@ def copySystem(system :st.System, cSystem = True, cFrames = None, cFields = None
     for sField in cScalarFields:
         s2.scalarfields[sField] = system.scalarfields[sField]
     return s2
-    # for k, e in system.system.items():
-    #     print(f"System {k}: {e}")
-        
-
-    # for key, fr in system.frames.items():
-    #     print(f"{key}: {fr}")
-    # for key, fr in s2.frames.items():
-    #     print(f"{key}: {fr}")
-        
-
-
-
 
 if __name__ == "__main__":
     import sys

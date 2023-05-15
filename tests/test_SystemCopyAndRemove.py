@@ -138,7 +138,9 @@ class Test_SystemCopyAndRemove(unittest.TestCase):
         
         self.assertFalse("par" in self.s.groups["testgroup"]["members"])
 
-        self.s.removeElement("hyp", "ell", "plane")
+        self.s.removeElement("hyp")
+        self.s.removeElement("ell")
+        self.s.removeElement("plane")
 
         self.assertFalse("par" in self.s.system)
         self.assertFalse("hyp" in self.s.system)

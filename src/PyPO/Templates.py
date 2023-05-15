@@ -32,7 +32,7 @@ reflDict = {
 # Using the tube, one can create any distribution in between a point source and a collimated beam.
 # The tube is cosntructed from concentrical elliptical rings, spaced equally apart. If the number of rings is zero, only the chief ray is generated.
 # The tube can be given a semi-major and semi-minor axis. These are the used to construct the outer ring in the tube. 
-# In addition, opening angles along the semi-major and semi-minor axis can be specified. The
+# In addition, opening angles along the semi-major and semi-minor axis can be specified.
 TubeRTDict = {
         "name"      : "Name of tubular ray-trace frame (string)",
         "nRays"     : "Number of rays in a ray-trace ring (int)",

@@ -1,4 +1,3 @@
-
 #include <cmath>
 #define FLEPS 1.0E-8
 
@@ -12,7 +11,6 @@
         
     Simple, bare-bones definitions of reflectors for CPU/GPU ray-tracing.
         Use only for raytracing; for PO, use the elaborate definitions.
-        Include derivatives necessary for Newton method
 */
 
 

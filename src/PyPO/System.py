@@ -40,7 +40,6 @@ logging.getLogger(__name__)
 class System(object):
     customBeamPath = os.path.join(sysPath, "custom", "beam")
     customReflPath = os.path.join(sysPath, "custom", "reflector")
-
     savePathSystems = os.path.join(sysPath, "save", "systems")
 
 
@@ -49,6 +48,8 @@ class System(object):
     #
     # @param redirect Redirect all print statements within system to given stdout.
     # @param context Whether system is created in script or in GUI.
+    # @param verbose Enable system logger.
+    # @param override Allow overriding names.
     def __init__(self, redirect=None, context=None, verbose=True, override=True):
         self.num_ref = 0
         self.num_cam = 0
@@ -118,6 +119,8 @@ class System(object):
     def getSystemLogger(self):
         return self.clog
 
+    ##
+    # Print system contents.
     def __str__(self):
         s = "Contents of system:\n"
         s += f"Reflectors {len(self.system)}:\n"
@@ -192,13 +195,6 @@ class System(object):
             self.clog.setLevel(logging.DEBUG)
         else:
             self.clog.setLevel(logging.CRITICAL)
-
-        #if handler is None:
-        #    for fstream in self.clog.handlers:
-        #        fstream.setStream(sys.stdout) if verbose else fstream.setStream(open(os.devnull, "w"))
-
-        #else:
-        #    self.clog.handlers[handler].setStream() if verbose else self.clog.handlers[handler].setStream(open(os.devnull, "w"))
 
     ##
     # Add a paraboloid reflector to the System.
@@ -409,7 +405,6 @@ class System(object):
         self.clog.info(f"Added plane {_reflDict['name']} to system.")
         self.num_ref += 1
    
-
     ##
     # Rotate reflector grids.
     #
@@ -419,9 +414,10 @@ class System(object):
     #
     # @param name Reflector name or list of reflector names.
     # @param rotation Numpy ndarray of length 3, containing rotation angles around x, y and z axes, in degrees.
-    # @param pivot Numpy ndarray of length 3, containing pivot x, y and z co-ordinates, in mm. Defaults to pos. 
     # @param obj Whether the name corresponds to a single element or group.
     # @param mode Apply rotation relative ('relative') to current orientation, or rotate to specified orientation ('absolute').
+    # @param pivot Numpy ndarray of length 3, containing pivot x, y and z co-ordinates, in mm. Defaults to pos. 
+    # @param keep_pol Keep polarisation of a field/current defined on the surface, if present.
     def rotateGrids(self, name, rotation, obj="element", mode="relative", pivot=None, keep_pol=False):
 
         if obj == "element":
@@ -607,7 +603,10 @@ class System(object):
     #
     # Set internal transformation matrix of a (selection of) reflector(s) to identity.
     #
-    # @param name Reflector name or list of reflector names to be homed.
+    # @param name Reflector name or list of reflector or group to be homed.
+    # @param obj Type of object to be homed.
+    # @param trans Home (translate) back to home position.
+    # @param rot Home (rotate) back to home orientation.
     def homeReflector(self, name, obj="element", trans=True, rot=True):
         if obj == "group":
             check_groupSystem(name, self.groups, self.clog, extern=True)
@@ -764,11 +763,11 @@ class System(object):
     # Remove a group of elements from system. Note that this does not remove the elements inside the group.
     #
     # @param name_group Name of the group to be removed.
-    def removeGroup(self, *names):
-        for ng in names:
-            check_groupSystem(ng, self.groups, self.clog, extern=True)
-            del self.groups[ng]
-        self.clog.info(f"Removed group {names} from system.")
+    def removeGroup(self, name_group):
+        check_groupSystem(ng, self.groups, self.clog, extern=True)
+        del self.groups[name_group]
+        
+        self.clog.info(f"Removed group {name_group} from system.")
 
     ##
     # Generate reflector grids and normals.
@@ -819,7 +818,7 @@ class System(object):
         self.clog.info(f"Saved current system to {name}.")
 
     ##
-    # Load a system object from /save/systems/. This loads all reflectors, fields, currents and frames in the system to disk.
+    # Load a system object from /save/systems/. This loads all reflectors, fields, currents and frames in the system from disk.
     #
     # @param name Load the system under this name.
     def loadSystem(self, name):
@@ -870,19 +869,19 @@ class System(object):
     # Remove reflector from system.
     #
     # @ param name Name of reflector to be removed.
-    def removeElement(self, *name):
-        for n in name:
-            check_elemSystem(n, self.system, self.clog, extern=True)
-            for group in self.groups.values():
-                if n in group["members"]:
-                    group["members"].remove(n)
-            del self.system[n]
+    def removeElement(self, name):
+        check_elemSystem(name, self.system, self.clog, extern=True)
+        for group in self.groups.values():
+            if name in group["members"]:
+                group["members"].remove(name)
+        del self.system[name]
         self.clog.info(f"Removed element {name} from system.")
     
     ##
     # Copy reflector.
     #
     # @ param name Name of reflector to be copied.
+    # @ param name_copy Name of new reflector.
     def copyElement(self, name, name_copy):
         check_elemSystem(name, self.system, self.clog, extern=True)
         self.system[name_copy] = self.copyObj(self.system[name])
@@ -892,49 +891,50 @@ class System(object):
     # Copy group.
     #
     # @ param name Name of group to be copied.
+    # @ param name_copy Name of new group.
     def copyGroup(self, name, name_copy):
         check_groupSystem(name, self.groups, self.clog, extern=True)
         self.groups[name_copy] = self.copyObj(self.groups[name])
         self.clog.info(f"Copied group {name} to {name_copy}.")
     
     ##
-    # Remove a ray-trace frame from system
+    # Remove a ray-trace frame from system.
     #
     # @param frameName Name of frame to be removed.
-    def removeFrame(self, *frameName):
-        for fn in frameName:
-            check_frameSystem(fn, self.frames, self.clog, extern=True)
-            del self.frames[fn]
+    def removeFrame(self, frameName):
+        check_frameSystem(frameName, self.frames, self.clog, extern=True)
+        del self.frames[frameName]
+        
         self.clog.info(f"Removed frame {frameName} from system.")
     
     ##
-    # Remove a PO field from system
+    # Remove a PO field from system.
     #
     # @param fieldName Name of field to be removed.
-    def removeField(self, *fieldName):
-        for fn in fieldName:
-            check_fieldSystem(fn, self.fields, self.clog, extern=True)
-            del self.fields[fn]
+    def removeField(self, fieldName):
+        check_fieldSystem(fieldName, self.fields, self.clog, extern=True)
+        del self.fields[fieldName]
+        
         self.clog.info(f"Removed PO field {fieldName} from system.")
     
     ##
-    # Remove a PO current from system
+    # Remove a PO current from system.
     #
     # @param curentName Name of current to be removed.
-    def removeCurrent(self, *currentName):
-        for cn in currentName:
-            check_currentSystem(cn, self.currents, self.clog, extern=True)
-            del self.currents[cn]
+    def removeCurrent(self, currentName):
+        check_currentSystem(currentName, self.currents, self.clog, extern=True)
+        del self.currents[currentName]
+        
         self.clog.info(f"Removed PO current {currentName} from system.")
 
     ##
-    # Remove a scalar PO field from system
+    # Remove a scalar PO field from system.
     #
     # @param fieldName Name of scalar field to be removed.
-    def removeScalarField(self, *fieldName):
-        for fn in fieldName:
-            check_scalarfieldSystem(fn, self.scalarfields, self.clog, extern=True)
-            del self.scalarfields[fn]
+    def removeScalarField(self, fieldName):
+        check_scalarfieldSystem(fieldName, self.scalarfields, self.clog, extern=True)
+        del self.scalarfields[fieldName]
+        
         self.clog.info(f"Removed scalar PO field {fieldName} from system.")
     
     ##
@@ -1116,9 +1116,6 @@ class System(object):
         self.frames[_argDict["name"]] = makeRTframe(_argDict)
 
         self.frames[_argDict["name"]].setMeta(self.copyObj(world.ORIGIN()), self.copyObj(world.IAX()), self.copyObj(world.INITM()))
-        #self.frames[argDict["name"]].pos = world.ORIGIN()
-        #self.frames[argDict["name"]].ori = world.IAX()
-        #self.frames[argDict["name"]].transf = world.INITM()
 
         self.clog.info(f"Added tubular frame {_argDict['name']} to system.")
     
@@ -1234,7 +1231,7 @@ class System(object):
     ##
     # Create a vectorial Gaussian beam.
     #
-    # @param argDict A GDict containing parameters for the Gaussian beam.
+    # @param gaussDict A GDict containing parameters for the Gaussian beam.
     # @param name_source Name of plane on which to define Gaussian.
     #
     # @see GDict
@@ -1257,10 +1254,10 @@ class System(object):
     ##
     # Create a scalar Gaussian beam.
     #
-    # @param argDict A GDict containing parameters for the Gaussian beam.
+    # @param gaussDict A GDict containing parameters for the Gaussian beam.
     # @param name_source Name of plane on which to define Gaussian.
     #
-    # @see GDict
+    # @see SGDict
     def createScalarGaussian(self, gaussDict, name_source):
         check_elemSystem(name_source, self.system, self.clog, extern=True)
         
@@ -1363,6 +1360,8 @@ class System(object):
     # @param name_field Name of field object, propagated along with the frame by multiplication.
     # @param name_target Name of surface on which to interpolate the field.
     # @param name_out Name of output field object in target surface.
+    # @param comp Component of field to interpolate. If scalar, leave as is.
+    # @param method Method for the interpolation.
     #
     # @returns out Complex numpy array containing interpolated field.
     def interpFrame(self, name_fr_in, name_field, name_target, name_out, comp=None, method="nearest"):
@@ -1689,8 +1688,8 @@ class System(object):
     # @param comp Component of field object.
     # @param interp Interpolation factor for finding the HPBW. Defaults to 50.
     #
-    # @returns HPBW_E Half-power beamwidth along E-plane
-    # @returns HPBW_H Half-power beamwidth along H-plane
+    # @returns HPBW_E Half-power beamwidth along E-plane.
+    # @returns HPBW_H Half-power beamwidth along H-plane.
     def calcHPBW(self, name_field, comp, interp=50):
         x_cut, y_cut, x_strip, y_strip = self.calcBeamCuts(name_field, comp)#, center=False, align=False)
 
@@ -1885,6 +1884,7 @@ class System(object):
 
     ##
     # Generate a 2D plot of a field or current.
+    # Note that matplotlib offers custom control over figures in the matplotlib window.
     #
     # @param name_obj Name of field or current to plot.
     # @param comp Component of field or current to plot. 
@@ -1980,6 +1980,7 @@ class System(object):
 
     ##
     # Plot a 3D reflector.
+    # Note that matplotlib offers custom control over figures in the matplotlib window.
     #
     # @param name_surface Name of reflector to plot.
     # @param cmap Colormap of reflector. Default is cool.
@@ -1993,9 +1994,6 @@ class System(object):
     def plot3D(self, name_surface, cmap=cm.cool,
             norm=False, fine=2, show=True, foc1=False, foc2=False, save=False, ret=False):
         
-        #pt.rcParams['xtick.minor.visible'] = False
-        #pt.rcParams['ytick.minor.visible'] = False
-
         fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
         
         if isinstance(name_surface, list) or isinstance(name_surface, np.ndarray):
@@ -2019,11 +2017,9 @@ class System(object):
         elif show:
             pt.show()
 
-        #pt.rcParams['xtick.minor.visible'] = True
-        #pt.rcParams['ytick.minor.visible'] = True
-
     ##
     # Plot the current system. Plots the reflectors and optionally ray-trace frames in a 3D plot.
+    # Note that matplotlib offers custom control over figures in the matplotlib window.
     #
     # @param name_surface Name of reflector to plot.
     # @param cmap Colormap of reflector. Default is cool.
@@ -2041,8 +2037,6 @@ class System(object):
 
         select = [] if select is None else select
         RTframes = [] if RTframes is None else RTframes
-        #pt.rcParams['xtick.minor.visible'] = False
-        #pt.rcParams['ytick.minor.visible'] = False
         
         plotDict = {}
         if select:
@@ -2072,14 +2066,13 @@ class System(object):
 
         elif show:
             pt.show()
-        
-        #pt.rcParams['xtick.minor.visible'] = True
-        #pt.rcParams['ytick.minor.visible'] = True
     
     ##
     # Plot a group of reflectors.
     #
     # @param name_group Name of group to be plotted.
+    # @param show Show the plot.
+    # @param ret Whether to return figure and axis.
     def plotGroup(self, name_group, show=True, ret=False):
         select = [x for x in self.groups[name_group]["members"]]
 
@@ -2379,7 +2372,7 @@ class System(object):
     # If so, rotate vectorial field/current components along.
     #
     # @param name Name of reflector to be rotated.
-    # @param rotation Array containing the rotation of the reflector.
+    # @param transf Array containing the transformation of the reflector.
     def _checkBoundPO(self, name, transf):
 
         bound_fields = []
@@ -2461,5 +2454,3 @@ class System(object):
         else:
             return [default, 1.]
 
-if __name__ == "__main__":
-    print("System interface for PyPO.")

@@ -84,7 +84,7 @@ class c2rBundle(ctypes.Structure):
                 ("r3z", ctypes.POINTER(ctypes.c_double))]
 
 ##
-# Reflectorparameters used by C++ backend, double precision..
+# Reflectorparameters used by C++ backend, double precision.
 class reflparams(ctypes.Structure):
     _fields_ = [("coeffs", ctypes.POINTER(ctypes.c_double)),
                 ("lxu", ctypes.POINTER(ctypes.c_double)),
@@ -240,7 +240,7 @@ class c2rBundlef(ctypes.Structure):
                 ("r3z", ctypes.POINTER(ctypes.c_float))]
 
 ##
-# Reflectorparameters used by C++ backend, single precision..
+# Reflectorparameters used by C++ backend, single precision.
 class reflparamsf(ctypes.Structure):
     _fields_ = [("coeffs", ctypes.POINTER(ctypes.c_float)),
                 ("lxu", ctypes.POINTER(ctypes.c_float)),

@@ -18,12 +18,12 @@ PO_modelist = ["JM", "EH", "JMEH", "EHP", "FF", "scalar"]
 
 ##
 # Get the regular expression for checking if an object already exists.
-# Counts the amount of occurences in order to avoid cobflicting names.
+# Counts the amount of occurrences in order to avoid conflicting names.
 #
 # @param name Name of object.
 # @param nameList List of names to check.
 #
-# @returns num Increment of highest occurence of number.
+# @returns num Increment of highest occurrence of number.
 def getIndex(name, nameList):
     regex = f"(?<!.){name}(_(\d*(?![ -~])))*(?![ -~])"
     l = re.compile(regex)
@@ -54,6 +54,7 @@ def has_CUDA():
 #
 # @param name Name of element.
 # @param elements The system dictionary containing all elements.
+# @param clog CustomLogger object.
 # @param errStr Error string for appending error messages.
 # @param extern Whether this function is called from System or from here.
 #
@@ -78,6 +79,7 @@ def check_elemSystem(name, elements, clog, errStr="", extern=False):
 #
 # @param name Name of field.
 # @param fields The fields dictionary containing all fields.
+# @param clog CustomLogger object.
 # @param errStr Error string for appending error messages.
 # @param extern Whether this function is called from System or from here.
 #
@@ -102,6 +104,7 @@ def check_fieldSystem(name, fields, clog, errStr="", extern=False):
 #
 # @param name Name of current.
 # @param currents The currents dictionary containing all currents.
+# @param clog CustomLogger object.
 # @param errStr Error string for appending error messages.
 # @param extern Whether this function is called from System or from here.
 #
@@ -126,6 +129,7 @@ def check_currentSystem(name, currents, clog, errStr="", extern=False):
 #
 # @param name Name of scalarfield.
 # @param scalarfields The scalarfields dictionary containing all scalarfields.
+# @param clog CustomLogger object.
 # @param errStr Error string for appending error messages.
 # @param extern Whether this function is called from System or from here.
 #
@@ -150,6 +154,7 @@ def check_scalarfieldSystem(name, scalarfields, clog, errStr="", extern=False):
 #
 # @param name Name of frame.
 # @param frames The frames dictionary containing all frames.
+# @param clog CustomLogger object.
 # @param errStr Error string for appending error messages.
 # @param extern Whether this function is called from System or from here.
 #
@@ -174,6 +179,7 @@ def check_frameSystem(name, frames, clog, errStr="", extern=False):
 #
 # @param name Name of group.
 # @param groups The groups dictionary containing all groups.
+# @param clog CustomLogger object.
 # @param errStr Error string for appending error messages.
 # @param extern Whether this function is called from System or from here.
 #
@@ -259,19 +265,15 @@ class MergeBeamError(Exception):
     pass
 
 ##
-# Error message when a frame, field or current already occurs in the System.
-#
-# @param elemName Name of object already in use.
-#
-# @returns errStr The errorstring.
-def errMsg_name(elemName):
-    return f"Name \"{elemName}\" already in use. Choose different name.\n"
+# ApertureError. Raised when aperDict is filled incorrectly.
+class ApertureError(Exception):
+    pass
 
 ##
 # Error message when a mandatory field has not been filled in a dictionary.
 #
 # @param fieldName Name of field in dictionary that is not filled.
-# @param elemName Name of dictionary where error occured. 
+# @param elemName Name of dictionary where error occurred. 
 #
 # @returns errStr The errorstring.
 def errMsg_field(fieldName, elemName):
@@ -282,7 +284,7 @@ def errMsg_field(fieldName, elemName):
 #
 # @param fieldName Name of field in dictionary that is incorrectly filled.
 # @param inpType Type of given input.
-# @param elemName Name of dictionary where error occured. 
+# @param elemName Name of dictionary where error occurred. 
 # @param fieldType Expected type of input.
 #
 # @returns errStr The errorstring.
@@ -294,7 +296,7 @@ def errMsg_type(fieldName, inpType, elemName, fieldType):
 #
 # @param fieldName Name of field in dictionary.
 # @param option Given option.
-# @param elemName Name of dictionary where error occured. 
+# @param elemName Name of dictionary where error occurred. 
 # @param args Expected options.
 #
 # @returns errStr The errorstring.
@@ -310,7 +312,7 @@ def errMsg_option(fieldName, option, elemName, args):
 #
 # @param fieldName Name of field in dictionary.
 # @param shape Shape of input.
-# @param elemName Name of dictionary where error occured.
+# @param elemName Name of dictionary where error occurred.
 # @param shapeExpect Expected input shape for field.
 #
 # @returns errStr The errorstring.
@@ -322,7 +324,7 @@ def errMsg_shape(fieldName, shape, elemName, shapeExpect):
 #
 # @param fieldName Name of field where incorrect value is encountered.
 # @param value Input value.
-# @param Name of dictionary where error occured.
+# @param Name of dictionary where error occurred.
 #
 # @returns errStr The errorstring.
 def errMsg_value(fieldName, value, elemName):
@@ -424,8 +426,8 @@ def block_ndarray(fieldName, elemDict, shape, cust_name=False):
 #
 # @param elemName Name of element, string.
 # @param nameList List of names in system dictionary.
-# @param num_ref Number of reflectors in System.
-def check_ElemDict(elemDict, nameList, num_ref, clog):
+# @param clog CustomLogger object.
+def check_ElemDict(elemDict, nameList, clog):
     
     errStr = ""
    
@@ -646,6 +648,7 @@ def check_ElemDict(elemDict, nameList, num_ref, clog):
 #
 # @param TubeRTDict A TubeRTDict object.
 # @param namelist List containing names of frames in System.
+# @param clog CustomLogger object.
 #
 # @see TubeRTDict
 def check_TubeRTDict(TubeRTDict, nameList, clog):
@@ -733,6 +736,7 @@ def check_TubeRTDict(TubeRTDict, nameList, clog):
 #
 # @param GRTDict A GRTDict object.
 # @param namelist List containing names of frames in System.
+# @param clog CustomLogger object.
 #
 # @see GRTDict
 def check_GRTDict(GRTDict, nameList, clog):
@@ -812,6 +816,7 @@ def check_GRTDict(GRTDict, nameList, clog):
 # @param runRTDict A runRTDict.
 # @param elements List containing names of surfaces in System.
 # @param frames List containing names of frames in System.
+# @param clog CustomLogger object.
 def check_runRTDict(runRTDict, elements, frames, clog):
     errStr = ""
    
@@ -874,6 +879,7 @@ def check_runRTDict(runRTDict, elements, frames, clog):
 #
 # @param PSDict A PSDict object.
 # @param namelist List containing names of fields in System.
+# @param clog CustomLogger object.
 #
 # @see PSDict
 def check_PSDict(PSDict, nameList, clog):
@@ -934,6 +940,7 @@ def check_PSDict(PSDict, nameList, clog):
 #
 # @param GPODict A GPODict object.
 # @param namelist List containing names of fields in System.
+# @param clog CustomLogger object.
 #
 # @see GPODict
 def check_GPODict(GPODict, nameList, clog):
@@ -1029,6 +1036,7 @@ def check_GPODict(GPODict, nameList, clog):
 # @param elements List containing names of surfaces in System.
 # @param currents List containing names of currents in System.
 # @param scalarfields List containing names of scalarfields in System.
+# @param clog CustomLogger object.
 def check_runPODict(runPODict, elements, fields, currents, scalarfields, frames, clog):
     errStr = ""
 
@@ -1175,6 +1183,7 @@ def check_runPODict(runPODict, elements, fields, currents, scalarfields, frames,
 # @param elements List containing names of surfaces in System.
 # @param frames List containing names of frames in System.
 # @param fields List containing names of frames in System.
+# @param clog CustomLogger object.
 def check_hybridDict(hybridDict, elements, frames, fields, clog):
     errStr = ""
    
@@ -1224,6 +1233,7 @@ def check_hybridDict(hybridDict, elements, frames, fields, clog):
 # CHeck if aperture dictionary is valid.
 #
 # @param aperDict An aperture dictionary.
+# @param clog CustomLogger object.
 #
 # @see aperDict
 def check_aperDict(aperDict, clog):
@@ -1248,11 +1258,18 @@ def check_aperDict(aperDict, clog):
     if not "inner" in aperDict:
         errStr += errMsg_field("inner", "aperDict")
 
+    if errStr:
+        errList = errStr.split("\n")[:-1]
+
+        for err in errList:
+            clog.error(err)
+        raise ApertureError()
 ##
 # Check if ellipsoid limits are valid points.
 # If not, reduces limits to acceptable values.
 #
 # @param ellipsoid A reflDict containing description of ellipsoid surface.
+# @param clog CustomLogger object.
 def check_ellipseLimits(ellipsoid, clog):
     buff = 1000
     idx_lim = 0
@@ -1296,6 +1313,7 @@ def check_ellipseLimits(ellipsoid, clog):
 #
 # @param beams Fields/currents to be merged.
 # @param checkDict System c=dictionary containing fields/currents.
+# @param clog CustomLogger object.
 def check_sameBound(beams, checkDict, clog):
     errStr = ""
     surf0 = checkDict[beams[0]].surf

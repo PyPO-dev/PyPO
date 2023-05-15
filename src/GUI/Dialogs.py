@@ -4,7 +4,6 @@ from PySide2.QtCore import Qt
 ##
 # @file Defines dialogs for the GUI.
 
-
 ##
 # Dialog to be shown during long calculations. 
 class SymDialog(QDialog):
@@ -31,7 +30,6 @@ class SymDialog(QDialog):
         # self.clog.info("ABORTED.")
         print("ABORTED.")
         super().reject()
-
 
 ##
 # Dialog to be shown when trying to delete an element.

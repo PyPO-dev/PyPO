@@ -180,7 +180,6 @@ void RayTracer<T, U, V>::propagateRaysToP(int start, int stop,
         V dx = fr_in->dx[i];
         V dy = fr_in->dy[i];
         V dz = fr_in->dz[i];
-        //printf("%d\n", i);
 
         while (check > epsilon)
         {

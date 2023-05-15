@@ -8,12 +8,13 @@ from numpy import array
 ##
 # @file provides implementation of form inputs
 
-
+##
+# Exception to be thrown when empty field is encountered.
 class EmptyFieldException(Exception):
     pass
 
 ##
-# Input that cannot be edited by user
+# Input that cannot be edited by user.
 # 
 # Can be used to communicate information to user about the form. In this case outputName of the provided InputDescription should be None.
 # Can also be used for adding a prefilled value that is visible or invisible to user depending on the 'hidden' value of provided InputDescription (visible by default).
@@ -47,7 +48,7 @@ class StaticInput(inputWidgetInterface):
 ##
 # Implements a checkbox input.
 # 
-# @param inputDescription.prefill If set to true the checkbox will be checked by default
+# @param inputDescription.prefill If set to true the checkbox will be checked by default.
 class checkbox(inputWidgetInterface):
     def __init__ (self, inputDescription:InputDescription):
         super().__init__()
@@ -86,9 +87,8 @@ class checkbox(inputWidgetInterface):
 # Implements a single or multiple valued text edit.
 # 
 # @param inputDescription.numFields Determines the number of fields, default = 1.
-# @param inputDescription.hints List of strings to provide hints. The length of this list should match the number of fields If inputDescription.prefill is True the hints will be used as prefilled values. 
+# @param inputDescription.hints List of strings to provide hints. The length of this list should match the number of fields. If inputDescription.prefill is True, the hints will be used as prefilled values. 
 # @param inputDescription.prefill, If set to true the hints will be used as prefilled values.
-
 class VectorInput(inputWidgetInterface):
     def __init__ (self, inputDescription:InputDescription):
         super().__init__()
@@ -182,7 +182,7 @@ class VectorInput(inputWidgetInterface):
 
 
 ##
-# Implements a radio button selection widget, used for 'one of many' type of options 
+# Implements a radio button selection widget, used for 'one of many' type of options.
 class SimpleRadio(selectionWidgetInterface):
 
     selectionChangedSignal = Signal(int)
@@ -242,7 +242,7 @@ class SimpleRadio(selectionWidgetInterface):
 # Implements a dropdown menu.
 # 
 # @param inputDescription.options list of strings providing the options for the dropdown.
-# @param dynamic Sets "--Select item--" first option. This is used by @see DynamicDropdownWidget to provide a blank form by default
+# @param dynamic Sets "--Select item--" first option. This is used by @see DynamicDropdownWidget to provide a blank form by default.
 class SimpleDropdown(selectionWidgetInterface):
     
     selectionChangedSignal = Signal(int)
@@ -382,9 +382,9 @@ class XYZRadio(inputWidgetInterface):
 ##
 # Implement a widget for 'many of many' type selection is possible.
 # 
-# User can select an option from a dropdown and it will appear in a listView. By clicking on an option in the listView it will disappear and return to the dropdown
+# User can select an option from a dropdown and it will appear in a listView. By clicking on an option in the listView it will disappear and return to the dropdown.
 # 
-# @param inputDescription.option List of options 
+# @param inputDescription.option List of options.
 class ElementSelectionWidget(inputWidgetInterface):
     def __init__ (self, inputDescription: InputDescription):
         super().__init__()

@@ -62,7 +62,7 @@ extern "C"
     PYPO_DLL void propagateRays(reflparams ctp, cframe *fr_in, cframe *fr_out,
                        int numThreads, double epsilon, double t0);
 
-    // SINGLE NTERFACE
+    // SINGLE INTERFACE
     PYPO_DLL void propagateToGridf_JM(c2Bundlef *res, reflparamsf source, reflparamsf target,
                          reflcontainerf *cs, reflcontainerf *ct,
                          c2Bundlef *currents,

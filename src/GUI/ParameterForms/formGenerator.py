@@ -1,6 +1,5 @@
-from PySide2.QtWidgets import QWidget, QComboBox, QFormLayout, QLabel, QLineEdit, QVBoxLayout, QHBoxLayout, QPushButton, QStackedWidget, QCheckBox, QRadioButton, QButtonGroup, QGridLayout, QSpacerItem, QSizePolicy
-from PySide2.QtCore import QRegExp, Qt, Slot, Signal
-from PySide2.QtGui import QRegExpValidator
+from PySide2.QtWidgets import QWidget, QFormLayout, QVBoxLayout, QHBoxLayout, QPushButton, QStackedWidget, QSpacerItem, QSizePolicy
+from PySide2.QtCore import Qt, Slot, Signal
 from src.GUI.utils import *
 from src.GUI.ParameterForms.simpleInputWidgets import checkbox, StaticInput, VectorInput, SimpleRadio, SimpleDropdown, XYZRadio, ElementSelectionWidget
 from src.GUI.ParameterForms.InputDescription import *
@@ -12,6 +11,11 @@ from src.GUI.ParameterForms.inputWidgetInterfaces import *
 # Form generator.
 #
 # This script contains the form generator and dynamic inputWidgets.
+
+##
+# FormGenerator.
+#
+# Generate an input form for interacting with PyPO.
 class FormGenerator(QWidget):
     closed = Signal()
     ##
@@ -85,7 +89,7 @@ class FormGenerator(QWidget):
                 self.layout.addRow(input)
 
     ##
-    # Creates buttons in the bottom of the form.
+    # Creates close, clear and read buttons in the bottom of the form.
     #
     def setupButtons(self):
         addBtn = QPushButton(self.okText)
@@ -135,18 +139,16 @@ class FormGenerator(QWidget):
         for input in self.inputs:
             paramDict.update(input.read())
         return paramDict
-    
-
-
 
 ##
 # Dynamic dropdown.
 #
-# Dropdown followed by a dynamic section that changes depending on users selection in the dropdown
+# Dropdown followed by a dynamic section that changes depending on users selection in the dropdown.
 class DynamicDropdownWidget(inputWidgetInterface):
     ##
     # Constructor. Creates the form section.
     #
+    # @param inp InputDescription object received from formData.
     def __init__ (self, inp):
         super().__init__()
         self.inputDescription = inp
@@ -173,7 +175,7 @@ class DynamicDropdownWidget(inputWidgetInterface):
         self.modeUpdate(0)
 
     ##
-    # Creates the nested forms
+    # Creates the nested forms.
     #
     def makeChildren(self):
         self.stackedWidget = QStackedWidget()
@@ -188,7 +190,7 @@ class DynamicDropdownWidget(inputWidgetInterface):
     ##
     # Updates the dynamic widget according to users selection.
     #
-    # @param index Index of the option
+    # @param index Index of the option.
     @Slot(int)
     def modeUpdate(self, index):
         if self.hasChildren:
@@ -231,11 +233,12 @@ class DynamicDropdownWidget(inputWidgetInterface):
 ##
 # Dynamic radio button.
 #
-# radio button group followed by a dynamic section that changes depending on users selection in the dropdown
+# radio button group followed by a dynamic section that changes depending on users selection in the dropdown.
 class DynamicRadioWidget(inputWidgetInterface):
     ##
     # Constructor. Creates the form section.
     #
+    # @param inp InputDescription object received from formData.
     def __init__ (self, inp):
         super().__init__()
         self.inputDescription = inp
@@ -265,7 +268,7 @@ class DynamicRadioWidget(inputWidgetInterface):
         self.modeUpdate(-1)
 
     ##
-    # Creates the nested forms
+    # Creates the nested forms.
     #
     def makeChildren(self):
         self.stackedWidget = QStackedWidget()
@@ -282,7 +285,7 @@ class DynamicRadioWidget(inputWidgetInterface):
     ##
     # Updates the dynamic widget according to users selection.
     #
-    # @param index Index of the option
+    # @param index Index of the option.
     @Slot(int)
     def modeUpdate(self, index):
         if self.hasChildren:
@@ -300,7 +303,7 @@ class DynamicRadioWidget(inputWidgetInterface):
     ##
     # Reads the inputs.
     #
-    # @return A dictionary containing the values read form the inputs.
+    # @return A dictionary containing the values read from the inputs.
     def read(self):
         try:
             ind = self.mode.currentIndex()

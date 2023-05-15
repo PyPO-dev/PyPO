@@ -10,7 +10,7 @@
 /*! \file InterfaceReflector.cpp
     \brief Implementation of reflector objects.
     
-    General definitions of reflector objects. Generate using xy, uv or Azimuth over Elevation parametrization.
+    General definitions of reflector objects. Generates reflectors using xy, uv or Azimuth over Elevation parametrization.
         Associated normal vectors and area element sizes are also returned.
 */
 
@@ -29,7 +29,7 @@
  * @see Utils
  * @see Structs
  * @see reflcontainer
- * @see reflcontainerf
+ * @see reflcontainerfa
  */
 template<typename T, typename U>
 void transformGrids(T *reflc, int idx, std::array<U, 3> &inp, std::array<U, 3> &out, Utils<U> *ut, U mat[16])
@@ -218,19 +218,7 @@ void Parabola_uv(T *parabola, U xu_lo, U xu_up, U yv_lo,
 
             duv = sqrt(du*du*cos(v)*cos(v) + du*du*sin(v)*sin(v)*majmin*majmin);
             parabola->area[idx] = norm * r * duv * dv;
-            /*
-            prefac =  nfac / sqrt(4 * b*b * u*u * cos(v)*cos(v) +
-                      4 * a*a * u*u * sin(v)*sin(v) +
-                      a*a * b*b);
 
-            parabola->nx[idx] = -2 * b * u * cos(v) * prefac;
-            parabola->ny[idx] = -2 * a * u * sin(v) * prefac;
-            parabola->nz[idx] = b * a * prefac;
-
-            parabola->area[idx] = u * sqrt(4 * b*b * u*u * cos(v)*cos(v) +
-                                    4 * a*a * u*u * sin(v)*sin(v) +
-                                    a*a * b*b) * du * dv;
-            */
             if (transform)
             {
                 transformGrids<T, U>(parabola, idx, inp, out, &ut, mat);
@@ -403,17 +391,6 @@ void Hyperbola_uv(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
             duv = sqrt(du*du*cos(v)*cos(v) + du*du*sin(v)*sin(v)*majmin*majmin);
             hyperbola->area[idx] = norm * r * duv * dv;
 
-            /*
-            prefac = nfac / sqrt(b*b * c*c * (u*u - 1) * cos(v)*cos(v) +
-                      a*a * c*c * (u*u - 1) * sin(v)*sin(v) + a*a * b*b * u*u);
-
-            hyperbola->nx[idx] = -b * c * sqrt(u*u - 1) * cos(v) * prefac;
-            hyperbola->ny[idx] = -a * c * sqrt(u*u - 1) * sin(v) * prefac;
-            hyperbola->nz[idx] = b * a * u * prefac;
-
-            hyperbola->area[idx] = sqrt(b*b * c*c * (u*u - 1) * cos(v)*cos(v) +
-                                        a*a * c*c * (u*u - 1) * sin(v)*sin(v) + a*a * b*b * u*u) * du * dv;
-            */
             if (transform)
             {
                 transformGrids<T, U>(hyperbola, idx, inp, out, &ut, mat);
@@ -537,7 +514,6 @@ void Ellipse_uv(T *ellipse, U xu_lo, U xu_up, U yv_lo,
     U dv = (yv_up - yv_lo) / (ncy - 1);
 
     U majmin = sqrt(1 - ecc_uv*ecc_uv);
-    // Generate using xy parametrisation
     U u, duv;
     U v;
     U prefac;
@@ -556,16 +532,16 @@ void Ellipse_uv(T *ellipse, U xu_lo, U xu_up, U yv_lo,
             v = (j * dv + yv_lo) * M_PI/180;
             int idx = i*ncy + j;
 
-            x = u * cos(v);// + xcenter;
-            y = u * sin(v) * majmin;// + ycenter;
+            x = u * cos(v);
+            y = u * sin(v) * majmin;
 
             r = sqrt(x*x + y*y);
 
             xr = x * cos(rot_uv) - y * sin(rot_uv);
             yr = x * sin(rot_uv) + y * cos(rot_uv);
 
-            x = xr;// + xcenter;
-            y = yr;// + ycenter;
+            x = xr + xcenter;
+            y = yr + ycenter;
 
             ellipse->x[idx] = x;
             ellipse->y[idx] = y;
@@ -586,20 +562,6 @@ void Ellipse_uv(T *ellipse, U xu_lo, U xu_up, U yv_lo,
             duv = sqrt(du*du*cos(v)*cos(v) + du*du*sin(v)*sin(v)*majmin*majmin);
             ellipse->area[idx] = norm * r * duv * dv;
             
-            /*
-            ellipse->z[idx] = c * cos(u);
-
-            prefac = nfac / sqrt(b*b * c*c * sin(u)*sin(u) * cos(v)*cos(v) +
-                      a*a * c*c * sin(u)*sin(u) * sin(v)*sin(v) + a*a * b*b * cos(u)*cos(u));
-
-            ellipse->nx[idx] = b * c * sin(u) * cos(v) * prefac;
-            ellipse->ny[idx] = a * c * sin(u) * sin(v) * prefac;
-            ellipse->nz[idx] = b * a * cos(u) * prefac;
-
-            ellipse->area[idx] = sin(u) * sqrt(b*b * c*c * sin(u)*sin(u) * cos(v)*cos(v) +
-                                        a*a * c*c * sin(u)*sin(u) * sin(v)*sin(v) +
-                                        a*a * b*b * cos(u)*cos(u)) * du * dv;
-            */
             if (transform)
             {
                 transformGrids<T, U>(ellipse, idx, inp, out, &ut, mat);
@@ -619,8 +581,6 @@ void Ellipse_uv(T *ellipse, U xu_lo, U xu_up, U yv_lo,
  * @param xu_up Upper limit on x co-ordinate, double/float.
  * @param yv_lo Lower limit on y co-ordinate, double/float.
  * @param yv_up Upper limit on y co-ordinate, double/float.
- * @param xcenter Center x co-ordinate of xy region.
- * @param ycenter Center y co-ordinate of xy region.
  * @param ncx Number of cells along x-axis.
  * @param ncy Number of cells along y-axis.
  * @param nfac Flip normal vectors.
@@ -632,13 +592,12 @@ void Ellipse_uv(T *ellipse, U xu_lo, U xu_up, U yv_lo,
  */
 template<typename T, typename U>
 void Plane_xy(T *plane, U xu_lo, U xu_up, U yv_lo,
-              U yv_up, U xcenter, U ycenter, int ncx, int ncy, int nfac,
+              U yv_up, int ncx, int ncy, int nfac,
               U mat[16], bool transform)
 {
     U dx = (xu_up - xu_lo) / (ncx - 1);
     U dy = (yv_up - yv_lo) / (ncy - 1);
 
-    // Generate using xy parametrisation
     U x;
     U y;
     U prefac;
@@ -707,7 +666,6 @@ void Plane_uv(T *plane, U xu_lo, U xu_up, U yv_lo,
 {
 
 
-    // Generate using xy parametrisation
     U u, du, duv;
     U v, dv, r;
     U x, xr, y, yr;
@@ -732,15 +690,15 @@ void Plane_uv(T *plane, U xu_lo, U xu_up, U yv_lo,
             v = (j * dv + yv_lo);
             int idx = i*ncy + j;
             
-            // Calculate co-ordinate of ellipse in restframe
+            // Calculate co-ordinate of ellipse in rest frame
             x = u * cos(v);
             y = u * sin(v) * majmin;
 
-            // Calculate distance of x, y point to origin in restframe.
+            // Calculate distance of x, y point to origin in rest frame.
             // Rotation preserves area elements
             r = sqrt(x*x + y*y);
             
-            // Rotate ellipse in restframe
+            // Rotate ellipse in rest frame
             xr = x * cos(rot_uv) - y * sin(rot_uv);
             yr = x * sin(rot_uv) + y * cos(rot_uv);
 
@@ -794,7 +752,6 @@ void Plane_AoE(T *plane, U xu_lo, U xu_up, U yv_lo,
     U dA = (xu_up - xu_lo) / (ncx - 1);
     U dE = (yv_up - yv_lo) / (ncy - 1);
 
-    // Generate using xy parametrisation
     U Az;
     U El;
 
@@ -815,7 +772,6 @@ void Plane_AoE(T *plane, U xu_lo, U xu_up, U yv_lo,
             {
                 plane->x[idx] = sqrt(Az*Az + El*El) * M_PI/180;
                 plane->y[idx] = atan2(El, Az);
-                //plane->y[idx] = constrainAngle<U>(atan(El / Az));
 
                     if (plane->y[idx] != plane->y[idx])
                     {
@@ -909,7 +865,7 @@ void generateGrid(reflparams refl, reflcontainer *container, bool transform, boo
         else if (refl.type == 3)
         {
             Plane_xy<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, xcenter, ycenter, ncx, ncy, nfac, refl.transf, transform);
+                                            yv_up, ncx, ncy, nfac, refl.transf, transform);
         }
     }
 
@@ -1013,7 +969,7 @@ void generateGridf(reflparamsf refl, reflcontainerf *container, bool transform, 
         else if (refl.type == 3)
         {
             Plane_xy<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
-                                            yv_up, xcenter, ycenter, ncx, ncy, nfac, refl.transf, transform);
+                                            yv_up, ncx, ncy, nfac, refl.transf, transform);
         }
     }
 

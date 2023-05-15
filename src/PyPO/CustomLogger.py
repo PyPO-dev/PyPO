@@ -109,9 +109,6 @@ class CustomLogger(object):
 
         return logger
 
-    def getNewStream(self):
-        pass
-
 ##
 # Utility class for creating GUI loggers.
 # Has emit method which writes the logging output to the console.
@@ -147,7 +144,3 @@ class CustomGUILogger(object):
 
         logger.addHandler(ch)
         return logger
-
-    def getNewStream(self):
-        pass
-

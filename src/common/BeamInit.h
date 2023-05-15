@@ -16,7 +16,7 @@
 /*! \file BeamInit.h
     \brief Initialize beam objects.
     
-    Initializes ray-trace frames, Gaussian beams and custom beams by calculating currents.
+    Initializes ray-trace frames, PO beams, and custom beams.
 */
 
 /** 

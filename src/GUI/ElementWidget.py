@@ -13,16 +13,16 @@ from src.GUI.Dialogs import RemoveElementDialog
 # 
 # Defines ElementWidgets consisting of a name label and an options button. These element widgets are 
 # subclassed into their own type and styled in a distinct color in style.css. The subclasses handle 
-# passing the required parameters to the parent. The parent accepts all possible option (actions) that 
+# passing the required parameters to the parent. The parent accepts all possible options (actions) that 
 # could be given by a subclass. The parent should have a function for each of the possible action.  
 class ElementWidget(QWidget):
     def __init__ (self, name, plotAction, removeAction, transformAction = None, RMSAction = None, 
-                    snapAction = None, copyAction = None, removeFromTree = None, infoAction = None, p=None):
+                    snapAction = None, copyAction = None, removeWid = None, infoAction = None, p=None):
 
         super().__init__(parent=p)
         self.plotAction = plotAction
         self.removeAction_ = removeAction
-        self.removeFromTree = removeFromTree
+        self.removeWid = removeWid
 
         self.actions = {
             "Plot": self.plot,
@@ -105,8 +105,8 @@ class ElementWidget(QWidget):
         if RemoveElementDialog(self.name).exec_():
             self.removeAction_(self.name)
             self.setParent(None)
-            if self.removeFromTree:
-                self.removeFromTree()
+            if self.removeWid:
+                self.removeWid()
     
     def snap(self):
         self._closeOptionsMenu()        
@@ -121,9 +121,9 @@ class ElementWidget(QWidget):
 
 
 class ReflectorWidget(ElementWidget):
-    def __init__(self, name, removeAction, transformAction, plotAction, snapAction, copyAction, removeFromTree=None, p=None): ##TODO: rename removeFromTree to remove?
+    def __init__(self, name, removeAction, transformAction, plotAction, snapAction, copyAction, removeWid=None, p=None):
         super().__init__(name, plotAction, removeAction, transformAction=transformAction, 
-                removeFromTree=removeFromTree, snapAction=snapAction, copyAction=copyAction, p=p)
+                removeWid=removeWid, snapAction=snapAction, copyAction=copyAction, p=p)
 
 class GroupWidget(ElementWidget):
     def __init__ (self, name, removeAction, plotAction, transformAction, snapAction, copyAction, infoAction):

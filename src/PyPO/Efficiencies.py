@@ -72,7 +72,7 @@ def calcRTtiltSTD(frame):
     return np.array([stdt_x, stdt_y, stdt_z])# / np.linalg.norm(np.array([stdt_x, stdt_y, stdt_z]))
 
 ##
-# Calcuate root-mean-square (RMS) of a ray-trace frame.
+# Calculate root-mean-square (RMS) of a ray-trace frame.
 #
 # @param frame Frame to calculate RMS of.
 #
@@ -164,16 +164,3 @@ def calcMainBeam(field, surfaceObject, fitGauss):
     eff_mb = np.sum(np.absolute(fitGauss_norm)**2) / np.sum(np.absolute(field_norm)**2)
     
     return eff_mb
-
-
-
-def calcDirectivity(eta_t, surfaceObject, k):
-    grids = generateGrid(surfaceObject, transform=False, spheric=True)
-
-    D = 10*np.log10(k**2 / np.pi * eta_t * np.sum(grids.area))
-
-    return D
-
-
-if __name__ == "__main__":
-    print("Functions to calculate system efficiencies.")

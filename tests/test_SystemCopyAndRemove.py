@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from src.PyPO.System import System as pypoSystem
+from src.PyPO.System import System as PyPOSystem
 from src.PyPO.Checks import InputReflError, InputRTError, InputPOError
 
 ##
@@ -8,7 +8,7 @@ from src.PyPO.Checks import InputReflError, InputRTError, InputPOError
 # File containing tests for copy and remove methods for reflectors, fields, currents, frames and scalar fields.
 class Test_SystemCopyAndRemove(unittest.TestCase):
     def setUp(self) -> None:
-        self.s = pypoSystem(override=False, verbose=False)
+        self.s = PyPOSystem(override=False, verbose=False)
         
         Parabola = {
             "name"      : "par",
@@ -138,7 +138,9 @@ class Test_SystemCopyAndRemove(unittest.TestCase):
         
         self.assertFalse("par" in self.s.groups["testgroup"]["members"])
 
-        self.s.removeElement("hyp", "ell", "plane")
+        self.s.removeElement("hyp")
+        self.s.removeElement("ell")
+        self.s.removeElement("plane")
 
         self.assertFalse("par" in self.s.system)
         self.assertFalse("hyp" in self.s.system)

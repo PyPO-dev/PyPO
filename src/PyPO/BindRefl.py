@@ -14,7 +14,7 @@ from src.PyPO.PyPOTypes import *
 # These bindings are concerned with generation of reflector grids from dictionaries.
 
 ##
-# Load the pypogpu shared library. Will detect the operating system and link the library accordingly.
+# Load the PyPOgpu shared library. Will detect the operating system and link the library accordingly.
 #
 # @returns lib The ctypes library containing the C/C++ functions.
 def loadRefllib():
@@ -33,7 +33,7 @@ def loadRefllib():
     return lib
 
 ##
-# Double precision function for generating reflectorgrids.
+# Double precision function for generating reflector grids.
 # This is the function called by the CPU PyPO bindings.
 # Also, when called from System, this is the binding that is called.
 # 
@@ -69,7 +69,7 @@ def generateGrid(reflparams_py, transform=True, spheric=True):
     return grids
 
 ##
-# Single precision function for generating reflectorgrids.
+# Single precision function for generating reflector grids.
 # This is the function called by the GPU PyPO bindings.
 # 
 # @param reflparams_py A reflDict dictionary.

@@ -14,7 +14,7 @@ import src.PyPO.Threadmgr as TManager
 # These bindings are concerned with propagations for the ray-tracer and the physical optics on the CPU.
 
 ##
-# Load the pypocpu shared library. Will detect the operating system and link the library accordingly.
+# Load the PyPOcpu shared library. Will detect the operating system and link the library accordingly.
 #
 # @returns lib The ctypes library containing the C/C++ functions.
 def loadCPUlib():
@@ -247,6 +247,3 @@ def RT_CPUd(runRTDict):
     shape = (runRTDict["fr_in"].size,)
     fr_out = frameToObj(res, np_t=np.float64, shape=shape)
     return fr_out
-
-if __name__ == "__main__":
-    print("Bindings for PyPO CPU.")

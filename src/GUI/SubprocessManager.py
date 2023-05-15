@@ -1,6 +1,5 @@
 from multiprocessing import Process, Manager
 from PySide2.QtCore import QThread, Signal, QObject
-from PySide2.QtWidgets import QWidget, QMainWindow, QApplication, QVBoxLayout, QPushButton, QLabel
 from src.GUI.Dialogs import SymDialog
 from time import sleep
 from copy import deepcopy
@@ -46,9 +45,6 @@ class SubprocessManager():
         self.waiterThread.quit()
         return res
             
-
-
-
 class Waiter(QObject):
     finished = Signal(int)
 
@@ -79,42 +75,4 @@ def copySystem(system :st.System, cSystem = True, cFrames = None, cFields = None
     for sField in cScalarFields:
         s2.scalarfields[sField] = system.scalarfields[sField]
     return s2
-    # for k, e in system.system.items():
-    #     print(f"System {k}: {e}")
-        
 
-    # for key, fr in system.frames.items():
-    #     print(f"{key}: {fr}")
-    # for key, fr in s2.frames.items():
-    #     print(f"{key}: {fr}")
-        
-
-
-
-
-if __name__ == "__main__":
-    import sys
-    class window(QWidget):
-        def __init__(self) -> None:
-            super().__init__()
-            layout = QVBoxLayout(self)
-            btn = QPushButton("run subprocess")
-            btn.clicked.connect(self.runSubprocess)
-            layout.addWidget(btn)
-
-
-
-            self.subProc = SubprocessManager(self)
-
-        def runSubprocess(self):
-            self.subProc.runInSubprocess(self.func, (5,), None)
-
-        def func(self, x):
-            for i in range(x):
-                sleep(1)
-                print(f"counting {i = }")
-
-    app = QApplication(sys.argv)
-    test = window()
-    test.show()
-    sys.exit(app.exec_())

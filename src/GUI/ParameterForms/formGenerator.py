@@ -1,6 +1,5 @@
-from PySide2.QtWidgets import QWidget, QComboBox, QFormLayout, QLabel, QLineEdit, QVBoxLayout, QHBoxLayout, QPushButton, QStackedWidget, QCheckBox, QRadioButton, QButtonGroup, QGridLayout, QSpacerItem, QSizePolicy
-from PySide2.QtCore import QRegExp, Qt, Slot, Signal
-from PySide2.QtGui import QRegExpValidator
+from PySide2.QtWidgets import QWidget, QFormLayout, QVBoxLayout, QHBoxLayout, QPushButton, QStackedWidget, QSpacerItem, QSizePolicy
+from PySide2.QtCore import Qt, Slot, Signal
 from src.GUI.utils import *
 from src.GUI.ParameterForms.simpleInputWidgets import checkbox, StaticInput, VectorInput, SimpleRadio, SimpleDropdown, XYZRadio, ElementSelectionWidget
 from src.GUI.ParameterForms.InputDescription import *

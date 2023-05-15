@@ -1,8 +1,6 @@
 from PySide2.QtWidgets import QWidget
 from abc import ABC, abstractclassmethod
 
-from src.GUI.ParameterForms.InputDescription import InputDescription, inType
-
 ##
 # @file 
 # Defines interfaces for input widgets to inherit from to ensure certain behavior.

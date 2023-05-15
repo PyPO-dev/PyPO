@@ -49,8 +49,6 @@ class Accordion(QWidget):
             ### Content ###
             self.content = QWidget()
             self.contentLayout = QVBoxLayout(self.content)
-            # self.contentLayout.setSpacing(0)
-            # self.contentLayout.setContentsMargins(0,0,0,0)
             layout.addWidget(self.content)
 
             # self.hideContent()

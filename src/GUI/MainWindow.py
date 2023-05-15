@@ -2,33 +2,25 @@ import os
 import sys
 import shutil
 from time import time
-from threading import Thread, Event
+from threading import Event
 from traceback import print_tb
-from multiprocessing import Process, Manager
+from multiprocessing import Manager
 
-from PySide2.QtWidgets import QApplication, QLabel, QTextEdit, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar, QScrollArea
-from PySide2.QtGui import QFont, QIcon, QTextCursor, QPixmap
-from PySide2.QtCore import Qt, QThreadPool, QThread
+from PySide2.QtWidgets import QLabel, QTextEdit, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar, QScrollArea
+from PySide2.QtGui import QTextCursor, QPixmap
+from PySide2.QtCore import Qt, QThreadPool
 
 from src.GUI.ParameterForms import formGenerator
 from src.GUI.ParameterForms.InputDescription import InputDescription
 from src.GUI.utils import inType
 import src.GUI.ParameterForms.formData as fData
 from src.GUI.PlotScreen import PlotScreen
-from src.GUI.Accordion import Accordion
-from src.GUI.Dialogs import SymDialog
 from src.GUI.WorkSpace import Workspace
-from src.GUI.SubprocessManager import SubprocessManager, copySystem, Waiter
+from src.GUI.SubprocessManager import SubprocessManager, copySystem
 
 from src.PyPO.CustomLogger import CustomGUILogger
 
-# import numpy as np
-from src.PyPO.Checks import InputReflError, InputRTError ##TODO @arend is this useful?
-
-sys.path.append('../')
-sys.path.append('../../')
 import src.PyPO.System as st
-import src.PyPO.Threadmgr as TManager
 import src.PyPO.Checks as chk
 
 ##

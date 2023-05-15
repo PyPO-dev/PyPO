@@ -1,12 +1,11 @@
 import os
-import sys
 import shutil
 from time import time
 from threading import Event
 from traceback import print_tb
 from multiprocessing import Manager
 
-from PySide2.QtWidgets import QLabel, QTextEdit, QMainWindow, QMenuBar, QMenu, QGridLayout, QWidget, QSizePolicy, QPushButton, QVBoxLayout, QHBoxLayout, QAction, QTabWidget, QTabBar, QScrollArea
+from PySide2.QtWidgets import QLabel, QTextEdit, QMainWindow, QGridLayout, QWidget, QSizePolicy, QVBoxLayout, QAction, QTabWidget, QScrollArea
 from PySide2.QtGui import QTextCursor, QPixmap
 from PySide2.QtCore import Qt, QThreadPool
 

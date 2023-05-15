@@ -37,7 +37,7 @@ It can model the forward and backward propagation of electromagnetic field distr
 Simulations are performed using either geometrical optics (GO) or the equivalent surface current approach, belonging to the field of physical optics (PO) [@Balanis:1989].
 The GO and PO calculations are performed using libraries written in C++ and CUDA, allowing for multi-threading and GPU acceleration.
 Common figures of merit, such as aperture efficiency and half-power beamwidth, can be calculated and used for quantitative analysis of the designed system.
-Input beam patterns can be selected from a range of models, such as Gaussian beams, point sources and uniform sources. 
+Input beam patterns can be selected from a range of models, such as Gaussian beams, point sources and uniform current distributions. 
 Custom beam patterns can also be imported to, for example, model the propagation of measured beam patterns through simulated optical systems.
 
 `PyPO` can be used through either a scripting-based approach, where simulations are defined in Python scripts, or through the graphical user interface (GUI).
@@ -58,6 +58,7 @@ The package comes with several Jupyter Notebook tutorials illustrating the workf
 Several tutorials for using the GUI features are also included and can be found in the software documentation.
 
 # Acknowledgements
+We would like to thank dr. Shahab Oddin Dabironezare for useful discussions and proofreading the manuscript.
 This work is supported by the European Union (ERC Consolidator Grant No. 101043486 TIFUUN). Views and opinions expressed are however those of the authors only and do not necessarily reflect those of the European Union or the European Research Council Executive Agency. Neither the European Union nor the granting authority can be held responsible for them.
 
 # References

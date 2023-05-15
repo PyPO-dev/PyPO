@@ -108,7 +108,7 @@ public:
                               V *cs, V *ct,
                               W *currents, U *res);
 
-    std::array<std::complex<T>, 3> farfieldAtPoint(V *cs, W *currents,
+    std::array<std::array<std::complex<T>, 3>, 2> farfieldAtPoint(V *cs, W *currents,
                                               const std::array<T, 3> &point_target);
 
     void parallelFarField(V *cs, V *ct,
@@ -1122,7 +1122,7 @@ void Propagation<T, U, V, W>::propagateToFarField(int start, int stop,
     std::array<T, 3> r_hat;                // Unit vector in far-field point direction
 
     // Arrays of complex Ts
-    std::array<std::complex<T>, 3> e;            // far-field E-field
+    std::array<std::array<std::complex<T>, 3>, 2> eh;            // far-field EH-field
 
     int jc = 0;
     for(int i=start; i<stop; i++)
@@ -1136,24 +1136,24 @@ void Propagation<T, U, V, W>::propagateToFarField(int start, int stop,
         r_hat[2] = cos(phi);
 
         // Calculate total incoming E and H field at point on target
-        e = farfieldAtPoint(cs, currents, r_hat);
+        eh = farfieldAtPoint(cs, currents, r_hat);
 
-        res->r1x[i] = e[0].real();
-        res->r1y[i] = e[1].real();
-        res->r1z[i] = e[2].real();
+        res->r1x[i] = eh[0][0].real();
+        res->r1y[i] = eh[0][1].real();
+        res->r1z[i] = eh[0][2].real();
 
-        res->i1x[i] = e[0].imag();
-        res->i1y[i] = e[1].imag();
-        res->i1z[i] = e[2].imag();
+        res->i1x[i] = eh[0][0].imag();
+        res->i1y[i] = eh[0][1].imag();
+        res->i1z[i] = eh[0][2].imag();
 
         // TODO: Calculate H far fields
-        res->r2x[i] = 0.;
-        res->r2y[i] = 0.;
-        res->r2z[i] = 0.;
-
-        res->i2x[i] = 0.;
-        res->i2y[i] = 0.;
-        res->i2z[i] = 0.;
+        res->r2x[i] = eh[1][0].real();
+        res->r2y[i] = eh[1][1].real();
+        res->r2z[i] = eh[1][2].real();
+                                      
+        res->i2x[i] = eh[1][0].imag();
+        res->i2y[i] = eh[1][1].imag();
+        res->i2z[i] = eh[1][2].imag();
     }
 }
 
@@ -1172,12 +1172,13 @@ void Propagation<T, U, V, W>::propagateToFarField(int start, int stop,
  * @see c2Bundlef
  */
 template <class T, class U, class V, class W>
-std::array<std::complex<T>, 3> Propagation<T, U, V, W>::farfieldAtPoint(V *cs,
+std::array<std::array<std::complex<T>, 3>, 2> Propagation<T, U, V, W>::farfieldAtPoint(V *cs,
                                                 W *currents,
                                                 const std::array<T, 3> &r_hat)
 {
     // Scalars (T & complex T)
     T omega_mu;                       // Angular frequency of field times mu
+    T omega_eps;                       // Angular frequency of field times eps
     T r_hat_in_rp;                 // r_hat dot product r_prime
     std::complex<T> r_in_s;        // Container for inner products between wavevctor and currents
     std::complex<T> expo;
@@ -1188,6 +1189,7 @@ std::array<std::complex<T>, 3> Propagation<T, U, V, W>::farfieldAtPoint(V *cs,
 
     // Arrays of complex Ts
     std::array<std::complex<T>, 3> e;        // Electric field on far-field point
+    std::array<std::complex<T>, 3> h;        // Magnetic field on far-field point
     std::array<std::complex<T>, 3> _js;      // Temporary Electric current at source point
     std::array<std::complex<T>, 3> _ms;      // Temporary Magnetic current at source point
 
@@ -1197,12 +1199,18 @@ std::array<std::complex<T>, 3> Propagation<T, U, V, W>::farfieldAtPoint(V *cs,
     std::array<std::complex<T>, 3> _ctemp;
     std::array<std::complex<T>, 3> js_tot_factor;
     std::array<std::complex<T>, 3> ms_tot_factor;
+    std::array<std::complex<T>, 3> js_tot_factor_h;
+    std::array<std::complex<T>, 3> ms_tot_factor_h;
+
+    // Output array
+    std::array<std::array<std::complex<T>, 3>, 2> out;
 
     // Matrices
     std::array<std::array<T, 3>, 3> rr_dyad;       // Dyadic product between r_hat - r_hat
     std::array<std::array<T, 3>, 3> eye_min_rr;    // I - rr
 
     e.fill(z0);
+    h.fill(z0);
     js.fill(z0);
     ms.fill(z0);
 
@@ -1238,18 +1246,28 @@ std::array<std::complex<T>, 3> Propagation<T, U, V, W>::farfieldAtPoint(V *cs,
     }
 
     ut.matVec(eye_min_rr, js, _ctemp);
-
     ut.s_mult(_ctemp, omega_mu, js_tot_factor);
 
     ut.ext(r_hat, ms, _ctemp);
     ut.s_mult(_ctemp, k, ms_tot_factor);
 
+    omega_eps = C_L * k * EPS;
+    
+    ut.matVec(eye_min_rr, ms, _ctemp);
+    ut.s_mult(_ctemp, omega_eps, ms_tot_factor_h);
+
+    ut.ext(r_hat, js, _ctemp);
+    ut.s_mult(_ctemp, k, js_tot_factor_h);
+    
     for (int n=0; n<3; n++)
     {
         e[n] = -js_tot_factor[n] + ms_tot_factor[n];
+        h[n] = -ms_tot_factor[n] - js_tot_factor[n];
     }
 
-    return e;
+    out[0] = e;
+    out[1] = h;
+    return out;
 }
 
 /**

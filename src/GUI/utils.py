@@ -3,12 +3,13 @@ from PySide2.QtCore import Qt, QRegExp
 from PySide2.QtGui import QRegExpValidator
 from enum import Enum, auto
 
-# class validation(Enum):
-#     integers = auto()
-
+##
+# Raised when an inputDescription is created incorrectly  
 class InputDescriptionError(Exception):
     pass
 
+##
+# Enum containing the possible types for an inputDescription 
 class inType(Enum):
     static = 0
     vectorStrings = 1
@@ -22,7 +23,8 @@ class inType(Enum):
     dynamicRadio = 9
     elementSelector = 10
 
-
+##
+# Enum containing workspace sections  
 class WSSections(Enum):
     Element = 0
     RayTraceFrame = 1

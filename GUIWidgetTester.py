@@ -7,7 +7,7 @@ from src.GUI.ParameterForms.simpleInputWidgets import ElementSelectionWidget
 import traceback
 
 from src.GUI.WorkSpace import Workspace
-
+# 
 
 app = QApplication(sys.argv)
 

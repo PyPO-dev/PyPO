@@ -72,7 +72,7 @@ def calcRTtiltSTD(frame):
     return np.array([stdt_x, stdt_y, stdt_z])# / np.linalg.norm(np.array([stdt_x, stdt_y, stdt_z]))
 
 ##
-# Calcuate root-mean-square (RMS) of a ray-trace frame.
+# Calculate root-mean-square (RMS) of a ray-trace frame.
 #
 # @param frame Frame to calculate RMS of.
 #

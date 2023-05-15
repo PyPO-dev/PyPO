@@ -11,7 +11,7 @@ class resContainer(object):
     # Also creates a member variable, in which the EH/JM labels are stored for the getter/setter functions. 
     #
     # @param args Sequence of EH/JM components.
-    # @param restype Whether object is a field ("EH") or a current ("JM"). Default is "EH"
+    # @param restype Whether object is a field ("EH") or a current ("JM"). Default is "EH".
     def __init__(self, *args, restype=None):
         self.type = "EH" if restype is None else restype
         self.memlist = []

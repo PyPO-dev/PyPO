@@ -1,3 +1,7 @@
+##
+# @file
+# Functions to set context for the logging and error checking.
+
 def setContext(_context=None):
     global context
     context = "S" if _context is None else _context

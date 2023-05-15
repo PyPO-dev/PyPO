@@ -829,7 +829,7 @@ class MainWidget(QWidget):
     def addPropRaysAction(self): 
         try:
             propRaysDict = self.ParameterWid.read()
-            chk.check_runRTDict(propRaysDict, self.stm, self.stm.frames, self.clog)
+            chk.check_runRTDict(propRaysDict, self.stm.system, self.stm.frames, self.clog)
         
             self.stm.runRayTracer(propRaysDict)
             self.addFrameWidget(propRaysDict["fr_out"])

@@ -3,7 +3,7 @@
 /*! \file InterfaceBeam.cpp
     \brief Implementations for beam initialization interface.
     
-    Implementation of interface for initializing ray-trace frames, Gaussian beams and custom beams by calculating currents.
+    Implementation of interface for initializing ray-trace frames and PO beams.
 */
 
 /**

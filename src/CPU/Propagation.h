@@ -336,7 +336,7 @@ void Propagation<T,U, V, W>::propagateBeam_JM(int start, int stop,
  * @param cs Pointer to reflcontainer or reflcontainerf object containing source grids.
  * @param ct Pointer to reflcontainer or reflcontainerf object containing target grids.
  * @param currents Pointer to c2Bundle or c2Bundlef object containing currents on source.
- * @param res Pointer to c2Bundle or c2Bundlef object, to be filled with caculation results.
+ * @param res Pointer to c2Bundle or c2Bundlef object, to be filled with calculation results.
  *
  * @see reflcontainer
  * @see reflcontainerf
@@ -394,7 +394,7 @@ void Propagation<T, U, V, W>::propagateBeam_EH(int start, int stop,
  * @param cs Pointer to reflcontainer or reflcontainerf object containing source grids.
  * @param ct Pointer to reflcontainer or reflcontainerf object containing target grids.
  * @param currents Pointer to c2Bundle or c2Bundlef object containing currents on source.
- * @param res Pointer to c4Bundle or c4Bundlef object, to be filled with caculation results.
+ * @param res Pointer to c4Bundle or c4Bundlef object, to be filled with calculation results.
  *
  * @see reflcontainer
  * @see reflcontainerf
@@ -557,7 +557,7 @@ void Propagation<T, U, V, W>::propagateBeam_JMEH(int start, int stop,
  * @param cs Pointer to reflcontainer or reflcontainerf object containing source grids.
  * @param ct Pointer to reflcontainer or reflcontainerf object containing target grids.
  * @param currents Pointer to c2Bundle or c2Bundlef object containing currents on source.
- * @param res Pointer to c2rBundle or c2rBundlef object, to be filled with caculation results.
+ * @param res Pointer to c2rBundle or c2rBundlef object, to be filled with calculation results.
  *
  * @see reflcontainer
  * @see reflcontainerf
@@ -684,7 +684,7 @@ void Propagation<T, U, V, W>::propagateBeam_EHP(int start, int stop,
  * @param cs Pointer to reflcontainer or reflcontainerf object containing source grids.
  * @param ct Pointer to reflcontainer or reflcontainerf object containing target grids.
  * @param field Pointer to arrC1 or arrC1f object containing field on source.
- * @param res Pointer to arrC1 or arrC1f object, to be filled with caculation results.
+ * @param res Pointer to arrC1 or arrC1f object, to be filled with calculation results.
  *
  * @see reflcontainer
  * @see reflcontainerf
@@ -1094,7 +1094,7 @@ void Propagation<T, U, V, W>::parallelPropScalar(V *cs, V *ct,
  * @param cs Pointer to reflcontainer or reflcontainerf object containing source grids.
  * @param ct Pointer to reflcontainer or reflcontainerf object containing target grids.
  * @param currents Pointer to c2Bundle or c2Bundlef object containing currents on source.
- * @param res Pointer to c2Bundle or c2Bundlef object, to be filled with caculation results.
+ * @param res Pointer to c2Bundle or c2Bundlef object, to be filled with calculation results.
  *
  * @see reflcontainer
  * @see reflcontainerf

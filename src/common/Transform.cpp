@@ -22,8 +22,6 @@ void transformRays(cframe *fr, double *mat)
         inp[1] = fr->y[i];
         inp[2] = fr->z[i];
 
-        //if (inv) {ut.invmatVec4(ctp.transf, inp, out);}
-        //else {ut.matVec4(ctp.transf, inp, out);}
         ut.matVec4(mat, inp, out);
         
         fr->x[i] = out[0];
@@ -34,8 +32,6 @@ void transformRays(cframe *fr, double *mat)
         inp[1] = fr->dy[i];
         inp[2] = fr->dz[i];
 
-        //if (inv) {ut.invmatVec4(ctp.transf, inp, out, vec);}
-        //else {ut.matVec4(ctp.transf, inp, out, vec);}
         ut.matVec4(mat, inp, out, vec);
         
         fr->dx[i] = out[0];
@@ -64,8 +60,6 @@ void transformFields(c2Bundle *fields, double *mat, int nTot)
         inp[1] = fields->r1y[i];
         inp[2] = fields->r1z[i];
 
-        //if (inv) {ut.invmatVec4(ctp.transf, inp, out);}
-        //else {ut.matVec4(ctp.transf, inp, out);}
         ut.matVec4(mat, inp, out, vec);
         //printf("%d\n", len);        
         fields->r1x[i] = out[0];
@@ -76,8 +70,6 @@ void transformFields(c2Bundle *fields, double *mat, int nTot)
         inp[1] = fields->i1y[i];
         inp[2] = fields->i1z[i];
 
-        //if (inv) {ut.invmatVec4(ctp.transf, inp, out);}
-        //else {ut.matVec4(ctp.transf, inp, out);}
         ut.matVec4(mat, inp, out, vec);
         
         fields->i1x[i] = out[0];
@@ -88,8 +80,6 @@ void transformFields(c2Bundle *fields, double *mat, int nTot)
         inp[1] = fields->r2y[i];
         inp[2] = fields->r2z[i];
 
-        //if (inv) {ut.invmatVec4(ctp.transf, inp, out);}
-        //else {ut.matVec4(ctp.transf, inp, out);}
         ut.matVec4(mat, inp, out, vec);
         
         fields->r2x[i] = out[0];
@@ -100,8 +90,6 @@ void transformFields(c2Bundle *fields, double *mat, int nTot)
         inp[1] = fields->i2y[i];
         inp[2] = fields->i2z[i];
 
-        //if (inv) {ut.invmatVec4(ctp.transf, inp, out);}
-        //else {ut.matVec4(ctp.transf, inp, out);}
         ut.matVec4(mat, inp, out, vec);
         
         fields->i2x[i] = out[0];

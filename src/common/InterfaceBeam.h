@@ -13,7 +13,7 @@
 /*! \file InterfaceBeam.h
     \brief Header for beam initialization interface.
     
-    Declaration of interface for initializing ray-trace frames, Gaussian beams and custom beams by calculating currents.
+    Declaration of interface for initializing ray-trace frames and PO beams.
 */
 
 extern "C"

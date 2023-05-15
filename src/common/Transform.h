@@ -18,7 +18,7 @@
 #define __Transform_h
 
 /*! \file Transform.h
-    \brief Transformations for frames and fields/currents.
+    \brief Declaration of transformations for frames and fields/currents.
 */
 extern "C"
 {

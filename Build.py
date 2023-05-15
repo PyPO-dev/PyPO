@@ -107,16 +107,21 @@ def BuildPyPO():
             clog.error("Could not build PyPO.")
 
     if args.docs:
+        doc_path = os.path.join("..", "PyPO-docs", "docs")
         try:
             try:
                 shutil.rmtree("docs")
+            except:
+                pass
+            try:
+                shutil.rmtree(doc_path)
             except:
                 pass
             clog.info("Generating PyPO documentation...")
             os.system("doxygen doxy/Doxyfile")
             
             # Convert md for GUI tutorials to html and copy to /docs
-            guitut_path = os.path.join("tutorials", "Gui")
+            guitut_path = os.path.join("..", "PyPO-tutorials", "tutorials", "Gui")
             
             file_md = []
             for (dirpath, dirnames, filenames) in os.walk(guitut_path):
@@ -151,9 +156,11 @@ def BuildPyPO():
             with open(filelist_path, 'w') as file:
                 file.write(filedata)
 
+            shutil.move("docs", doc_path)
             clog.info("Succesfully generated PyPO documentation.")
         
-        except:
+        except Exception as err:
+            print(err)
             clog.error("Failed to generate documentation. Is doxygen installed?")
     
     if args.test:

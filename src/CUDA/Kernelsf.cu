@@ -750,10 +750,11 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
 __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
                                 cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
                                 cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz,
-                                float (&r_hat)[3], float *d_A, cuFloatComplex (&e)[3])
+                                float (&r_hat)[3], float *d_A, cuFloatComplex (&e)[3], cuFloatComplex (&h)[3])
 {
     // Scalars (float & complex float)
     float omega_mu;                       // Angular frequency of field times mu
+    float omega_eps;                       // Angular frequency of field times eps
     float r_hat_in_rp;                 // r_hat dot product r_prime
 
     // Arrays of floats
@@ -766,6 +767,8 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
     cuFloatComplex _ctemp[3];
     cuFloatComplex js_tot_factor[3];
     cuFloatComplex ms_tot_factor[3];
+    cuFloatComplex js_tot_factor_h[3];
+    cuFloatComplex ms_tot_factor_h[3];
     cuFloatComplex expo;
     cuFloatComplex cfact;
 
@@ -780,6 +783,10 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
     e[0] = con[8];
     e[1] = con[8];
     e[2] = con[8];
+    
+    h[0] = con[8];
+    h[1] = con[8];
+    h[2] = con[8];
 
     for(int i=0; i<g_s; i++)
     {
@@ -808,9 +815,18 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
     ext(r_hat, ms, _ctemp);
     s_mult(_ctemp, con[0].x, ms_tot_factor);
 
+    omega_eps = con[5].x * con[0].x * con[1].x;
+    
+    matVec(eye_min_rr, ms, _ctemp);
+    s_mult(_ctemp, omega_eps, ms_tot_factor_h);
+
+    ext(r_hat, js, _ctemp);
+    s_mult(_ctemp, -con[0].x, js_tot_factor_h);
+    
     for (int n=0; n<3; n++)
     {
         e[n] = cuCsubf(ms_tot_factor[n], js_tot_factor[n]);
+        h[n] = cuCsubf(js_tot_factor_h[n], ms_tot_factor_h[n]);
     }
 }
 
@@ -854,6 +870,7 @@ void __global__ GpropagateBeam_4(float *d_xs, float *d_ys, float *d_zs,
 
     // Arrays of complex floats
     cuFloatComplex e[3];            // far-field E-field
+    cuFloatComplex h[3];            // far-field H-field
 
     int idx = blockDim.x*blockIdx.x + threadIdx.x;
     if (idx < g_t)
@@ -869,15 +886,15 @@ void __global__ GpropagateBeam_4(float *d_xs, float *d_ys, float *d_zs,
         farfieldAtPoint(d_xs, d_ys, d_zs,
                       d_Jx, d_Jy, d_Jz,
                       d_Mx, d_My, d_Mz,
-                      r_hat, d_A, e);
+                      r_hat, d_A, e, h);
 
         d_Ext[idx] = e[0];
         d_Eyt[idx] = e[1];
         d_Ezt[idx] = e[2];
 
-        d_Hxt[idx] = e[0];
-        d_Hyt[idx] = e[1];
-        d_Hzt[idx] = e[2];
+        d_Hxt[idx] = h[0];
+        d_Hyt[idx] = h[1];
+        d_Hzt[idx] = h[2];
     }
 }
 

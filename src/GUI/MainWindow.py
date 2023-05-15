@@ -38,18 +38,15 @@ import src.PyPO.Checks as chk
 # MainWidget is responsible for all gui functionalities
 #
 class MainWidget(QWidget):
+    
     ##
-    # Constructor. Configures the layout and initializes the underlying system
+    # Constructor. Configures the layout and initializes the underlying system.
+    #
     # @see System
-    # 
-    # 
-
     def __init__(self, parent=None):
         super().__init__(parent)
         # Window settings
         self.setWindowTitle("PyPO")
-
-
 
         # GridParameters
         self.grid = QGridLayout()
@@ -59,10 +56,10 @@ class MainWidget(QWidget):
         self.GPConsole        = [1, 2, 1, 1]
 
         self._mkConsole()
+        
         # init System
         self.clog_mgr = CustomGUILogger(os.path.basename(__file__))
         self.clog = self.clog_mgr.getCustomGUILogger(self.console)
-        #self.clog.info(f"STARTED PyPO GUI SESSION.")
         
         self.stm = st.System(redirect=self.clog, context="G", override=False)
        
@@ -71,7 +68,6 @@ class MainWidget(QWidget):
 
         # init layout
         self.grid.setContentsMargins(5,5,5,5)
-        # self.grid.setMargin(0)
         self.grid.setSpacing(5)
 
         self._mkWorkSpace()
@@ -83,9 +79,7 @@ class MainWidget(QWidget):
         self.threadpool = QThreadPool()
         self.subprocessManager = SubprocessManager(self)
 
-        # NOTE Raytrace stuff
         self.frameDict = {}
-        # end NOTE
 
     ### Gui setup functions
     ##

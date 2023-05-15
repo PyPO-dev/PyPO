@@ -2,14 +2,16 @@ from PySide2.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout
 from PySide2.QtCore import Qt
 
 ##
-# @file An implementation of an accordion component
-#   
+# @file An implementation of an accordion component.
+#  
+
+##
+# Class to implement an Accordion widget.
 class Accordion(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         layout = QVBoxLayout()
         self.setLayout(layout)
-        # layout.setContentsMargins(0,0,0,0)
         layout.setAlignment(Qt.AlignTop)
 
         self.POFields = self.AccordionSection("Fields")
@@ -19,6 +21,8 @@ class Accordion(QWidget):
         layout.addWidget(self.POCurrents)
         layout.addWidget(self.SPOFields)
             
+    ##
+    # Define section of Accordian.
     class AccordionSection(QWidget):
         def __init__(self, text, parent=None):
             super().__init__(parent)

@@ -3,7 +3,7 @@ from src.GUI.utils import inType, InputDescriptionError
 
 ##
 # @file 
-# Defines an attr dataclass used to store the data of parameter forms
+# Defines an attr dataclass used to store the data of parameter forms.
 # 
 
 ## 
@@ -14,55 +14,67 @@ from src.GUI.utils import inType, InputDescriptionError
 # the values a list of inputDescriptions. These lists are fed into new form generators allowing for nested forms.   
 @define
 class InputDescription:
-    ## @var inType: determines the type of the input
+    ## 
+    # Determines the type of the input.
     # 
-    # @see inType 
+    # @see inType
     inType : inType= field()
+    
     ##
-    #  @var OutputName: string representing the key in the output dictionary 
+    # String representing the key in the output dictionary.
     outputName = field(default=None)
+    
     ##
-    #  @var Label for the form, if not set then the outputName will be used 
+    # Label for the form, if not set then the outputName will be used.
     label = field(default=None)
+    
     ##
-    # @var staticValue
-    #
     # Value to be output if inType is static. In such case the user is not able to interact with the input 
-    # field this value represents the predetermined output  
+    # field. This value represents the predetermined output.
     staticValue = field(default=None)
+    
     ##
-    # List of values, used if inType is a vector type. Can be used as hints or as prefilled values if 'prefill' is True
-    # Also used in 'SimpleRadio', 'SimpleDropdown' and 'ElementSelectionWidget' to display in stead of options. In such
-    # case options are still used to read the form but this way you can make a difference between what the user sees and 
-    # how the choice is interpreted.  
+    # List of values, used if inType is a vector type. Can be used as hints or as prefilled values if 'prefill' is True.
+    # Also used in 'SimpleRadio', 'SimpleDropdown' and 'ElementSelectionWidget' to display hints instead of options. In such
+    # cases options are still used to read the form, but this way you can make a difference between what the user sees and 
+    # how the choice is interpreted.
     hints = field(default=Factory(list))
+    
     ##
     # Number of input fields, used if inType is a vector type. 
     numFields = field(default=None)
+    
     ##
-    # Determines wether the output will be converted to a numpy array, used if inType is a vector type 
+    # Determines wether the output will be converted to a numpy array, used if inType is a vector type.
     oArray = field(default=None)
+    
     ##
-    # Dictionary containing strings as keys and lists of inputDescriptions as values. Used to nest 
-    # forms if inType is a dynamic type 
+    # Dictionary containing strings as keys and lists of inputDescriptions as values. Used to nest
+    # forms if inType is a dynamic type.
     subDict = field(default=None)
+    
     ##
-    # List of options used in 'SimpleRadio', 'SimpleDropdown' and 'ElementSelectionWidget' to provide options
+    # List of options used in 'SimpleRadio', 'SimpleDropdown' and 'ElementSelectionWidget' to provide options.
+    #
     # @see hints 
     options = field(default=None)
+    
     ##
-    # Hides the input 
-    # Used in case of a static input to hide the input
+    # Hides the input.
+    # Used in case of a static input to hide the input.
     hidden = field(default=False)
+    
     ##
-    # used by all inputs to provide a tooltip
+    # used by all inputs to provide a tooltip.
     toolTip = field(default=None)
+    
     ##
-    # If true a vector type input will use the hints as prefilled values
-    # If true a checkbox input will be checked by default
+    # If true a vector type input will use the hints as prefilled values.
+    # If true a checkbox input will be checked by default.
     prefill = field(default=False)
 
-
+    ##
+    # General validation of inputDescriptions.
     def __attrs_post_init__(self):
         vectorTypes = [inType.vectorFloats, inType.vectorIntegers, inType.vectorStrings]
         selectionTypes = [inType.radio, inType.dropdown]

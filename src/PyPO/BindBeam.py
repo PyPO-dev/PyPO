@@ -14,7 +14,7 @@ import src.PyPO.Threadmgr as TManager
 # These bindings are concerned with beam generation for the ray-tracer and the physical optics.
 
 ##
-# Load the pypobeam shared library. Will detect the operating system and link the library accordingly.
+# Load the PyPObeam shared library. Will detect the operating system and link the library accordingly.
 #
 # @returns lib The ctypes library containing the C/C++ functions.
 def loadBeamlib():
@@ -50,24 +50,24 @@ def loadBeamlib():
 # Generate a tubular ray-trace frame.
 # The tube consists of annular rings of rays and can be given opening angles and radii.
 #
-# @param rdict_py A filled TubeRTDict.
+# @param RTDict_py A filled TubeRTDict.
 #
 # @returns out A frame object containing the ray-trace frame.
 #
 # @see TubeRTDict
 # @see frame
-def makeRTframe(rdict_py):
+def makeRTframe(RTDict_py):
     lib = loadBeamlib()
 
-    nTot = 1 + rdict_py["nRays"] * 4 * rdict_py["nRing"]
+    nTot = 1 + RTDict_py["nRays"] * 4 * RTDict_py["nRing"]
 
-    c_rdict = RTDict()
+    RTDict_c = RTDict()
     res = cframe()
 
     allocate_cframe(res, nTot, ctypes.c_double)
-    allfill_RTDict(c_rdict, rdict_py, ctypes.c_double)
+    allfill_RTDict(RTDict_c, RTDict_py, ctypes.c_double)
 
-    lib.makeRTframe(c_rdict, ctypes.byref(res))
+    lib.makeRTframe(RTDict_c, ctypes.byref(res))
 
     shape = (nTot,)
     out = frameToObj(res, np_t=np.float64, shape=shape)
@@ -176,7 +176,7 @@ def makeScalarGauss(gdict_py, source):
     return out_field
 
 ##
-# Calculate electyromagnetic currents from electromagnetic field.
+# Calculate electromagnetic currents from electromagnetic field.
 #
 # @param fields Fields object containing electromagnetic fields.
 # @param source A reflDict dictionary describing the plane on which the Gaussian is defined.

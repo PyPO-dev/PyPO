@@ -8,7 +8,6 @@
 
 // Declare constant memory for Device
 __constant__ cuFloatComplex con[CSIZE];     // Contains: k, eps, mu0, zeta0, pi, C_l, Time direction, unit, zero, c4 as complex numbers
-//__constant__ cuDoubleComplex con[CSIZE];
 
 __constant__ float eye[3][3];      // Identity matrix
 __constant__ int g_s;               // Gridsize on source
@@ -296,7 +295,7 @@ __global__ void GpropagateBeam_0(float *d_xs, float *d_ys, float *d_zs,
                     d_Mx, d_My, d_Mz,
                     point, d_A, d_ei, d_hi);
 
-        // Calculate normalised incoming poynting vector.
+        // Calculate normalised incoming Poynting vector.
         conja(d_hi, temp1);                        // h_conj
         ext(d_ei, temp1, temp2);                  // e_out_h
 
@@ -312,7 +311,7 @@ __global__ void GpropagateBeam_0(float *d_xs, float *d_ys, float *d_zs,
         normalize(S_out_n, p_i_perp);                       // p_i_perp
         ext(p_i_perp, S_i_norm, p_i_parr);               // p_i_parr
 
-        // Now calculate reflected poynting vector.
+        // Now calculate reflected Poynting vector.
         snell(S_i_norm, norms, S_r_norm);                // S_r_norm
 
         // Calculate normalised reflected polarization vectors
@@ -526,7 +525,7 @@ __global__ void GpropagateBeam_2(float *d_xs, float *d_ys, float *d_zs,
         d_Hyt[idx] = d_hi[1];
         d_Hzt[idx] = d_hi[2];
 
-        // Calculate normalised incoming poynting vector.
+        // Calculate normalised incoming Poynting vector.
         conja(d_hi, temp1);                        // h_conj
         ext(d_ei, temp1, temp2);                  // e_out_h
 
@@ -542,7 +541,7 @@ __global__ void GpropagateBeam_2(float *d_xs, float *d_ys, float *d_zs,
         normalize(S_out_n, p_i_perp);                       // p_i_perp
         ext(p_i_perp, S_i_norm, p_i_parr);               // p_i_parr
 
-        // Now calculate reflected poynting vector.
+        // Now calculate reflected Poynting vector.
         snell(S_i_norm, norms, S_r_norm);                // S_r_norm
 
         // Calculate normalised reflected polarization vectors
@@ -675,7 +674,7 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
                     d_Mx, d_My, d_Mz,
                     point, d_A, d_ei, d_hi);
 
-        // Calculate normalised incoming poynting vector.
+        // Calculate normalised incoming Poynting vector.
         conja(d_hi, temp1);                        // h_conj
         ext(d_ei, temp1, temp2);                  // e_out_h
 
@@ -693,10 +692,10 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
         normalize(S_out_n, p_i_perp);                       // p_i_perp
         ext(p_i_perp, S_i_norm, p_i_parr);               // p_i_parr
 
-        // Now calculate reflected poynting vector.
+        // Now calculate reflected Poynting vector.
         snell(S_i_norm, norms, S_r_norm);                // S_r_norm
 
-        // Store REFLECTED Pynting vectors
+        // Store REFLECTED Poynting vectors
         d_Prxt[idx] = S_r_norm[0];
         d_Pryt[idx] = S_r_norm[1];
         d_Przt[idx] = S_r_norm[2];
@@ -898,6 +897,20 @@ void __global__ GpropagateBeam_4(float *d_xs, float *d_ys, float *d_zs,
     }
 }
 
+
+/**
+ * Calculate scalarfield on target.
+ *
+ * Kernel for calculating scalarfield on a target.
+ *
+ * @param d_xs Array containing source points x-coordinate.
+ * @param d_ys Array containing source points y-coordinate.
+ * @param d_zs Array containing source points z-coordinate.
+ * @param d_sfs Array containing source scalarfield.
+ * @param point Array containing target point.
+ * @param d_A Array containing area elements.
+ * @param e Array to be filled with results.
+ */
 void __device__ scalarfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
                                    cuFloatComplex *d_sfs, float (&point)[3], float *d_A, cuFloatComplex &e)
 {

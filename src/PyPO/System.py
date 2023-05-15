@@ -212,7 +212,7 @@ class System(object):
         reflDict["type"] = 0
 
         _reflDict = self.copyObj(reflDict)
-        check_ElemDict(_reflDict, self.system.keys(), self.num_ref, self.clog) 
+        check_ElemDict(_reflDict, self.system.keys(), self.clog) 
         self.system[_reflDict["name"]] = _reflDict
 
         if _reflDict["pmode"] == "focus":
@@ -264,7 +264,7 @@ class System(object):
 
         reflDict["type"] = 1
         _reflDict = self.copyObj(reflDict)
-        check_ElemDict(_reflDict, self.system.keys(), self.num_ref, self.clog) 
+        check_ElemDict(_reflDict, self.system.keys(), self.clog) 
         self.system[_reflDict["name"]] = _reflDict
         
         if _reflDict["pmode"] == "focus":
@@ -324,7 +324,7 @@ class System(object):
 
         reflDict["type"] = 2
         _reflDict = self.copyObj(reflDict)
-        check_ElemDict(_reflDict, self.system.keys(), self.num_ref, self.clog) 
+        check_ElemDict(_reflDict, self.system.keys(), self.clog) 
         self.system[_reflDict["name"]] = _reflDict
         
         if _reflDict["pmode"] == "focus":
@@ -387,7 +387,7 @@ class System(object):
 
         reflDict["type"] = 3
         _reflDict = self.copyObj(reflDict)
-        check_ElemDict(_reflDict, self.system.keys(), self.num_ref, self.clog) 
+        check_ElemDict(_reflDict, self.system.keys(), self.clog) 
         
         self.system[_reflDict["name"]] = _reflDict
         self.system[_reflDict["name"]]["coeffs"] = np.zeros(3)

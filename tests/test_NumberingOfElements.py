@@ -1,12 +1,12 @@
 import unittest
 import numpy as np
-from src.PyPO.System import System as pypoSystem
+from src.PyPO.System import System as PyPOSystem
 from src.PyPO.Checks import InputReflError, InputRTError, InputPOError
 
 
 class Test_SystemDictsAndAddElement(unittest.TestCase):
     def setUp(self) -> None:
-        self.s = pypoSystem(override=False, verbose=False)
+        self.s = PyPOSystem(override=False, verbose=False)
 
     def test_namingReflector(self):
         validParabola = {

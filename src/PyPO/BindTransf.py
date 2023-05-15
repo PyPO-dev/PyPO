@@ -76,9 +76,6 @@ def transformPO(obj, transf):
     
     if obj.type == "JM":
         obj_type = "currents"
-        #currentConv(obj, res, obj.size, ctypes.c_double)
-    
-        #fieldConv(obj, res, obj.size, ctypes.c_double)
    
     nTot = ctypes.c_int(obj.size)
 

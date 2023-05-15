@@ -121,7 +121,7 @@ class ElementWidget(QWidget):
 
 
 class ReflectorWidget(ElementWidget):
-    def __init__(self, name, removeAction, transformAction, plotAction, snapAction, copyAction, removeWid=None, p=None): ##TODO: rename removeWid to remove?
+    def __init__(self, name, removeAction, transformAction, plotAction, snapAction, copyAction, removeWid=None, p=None):
         super().__init__(name, plotAction, removeAction, transformAction=transformAction, 
                 removeWid=removeWid, snapAction=snapAction, copyAction=copyAction, p=p)
 

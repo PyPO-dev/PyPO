@@ -1227,7 +1227,7 @@ class MainWidget(QWidget):
             dialStr = f"Calculating frame and field on {propBeamDict['t_name']}..."
 
 
-            s_copy = copySystem(self.stm, cSystem=True, cFields = fields, cFrames=frames)
+            s_copy = copySystem(self.stm, cSystem=True, cFields = fields, cFrames=frames, cAssoc = self.stm.assoc)
 
             mgr = Manager()
             returnDict = mgr.dict()

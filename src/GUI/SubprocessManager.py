@@ -5,13 +5,15 @@ from time import sleep
 from copy import deepcopy
 import src.PyPO.System as st
 
-
+##
+# @file Contains the tools to run a function in a subprocess
 class SubprocessManager():
     def __init__(self, parentWidget) -> None:
         self.parentWidget = parentWidget
         self.subProcessRunning = False
 
-
+    ##
+    # To be connected to the finished signal of the waiter object  
     def waiterFinished(self , success):
         if success:
             self.currentCalculationDialog.accept()
@@ -19,7 +21,11 @@ class SubprocessManager():
             self.currentCalculationDialog.reject()
         self.subProcessRunning = False
 
-
+    ## 
+    # Runs a function in a subprocess
+    # @param work Function to be run in subprocess 
+    # @param args Tuple of the arguments work takes 
+    # @param dialogText String to be shown in the waiting dialog; defaults to "Calculating"
     def runInSubprocess(self, work, args, dialogText = ""):
         if self.subProcessRunning:
             return
@@ -45,6 +51,8 @@ class SubprocessManager():
         self.waiterThread.quit()
         return res
             
+## 
+# QObject Waits until process is finished and emits a signal
 class Waiter(QObject):
     finished = Signal(int)
 
@@ -53,26 +61,32 @@ class Waiter(QObject):
 
     def run(self):
         self.process.join()
-        print("waiter: Process joined")
         self.finished.emit(self.process.exitcode==0)
 
-
+##
+# Makes a copy of system, deep copies some dictionaries.
+#  @param system The System object to be copied
+#  @param cSystem Boolean determines wether to copy the system.system dictionary
+#  @param cFrames Boolean determines wether to copy the system.Frames dictionary
+#  @param cFields Boolean determines wether to copy the system.Fields dictionary
+#  @param cCurrents Boolean determines wether to copy the system.Currents dictionary
+#  @param cScalarFields Boolean determines wether to copy the system.ScalarFields dictionary
 def copySystem(system :st.System, cSystem = True, cFrames = None, cFields = None, cCurrents = None, cScalarFields = None):
     cFrames = [] if cFrames is None else cFrames
     cFields = [] if cFields is None else cFields
     cCurrents = [] if cCurrents is None else cCurrents
     cScalarFields = [] if cScalarFields is None else cScalarFields
     
-    s2 = st.System(context="G", override=False)
+    sCopy = st.System(context="G", override=False)
     if cSystem:
-        s2.system.update(deepcopy(system.system))
+        sCopy.system.update(deepcopy(system.system))
     for frame in cFrames:
-        s2.frames[frame] = system.frames[frame]
+        sCopy.frames[frame] = system.frames[frame]
     for field in cFields:
-        s2.fields[field] = system.fields[field]
+        sCopy.fields[field] = system.fields[field]
     for current in cCurrents:
-        s2.currents[current] = system.currents[current]
+        sCopy.currents[current] = system.currents[current]
     for sField in cScalarFields:
-        s2.scalarfields[sField] = system.scalarfields[sField]
-    return s2
+        sCopy.scalarfields[sField] = system.scalarfields[sField]
+    return sCopy
 

@@ -69,10 +69,10 @@ class Waiter(QObject):
 # 
 # @param system The System object to be copied
 # @param cSystem Boolean determines wether to copy the system.system dictionary
-# @param cFrames Boolean determines wether to copy the system.Frames dictionary
-# @param cFields Boolean determines wether to copy the system.Fields dictionary
-# @param cCurrents Boolean determines wether to copy the system.Currents dictionary
-# @param cScalarFields Boolean determines wether to copy the system.ScalarFields dictionary
+# @param cFrames list of Frames to copy
+# @param cFields list of Fields to copy
+# @param cCurrents list of Currents to copy
+# @param cScalarFields list of ScalarFields to copy
 def copySystem(system :st.System, cSystem = True, cFrames = None, cFields = None, cCurrents = None, cScalarFields = None):
     cFrames = [] if cFrames is None else cFrames
     cFields = [] if cFields is None else cFields

@@ -66,6 +66,15 @@ class Waiter(QObject):
 
 ##
 # Makes a copy of system, deep copies some dictionaries.
+<<<<<<< HEAD
+#  @param system The System object to be copied
+#  @param cSystem Boolean determines wether to copy the system.system dictionary
+#  @param cFrames Boolean determines wether to copy the system.Frames dictionary
+#  @param cFields Boolean determines wether to copy the system.Fields dictionary
+#  @param cCurrents Boolean determines wether to copy the system.Currents dictionary
+#  @param cScalarFields Boolean determines wether to copy the system.ScalarFields dictionary
+def copySystem(system :st.System, cSystem = True, cFrames = None, cFields = None, cCurrents = None, cScalarFields = None, cAssoc = None):
+=======
 # 
 # @param system The System object to be copied
 # @param cSystem Boolean determines wether to copy the system.system dictionary
@@ -74,10 +83,12 @@ class Waiter(QObject):
 # @param cCurrents list of Currents to copy
 # @param cScalarFields list of ScalarFields to copy
 def copySystem(system :st.System, cSystem = True, cFrames = None, cFields = None, cCurrents = None, cScalarFields = None):
+>>>>>>> fcf48421ccc4f924c1a3109ed59aae6d72949597
     cFrames = [] if cFrames is None else cFrames
     cFields = [] if cFields is None else cFields
     cCurrents = [] if cCurrents is None else cCurrents
     cScalarFields = [] if cScalarFields is None else cScalarFields
+    cAssoc = [] if cAssoc is None else cAssoc
     
     sCopy = st.System(context="G", override=False)
     if cSystem:
@@ -90,5 +101,7 @@ def copySystem(system :st.System, cSystem = True, cFrames = None, cFields = None
         sCopy.currents[current] = system.currents[current]
     for sField in cScalarFields:
         sCopy.scalarfields[sField] = system.scalarfields[sField]
+    for sAs in cAssoc:
+        sCopy.assoc[sAs] = system.assoc[sAs]
     return sCopy
 

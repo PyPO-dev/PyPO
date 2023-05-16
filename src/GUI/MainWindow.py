@@ -106,8 +106,9 @@ class MainWidget(QWidget):
         # rebuild 
         logo = QLabel()
         pixmap = QPixmap('src/GUI/resources/logo.png')
-        pixmap = pixmap.scaledToWidth(300)
+        pixmap = pixmap.scaledToWidth(250)
         logo.setPixmap(pixmap)
+        logo.resize(300, 150)
         self.WorkSpace = Workspace()
         leftPane =  QWidget()
         leftPane.setFixedWidth(300)
@@ -1178,10 +1179,13 @@ class MainWidget(QWidget):
             print(f"{calcSuccess = }")
             if calcSuccess:
                 s_copy = returnDict["system"]
+                print(s_copy.assoc)
                 self.stm.frames.update(s_copy.frames)
                 self.stm.fields.update(s_copy.fields)
                 self.stm.currents.update(s_copy.currents)
                 self.stm.scalarfields.update(s_copy.scalarfields)
+                self.stm.assoc.update(s_copy.assoc)
+                print(self.stm.assoc) 
                 dtime = time() - start_time
                 self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
                 self._addToWidgets(propBeamDict)
@@ -1210,9 +1214,11 @@ class MainWidget(QWidget):
                 hybridDict["interp"] = False
 
             hybridDict["mode"] = "hybrid"
-            print(self.stm.assoc)
+            surf = self.stm.fields[hybridDict["field_in"]].surf
+            
             chk.check_hybridDict(hybridDict, self.stm.system.keys(), self.stm.frames.keys(), self.stm.fields.keys(), self.clog)
-            chk.check_associations(self.stm.assoc, hybridDict["field_in"], hybridDict["fr_in"], self.stm.fields[hybridDict["field_in"]].surf, self.clog)
+            chk.check_associations(self.stm.assoc, hybridDict["field_in"], hybridDict["fr_in"], surf, self.clog)
+
             start_time = time()
         
             self.clog.info("*** Starting PO hybrid propagation ***")
@@ -1226,7 +1232,7 @@ class MainWidget(QWidget):
             dialStr = f"Calculating frame and field on {propBeamDict['t_name']}..."
 
 
-            s_copy = copySystem(self.stm, cSystem=True, cFields = fields, cFrames=frames, cAssoc = list(self.stm.assoc.keys()))
+            s_copy = copySystem(self.stm, cSystem=True, cFields = fields, cFrames=frames, cAssoc = self.stm.assoc)
 
             mgr = Manager()
             returnDict = mgr.dict()
@@ -1241,6 +1247,7 @@ class MainWidget(QWidget):
                 self.stm.fields.update(s_copy.fields)
                 self.stm.currents.update(s_copy.currents)
                 self.stm.scalarfields.update(s_copy.scalarfields)
+                self.stm.assoc.update(s_copy.assoc)
 
                 dtime = time() - start_time
                 self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")

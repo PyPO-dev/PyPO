@@ -427,8 +427,7 @@ def block_ndarray(fieldName, elemDict, shape, cust_name=False):
 # @param elemName Name of element, string.
 # @param nameList List of names in system dictionary.
 # @param clog CustomLogger object.
-def check_ElemDict(elemDict, nameList, clog):
-    
+def check_ElemDict(elemDict, nameList, clog): 
     errStr = ""
    
     elemDict["transf"] = world.INITM() 
@@ -1273,7 +1272,6 @@ def check_aperDict(aperDict, clog):
 def check_ellipseLimits(ellipsoid, clog):
     buff = 1000
     idx_lim = 0
-
     if ellipsoid["coeffs"][1] < ellipsoid["coeffs"][0]:
         idx_lim = 1
 
@@ -1328,9 +1326,27 @@ def check_sameBound(beams, checkDict, clog):
         
         raise MergeBeamError()
 
-
-
-
+##
+# Check if field and frame are associated on the same surface.
+# Used for hybrid propagations.
+# Currently, can only have one single association per surface!
+#
+# @param associations All present associations in system.
+# @param fieldName Name of field to be propagated.
+# @param frameName Name of frame to be propagated.
+# @param surf Name of surface from which a hybrid propagation is performed.
+# @param clog CustomLogger object.
+def check_associations(associations, fieldName, frameName, surf, clog):
+    if surf not in associations.keys():
+        clog.error(f"Surface {surf} not found in associations.")
+        
+        raise HybridPropError
+    
+    else:
+        if (fieldName not in associations[surf]) or (frameName not in associations[surf]):
+            clog.error(f"Field {fieldName} and frame {frameName} are not associated.")
+            
+            raise HybridPropError
 
 
 

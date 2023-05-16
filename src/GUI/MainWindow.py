@@ -1210,6 +1210,7 @@ class MainWidget(QWidget):
                 hybridDict["interp"] = False
 
             hybridDict["mode"] = "hybrid"
+            print(self.stm.assoc)
             chk.check_hybridDict(hybridDict, self.stm.system.keys(), self.stm.frames.keys(), self.stm.fields.keys(), self.clog)
             chk.check_associations(self.stm.assoc, hybridDict["field_in"], hybridDict["fr_in"], self.stm.fields[hybridDict["field_in"]].surf, self.clog)
             start_time = time()
@@ -1225,7 +1226,7 @@ class MainWidget(QWidget):
             dialStr = f"Calculating frame and field on {propBeamDict['t_name']}..."
 
 
-            s_copy = copySystem(self.stm, cSystem=True, cFields = fields, cFrames=frames, cAssoc = self.stm.assoc)
+            s_copy = copySystem(self.stm, cSystem=True, cFields = fields, cFrames=frames, cAssoc = list(self.stm.assoc.keys()))
 
             mgr = Manager()
             returnDict = mgr.dict()

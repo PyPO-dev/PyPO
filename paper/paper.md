@@ -49,16 +49,17 @@ A software package capable of efficient GO and PO calulations through optical sy
 Currently, `PyPO` is also being used in simulations of measured beam patterns of DESHIMA 2.0 at the ASTE [@ASTE] telescope for the analysis of instrument and optical system performance.
 
 Commercial software for GO and PO calculations and analysis, such as OpticStudio (Zemax) and GRASP (TICRA), has already been developed, but to our knowledge `PyPO` is the first free open-source Python package that simulates planar and quadric (off-axis) reflector geometries using both GO and PO. 
-Moreover, `PyPO` does not employ approximations often employed by other software packages such as `POPPy` [@Perrin:2012] and Prysm [@Dube:2019]. Rather, PyPO directly solves the radiation integral, allowing for propagation between multiple (off-axis) reflector surfaces.
+Moreover, `PyPO` does not employ approximations often employed by other software packages such as `POPPy` [@Perrin:2012] and Prysm [@Dube:2019]. 
+Rather, PyPO directly solves the radiation integral, allowing for propagation between multiple (off-axis) reflector surfaces.
 
 # Availability
-`PyPO` can be found on [Github](https://github.com/PyPO-dev/PyPO) and is available for Linux, Windows and MacOS.
+`PyPO` can be found on [Github](https://github.com/PyPO-dev/PyPO) and is available for Linux, MacOS and Windows.
 Software documentation and instructions regarding installation, contributing and issue tracking can be found in the [documentation](https://pypo-dev.github.io/PyPO-docs/).
 The package comes with several Jupyter Notebook tutorials illustrating the workflow and features, and can be used as building blocks for new reflector systems.
 Several tutorials for using the GUI features are also included and can be found in the software documentation.
 
 # Acknowledgements
-We would like to thank dr. Shahab Oddin Dabironezare for useful discussions and proofreading the manuscript.
+We thank Shahab Oddin Dabironezare for useful discussions and proofreading the manuscript.
 This work is supported by the European Union (ERC Consolidator Grant No. 101043486 TIFUUN). Views and opinions expressed are however those of the authors only and do not necessarily reflect those of the European Union or the European Research Council Executive Agency. Neither the European Union nor the granting authority can be held responsible for them.
 
 # References

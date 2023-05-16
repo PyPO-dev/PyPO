@@ -2,7 +2,7 @@
  *
  * \section intro_sec Introduction
  *
- * This is the software documentation of PyPO, a Python Physical Optics package.
+ * This is the software documentation of [PyPO](https://github.com/PyPO-dev/PyPO), a Python Physical Optics package.
  * The goal of these pages is to provide a detailed and comprehensive overview of the source code that makes PyPO run.
  * For information regarding prerequisites, installation, etc., we refer to the [General information](General.md) page.
  *
@@ -19,10 +19,6 @@
  * \subsection license License
  * This project is released under the [MIT License](https://opensource.org/licenses/MIT).
  * \subsection contact Contact
- * 
- * For questions/support concerning the PyPO backend source code, please contact:
- * arendmoerman@gmail.com
- *
- * For questions/support concerning the PyPO GUI, please contact:
- * maikel.gafaji@gmail.com
+ * For questions/support, please contact:
+ * PyPO.dev@gmail.com
  */

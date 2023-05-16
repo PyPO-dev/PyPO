@@ -829,7 +829,7 @@ class MainWidget(QWidget):
     def addPropRaysAction(self): 
         try:
             propRaysDict = self.ParameterWid.read()
-            chk.check_runRTDict(propRaysDict, self.stm, self.stm.frames, self.clog)
+            chk.check_runRTDict(propRaysDict, self.stm.system, self.stm.frames, self.clog)
         
             self.stm.runRayTracer(propRaysDict)
             self.addFrameWidget(propRaysDict["fr_out"])
@@ -1179,10 +1179,13 @@ class MainWidget(QWidget):
             print(f"{calcSuccess = }")
             if calcSuccess:
                 s_copy = returnDict["system"]
+                print(s_copy.assoc)
                 self.stm.frames.update(s_copy.frames)
                 self.stm.fields.update(s_copy.fields)
                 self.stm.currents.update(s_copy.currents)
                 self.stm.scalarfields.update(s_copy.scalarfields)
+                self.stm.assoc.update(s_copy.assoc)
+                print(self.stm.assoc) 
                 dtime = time() - start_time
                 self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
                 self._addToWidgets(propBeamDict)
@@ -1211,8 +1214,10 @@ class MainWidget(QWidget):
                 hybridDict["interp"] = False
 
             hybridDict["mode"] = "hybrid"
+            surf = self.stm.fields[hybridDict["field_in"]].surf
             
             chk.check_hybridDict(hybridDict, self.stm.system.keys(), self.stm.frames.keys(), self.stm.fields.keys(), self.clog)
+            chk.check_associations(self.stm.assoc, hybridDict["field_in"], hybridDict["fr_in"], surf, self.clog)
 
             start_time = time()
         
@@ -1227,7 +1232,7 @@ class MainWidget(QWidget):
             dialStr = f"Calculating frame and field on {propBeamDict['t_name']}..."
 
 
-            s_copy = copySystem(self.stm, cSystem=True, cFields = fields, cFrames=frames)
+            s_copy = copySystem(self.stm, cSystem=True, cFields = fields, cFrames=frames, cAssoc = self.stm.assoc)
 
             mgr = Manager()
             returnDict = mgr.dict()
@@ -1242,6 +1247,7 @@ class MainWidget(QWidget):
                 self.stm.fields.update(s_copy.fields)
                 self.stm.currents.update(s_copy.currents)
                 self.stm.scalarfields.update(s_copy.scalarfields)
+                self.stm.assoc.update(s_copy.assoc)
 
                 dtime = time() - start_time
                 self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")

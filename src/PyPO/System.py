@@ -68,6 +68,7 @@ class System(object):
         self.scalarfields = {}
 
         self.groups = {}
+        self.assoc = {}
 
         self.EHcomplist = np.array(["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"])
         self.JMcomplist = np.array(["Jx", "Jy", "Jz", "Mx", "My", "Mz"])
@@ -1054,6 +1055,8 @@ class System(object):
 
             frame = self.loadFramePoynt(out[1], _runPODict["t_name"])
             self.frames[_runPODict["name_P"]] = frame
+       
+            self.assoc[_runPODict["t_name"]] = [_runPODict["name_EH"], _runPODict["name_P"]]
 
         elif _runPODict["mode"] == "scalar":
             out.setMeta(_runPODict["t_name"], _runPODict["k"])
@@ -1306,6 +1309,8 @@ class System(object):
     
     ##
     # Perform a hybrid RT/PO propagation, starting from a reflected field and set of Poynting vectors.
+    # Stores name of resultant field and frame in self.assoc, as two associated objects.
+    # The name of the association is the surface on which both are defined.
     #
     # @param hybridDict A hybridDict dictionary.
     def runHybridPropagation(self, hybridDict):
@@ -1313,6 +1318,8 @@ class System(object):
         start_time = time.time()
 
         check_hybridDict(hybridDict, self.system, self.frames, self.fields, self.clog)
+        surf = self.fields[hybridDict["field_in"]].surf
+        check_associations(self.assoc, hybridDict["field_in"], hybridDict["fr_in"], surf, self.clog)
 
         field = self.copyObj(self.fields[hybridDict["field_in"]])
 
@@ -1349,7 +1356,8 @@ class System(object):
             self.interpFrame(hybridDict["fr_out"], hybridDict["field_out"], hybridDict["t_name"], hybridDict["field_out"], comp=hybridDict["comp"])
         
         dtime = time.time() - start_time
-        
+
+        self.assoc[hybridDict["t_name"]] = [hybridDict["field_out"], hybridDict["fr_out"]]
         self.clog.work(f"*** Finished: {dtime:.3f} seconds ***")
 
     ##
@@ -2279,6 +2287,7 @@ class System(object):
 
             frame = self.loadFramePoynt(out[1], _runPODict["t_name"])
             self.frames[_runPODict["name_P"]] = frame
+            self.assoc[_runPODict["t_name"]] = [_runPODict["name_EH"], _runPODict["name_P"]]
 
         elif _runPODict["mode"] == "scalar":
             out.setMeta(_runPODict["t_name"], _runPODict["k"])

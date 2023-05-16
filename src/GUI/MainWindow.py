@@ -106,9 +106,8 @@ class MainWidget(QWidget):
         # rebuild 
         logo = QLabel()
         pixmap = QPixmap('src/GUI/resources/logo.png')
-        pixmap = pixmap.scaledToWidth(250)
+        pixmap = pixmap.scaledToWidth(300)
         logo.setPixmap(pixmap)
-        logo.resize(300, 150)
         self.WorkSpace = Workspace()
         leftPane =  QWidget()
         leftPane.setFixedWidth(300)

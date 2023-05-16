@@ -1,7 +1,6 @@
-from multiprocessing import Process, Manager
+from multiprocessing import Process
 from PySide2.QtCore import QThread, Signal, QObject
 from src.GUI.Dialogs import SymDialog
-from time import sleep
 from copy import deepcopy
 import src.PyPO.System as st
 
@@ -13,7 +12,9 @@ class SubprocessManager():
         self.subProcessRunning = False
 
     ##
-    # To be connected to the finished signal of the waiter object  
+    # To be connected to the finished signal of the waiter object 
+    # 
+    # @param success Boolean, determines wether calculation finished successfully 
     def waiterFinished(self , success):
         if success:
             self.currentCalculationDialog.accept()
@@ -65,6 +66,7 @@ class Waiter(QObject):
 
 ##
 # Makes a copy of system, deep copies some dictionaries.
+<<<<<<< HEAD
 #  @param system The System object to be copied
 #  @param cSystem Boolean determines wether to copy the system.system dictionary
 #  @param cFrames Boolean determines wether to copy the system.Frames dictionary
@@ -72,6 +74,16 @@ class Waiter(QObject):
 #  @param cCurrents Boolean determines wether to copy the system.Currents dictionary
 #  @param cScalarFields Boolean determines wether to copy the system.ScalarFields dictionary
 def copySystem(system :st.System, cSystem = True, cFrames = None, cFields = None, cCurrents = None, cScalarFields = None, cAssoc = None):
+=======
+# 
+# @param system The System object to be copied
+# @param cSystem Boolean determines wether to copy the system.system dictionary
+# @param cFrames Boolean determines wether to copy the system.Frames dictionary
+# @param cFields Boolean determines wether to copy the system.Fields dictionary
+# @param cCurrents Boolean determines wether to copy the system.Currents dictionary
+# @param cScalarFields Boolean determines wether to copy the system.ScalarFields dictionary
+def copySystem(system :st.System, cSystem = True, cFrames = None, cFields = None, cCurrents = None, cScalarFields = None):
+>>>>>>> fcf48421ccc4f924c1a3109ed59aae6d72949597
     cFrames = [] if cFrames is None else cFrames
     cFields = [] if cFields is None else cFields
     cCurrents = [] if cCurrents is None else cCurrents

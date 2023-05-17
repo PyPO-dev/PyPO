@@ -16,7 +16,7 @@ authors:
     affiliation: 2
   - name: Kenichi Karatsu
     orcid: 0000-0003-4562-5584
-    affiliation: [1,3]
+    affiliation: "1,3"
   - name: Akira Endo
     orcid: 0000-0003-0379-2341
     affiliation: 1

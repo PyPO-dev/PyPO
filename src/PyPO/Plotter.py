@@ -339,7 +339,6 @@ def plotSystem(systemDict, ax, fine, cmap,norm,
     #ax.set_title("System", fontsize=20)
     world_limits = ax.get_w_lims()
 
-    ax.set_box_aspect((1,1,1))
     ax.tick_params(axis='x', which='major', pad=-3)
 
     if RTframes:
@@ -358,6 +357,7 @@ def plotSystem(systemDict, ax, fine, cmap,norm,
 
     #set_axes_equal(ax)
     ax.minorticks_off()
+    #ax.set_box_aspect((1,1,1))
     ax.set_box_aspect((world_limits[1]-world_limits[0],world_limits[3]-world_limits[2],world_limits[5]-world_limits[4]))
 
 ##

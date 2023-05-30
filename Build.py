@@ -73,7 +73,7 @@ def BuildPyPO():
             clog.warning("Nothing to clean.")
 
     if args.config:
-        dir_lists = os.path.join(os.getcwd(), "src")
+        dir_lists = os.getcwd()
         dir_build = os.path.join(os.getcwd(), "out", "build")
 
         if not os.path.exists(dir_build):

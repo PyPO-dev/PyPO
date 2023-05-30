@@ -1659,10 +1659,11 @@ class System(object):
     # @param show Show plot. Default is True.
     # @param save Save plot to savePath.
     # @param ret Return the Figure and Axis object. Only called by GUI. Default is False.
+    # @param extension Extension type of image to be saved.
     #
     # @returns fig Figure object.
     # @returns ax Axes object.
-    def plotBeamCut(self, name_field, comp, comp_cross=None, vmin=None, vmax=None, units='', name="", show=True, save=False, ret=False):
+    def plotBeamCut(self, name_field, comp, comp_cross=None, vmin=None, vmax=None, units='', name="", show=True, save=False, ret=False, extension="png"):
         E_cut, H_cut, E_strip, H_strip = self.calcBeamCuts(name_field, comp)
 
         #if comp_cross is not None:
@@ -1675,14 +1676,13 @@ class System(object):
         vmin = np.min([np.min(E_cut), np.min(H_cut)]) if vmin is None else vmin
         vmax = np.max([np.max(E_cut), np.max(H_cut)]) if vmax is None else vmax
         
-        fig, ax = plt.plotBeamCut(E_cut, H_cut, E_strip, H_strip, vmin, vmax, unitl)
+        fig, ax = plt.plotBeamCut(H_cut, E_cut, H_strip, E_strip, vmin, vmax, unitl)
 
         if ret:
             return fig, ax
 
         elif save:
-            pt.savefig(fname=self.savePath + '{}_EH_cut.jpg'.format(name),
-                        bbox_inches='tight', dpi=300)
+            pt.savefig(fname=self.savePath + f'{name}_EH_cut.{extension}', bbox_inches='tight', dpi=300)
             pt.close()
 
         elif show:
@@ -1915,6 +1915,7 @@ class System(object):
     # @param titleP Title of the phase plot. Default is "Phase".
     # @param unwrap_phase Unwrap the phase patter. Prevents annular structure in phase pattern. Default is False.
     # @param ret Return the Figure and Axis object. Only called by GUI. Default is False.
+    # @param extension Extension type of image to be saved.
     #
     # @see aperDict
     def plotBeam2D(self, name_obj, comp=None, contour=None, contour_comp=None,
@@ -1922,7 +1923,7 @@ class System(object):
                     save=False, interpolation=None, norm=True,
                     aperDict=None, mode='dB', project='xy',
                     units="", name="", titleA="Power", titleP="Phase",
-                    unwrap_phase=False, ret=False):
+                    unwrap_phase=False, ret=False, extension="png"):
 
         aperDict = {"plot":False} if aperDict is None else aperDict
 
@@ -1979,8 +1980,7 @@ class System(object):
             return fig, ax
 
         elif save:
-            pt.savefig(fname=self.savePath + '{}_{}.jpg'.format(plotObject["name"], name),
-                        bbox_inches='tight', dpi=300)
+            pt.savefig(fname=self.savePath + f'{plotObject["name"]}_{name}.{extension}', bbox_inches='tight', dpi=300)
             pt.close()
 
         elif show:
@@ -1999,8 +1999,9 @@ class System(object):
     # @param foc2 Plot focus 2. Default is False.
     # @param save Save the plot.
     # @param ret Return Figure and Axis. Only used in GUI.
+    # @param extension Extension type of image to be saved.
     def plot3D(self, name_surface, cmap=cm.cool,
-            norm=False, fine=2, show=True, foc1=False, foc2=False, save=False, ret=False):
+            norm=False, fine=2, show=True, foc1=False, foc2=False, save=False, ret=False, extension="png"):
         
         fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
         
@@ -2019,7 +2020,7 @@ class System(object):
             return fig, ax
         
         elif save:
-            pt.savefig(fname=self.savePath + '{}.jpg'.format(plotObject["name"]),bbox_inches='tight', dpi=300)
+            pt.savefig(fname=self.savePath + f'{plotObject["name"]}.{extension}',bbox_inches='tight', dpi=300)
             pt.close()
 
         elif show:
@@ -2040,8 +2041,9 @@ class System(object):
     # @param ret Return Figure and Axis. Only used in GUI.
     # @param select A list of names of reflectors to plot. If not given, plot all reflectors.
     # @param RTframes A list of names of frame to plot. If not given, plot no ray-trace frames.
+    # @param extension Extension type of image to be saved.
     def plotSystem(self, cmap=cm.cool,
-                norm=False, fine=2, show=True, foc1=False, foc2=False, save=False, ret=False, select=None, RTframes=None, RTcolor="black"):
+                norm=False, fine=2, show=True, foc1=False, foc2=False, save=False, ret=False, select=None, RTframes=None, RTcolor="black", extension="png"):
 
         select = [] if select is None else select
         RTframes = [] if RTframes is None else RTframes
@@ -2069,7 +2071,7 @@ class System(object):
             return fig, ax
         
         elif save:
-            pt.savefig(fname=self.savePath + 'system.pdf',bbox_inches='tight', dpi=300)
+            pt.savefig(fname=self.savePath + f'system.{extension}',bbox_inches='tight', dpi=300)
             pt.close()
 
         elif show:
@@ -2097,7 +2099,8 @@ class System(object):
     # @param project Set abscissa and ordinate of plot. Should be given as a string. Default is "xy".
     # @param ret Return Figure and Axis. Default is False.
     # @param aspect Aspect ratio of plot. Default is 1.
-    def plotRTframe(self, name_frame, project="xy", ret=False, aspect=1):
+    # @param extension Extension type of image to be saved.
+    def plotRTframe(self, name_frame, project="xy", ret=False, aspect=1, extension="png"):
         check_frameSystem(name_frame, self.frames, self.clog, extern=True)
         if ret:
             return plt.plotRTframe(self.frames[name_frame], project, self.savePath, ret, aspect)

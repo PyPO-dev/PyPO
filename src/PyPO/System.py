@@ -12,21 +12,21 @@ from pathlib import Path
 import pickle 
 
 # PyPO-specific modules
-from src.PyPO.BindRefl import *
-from src.PyPO.BindGPU import *
-from src.PyPO.BindCPU import *
-from src.PyPO.BindBeam import *
-from src.PyPO.BindTransf import *
-from src.PyPO.MatTransform import *
-from src.PyPO.PyPOTypes import *
-from src.PyPO.Checks import *
-import src.PyPO.Config as Config
-from src.PyPO.CustomLogger import CustomLogger
-import src.PyPO.Plotter as plt
-import src.PyPO.Efficiencies as effs
-import src.PyPO.FitGauss as fgs
+from PyPO.BindRefl import *
+from PyPO.BindGPU import *
+from PyPO.BindCPU import *
+from PyPO.BindBeam import *
+from PyPO.BindTransf import *
+from PyPO.MatTransform import *
+from PyPO.PyPOTypes import *
+from PyPO.Checks import *
+import PyPO.Config as Config
+from PyPO.CustomLogger import CustomLogger
+import PyPO.Plotter as plt
+import PyPO.Efficiencies as effs
+import PyPO.FitGauss as fgs
 
-import src.PyPO.WorldParam as world
+import PyPO.WorldParam as world
 
 # Set PyPO absolute root path
 sysPath = Path(__file__).parents[2]

@@ -1,5 +1,5 @@
 import numpy as np
-import src.PyPO.WorldParam as world
+import PyPO.WorldParam as world
 
 ##
 # @file

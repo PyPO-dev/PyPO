@@ -7,8 +7,8 @@ import unittest
 import numpy as np
 from pathlib import Path
 
-from src.PyPO.System import System
-from src.PyPO.FitGauss import fitGaussAbs, generateGauss
+from PyPO.System import System
+from PyPO.FitGauss import fitGaussAbs, generateGauss
 
 import matplotlib.pyplot as pt
 

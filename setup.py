@@ -30,9 +30,9 @@ class build_ext(build_ext_orig):
         extdir.mkdir(parents=True, exist_ok=True)
 
         # example of cmake args
-        config = 'Debug' if self.debug else 'Release'
+        config = 'Release'
         cmake_args = [
-            '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + "lib",
+            '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + str(extdir.parent.absolute()),
             '-DCMAKE_BUILD_TYPE=' + config
         ]
 
@@ -54,18 +54,21 @@ with open('requirements.txt') as f:
 
 setup(
     name='PyPO',
-    version='1.0.3',
+    version='1.1.1',
+    author="PyPO-dev",
     install_requires = required,
-    package_dir = {
-            '': 'src',
-        },
+    package_dir = {'': 'src'},
     packages=['PyPO'],
-    ext_modules=[CMakeExtension('lib/pyporefl'),
-        CMakeExtension('lib/pypobeam'),
-        CMakeExtension('lib/pypotransf'),
-        CMakeExtension('lib/pypocpu'),
-        CMakeExtension('lib/pypogpu')],
-    cmdclass={
-        'build_ext': build_ext,
-    }
+    ext_modules=[CMakeExtension(os.path.join("PyPO", "pyporefl")),
+        CMakeExtension(os.path.join("PyPO", "pypobeam")),
+        CMakeExtension(os.path.join("PyPO", "pypocpu")),
+        CMakeExtension(os.path.join("PyPO", "pypogpu")),
+        CMakeExtension(os.path.join("PyPO", "pypotransf"))],
+    cmdclass={'build_ext': build_ext},
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+    ],
+    python_requires='>=3.8',
 )

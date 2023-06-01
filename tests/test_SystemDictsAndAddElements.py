@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
-from src.PyPO.System import System as pypoSystem
-from src.PyPO.Checks import InputReflError, InputRTError, InputPOError
+from PyPO.System import System as pypoSystem
+from PyPO.Checks import InputReflError, InputRTError, InputPOError
 
 
 class Test_SystemDictsAndAddElement(unittest.TestCase):

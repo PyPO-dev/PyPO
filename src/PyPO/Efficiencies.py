@@ -1,7 +1,7 @@
 import numpy as np
-from src.PyPO.PyPOTypes import *
-from src.PyPO.BindRefl import *
-from src.PyPO.FitGauss import fitGaussAbs
+from PyPO.PyPOTypes import *
+from PyPO.BindRefl import *
+from PyPO.FitGauss import fitGaussAbs
 
 ##
 # @file

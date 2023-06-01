@@ -7,8 +7,8 @@ import unittest
 import numpy as np
 from pathlib import Path
 
-from src.PyPO.System import System
-from src.PyPO.Efficiencies import _generateMask
+from PyPO.System import System
+from PyPO.Efficiencies import _generateMask
 
 ##
 # @file

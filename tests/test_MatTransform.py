@@ -6,7 +6,7 @@ import random
 import unittest
 import numpy as np
 
-from src.PyPO.System import System
+from PyPO.System import System
 ##
 # @file
 # 

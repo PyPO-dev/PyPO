@@ -7,9 +7,9 @@ import matplotlib.ticker as ticker
 import warnings
 warnings.filterwarnings("ignore")
 
-import src.PyPO.PlotConfig
-import src.PyPO.Colormaps as cmaps
-from src.PyPO.BindRefl import *
+import PyPO.PlotConfig
+import PyPO.Colormaps as cmaps
+from PyPO.BindRefl import *
 
 ##
 # @file

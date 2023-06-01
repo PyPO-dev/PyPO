@@ -4,124 +4,74 @@ import os
 import shutil
 import platform
 import argparse
-
-from src.PyPO.CustomLogger import CustomLogger
+import traceback
 
 ##
 # @file
-# PyPO build script.
+# PyPO build and utilities script.
 #
-# Configures CMake, generates makefiles and runs them.
-# Also contains functions to install prerequisites and clean build directories.
-# There is one flag for generating documentation, but most users (probably) won't use this option.
+# This script contains options to build distributions for PyPO and is mostly meant for convenience when developing.
+# Also, documentation can be built through this script. 
+# However, for this function to work properly, you should also have cloned the PyPO-docs and PyPO-tutorials repos into the same root as PyPO.
+# The unittests can also be run from this script.
 # For an overview of the possible flags, run in a terminal:
 #```
 # python Build.py --help
 #```
 def BuildPyPO():
-    clog_mgr = CustomLogger(os.path.basename(__file__))
-    clog = clog_mgr.getCustomLogger()
-
-    pathToBuild = os.path.join("src")
-    
-    parser = argparse.ArgumentParser(description="build and test interface script for PyPO")
-    parser.add_argument("-p", "--prereqs", help="install PyPO prerequisites", action="store_true")
-    parser.add_argument("-o", "--optional", help="install optional packages", action="store_true")
-    parser.add_argument("-f", "--config", help="configure PyPO build scripts", action="store_true")
-    parser.add_argument("-m", "--make", help="build PyPO libraries", action="store_true")
-    parser.add_argument("-c", "--clean", help="remove PyPO build directory", action="store_true")
+    parser = argparse.ArgumentParser(description="documenting and test interface script for PyPO")
+    parser.add_argument("-s", "--sdist", help="generate a PyPO source distribution into dist folder", action="store_true")
+    parser.add_argument("-b", "--bdist", help="generate a PyPO binary wheel into dist folder. EXPERIMENTAL.", action="store_true")
+    parser.add_argument("-u", "--upload", help="upload dist folder to test-pypi using twine. Will ask for username and password", action="store_true")
     parser.add_argument("-d", "--docs", help="generate PyPO documentation with doxygen", action="store_true")
     parser.add_argument("-t", "--test", help="run PyPO unittests", action="store_true")
     args = parser.parse_args()
 
-    if args.prereqs:
-        clog.info("Installing PyPO prerequisites...")
-        path_to_reqs = os.path.join("out", "requirements", "requirements.txt")
-        path_to_reqs_opt = os.path.join("out", "requirements", "requirements_gui.txt")
-        if platform.system() == "Linux":
-            os.system("sudo apt install cm-super dvipng gcc build-essential cmake")
-            
-            if args.optional:
-                os.system("sudo apt install qtbase5-dev qt5-qmake qtbase5-dev-tools")
+    if args.sdist:
+        os.system("python3 setup.py sdist")
 
-        elif platform.system() == "Darwin":
-            os.system("xcode-select --install")
-            os.system("brew install gcc cmake")
-            
-            if args.optional:
-                os.system("brew install qt5 qtbase5-dev qt5-qmake qtbase5-dev-tools")
-            
-        #elif platform.system() == "Windows":
-        #    os.system("py -m pip install numpy matplotlib scipy setuptools nose PySide2 tqdm inquirer attrs")
-            
-        if args.optional:
-            os.system(f"pip install -U -r {path_to_reqs_opt}")
-        
-        else:
-            os.system(f"pip install -U -r {path_to_reqs}")
-        
-        clog.info("Succesfully installed PyPO prerequisites.")
-        clog.warning("Install CUDA manually to enable PyPO on GPU.")
-    
-    if args.clean:
-        try:
-            clog.info("Cleaning build directory...")
-            dir_build = os.path.join(os.getcwd(), "out", "build")
-            shutil.rmtree(dir_build)
-            clog.info("Succesfully cleaned build directory.")
-        except:
-            clog.warning("Nothing to clean.")
+    if args.bdist:
+        os.system("python3 setup.py bdist_wheel")
 
-    if args.config:
-        dir_lists = os.getcwd()
-        dir_build = os.path.join(os.getcwd(), "out", "build")
-
-        if not os.path.exists(dir_build):
-            os.makedirs(dir_build)
-        
-        try:
-            clog.info("Configuring PyPO...")
-            if os.name == "posix":
-                os.system(f"cmake -S {dir_lists} -B {dir_build} -DCMAKE_BUILD_TYPE=Release")
-
-            elif os.name == "nt":
-                os.system(f"cmake -S {dir_lists} -B {dir_build}")
-            clog.info("Succesfully configured PyPO.")
-        
-        except:
-            clog.error("Could not configure PyPO. Is CMake installed?")
-
-    if args.make:
-        try:
-            clog.info("Building PyPO...")
-            dir_lists = os.path.join(os.getcwd(), "src")
-            dir_build = os.path.join(os.getcwd(), "out", "build")
-
-            if not os.path.exists(dir_build):
-                os.makedirs(dir_build)
-
-            os.system(f"cmake --build {dir_build}")
-            clog.info("Succesfully built PyPO.")
-
-        except:
-            clog.error("Could not build PyPO.")
+    if args.upload:
+        os.system("twine upload --repository testpypi dist/*")
 
     if args.docs:
         doc_path = os.path.join("..", "PyPO-docs", "docs")
+        tut_path = os.path.join("..", "PyPO-tutorials", "tutorials")
+
         try:
             try:
                 shutil.rmtree("docs")
-            except:
-                pass
+            except Exception as err:
+                print(traceback.format_exc())
+            
             try:
                 shutil.rmtree(doc_path)
-            except:
-                pass
-            clog.info("Generating PyPO documentation...")
-            os.system("doxygen doxy/Doxyfile")
+            except Exception as err:
+                print(traceback.format_exc())
+            
+            os.system(f"doxygen {os.path.join('doxy', 'Doxyfile')}")
+            
+            # Convert regular tutorials to html format for inclusion in the documentation.
+            for (dirpath, dirnames, filenames) in os.walk(tut_path):
+                dest_path = os.path.join("docs", "tutorials")
+                os.mkdir(dest_path)
+                for file in filenames:
+                    if file.split('.')[1] != "ipynb":
+                        continue
+
+                    _path = os.path.join(tut_path, file)
+                    html_path = os.path.join(tut_path, f"{file.split('.')[0]}.html")
+                    html_dest_path = os.path.join(dest_path, f"{file.split('.')[0]}.html")
+
+                    os.system(f"jupyter nbconvert --to html --template lab --theme dark {_path}")
+                    os.rename(html_path, html_dest_path)
+                
+                break
             
             # Convert md for GUI tutorials to html and copy to /docs
-            guitut_path = os.path.join("..", "PyPO-tutorials", "tutorials", "Gui")
+            guitut_path = os.path.join(tut_path, "Gui")
             
             file_md = []
             for (dirpath, dirnames, filenames) in os.walk(guitut_path):
@@ -129,6 +79,7 @@ def BuildPyPO():
                     if file.split(".")[1] == "md":
                         file_md.append(file)
                 break
+            
             for file in file_md:
                 filename = file.split(".")[0]
                 filename_html = filename + ".html"
@@ -155,23 +106,20 @@ def BuildPyPO():
             
             with open(filelist_path, 'w') as file:
                 file.write(filedata)
-
+            
             shutil.move("docs", doc_path)
-            clog.info("Succesfully generated PyPO documentation.")
         
         except Exception as err:
-            print(err)
-            clog.error("Failed to generate documentation. Is doxygen installed?")
+            print(traceback.format_exc())
     
     if args.test:
         try:
-            clog.info("Running PyPO unittests...")
             dir_tests = os.path.join(os.getcwd(), "tests")
 
             os.system(f"nose2 -v")
 
-        except:
-            clog.error("Failed to test PyPO.")
+        except Exception as err:
+            print(err)
 
  
 if __name__ == "__main__":

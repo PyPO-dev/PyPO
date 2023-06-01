@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 import random
-from src.PyPO.System import System
+from PyPO.System import System
 
 class Test_Gridding(unittest.TestCase):
     def test_gcenterParabola(self):

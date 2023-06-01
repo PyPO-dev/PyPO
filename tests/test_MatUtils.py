@@ -6,7 +6,7 @@ import numpy as np
 
 import matplotlib.pyplot as pt
 
-from src.PyPO.MatUtils import findConnectedSubsets
+from PyPO.MatUtils import findConnectedSubsets
 ##
 # @file
 # 

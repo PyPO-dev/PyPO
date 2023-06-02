@@ -2097,12 +2097,14 @@ class System(object):
     # @param project Set abscissa and ordinate of plot. Should be given as a string. Default is "xy".
     # @param ret Return Figure and Axis. Default is False.
     # @param aspect Aspect ratio of plot. Default is 1.
-    def plotRTframe(self, name_frame, project="xy", ret=False, aspect=1):
+    # @param unit Units of the axes for the plot.
+    def plotRTframe(self, name_frame, project="xy", ret=False, aspect=1, unit="mm"):
+        unit = self._units(unit)
         check_frameSystem(name_frame, self.frames, self.clog, extern=True)
         if ret:
-            return plt.plotRTframe(self.frames[name_frame], project, self.savePath, ret, aspect)
+            return plt.plotRTframe(self.frames[name_frame], project, self.savePath, ret, aspect, unit)
         else:
-            plt.plotRTframe(self.frames[name_frame], project, self.savePath, ret, aspect)
+            plt.plotRTframe(self.frames[name_frame], project, self.savePath, ret, aspect, unit)
 
     ##
     # Create a deep copy of any object.
@@ -2154,7 +2156,7 @@ class System(object):
     # @param verbose Allow verbose System logging.
     #
     # @returns out The focus co-ordinate.
-    def findRTfocus(self, name_frame, f0=None):
+    def findRTfocus(self, name_frame, f0=None, tol=1e-12):
         check_frameSystem(name_frame, self.frames, self.clog, extern=True)
         f0 = 0 if f0 is None else f0
        
@@ -2162,7 +2164,12 @@ class System(object):
         tilt = self.calcRTtilt(name_frame)
         center = self.calcRTcenter(name_frame)
         match = self.copyObj(world.IAX())
-        R = self.findRotation(match, tilt)
+        
+        if np.all(np.isclose(match, -tilt)):
+            R = np.eye(4)
+        else:
+            R = self.findRotation(match, tilt)
+        
         t_name = f"focal_plane_{name_frame}"
         fr_out = f"focus_{name_frame}"
 
@@ -2183,7 +2190,7 @@ class System(object):
                 "fr_out"    : fr_out,
                 "t_name"    : t_name,
                 "device"    : "CPU",
-                "tol"       : 1e-12,
+                "tol"       : tol,
                 "nThreads"  : 1
                 }
 
@@ -2192,7 +2199,7 @@ class System(object):
         verbosity_init = self.verbosity
         self.setLoggingVerbosity(verbose=False)
         
-        res = fmin(self._optimiseFocus, f0, args=(runRTDict, tilt), full_output=True, disp=False)
+        res = fmin(self._optimiseFocus, f0, args=(runRTDict, tilt), full_output=True, disp=False, ftol=tol)
  
         out = res[0] * tilt + center
         self.translateGrids(t_name, out, mode="absolute")
@@ -2450,6 +2457,12 @@ class System(object):
 
         elif unit == "cm":
             return [unit, 1e-2]
+        
+        elif unit == "um":
+            return [unit, 1e3]
+        
+        elif unit == "nm":
+            return [unit, 1e6]
 
         elif unit == "deg":
             return [unit, 1.]

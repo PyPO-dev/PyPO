@@ -1,24 +1,85 @@
-/*! \mainpage PyPO software documentation
- *
- * \section intro_sec Introduction
- *
- * This is the software documentation of [PyPO](https://github.com/PyPO-dev/PyPO), a Python Physical Optics package.
- * The goal of these pages is to provide a detailed and comprehensive overview of the source code that makes PyPO run.
- * For information regarding prerequisites, installation, etc., we refer to the [General information](General.md) page.
- *
- * For most users of PyPO, the Python interface documentation is a nice reference for quick lookup of available functions. 
- * To get more information on inputs for certain interface functions, the template list is a good starting point.
- * For the user who is planning on getting hands-on with PyPO development, the C/C++ and CUDA documentation should get you started.
- * \subsection guitut Tutorials
- * Several tutorials have been developed in order to demonstrate the usage and functionality of `PyPO`.
- * The general tutorials on using `PyPO` through the scripting interface can be found in the tutorials folder in the `PyPO` root directory.
- * The tutorials on how to use the GUI can be found [here](Tutorial.md).
- * \subsection contrib Contributor Guidelines
- * People wishing to contribute are more than welcome to do so. Contributions can be made by opening a pull request to the main repository from your own fork of `PyPO`,
- * containing your contributions. These will then be reviewed and considered for addition to `PyPO`. Issues and bugs can be reported in the `PyPO` [issue tracker](https://github.com/arend95/PyPO/issues).
- * \subsection license License
- * This project is released under the [MIT License](https://opensource.org/licenses/MIT).
- * \subsection contact Contact
- * For questions/support, please contact:
- * PyPO.dev@gmail.com
- */
+/** 
+\mainpage Home
+
+\section intro_sec Introduction
+Welcome to the `PyPO` user manual. Here you can find several resources that will assist in using and/or developing `PyPO`.
+This homepage contains general information regarding installation instructions, the content of the user manual, contributor guidelines and contact information.
+After installing, the best place to start for new users would be the \ref funds "PyPO fundamentals" tutorials, after which the rest of the tutorials can be studied.
+For contributor guidelines and general development instructions, please see the \ref contribguide "instructions for developers" page.
+
+\section inst Installation
+The prerequisites for installing `PyPO` on any operating system are:
+- A working [Python installation of version 3.8 or higher](https://www.python.org/downloads/release/python-380/).
+- A [pip installation](https://pip.pypa.io/en/stable/installation/).
+
+Currently, `PyPO` can only be built from source.
+\subsection sdist Install From Source
+\subsubsection linux Linux
+First, install CMake:
+```
+pip install cmake
+```
+All other necessary prerequisites are fetched and installed upon installing `PyPO`.
+To install `PyPO`, clone the git repository:
+```
+git clone https://github.com/PyPO-dev/PyPO
+```
+Alternatively, download the .zip package from [here](https://github.com/PyPO-dev/PyPO) and unpack in the preferred destination.
+Navigate to the cloned/unpacked repository and run:
+```
+pip install .
+```
+
+\subsubsection macos MacOS
+Installing `PyPO` from source on MacOS proceeds largely along the same lines as for Linux.
+The only difference being that you will need to have the command line tools package installed:
+```
+xcode-select --install
+```
+
+Then, installation of `PyPO` proceeds in the same fashion as for Linux.
+
+\subsection cuda Using PyPO On GPU
+In order to use the GPU accelerated libraries for `PyPO`, a working CUDA installation should be present.
+For Linux, [this article](https://linuxconfig.org/how-to-install-cuda-on-ubuntu-20-04-focal-fossa-linux) describes nicely how to install CUDA through the apt repository.
+
+For Windows, see the [official instructions](https://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/index.html) on the Nvidia website.
+
+Unfortunately, [Apple has stopped supporing Nvidia cards since 2015](https://appleinsider.com/articles/19/01/18/apples-management-doesnt-want-nvidia-support-in-macos-and-thats-a-bad-sign-for-the-mac-pro) and therefore, the CUDA libraries for `PyPO` cannot be installed on MacOS currently.
+
+\subsection optdep Optional Dependencies
+`PyPO` contains several optional features such as a graphical user interface (GUI).
+For developers, an automated testing framework is present as well as a documentation generator.
+The prerequisites for these features are not installed through the regular install. 
+Instead, they can be installed separately as needed.
+
+To use the GUI, PySide2 and attrs needs to be installed:
+```
+pip install PySide2 attrs
+```
+
+The automated tests are run using the nose2 framework:
+```
+pip install nose2
+```
+
+Documentation in `PyPO` is generated using [Doxygen](https://www.doxygen.nl/index.html).
+Please see their [installation page](https://www.doxygen.nl/manual/install.html) for instructions regarding installation.
+
+\section man User Manual
+Several tutorials have been developed in order to demonstrate the usage and functionality of `PyPO`:
+- the first group of tutorials are meant to show the fundamentals of `PyPO` and the design philosophy,
+- the second set of tutorials showcase the functionalities of the package,
+- the third and final set show how to use the GUI.
+
+The software documentation for `PyPO` is split into two parts:
+- the first part forms a comprehensive API reference for all public methods of `PyPO`,
+- the second part forms a reference for all internal Python, C/C++ and CUDA code.
+
+\section license License
+This project is released under the [MIT License](https://opensource.org/licenses/MIT).
+
+\section contact Contact
+For questions/support, please contact:
+PyPO.dev@gmail.com
+*/

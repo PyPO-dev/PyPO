@@ -1,0 +1,5 @@
+/**
+\defgroup public_api_hybrid Hybrid RT/PO Methods
+\brief This section contains a list of public `PyPO` methods which employ both ray tracing (RT) and physical optics (PO).
+*/
+

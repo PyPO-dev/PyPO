@@ -17,26 +17,21 @@ class build_ext(build_ext_orig):
     def run(self):
         for ext in self.extensions:
             self.build_cmake(ext)
-        super().run()
+        #super().run()
 
     def build_cmake(self, ext):
         cwd = pathlib.Path().absolute()
 
-        # these dirs will be created in build_py, so if you don't have
-        # any python sources to bundle, the dirs will be missing
         build_temp = pathlib.Path(self.build_temp)
         build_temp.mkdir(parents=True, exist_ok=True)
         extdir = pathlib.Path(self.get_ext_fullpath(ext.name))
-        extdir.mkdir(parents=True, exist_ok=True)
 
-        # example of cmake args
-        config = 'Release'
+        config = 'Release ' + '--j4'
         cmake_args = [
             '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + str(extdir.parent.absolute()),
             '-DCMAKE_BUILD_TYPE=' + config
         ]
 
-        # example of build args
         build_args = [
             '--config', config
         ]
@@ -45,30 +40,27 @@ class build_ext(build_ext_orig):
         self.spawn(['cmake', str(cwd)] + cmake_args)
         if not self.dry_run:
             self.spawn(['cmake', '--build', '.'] + build_args)
-        # Troubleshooting: if fail on line above then delete all possible 
-        # temporary CMake files including "CMakeCache.txt" in top level dir.
         os.chdir(str(cwd))
 
-with open('requirements.txt') as f:
-    required = f.read().splitlines()
+required = ["numpy", "scipy", "matplotlib"]
 
 setup(
-    name='PyPO',
+    name='PyPO-pkg',
     version='1.1.1',
-    author="PyPO-dev",
+    author="Arend Moerman",
     install_requires = required,
     package_dir = {'': 'src'},
     packages=['PyPO'],
-    ext_modules=[CMakeExtension(os.path.join("PyPO", "pyporefl")),
-        CMakeExtension(os.path.join("PyPO", "pypobeam")),
-        CMakeExtension(os.path.join("PyPO", "pypocpu")),
-        CMakeExtension(os.path.join("PyPO", "pypogpu")),
-        CMakeExtension(os.path.join("PyPO", "pypotransf"))],
+    ext_modules=[CMakeExtension(os.path.join("PyPO", "libs"))],
     cmdclass={'build_ext': build_ext},
     classifiers=[
         "Programming Language :: Python :: 3",
+        "Programming Language :: C",
+        "Programming Language :: C++",
+        "Environment :: GPU :: NVIDIA CUDA :: 11",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
+        "Topic :: Scientific/Engineering :: Physics"
     ],
     python_requires='>=3.8',
 )

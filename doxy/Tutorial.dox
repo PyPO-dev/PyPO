@@ -1,0 +1,38 @@
+/** 
+\page tutorials Tutorials
+These tutorials are designed to showcase the features of `PyPO`.
+
+\section funds PyPO Fundamentals
+In this set of tutorials, we discuss the `PyPO` basics.
+In particular, the datatypes used for input/output are discussed.
+Also, the fundamentals of generating reflectors in `PyPO` are discussed.
+
+\section funcs PyPO Functionalities
+This set of tutorials demonstrates how to use `PyPO` in calculations.
+The set starts with tutorials on how to build optical systems and perform ray-traces through them.
+Then, the physical optics calculations are demonstrated.
+The final tutorials in this set are concerned with calculating metrics used in `PyPO`, such as aperture efficiency, and importing custom beam patterns.
+
+[Building an optical system and performing ray-traces](tutorials/Tutorial1.html)
+
+[More advanced optical systems and ray-tracing options](tutorials/Tutorial2.html)
+
+[Performing physical optics propagations](tutorials/Tutorial3.html)
+
+[Backward propagation](tutorials/Tutorial4.html)
+
+[PO efficiencies and metrics](tutorials/Tutorial5.html)
+
+[Importing custom beam patterns](tutorials/Tutorial6.html)
+
+\section guitut GUI Tutorials
+To provide a little help on how to use the GUI module, these tutorials can come in handy.
+The tutorials are designed to demonstrate basic knowledge on how to use `PyPO` through the GUI.
+This set of tutorials is essentially the same as the first three tutorials in the `PyPO` functionalities set, but worked in the GUI.
+
+[Building an optical system and performing ray-traces (GUI)](Gui/Tutorial_Gui_1.html)
+
+[More advanced optical systems and ray-tracing options (GUI)](Gui/Tutorial_Gui_2.html)
+
+[Performing physical optics propagations (GUI)](Gui/Tutorial_Gui_3.html)
+*/

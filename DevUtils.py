@@ -8,7 +8,7 @@ import traceback
 
 ##
 # @file
-# PyPO build and utilities script.
+# PyPO developer utilities script.
 #
 # This script contains options to build distributions for PyPO and is mostly meant for convenience when developing.
 # Also, documentation can be built through this script. 
@@ -16,15 +16,15 @@ import traceback
 # The unittests can also be run from this script.
 # For an overview of the possible flags, run in a terminal:
 #```
-# python Build.py --help
+# python DevUtils.py --help
 #```
-def BuildPyPO():
-    parser = argparse.ArgumentParser(description="documenting and test interface script for PyPO")
+def DevUtils():
+    parser = argparse.ArgumentParser(description="development interface script for PyPO")
     parser.add_argument("-s", "--sdist", help="generate a PyPO source distribution into dist folder", action="store_true")
     parser.add_argument("-b", "--bdist", help="generate a PyPO binary wheel into dist folder. EXPERIMENTAL.", action="store_true")
     parser.add_argument("-u", "--upload", help="upload dist folder to test-pypi using twine. Will ask for username and password", action="store_true")
     parser.add_argument("-d", "--docs", help="generate PyPO documentation with doxygen", action="store_true")
-    parser.add_argument("-t", "--test", help="run PyPO unittests", action="store_true")
+    parser.add_argument("-t", "--test", help="run PyPO automated tests", action="store_true")
     args = parser.parse_args()
 
     if args.sdist:
@@ -123,4 +123,4 @@ def BuildPyPO():
 
  
 if __name__ == "__main__":
-	BuildPyPO()
+	DevUtils()

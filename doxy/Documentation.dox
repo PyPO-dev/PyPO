@@ -1,0 +1,24 @@
+/** 
+\page pypodocs Documentation
+This page contains the software documentation for `PyPO`. 
+
+\section apiref Public API Reference
+The public API reference contains all public methods of `PyPO`.
+This list acts as a reference for general users and is structured in groups for a better overview.
+
+\subpage public_api_sysio
+
+\subpage public_api_common
+
+\subpage public_api_reflmeths
+
+\subpage public_api_frames
+
+\subpage public_api_po
+
+\subpage public_api_vis
+
+\section fulldocs Full Software Documentation
+This page contains the entire documented source code, including the GUI source code. 
+It is mostly aimed towards developers wanting to work on `PyPO` and/or the GUI.
+*/

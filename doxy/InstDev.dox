@@ -1,0 +1,100 @@
+/**
+\page contribguide Instructions For Contributions & Development
+This page contains an overview of instructions for people intending to develop `PyPO`.
+These include the contributor guidelines, but also guidelines on how to document contributions and how to test `PyPO`.
+
+\section contrib Contributor Guidelines
+People wishing to contribute are more than welcome to do so. Contributions can be made by opening a pull request to the main repository from your own fork of `PyPO`,
+containing your contributions. 
+These will then be reviewed and considered for addition to `PyPO`. 
+Issues, feature requests and bugs can be reported in the `PyPO` [issue tracker](https://github.com/arend95/PyPO/issues).
+
+\section devinstructions Instructions For Developers
+As mentioned in the contributot guidelines, contributions to `PyPO` are more than welcome. 
+This section contains information on utilities put in place to make it easier to develop, as well as certain rules and practices for making `PyPO` easy to maintain.
+
+\subsection devinstall Dev Install
+Installing `PyPO` for development is very similar to general installation:
+```
+git clone https://github.com/PyPO-dev/PyPO
+```
+Alternatively, download the .zip package from [here](https://github.com/PyPO-dev/PyPO) and unpack in the preferred destination.
+Navigate to the cloned/unpacked repository and run:
+```
+pip install -e .
+```
+
+The "-e" flag tells pip to install `PyPO` in the actual "src/" directory of the `PyPO` repository. 
+This means that any changes to the Python source code are immediately reflected in the package imported through Python.
+For the C/C++/CUDA code, this is not true. These scripts need to be compiled into libraries again (which happens when the `pip install -e .` command is run)
+before the changes are reflected in the package.
+
+For ease of development, one can use the `DevUtils.py` script. This script contains an interface for development and will be used often throughout this page.
+Enter the following in the `PyPO` root to see all options available through the script:
+```
+./DevUtils.py -h
+```
+
+\subsection gendoc Generating Documentation
+`PyPO` documentation is generated using Doxygen and generated from comment blocks. 
+Because of this, there are several rules for developers regarding comments.
+The C/C++/CUDA scripts use the so-called [Javadoc](https://en.wikipedia.org/wiki/Javadoc) style:
+```
+/**
+ * Here comes a short description describing in keywords what the function does
+ *
+ * Followed by a longer description, placing the function's usage in a broader perspective perhaps.
+ *
+ * @param input Some input parameter of type inputObject.
+ * @return output Some output parameter of type outputObject.
+ *
+ * @see inputObject
+ * @see outputObject
+ */
+outputObject someFunc(inputObject input) {
+    ...
+    return output;
+}
+```
+
+The Python scripts are not documented using docstrings, as Doxygen's special commands are not supported using docstrings.
+Instead, we use another style, called the doxygen style:
+```
+##
+# Here comes a short description describing in keywords what the function does
+#
+# Followed by a longer description, placing the function's usage in a broader perspective perhaps.
+#
+# @param input Some input parameter of type inputObject.
+# @return output Some output parameter of type outputObject.
+#
+# @see inputObject
+# @see outputObject
+def someFunc(inputObject):
+    ...
+    return output
+```
+
+For an overview of the mentioned (and other) comment styles for doxygen, see [this link](https://www.doxygen.nl/manual/docblocks.html).
+
+To generate documentation, it is important to have forked the `PyPO-docs` and the `PyPO-tutorials` repository into the same root as the regular `PyPO` repository.
+The documentation can be generated using the `DevUtils.py` script:
+```
+./DevUtils.py -d
+```
+
+This will generate the full `PyPO` user manual and place it in the "docs/" directory in the `PyPO-docs` repository.
+The updated fork of `PyPO-docs` can then be pushed to the `PyPO-docs` git repository where, after reviewing, it is merged with the main branch.
+After merging with main, the github-pages are updated and the new documentation will go online.
+
+\subsection runtests Running The Tests
+`PyPO` contains an automated testing suite that can be run quite easily from the command line:
+```
+./DevUtils.py -t
+```
+
+This command will execute the entire testing suite.
+The testing suite contains unit tests, integration tests and system tests. The unit tests are concerned with atomic input/output relations.
+The integration tests are concerned with testing bits of `PyPO` together, such as the rotations and translations for reflectors.
+The system tests test `PyPO` by simulating physical systems and checking the correctness of the results.
+*/

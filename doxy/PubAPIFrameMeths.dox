@@ -1,0 +1,4 @@
+/**
+\defgroup public_api_frames Ray Trace Methods 
+\brief This section contains a list of public `PyPO` methods which are used for performing ray trace related tasks.
+*/

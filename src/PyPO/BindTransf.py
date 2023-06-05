@@ -2,11 +2,13 @@ import ctypes
 import numpy as np
 import os
 import pathlib
-from src.PyPO.BindUtils import *
-from src.PyPO.Structs import *
-from src.PyPO.PyPOTypes import *
-import src.PyPO.Config as Config
-import src.PyPO.Threadmgr as TManager
+import traceback
+
+from PyPO.BindUtils import *
+from PyPO.Structs import *
+from PyPO.PyPOTypes import *
+import PyPO.Config as Config
+import PyPO.Threadmgr as TManager
 
 ##
 # @file
@@ -18,15 +20,14 @@ import src.PyPO.Threadmgr as TManager
 #
 # @returns lib The ctypes library containing the C/C++ functions.
 def loadTransflib():
+    path_cur = pathlib.Path(__file__).parent.resolve()
     try:
-        LD_PATH = pathlib.Path(__file__).parents[2]/"out/build/Debug"
-        lib = ctypes.CDLL(str(LD_PATH/"pypotransf.dll"))
+        lib = ctypes.CDLL(os.path.join(path_cur, "libpypotransf.dll"))
     except:
-        LD_PATH = pathlib.Path(__file__).parents[2]/"out/build"
         try:
-            lib = ctypes.CDLL(LD_PATH/"libpypotransf.so")
+            lib = ctypes.CDLL(os.path.join(path_cur, "libpypotransf.so"))
         except:
-            lib = ctypes.CDLL(LD_PATH/"libpypotransf.dylib")
+            lib = ctypes.CDLL(os.path.join(path_cur, "libpypotransf.dylib"))
 
     lib.transformRays.argtypes = [ctypes.POINTER(cframe), ctypes.POINTER(ctypes.c_double)]
     lib.transformRays.restype = None

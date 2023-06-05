@@ -4,9 +4,9 @@ import os
 import sys
 import pathlib
 
-from src.PyPO.BindUtils import allfill_reflparams, allocate_reflcontainer, creflToObj
-from src.PyPO.Structs import *
-from src.PyPO.PyPOTypes import *
+from PyPO.BindUtils import allfill_reflparams, allocate_reflcontainer, creflToObj
+from PyPO.Structs import *
+from PyPO.PyPOTypes import *
 
 ##
 # @file
@@ -18,17 +18,14 @@ from src.PyPO.PyPOTypes import *
 #
 # @returns lib The ctypes library containing the C/C++ functions.
 def loadRefllib():
+    path_cur = pathlib.Path(__file__).parent.resolve()
     try:
-        LD_PATH = pathlib.Path(__file__).parents[2]/"out/build/Debug"
-        lib = ctypes.CDLL(str(LD_PATH/"pyporefl.dll"))
+        lib = ctypes.CDLL(os.path.join(path_cur, "libpyporefl.dll"))
     except:
-        LD_PATH = pathlib.Path(__file__).parents[2]/"out/build"
-        
         try:
-            lib = ctypes.CDLL(LD_PATH/"libpyporefl.so")
-
+            lib = ctypes.CDLL(os.path.join(path_cur, "libpyporefl.so"))
         except:
-            lib = ctypes.CDLL(LD_PATH/"libpyporefl.dylib")
+            lib = ctypes.CDLL(os.path.join(path_cur, "libpyporefl.dylib"))
 
     return lib
 

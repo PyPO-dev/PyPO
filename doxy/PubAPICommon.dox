@@ -1,0 +1,5 @@
+/**
+\defgroup public_api_common Common Transformation Methods
+\brief This section contains a list of public `PyPO` methods which are used for rotating and translating reflectors, groups and frame objects.
+*/
+

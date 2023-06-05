@@ -1,0 +1,4 @@
+/**
+\defgroup public_api_po Physical Optics Methods 
+\brief This section contains a list of public `PyPO` methods which are used for performing physical optics related tasks.
+*/

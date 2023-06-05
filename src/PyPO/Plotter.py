@@ -7,9 +7,9 @@ import matplotlib.ticker as ticker
 import warnings
 warnings.filterwarnings("ignore")
 
-import src.PyPO.PlotConfig
-import src.PyPO.Colormaps as cmaps
-from src.PyPO.BindRefl import *
+import PyPO.PlotConfig
+import PyPO.Colormaps as cmaps
+from PyPO.BindRefl import *
 
 ##
 # @file
@@ -339,7 +339,6 @@ def plotSystem(systemDict, ax, fine, cmap,norm,
     #ax.set_title("System", fontsize=20)
     world_limits = ax.get_w_lims()
 
-    ax.set_box_aspect((1,1,1))
     ax.tick_params(axis='x', which='major', pad=-3)
 
     if RTframes:
@@ -358,6 +357,7 @@ def plotSystem(systemDict, ax, fine, cmap,norm,
 
     #set_axes_equal(ax)
     ax.minorticks_off()
+    #ax.set_box_aspect((1,1,1))
     ax.set_box_aspect((world_limits[1]-world_limits[0],world_limits[3]-world_limits[2],world_limits[5]-world_limits[4]))
 
 ##
@@ -397,40 +397,41 @@ def plotBeamCut(x_cut, y_cut, x_strip, y_strip, vmin, vmax, unit):
 # @param savePath Path to save plot to.
 # @param returns Whether to return figure object.
 # @param aspect Aspect ratio of plot.
-def plotRTframe(frame, project, savePath, returns, aspect):
+# @param unit Units of the axes for the plot.
+def plotRTframe(frame, project, savePath, returns, aspect, unit):
     fig, ax = pt.subplots(1,1, figsize=(5,5))
 
     idx_good = np.argwhere((frame.dx**2 + frame.dy**2 + frame.dz**2) > 0.8)
 
     if project == "xy":
-        ax.scatter(frame.x[idx_good], frame.y[idx_good], color="black", s=10)
-        ax.set_xlabel(r"$x$ / mm")
-        ax.set_ylabel(r"$y$ / mm")
+        ax.scatter(frame.x[idx_good] * unit[1], frame.y[idx_good] * unit[1], color="black", s=10)
+        ax.set_xlabel(r"$x$ / {}".format(unit[0]))
+        ax.set_ylabel(r"$y$ / {}".format(unit[0]))
 
     elif project == "xz":
-        ax.scatter(frame.x[idx_good], frame.z[idx_good], color="black", s=10)
-        ax.set_xlabel(r"$x$ / mm")
-        ax.set_ylabel(r"$z$ / mm")
+        ax.scatter(frame.x[idx_good] * unit[1], frame.z[idx_good] * unit[1], color="black", s=10)
+        ax.set_xlabel(r"$x$ / {}".format(unit[0]))
+        ax.set_ylabel(r"$z$ / {}".format(unit[0]))
     
     elif project == "yz":
-        ax.scatter(frame.y[idx_good], frame.z[idx_good], color="black", s=10)
-        ax.set_xlabel(r"$y$ / mm")
-        ax.set_ylabel(r"$z$ / mm")
+        ax.scatter(frame.y[idx_good] * unit[1], frame.z[idx_good] * unit[1], color="black", s=10)
+        ax.set_xlabel(r"$y$ / {}".format(unit[0]))
+        ax.set_ylabel(r"$z$ / {}".format(unit[0]))
     
     elif project == "yx":
-        ax.scatter(frame.y[idx_good], frame.x[idx_good], color="black", s=10)
-        ax.set_xlabel(r"$y$ / mm")
-        ax.set_ylabel(r"$x$ / mm")
+        ax.scatter(frame.y[idx_good] * unit[1], frame.x[idx_good] * unit[1], color="black", s=10)
+        ax.set_xlabel(r"$y$ / {}".format(unit[0]))
+        ax.set_ylabel(r"$x$ / {}".format(unit[0]))
 
     elif project == "zy":
-        ax.scatter(frame.z[idx_good], frame.y[idx_good], color="black", s=10)
-        ax.set_xlabel(r"$z$ / mm")
-        ax.set_ylabel(r"$y$ / mm")
+        ax.scatter(frame.z[idx_good] * unit[1], frame.y[idx_good] * unit[1], color="black", s=10)
+        ax.set_xlabel(r"$z$ / {}".format(unit[0]))
+        ax.set_ylabel(r"$y$ / {}".format(unit[0]))
     
     elif project == "zx":
-        ax.scatter(frame.z[idx_good], frame.x[idx_good], color="black", s=10)
-        ax.set_xlabel(r"$z$ / mm")
-        ax.set_ylabel(r"$x$ / mm")
+        ax.scatter(frame.z[idx_good] * unit[1], frame.x[idx_good] * unit[1], color="black", s=10)
+        ax.set_xlabel(r"$z$ / {}".format(unit[0]))
+        ax.set_ylabel(r"$x$ / {}".format(unit[0]))
 
     ax.set_aspect(aspect)
     

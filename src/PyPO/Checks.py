@@ -5,10 +5,9 @@ import re
 
 nThreads_cpu = os.cpu_count()
 
-from src.PyPO.PyPOTypes import *
-from src.PyPO.CustomLogger import CustomLogger
-import src.PyPO.Config as Config
-import src.PyPO.WorldParam as world
+from PyPO.PyPOTypes import *
+import PyPO.Config as Config
+import PyPO.WorldParam as world
 
 PO_modelist = ["JM", "EH", "JMEH", "EHP", "FF", "scalar"]
 
@@ -40,10 +39,11 @@ def getIndex(name, nameList):
 # Checks the paths for Windows, Linux and Mac OS.
 def has_CUDA():
     has = False
+    path_cur = pathlib.Path(__file__).parent.resolve()
 
-    win_cuda = os.path.exists(pathlib.Path(__file__).parents[2]/"out/build/Debug/pypogpu.dll")    
-    nix_cuda = os.path.exists(pathlib.Path(__file__).parents[2]/"out/build/libpypogpu.so")
-    mac_cuda = os.path.exists(pathlib.Path(__file__).parents[2]/"out/build/libpypogpu.dylib")
+    win_cuda = os.path.exists(os.path.join(path_cur, "pypogpu.dll"))
+    nix_cuda = os.path.exists(os.path.join(path_cur, "libpypogpu.so"))
+    mac_cuda = os.path.exists(os.path.join(path_cur, "libpypogpu.dylib"))
 
     has = win_cuda or nix_cuda or mac_cuda
 

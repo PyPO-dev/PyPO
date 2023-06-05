@@ -2,25 +2,29 @@ cmake_minimum_required(VERSION 3.16.3)
 
 #set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
-project(PyPO 
-    VERSION 0.9.0 
+project(PyPO-pkg 
+    VERSION 1.0.0 
     DESCRIPTION "Python Physical Optics"
     LANGUAGES CXX C)
+
+if(SKBUILD)
+    message(STATUS "The project is built using scikit-build")
+endif()
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
-add_library(pyporefl SHARED common/InterfaceReflector.cpp)
-target_include_directories(pyporefl PUBLIC common include)
+add_library(pyporefl SHARED src/common/InterfaceReflector.cpp)
+target_include_directories(pyporefl PUBLIC src/common src/include)
 
-add_library(pypobeam SHARED common/InterfaceBeam.cpp)
+add_library(pypobeam SHARED src/common/InterfaceBeam.cpp)
 target_link_libraries(pypobeam PRIVATE pyporefl)
 
-add_library(pypotransf SHARED common/Transform.cpp)
-target_include_directories(pypotransf PRIVATE include)
+add_library(pypotransf SHARED src/common/Transform.cpp)
+target_include_directories(pypotransf PRIVATE src/include)
 
-add_library(pypocpu SHARED CPU/InterfaceCPU.cpp)
-target_include_directories(pypocpu PRIVATE CPU)
+add_library(pypocpu SHARED src/CPU/InterfaceCPU.cpp)
+target_include_directories(pypocpu PRIVATE src/CPU)
 
 if(NOT WIN32)
     target_compile_options(pypocpu PRIVATE -pthread)
@@ -35,10 +39,10 @@ check_language(CUDA)
 if(CMAKE_CUDA_COMPILER)
     enable_language(CUDA)
     set(CMAKE_CUDA_STANDARD 11)
-    file(GLOB CUDAfiles CUDA/*.cu)
+    file(GLOB CUDAfiles src/CUDA/*.cu)
 
     add_library(pypogpu SHARED ${CUDAfiles})
-    target_include_directories(pypogpu PRIVATE CUDA)
+    target_include_directories(pypogpu PRIVATE src/CUDA)
     target_link_libraries(pypogpu PRIVATE pyporefl)
     set_target_properties(pypogpu PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
     set_property(TARGET pypogpu PROPERTY CUDA_ARCHITECTURES OFF)

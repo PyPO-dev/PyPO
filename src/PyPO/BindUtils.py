@@ -1,8 +1,8 @@
 import ctypes
 import numpy as np
 
-from src.PyPO.PyPOTypes import *
-import src.PyPO.Config as Config
+from PyPO.PyPOTypes import *
+import PyPO.Config as Config
 
 ##
 # @file

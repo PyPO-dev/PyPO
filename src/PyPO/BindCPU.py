@@ -2,11 +2,11 @@ import ctypes
 import numpy as np
 import os
 import pathlib
-from src.PyPO.BindUtils import *
-from src.PyPO.Structs import *
-from src.PyPO.PyPOTypes import *
-import src.PyPO.Config as Config
-import src.PyPO.Threadmgr as TManager
+from PyPO.BindUtils import *
+from PyPO.Structs import *
+from PyPO.PyPOTypes import *
+import PyPO.Config as Config
+import PyPO.Threadmgr as TManager
 
 ##
 # @file
@@ -18,15 +18,14 @@ import src.PyPO.Threadmgr as TManager
 #
 # @returns lib The ctypes library containing the C/C++ functions.
 def loadCPUlib():
+    path_cur = pathlib.Path(__file__).parent.resolve()
     try:
-        LD_PATH = pathlib.Path(__file__).parents[2]/"out/build/Debug"
-        lib = ctypes.CDLL(str(LD_PATH/"pypocpu.dll"))
+        lib = ctypes.CDLL(os.path.join(path_cur, "libpypocpu.dll"))
     except:
-        LD_PATH = pathlib.Path(__file__).parents[2]/"out/build"
         try:
-            lib = ctypes.CDLL(LD_PATH/"libpypocpu.so")
+            lib = ctypes.CDLL(os.path.join(path_cur, "libpypocpu.so"))
         except:
-            lib = ctypes.CDLL(LD_PATH/"libpypocpu.dylib")
+            lib = ctypes.CDLL(os.path.join(path_cur, "libpypocpu.dylib"))
 
     lib.propagateToGrid_JM.argtypes = [ctypes.POINTER(c2Bundle), reflparams, reflparams,
                                         ctypes.POINTER(reflcontainer), ctypes.POINTER(reflcontainer),

@@ -12,21 +12,21 @@ from pathlib import Path
 import pickle 
 
 # PyPO-specific modules
-from src.PyPO.BindRefl import *
-from src.PyPO.BindGPU import *
-from src.PyPO.BindCPU import *
-from src.PyPO.BindBeam import *
-from src.PyPO.BindTransf import *
-from src.PyPO.MatTransform import *
-from src.PyPO.PyPOTypes import *
-from src.PyPO.Checks import *
-import src.PyPO.Config as Config
-from src.PyPO.CustomLogger import CustomLogger
-import src.PyPO.Plotter as plt
-import src.PyPO.Efficiencies as effs
-import src.PyPO.FitGauss as fgs
+from PyPO.BindRefl import *
+from PyPO.BindGPU import *
+from PyPO.BindCPU import *
+from PyPO.BindBeam import *
+from PyPO.BindTransf import *
+from PyPO.MatTransform import *
+from PyPO.PyPOTypes import *
+from PyPO.Checks import *
+import PyPO.Config as Config
+from PyPO.CustomLogger import CustomLogger
+import PyPO.Plotter as plt
+import PyPO.Efficiencies as effs
+import PyPO.FitGauss as fgs
 
-import src.PyPO.WorldParam as world
+import PyPO.WorldParam as world
 
 # Set PyPO absolute root path
 sysPath = Path(__file__).parents[2]
@@ -38,9 +38,9 @@ logging.getLogger(__name__)
 #
 # This script contains the System class definition.
 class System(object):
-    customBeamPath = os.path.join(sysPath, "custom", "beam")
-    customReflPath = os.path.join(sysPath, "custom", "reflector")
-    savePathSystems = os.path.join(sysPath, "save", "systems")
+    customBeamPath = os.getcwd()
+    customReflPath = os.getcwd()
+    savePathSystems = os.getcwd()
 
 
     ##
@@ -81,7 +81,7 @@ class System(object):
         if not saveSystemsExist:
             os.makedirs(self.savePathSystems)
         
-        self.savePath = os.path.join(sysPath, "images")
+        self.savePath = os.getcwd() 
 
         existSave = os.path.isdir(self.savePath)
 
@@ -114,7 +114,12 @@ class System(object):
             del self.clog
     
     ##
-    # Obtain a reference to the custom logger used by system.
+    # @brief Obtain a reference to the custom logger used by system.
+    #
+    # This method can be called to obtain a reference to the logging object that PyPO uses internally.
+    # Can be convenient in cases one wants to log their own information in the layout of the PyPO logger.
+    #
+    # @ingroup public_api_sysio
     #
     # @returns clog Reference to system logger.
     def getSystemLogger(self):
@@ -145,10 +150,15 @@ class System(object):
         return s
 
     ##
-    # Set path to folder containing custom beams.
+    # @brief Set path to folder containing custom beam patterns.
     #
-    # @param path Path to custom beams. Beams should be stored in r<name_of_beam>.txt and i<name_of_beam>.txt format, containing real and imaginary parts respectively.
-    # @param append Whether path is relative to ./custom/beams/ or absolute.
+    # Set the path to the directory where PyPO looks for custom beam patterns.
+    # When a custom beam pattern is imported using the readCustomBeam() method, PyPO will look in the specified path for the beam patterns. 
+    #
+    # @ingroup public_api_sysio
+    #
+    # @param path Path to custom beams.
+    # @param append Whether path is relative to current working directory or absolute from home.
     def setCustomBeamPath(self, path, append=False):
         if append:
             self.customBeamPath = os.path.join(self.customBeamPath, path)
@@ -158,8 +168,12 @@ class System(object):
     ##
     # Set path to folder were to save output plots.
     #
+    # Set the path to the directory where PyPO saves output plots.
+    #
+    # @ingroup public_api_sysio
+    #
     # @param path Path to save directory.
-    # @param append Whether path is relative to ./images/ or absolute.
+    # @param append Whether path is relative to current working directory or absolute from home.
     def setSavePath(self, path, append=False):
         if append:
             self.savePath = os.path.join(self.savePath, path)
@@ -173,8 +187,12 @@ class System(object):
     ##
     # Set path to folder were to save systems.
     #
+    # Set the path to the directory where PyPO saves systems.
+    #
+    # @ingroup public_api_sysio
+    #
     # @param path Path to save directory.
-    # @param append Whether path is relative to ./save/systems/ or absolute.
+    # @param append Whether path is relative to current working directory or absolute from home.
     def setSavePathSystems(self, path, append=False):
         if append:
             self.savePathSystems = os.path.join(self.savePathSystems, path)
@@ -188,6 +206,11 @@ class System(object):
     ##
     # Set the verbosity of the logging from within the system.
     #
+    # Sometimes it is preferrable to not generate logging output to the console, for example when PyPO methods are called in for loops.
+    # This method allows for on/off switching of the logging unit so that the console is not flooded with logging messages.
+    #
+    # @ingroup public_api_sysio
+    #
     # @param verbose Whether to enable logging or not.
     # @param handler If multiple handlers are present, select which handler to adjust.
     def setLoggingVerbosity(self, verbose=True, handler=None):
@@ -200,8 +223,9 @@ class System(object):
     ##
     # Add a paraboloid reflector to the System.
     #
-    # Take a reflectordictionary and append to self.system list.
-    # If "pmode" == "focus", convert focus and vertex to a, b, c coefficients.
+    # This method takes a dictionary filled with the parameters for a paraboloid reflector and generates an internal dictionary for generating the reflectorgrids. 
+    #
+    # @ingroup public_api_reflmeths
     #
     # @param reflDict A filled reflectordictionary. Will raise an exception if not properly filled.
     def addParabola(self, reflDict):
@@ -253,8 +277,9 @@ class System(object):
     ##
     # Add a hyperboloid reflector to the System.
     #
-    # Take a reflectordictionary and append to self.system list.
-    # If "pmode" == "focus", convert focus_1 and focus_2 to a, b, c coefficients.
+    # This method takes a dictionary filled with the parameters for a hyperboloid reflector and generates an internal dictionary for generating the reflectorgrids. 
+    #
+    # @ingroup public_api_reflmeths
     #
     # @param reflDict A filled reflectordictionary. Will raise an exception if not properly filled.
     def addHyperbola(self, reflDict):
@@ -313,8 +338,9 @@ class System(object):
     ##
     # Add an ellipsoid reflector to the System.
     #
-    # Take a reflectordictionary and append to self.system list.
-    # If "pmode" == "focus", convert focus_1 and focus_2 to a, b, c coefficients.
+    # This method takes a dictionary filled with the parameters for an ellipsoid reflector and generates an internal dictionary for generating the reflectorgrids. 
+    #
+    # @ingroup public_api_reflmeths
     #
     # @param reflDict A filled reflectordictionary. Will raise an exception if not properly filled.
     def addEllipse(self, reflDict):
@@ -376,8 +402,9 @@ class System(object):
     ##
     # Add a planar surface to the System.
     #
-    # Take a reflectordictionary and append to self.system list.
-    # If "gmode" == "AoE", the surface is evaluated as an angular far-field grid.
+    # This method takes a dictionary filled with the parameters for a planar reflector and generates an internal dictionary for generating the reflectorgrids. 
+    #
+    # @ingroup public_api_reflmeths
     #
     # @param reflDict A filled reflectordictionary. Will raise an exception if not properly filled.
     def addPlane(self, reflDict):
@@ -409,9 +436,13 @@ class System(object):
     ##
     # Rotate reflector grids.
     #
-    # Apply a rotation, around a center of rotation, to a reflector or group. 
+    # Apply a rotation, around a center of rotation, to a reflector, group or frame.
     # Note that an absolute orientation rotates the orientation such that it is oriented w.r.t. the z-axis.
-    # In this case, the pivot defaults to the origin.
+    # In this case, the pivot defaults to the origin and not to the specified pivot.
+    # In the case that a PO field and/or a PO current is associated with the reflector, the polarisation of the field and/or current is rotated along as well.
+    # This can be disabled by setting the "keep_pol" parameter to "True".
+    #
+    # @ingroup public_api_common 
     #
     # @param name Reflector name or list of reflector names.
     # @param rotation Numpy ndarray of length 3, containing rotation angles around x, y and z axes, in degrees.
@@ -542,7 +573,10 @@ class System(object):
     ##
     # Translate reflector grids.
     #
-    # Apply a translation to a reflector or a group.
+    # Apply a translation to a reflector, group or frame.
+    # If the translation is absolute, the object will be translated such that its internal position parameter coincides with the specified translation.
+    #
+    # @ingroup public_api_common 
     #
     # @param name Reflector name or list of reflector names.
     # @param translation Numpy ndarray of length 3, containing translation x, y and z co-ordinates, in mm.
@@ -602,7 +636,9 @@ class System(object):
     ##
     # Home a reflector or a group back into default configuration.
     #
-    # Set internal transformation matrix of a (selection of) reflector(s) to identity.
+    # Set internal transformation matrix of a reflector or group to identity. 
+    #
+    # @ingroup public_api_reflmeths
     #
     # @param name Reflector name or list of reflector or group to be homed.
     # @param obj Type of object to be homed.
@@ -650,10 +686,14 @@ class System(object):
  
     ##
     # Take and store snapshot of object's current configuration.
-    # 
+    #
+    # A snapshot consists of the transformation matrix of an element, group of frame.
+    #
+    # @ingroup public_api_reflmeths
+    #
     # @param name Name of object to be snapped.
     # @param snap_name Name of snapshot to save.
-    # @param obj Whether object is an element or a group.
+    # @param obj Whether object is an element, group or frame.
     def snapObj(self, name, snap_name, obj="element"):
         if obj == "group":
             check_groupSystem(name, self.groups, self.clog, extern=True)
@@ -678,10 +718,14 @@ class System(object):
     
     ##
     # Revert object configuration to a saved snapshot.
-    # 
+    #
+    # Reverting an object to a snapshot replaces the internal transformation matrix with the matrix stored in the snapshot.
+    #
+    # @ingroup public_api_reflmeths
+    #
     # @param name Name of obj to revert.
     # @param snap_name Name of snapshot to revert to.
-    # @param obj Whether object is an element or a group.
+    # @param obj Whether object is an element, group or frame.
     def revertToSnap(self, name, snap_name, obj="element"):
         if obj == "group":
             check_groupSystem(name, self.groups, self.clog, extern=True)
@@ -697,10 +741,7 @@ class System(object):
             check_elemSystem(name, self.system, self.clog, extern=True)
             self._checkBoundPO(name, InvertMat(self.system[name]["transf"]))
             self.system[name]["transf"] = self.copyObj(self.system[name]["snapshots"][snap_name])
-            self._checkBoundPO(name, self.system[name]["transf"])
-        
-            self.clog.info(f"Reverted element {name} to snapshot {snap_name}.")
-        
+            self._checkBoundPO(name, self.system[name]["transf"]) self.clog.info(f"Reverted element {name} to snapshot {snap_name}.")
         elif obj == "frame":
             check_frameSystem(name, self.frames, self.clog, extern=True)
             self.frames[name].transf = self.copyObj(self.frames[name].snapshots[snap_name])
@@ -712,7 +753,11 @@ class System(object):
     
     ##
     # Delete a saved snapshot belonging to an object.
-    # 
+    #
+    # This deletes the stored snapshot, including the associated transformation matrix.
+    #
+    # @ingroup public_api_reflmeths
+    #
     # @param name Name of object.
     # @param snap_name Name of snapshot to delete.
     # @param obj Whether object is an element or a group.
@@ -737,9 +782,15 @@ class System(object):
     ##
     # Group elements together into a single block. After grouping, can translate, rotate and characterise as one.
     #
+    # This method adds a new field to the internal groups dictionary, with the key being the given name of the group.
+    # The item corresponding to this key is, again, a dictionary. The first key, "members", corresponds to a list containing the names of the reflectors added to the group.
+    # The position and orientation trackers of the group are set to the origin and the z-axis, respectively, if not passed as arguments.
+    #
+    # @ingroup public_api_reflmeths
+    #
     # @param names Names of elements to put in group.
     # @param name_group Name of the group.
-    # @param pos Position tracer for the group.
+    # @param pos Position tracker for the group.
     # @param ori Orientation tracker for group.
     def groupElements(self, name_group, *names, pos=None, ori=None):
         num = getIndex(name_group, self.groups.keys())
@@ -763,6 +814,10 @@ class System(object):
     ##
     # Remove a group of elements from system. Note that this does not remove the elements inside the group.
     #
+    # Removing a group only removes the key and item in the internal groups dictionary and does not remove the contained elements.
+    #
+    # @ingroup public_api_reflmeths
+    #
     # @param name_group Name of the group to be removed.
     def removeGroup(self, name_group):
         check_groupSystem(ng, self.groups, self.clog, extern=True)
@@ -773,7 +828,10 @@ class System(object):
     ##
     # Generate reflector grids and normals.
     # 
-    # Evaluate a stored reflDict and return the x, y, z grids, area and normals.
+    # Evaluate a stored reflector dictionary and return the x, y, z grids, area and normals.
+    # The outputs are grouped together in a grids object.
+    #
+    # @ingroup public_api_reflmeths
     #
     # @param name Name of reflector to be gridded.
     # @param transform Apply internal transformation matrix to reflector.
@@ -788,7 +846,12 @@ class System(object):
         return grids
     
     ##
-    # Save a system object to /save/systems/. This saves all reflectors, fields, currents and frames in the system to disk.
+    # Save a system object to disk. 
+    #
+    # The system from which this method is called will be saved in its entirety, e.g. all reflectors, fields, currents and frames, to disk.
+    # The directory to which the system will be saved will either be the current working directory or the directory specified with setSavePathSystems().
+    #
+    # @ingroup public_api_sysio
     #
     # @param name Save the current system under this name.
     def saveSystem(self, name):
@@ -821,6 +884,12 @@ class System(object):
     ##
     # Load a system object from /save/systems/. This loads all reflectors, fields, currents and frames in the system from disk.
     #
+    # The system from which this method is called will be overwritten in its entirety, e.g. all reflectors, fields, currents and frames will be replaced with the 
+    # internal dictionaries of the system to load.
+    # The directory from which the system will be saved will either be the current working directory or the directory specified with setSavePathSystems().
+    #
+    # @ingroup public_api_sysio
+    #
     # @param name Load the system under this name.
     def loadSystem(self, name):
         self.clog.info(f"Loading system {name} from {self.savePathSystems} into current system.")
@@ -852,6 +921,12 @@ class System(object):
     ##
     # Merge multiple systems together into current system.
     # 
+    # This method takes a arbitrary amount of system objects and updates the internal dictionaries of the system from which this method is called.
+    # This means that the calling system will keep its internal dictionaries. However, if the systems contain a key in the internal dictionaries
+    # matching a key in the calling system, this key and item will be overwritten.
+    #
+    # @ingroup public_api_sysio
+    #
     # @param systems Systems to be merged into current system
     def mergeSystem(self, *systems):
         if len(set(systems)) < len(systems):
@@ -869,6 +944,12 @@ class System(object):
     ##
     # Remove reflector from system.
     #
+    # This removes the key and corresponding reflector dictionary in the internal system dictionary.
+    # It also check whether the element is included in a group.
+    # If it is included in a group, the method will also remove the element from the "members" list of the group.
+    #
+    # @ingroup public_api_reflmeths
+    #
     # @ param name Name of reflector to be removed.
     def removeElement(self, name):
         check_elemSystem(name, self.system, self.clog, extern=True)
@@ -881,6 +962,11 @@ class System(object):
     ##
     # Copy reflector.
     #
+    # This method takes an internal reflector dictionary and generates a deepcopy, i.e. a true copy.
+    # The copy can be adjusted safely without changing the contents of the original.
+    #
+    # @ingroup public_api_reflmeths
+    #
     # @ param name Name of reflector to be copied.
     # @ param name_copy Name of new reflector.
     def copyElement(self, name, name_copy):
@@ -890,6 +976,13 @@ class System(object):
     
     ##
     # Copy group.
+    #
+    # This method takes a group name and generates a deepcopy, i.e. a true copy.
+    # The copy can be adjusted safely without changing the contents of the original.
+    # Note however that the elements themselves are not deepcopied.
+    # This might change later on.
+    #
+    # @ingroup public_api_reflmeths
     #
     # @ param name Name of group to be copied.
     # @ param name_copy Name of new group.
@@ -901,6 +994,10 @@ class System(object):
     ##
     # Remove a ray-trace frame from system.
     #
+    # This method takes the name of an internally stored frame object and removes it from the internal dictionary.
+    #
+    # @ingroup public_api_frames
+    #
     # @param frameName Name of frame to be removed.
     def removeFrame(self, frameName):
         check_frameSystem(frameName, self.frames, self.clog, extern=True)
@@ -910,6 +1007,10 @@ class System(object):
     
     ##
     # Remove a PO field from system.
+    #
+    # This method takes the name of an internally stored PO field object and removes it from the internal dictionary.
+    #
+    # @ingroup public_api_po
     #
     # @param fieldName Name of field to be removed.
     def removeField(self, fieldName):
@@ -921,6 +1022,10 @@ class System(object):
     ##
     # Remove a PO current from system.
     #
+    # This method takes the name of an internally stored PO current object and removes it from the internal dictionary.
+    #
+    # @ingroup public_api_po
+    #
     # @param curentName Name of current to be removed.
     def removeCurrent(self, currentName):
         check_currentSystem(currentName, self.currents, self.clog, extern=True)
@@ -931,6 +1036,10 @@ class System(object):
     ##
     # Remove a scalar PO field from system.
     #
+    # This method takes the name of an internally stored PO scalarfield object and removes it from the internal dictionary.
+    #
+    # @ingroup public_api_po
+    #
     # @param fieldName Name of scalar field to be removed.
     def removeScalarField(self, fieldName):
         check_scalarfieldSystem(fieldName, self.scalarfields, self.clog, extern=True)
@@ -940,6 +1049,12 @@ class System(object):
     
     ##
     # Read a custom beam from disk into the system. 
+    #
+    # The system will look in the customBeamPath, which defaults to the current working directory and can be set with the setCustomBeamPath() method.
+    # Note that the custom beam pattern needs to contain a real and imaginary part, and that these need to be stored in separate .txt files, stored as
+    # such: r<name_beam>.txt and i<name_beam>.txt, where 'r' and 'i' refer to the real and imaginary part, respectively.
+    #
+    # @ingroup public_api_po
     #
     # @param name_beam Name of the beam (without the 'r' or 'i' prefixes or '.txt' suffix).
     # @param name_source Name of source surface on which to define the beam. 
@@ -976,11 +1091,21 @@ class System(object):
         self.currents[name_beam] = currents_c
 
     ##
-    # Calculate currents on a surface given a field object. Sort of a private method.
-    # 
+    # Calculate currents on a surface given a field object.
+    #
+    # Given a surface and a PO field defined on said surface it is possible to calculate the image PO currents, the virtual currents that would give rise to the PO field.
+    # This is also known as the image theorem.
+    # For this, it is necessary to give appropriate boundary conditions on the surface. This depends on the PO field that is present.
+    # If only the electric field is known, the currents can be calculated by assuming a PMC (perfect magnetic conductor)
+    # right behind the surface, which radiated the elctric fields.
+    # In case only the magnetic field is know, the PMC is replaced by a PEC (perfect electric conductor).
+    # In case both electric and magnetic fields are know, the boundary conditions for vectorial EM fields at the surface can be used to calculate the image currents.
+    #
+    # @ingroup public_api_po
+    #
     # @param name_source Name of surface in which to calculate currents.
     # @param fields Fields object from which to calculate currents.
-    # @para mode Which approximation to use. Can choose between Perfect Electrical Conductor ('PEC'), Perfect Magnetic Conductor ('PMC') or full calculation ('full'). Defaults to 'PMC'.
+    # @para mode Which approximation to use. Can choose between Perfect Electrical Conductor ('PEC', requires H-field), Perfect Magnetic Conductor ('PMC', requires E-field) or full calculation ('full', requires both). Defaults to 'PMC'.
     #
     # @see fields
     # @see currents
@@ -990,8 +1115,12 @@ class System(object):
         return currents
 
     ##
-    # Instantiate a PO propagation. Stores desired output in the system.fields and/or system.currents lists.
-    # If the 'EHP' mode is selected, the reflected Poynting frame is stored in system.frames.
+    # Instantiate a PO propagation. 
+    #
+    # Stores desired output in the internal fields and/or internal currents dictionary.
+    # If the 'EHP' mode is selected, the reflected Poynting frame is stored in the internal frame dictionary.
+    #
+    # @ingroup public_api_po
     #
     # @param PODict Dictionary containing the PO propagation instructions.
     #
@@ -1053,7 +1182,7 @@ class System(object):
             out[0].setMeta(_runPODict["t_name"], _runPODict["k"])
             self.fields[_runPODict["name_EH"]] = out[0]
 
-            frame = self.loadFramePoynt(out[1], _runPODict["t_name"])
+            frame = self._loadFramePoynt(out[1], _runPODict["t_name"])
             self.frames[_runPODict["name_P"]] = frame
        
             self.assoc[_runPODict["t_name"]] = [_runPODict["name_EH"], _runPODict["name_P"]]
@@ -1068,7 +1197,14 @@ class System(object):
     ##
     # Merge multiple beams that are defined on the same surface.
     #
+    # The beams to be merged are first checked to see if they are all defined on the same surface.
+    # Then, a new PO field or current is defined in the internal dictionary with the new name.
+    #
+    # @ingroup public_api_po
+    #
     # @param beams Fields or currents objects to merge.
+    # @param obj Whether the beams are PO fields or currents.
+    # @param merged_name Name of merged object.
     def mergeBeams(self, *beams, obj="fields", merged_name="combined"):
         check_sameBound(beams, checkDict=getattr(self, obj), clog=self.clog) 
         ex = getattr(self, obj)[beams[0]]
@@ -1107,6 +1243,11 @@ class System(object):
     ##
     # Create a tube of rays from a TubeRTDict.
     #
+    # The tube of rays will be placed in the internal frame dictionary. 
+    # Position and orientation trackers for the frame are initialised to the origin and z-axis, respectively.
+    #
+    # @ingroup public_api_frames
+    #
     # @param argDict A TubeRTDict, filled. If not filled properly, will raise an exception.
     #
     # @see TubeRTDict
@@ -1124,6 +1265,12 @@ class System(object):
     
     ##
     # Create a Gaussian beam distribution of rays from a GRTDict.
+    #
+    # The Gaussian frame will be placed in the internal frame dictionary.
+    # The frame is generated by rejection-sampling a Gaussian distribution in position and direction on an xy-grid.
+    # Position and orientation trackers for the frame are initialised to the origin and z-axis, respectively.
+    #
+    # @ingroup public_api_frames
     #
     # @param argDict A GRTDict, filled. If not filled properly, will raise an exception.
     #
@@ -1151,28 +1298,14 @@ class System(object):
         self.clog.info(f"Added Gaussian frame {_argDict['name']} to system.")
 
     ##
-    # Convert a Poynting vector grid to a frame object. Sort of private method
-    # 
-    # @param Poynting An rfield object containing reflected Poynting vectors.
-    # @param name_source Name of reflector on which reflected Poynting vectors are defined
-    #
-    # @returns frame_in Frame object containing the Poynting vectors and base points.
-    #
-    # @see rfield
-    # @see frame
-    def loadFramePoynt(self, Poynting, name_source):
-        check_elemSystem(name_source, self.system, self.clog, extern=True)
-        grids = generateGrid(self.system[name_source])
-
-        nTot = Poynting.x.shape[0] * Poynting.x.shape[1]
-        frame_in = frame(nTot, grids.x.ravel(), grids.y.ravel(), grids.z.ravel(),
-                        Poynting.x.ravel(), Poynting.y.ravel(), Poynting.z.ravel())
-
-        return frame_in
-
-    ##
     # Calculate total length of a ray-trace beam.
+    #
     # Takes multiple frames and calculates the distance for each ray between frames.
+    # If the "start" parameter is set to a len-3 Numpy array, the ray length will also include the 
+    # distance between the position of the ray in the first frame and the given starting point.
+    # This is useful in case the rays emanate from a single point which is not included as a frame in the internal dictionary.
+    #
+    # @ingroup public_api_frames
     #
     # @param frames Frames between which to calculate total pathlength.
     # @param start Point from which to start the calculation, len-3 Numpy array. If given, also calculates distance between point and the first frame. Defaults to None.
@@ -1234,6 +1367,14 @@ class System(object):
     ##
     # Create a vectorial Gaussian beam.
     #
+    # This method creates a general, potentially astigmatic, vectorial Gaussian beam.
+    # The beam is evaluated with the focus at z = 0. 
+    # The surface on which the beam is calculated, defined by "name_source", does not have to lie in or be parallel to the xy-plane.
+    # Instead, the Gaussian beam is evaluated on the surface as-is, evaluating the Gaussian beam at the xyz-points on the surface.
+    # Still, the focus is at z = 0. If one wishes to displace the focal point, the PO fields and currents need to be translated after generating the Gaussian beam.
+    #
+    # @ingroup public_api_po
+    #
     # @param gaussDict A GDict containing parameters for the Gaussian beam.
     # @param name_source Name of plane on which to define Gaussian.
     #
@@ -1257,6 +1398,14 @@ class System(object):
     ##
     # Create a scalar Gaussian beam.
     #
+    # This method creates a general, potentially astigmatic, scalar Gaussian beam.
+    # The beam is evaluated with the focus at z = 0. 
+    # The surface on which the beam is calculated, defined by "name_source", does not have to lie in or be parallel to the xy-plane.
+    # Instead, the Gaussian beam is evaluated on the surface as-is, evaluating the Gaussian beam at the xyz-points on the surface.
+    # Still, the focus is at z = 0. If one wishes to displace the focal point, the PO scalarfield needs to be translated after generating the Gaussian beam.
+    #
+    # @ingroup public_api_po
+    #
     # @param gaussDict A GDict containing parameters for the Gaussian beam.
     # @param name_source Name of plane on which to define Gaussian.
     #
@@ -1276,6 +1425,10 @@ class System(object):
 
     ##
     # Run a ray-trace propagation from a frame to a surface.
+    #
+    # The resulting frame is placed in the internal frames dictionary.
+    #
+    # @ingroup public_api_frames
     #
     # @param runRTDict A runRTDict object specifying the ray-trace.
     def runRayTracer(self, runRTDict):
@@ -1309,8 +1462,14 @@ class System(object):
     
     ##
     # Perform a hybrid RT/PO propagation, starting from a reflected field and set of Poynting vectors.
-    # Stores name of resultant field and frame in self.assoc, as two associated objects.
-    # The name of the association is the surface on which both are defined.
+    #
+    # The propagation is done by performing a ray trace from the starting frame into the target surface.
+    # Then, the starting reflected field is propagated to the target by multiplying each point on the field by the 
+    # phase factor corresponding to the travel length of the Poynting vector ray associated to the point on the field.
+    # Stores name of resultant field and frame in the internal association dictionary as two associated objects.
+    # The name of the association is the surface on which both the target frame and field are defined.
+    #
+    # @ingroup public_api_hybrid
     #
     # @param hybridDict A hybridDict dictionary.
     def runHybridPropagation(self, hybridDict):
@@ -1362,7 +1521,11 @@ class System(object):
 
     ##
     # Interpolate a frame and an associated field on a regular surface.
+    #
     # The surface should be the target on which the input frame is calculated.
+    # The "name_field" should be an associated field, calculated in the same hybrid propagation as "name_fr_in".
+    # 
+    # @ingroup public_api_hybrid
     #
     # @param name_fr_in Name of input frame.
     # @param name_field Name of field object, propagated along with the frame by multiplication.
@@ -1420,6 +1583,10 @@ class System(object):
     ##
     # Calculate the geometric center of a ray-trace frame.
     #
+    # The center is calculated by finding the centroid of the given frame.
+    #
+    # @ingroup public_api_frames
+    #
     # @param name_frame Name of frame to calculate center of.
     #
     # @returns c_f Len-3 Numpy array containing x, y and z co-ordinates of frame center.
@@ -1431,6 +1598,10 @@ class System(object):
 
     ##
     # Calculate the mean direction normal of a ray-trace frame.
+    #
+    # The mean direction is calculated by taking the mean tilt of every ray in the frame.
+    #
+    # @ingroup public_api_frames
     #
     # @param name_frame Name of frame to calculate tilt of.
     #
@@ -1444,6 +1615,10 @@ class System(object):
     ##
     # Calculate the RMS spot size of a ray-trace frame.
     #
+    # The RMS spotsize is calculated by taking the root-mean-square of the positions of the rays in the frame.
+    #
+    # @ingroup public_api_frames
+    #
     # @param name_frame Name of frame to calculate RMS of.
     #
     # @returns rms RMS spot size of frame in mm.
@@ -1455,7 +1630,10 @@ class System(object):
 
     ##
     # Calculate spillover efficiency of a beam defined on a surface.
+    #
     # The method calculates the spillover using the fraction of the beam that illuminates the region defined in aperDict versus the total beam.
+    #
+    # @ingroup public_api_po
     #
     # @param name_field Name of the PO field.
     # @param comp Component of field to calculate spillover of.
@@ -1476,8 +1654,11 @@ class System(object):
 
     ##
     # Calculate taper efficiency of a beam defined on a surface.
+    #
     # The method calculates the taper efficiency using the fraction of the beam that illuminates the region defined in aperDict versus the total beam.
     # If aperDict is not given, it will calculate the taper efficiency on the entire beam.
+    #
+    # @ingroup public_api_po
     #
     # @param name_field Name of the PO field.
     # @param comp Component of field to calculate taper efficiency of.
@@ -1501,7 +1682,10 @@ class System(object):
 
     ##
     # Calculate cross-polar efficiency of a field defined on a surface.
+    #
     # The cross-polar efficiency is calculated over the entire field extent.
+    #
+    # @ingroup public_api_po
     #
     # @param name_field Name of the PO field.
     # @param comp_co Co-polar component of field.
@@ -1519,6 +1703,12 @@ class System(object):
 
     ##
     # Fit a Gaussian profile to the amplitude of a field component and adds the result to scalar field in system.
+    #
+    # The resultant Gaussian fit cannot be propagated using vectorial means, but can be propagated using scalar propagation.
+    # Note that this method is very sensitive to initial conditions, especially when the beam pattern to which to fit the Gaussian has multiple maxima or is generally
+    # ill-described by a Gaussian. In the latter case, the method may fail altogether.
+    #
+    # @ingroup public_api_po
     #
     # @param name_field Name of field object.
     # @param comp Component of field object.
@@ -1556,9 +1746,15 @@ class System(object):
 
     ##
     # Calculate main-beam efficiency of a beam pattern.
+    #
     # The main-beam efficiency is calculated by fitting a Gaussian amplitude profile to the central lobe.
+    # This might reuire fine-tuning the "thres" parameter, or changing the space in whcih to fit by supplying the "mode" parameter.
     # Then, the efficiency is defined as the fraction of power in the Gaussian w.r.t. the full pattern.
     # Designed for far-field beam patterns, but also applicable to regular fields.
+    # Note that since this method uses the fitGaussAbs() method, the result is quite sensitive to initial conditions and should therefore be (iteratively) checked for 
+    # robustness.
+    #
+    # @ingroup public_api_po
     #
     # @param name_field Name of field object.
     # @param comp Component of field object.
@@ -1582,6 +1778,15 @@ class System(object):
     
     ##
     # Calculate cross sections of a beam pattern.
+    #
+    # This method calculates cross sections along the cardinal planes of the beam pattern.
+    # The cardinal planes here are defined to lie along the semi-major and semi-minor axes of the beam pattern.
+    # It does this by first finding the center and position angle of the beam pattern.
+    # Then, it creates a snapshot of the current configuration and translates and rotates the beam pattern so that the cardinal planes are 
+    # oriented along the x- and y-axes.
+    # It is also possible to not do this and instead directly calculate the cross sections along the x- and y-axes as-is.
+    #
+    # @ingroup public_api_po
     #
     # @param name_field Name of field object.
     # @param comp Component of field object.
@@ -1649,6 +1854,11 @@ class System(object):
     ##
     # Plot beam pattern cross sections.
     #
+    # Plot the beam cross sections for a PO field.
+    # In this case, calcBeamCuts() will try to translate and rotate the supplied beam pattern to lie along the x- and y-axes.
+    #
+    # @ingroup public_api_vis
+    #
     # @param name_field Name of field object.
     # @param comp Component of field object.
     # @param comp_cross Cross-polar component. If given, is plotted as well. Defaults to None.
@@ -1690,7 +1900,11 @@ class System(object):
 
     ##
     # Calculate half-power beamwidth.
+    #
     # This is done by directly evaluating the -3 dB points along both cardinal planes of the beam pattern.
+    # Then, the distance between antipodal half-power points is calculated on an interpolation of the supplied PO field.
+    #
+    # @ingroup public_api_po
     #
     # @param name_field Name of field object.
     # @param comp Component of field object.
@@ -1717,6 +1931,13 @@ class System(object):
 
     ##
     # Generate point-source PO fields and currents.
+    #
+    # The point source is generated in the center of the source surface given by "name_surface".
+    # It is generally a good idea to make this source surface as small as possible, in order to create a "nice" point source.
+    # If this is too big, the resulting PO field more closely resembles a uniformly illuminated square.
+    # The H-field is set to 0.
+    #
+    # @ingroup public_api_po
     #
     # @param PSDict A PSDict dictionary, containing parameters for the point source.
     # @param name_surface Name of surface on which to define the point-source.
@@ -1757,6 +1978,11 @@ class System(object):
     ##
     # Generate uniform PO fields and currents.
     #
+    # The uniform field is generated by defining a PO field on the source surface and setting all values to the amplitude specified in 
+    # the input dictionary. The H-field is set to 0.
+    #
+    # @ingroup public_api_po
+    #
     # @param UDict A UDict dictionary, containing parameters for the uniform pattern.
     # @param name_surface Name of surface on which to define the uniform pattern.
     #
@@ -1791,6 +2017,13 @@ class System(object):
     ##
     # Generate point-source scalar PO field.
     #
+    # The point source is generated in the center of the source surface given by "name_surface".
+    # It is generally a good idea to make this source surface as small as possible, in order to create a "nice" point source.
+    # If this is too big, the resulting PO field more closely resembles a uniformly illuminated square.
+    # The H-field is set to 0.
+    #
+    # @ingroup public_api_po
+    #
     # @param PSDict A PSDict dictionary, containing parameters for the point source.
     # @param name_surface Name of surface on which to define the point-source.
     #
@@ -1819,6 +2052,11 @@ class System(object):
     ##
     # Generate scalar uniform PO fields and currents.
     #
+    # The uniform field is generated by defining a PO field on the source surface and setting all values to the amplitude specified in 
+    # the input dictionary. The H-field is set to 0.
+    #
+    # @ingroup public_api_po
+    #
     # @param UDict A UDict dictionary, containing parameters for the uniform pattern.
     # @param name_surface Name of surface on which to define the uniform pattern.
     #
@@ -1841,9 +2079,12 @@ class System(object):
    
     ##
     # Interpolate a PO beam. Only for beams defined on planar surfaces.
-    # Can interpolate fields and currents separately.
-    # Results are stored in a new fields/currents object with the original name appended by 'interp'.
+    #
+    # Can interpolate PO fields and currents separately.
+    # Results are stored in a new PO fields/currents object with the original name appended by 'interp'.
     # Also, a new plane will be created with the updated gridsize and name appended by 'interp'.
+    #
+    # @ingroup public_api_po
     #
     # @param name Name of beam to be interpolated.
     # @param gridsize_new New gridsizes for interpolation.
@@ -1891,8 +2132,12 @@ class System(object):
             self.currents[name + "_interp"] = obj_interp
 
     ##
-    # Generate a 2D plot of a field or current.
+    # Generate a 2D plot of a PO (scalar)field or current.
+    #
     # Note that matplotlib offers custom control over figures in the matplotlib window.
+    # This means that most parameters described for this method can be adjusted in the matplotlib plotting window.
+    #
+    # @ingroup public_api_vis
     #
     # @param name_obj Name of field or current to plot.
     # @param comp Component of field or current to plot. 
@@ -1988,7 +2233,11 @@ class System(object):
 
     ##
     # Plot a 3D reflector.
+    #
     # Note that matplotlib offers custom control over figures in the matplotlib window.
+    # This means that most parameters described for this method can be adjusted in the matplotlib plotting window.
+    #
+    # @ingroup public_api_vis
     #
     # @param name_surface Name of reflector to plot.
     # @param cmap Colormap of reflector. Default is cool.
@@ -2027,7 +2276,12 @@ class System(object):
 
     ##
     # Plot the current system. Plots the reflectors and optionally ray-trace frames in a 3D plot.
+    #
+    # The ray-trace frames to plot are supplied as a list to the "RTframes" parameter.
     # Note that matplotlib offers custom control over figures in the matplotlib window.
+    # This means that most parameters described for this method can be adjusted in the matplotlib plotting window.
+    #
+    # @ingroup public_api_vis
     #
     # @param name_surface Name of reflector to plot.
     # @param cmap Colormap of reflector. Default is cool.
@@ -2078,6 +2332,11 @@ class System(object):
     ##
     # Plot a group of reflectors.
     #
+    # Note that matplotlib offers custom control over figures in the matplotlib window.
+    # This means that most parameters described for this method can be adjusted in the matplotlib plotting window.
+    #
+    # @ingroup public_api_vis
+    #
     # @param name_group Name of group to be plotted.
     # @param show Show the plot.
     # @param ret Whether to return figure and axis.
@@ -2093,17 +2352,93 @@ class System(object):
     ##
     # Create a spot diagram of a ray-trace frame.
     #
+    # Note that matplotlib offers custom control over figures in the matplotlib window.
+    # This means that most parameters described for this method can be adjusted in the matplotlib plotting window.
+    #
+    # @ingroup public_api_vis
+    #
     # @param name_frame Name of frame to plot.
     # @param project Set abscissa and ordinate of plot. Should be given as a string. Default is "xy".
     # @param ret Return Figure and Axis. Default is False.
     # @param aspect Aspect ratio of plot. Default is 1.
-    def plotRTframe(self, name_frame, project="xy", ret=False, aspect=1):
+    # @param unit Units of the axes for the plot.
+    def plotRTframe(self, name_frame, project="xy", ret=False, aspect=1, unit="mm"):
+        unit = self._units(unit)
         check_frameSystem(name_frame, self.frames, self.clog, extern=True)
         if ret:
-            return plt.plotRTframe(self.frames[name_frame], project, self.savePath, ret, aspect)
+            return plt.plotRTframe(self.frames[name_frame], project, self.savePath, ret, aspect, unit)
         else:
-            plt.plotRTframe(self.frames[name_frame], project, self.savePath, ret, aspect)
+            plt.plotRTframe(self.frames[name_frame], project, self.savePath, ret, aspect, unit)
 
+
+    ##
+    # Find the focus of a ray-trace frame.
+    #
+    # Adds a new plane to the System, perpendicular to the mean ray-trace tilt of the input frame.
+    # The new plane is called focal_plane_<name_frame> and stored in the internal system dictionary.
+    # After completion, the new plane is centered at the ray-trace focus.
+    # The focus frame is stored as focus_<name_frame> in the internal frames dictionary.
+    #
+    # @ingroup public_api_frames
+    #
+    # @param name_frame Name of the input frame.
+    # @param f0 Initial try for focal distance.
+    # @param verbose Allow verbose System logging.
+    #
+    # @returns out The focus co-ordinate.
+    def findRTfocus(self, name_frame, f0=None, tol=1e-12):
+        check_frameSystem(name_frame, self.frames, self.clog, extern=True)
+        f0 = 0 if f0 is None else f0
+       
+        
+        tilt = self.calcRTtilt(name_frame)
+        center = self.calcRTcenter(name_frame)
+        match = self.copyObj(world.IAX())
+        
+        if np.all(np.isclose(match, -tilt)):
+            R = np.eye(4)
+        else:
+            R = self.findRotation(match, tilt)
+        
+        t_name = f"focal_plane_{name_frame}"
+        fr_out = f"focus_{name_frame}"
+
+        target = {
+                "name"      : t_name,
+                "gmode"     : "xy",
+                "lims_x"    : np.array([-4.2, 4.2]),
+                "lims_y"    : np.array([-4.2, 4.2]),
+                "gridsize"  : np.array([3, 3])
+                }
+
+        self.addPlane(target)
+        self.system[t_name]["transf"] = R 
+        self.translateGrids(t_name, center)
+        
+        runRTDict = {
+                "fr_in"     : name_frame,
+                "fr_out"    : fr_out,
+                "t_name"    : t_name,
+                "device"    : "CPU",
+                "tol"       : tol,
+                "nThreads"  : 1
+                }
+
+        self.clog.work(f"Finding focus of {name_frame}...")
+        
+        verbosity_init = self.verbosity
+        self.setLoggingVerbosity(verbose=False)
+        
+        res = fmin(self._optimiseFocus, f0, args=(runRTDict, tilt), full_output=True, disp=False, ftol=tol)
+ 
+        out = res[0] * tilt + center
+        self.translateGrids(t_name, out, mode="absolute")
+        
+        self.setLoggingVerbosity(verbose=verbosity_init)
+        self.clog.result(f"Focus of frame {name_frame}: {*['{:0.3e}'.format(x) for x in out],}, RMS: {res[1]:.3e}")
+
+        return out
+        
     ##
     # Create a deep copy of any object.
     # 
@@ -2143,65 +2478,7 @@ class System(object):
         R_transf[:-1, :-1] = R
         
         return R_transf
-
-    ##
-    # Find the focus of a ray-trace frame.
-    # Adds a new plane to the System, perpendicular to the mean ray-trace tilt of the input frame.
-    # After completion, the new plane is centered at the ray-trace focus.
-    #
-    # @param name_frame Name of the input frame.
-    # @param f0 Initial try for focal distance.
-    # @param verbose Allow verbose System logging.
-    #
-    # @returns out The focus co-ordinate.
-    def findRTfocus(self, name_frame, f0=None):
-        check_frameSystem(name_frame, self.frames, self.clog, extern=True)
-        f0 = 0 if f0 is None else f0
-       
-        
-        tilt = self.calcRTtilt(name_frame)
-        center = self.calcRTcenter(name_frame)
-        match = self.copyObj(world.IAX())
-        R = self.findRotation(match, tilt)
-        t_name = f"focal_plane_{name_frame}"
-        fr_out = f"focus_{name_frame}"
-
-        target = {
-                "name"      : t_name,
-                "gmode"     : "xy",
-                "lims_x"    : np.array([-4.2, 4.2]),
-                "lims_y"    : np.array([-4.2, 4.2]),
-                "gridsize"  : np.array([3, 3])
-                }
-
-        self.addPlane(target)
-        self.system[t_name]["transf"] = R 
-        self.translateGrids(t_name, center)
-        
-        runRTDict = {
-                "fr_in"     : name_frame,
-                "fr_out"    : fr_out,
-                "t_name"    : t_name,
-                "device"    : "CPU",
-                "tol"       : 1e-12,
-                "nThreads"  : 1
-                }
-
-        self.clog.work(f"Finding focus of {name_frame}...")
-        
-        verbosity_init = self.verbosity
-        self.setLoggingVerbosity(verbose=False)
-        
-        res = fmin(self._optimiseFocus, f0, args=(runRTDict, tilt), full_output=True, disp=False)
- 
-        out = res[0] * tilt + center
-        self.translateGrids(t_name, out, mode="absolute")
-        
-        self.setLoggingVerbosity(verbose=verbosity_init)
-        self.clog.result(f"Focus of frame {name_frame}: {*['{:0.3e}'.format(x) for x in out],}, RMS: {res[1]:.3e}")
-
-        return out
-        
+    
     ##
     # Find x, y and z rotation angles from general rotation matrix.
     # Note that the angles are not necessarily the same as the original angles of the matrix.
@@ -2285,7 +2562,7 @@ class System(object):
             out[0].setMeta(_runPODict["t_name"], _runPODict["k"])
             self.fields[_runPODict["name_EH"]] = out[0]
 
-            frame = self.loadFramePoynt(out[1], _runPODict["t_name"])
+            frame = self._loadFramePoynt(out[1], _runPODict["t_name"])
             self.frames[_runPODict["name_P"]] = frame
             self.assoc[_runPODict["t_name"]] = [_runPODict["name_EH"], _runPODict["name_P"]]
 
@@ -2353,6 +2630,26 @@ class System(object):
     #                       PRIVATE METHODS                     #
     #                                                           #
     #############################################################
+    
+    ##
+    # Convert a Poynting vector grid to a frame object.
+    # 
+    # @param Poynting An rfield object containing reflected Poynting vectors.
+    # @param name_source Name of reflector on which reflected Poynting vectors are defined
+    #
+    # @returns frame_in Frame object containing the Poynting vectors and base points.
+    #
+    # @see rfield
+    # @see frame
+    def _loadFramePoynt(self, Poynting, name_source):
+        check_elemSystem(name_source, self.system, self.clog, extern=True)
+        grids = generateGrid(self.system[name_source])
+
+        nTot = Poynting.x.shape[0] * Poynting.x.shape[1]
+        frame_in = frame(nTot, grids.x.ravel(), grids.y.ravel(), grids.z.ravel(),
+                        Poynting.x.ravel(), Poynting.y.ravel(), Poynting.z.ravel())
+
+        return frame_in
     
     ##
     # Cost function for finding a ray-trace frame focus.
@@ -2450,6 +2747,12 @@ class System(object):
 
         elif unit == "cm":
             return [unit, 1e-2]
+        
+        elif unit == "um":
+            return [unit, 1e3]
+        
+        elif unit == "nm":
+            return [unit, 1e6]
 
         elif unit == "deg":
             return [unit, 1.]

@@ -1,0 +1,4 @@
+/**
+\defgroup public_api_reflmeths Reflector Methods 
+\brief This section contains a list of public `PyPO` methods concerning making/moving/deleting elements and groups.
+*/

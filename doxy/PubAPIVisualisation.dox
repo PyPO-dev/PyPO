@@ -1,0 +1,4 @@
+/**
+\defgroup public_api_vis Visualisation Methods 
+\brief This section contains a list of public `PyPO` methods which are used for visualising systems, elements, frames and PO fields/currents.
+*/

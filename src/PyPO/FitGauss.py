@@ -1,9 +1,9 @@
 import numpy as np
 from scipy.optimize import fmin
 
-from src.PyPO.PyPOTypes import *
-from src.PyPO.BindRefl import *
-from src.PyPO.MatUtils import *
+from PyPO.PyPOTypes import *
+from PyPO.BindRefl import *
+from PyPO.MatUtils import *
 
 ##
 # @file

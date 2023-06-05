@@ -7,7 +7,7 @@ import unittest
 import numpy as np
 from pathlib import Path
 
-from src.PyPO.System import System
+from PyPO.System import System
 
 class Test_Backwards(unittest.TestCase):
     def test_Backwards(self):

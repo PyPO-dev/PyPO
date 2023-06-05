@@ -5,8 +5,8 @@ from scipy.stats import special_ortho_group
 import unittest
 import numpy as np
 
-from src.PyPO.System import System
-import src.PyPO.MatTransform as mt
+from PyPO.System import System
+import PyPO.MatTransform as mt
 ##
 # @file
 # 

@@ -17,10 +17,10 @@ from src.GUI.PlotScreen import PlotScreen
 from src.GUI.WorkSpace import Workspace
 from src.GUI.SubprocessManager import SubprocessManager, copySystem
 
-from src.PyPO.CustomLogger import CustomGUILogger
+from PyPO.CustomLogger import CustomGUILogger
 
-import src.PyPO.System as st
-import src.PyPO.Checks as chk
+import PyPO.System as st
+import PyPO.Checks as chk
 
 ##
 # @file 

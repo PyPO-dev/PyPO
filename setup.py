@@ -46,7 +46,7 @@ required = ["numpy", "scipy", "matplotlib"]
 
 setup(
     name='PyPO-pkg',
-    version='1.1.1',
+    version='1.0.0',
     author="Arend Moerman",
     install_requires = required,
     package_dir = {'': 'src'},

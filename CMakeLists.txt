@@ -7,10 +7,6 @@ project(PyPO-pkg
     DESCRIPTION "Python Physical Optics"
     LANGUAGES CXX C)
 
-if(SKBUILD)
-    message(STATUS "The project is built using scikit-build")
-endif()
-
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 

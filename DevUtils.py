@@ -20,13 +20,14 @@ import traceback
 #```
 def DevUtils():
     parser = argparse.ArgumentParser(description="development interface script for PyPO")
+    parser.add_argument("-v", "--set-version", type=str, help="set PyPO version for distribution")
     parser.add_argument("-s", "--sdist", help="generate a PyPO source distribution into dist folder", action="store_true")
     parser.add_argument("-b", "--bdist", help="generate a PyPO binary wheel into dist folder. EXPERIMENTAL.", action="store_true")
     parser.add_argument("-u", "--upload", help="upload dist folder to test-pypi using twine. Will ask for username and password", action="store_true")
     parser.add_argument("-d", "--docs", help="generate PyPO documentation with doxygen", action="store_true")
     parser.add_argument("-t", "--test", help="run PyPO automated tests", action="store_true")
     args = parser.parse_args()
-
+    
     if args.sdist:
         os.system("python3 setup.py sdist")
 

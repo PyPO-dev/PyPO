@@ -1130,7 +1130,7 @@ def check_runPODict(runPODict, elements, fields, currents, scalarfields, frames,
         if "name_field" not in runPODict:
             errStr += errMsg_field("name_field", "runPODict")
         
-        num = getIndex(runPODict["name_field"], fields)
+        num = getIndex(runPODict["name_field"], scalarfields)
 
         if num > 0:
             runPODict["name_field"] = runPODict["name_field"] + "_{}".format(num)

@@ -33,7 +33,7 @@ After the merge, do not forget to synchronise your remote/local copy:
 ```
 git checkout main
 git pull upstream main
-git oush origin main
+git push origin main
 ```
 
 Then, the feature branch can be deleted:

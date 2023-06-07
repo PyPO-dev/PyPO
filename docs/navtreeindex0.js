@@ -14,6 +14,7 @@ var NAVTREEINDEX0 =
 "index.html#man":[0,2],
 "index.html#optdep":[0,1,2],
 "index.html#sdist":[0,1,0],
+"index.html#windows":[0,1,0,2],
 "pages.html":[],
 "pypodocs.html":[2],
 "tutorials.html":[1]

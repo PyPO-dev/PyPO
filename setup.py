@@ -39,7 +39,10 @@ class build_ext(build_ext_orig):
         os.chdir(str(build_temp))
         self.spawn(['cmake', str(cwd)] + cmake_args)
         if not self.dry_run:
-            self.spawn(['cmake', '--build', '.'] + build_args)
+            if os.name != "nt":
+                self.spawn(['cmake', '--build', '.'] + build_args)
+            else:
+                self.spawn(['cmake', '--build', '.'])
         os.chdir(str(cwd))
 
 required = ["numpy", "scipy", "matplotlib"]

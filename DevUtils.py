@@ -23,9 +23,10 @@ def DevUtils():
     parser.add_argument("-v", "--set-version", type=str, help="set PyPO version for distribution")
     parser.add_argument("-s", "--sdist", help="generate a PyPO source distribution into dist folder", action="store_true")
     parser.add_argument("-b", "--bdist", help="generate a PyPO binary wheel into dist folder. EXPERIMENTAL.", action="store_true")
-    parser.add_argument("-u", "--upload", help="upload dist folder to test-pypi using twine. Will ask for username and password", action="store_true")
     parser.add_argument("-d", "--docs", help="generate PyPO documentation with doxygen", action="store_true")
     parser.add_argument("-t", "--test", help="run PyPO automated tests", action="store_true")
+    parser.add_argument("--upload-test", help="upload dist folder to test-pypi using twine. Will ask for username and password", action="store_true")
+    parser.add_argument("--upload-pip", help="upload dist folder to pypi using twine. Will ask for username and password", action="store_true")
     args = parser.parse_args()
     
     if args.sdist:
@@ -34,8 +35,11 @@ def DevUtils():
     if args.bdist:
         os.system("python3 setup.py bdist_wheel")
 
-    if args.upload:
+    if args.upload_test:
         os.system("twine upload --repository testpypi dist/*")
+    
+    if args.upload_pip:
+        os.system("twine upload dist/*")
 
     if args.docs:
         tut_path = "tutorials"

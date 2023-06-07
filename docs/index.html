@@ -114,7 +114,6 @@ Installation</h1>
 <li>A working <a href="https://www.python.org/downloads/release/python-380/">Python installation of version 3.8 or higher</a>.</li>
 <li>A <a href="https://pip.pypa.io/en/stable/installation/">pip installation</a>.</li>
 </ul>
-<p>Currently, <code>PyPO</code> can only be built from source. </p>
 <h2><a class="anchor" id="sdist"></a>
 Install From Source</h2>
 <h3><a class="anchor" id="linux"></a>
@@ -126,6 +125,11 @@ Linux</h3>
 MacOS</h3>
 <p>Installing <code>PyPO</code> from source on MacOS proceeds largely along the same lines as for Linux. The only difference being that you will need to have the command line tools package installed: </p><div class="fragment"><div class="line">xcode-select --install</div>
 </div><!-- fragment --><p>Then, installation of <code>PyPO</code> proceeds in the same fashion as for Linux.</p>
+<h3><a class="anchor" id="windows"></a>
+Windows</h3>
+<p>Install CMake through pip: </p><div class="fragment"><div class="line">pip install cmake</div>
+</div><!-- fragment --><p>Then, install <a href="https://visualstudio.microsoft.com/vs/express/">Visual Studio Express</a>. Choose the C++ desktop development package. Important is, is that the MSVC compiler is present</p>
+<p>After this is installed, <code>PyPO</code> can be installed just like on Linux or MacOS.</p>
 <h3><a class="anchor" id="devinstall"></a>
 Dev Install</h3>
 <p>In order to develop <code>PyPO</code>, we recommend to install <code>PyPO</code> in edit mode. See <a class="el" href="index.html#devinstall">this section</a> of the developers guidelines page for more info.</p>

@@ -114,7 +114,7 @@ Contributor Guidelines</h1>
 </div><!-- fragment --><p>Then, when it is time to push the changes to the original repo, run: </p><div class="fragment"><div class="line">git push origin &lt;<span class="keyword">new</span>-branch-name&gt;</div>
 </div><!-- fragment --><p>This should prompt Github to ask you to open a pull request to the orignial repository. Open the pull request, and the contribution will be reviewed. If it is accepted, the changes will be merged into the original main branch. After the merge, do not forget to synchronise your remote/local copy: </p><div class="fragment"><div class="line">git checkout main</div>
 <div class="line">git pull upstream main</div>
-<div class="line">git oush origin main</div>
+<div class="line">git push origin main</div>
 </div><!-- fragment --><p>Then, the feature branch can be deleted: </p><div class="fragment"><div class="line">git branch -d &lt;<span class="keyword">new</span>-branch-name&gt;</div>
 <div class="line">git push --<span class="keyword">delete</span> origin &lt;<span class="keyword">new</span>-branch-name&gt;</div>
 </div><!-- fragment --><p>Issues, feature requests and bugs can be reported in the <code>PyPO</code> <a href="https://github.com/arend95/PyPO/issues">issue tracker</a>.</p>
@@ -128,8 +128,7 @@ Dev Install</h2>
 </div><!-- fragment --><p>The "-e" flag tells pip to install <code>PyPO</code> in the actual "src/PyPO/" directory of the <code>PyPO</code> repository. This means that any changes to the Python source code are immediately reflected in the package imported through Python. For the C/C++/CUDA code, this is not true. These scripts need to be compiled into libraries again (which happens when the <code>pip install -e .</code> command is run) before the changes are reflected in the package.</p>
 <p>PyPO can be uninstalled by running: </p><div class="fragment"><div class="line">pip uninstall PyPO-pkg </div>
 </div><!-- fragment --><p>Note that this does not remove the compiled libraries in the "src/PyPO/" folder. If desired, these need to be removed manually.</p>
-<p>For ease of development, one can use the <code>DevUtils.py</code> script. This script contains an interface for development and will be used often throughout this page. Enter the following in the <code>PyPO</code> root to see all options available through the script: </p><div class="fragment"><div class="line">./DevUtils.py -h</div>
-</div><!-- fragment --><h2><a class="anchor" id="gendoc"></a>
+<h2><a class="anchor" id="gendoc"></a>
 Generating Documentation</h2>
 <p><code>PyPO</code> documentation is generated using Doxygen and generated from comment blocks. Because of this, there are several rules for developers regarding comments. The C/C++/CUDA scripts use the so-called <a href="https://en.wikipedia.org/wiki/Javadoc">Javadoc</a> style: </p><div class="fragment"><div class="line"><span class="comment">/**</span></div>
 <div class="line"><span class="comment">   Here comes a short description describing in keywords what the function does</span></div>
@@ -160,9 +159,8 @@ Generating Documentation</h2>
 <div class="line">    ...</div>
 <div class="line">    return output</div>
 </div><!-- fragment --><p>For an overview of the mentioned (and other) comment styles for doxygen, see <a href="https://www.doxygen.nl/manual/docblocks.html">this link</a>.</p>
-<p>To generate documentation, it is important to have forked the "PyPO-docs" and the "PyPO-tutorials" repository into the same root as the regular "PyPO" repository. The documentation can be generated using the <code>DevUtils.py</code> script: </p><div class="fragment"><div class="line">./DevUtils.py -d</div>
-</div><!-- fragment --><p>This will generate the full <code>PyPO</code> user manual and place it in the "docs/" directory in the "PyPO-docs" repository. The updated fork of "PyPO-docs" can then be pushed to the "PyPO-docs" git repository a-la <a class="el" href="contribguide.html#contrib">the contributor guidelines</a>. After merging with main, the github-pages are updated and the new documentation will go online.</p>
-<p>In order to contribute to the tutorials, fork the "PyPO-tutorials" repo and incorporate your contributions a-la <a class="el" href="contribguide.html#contrib">the contributor guidelines</a>. Then, when the</p>
+<p>The documentation can be generated using the <code>DevUtils.py</code> script: </p><div class="fragment"><div class="line">./DevUtils.py -d</div>
+</div><!-- fragment --><p>This will generate the full <code>PyPO</code> user manual and place it in the "docs/" directory.</p>
 <h2><a class="anchor" id="runtests"></a>
 Running The Tests</h2>
 <p><code>PyPO</code> contains an automated testing suite that can be run quite easily from the command line: </p><div class="fragment"><div class="line">./DevUtils.py -t</div>

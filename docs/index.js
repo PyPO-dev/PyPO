@@ -4,7 +4,8 @@ var index =
     [ "Installation", "index.html#inst", [
       [ "Install From Source", "index.html#sdist", [
         [ "Linux", "index.html#linux", null ],
-        [ "MacOS", "index.html#macos", null ]
+        [ "MacOS", "index.html#macos", null ],
+        [ "Windows", "index.html#windows", null ]
       ] ],
       [ "Using PyPO On GPU", "index.html#cuda", null ],
       [ "Optional Dependencies", "index.html#optdep", null ]

@@ -12,7 +12,6 @@ The prerequisites for installing `PyPO` on any operating system are:
 - A working [Python installation of version 3.8 or higher](https://www.python.org/downloads/release/python-380/).
 - A [pip installation](https://pip.pypa.io/en/stable/installation/).
 
-Currently, `PyPO` can only be built from source.
 \subsection sdist Install From Source
 \subsubsection linux Linux
 First, install CMake:
@@ -38,6 +37,18 @@ xcode-select --install
 ```
 
 Then, installation of `PyPO` proceeds in the same fashion as for Linux.
+
+\subsubsection windows Windows
+Install CMake through pip:
+```
+pip install cmake
+```
+
+Then, install [Visual Studio Express](https://visualstudio.microsoft.com/vs/express/).
+Choose the C++ desktop development package.
+Important is, is that the MSVC compiler is present
+
+After this is installed, `PyPO` can be installed just like on Linux or MacOS.
 
 \subsubsection devinstall Dev Install
 In order to develop `PyPO`, we recommend to install `PyPO` in edit mode. See \ref devinstall "this section" of the developers guidelines page for more info.

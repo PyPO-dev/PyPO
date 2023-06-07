@@ -7,8 +7,7 @@
 #include "Structs.h"
 #include "InterfaceReflector.h"
 #include "Random.h"
-
-#define _USE_MATH_DEFINES
+#define M_PI 3.14159265358979323846
 
 #ifndef __BeamInit_h
 #define __BeamInit_h

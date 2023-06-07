@@ -1,0 +1,43 @@
+/**
+\page basictut5 Some More PyPO Dataclasses
+\section basictut5_intro Introduction
+Apart from dictionaries, `PyPO` also employs a few classes as datatypes. These are mostly results from calling `System` methods.
+On this page, we will explain these classes in more depth. 
+These explanations are more high level, for a lower level overview we refer to the \ref public_api_types "datatype classes reference".
+
+\section basictut5_grids The "reflGrids" Object
+As mentioned, a reflector in `PyPO` is nothing more than a dictionary with a specific set of parameters.
+This is done in order to be more economic with the memory.
+However, when a reflector has to be plotted, or when PO calculations have to be performed, the actual grids need to be generated.
+Methods in `System` that need these grids generate them themselves, but there is a method present that users can call to generate the grids themselves: the `generateGrids()` method.
+This method accepts the name of a reflector as positional argument and returns a `reflGrids` object.
+
+The grids object contains the xyz co-ordinates of the reflector surface, the xyz normal components and the area elements at each point on the reflector.
+
+\section basictut5_frames The "frames" Object
+A `frame` is an object describing a collection of rays. 
+It consists of the xyz co-ordinates of each ray and the xyz direction components of each ray.
+In addition, the size of the frame, which is the number of rays, is also a member of the object.
+
+The `frame` object also contains a "snapshots" member. This is for storing transformation matrices,
+which transform the `frame`. It is possible to store several atrices and in this way it is possible to revert back to a previous snapshot.
+
+The `frame` object contains a single method (apart from its constructor), named `setMeta()`.
+This method sets meta information of the `frame`, such as a position tracker (used for absolute translations), an orientation tracker (for absolute rotations) and a transformation matrix (which sets the total transformation).
+
+\section basictut5_fieldscurrents The "PO fields" and "PO currents" Objects
+The PO calculation results are stored in either a `fields` or `currents` object. 
+They both inherit from the `resContainer` base class. 
+
+The `fields` object contains six relevant members. These represent the xyz components of the complex-valued electric (E) and magnetic (H) fields. These are both taken into account in order to properly take polarisation into account.
+
+The `currents` object is very similar to the `fields` object, except that now it contains the electric current (J) and magnetic current (M). These currents are induced by the E and H fields and calculated using the boundary conditions for reflection of electromagnetic fields.
+
+Both objects have a method called `setMeta()`. 
+This method accepts the name of the surface on which the `fields` or `currents` are defined and the wavenumber "k", in 1/mm, belonging to the `fields` or `currents`.
+The other methods, `T()` and `H()`, take the transpose and Hermitian transpose, respectively, of each component of the `fields` or `currents` object.
+
+It is possible to index these objects. Iteration goes through E (J) first and then through H (M), and for each of these it iterates through the xyz components.
+
+The final object in the PO datatype collection is the `scalarfield`. This object contains one single member, the scalar field itself. The `setMeta()` method is present as well and is identical to the one for the regular `fields` and `currents` objects.
+*/

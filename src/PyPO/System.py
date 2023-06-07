@@ -1438,20 +1438,20 @@ class System(object):
     # @ingroup public_api_po
     #
     # @param gaussDict A GDict containing parameters for the Gaussian beam.
-    # @param name_source Name of plane on which to define Gaussian.
+    # @param name_surface Name of plane on which to define Gaussian.
     #
     # @see GDict
-    def createGaussian(self, gaussDict, name_source):
-        check_elemSystem(name_source, self.system, self.clog, extern=True)
+    def createGaussian(self, gaussDict, name_surface):
+        check_elemSystem(name_surface, self.system, self.clog, extern=True)
 
         _gaussDict = self.copyObj(gaussDict)
         check_GPODict(_gaussDict, self.fields, self.clog)
         
-        gauss_in = makeGauss(_gaussDict, self.system[name_source])
+        gauss_in = makeGauss(_gaussDict, self.system[name_surface])
 
         k = 2 * np.pi / _gaussDict["lam"]
-        gauss_in[0].setMeta(name_source, k)
-        gauss_in[1].setMeta(name_source, k)
+        gauss_in[0].setMeta(name_surface, k)
+        gauss_in[1].setMeta(name_surface, k)
 
         self.fields[_gaussDict["name"]] = gauss_in[0]
         self.currents[_gaussDict["name"]] = gauss_in[1]
@@ -1469,19 +1469,19 @@ class System(object):
     # @ingroup public_api_po
     #
     # @param gaussDict A GDict containing parameters for the Gaussian beam.
-    # @param name_source Name of plane on which to define Gaussian.
+    # @param name_surface Name of plane on which to define Gaussian.
     #
     # @see SGDict
-    def createScalarGaussian(self, gaussDict, name_source):
-        check_elemSystem(name_source, self.system, self.clog, extern=True)
+    def createScalarGaussian(self, gaussDict, name_surface):
+        check_elemSystem(name_surface, self.system, self.clog, extern=True)
         
         _gaussDict = self.copyObj(gaussDict)
         check_GPODict(_gaussDict, self.scalarfields, self.clog)
         
-        gauss_in = makeScalarGauss(_gaussDict, self.system[name_source])
+        gauss_in = makeScalarGauss(_gaussDict, self.system[name_surface])
 
         k = 2 * np.pi / _gaussDict["lam"]
-        gauss_in.setMeta(name_source, k)
+        gauss_in.setMeta(name_surface, k)
 
         self.scalarfields[_gaussDict["name"]] = gauss_in
 
@@ -1863,7 +1863,11 @@ class System(object):
     # @returns y_strip Co-ordinate values for y_cut.
     def calcBeamCuts(self, name_field, comp, phi=0, center=True, align=True, norm=False):
         check_fieldSystem(name_field, self.fields, self.clog, extern=True)
-        
+ 
+        verbosity_init = self.verbosity
+
+        self.setLoggingVerbosity(verbose=False)
+
         name_surf = self.fields[name_field].surf
         field = np.absolute(getattr(self.fields[name_field], comp))
         _field = self.copyObj(self.fields[name_field])
@@ -1910,6 +1914,7 @@ class System(object):
         self.revertToSnap(name_surf, "__pre")
         self.deleteSnap(name_surf, "__pre")
 
+        self.setLoggingVerbosity(verbose=verbosity_init)
         self.fields[name_field] = _field
 
         return x_cut, y_cut, x_strip, y_strip

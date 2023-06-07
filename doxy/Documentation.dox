@@ -18,7 +18,18 @@ This list acts as a reference for general users and is structured in groups for 
 
 \subpage public_api_vis
 
+\section input_templates Input Dictionary Templates & Datatypes
+This section contains an overview of all dictionaries used in `PyPO` as input.
+This includes reflector dictionaries, input beam pattern dictionaries, frame dictionaries, etc.
+Also, the datatype classes, such as frames and PO fields, are referenced here.
+
+\subpage public_api_templates
+
+\subpage public_api_types
+
 \section fulldocs Full Software Documentation
 This page contains the entire documented source code, including the GUI source code. 
 It is mostly aimed towards developers wanting to work on `PyPO` and/or the GUI.
+
+[Full software documentation](files.html)
 */

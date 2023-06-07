@@ -46,6 +46,7 @@ required = ["numpy", "scipy", "matplotlib"]
 
 setup(
     name='PyPO-pkg',
+    license="MIT",
     version='1.0.0',
     author="Arend Moerman",
     install_requires = required,

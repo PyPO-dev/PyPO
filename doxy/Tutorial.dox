@@ -17,6 +17,8 @@ They are therefore aimed at the new user.
 
 \ref basictut4 "Gridding And Parameterisations In PyPO"
 
+\ref basictut5 "Some More PyPO Datatypes"
+
 \section funcs PyPO Functionalities
 This set of tutorials demonstrates how to use `PyPO`, such as for making optical systems and performing calculations.
 The set starts with tutorials on how to build optical systems and perform ray-traces through them.

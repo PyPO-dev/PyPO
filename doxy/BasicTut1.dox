@@ -1,0 +1,57 @@
+/**
+\page basictut1 Introduction To PyPO & Design Principles
+\section basictut1_intro Introduction
+`PyPO` is a Python package that simulates the propagation of electromagnetic field distributions using the equivalent surface current method which is a method belonging to the field of physical optics (PO).
+This allows for vectorial propagation of beam patterns between (off-axis) quadric and planar reflector geometries.
+On this page, we will outline the basic design principles of `PyPO`. We will discuss, from the bottom up, how the different software layers interact.
+The first section will describe the libraries powering `PyPO`. Even though these libraries are written in C/C++/CUDA, we will try to keep the explanation accesible.
+However, to fully appreciate the software structure of `PyPO`, basic familiarity with concepts such as C-type pointers is beneficial.
+The second section will focus on the bindings interface, which connects the libraries with the Python source code using the `ctypes` package.
+The third section describes how the Python software itself is structured.
+
+\section basictut1_bottom Rock Bottom: The Bottom Layer
+`PyPO` is powered by libraries written in C/C++/CUDA. Because the physical optics calculations are quite heavy, these are written in a compiled language.
+The reasons for choosing C/C++ are twofold:
+- The relative ease of interfacing C/C++ using `ctypes`,
+- our own familiarity with these languages.
+Because of the powerful computational abilities of current day GPUs, we have also written the libraries in CUDA. 
+This does necessitate an Nvidia card and GPU implementations in other frameworks (e.g. Metal for Apple) are always a welcome addition.
+
+The bottom layer takes care of the following tasks in `PyPO`:
+- generating reflector grids from inputs,
+- transforming ray-trace frames and PO fields and currents,
+- generating initial beam patterns for PO propagations,
+- generating initial ray-trace frames.
+
+`PyPO` uses the [CMake]() build system to compile the bottom layer into so-called dynamically linked libraries (.so on Linux, .dylib on MacOS and .dll on Windows). 
+The reason for choosing CMake is the multi-platform compilation capabilities delivered by CMake. 
+Instead of writing Makefiles for every platform, CMake takes care of this for us by writing its own Makefiles, depending on the operating system on which `PyPO` is built.
+
+\section basictut1_middle Binding It Together: The Middle Layer
+To use the compiled libraries in `PyPO` we use the `ctypes` package, which is part of the standard packages on Python (maybe mention PEP number?).
+The interface between the bottom layer and top layers of `PyPO` consists of data objects shared between the C/C++ layer and the Python layer. 
+On the C/C++ side, these objects are defined as structs. On the Python side, we define classes that inherit from the `ctypes.Structure` base class.
+The C/C++ structs and Python classes, including all members, share the same name. In this way, `ctypes` exposes the data structures in both layers to one another.
+In general, it is preferrable to have one layer take care of all memory (de-)allocations. 
+In `PyPO`, this role is given to the Python side. This is accomplished in the following way:
+- Python creates a pointer to a data structure on the Python side, i.e. a class inheriting from `ctypes.Structure`,
+- the structure is filled with the input necessary for the bottom layer to carry out the calculation,
+- Python also creates a pointer to a data structure which will act as the output container (and is thus left empty),
+-- this ensures that sole ownership of pointers to input/output data structures lies with Python,
+- both pointers are passed along to the bottom layer using `ctypes`, where the bottom layer will do work,
+- When the calculation is finished, the output data structure is filled,
+- Python receives a signal that the bottom layer is finished and accesses the output data structure using its own pointer,
+- the bottom layer deletes all internally allocated memory structures.
+
+Basically, we are using `ctypes` to expose the libraries so that we can call C/C++ methods from Python as if they were Python methods.
+For more information regarding `ctypes`, we refer to the [documentation]().
+
+\section basictut1_top Getting There: The Top Layer
+The top layer consists of Python scripts that do a whole lot of things.
+Here, the high level functionalities are defined, such as calculation of performance metrics, visualisation if optical systems and results, but also setting paths to custom input beam patterns and such. For an exhaustive list, we refer to the \ref apiref "public API reference".
+The top layer also keeps track of everything that is going on in a simulation.
+It contains a nicely formatted logger, which can log miscellaneous information to the console.
+Also, the top layer is where the `System` is created, the interface through which `PyPO` is used.
+
+The next tutorials in the `PyPO` fundamental tutorial set will dive deeper into how we can interact with the top layer.
+*/

@@ -20,13 +20,14 @@ import traceback
 #```
 def DevUtils():
     parser = argparse.ArgumentParser(description="development interface script for PyPO")
+    parser.add_argument("-v", "--set-version", type=str, help="set PyPO version for distribution")
     parser.add_argument("-s", "--sdist", help="generate a PyPO source distribution into dist folder", action="store_true")
     parser.add_argument("-b", "--bdist", help="generate a PyPO binary wheel into dist folder. EXPERIMENTAL.", action="store_true")
     parser.add_argument("-u", "--upload", help="upload dist folder to test-pypi using twine. Will ask for username and password", action="store_true")
     parser.add_argument("-d", "--docs", help="generate PyPO documentation with doxygen", action="store_true")
     parser.add_argument("-t", "--test", help="run PyPO automated tests", action="store_true")
     args = parser.parse_args()
-
+    
     if args.sdist:
         os.system("python3 setup.py sdist")
 
@@ -51,12 +52,13 @@ def DevUtils():
             except Exception as err:
                 print(traceback.format_exc())
             
-            os.system(f"doxygen {os.path.join('doxy', 'Doxyfile')}")
-            
+            #os.mkdir("docs")
+            #os.mkdir(os.path.join("docs", "tutorials"))
+
             # Convert regular tutorials to html format for inclusion in the documentation.
             for (dirpath, dirnames, filenames) in os.walk(tut_path):
                 dest_path = os.path.join("docs", "tutorials")
-                os.mkdir(dest_path)
+                os.makedirs(dest_path)
                 for file in filenames:
                     if file.split('.')[1] != "ipynb":
                         continue
@@ -69,8 +71,8 @@ def DevUtils():
                     os.rename(html_path, html_dest_path)
                 
                 break
-            
             # Convert md for GUI tutorials to html and copy to /docs
+            dest_path = os.path.join("docs", "Gui")
             guitut_path = os.path.join(tut_path, "Gui")
             
             file_md = []
@@ -86,24 +88,16 @@ def DevUtils():
 
                 os.system(f"pandoc {os.path.join(guitut_path, file)} -t html -o {os.path.join(guitut_path, filename_html)}")
 
-            dest_path = os.path.join("docs", "Gui")
+            
+            os.system(f"doxygen {os.path.join('doxy', 'Doxyfile')}")
             shutil.copytree(guitut_path, dest_path, ignore=shutil.ignore_patterns("*.md"))
-
-            # Read html to set default detail level of menus
-            annotated_path = os.path.join("docs", "annotated.html")
+            
             filelist_path = os.path.join("docs", "files.html")
-            
-            with open(annotated_path, 'r') as file :
-                filedata = file.read()
-                filedata = filedata.replace('init_search(); });', 'init_search(); toggleLevel(2); });')
-            
-            with open(annotated_path, 'w') as file:
-                file.write(filedata)
-            
             with open(filelist_path, 'r') as file :
                 filedata = file.read()
-                filedata = filedata.replace('init_search(); });', 'init_search(); toggleLevel(2); });')
-            
+                filedata = filedata.replace('File List', 'Full Software Documentation')
+                filedata = filedata.replace("Here is a list of all documented files with brief descriptions:",
+                                            "Here is a list containing the full software documentation. The structure of this page reflects the source code hierarchy.")
             with open(filelist_path, 'w') as file:
                 file.write(filedata)
             

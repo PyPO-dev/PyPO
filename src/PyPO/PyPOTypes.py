@@ -4,6 +4,8 @@
 
 ##
 # Base class for EH fields and JM currents.
+#
+# @ingroup public_api_types
 class resContainer(object):
 
     ##
@@ -71,6 +73,8 @@ class resContainer(object):
 
 ##
 # Wrapper for making a currents object. 
+#
+# @ingroup public_api_types
 class currents(resContainer):
     ##
     # Constructor. Takes JM components and assigns them to member variables.
@@ -86,6 +90,8 @@ class currents(resContainer):
 
 ##
 # Wrapper for making a fields object. 
+#
+# @ingroup public_api_types
 class fields(resContainer):
     ##
     # Constructor. Takes JM components and assigns them to member variables.
@@ -101,6 +107,8 @@ class fields(resContainer):
 
 ##
 # Class for making a real-vaLuad 3D object, used for Poynting vectors.
+#
+# @ingroup public_api_types
 class rfield(object):
 
     ##
@@ -116,6 +124,8 @@ class rfield(object):
 
 ##
 # Structure for storing scalar fields and associated metadata.
+#
+# @ingroup public_api_types
 class scalarfield(object):
     ##
     # Constructor for scalar field.
@@ -135,6 +145,8 @@ class scalarfield(object):
 
 ##
 # Structure for storing reflector grids, area and normals
+#
+# @ingroup public_api_types
 class reflGrids(object):
 
     ##
@@ -160,6 +172,8 @@ class reflGrids(object):
 
 ##
 # Structure for storing ray-trace frames.
+#
+# @ingroup public_api_types
 class frame(object):
 
     ##

@@ -39,6 +39,9 @@ xcode-select --install
 
 Then, installation of `PyPO` proceeds in the same fashion as for Linux.
 
+\subsubsection devinstall Dev Install
+In order to develop `PyPO`, we recommend to install `PyPO` in edit mode. See \ref devinstall "this section" of the developers guidelines page for more info.
+
 \subsection cuda Using PyPO On GPU
 In order to use the GPU accelerated libraries for `PyPO`, a working CUDA installation should be present.
 For Linux, [this article](https://linuxconfig.org/how-to-install-cuda-on-ubuntu-20-04-focal-fossa-linux) describes nicely how to install CUDA through the apt repository.
@@ -75,6 +78,9 @@ Several tutorials have been developed in order to demonstrate the usage and func
 The software documentation for `PyPO` is split into two parts:
 - the first part forms a comprehensive API reference for all public methods of `PyPO`,
 - the second part forms a reference for all internal Python, C/C++ and CUDA code.
+
+\section main_contribguidelines Contributor Guidelines
+The contributor and development guidelines can be found \ref contribguide "here".
 
 \section license License
 This project is released under the [MIT License](https://opensource.org/licenses/MIT).

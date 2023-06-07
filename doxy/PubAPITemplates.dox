@@ -1,0 +1,5 @@
+/**
+\defgroup public_api_templates Input Dictionary Reference
+\brief This section contains a list of all input dictionaries used in `PyPO`.
+*/
+

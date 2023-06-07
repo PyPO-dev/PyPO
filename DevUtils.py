@@ -38,22 +38,13 @@ def DevUtils():
         os.system("twine upload --repository testpypi dist/*")
 
     if args.docs:
-        doc_path = os.path.join("..", "PyPO-docs", "docs")
-        tut_path = os.path.join("..", "PyPO-tutorials", "tutorials")
+        tut_path = "tutorials"
 
         try:
             try:
                 shutil.rmtree("docs")
             except Exception as err:
                 print(traceback.format_exc())
-            
-            try:
-                shutil.rmtree(doc_path)
-            except Exception as err:
-                print(traceback.format_exc())
-            
-            #os.mkdir("docs")
-            #os.mkdir(os.path.join("docs", "tutorials"))
 
             # Convert regular tutorials to html format for inclusion in the documentation.
             for (dirpath, dirnames, filenames) in os.walk(tut_path):
@@ -101,8 +92,6 @@ def DevUtils():
             with open(filelist_path, 'w') as file:
                 file.write(filedata)
             
-            shutil.move("docs", doc_path)
-        
         except Exception as err:
             print(traceback.format_exc())
     

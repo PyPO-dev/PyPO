@@ -137,7 +137,6 @@ dmypy.json
 # User-specific folders
 images/
 save/
-docs/
 
 custom/*
 !custom/beam
@@ -168,7 +167,6 @@ examples/images/
 tests/Python/datadir/
 datadir/
 Imports.py
-tutorials/
 # vim stuff
 *.swp
 *.swo

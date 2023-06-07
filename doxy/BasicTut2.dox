@@ -1,0 +1,34 @@
+/**
+\page basictut2 The PyPO System
+\section basictut2_intro Introduction
+In this tutorial, we discuss the `System` object. In `PyPO`, all functionality is accessed through the `System` object.
+This object can be seen as the laboratory, where one can place optical elements and simulate the propagation of electromagnetic fields through them.
+
+\section basictut2_import Importing The System
+A `System` object is created in `PyPO` in the following way:
+```
+from PyPO.System import System
+st = System()
+```
+We have created a `System` object named `st`.
+A `System` has its own logger. This logger is an instance of the `Logging` module in the Python standard library.
+It logs, for example, whenever a reflector or optical element is generated, or when such an element is transformed.
+If you do not want the `System` to log actions, you can instantiate the `System` and pass the "verbose=False" argument:
+```
+from PyPO.System import System
+st = System(verbose=False)
+```
+
+This can always be changed down the line by calling the `setLoggingVerbosity()` method of `System`:
+```
+st.setLoggingVerbosity(True)
+```
+For an overview of the `System` methods that affect the configuration of the `System`, see \ref public_api_sysio "the API documentation for the System".
+
+\section basictut2_internal Internal Components Of A System
+A `System` keeps track of all reflectors/elements, ray-trace frames and PO fields/currents (these are explained in a later tutorial) in internal dictionaries.
+Each internal dictionary will be explained later when the relevant data structure it stores is discussed, but for now, it is important to know that `System` methods rarely return objects.
+Rather, it stores these objects internally.
+For an overview of the `System` internal dictionaries, see \ref public_api_internaldicts "the API documentation for internal dictionaries".
+*/
+

@@ -116,7 +116,7 @@ Cartesian Parameterisation</h1>
 <li>"lims_y" : A Numpy array of length 2, containing the lower and upper limit of the y-range of the parameterisation.</li>
 </ul>
 <p>See image below for a paraboloid with "gmode" set to "xy" and "lims_x" and "lims_y" both set to <code>numpy.array([-1, 1])</code>. The "pmode" is "manual", with "coeffs" set to <code>numpy.array([1, 1])</code>.</p>
-<p><img src="resources/par_xy.png" alt="" class="inline" title="caption"/></p>
+<p><img src="par_xy.png" alt="" class="inline" title="caption"/></p>
 <h1><a class="anchor" id="basictut4_uv"></a>
 Polar Parameterisation</h1>
 <p>The next parameterisation is the polar, or "uv", parameterisation. This parameterisation first takes a (rectangular) patch in the uv-plane, and converts it to a (circular) patch in the xy-plane. The u co-ordinate is the radial part and the v co-ordinate the angular part. Then, the procedure goes along the same lines as for the "xy" parameterisation. This parameterisation is more appropriate for symmetric surfaces of revolution, due to the rotational symmetry present in the parameterisation and reflector.</p>
@@ -125,7 +125,7 @@ Polar Parameterisation</h1>
 <li>"lims_v" : A Numpy array of length 2, containing the lower and upper limit of the v-range of the parameterisation. In this context, v is defined w.r.t. the positive x-axis and measured in degrees.</li>
 </ul>
 <p>See image below for the same paraboloid with "gmode" set to "uv" and "lims_u" to <code>numpy.array([0, 1])</code> and "lims_v" set to <code>numpy.array([0, 360])</code>.</p>
-<p><img src="resources/par_uv.png" alt="" class="inline" title="caption"/></p>
+<p><img src="par_uv.png" alt="" class="inline" title="caption"/></p>
 <h2><a class="anchor" id="basictut4_uv_opts"></a>
 Optional Fields For "uv" Parameterisation</h2>
 <p>When the "uv" parameterisation is selected, three optional fields become available:</p><ul>
@@ -136,9 +136,9 @@ Optional Fields For "uv" Parameterisation</h2>
 <p>These options are not (yet) available for the "xy" parameterisation.</p>
 <p>Of these options, the "gcenter" option plays a special role. Using this field, it is possible to generate off-axis reflectors from a circular xy patch. This is interesting from the perspective of, for example, radio telescope designers, as off-axis designs have the advantage of having less feed/secondary support strut blockage.</p>
 <p>See image below for the same paraboloid with "gcenter" set to <code>numpy.array([0.5, 0.5])</code>.</p>
-<p><img src="resources/par_uv_gc.png" alt="" class="inline"/></p>
+<p><img src="par_uv_gc.png" alt="" class="inline"/></p>
 <p>See image below for the same paraboloid with "ecc_uv" set to 0.7 and "rot_uv" set to 45 degrees. The "gcenter" is set to the origin again.</p>
-<p><img src="resources/par_uv_07_45.png" alt="" class="inline"/></p>
+<p><img src="par_uv_07_45.png" alt="" class="inline"/></p>
 <h1><a class="anchor" id="basictut4_AoE"></a>
 "AoE" (Azimuth Over Elevation) Parameterisation</h1>
 <p>The final parameterisation type is the Azimuth-over-Elevation, or "AoE", parameterisation. This parameterisation is exclusive to planar geometries. The parameterisation is necessary for defining far-field elements. When a far-field beam pattern is calculated on an "AoE" parameterised surface, <code>PyPO</code> internally converts the Azimuth and Elevation angles to direction cosines on-sky and calculates the far-field.</p>

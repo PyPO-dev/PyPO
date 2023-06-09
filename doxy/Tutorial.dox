@@ -2,22 +2,6 @@
 \page tutorials Tutorials
 These tutorials are designed to showcase the features of `PyPO`.
 
-\section funds PyPO Fundamentals
-In this set of tutorials, we discuss the `PyPO` basics.
-In particular, the datatypes used for input/output are discussed.
-Also, the fundamentals of generating reflectors in `PyPO` are discussed.
-These tutorials are more like explanations, and less hands-on than the functionality tutorials.
-They are therefore aimed at the new user.
-
-\ref basictut1 "Introduction to PyPO and design principles"
-
-\ref basictut2 "Introduction To The System object"
-
-\ref basictut3 "Reflectors/Elements In PyPO"
-
-\ref basictut4 "Gridding And Parameterisations In PyPO"
-
-\ref basictut5 "Some More PyPO Datatypes"
 
 \section funcs PyPO Functionalities
 This set of tutorials demonstrates how to use `PyPO`, such as for making optical systems and performing calculations.

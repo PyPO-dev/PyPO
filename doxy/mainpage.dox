@@ -12,14 +12,17 @@ The prerequisites for installing `PyPO` on any operating system are:
 - A working [Python installation of version 3.8 or higher](https://www.python.org/downloads/release/python-380/).
 - A [pip installation](https://pip.pypa.io/en/stable/installation/).
 
+All other necessary prerequisites are fetched and installed upon installing `PyPO`.
+
 \subsection sdist Install From Source
-\subsubsection linux Linux
-First, install CMake:
+\subsubsection General Prerequisites
+Irrespective of operating system, `PyPO` uses [CMake](https://cmake.org/) to build from source and if a source distribution is desired, it needs to be installed:
 ```
 pip install cmake
 ```
-All other necessary prerequisites are fetched and installed upon installing `PyPO`.
-To install `PyPO`, clone the git repository:
+
+\subsubsection linux Linux
+To install `PyPO` from source on Linux, clone the git repository:
 ```
 git clone https://github.com/PyPO-dev/PyPO
 ```
@@ -30,25 +33,19 @@ pip install .
 ```
 
 \subsubsection macos MacOS
-Installing `PyPO` from source on MacOS proceeds largely along the same lines as for Linux.
-The only difference being that you will need to have the command line tools package installed:
+You will need to have the command line tools package installed:
 ```
 xcode-select --install
 ```
 
-Then, installation of `PyPO` proceeds in the same fashion as for Linux.
+Then, installation of `PyPO` proceeds in the same fashion as for \ref linux "Linux".
 
 \subsubsection windows Windows
-Install CMake through pip:
-```
-pip install cmake
-```
-
-Then, install [Visual Studio Express](https://visualstudio.microsoft.com/vs/express/).
+Install [Visual Studio Express](https://visualstudio.microsoft.com/vs/express/).
 Choose the C++ desktop development package.
 Important is, is that the MSVC compiler is present
 
-After this is installed, `PyPO` can be installed just like on Linux or MacOS.
+After this is installed, `PyPO` can be installed just like on \ref linux "Linux".
 
 \subsubsection devinstall Dev Install
 In order to develop `PyPO`, we recommend to install `PyPO` in edit mode. See \ref devinstall "this section" of the developers guidelines page for more info.
@@ -60,6 +57,9 @@ For Linux, [this article](https://linuxconfig.org/how-to-install-cuda-on-ubuntu-
 For Windows, see the [official instructions](https://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/index.html) on the Nvidia website.
 
 Unfortunately, [Apple has stopped supporing Nvidia cards since 2015](https://appleinsider.com/articles/19/01/18/apples-management-doesnt-want-nvidia-support-in-macos-and-thats-a-bad-sign-for-the-mac-pro) and therefore, the CUDA libraries for `PyPO` cannot be installed on MacOS currently.
+
+After installing CUDA, `PyPO` will detect this and, upon building, will build the CUDA libraries.
+It is therefore important to re-install `PyPO` if you installed it before installing CUDA, otherwise the libraries will not be built.
 
 \subsection optdep Optional Dependencies
 `PyPO` contains several optional features such as a graphical user interface (GUI).
@@ -81,14 +81,17 @@ Documentation in `PyPO` is generated using [Doxygen](https://www.doxygen.nl/inde
 Please see their [installation page](https://www.doxygen.nl/manual/install.html) for instructions regarding installation.
 
 \section man User Manual
+For a basic understanding of `PyPO` and its design, we refer to the explanations page.
+
 Several tutorials have been developed in order to demonstrate the usage and functionality of `PyPO`:
-- the first group of tutorials are meant to show the fundamentals of `PyPO` and the design philosophy,
-- the second set of tutorials showcase the functionalities of the package,
-- the third and final set show how to use the GUI.
+- the first set of tutorials showcase the functionalities of the package,
+- the second and final set show how to use the GUI.
 
 The software documentation for `PyPO` is split into two parts:
 - the first part forms a comprehensive API reference for all public methods of `PyPO`,
 - the second part forms a reference for all internal Python, C/C++ and CUDA code.
+
+In addition, the documentations page contains a comprehensive overview of the common input/output types of `PyPO`. 
 
 \section main_contribguidelines Contributor Guidelines
 The contributor and development guidelines can be found \ref contribguide "here".

@@ -19,7 +19,7 @@ The following entries in a reflectordictionary are common to all geometries:
 - "name" : This is the name given to the reflector. It should be a string.
 - "gmode" : The gridding mode. This parameter sets the parameterisation used for generating the reflector grid. The options are passed as a string and are discussed in a separate tutorial.
 - "flip" : Whether to flip the normal vectors of the surface or not. This is a Boolean and defaults to "False". In this case, the vectors point upward, towards the positive z-axis.
-- "gridsize" : A Numpy array of length 2, this parameter sets the number of cells along the gridding axes. Read more here.
+- "gridsize" : A Numpy array of length 2, this parameter sets the number of cells along the gridding axes. Read more about gridsizes \ref basictut4 "here".
 
 Reflectors and elements are identified in a `System` by their names. It is therefore important to give your reflectors and elements sensible names.
 If the "name" field is not specified, `PyPO` will name it with the geometry of the reflector.
@@ -36,8 +36,8 @@ A paraboloid is a quadric surface parameterised by two positive real numbers 'a'
     Paraboloid(x,y,z) = \left( \frac{x}{a} \right)^2 + \left( \frac{y}{b} \right)^2 - z = 0
 \f]
 
-A special case arises when 'a' = 'b'. In this case, the paraboloid is a so-called [surface of revolution](https://en.wikipedia.org/wiki/Surface_of_revolution), 
-and is symmetric around the central symmetry axis. In this case, the paraboloid has two focii: one at a finite distance from the vertex (the bottom of the 'bowl' of the paraboloid) along the axis of symmetry and one at infinity.
+A special case arises when 'a' = 'b'. In this case, the paraboloid is a so-called [surface of revolution](https://en.wikipedia.org/wiki/Surface_of_revolution) and is symmetric around the central symmetry axis. 
+In this case, the paraboloid has a single focus at a finite distance from the vertex (the bottom of the 'bowl' of the paraboloid) along the axis of symmetry.
 
 The basic template for a dictionary for defining a paraboloid contains, in addition to the general fields:
 - "pmode" : The parameter mode. If this is set to "manual", the dictionary must also contain the following field:

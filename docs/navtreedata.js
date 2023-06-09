@@ -26,6 +26,7 @@ var NAVTREE =
 [
   [ "PyPO User Manual", "index.html", [
     [ "Home", "index.html", "index" ],
+    [ "Explanations", "explanations.html", null ],
     [ "Tutorials", "tutorials.html", null ],
     [ "Documentation", "pypodocs.html", null ],
     [ "Contribution", "contribguide.html", null ]

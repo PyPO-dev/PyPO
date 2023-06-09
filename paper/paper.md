@@ -48,9 +48,11 @@ Development of `PyPO` started with the need for alignment strategies for the wid
 A software package capable of efficient GO and PO calulations through optical systems consisting of off-axis quadric surfaces was necessary for calculating the configuration of the corrective optics. 
 Currently, `PyPO` is also being used in simulations of measured beam patterns of DESHIMA 2.0 at the ASTE [@ASTE] telescope for the analysis of instrument and optical system performance.
 
-Commercial software for GO and PO calculations and analysis, such as OpticStudio (Zemax) and GRASP (TICRA), has already been developed, but to our knowledge `PyPO` is the first free open-source Python package that simulates planar and quadric (off-axis) reflector geometries using both GO and PO. 
-Moreover, `PyPO` does not employ approximations often employed by other software packages such as `POPPy` [@Perrin:2012] and Prysm [@Dube:2019]. 
-Rather, PyPO directly solves the radiation integral, allowing for propagation between multiple (off-axis) reflector surfaces.
+Commercial software for GO and PO calculations and analysis, such as OpticStudio (Zemax) and GRASP (TICRA), has already been developed. 
+Of these, GRASP also employs the method of equivalent surface currents.
+Open-source optical simulation software packages such as POPPy (Perrin & others, 2012) and Prysm (Dube, 2019) are also available. 
+These open-source software packages use Fourier methods to solve the Rayleigh-Sommerfeld integral equation.
+PyPO aims to contribute to this open-source optical simulation ecosystem by offering a software package working on the principle of the equivalent surface currents.
 
 # Availability
 `PyPO` can be found on [Github](https://github.com/PyPO-dev/PyPO) and is available for Linux, MacOS and Windows.

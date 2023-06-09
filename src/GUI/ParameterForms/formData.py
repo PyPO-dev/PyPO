@@ -275,7 +275,7 @@ def initGaussianInp(elemDict):
             InputDescription(inType.vectorFloats, "w0y", label="Beamwaist in Y", hints=[5], numFields=1),
             InputDescription(inType.vectorFloats, "n", label="Refractive index", hints=[1], numFields=1),
             InputDescription(inType.vectorFloats, "E0", label="Peak value", hints=[1], numFields=1),
-            InputDescription(inType.vectorFloats, "z", label="Focal distance", hints=[0], numFields=1),
+            InputDescription(inType.vectorFloats, "dxyz", label="Astigmatic distance", hints=[0], numFields=1),
             InputDescription(inType.vectorFloats, "pol", label="Polarization", hints=[1,0,0], numFields=3, oArray=True)
             ]
     

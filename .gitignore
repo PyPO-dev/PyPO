@@ -159,6 +159,7 @@ log
 !src/GUI/resources/*.png
 !doxy/resources/*.png
 !docs/*.png
+!docs/Gui/README_Resources/*.png
 
 # Personal projects/files
 personal/

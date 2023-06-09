@@ -115,7 +115,7 @@ General Discussion</h1>
 <li>"name" : This is the name given to the reflector. It should be a string.</li>
 <li>"gmode" : The gridding mode. This parameter sets the parameterisation used for generating the reflector grid. The options are passed as a string and are discussed in a separate tutorial.</li>
 <li>"flip" : Whether to flip the normal vectors of the surface or not. This is a Boolean and defaults to "False". In this case, the vectors point upward, towards the positive z-axis.</li>
-<li>"gridsize" : A Numpy array of length 2, this parameter sets the number of cells along the gridding axes. Read more here.</li>
+<li>"gridsize" : A Numpy array of length 2, this parameter sets the number of cells along the gridding axes. Read more about gridsizes <a class="el" href="basictut4.html">here</a>.</li>
 </ul>
 <p>Reflectors and elements are identified in a <code>System</code> by their names. It is therefore important to give your reflectors and elements sensible names. If the "name" field is not specified, <code>PyPO</code> will name it with the geometry of the reflector. For example, if a paraboloid reflector is made but no name is given, it will automatically be named "Paraboloid". If a name already occurs in the system dictionary, <code>PyPO</code> will overwrite the reflector dictionary at this name with the new one, unless the <code>System</code> object is instantiated with the "override" argument set to "False": </p><div class="fragment"><div class="line">st = System(<span class="keyword">override</span>=False)</div>
 </div><!-- fragment --><p> Now, <code>PyPO</code> will append "_&lt;N&gt;" to the duplicate name, with "&lt;N&gt;" being the amount of times the name has already occured in the system dictionary.</p>
@@ -126,7 +126,7 @@ Paraboloid Geometries</h1>
     Paraboloid(x,y,z) = \left( \frac{x}{a} \right)^2 + \left( \frac{y}{b} \right)^2 - z = 0
 \]
 </p>
-<p>A special case arises when 'a' = 'b'. In this case, the paraboloid is a so-called <a href="https://en.wikipedia.org/wiki/Surface_of_revolution">surface of revolution</a>, and is symmetric around the central symmetry axis. In this case, the paraboloid has two focii: one at a finite distance from the vertex (the bottom of the 'bowl' of the paraboloid) along the axis of symmetry and one at infinity.</p>
+<p>A special case arises when 'a' = 'b'. In this case, the paraboloid is a so-called <a href="https://en.wikipedia.org/wiki/Surface_of_revolution">surface of revolution</a> and is symmetric around the central symmetry axis. In this case, the paraboloid has a single focus at a finite distance from the vertex (the bottom of the 'bowl' of the paraboloid) along the axis of symmetry.</p>
 <p>The basic template for a dictionary for defining a paraboloid contains, in addition to the general fields:</p><ul>
 <li>"pmode" : The parameter mode. If this is set to "manual", the dictionary must also contain the following field:<ul>
 <li>"coeffs" : A Numpy array of length 2, containing the 'a' and 'b' parameters defining the shape of the paraboloid.</li>

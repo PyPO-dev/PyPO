@@ -1,11 +1,12 @@
 <h1 id="pypo-gui-manual">PyPO GUI Manual</h1>
 <h2 id="starting-the-gui">Starting The GUI</h2>
-<p>Before we can use the GUI, we have to start it up. The GUI can only ben used if <code>PyPO</code> is installed from source because the GUI source code is only included if directly obtained from Github. Also make sure that PySides2 is installed, otherwise the GUI will not launch.</p>
+<p>Before we can use the GUI, we have to start it up. The GUI can only ben used if <code>PyPO</code> is installed from source because the GUI source code is only included if directly obtained from Github. Also make sure that PySide2 and attrs are installed, otherwise the GUI will not launch:</p>
+<pre><code>pip install PySide2 attrs</code></pre>
 <p>Navigate to the location of the <code>PyPO</code> root directory and run:</p>
 <pre><code>python GuiApp.py</code></pre>
 <p>which should launch the GUI.</p>
 <h2 id="introduction">Introduction</h2>
-<p>In this tutorial we wil, step by step, build a simple reflector system and perform a ray-trace calculation trough it. <!--![Blank app](README_Resources/blankGui.png)--></p>
+<p>In this tutorial we will, step by step, build a simple reflector system and perform a ray-trace calculation trough it. <!--![Blank app](README_Resources/blankGui.png)--></p>
 <p>The gui consists of 3 widgets:</p>
 <ul>
 <li>Workspace (left)</li>
@@ -21,7 +22,7 @@ A blank GUI window at startup
 </figure>
 <h2 id="creating-reflectors">Creating Reflectors</h2>
 <p>From the elements menu select <em>Add Reflector</em> &gt; <em>Quadric surface</em>.</p>
-<p>A form will show up with one dropdown selector. By selecting options, more options will show up. By filling in the parameters and clicking <em>add</em>, a reflector has been added to the system. If successful, a widget will show up in the workspace as such:</p>
+<p>A form will show up with a dropdown selector. Click the button that displays “–Select item–”. You can choose between three different quadric geometries. Upon clicking a geometry, a new form pops up, containing a bunch of parameters. By filling in the parameters and clicking <em>add</em>, a reflector has been added to the system. If successful, a widget will show up in the workspace as such:</p>
 <!--![System with one paraboloid reflector](README_Resources/pri_form.png)-->
 <figure>
 <img src="README_Resources/pri_form.png" alt="System with one paraboloid reflector" width="700px"/>
@@ -34,7 +35,7 @@ System with one paraboloid reflector
 <img src="README_Resources/emptyFieldErr.png" alt="text saying: Error - Empty field at Focus xyz" width="600px"/>
 </figure>
 <h2 id="plotting">Plotting</h2>
-<p>Now to see the reflector we just defined we need to plot it. By clicking on the three dots on the right side of the element widget the element options menu will open. The first option is plot.</p>
+<p>To inspect the reflector we just defined, we need to plot it. By clicking on the three dots on the right side of the element widget the element options menu will open. The first option is plot.</p>
 <figure>
 <img src="README_Resources/options_plot.png" width="300px"/>
 <figcaption>
@@ -49,29 +50,29 @@ Plot of the paraboloid reflector
 </figcaption>
 </figure>
 <h2 id="defining-ray-trace-frames">Defining Ray-Trace Frames</h2>
-<p>Now we will define a ray trace frame. We can do that from the menu bar by selecting Ray-trace &gt; Make frame &gt; Tube.</p>
-<p>Again, a form will show up. We fill it with the next parameters.</p>
+<p>Now we will define a ray-trace frame. We can do that from the menu bar by selecting Ray-trace &gt; Make frame &gt; Tube.</p>
+<p>Again, a form will show up. We fill it with the following parameters.</p>
 <figure>
 <img src="README_Resources/frame_form.png" alt="Selecting make tube frame" />
 <figcaption>
 Frame parameter form
 </figcaption>
 </figure>
-<p>When the frame is added a widget will show up in the <em>Frames</em> tab of the workspace. By clicking <em>plot</em> in the frame options menu we are presented with a form that allows us to choose the plane in which we want to plot this frame. If we select x and y we get the following plot.</p>
+<p>When the frame is added, a widget will show up in the <em>Frames</em> tab of the workspace. By clicking <em>plot</em> in the frame options menu we are presented with a form that allows us to choose the plane in which we want to plot this frame. If we select x and y we get the following plot.</p>
 <figure>
 <img src="README_Resources/frame_plot.png" width="800px" />
 <figcaption>
 Plot of the frame in xy plane
 </figcaption>
 </figure>
-<p>Now we’ve defined a frame on the xy plane with z-coordinate 0. We can translate this frame upwards by selecting the transform option from the frame options as shown below</p>
+<p>Now we can see that we have defined a frame on the xy plane with z co-ordinate equal to 0 mm. We can translate this frame upwards by selecting the transform option from the frame options as shown below</p>
 <figure>
 <img src="README_Resources/frame_transrform.png" width="400px"/>
 <figcaption>
 Frame transformation form
 </figcaption>
 </figure>
-<p>Now if we plot the frame again from the side (e.g. in the xz plane). After zooming in with the zoom tool in the plot, we can see that all of the points have z coordinate 3000.</p>
+<p>Now, if we plot the frame again from the side (e.g. in the xz-plane) we can see if the translation was succesful. After zooming in with the zoom tool in the plot, we can see that all of the points have z coordinate equal to 3000 mm and the translation was succesful.</p>
 <figure>
 <img src="README_Resources/frame_plot2.png" width="800px" />
 <figcaption>
@@ -90,7 +91,7 @@ For for trace propagation
 <figcaption>
 </figcaption>
 </figure>
-<p>This will create a new frame <em>fr_pri</em>. If we plot this frame in th xy plane, it will look exactly the same as the previous frame. But looking from the side (e.g. plotting in the xz plane) we can see that the points have been projected onto the paraboloid.</p>
+<p>This will create a new frame <em>fr_pri</em>. If we plot this frame in the xy-plane, it will look exactly the same as the previous frame. But looking from the side (e.g. plotting in the xz-plane) we can see that the points have been projected onto the paraboloid.</p>
 <figure>
 <img src="README_Resources/fr2_plot.png" alt="Plot *fr_pri* in xz plane" style="width:50%">
 <figcaption>
@@ -104,7 +105,8 @@ Plot <em>fr_pri</em> in xz plane
 </figcaption>
 </figure>
 <h2 id="focus-finding">Focus Finding</h2>
-<p>After the rays were propagated onto the paraboloid reflector, they can be propagated to the focus of the reflector. This can be done with the <em>focus finder</em>; in the menubar we select <em>Tools &gt; Focus finder</em>. Then we select the frame we want to find the focus of and click <em>Find focus</em>. This will automatically generate a new frame. If we plot this frame in <em>xy</em> we see that the numbers along the axes are very small. The frame has been propagated to the focal plane.</p>
+<p>After the rays are propagated onto the paraboloid reflector, they can be propagated to the focus of the reflector. We could do this by remembering that we supplied the focus as one of the generating parameters of the paraboloid, but <code>PyPO</code> contains a tool for this, if the focus is not known: the <em>focus finder</em>.</p>
+<p>in the menubar we select <em>Tools &gt; Focus finder</em>. Then we select the frame we want to find the focus of and click <em>Find focus</em>. This will automatically generate a new frame. If we plot this frame in <em>xy</em> we see that the numbers along the axes are very small. The frame has been propagated to the focal plane using the tool.</p>
 <figure>
 <img src="README_Resources/foc_frame_plot.png" alt="Selecting make tube frame" />
 <figcaption>

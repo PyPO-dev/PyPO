@@ -107,29 +107,31 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <div class="contents">
 <div class="textblock"><h1><a class="anchor" id="intro_sec"></a>
 Introduction</h1>
-<p>Welcome to the <code>PyPO</code> user manual. Here you can find several resources that will assist in using and/or developing <code>PyPO</code>. This homepage contains general information regarding installation instructions, the content of the user manual, contributor guidelines and contact information. After installing, the best place to start for new users would be the <a class="el" href="tutorials.html#funds">PyPO fundamentals</a> tutorials, after which the rest of the tutorials can be studied. For contributor guidelines and general development instructions, please see the <a class="el" href="contribguide.html">instructions for developers</a> page.</p>
+<p>Welcome to the <code>PyPO</code> user manual. Here you can find several resources that will assist in using and/or developing <code>PyPO</code>. This homepage contains general information regarding installation instructions, the content of the user manual, contributor guidelines and contact information. After installing, the best place to start for new users would be the PyPO fundamentals tutorials, after which the rest of the tutorials can be studied. For contributor guidelines and general development instructions, please see the <a class="el" href="contribguide.html">instructions for developers</a> page.</p>
 <h1><a class="anchor" id="inst"></a>
 Installation</h1>
 <p>The prerequisites for installing <code>PyPO</code> on any operating system are:</p><ul>
 <li>A working <a href="https://www.python.org/downloads/release/python-380/">Python installation of version 3.8 or higher</a>.</li>
 <li>A <a href="https://pip.pypa.io/en/stable/installation/">pip installation</a>.</li>
 </ul>
+<p>All other necessary prerequisites are fetched and installed upon installing <code>PyPO</code>.</p>
 <h2><a class="anchor" id="sdist"></a>
 Install From Source</h2>
-<h3><a class="anchor" id="linux"></a>
+<h3><a class="anchor" id="General"></a>
+Prerequisites</h3>
+<p>Irrespective of operating system, <code>PyPO</code> uses <a href="https://cmake.org/">CMake</a> to build from source and if a source distribution is desired, it needs to be installed: </p><div class="fragment"><div class="line">pip install cmake</div>
+</div><!-- fragment --><h3><a class="anchor" id="linux"></a>
 Linux</h3>
-<p>First, install CMake: </p><div class="fragment"><div class="line">pip install cmake</div>
-</div><!-- fragment --><p> All other necessary prerequisites are fetched and installed upon installing <code>PyPO</code>. To install <code>PyPO</code>, clone the git repository: </p><div class="fragment"><div class="line">git clone https:<span class="comment">//github.com/PyPO-dev/PyPO</span></div>
+<p>To install <code>PyPO</code> from source on Linux, clone the git repository: </p><div class="fragment"><div class="line">git clone https:<span class="comment">//github.com/PyPO-dev/PyPO</span></div>
 </div><!-- fragment --><p> Alternatively, download the .zip package from <a href="https://github.com/PyPO-dev/PyPO">here</a> and unpack in the preferred destination. Navigate to the cloned/unpacked repository and run: </p><div class="fragment"><div class="line">pip install .</div>
 </div><!-- fragment --><h3><a class="anchor" id="macos"></a>
 MacOS</h3>
-<p>Installing <code>PyPO</code> from source on MacOS proceeds largely along the same lines as for Linux. The only difference being that you will need to have the command line tools package installed: </p><div class="fragment"><div class="line">xcode-select --install</div>
-</div><!-- fragment --><p>Then, installation of <code>PyPO</code> proceeds in the same fashion as for Linux.</p>
+<p>You will need to have the command line tools package installed: </p><div class="fragment"><div class="line">xcode-select --install</div>
+</div><!-- fragment --><p>Then, installation of <code>PyPO</code> proceeds in the same fashion as for <a class="el" href="index.html#linux">Linux</a>.</p>
 <h3><a class="anchor" id="windows"></a>
 Windows</h3>
-<p>Install CMake through pip: </p><div class="fragment"><div class="line">pip install cmake</div>
-</div><!-- fragment --><p>Then, install <a href="https://visualstudio.microsoft.com/vs/express/">Visual Studio Express</a>. Choose the C++ desktop development package. Important is, is that the MSVC compiler is present</p>
-<p>After this is installed, <code>PyPO</code> can be installed just like on Linux or MacOS.</p>
+<p>Install <a href="https://visualstudio.microsoft.com/vs/express/">Visual Studio Express</a>. Choose the C++ desktop development package. Important is, is that the MSVC compiler is present</p>
+<p>After this is installed, <code>PyPO</code> can be installed just like on <a class="el" href="index.html#linux">Linux</a>.</p>
 <h3><a class="anchor" id="devinstall"></a>
 Dev Install</h3>
 <p>In order to develop <code>PyPO</code>, we recommend to install <code>PyPO</code> in edit mode. See <a class="el" href="index.html#devinstall">this section</a> of the developers guidelines page for more info.</p>
@@ -138,6 +140,7 @@ Using PyPO On GPU</h2>
 <p>In order to use the GPU accelerated libraries for <code>PyPO</code>, a working CUDA installation should be present. For Linux, <a href="https://linuxconfig.org/how-to-install-cuda-on-ubuntu-20-04-focal-fossa-linux">this article</a> describes nicely how to install CUDA through the apt repository.</p>
 <p>For Windows, see the <a href="https://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/index.html">official instructions</a> on the Nvidia website.</p>
 <p>Unfortunately, <a href="https://appleinsider.com/articles/19/01/18/apples-management-doesnt-want-nvidia-support-in-macos-and-thats-a-bad-sign-for-the-mac-pro">Apple has stopped supporing Nvidia cards since 2015</a> and therefore, the CUDA libraries for <code>PyPO</code> cannot be installed on MacOS currently.</p>
+<p>After installing CUDA, <code>PyPO</code> will detect this and, upon building, will build the CUDA libraries. It is therefore important to re-install <code>PyPO</code> if you installed it before installing CUDA, otherwise the libraries will not be built.</p>
 <h2><a class="anchor" id="optdep"></a>
 Optional Dependencies</h2>
 <p><code>PyPO</code> contains several optional features such as a graphical user interface (GUI). For developers, an automated testing framework is present as well as a documentation generator. The prerequisites for these features are not installed through the regular install. Instead, they can be installed separately as needed.</p>
@@ -146,15 +149,16 @@ Optional Dependencies</h2>
 </div><!-- fragment --><p>Documentation in <code>PyPO</code> is generated using <a href="https://www.doxygen.nl/index.html">Doxygen</a>. Please see their <a href="https://www.doxygen.nl/manual/install.html">installation page</a> for instructions regarding installation.</p>
 <h1><a class="anchor" id="man"></a>
 User Manual</h1>
+<p>For a basic understanding of <code>PyPO</code> and its design, we refer to the explanations page.</p>
 <p>Several tutorials have been developed in order to demonstrate the usage and functionality of <code>PyPO</code>:</p><ul>
-<li>the first group of tutorials are meant to show the fundamentals of <code>PyPO</code> and the design philosophy,</li>
-<li>the second set of tutorials showcase the functionalities of the package,</li>
-<li>the third and final set show how to use the GUI.</li>
+<li>the first set of tutorials showcase the functionalities of the package,</li>
+<li>the second and final set show how to use the GUI.</li>
 </ul>
 <p>The software documentation for <code>PyPO</code> is split into two parts:</p><ul>
 <li>the first part forms a comprehensive API reference for all public methods of <code>PyPO</code>,</li>
 <li>the second part forms a reference for all internal Python, C/C++ and CUDA code.</li>
 </ul>
+<p>In addition, the documentations page contains a comprehensive overview of the common input/output types of <code>PyPO</code>.</p>
 <h1><a class="anchor" id="main_contribguidelines"></a>
 Contributor Guidelines</h1>
 <p>The contributor and development guidelines can be found <a class="el" href="contribguide.html">here</a>.</p>

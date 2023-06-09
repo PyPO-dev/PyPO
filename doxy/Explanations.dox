@@ -1,0 +1,16 @@
+/** 
+\page explanations Explanations
+\section expl_head PyPO Explanations
+Here you can find explanations on basic `PyPO` topics.
+Reading these explanations is recommended before diving into the \ref tutorials "tutorials" proper.
+
+\ref basictut1 "Introduction to PyPO and design principles"
+
+\ref basictut2 "Introduction To The System object"
+
+\ref basictut3 "Reflectors/Elements In PyPO"
+
+\ref basictut4 "Gridding And Parameterisations In PyPO"
+
+\ref basictut5 "Some More PyPO Datatypes"
+*/

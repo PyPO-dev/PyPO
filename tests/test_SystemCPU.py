@@ -118,7 +118,22 @@ class Test_SystemCPU(unittest.TestCase):
                     self.s.runPO(runPODict)
                     self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
                     self.assertEqual(type(self.s.frames["test_P"]), pypotypes.frame)
+    
+    def test_runPO_FF(self):
+        for i, plane in enumerate(TestTemplates.getPlaneList()):
+            if i == 2:
+                break
 
+            for i, source in enumerate(TestTemplates.getPOSourceList()):
+                if i == 0:
+                    self.s.createGaussian(source, plane["name"])
+                
+                elif i == 1:
+                    self.s.createPointSource(source, plane["name"])
+                    
+                runPODict = self._get_runPODictFF(source["name"], TestTemplates.getPlaneList()[-1]["name"],"test_EH")
+                self.s.runPO(runPODict)
+                self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
 
     def test_runRT(self):
         self.s.createTubeFrame(TestTemplates.TubeRTframe)
@@ -194,6 +209,19 @@ class Test_SystemCPU(unittest.TestCase):
 
         return runPODict
     
+    def _get_runPODictFF(self, source_current, target, name_EH):
+        runPODict = {
+                "t_name"    : target,
+                "s_current" : source_current,
+                "epsilon"   : 10,
+                "exp"       : "fwd",
+                "device"    : "CPU",
+                "name_EH"   : name_EH,
+                "mode"      : "FF"
+                }
+    
+        return runPODict
+
     def _get_runPODictEHP(self, source_current, target, name_EH, name_P):
         runPODict = {
                 "t_name"    : target,

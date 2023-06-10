@@ -104,7 +104,7 @@ def DevUtils():
             dir_tests = os.path.join(os.getcwd(), "tests")
 
             os.system(f"nose2 -v")
-
+        
         except Exception as err:
             print(err)
 

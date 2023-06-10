@@ -48,7 +48,7 @@ Important is, is that the MSVC compiler is present
 After this is installed, `PyPO` can be installed just like on \ref linux "Linux".
 
 \subsubsection devinstall Dev Install
-In order to develop `PyPO`, we recommend to install `PyPO` in edit mode. See \ref devinstall "this section" of the developers guidelines page for more info.
+In order to develop `PyPO`, we recommend to install `PyPO` in edit mode. See \ref devinstall_page "this section" of the developers guidelines page for more info.
 
 \subsection cuda Using PyPO On GPU
 In order to use the GPU accelerated libraries for `PyPO`, a working CUDA installation should be present.
@@ -81,13 +81,13 @@ Documentation in `PyPO` is generated using [Doxygen](https://www.doxygen.nl/inde
 Please see their [installation page](https://www.doxygen.nl/manual/install.html) for instructions regarding installation.
 
 \section man User Manual
-For a basic understanding of `PyPO` and its design, we refer to the explanations page.
+For a basic understanding of `PyPO` and its design, we refer to the \ref expl_head "explanations page".
 
-Several tutorials have been developed in order to demonstrate the usage and functionality of `PyPO`:
+Several \ref tutorials "tutorials" have been developed in order to demonstrate the usage and functionality of `PyPO`:
 - the first set of tutorials showcase the functionalities of the package,
 - the second and final set show how to use the GUI.
 
-The software documentation for `PyPO` is split into two parts:
+The \ref pypodocs "software documentation" for `PyPO` is split into two parts:
 - the first part forms a comprehensive API reference for all public methods of `PyPO`,
 - the second part forms a reference for all internal Python, C/C++ and CUDA code.
 

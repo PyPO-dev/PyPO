@@ -4,8 +4,8 @@ This page contains an overview of instructions for people intending to develop `
 These include the contributor guidelines, but also guidelines on how to document contributions and how to test `PyPO`.
 
 \section contrib Contributor Guidelines
-People wishing to contribute are more than welcome to do so. Contributions can be made by opening a pull request to the main repository from your own fork of `PyPO`,
-containing your contributions, the so-called [fork-and-branch workflow](https://blog.scottlowe.org/2015/01/27/using-fork-branch-git-workflow/).
+People wishing to contribute are more than welcome to do so. Contributions can be made by opening a pull request to the main repository from your own fork of `PyPO`.
+This is the so-called [fork-and-branch workflow](https://blog.scottlowe.org/2015/01/27/using-fork-branch-git-workflow/).
 Create a fork from the [PyPO repository](https://github.com/PyPO-dev/PyPO) to your own profile, and clone:
 ```
 git clone <URL-to-your-PyPO-fork>
@@ -42,16 +42,16 @@ git branch -d <new-branch-name>
 git push --delete origin <new-branch-name>
 ```
 
+\section issues Issues, Feauture Requests & Bugs
 Issues, feature requests and bugs can be reported in the `PyPO` [issue tracker](https://github.com/arend95/PyPO/issues).
 
 \section devinstructions Instructions For Developers
 As mentioned in the contributor guidelines, contributions to `PyPO` are more than welcome. 
 This section contains information on utilities put in place to make it easier to develop, as well as certain rules and practices for making `PyPO` easy to maintain.
 
-It is assumed that you have forked the PyPO, PyPO-docs and PyPO-tutorials repositories to a root directory, which we will call PyPO-dev for now.
-It is also assumed that each of these repositories has an upstream pointing to the original repos.
+It is assumed that you have forked the PyPO repository to a root directory, which we will call PyPO-dev for now.
 
-\subsection devinstall Dev Install
+\subsection devinstall_page Dev Install
 Installing `PyPO` for development is very similar to general installation:
 Navigate to the cloned (and forked) PyPO repository and run:
 ```

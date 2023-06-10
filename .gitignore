@@ -157,9 +157,13 @@ log
 !tutorials/Gui/README_Resources/ResourcesT2/*.png
 !tutorials/Gui/README_Resources/ResourcesT3/*.png
 !src/GUI/resources/*.png
+!src/GUI/resources/ResourcesT2/*.png
+!src/GUI/resources/ResourcesT3/*.png
 !doxy/resources/*.png
 !docs/*.png
 !docs/Gui/README_Resources/*.png
+!docs/Gui/README_Resources/ResourcesT2/*.png
+!docs/Gui/README_Resources/ResourcesT3/*.png
 
 # Personal projects/files
 personal/

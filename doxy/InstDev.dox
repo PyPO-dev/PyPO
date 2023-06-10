@@ -120,14 +120,17 @@ The documentation can be generated using the `DevUtils.py` script:
 
 This will generate the full `PyPO` user manual and place it in the "docs/" directory.
 
-\subsection runtests Running The Tests
+\subsection runtests Running The Automated Tests
 `PyPO` contains an automated testing suite that can be run quite easily from the command line:
 ```
 ./DevUtils.py -t
 ```
 
 This command will execute the entire testing suite.
-The testing suite contains unit tests, integration tests and system tests. The unit tests are concerned with atomic input/output relations.
-The integration tests are concerned with testing bits of `PyPO` together, such as the rotations and translations for reflectors.
-The system tests test `PyPO` by simulating physical systems and checking the correctness of the results.
+
+Note that nose2 needs to be installed:
+```
+pip install nose2
+```
+
 */

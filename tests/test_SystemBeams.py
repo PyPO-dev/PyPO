@@ -5,20 +5,15 @@ import ctypes
 import TestUtils.TestTemplates as TestTemplates
 
 import PyPO.BindBeam as beamlibs
-import PyPO.BindCPU as cpulibs
-import PyPO.BindRefl as refllibs
-import PyPO.BindTransf as transflibs
-import PyPO.BindGPU as gpulibs
-
 import PyPO.PyPOTypes as pypotypes
 
 from PyPO.System import System
 
 ##
 # @file
-# Tests for checking if shared object files are importable
+# Tests for checking if beams in PyPO are correct
 
-class Test_SystemBindings(unittest.TestCase):
+class Test_SystemBeams(unittest.TestCase):
     
     ##
     # Determine whether shared object exists or not.
@@ -47,9 +42,6 @@ class Test_SystemBindings(unittest.TestCase):
         lib = transflibs.loadTransflib()
         self.assertEqual(type(lib), ctypes.CDLL)
     
-    def test_loadRefllib(self):
-        lib = refllibs.loadRefllib()
-        self.assertEqual(type(lib), ctypes.CDLL)
 
     def test_loadCPUlib(self):
         lib = cpulibs.loadCPUlib()
@@ -98,7 +90,7 @@ class Test_SystemBindings(unittest.TestCase):
         self.assertEqual(type(self.s.fields["testPS_UField"]), pypotypes.fields)
         self.assertEqual(type(self.s.currents["testPS_UField"]), pypotypes.currents)
     
-    def test_makeScalarPointSource(self):
+    def test_createScalarPointSource(self):
         self.s.addPlane(TestTemplates.plane_xy)
         self.s.createPointSourceScalar(TestTemplates.PS_Ufield, "testPlane_xy")
         self.assertEqual(type(self.s.scalarfields["testPS_UField"]), pypotypes.scalarfield)
@@ -118,7 +110,7 @@ class Test_SystemBindings(unittest.TestCase):
         self.assertEqual(type(self.s.fields["testPS_UField"]), pypotypes.fields)
         self.assertEqual(type(self.s.currents["testPS_UField"]), pypotypes.currents)
     
-    def test_makeScalarUniformSource(self):
+    def test_createScalarUniformSource(self):
         self.s.addPlane(TestTemplates.plane_xy)
         self.s.createUniformSourceScalar(TestTemplates.PS_Ufield, "testPlane_xy")
         self.assertEqual(type(self.s.scalarfields["testPS_UField"]), pypotypes.scalarfield)
@@ -126,5 +118,6 @@ class Test_SystemBindings(unittest.TestCase):
         self.s.addPlane(TestTemplates.plane_uv)
         self.s.createUniformSourceScalar(TestTemplates.PS_Ufield, "testPlane_uv")
         self.assertEqual(type(self.s.scalarfields["testPS_UField"]), pypotypes.scalarfield)
+
 if __name__ == "__main__":
     unittest.main()

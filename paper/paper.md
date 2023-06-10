@@ -56,7 +56,7 @@ PyPO aims to contribute to this open-source optical simulation ecosystem by offe
 
 # Availability
 `PyPO` can be found on [Github](https://github.com/PyPO-dev/PyPO) and is available for Linux, MacOS and Windows.
-Software documentation and instructions regarding installation, contributing and issue tracking can be found in the [documentation](https://pypo-dev.github.io/PyPO-docs/).
+Software documentation and instructions regarding installation, contributing and issue tracking can be found in the [documentation](https://pypo-dev.github.io/PyPO/).
 The package comes with several Jupyter Notebook tutorials illustrating the workflow and features, and can be used as building blocks for new reflector systems.
 Several tutorials for using the GUI features are also included and can be found in the software documentation.
 

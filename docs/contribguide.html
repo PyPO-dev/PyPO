@@ -108,7 +108,7 @@ $(document).ready(function(){initNavTree('contribguide.html',''); initResizable(
 <div class="textblock"><p>This page contains an overview of instructions for people intending to develop <code>PyPO</code>. These include the contributor guidelines, but also guidelines on how to document contributions and how to test <code>PyPO</code>.</p>
 <h1><a class="anchor" id="contrib"></a>
 Contributor Guidelines</h1>
-<p>People wishing to contribute are more than welcome to do so. Contributions can be made by opening a pull request to the main repository from your own fork of <code>PyPO</code>, containing your contributions, the so-called <a href="https://blog.scottlowe.org/2015/01/27/using-fork-branch-git-workflow/">fork-and-branch workflow</a>. Create a fork from the <a href="https://github.com/PyPO-dev/PyPO">PyPO repository</a> to your own profile, and clone: </p><div class="fragment"><div class="line">git clone &lt;URL-to-your-PyPO-fork&gt;</div>
+<p>People wishing to contribute are more than welcome to do so. Contributions can be made by opening a pull request to the main repository from your own fork of <code>PyPO</code>. This is the so-called <a href="https://blog.scottlowe.org/2015/01/27/using-fork-branch-git-workflow/">fork-and-branch workflow</a>. Create a fork from the <a href="https://github.com/PyPO-dev/PyPO">PyPO repository</a> to your own profile, and clone: </p><div class="fragment"><div class="line">git clone &lt;URL-to-your-PyPO-fork&gt;</div>
 </div><!-- fragment --><p>Set the original repo as upstream: </p><div class="fragment"><div class="line">git remote add upstream https:<span class="comment">//github.com/PyPO-dev/PyPO</span></div>
 </div><!-- fragment --><p>It is good practice to make a feature branch in which you can store your work: </p><div class="fragment"><div class="line">git checkout -b &lt;<span class="keyword">new</span>-branch-name&gt;</div>
 </div><!-- fragment --><p>Then, when it is time to push the changes to the original repo, run: </p><div class="fragment"><div class="line">git push origin &lt;<span class="keyword">new</span>-branch-name&gt;</div>
@@ -117,12 +117,14 @@ Contributor Guidelines</h1>
 <div class="line">git push origin main</div>
 </div><!-- fragment --><p>Then, the feature branch can be deleted: </p><div class="fragment"><div class="line">git branch -d &lt;<span class="keyword">new</span>-branch-name&gt;</div>
 <div class="line">git push --<span class="keyword">delete</span> origin &lt;<span class="keyword">new</span>-branch-name&gt;</div>
-</div><!-- fragment --><p>Issues, feature requests and bugs can be reported in the <code>PyPO</code> <a href="https://github.com/arend95/PyPO/issues">issue tracker</a>.</p>
+</div><!-- fragment --><h1><a class="anchor" id="issues"></a>
+Issues, Feauture Requests &amp; Bugs</h1>
+<p>Issues, feature requests and bugs can be reported in the <code>PyPO</code> <a href="https://github.com/arend95/PyPO/issues">issue tracker</a>.</p>
 <h1><a class="anchor" id="devinstructions"></a>
 Instructions For Developers</h1>
 <p>As mentioned in the contributor guidelines, contributions to <code>PyPO</code> are more than welcome. This section contains information on utilities put in place to make it easier to develop, as well as certain rules and practices for making <code>PyPO</code> easy to maintain.</p>
-<p>It is assumed that you have forked the PyPO, PyPO-docs and PyPO-tutorials repositories to a root directory, which we will call PyPO-dev for now. It is also assumed that each of these repositories has an upstream pointing to the original repos.</p>
-<h2><a class="anchor" id="devinstall"></a>
+<p>It is assumed that you have forked the PyPO repository to a root directory, which we will call PyPO-dev for now.</p>
+<h2><a class="anchor" id="devinstall_page"></a>
 Dev Install</h2>
 <p>Installing <code>PyPO</code> for development is very similar to general installation: Navigate to the cloned (and forked) PyPO repository and run: </p><div class="fragment"><div class="line">pip install -e .</div>
 </div><!-- fragment --><p>The "-e" flag tells pip to install <code>PyPO</code> in the actual "src/PyPO/" directory of the <code>PyPO</code> repository. This means that any changes to the Python source code are immediately reflected in the package imported through Python. For the C/C++/CUDA code, this is not true. These scripts need to be compiled into libraries again (which happens when the <code>pip install -e .</code> command is run) before the changes are reflected in the package.</p>

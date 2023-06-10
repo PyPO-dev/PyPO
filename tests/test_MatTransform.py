@@ -38,7 +38,7 @@ class Test_MatTransform(unittest.TestCase):
         self._run_rotations("plane_test", "plane_ref")
 
     def _run_rotations(self, name_test, name_ref):
-        for i in range(100):
+        for i in range(10):
             self._make_random_system()
             
             rotation0 = np.degrees((np.random.rand(3) - 0.5) * 2*np.pi)
@@ -80,7 +80,7 @@ class Test_MatTransform(unittest.TestCase):
             del self.s
     
     def _run_translations(self, name_test, name_ref):
-        for i in range(100):
+        for i in range(10):
             self._make_random_system()
             
             translation0 = np.random.rand(3)

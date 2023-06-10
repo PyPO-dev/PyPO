@@ -1,5 +1,5 @@
 import numpy as np
-import PyPO.System as System
+from PyPO.System import System
 
 ##
 # @file
@@ -18,7 +18,7 @@ TubeRTframe =  {
 GaussRTframe =  {
         "name"      : "testGaussRTframe",
         "nRays"     : 7,
-        "lam"       : 1,
+        "lam"       : 0.01,
         "n"         : 1,
         "seed"      : 1,
         "x0"        : 1,
@@ -51,7 +51,7 @@ paraboloid_man_xy = {
         "gmode"     : "xy",
         "lims_x"    : np.array([-1, 1]),
         "lims_y"    : np.array([-1, 1]),
-        "gridsize"  : np.array([31, 31])
+        "gridsize"  : np.array([3, 3])
         }
 
 paraboloid_man_uv = {
@@ -61,7 +61,7 @@ paraboloid_man_uv = {
         "gmode"     : "uv",
         "lims_u"    : np.array([0, 1]),
         "lims_v"    : np.array([0, 360]),
-        "gridsize"  : np.array([31, 31])
+        "gridsize"  : np.array([3, 3])
         }
 
 paraboloid_foc_xy = {
@@ -72,7 +72,7 @@ paraboloid_foc_xy = {
         "gmode"     : "xy",
         "lims_x"    : np.array([-1, 1]),
         "lims_y"    : np.array([-1, 1]),
-        "gridsize"  : np.array([31, 31])
+        "gridsize"  : np.array([3, 3])
         }
 
 paraboloid_foc_uv = {
@@ -83,7 +83,7 @@ paraboloid_foc_uv = {
         "gmode"     : "uv",
         "lims_u"    : np.array([0, 1]),
         "lims_v"    : np.array([0, 360]),
-        "gridsize"  : np.array([31, 31])
+        "gridsize"  : np.array([3, 3])
         }
 
 #### HYPERBOLOIDS ####
@@ -95,7 +95,7 @@ hyperboloid_man_xy = {
         "gmode"     : "xy",
         "lims_x"    : np.array([-1, 1]),
         "lims_y"    : np.array([-1, 1]),
-        "gridsize"  : np.array([31, 31])
+        "gridsize"  : np.array([3, 3])
         }
 
 hyperboloid_man_uv = {
@@ -106,7 +106,7 @@ hyperboloid_man_uv = {
         "gmode"     : "uv",
         "lims_u"    : np.array([0, 1]),
         "lims_v"    : np.array([0, 360]),
-        "gridsize"  : np.array([31, 31])
+        "gridsize"  : np.array([3, 3])
         }
 
 hyperboloid_foc_xy = {
@@ -118,7 +118,7 @@ hyperboloid_foc_xy = {
         "gmode"     : "xy",
         "lims_x"    : np.array([-1, 1]),
         "lims_y"    : np.array([-1, 1]),
-        "gridsize"  : np.array([31, 31])
+        "gridsize"  : np.array([3, 3])
         }
 
 hyperboloid_foc_uv = {
@@ -130,7 +130,7 @@ hyperboloid_foc_uv = {
         "gmode"     : "uv",
         "lims_u"    : np.array([0, 1]),
         "lims_v"    : np.array([0, 360]),
-        "gridsize"  : np.array([31, 31])
+        "gridsize"  : np.array([3, 3])
         }
 
 #### ELLIPSOIDS ####
@@ -138,24 +138,24 @@ ellipsoid_z_man_xy = {
         "name"      : "testEllipsoid_z_man_xy",
         "pmode"     : "manual",
         "orient"    : "z",
-        "coeffs"    : np.array([1, 1, 1]),
+        "coeffs"    : np.array([10, 10, 1]),
         "ecc"       : 0.5,
         "gmode"     : "xy",
         "lims_x"    : np.array([-1, 1]),
         "lims_y"    : np.array([-1, 1]),
-        "gridsize"  : np.array([31, 31])
+        "gridsize"  : np.array([3, 3])
         }
 
 ellipsoid_z_man_uv = {
         "name"      : "testEllipsoid_z_man_uv",
         "pmode"     : "manual",
         "orient"    : "z",
-        "coeffs"    : np.array([1, 1, 1]),
+        "coeffs"    : np.array([10, 10, 1]),
         "ecc"       : 0.5,
         "gmode"     : "uv",
         "lims_u"    : np.array([0, 1]),
         "lims_v"    : np.array([0, 360]),
-        "gridsize"  : np.array([31, 31])
+        "gridsize"  : np.array([3, 3])
         }
 
 ellipsoid_z_foc_xy = {
@@ -168,7 +168,7 @@ ellipsoid_z_foc_xy = {
         "gmode"     : "xy",
         "lims_x"    : np.array([-1, 1]),
         "lims_y"    : np.array([-1, 1]),
-        "gridsize"  : np.array([31, 31])
+        "gridsize"  : np.array([3, 3])
         }
 
 ellipsoid_z_foc_uv = {
@@ -181,31 +181,31 @@ ellipsoid_z_foc_uv = {
         "gmode"     : "uv",
         "lims_u"    : np.array([0, 1]),
         "lims_v"    : np.array([0, 360]),
-        "gridsize"  : np.array([31, 31])
+        "gridsize"  : np.array([3, 3])
         }
 
 ellipsoid_x_man_xy = {
         "name"      : "testEllipsoid_x_man_xy",
         "pmode"     : "manual",
         "orient"    : "x",
-        "coeffs"    : np.array([1, 1, 1]),
+        "coeffs"    : np.array([1, 10, 10]),
         "ecc"       : 0.5,
         "gmode"     : "xy",
         "lims_x"    : np.array([-1, 1]),
         "lims_y"    : np.array([-1, 1]),
-        "gridsize"  : np.array([31, 31])
+        "gridsize"  : np.array([3, 3])
         }
 
 ellipsoid_x_man_uv = {
         "name"      : "testEllipsoid_x_man_uv",
         "pmode"     : "manual",
         "orient"    : "x",
-        "coeffs"    : np.array([1, 1, 1]),
+        "coeffs"    : np.array([1, 10, 10]),
         "ecc"       : 0.5,
         "gmode"     : "uv",
         "lims_u"    : np.array([0, 1]),
         "lims_v"    : np.array([0, 360]),
-        "gridsize"  : np.array([31, 31])
+        "gridsize"  : np.array([3, 3])
         }
 
 ellipsoid_x_foc_xy = {
@@ -218,7 +218,7 @@ ellipsoid_x_foc_xy = {
         "gmode"     : "xy",
         "lims_x"    : np.array([-1, 1]),
         "lims_y"    : np.array([-1, 1]),
-        "gridsize"  : np.array([31, 31])
+        "gridsize"  : np.array([3, 3])
         }
 
 ellipsoid_x_foc_uv = {
@@ -231,7 +231,7 @@ ellipsoid_x_foc_uv = {
         "gmode"     : "uv",
         "lims_u"    : np.array([0, 1]),
         "lims_v"    : np.array([0, 360]),
-        "gridsize"  : np.array([31, 31])
+        "gridsize"  : np.array([3, 3])
         }
 
 #### PLANES ####
@@ -240,7 +240,7 @@ plane_xy = {
         "gmode"     : "xy",
         "lims_x"    : np.array([-1, 1]),
         "lims_y"    : np.array([-1, 1]),
-        "gridsize"  : np.array([31, 31])
+        "gridsize"  : np.array([3, 3])
         }
 
 plane_uv = {
@@ -248,7 +248,7 @@ plane_uv = {
         "gmode"     : "uv",
         "lims_u"    : np.array([0, 1]),
         "lims_v"    : np.array([0, 360]),
-        "gridsize"  : np.array([31, 31])
+        "gridsize"  : np.array([3, 3])
         }
 
 plane_AoE = {
@@ -256,7 +256,7 @@ plane_AoE = {
         "gmode"     : "AoE",
         "lims_Az"   : np.array([-1, 1]),
         "lims_El"   : np.array([-1, 1]),
-        "gridsize"  : np.array([31, 31])
+        "gridsize"  : np.array([3, 3])
         }
 
 aperDict = {
@@ -267,31 +267,68 @@ aperDict = {
         }
 
 ##
+# Get a list of plane dictionaries.
+#
+# @returns out List of all plane dictionaries
+def getPlaneList():
+    out = [plane_xy, plane_uv, plane_AoE]
+    return out
+
+##
+# Get a list of paraboloid dictionaries.
+#
+# @returns out List of all paraboloid dictionaries
+def getParaboloidList():
+    out = [paraboloid_man_xy, paraboloid_man_uv, 
+            paraboloid_foc_xy, paraboloid_foc_uv]
+    return out
+
+##
+# Get a list of hyperboloid dictionaries.
+#
+# @returns out List of all hyperboloid dictionaries
+def getHyperboloidList():
+    out = [hyperboloid_man_xy, hyperboloid_man_uv, 
+            hyperboloid_foc_xy, hyperboloid_foc_uv]
+    return out
+
+##
+# Get a list of ellipsoid dictionaries.
+#
+# @returns out List of all ellipsoid dictionaries
+def getEllipsoidList():
+    out = [ellipsoid_x_man_xy, ellipsoid_x_man_uv, 
+            ellipsoid_x_foc_xy, ellipsoid_x_foc_uv,
+            ellipsoid_z_man_xy, ellipsoid_z_man_uv,
+            ellipsoid_z_foc_xy, ellipsoid_z_foc_uv
+            ]
+    return out
+
+##
+# Get a list containing all PO source dictionaries.
+#
+# @returns out List of all PO source dictionaries. 
+def getPOSourceList():
+    out = [GPOfield, PS_Ufield]
+    return out
+
+##
 # Get a system with all possible reflectortypes.
+#
+# @returns s System object with all types of reflectors added
 def getSystemWithReflectors():
     s = System(verbose=False)
 
-    s.addPlane(TestTemplates.plane_xy)
-    s.addPlane(TestTemplates.plane_uv)
-    s.addPlane(TestTemplates.plane_AoE)
+    for plane in getPlaneList():
+        s.addPlane(plane)
 
-    s.addParabola(TestTemplates.paraboloid_man_xy)
-    s.addParabola(TestTemplates.paraboloid_man_uv)
-    s.addParabola(TestTemplates.paraboloid_foc_xy)
-    s.addParabola(TestTemplates.paraboloid_foc_uv)
+    for parabola in getParaboloidList():
+        s.addParabola(parabola)
 
-    s.addHyperbola(TestTemplates.hyperboloid_man_xy)
-    s.addHyperbola(TestTemplates.hyperboloid_man_uv)
-    s.addHyperbola(TestTemplates.hyperboloid_foc_xy)
-    s.addHyperbola(TestTemplates.hyperboloid_foc_uv)
+    for hyperbola in getHyperboloidList():
+        s.addHyperbola(hyperbola)
 
-    s.addEllipse(TestTemplates.ellipsoid_x_man_xy)
-    s.addEllipse(TestTemplates.ellipsoid_x_man_uv)
-    s.addEllipse(TestTemplates.ellipsoid_x_foc_xy)
-    s.addEllipse(TestTemplates.ellipsoid_x_foc_uv)
-    s.addEllipse(TestTemplates.ellipsoid_z_man_xy)
-    s.addEllipse(TestTemplates.ellipsoid_z_man_uv)
-    s.addEllipse(TestTemplates.ellipsoid_z_foc_xy)
-    s.addEllipse(TestTemplates.ellipsoid_z_foc_uv)
+    for ellipse in getEllipsoidList():
+        s.addEllipse(ellipse)
 
     return s

@@ -4,24 +4,30 @@ import ctypes
 
 from . import TestTemplates
 
-import PyPO.BindCPU as cpulibs
+import PyPO.BindGPU as cpulibs
 import PyPO.PyPOTypes as pypotypes
 
 from PyPO.System import System
 
 ##
 # @file
-# Tests for checking if CPU operations in PyPO are correct
+# Tests for checking if GPU operations in PyPO are correct
 
-class Test_SystemCPU(unittest.TestCase):
+class Test_SystemGPU(unittest.TestCase):
     def setUp(self):
         self.s = TestTemplates.getSystemWithReflectors()
-
-    def test_loadCPUlib(self):
-        lib = cpulibs.loadCPUlib()
-        self.assertEqual(type(lib), ctypes.CDLL)
+        
+        self.GPU_flag = True
+        try:
+            lib = cpulibs.loadGPUlib()
+            self.assertEqual(type(lib), ctypes.CDLL)
+        except OSError:
+            print("No GPU libraries found... Not testing GPU functionalities.")
+            self.GPU_flag = False
 
     def test_runPO_JM(self):
+        if not self.GPU_flag:
+            return
         for plane in TestTemplates.getPlaneList():
             for i, source in enumerate(TestTemplates.getPOSourceList()):
                 if i == 0:
@@ -44,6 +50,8 @@ class Test_SystemCPU(unittest.TestCase):
                     self.assertEqual(type(self.s.currents["test_JM"]), pypotypes.currents)
     
     def test_runPO_EH(self):
+        if not self.GPU_flag:
+            return
         for plane in TestTemplates.getPlaneList():
             for i, source in enumerate(TestTemplates.getPOSourceList()):
                 if i == 0:
@@ -66,6 +74,8 @@ class Test_SystemCPU(unittest.TestCase):
                     self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
 
     def test_runPO_JMEH(self):
+        if not self.GPU_flag:
+            return
         for plane in TestTemplates.getPlaneList():
             for i, source in enumerate(TestTemplates.getPOSourceList()):
                 if i == 0:
@@ -93,6 +103,8 @@ class Test_SystemCPU(unittest.TestCase):
                     self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
     
     def test_runPO_EHP(self):
+        if not self.GPU_flag:
+            return
         for plane in TestTemplates.getPlaneList():
             for i, source in enumerate(TestTemplates.getPOSourceList()):
                 if i == 0:
@@ -121,6 +133,8 @@ class Test_SystemCPU(unittest.TestCase):
 
 
     def test_runRT(self):
+        if not self.GPU_flag:
+            return
         self.s.createTubeFrame(TestTemplates.TubeRTframe)
         self.s.createGRTFrame(TestTemplates.GaussRTframe)
         
@@ -160,7 +174,7 @@ class Test_SystemCPU(unittest.TestCase):
                 "s_current" : source_current,
                 "epsilon"   : 10,
                 "exp"       : "fwd",
-                "device"    : "CPU",
+                "device"    : "GPU",
                 "name_JM"   : name_JM,
                 "mode"      : "JM"
                 }
@@ -173,7 +187,7 @@ class Test_SystemCPU(unittest.TestCase):
                 "s_current" : source_current,
                 "epsilon"   : 10,
                 "exp"       : "fwd",
-                "device"    : "CPU",
+                "device"    : "GPU",
                 "name_EH"   : name_EH,
                 "mode"      : "EH"
                 }
@@ -186,7 +200,7 @@ class Test_SystemCPU(unittest.TestCase):
                 "s_current" : source_current,
                 "epsilon"   : 10,
                 "exp"       : "fwd",
-                "device"    : "CPU",
+                "device"    : "GPU",
                 "name_JM"   : name_JM,
                 "name_EH"   : name_EH,
                 "mode"      : "JMEH"
@@ -200,7 +214,7 @@ class Test_SystemCPU(unittest.TestCase):
                 "s_current" : source_current,
                 "epsilon"   : 10,
                 "exp"       : "fwd",
-                "device"    : "CPU",
+                "device"    : "GPU",
                 "name_EH"   : name_EH,
                 "name_P"    : name_P,
                 "mode"      : "EHP"
@@ -212,7 +226,7 @@ class Test_SystemCPU(unittest.TestCase):
         runRTDict = {
                 "fr_in"     : fr_in,
                 "t_name"    : target,
-                "device"    : "CPU",
+                "device"    : "GPU",
                 "fr_out"    : fr_out,
                 "t0"        : 1
                 }

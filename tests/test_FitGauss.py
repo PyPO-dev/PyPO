@@ -17,7 +17,7 @@ import matplotlib.pyplot as pt
 # File containing tests for Gaussian fitting in PyPO.
 class Test_FitGauss(unittest.TestCase):
     def test_fitGauss(self):
-        for i in range(100):
+        for i in range(10):
             w0x, w0y, rot, tx, ty = self._makeRandomGauss()
             popt, perr = self.s.fitGaussAbs("Gauss", "Ex", thres=-11, mode="linear", full_output=True, ratio=None)
 

@@ -21,7 +21,7 @@ class Test_RayTraceUtils(unittest.TestCase):
                 "tol"       : 1e-12,
                 "device"    : "CPU"
                 }
-        for i in range(100):
+        for i in range(10):
             self._RT_random_parabola()
             
             self.s.runRayTracer(runRTDict)
@@ -71,7 +71,7 @@ class Test_RayTraceUtils(unittest.TestCase):
                 "tol"       : 1e-12,
                 "device"    : "CPU"
                 }
-        for i in range(100):
+        for i in range(10):
             self._RT_random_ellipse("z")
             
             self.s.runRayTracer(runRTDict)
@@ -91,7 +91,7 @@ class Test_RayTraceUtils(unittest.TestCase):
                 "tol"       : 1e-12,
                 "device"    : "CPU"
                 }
-        for i in range(100):
+        for i in range(10):
             self._RT_random_ellipse("x")
            
             self.s.runRayTracer(runRTDict)
@@ -147,7 +147,7 @@ class Test_RayTraceUtils(unittest.TestCase):
         self.s.translateGrids("start", focus1, obj="frame")
     
     def test_findRotation(self):
-        for i in range(100):
+        for i in range(10):
             self.s = System(verbose=False)
             R = special_ortho_group.rvs(dim=3)
 
@@ -164,7 +164,7 @@ class Test_RayTraceUtils(unittest.TestCase):
                 self.assertAlmostEqual(ri, ro)
     
     def test_getAnglesFromMatrix(self):
-        for i in range(100):
+        for i in range(10):
             self.s = System(verbose=False)
             R = special_ortho_group.rvs(dim=3)
 

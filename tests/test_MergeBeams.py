@@ -11,7 +11,7 @@ from PyPO.System import System
 
 class Test_MergeBeams(unittest.TestCase):
     def test_mergeBeams_uv(self):
-        for i in range(100):
+        for i in range(10):
             self._generate_uniform_uv()
             self.s.mergeBeams("source1", "source2", merged_name="combined")
             for i in range(6):

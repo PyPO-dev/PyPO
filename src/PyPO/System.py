@@ -282,6 +282,17 @@ class System(object):
             self.clog.setLevel(logging.CRITICAL)
 
     ##
+    # Set the override toggle.
+    #
+    # By setting "override" to False, PyPO will start appending number of occurences of a duplicate name instead of overwriting it.
+    #
+    # @ingroup public_api_sysio
+    #
+    # @param override Whether to override duplicate reflector names or not.
+    def setOverride(self, override=True):
+        Config.setOverride(override)
+
+    ##
     # Add a paraboloid reflector to the System.
     #
     # This method takes a dictionary filled with the parameters for a paraboloid reflector and generates an internal dictionary for generating the reflectorgrids. 

@@ -2,7 +2,10 @@ import unittest
 import numpy as np
 import ctypes
 
-from . import TestTemplates
+try:
+    from . import TestTemplates
+except:
+    import TestTemplates
 
 import PyPO.BindCPU as cpulibs
 import PyPO.PyPOTypes as pypotypes
@@ -136,9 +139,6 @@ class Test_SystemCPU(unittest.TestCase):
                 self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
 
     def test_runRT(self):
-        self.s.createTubeFrame(TestTemplates.TubeRTframe)
-        self.s.createGRTFrame(TestTemplates.GaussRTframe)
-        
         self.s.translateGrids(TestTemplates.TubeRTframe["name"], np.array([0, 0, -1]), obj="frame")
         self.s.translateGrids(TestTemplates.GaussRTframe["name"], np.array([0, 0, -1]), obj="frame")
         

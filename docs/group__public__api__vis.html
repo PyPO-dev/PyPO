@@ -113,9 +113,9 @@ $(document).ready(function(){initNavTree('group__public__api__vis.html',''); ini
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga8c64602997bf25968a619a32f34f266e"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__vis.html#ga8c64602997bf25968a619a32f34f266e">PyPO.System.System.plotBeamCut</a> (self, name_field, comp, comp_cross=None, vmin=None, vmax=None, units='', name=&quot;&quot;, show=True, save=False, ret=False)</td></tr>
-<tr class="memdesc:ga8c64602997bf25968a619a32f34f266e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Plot beam pattern cross sections.  <br /></td></tr>
-<tr class="separator:ga8c64602997bf25968a619a32f34f266e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga67831b3573256bd526aa5e5f6f8f717d"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__vis.html#ga67831b3573256bd526aa5e5f6f8f717d">PyPO.System.System.plotBeamCut</a> (self, name_field, comp, comp_cross=None, vmin=None, vmax=None, center=True, align=True, units='', name=&quot;&quot;, show=True, save=False, ret=False)</td></tr>
+<tr class="memdesc:ga67831b3573256bd526aa5e5f6f8f717d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Plot beam pattern cross sections.  <br /></td></tr>
+<tr class="separator:ga67831b3573256bd526aa5e5f6f8f717d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga39b35cecb313fe584b60f40fbe128401"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__vis.html#ga39b35cecb313fe584b60f40fbe128401">PyPO.System.System.plotBeam2D</a> (self, name_obj, comp=None, contour=None, contour_comp=None, vmin=None, vmax=None, levels=None, show=True, amp_only=False, save=False, interpolation=None, norm=True, aperDict=None, mode='dB', project='xy', units=&quot;&quot;, name=&quot;&quot;, titleA=&quot;Power&quot;, titleP=&quot;Phase&quot;, unwrap_phase=False, ret=False)</td></tr>
 <tr class="memdesc:ga39b35cecb313fe584b60f40fbe128401"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a 2D plot of a PO (scalar)field or current.  <br /></td></tr>
 <tr class="separator:ga39b35cecb313fe584b60f40fbe128401"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -379,7 +379,7 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">name_obj</td><td>Name of field or current to plot. </td></tr>
-    <tr><td class="paramname">comp</td><td>Component of field or current to plot. </td></tr>
+    <tr><td class="paramname">comp</td><td>Component of field or current to plot. String of two characters; an uppercase {E, H, J, M} for field followed by a lowercase {x, y, z} for component. (e.g: 'Jz') </td></tr>
     <tr><td class="paramname">contour</td><td>A PyPO field or current component to plot as contour. </td></tr>
     <tr><td class="paramname">contour_comp</td><td>Component of contour to plot as contour. If None, looks is scalarfields. </td></tr>
     <tr><td class="paramname">vmin</td><td>Minimum amplitude value to display. Default is -30. </td></tr>
@@ -406,8 +406,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ga8c64602997bf25968a619a32f34f266e" name="ga8c64602997bf25968a619a32f34f266e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga8c64602997bf25968a619a32f34f266e">&#9670;&#160;</a></span>plotBeamCut()</h2>
+<a id="ga67831b3573256bd526aa5e5f6f8f717d" name="ga67831b3573256bd526aa5e5f6f8f717d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga67831b3573256bd526aa5e5f6f8f717d">&#9670;&#160;</a></span>plotBeamCut()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -452,6 +452,18 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>center</em> = <code>True</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>align</em> = <code>True</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
           <td class="paramname"><em>units</em> = <code>''</code>, </td>
         </tr>
         <tr>
@@ -487,7 +499,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Plot beam pattern cross sections. </p>
-<p>Plot the beam cross sections for a PO field. In this case, calcBeamCuts() will try to translate and rotate the supplied beam pattern to lie along the x- and y-axes.</p>
+<p>Plot the beam cross sections for a PO field. In this case, calcBeamCuts() will try to translate and rotate the supplied beam pattern to lie along the x- and y-axes. Note that using the "center" and "align" arguments sgould not be done when plotting beam cuts of very non-Gaussian beams. For these patterns, it is advised to set the arguments to False and calculate the beam cuts as-is.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">name_field</td><td>Name of field object. </td></tr>
@@ -495,6 +507,8 @@ Functions</h2></td></tr>
     <tr><td class="paramname">comp_cross</td><td>Cross-polar component. If given, is plotted as well. Defaults to None. </td></tr>
     <tr><td class="paramname">vmin</td><td>Minimum amplitude value to display. Default is -30. </td></tr>
     <tr><td class="paramname">vmax</td><td>Maximum amplitude value to display. Default is 0. </td></tr>
+    <tr><td class="paramname">center</td><td>Whether to calculate beam center and center the beam cuts on this point. </td></tr>
+    <tr><td class="paramname">align</td><td>Whether to find position angle of beam cuts and align cut axes to this. </td></tr>
     <tr><td class="paramname">units</td><td>The units of the axes. Default is "", which is degrees. </td></tr>
     <tr><td class="paramname">name</td><td>Name of .png file where plot is saved. Only when save=True. Default is "". </td></tr>
     <tr><td class="paramname">show</td><td>Show plot. Default is True. </td></tr>

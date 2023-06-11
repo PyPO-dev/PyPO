@@ -15,7 +15,7 @@ var searchData=
   ['plane_5fxy_12',['Plane_xy',['../InterfaceReflector_8cpp.html#ae205dba51f78fc78d23478c68196f19a',1,'InterfaceReflector.cpp']]],
   ['plot3d_13',['plot3D',['../Plotter_8py.html#ae8f9d1083e6a48d48772e1bfa72f683c',1,'PyPO.Plotter.plot3D()'],['../group__public__api__vis.html#gaec433284697826854072723d27cd1341',1,'PyPO.System.System.plot3D()']]],
   ['plotbeam2d_14',['plotBeam2D',['../Plotter_8py.html#abfc7905b15c313046e115fdc25588c29',1,'PyPO.Plotter.plotBeam2D()'],['../group__public__api__vis.html#ga39b35cecb313fe584b60f40fbe128401',1,'PyPO.System.System.plotBeam2D()']]],
-  ['plotbeamcut_15',['plotBeamCut',['../Plotter_8py.html#a75e6dae9b9ab60048e4001de60c7c542',1,'PyPO.Plotter.plotBeamCut()'],['../group__public__api__vis.html#ga8c64602997bf25968a619a32f34f266e',1,'PyPO.System.System.plotBeamCut()']]],
+  ['plotbeamcut_15',['plotBeamCut',['../Plotter_8py.html#a75e6dae9b9ab60048e4001de60c7c542',1,'PyPO.Plotter.plotBeamCut()'],['../group__public__api__vis.html#ga67831b3573256bd526aa5e5f6f8f717d',1,'PyPO.System.System.plotBeamCut()']]],
   ['plotcurrentaction_16',['plotCurrentAction',['../classGUI_1_1MainWindow_1_1MainWidget.html#acf96e91acf404b037e77fe66f113ecf6',1,'GUI::MainWindow::MainWidget']]],
   ['plotcurrentform_17',['plotCurrentForm',['../classGUI_1_1MainWindow_1_1MainWidget.html#a3932d511e92822748fbcaaddcaa64c6d',1,'GUI::MainWindow::MainWidget']]],
   ['plotcurrentopt_18',['plotCurrentOpt',['../formData_8py.html#a68da93abea771834f915bada579be642',1,'GUI::ParameterForms::formData']]],

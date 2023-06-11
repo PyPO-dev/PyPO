@@ -119,9 +119,6 @@ Functions</h2></td></tr>
 <tr class="memitem:aa9dfeca7a9859e01ee39da1059f6cc42"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BindRefl_8py.html#aa9dfeca7a9859e01ee39da1059f6cc42">PyPO.BindRefl.generateGrid</a> (reflparams_py, transform=True, spheric=True)</td></tr>
 <tr class="memdesc:aa9dfeca7a9859e01ee39da1059f6cc42"><td class="mdescLeft">&#160;</td><td class="mdescRight">Double precision function for generating reflector grids.  <br /></td></tr>
 <tr class="separator:aa9dfeca7a9859e01ee39da1059f6cc42"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0a78c553e045c302425078722839c002"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BindRefl_8py.html#a0a78c553e045c302425078722839c002">PyPO.BindRefl.generateGridf</a> (reflparams_py, transform, spheric)</td></tr>
-<tr class="memdesc:a0a78c553e045c302425078722839c002"><td class="mdescLeft">&#160;</td><td class="mdescRight">Single precision function for generating reflector grids.  <br /></td></tr>
-<tr class="separator:a0a78c553e045c302425078722839c002"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Bindings for the ctypes interface for PyPO. </p>
@@ -161,52 +158,6 @@ Functions</h2></td></tr>
 
 <p>Double precision function for generating reflector grids. </p>
 <p>This is the function called by the CPU PyPO bindings. Also, when called from System, this is the binding that is called.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">reflparams_py</td><td>A reflDict dictionary. </td></tr>
-    <tr><td class="paramname">transform</td><td>Whether to generate the grid in nominal configuration or to apply transformation matrix. </td></tr>
-    <tr><td class="paramname">spheric</td><td>Convert Az-El co-ordinates to spherical (far-field only).</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>grids A reflGrids object. </dd></dl>
-
-</div>
-</div>
-<a id="a0a78c553e045c302425078722839c002" name="a0a78c553e045c302425078722839c002"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0a78c553e045c302425078722839c002">&#9670;&#160;</a></span>generateGridf()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">def PyPO.BindRefl.generateGridf </td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>reflparams_py</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>transform</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>spheric</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Single precision function for generating reflector grids. </p>
-<p>This is the function called by the GPU PyPO bindings.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">reflparams_py</td><td>A reflDict dictionary. </td></tr>

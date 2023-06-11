@@ -20,7 +20,6 @@ from PyPO.System import System
 class Test_SystemPO_RT(unittest.TestCase):
     def setUp(self):
         self.s = TestTemplates.getSystemWithReflectors()
-        
         self.GPU_flag = True
         try:
             lib = gpulibs.loadGPUlib()
@@ -105,8 +104,8 @@ class Test_SystemPO_RT(unittest.TestCase):
                         self.assertEqual(type(self.s.currents["test_JM"]), pypotypes.currents)
                         self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
     
-    def test_runPO_EHP(self):
-        for dev in ["CPU", "GPU"]:
+    def test_runPO_EHP_Hybrid(self):
+        for interp, dev in zip([False, True], ["CPU", "GPU"]):
             if dev == "GPU" and not self.GPU_flag:
                 return
             for plane in TestTemplates.getPlaneList():
@@ -117,11 +116,23 @@ class Test_SystemPO_RT(unittest.TestCase):
                         self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
                         self.assertEqual(type(self.s.frames["test_P"]), pypotypes.frame)
 
+                        runHybridDict = self._get_runPODictHybrid("test_P", "test_EH", plane["name"], "test_fr_out", "test_field_out", interp=interp)
+                       
+                        self.s.runHybridPropagation(runHybridDict)
+                        self.assertEqual(type(self.s.fields["test_field_out"]), pypotypes.fields)
+                        self.assertEqual(type(self.s.frames["test_fr_out"]), pypotypes.frame)
+
                     for parabola in TestTemplates.getParaboloidList():
                         runPODict = self._get_runPODictEHP(source["name"], parabola["name"],"test_EH", "test_P", device=dev)
                         self.s.runPO(runPODict)
                         self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
                         self.assertEqual(type(self.s.frames["test_P"]), pypotypes.frame)
+                        
+                        runHybridDict = self._get_runPODictHybrid("test_P", "test_EH", plane["name"], "test_fr_out", "test_field_out", interp=interp)
+                       
+                        self.s.runHybridPropagation(runHybridDict)
+                        self.assertEqual(type(self.s.fields["test_field_out"]), pypotypes.fields)
+                        self.assertEqual(type(self.s.frames["test_fr_out"]), pypotypes.frame)
                     
                     for ellipse in TestTemplates.getEllipsoidList():
                         runPODict = self._get_runPODictEHP(source["name"], ellipse["name"],"test_EH", "test_P", device=dev)
@@ -129,6 +140,13 @@ class Test_SystemPO_RT(unittest.TestCase):
                         self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
                         self.assertEqual(type(self.s.frames["test_P"]), pypotypes.frame)
     
+                        runHybridDict = self._get_runPODictHybrid("test_P", "test_EH", plane["name"], "test_fr_out", "test_field_out", interp=interp)
+                       
+                        self.s.runHybridPropagation(runHybridDict)
+                        self.assertEqual(type(self.s.fields["test_field_out"]), pypotypes.fields)
+                        self.assertEqual(type(self.s.frames["test_fr_out"]), pypotypes.frame)
+            
+
     def test_runPO_FF(self):
         for dev in ["CPU", "GPU"]:
             if dev == "GPU" and not self.GPU_flag:
@@ -260,6 +278,19 @@ class Test_SystemPO_RT(unittest.TestCase):
                 "name_EH"   : name_EH,
                 "name_P"    : name_P,
                 "mode"      : "EHP"
+                }
+
+        return runPODict
+    
+    def _get_runPODictHybrid(self, fr_in, field_in, target, fr_out, field_out, interp=False):
+        runPODict = {
+                "fr_in"     : fr_in,
+                "t_name"    : target,
+                "field_in"  : field_in,
+                "fr_out"    : fr_out,
+                "field_out" : field_out,
+                "interp"    : interp,
+                "comp"      : "Ex"
                 }
 
         return runPODict

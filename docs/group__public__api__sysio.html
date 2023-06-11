@@ -128,6 +128,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ga386edf2eb8e81c9640afaa39ef927b6d"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__sysio.html#ga386edf2eb8e81c9640afaa39ef927b6d">PyPO.System.System.setLoggingVerbosity</a> (self, verbose=True, handler=None)</td></tr>
 <tr class="memdesc:ga386edf2eb8e81c9640afaa39ef927b6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the verbosity of the logging from within the system.  <br /></td></tr>
 <tr class="separator:ga386edf2eb8e81c9640afaa39ef927b6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad7672196d4578280c2f47554d5e3436f"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__sysio.html#gad7672196d4578280c2f47554d5e3436f">PyPO.System.System.setOverride</a> (self, override=True)</td></tr>
+<tr class="memdesc:gad7672196d4578280c2f47554d5e3436f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the override toggle.  <br /></td></tr>
+<tr class="separator:gad7672196d4578280c2f47554d5e3436f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga3f28dd605141dd9d4932e9441cfb14dd"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__sysio.html#ga3f28dd605141dd9d4932e9441cfb14dd">PyPO.System.System.saveSystem</a> (self, name)</td></tr>
 <tr class="memdesc:ga3f28dd605141dd9d4932e9441cfb14dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save a system object to disk.  <br /></td></tr>
 <tr class="separator:ga3f28dd605141dd9d4932e9441cfb14dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -357,6 +360,43 @@ Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">verbose</td><td>Whether to enable logging or not. </td></tr>
     <tr><td class="paramname">handler</td><td>If multiple handlers are present, select which handler to adjust. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gad7672196d4578280c2f47554d5e3436f" name="gad7672196d4578280c2f47554d5e3436f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gad7672196d4578280c2f47554d5e3436f">&#9670;&#160;</a></span>setOverride()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def PyPO.System.System.setOverride </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>override</em> = <code>True</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the override toggle. </p>
+<p>By setting "override" to False, PyPO will start appending number of occurences of a duplicate name instead of overwriting it.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">override</td><td>Whether to override duplicate reflector names or not. </td></tr>
   </table>
   </dd>
 </dl>

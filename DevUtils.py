@@ -25,6 +25,7 @@ def DevUtils():
     parser.add_argument("-b", "--bdist", help="generate a PyPO binary wheel into dist folder. EXPERIMENTAL.", action="store_true")
     parser.add_argument("-d", "--docs", help="generate PyPO documentation with doxygen", action="store_true")
     parser.add_argument("-t", "--test", help="run PyPO automated tests", action="store_true")
+    parser.add_argument("-c", "--test-coverage", help="run PyPO automated tests and generate coverage report", action="store_true")
     parser.add_argument("--upload-test", help="upload dist folder to test-pypi using twine. Will ask for username and password", action="store_true")
     parser.add_argument("--upload-pip", help="upload dist folder to pypi using twine. Will ask for username and password", action="store_true")
     args = parser.parse_args()
@@ -104,6 +105,15 @@ def DevUtils():
             dir_tests = os.path.join(os.getcwd(), "tests")
 
             os.system(f"nose2 -v")
+        
+        except Exception as err:
+            print(err)
+    
+    if args.test_coverage:
+        try:
+            dir_tests = os.path.join(os.getcwd(), "tests")
+
+            os.system(f"nose2 --with-coverage -v")
         
         except Exception as err:
             print(err)

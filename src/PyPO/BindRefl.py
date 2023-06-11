@@ -65,34 +65,5 @@ def generateGrid(reflparams_py, transform=True, spheric=True):
 
     return grids
 
-##
-# Single precision function for generating reflector grids.
-# This is the function called by the GPU PyPO bindings.
-# 
-# @param reflparams_py A reflDict dictionary.
-# @param transform Whether to generate the grid in nominal configuration or to apply transformation matrix.
-# @param spheric Convert Az-El co-ordinates to spherical (far-field only).
-#
-# @returns grids A reflGrids object. 
-def generateGridf(reflparams_py, transform, spheric):
-    lib = loadRefllib()
-    size = reflparams_py["gridsize"][0] * reflparams_py["gridsize"][1]
-
-    inp = reflparamsf()
-    res = reflcontainerf()
-
-    allfill_reflparams(inp, reflparams_py, ctypes.c_float)
-    allocate_reflcontainer(res, size, ctypes.c_float)
-
-    lib.generateGridf.argtypes = [reflparamsf, ctypes.POINTER(reflcontainerf),
-                                ctypes.c_bool, ctypes.c_bool]
-    lib.generateGridf.restype = None
-
-    lib.generateGridf(inp, ctypes.byref(res), transform, spheric)
-
-    grids = creflToObj(res, reflparams_py["gridsize"], np.float32)
-
-    return grids
-
 if __name__ == "__main__":
     print("Bindings for PyPO reflectors.")

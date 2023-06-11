@@ -4,7 +4,7 @@ import ctypes
 
 try:
     from . import TestTemplates
-except:
+except ImportError:
     import TestTemplates
 
 import PyPO.BindGPU as cpulibs

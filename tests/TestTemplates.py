@@ -331,4 +331,7 @@ def getSystemWithReflectors():
     for ellipse in getEllipsoidList():
         s.addEllipse(ellipse)
 
+    s.createTubeFrame(TubeRTframe)
+    s.createGRTFrame(GaussRTframe)
+    
     return s

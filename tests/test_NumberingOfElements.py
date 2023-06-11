@@ -1,73 +1,39 @@
 import unittest
 import numpy as np
-from PyPO.System import System as PyPOSystem
+from PyPO.System import System
 from PyPO.Checks import InputReflError, InputRTError, InputPOError
 
+try:
+    from . import TestTemplates
+except:
+    import TestTemplates
 
 class Test_SystemDictsAndAddElement(unittest.TestCase):
-    def setUp(self) -> None:
-        self.s = PyPOSystem(override=False, verbose=False)
+    def setUp(self):
+        self.s = TestTemplates.getSystemWithReflectors()
+        self.s.setOverride(False) 
 
     def test_namingReflector(self):
-        validParabola = {
-            "name"      : "parabola",
-            "pmode"     : "focus",
-            "gmode"     : "uv",
-            "vertex"    : np.zeros(3),
-            "focus_1"   : np.array([0,0,12e3]),
-            "lims_u"    : np.array([200,12.5e3]),
-            "lims_v"    : np.array([0, 360]),
-            "gridsize"  : np.array([1501,1501])
-            }
-        validHyperbola = {           
-            "name"      : "hyperbola",
-            "pmode"     : "focus",
-            "gmode"     : "uv",
-            "flip"      : True,
-            "focus_1"   : np.array([0,0,3.5e3]),
-            "focus_2"   : np.array([0,0,3.5e3 - 5606.286]),
-            "ecc"       : 1.08208248,
-            "lims_u"    : np.array([0,310]),
-            "lims_v"    : np.array([0,360]),
-            "gridsize"  : np.array([501,1501])
-            }
-        validEllipse = {
-            "name"      : "ellipse",
-            "pmode"     : "manual",
-            "gmode"     : "xy",
-            "coeffs"    : np.array([3199.769638 / 2, 3199.769638 / 2, 3689.3421 / 2]),
-            "flip"      : False,
-            "lims_x"    : np.array([1435, 1545]),
-            "lims_y"    : np.array([-200, 200]),
-            "gridsize"  : np.array([401, 401])
-            }
-        validPlane = {
-            "name"      : "plane",
-            "gmode"     : "xy",
-            "lims_x"    : np.array([-1,1]),
-            "lims_y"    : np.array([-1,1]),
-            "gridsize"  : np.array([3, 3])
-            }
-        name = validParabola['name']
-        for func, validElem in [
-            (self.s.addPlane, validPlane),
-            (self.s.addParabola, validParabola),
-            (self.s.addHyperbola, validHyperbola),
-            (self.s.addEllipse, validEllipse)
-            ]:
-            n = validElem['name']
-            func(validElem)
-            func(validElem)
-            func(validElem)
-            
-            
-            name = n+"_1"
-            self.assertTrue(name in self.s.system)
-            
-            name = n+"_2"
-            self.assertTrue(name in self.s.system)
-            
-            
+        for plane in TestTemplates.getPlaneList():
+            for i in range(2):
+                self.s.addPlane(plane)
+                self.assertTrue(plane['name'] + f"_{i+1}" in self.s.system)
+        
+        for parabola in TestTemplates.getParaboloidList():
+            for i in range(2):
+                self.s.addParabola(parabola)
+                self.assertTrue(parabola['name'] + f"_{i+1}" in self.s.system)
+        
+        for hyperbola in TestTemplates.getHyperboloidList():
+            for i in range(2):
+                self.s.addHyperbola(hyperbola)
+                self.assertTrue(hyperbola['name'] + f"_{i+1}" in self.s.system)
+        
+        for ellipse in TestTemplates.getEllipsoidList():
+            for i in range(2):
+                self.s.addEllipse(ellipse)
+                self.assertTrue(ellipse['name'] + f"_{i+1}" in self.s.system)
+
 
     def test_namingGroup(self):
         self.s.groupElements('g')
@@ -77,37 +43,13 @@ class Test_SystemDictsAndAddElement(unittest.TestCase):
         self.assertTrue("g_2" in self.s.groups)
 
     def test_namingFrames(self):
-        tubeFrameDict = {
-            "name"          : "tf",
-            "nRays"         : 0,
-            "nRing"         : 0,
-            "angx0"         : 0,
-            "angy0"         : 0,
-            "x0"            : 4000,
-            "y0"            : 4000,
-            }
-        gaussFrame = {
-            "name"          : 'gf',
-            "nRays"         : 1,
-            "n"             : 1,
-            "lam"           : 1,
-            "x0"            : 5,
-            "y0"            : 5,
-            "setseed"       : 'set',
-            "seed"          : 1,
-            }
-        self.s.createTubeFrame(tubeFrameDict)
-        self.s.createTubeFrame(tubeFrameDict)
-        self.assertTrue("tf_1" in self.s.frames)
-        self.s.createTubeFrame(tubeFrameDict)
-        self.assertTrue("tf_2" in self.s.frames)
-
-        self.s.createGRTFrame(gaussFrame)
-        self.s.createGRTFrame(gaussFrame)
-        self.assertTrue("gf_1" in self.s.frames)
-        self.s.createGRTFrame(gaussFrame)
-        self.assertTrue("gf_2" in self.s.frames)
-
+        for i in range(2):
+            self.s.createTubeFrame(TestTemplates.TubeRTframe)
+            self.assertTrue(TestTemplates.TubeRTframe["name"] + f"_{i+1}" in self.s.frames)
+        
+        for i in range(2):
+            self.s.createGRTFrame(TestTemplates.GaussRTframe)
+            self.assertTrue(TestTemplates.GaussRTframe["name"] + f"_{i+1}" in self.s.frames)
 
     def test_addPOFields(self):
         validPlane = {

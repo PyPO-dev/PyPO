@@ -2,7 +2,10 @@ import unittest
 import numpy as np
 import ctypes
 
-from . import TestTemplates
+try:
+    from . import TestTemplates
+except:
+    import TestTemplates
 
 import PyPO.BindRefl as refllibs
 import PyPO.PyPOTypes as pypotypes

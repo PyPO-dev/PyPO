@@ -1935,6 +1935,7 @@ class System(object):
     #
     # Plot the beam cross sections for a PO field.
     # In this case, calcBeamCuts() will try to translate and rotate the supplied beam pattern to lie along the x- and y-axes.
+    # Note that using the "center" and "align" arguments sgould not be done when plotting beam cuts of very non-Gaussian beams. For these patterns, it is advised to set the arguments to False and calculate the beam cuts as-is. 
     #
     # @ingroup public_api_vis
     #
@@ -1943,6 +1944,8 @@ class System(object):
     # @param comp_cross Cross-polar component. If given, is plotted as well. Defaults to None.
     # @param vmin Minimum amplitude value to display. Default is -30.
     # @param vmax Maximum amplitude value to display. Default is 0.
+    # @param center Whether to calculate beam center and center the beam cuts on this point.
+    # @param align Whether to find position angle of beam cuts and align cut axes to this.
     # @param units The units of the axes. Default is "", which is degrees.
     # @param name Name of .png file where plot is saved. Only when save=True. Default is "".
     # @param show Show plot. Default is True.
@@ -1951,8 +1954,8 @@ class System(object):
     #
     # @returns fig Figure object.
     # @returns ax Axes object.
-    def plotBeamCut(self, name_field, comp, comp_cross=None, vmin=None, vmax=None, units='', name="", show=True, save=False, ret=False):
-        E_cut, H_cut, E_strip, H_strip = self.calcBeamCuts(name_field, comp)
+    def plotBeamCut(self, name_field, comp, comp_cross=None, vmin=None, vmax=None, center=True, align=True, units='', name="", show=True, save=False, ret=False):
+        E_cut, H_cut, E_strip, H_strip = self.calcBeamCuts(name_field, comp, center=center, align=align)
 
         #if comp_cross is not None:
             #cr45_cut, cr135_cut, cr45_strip, cr135_strip = self.calcBeamCuts(name_field, comp_cross, phi=45, align=False, center=False, norm="Ex")

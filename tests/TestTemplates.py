@@ -305,7 +305,7 @@ def getEllipsoidList():
     return out
 
 ##
-# Get a list containing all PO source dictionaries.
+# Get a list containing all PO source dictionaries. Can also be used for scalar sources.
 #
 # @returns out List of all PO source dictionaries. 
 def getPOSourceList():
@@ -321,6 +321,14 @@ def getSystemWithReflectors():
 
     for plane in getPlaneList():
         s.addPlane(plane)
+        if plane["gmode"] != "AoE":
+            s.createPointSource(PS_Ufield, plane["name"])
+            s.createUniformSource(PS_Ufield, plane["name"])
+            s.createGaussian(GPOfield, plane["name"])
+            
+            s.createPointSourceScalar(PS_Ufield, plane["name"])
+            s.createUniformSourceScalar(PS_Ufield, plane["name"])
+            s.createScalarGaussian(GPOfield, plane["name"])
 
     for parabola in getParaboloidList():
         s.addParabola(parabola)

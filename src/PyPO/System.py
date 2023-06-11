@@ -2222,7 +2222,7 @@ class System(object):
     # @ingroup public_api_vis
     #
     # @param name_obj Name of field or current to plot.
-    # @param comp Component of field or current to plot. 
+    # @param comp Component of field or current to plot. String of two characters; an uppercase {E, H, J, M} for field followed by a lowercase {x, y, z} for component. (e.g: 'Jz')
     # @param contour A PyPO field or current component to plot as contour.
     # @param contour_comp Component of contour to plot as contour. If None, looks is scalarfields.
     # @param vmin Minimum amplitude value to display. Default is -30.

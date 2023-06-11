@@ -29,6 +29,5 @@ For an overview of the `System` methods that affect the configuration of the `Sy
 A `System` keeps track of all reflectors/elements, ray-trace frames and PO fields/currents (these are explained in a later tutorial) in internal dictionaries.
 Each internal dictionary will be explained later when the relevant data structure it stores is discussed, but for now, it is important to know that `System` methods rarely return objects.
 Rather, it stores these objects internally.
-For an overview of the `System` internal dictionaries, see \ref public_api_internaldicts "the API documentation for internal dictionaries".
 */
 

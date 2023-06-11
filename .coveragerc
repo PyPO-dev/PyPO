@@ -1,0 +1,11 @@
+[run]
+branch = True
+
+[report]
+omit = 
+    build/*
+    tests/*
+    DevUtils.py
+    GuiApp.py
+    setup.py
+    src/PyPO/__init__.py

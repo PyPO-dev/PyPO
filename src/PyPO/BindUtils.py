@@ -38,7 +38,7 @@ def sfieldConv(field, c_field, size, ct_t):
 # @see arrC1f
 # @see scalarfield
 def arrC1ToObj(res, shape, np_t):
-    obj = np.ctypeslib.as_array(res.x, shape=shape) + 1j * np.ctypeslib.as_array(res.y, shape=shape)
+    obj = np.ctypeslib.as_array(res.x, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.y, shape=shape).astype(np_t)
 
     res = scalarfield(obj)
 

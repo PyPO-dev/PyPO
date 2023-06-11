@@ -5,7 +5,7 @@ from PyPO.Checks import InputReflError, InputRTError, InputPOError
 
 try:
     from . import TestTemplates
-except:
+except ImportError:
     import TestTemplates
 
 class Test_SystemDictsAndAddElement(unittest.TestCase):

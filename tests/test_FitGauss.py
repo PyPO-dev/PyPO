@@ -2,15 +2,12 @@ import sys
 import os
 import random
 import shutil
-
 import unittest
 import numpy as np
 from pathlib import Path
 
 from PyPO.System import System
 from PyPO.FitGauss import fitGaussAbs, generateGauss
-
-import matplotlib.pyplot as pt
 
 ##
 # @file
@@ -39,10 +36,8 @@ class Test_FitGauss(unittest.TestCase):
         plane_Gauss = {
                 "name"      : "plane_Gauss",
                 "gmode"     : "xy",
-                "lims_x"    : np.array([-1, 1]) * w0x * 2,# + trans_x,
-                "lims_y"    : np.array([-1, 1]) * w0y * 2,# + trans_y,
-                #"lims_x"    : np.array([-1, 1]) * w0x * 2 - trans_x,
-                #"lims_y"    : np.array([-1, 1]) * w0y * 2 - trans_y,
+                "lims_x"    : np.array([-1, 1]) * w0x * 2,
+                "lims_y"    : np.array([-1, 1]) * w0y * 2,
                 "gridsize"  : np.array([101, 101])
                 }
 
@@ -59,13 +54,7 @@ class Test_FitGauss(unittest.TestCase):
         
         rot = random.uniform(-90, 90)
 
-        #self.s.translateGrids("plane_Gauss", np.array([trans_x, trans_y, 0]))
-        #self.s.rotateGrids("plane_Gauss", np.array([0, 0, rot]), keep_pol=True)
         self.s.createGaussian(GDict, "plane_Gauss")
-        
-        #self.s.rotateGrids("plane_Gauss", np.array([0, 0, rot]), keep_pol=True)
-        #self.s.homeReflector("plane_Gauss")
-        #self.s.plotBeam2D("Gauss", "Ex")
 
         return w0x, w0y, rot, trans_x, trans_y
 

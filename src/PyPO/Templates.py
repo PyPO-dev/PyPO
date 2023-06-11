@@ -119,14 +119,17 @@ aperDict = {
 # 
 # @ingroup public_api_templates
 runPODict = {
-        "t_name"    : "Name of target surface (string)",
-        "s_current" : "Name of current object in system.currents (string)",
-        "s_field"   : "Scalar complex field for scalar propagation only (Numpy array)",
-        "epsilon"   : "Relative permittivity of source surface (real)",
-        "exp"       : "Divergent or convergent beam (string)",
-        "nThreads"  : "Number of CPU/GPU threads (int)",
-        "device"    : "Device to use for calculation",
-        "mode"      : "Determine return object (string)"
+        "t_name"        : "Name of target surface (string)",
+        "s_current"     : "Name of current object in system.currents (string)",
+        "s_scalarfield" : "Scalar complex field for scalar propagation only (Numpy array)",
+        "epsilon"       : "Relative permittivity of source surface (real)",
+        "exp"           : "Divergent or convergent beam (string)",
+        "nThreads"      : "Number of CPU/GPU threads (int)",
+        "device"        : "Device to use for calculation",
+        "mode"          : "Determine return object (string)",
+        "name_JM"       : "Name of output currents (string). Only relevant if 'mode' is set to JM or JMEH.",
+        "name_EH"       : "Name of output currents (string). Only relevant if 'mode' is set to EH, JMEH, EHP or FF.",
+        "name_field"    : "Name of output scalarfield (string). Only relevant if 'mode' is set to scalar."
         }
 
 ##

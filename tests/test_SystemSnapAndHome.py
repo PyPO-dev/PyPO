@@ -9,86 +9,22 @@ from pathlib import Path
 
 from PyPO.System import System
 
+try:
+    from . import TestTemplates
+except ImportError:
+    import TestTemplates
+
 class Test_SystemSnapAndHome(unittest.TestCase):
     def setUp(self):
-        self.s = System(verbose=False)
-        
-        self.validParabola = {
-            "name"      : "par",
-            "pmode"     : "focus",
-            "gmode"     : "uv",
-            "vertex"    : np.zeros(3),
-            "focus_1"   : np.array([0,0,12e3]),
-            "lims_u"    : np.array([200,12.5e3]),
-            "lims_v"    : np.array([0, 360]),
-            "gridsize"  : np.array([1501,1501])
-            }
-        
-        self.validHyperbola = {           
-            "name"      : "hyp",
-            "pmode"     : "focus",
-            "gmode"     : "uv",
-            "flip"      : True,
-            "focus_1"   : np.array([0,0,3.5e3]),
-            "focus_2"   : np.array([0,0,3.5e3 - 5606.286]),
-            "ecc"       : 1.08208248,
-            "lims_u"    : np.array([0,310]),
-            "lims_v"    : np.array([0,360]),
-            "gridsize"  : np.array([501,1501])
-            }
-        
-        self.validEllipse = {
-            "name"      : "ell",
-            "pmode"     : "manual",
-            "gmode"     : "xy",
-            "coeffs"    : np.array([3199.769638 / 2, 3199.769638 / 2, 3689.3421 / 2]),
-            "flip"      : False,
-            "lims_x"    : np.array([1435, 1545]),
-            "lims_y"    : np.array([-200, 200]),
-            "gridsize"  : np.array([401, 401])
-            }
-        
-        self.validPlane = {
-            "name"      : "plane",
-            "gmode"     : "xy",
-            "lims_x"    : np.array([-0.1,0.1]),
-            "lims_y"    : np.array([-0.1,0.1]),
-            "gridsize"  : np.array([3, 3])
-            }
+        self.s = TestTemplates.getSystemWithReflectors()
 
-        self.validRT_TubeFrame = {
-            "name"          : "tubeFrame",
-            "nRays"         : 8,
-            "nRing"         : 1,
-            "angx0"         : 0,
-            "angy0"         : 0,
-            "x0"            : 4000,
-            "y0"            : 4000,
-            }
+        self.names = [TestTemplates.paraboloid_man_xy["name"], 
+                TestTemplates.hyperboloid_man_xy["name"], TestTemplates.ellipsoid_z_man_xy["name"],
+                TestTemplates.plane_xy["name"]]
         
-        self.validRT_GaussFrame = {
-            "name"          : 'gaussFrame',
-            "nRays"         : 100,
-            "n"             : 1,
-            "lam"           : 1,
-            "x0"            : 5,
-            "y0"            : 5,
-            "setseed"       : 'set',
-            "seed"          : 1,
-            }
-        self.names = ["par", "hyp", "ell", "plane"]
+        self.fr_names = [TestTemplates.TubeRTframe["name"], TestTemplates.GaussRTframe["name"]]
 
-        self.fr_names = ["tubeFrame", "gaussFrame"]
-        
-        self.s.addParabola(self.validParabola)
-        self.s.addHyperbola(self.validHyperbola)
-        self.s.addEllipse(self.validEllipse)
-        self.s.addPlane(self.validPlane)
-
-        self.s.createTubeFrame(self.validRT_TubeFrame)
-        self.s.createGRTFrame(self.validRT_GaussFrame)
-
-        self.s.groupElements("testgroup", "par", "hyp", "ell", "plane")
+        self.s.groupElements("testgroup", *self.names)
 
     def test_snapObj(self):
         trans = np.random.rand(3) * 100

@@ -23,14 +23,23 @@ class Test_SystemCPU(unittest.TestCase):
     def test_loadCPUlib(self):
         lib = cpulibs.loadCPUlib()
         self.assertEqual(type(lib), ctypes.CDLL)
+        
+    def test_loadGPUlib(self):
+        self.GPU_flag = True
+        try:
+            lib = cpulibs.loadGPUlib()
+            self.assertEqual(type(lib), ctypes.CDLL)
+        except OSError:
+            print("No GPU libraries found... Not testing GPU functionalities.")
+            self.GPU_flag = False
 
     def test_runPO_JM(self):
+        for dev in ["CPU", "GPU"]:
+            if not self.GPU_flag:
+                return
+
         for plane in TestTemplates.getPlaneList():
-            for i, source in enumerate(TestTemplates.getPOSourceList()):
-                if i == 0:
-                    self.s.createGaussian(source, plane["name"])
-                elif i == 1:
-                    self.s.createPointSource(source, plane["name"])
+            for source in TestTemplates.getPOSourceList():
                 for hyperbola in TestTemplates.getHyperboloidList():
                     runPODict = self._get_runPODictJM(source["name"], hyperbola["name"],"test_JM")
                     self.s.runPO(runPODict)
@@ -48,11 +57,7 @@ class Test_SystemCPU(unittest.TestCase):
     
     def test_runPO_EH(self):
         for plane in TestTemplates.getPlaneList():
-            for i, source in enumerate(TestTemplates.getPOSourceList()):
-                if i == 0:
-                    self.s.createGaussian(source, plane["name"])
-                elif i == 1:
-                    self.s.createPointSource(source, plane["name"])
+            for source in TestTemplates.getPOSourceList():
                 for hyperbola in TestTemplates.getHyperboloidList():
                     runPODict = self._get_runPODictEH(source["name"], hyperbola["name"],"test_EH")
                     self.s.runPO(runPODict)
@@ -70,13 +75,7 @@ class Test_SystemCPU(unittest.TestCase):
 
     def test_runPO_JMEH(self):
         for plane in TestTemplates.getPlaneList():
-            for i, source in enumerate(TestTemplates.getPOSourceList()):
-                if i == 0:
-                    self.s.createGaussian(source, plane["name"])
-                
-                elif i == 1:
-                    self.s.createPointSource(source, plane["name"])
-
+            for source in TestTemplates.getPOSourceList():
                 for hyperbola in TestTemplates.getHyperboloidList():
                     runPODict = self._get_runPODictJMEH(source["name"], hyperbola["name"],"test_JM", "test_EH")
                     self.s.runPO(runPODict)
@@ -97,13 +96,7 @@ class Test_SystemCPU(unittest.TestCase):
     
     def test_runPO_EHP(self):
         for plane in TestTemplates.getPlaneList():
-            for i, source in enumerate(TestTemplates.getPOSourceList()):
-                if i == 0:
-                    self.s.createGaussian(source, plane["name"])
-                
-                elif i == 1:
-                    self.s.createPointSource(source, plane["name"])
-                    
+            for source in TestTemplates.getPOSourceList():
                 for hyperbola in TestTemplates.getHyperboloidList():
                     runPODict = self._get_runPODictEHP(source["name"], hyperbola["name"],"test_EH", "test_P")
                     self.s.runPO(runPODict)
@@ -127,13 +120,7 @@ class Test_SystemCPU(unittest.TestCase):
             if i == 2:
                 break
 
-            for i, source in enumerate(TestTemplates.getPOSourceList()):
-                if i == 0:
-                    self.s.createGaussian(source, plane["name"])
-                
-                elif i == 1:
-                    self.s.createPointSource(source, plane["name"])
-                    
+            for source in TestTemplates.getPOSourceList():
                 runPODict = self._get_runPODictFF(source["name"], TestTemplates.getPlaneList()[-1]["name"],"test_EH")
                 self.s.runPO(runPODict)
                 self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)

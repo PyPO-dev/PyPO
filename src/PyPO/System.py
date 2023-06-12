@@ -2610,7 +2610,7 @@ class System(object):
             P0 = P
             self.removeScalarField("_S_conv")
             
-            self.setLoggingVerbosity(True)
+            self.setLoggingVerbosity(logstate)
             self.clog.work(f"Difference : {diff} at gridsize {*['{:0.3e}'.format(x) for x in list(gridsize)],}")
             self.setLoggingVerbosity(False)
             
@@ -2891,22 +2891,5 @@ class System(object):
 
         else:
             return [default, 1.]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

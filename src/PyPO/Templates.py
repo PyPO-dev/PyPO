@@ -19,7 +19,7 @@ reflDict = {
         "focus_1"   : "First focal point co-ordinate (len-3 Numpy array, pmode='focus' only)",
         "focus_2"   : "Second focal point co-ordinate (len-3 Numpy array, pmode='focus' only, hyperbola & ellipse only)",
         "ecc"       : "Eccentricity (hyperbola & ellipse only)",
-        "orient"    : "Orient long axis along z ('z') or x ('x') axis. Only relevant for ellipsoids with 'pmode' set to 'focus'"
+        "orient"    : "Orient long axis along z ('z') or x ('x') axis. Only relevant for ellipsoids with 'pmode' set to 'focus'",
         "lims_x"    : "Upper and lower x-limit (gmode=xy, Numpy array of 2 reals)",
         "lims_y"    : "Upper and lower y-limit (gmode=xy, Numpy array of 2 reals)",
         "lims_u"    : "Aperture and vertex radii (gmode=uv, Numpy array of 2 reals)",

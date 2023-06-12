@@ -41,18 +41,19 @@ Input beam patterns can be selected from a range of models, such as Gaussian bea
 Custom beam patterns can also be imported to, for example, model the propagation of measured beam patterns through simulated optical systems.
 
 `PyPO` can be used through either a scripting-based approach, where simulations are defined in Python scripts, or through the graphical user interface (GUI).
-It only carries core dependencies on NumPy [@Harris:2020], Matplotlib [@Hunter:2007] and SciPy [@Virtanen:2020]. The unittesting framework carries a dependency on nose2. The GUI carries dependencies on PyQt5 and attrs.
+It only carries core dependencies on NumPy [@Harris:2020], Matplotlib [@Hunter:2007] and SciPy [@Virtanen:2020]. 
+The unittesting framework carries a dependency on nose2. 
+The GUI carries dependencies on PySide2 and attrs.
 
 # Statement of need
 Development of `PyPO` started with the need for alignment strategies for the wideband sub-mm spectrometer DESHIMA 2.0 [@Taniguchi:2022]. 
 A software package capable of efficient GO and PO calulations through optical systems consisting of off-axis quadric surfaces was necessary for calculating the configuration of the corrective optics. 
 Currently, `PyPO` is also being used in simulations of measured beam patterns of DESHIMA 2.0 at the ASTE [@ASTE] telescope for the analysis of instrument and optical system performance.
 
-Commercial software for GO and PO calculations and analysis, such as OpticStudio (Zemax) and GRASP (TICRA), has already been developed. 
-Of these, GRASP also employs the method of equivalent surface currents.
+Commercial software for GO/PO calculations and analysis, such as OpticStudio (Zemax) and GRASP (TICRA), has already been developed. 
 Open-source optical simulation software packages such as POPPy (Perrin & others, 2012) and Prysm (Dube, 2019) are also available. 
 These open-source software packages use Fourier methods to solve the Rayleigh-Sommerfeld integral equation.
-PyPO aims to contribute to this open-source optical simulation ecosystem by offering a software package working on the principle of the equivalent surface currents.
+`PyPO` aims to contribute to this open-source optical simulation ecosystem by offering a software package working on the principle of the equivalent surface currents.
 
 # Availability
 `PyPO` can be found on [Github](https://github.com/PyPO-dev/PyPO) and is available for Linux, MacOS and Windows.
@@ -62,6 +63,8 @@ Several tutorials for using the GUI features are also included and can be found 
 
 # Acknowledgements
 We thank Shahab Oddin Dabironezare for useful discussions and proofreading the manuscript.
-This work is supported by the European Union (ERC Consolidator Grant No. 101043486 TIFUUN). Views and opinions expressed are however those of the authors only and do not necessarily reflect those of the European Union or the European Research Council Executive Agency. Neither the European Union nor the granting authority can be held responsible for them.
+This work is supported by the European Union (ERC Consolidator Grant No. 101043486 TIFUUN). 
+Views and opinions expressed are however those of the authors only and do not necessarily reflect those of the European Union or the European Research Council Executive Agency. 
+Neither the European Union nor the granting authority can be held responsible for them.
 
 # References

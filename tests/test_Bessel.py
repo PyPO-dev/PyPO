@@ -10,7 +10,8 @@ from PyPO.System import System
 # 
 # Script for testing the far-field calculations of PyPO by calculating the far-field of 
 # a uniformly illuminated disk, with varying wavelength, and calculating the HPBW. 
-# This is then compared to the theoretical value of a Bessel function.
+# This is then compared to the theoretical value of a Bessel function by calculating the relative difference.
+# This test is a high level test, but included here such that it can be run automatically..
 class Test_Bessel(unittest.TestCase):
     
     def test_Bessel(self):

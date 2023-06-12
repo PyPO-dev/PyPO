@@ -1,6 +1,7 @@
 import unittest
 import numpy as np
 from PyPO.Checks import InputReflError, InputRTError, InputPOError
+import PyPO.Templates as pypotemp
 
 try:
     from . import TestTemplates
@@ -24,15 +25,15 @@ class Test_SystemDictsAndAddElement(unittest.TestCase):
 
         with self.assertRaises(InputReflError):
             self.s.addPlane(self.invalidDict) 
-        
-        with self.assertRaises(InputReflError):
             self.s.addParabola(self.invalidDict) 
-        
-        with self.assertRaises(InputReflError):
             self.s.addHyperbola(self.invalidDict) 
-        
-        with self.assertRaises(InputReflError):
             self.s.addEllipse(self.invalidDict) 
+
+            self.s.addPlane(pypotemp.reflDict) 
+            self.s.addParabola(pypotemp.reflDict) 
+            self.s.addHyperbola(pypotemp.reflDict) 
+            self.s.addEllipse(pypotemp.reflDict) 
+
 
     def test_addGroup(self):
         ltot = 0
@@ -50,9 +51,10 @@ class Test_SystemDictsAndAddElement(unittest.TestCase):
 
         with self.assertRaises(InputRTError):
             self.s.createTubeFrame(self.invalidDict) 
-        
-        with self.assertRaises(InputRTError):
             self.s.createGRTFrame(self.invalidDict) 
+            
+            self.s.createTubeFrame(pypotemp.TubeRTDict) 
+            self.s.createGRTFrame(pypotemp.GRTDict) 
 
     def test_addPOFields(self):
         ltot = len(TestTemplates.getPOSourceList())
@@ -62,13 +64,13 @@ class Test_SystemDictsAndAddElement(unittest.TestCase):
 
         with self.assertRaises(InputPOError):
             self.s.createGaussian(self.invalidDict, TestTemplates.plane_xy["name"]) 
-        
-        with self.assertRaises(InputPOError):
             self.s.createPointSource(self.invalidDict, TestTemplates.plane_xy["name"]) 
-        
-        with self.assertRaises(InputPOError):
             self.s.createUniformSource(self.invalidDict, TestTemplates.plane_xy["name"]) 
 
+            self.s.createGaussian(pypotemp.GPODict, TestTemplates.plane_xy["name"]) 
+            self.s.createPointSource(pypotemp.UPSDict, TestTemplates.plane_xy["name"]) 
+            self.s.createUniformSource(pypotemp.UPSDict, TestTemplates.plane_xy["name"]) 
+    
     def test_addPOScalarFields(self):
         ltot = len(TestTemplates.getPOSourceList())
 
@@ -76,13 +78,13 @@ class Test_SystemDictsAndAddElement(unittest.TestCase):
 
         with self.assertRaises(InputPOError):
             self.s.createScalarGaussian(self.invalidDict, TestTemplates.plane_xy["name"]) 
-        
-        with self.assertRaises(InputPOError):
             self.s.createPointSourceScalar(self.invalidDict, TestTemplates.plane_xy["name"]) 
-        
-        with self.assertRaises(InputPOError):
             self.s.createUniformSourceScalar(self.invalidDict, TestTemplates.plane_xy["name"]) 
     
+            self.s.createScalarGaussian(pypotemp.GPODict, TestTemplates.plane_xy["name"]) 
+            self.s.createPointSourceScalar(pypotemp.UPSDict, TestTemplates.plane_xy["name"]) 
+            self.s.createUniformSourceScalar(pypotemp.UPSDict, TestTemplates.plane_xy["name"]) 
+
 if __name__ == "__main__":
     unittest.main()
         

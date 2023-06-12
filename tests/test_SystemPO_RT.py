@@ -10,8 +10,10 @@ except:
 import PyPO.BindCPU as cpulibs
 import PyPO.BindGPU as gpulibs
 import PyPO.PyPOTypes as pypotypes
+import PyPO.Templates as pytemp
 
 from PyPO.System import System
+from PyPO.Checks import RunPOError, RunRTError, HybridPropError
 
 ##
 # @file
@@ -20,6 +22,7 @@ from PyPO.System import System
 class Test_SystemPO_RT(unittest.TestCase):
     def setUp(self):
         self.s = TestTemplates.getSystemWithReflectors()
+        self.s.setLoggingVerbosity(False)
         self.GPU_flag = True
         try:
             lib = gpulibs.loadGPUlib()
@@ -214,7 +217,55 @@ class Test_SystemPO_RT(unittest.TestCase):
                 runRTDict = self._get_runRTDict(TestTemplates.GaussRTframe["name"], ellipse["name"],"test_fr", device=dev)
                 self.s.runRayTracer(runRTDict)
                 self.assertEqual(type(self.s.frames["test_fr"]), pypotypes.frame)
+
+    def test_invalidRunPODict(self):
+        testDict = {}
         
+        with self.assertRaises(RunPOError):
+            self.s.runPO(testDict)
+
+        badDict = pytemp.runPODict
+        
+        with self.assertRaises(RunPOError):
+            self.s.runPO(badDict)
+    
+    def test_invalidRunRTDict(self):
+        testDict = {}
+
+        with self.assertRaises(RunRTError):
+            self.s.runRayTracer(testDict)
+        
+        badDict = pytemp.runRTDict
+        
+        with self.assertRaises(RunRTError):
+            self.s.runRayTracer(badDict)
+
+    def test_invalidRunHybridDict(self):
+        testDict = {}
+
+        with self.assertRaises(HybridPropError):
+            self.s.runHybridPropagation(testDict)
+        
+        badDict = pytemp.hybridDict
+        
+        with self.assertRaises(HybridPropError):
+            self.s.runHybridPropagation(badDict)
+
+    def test_autoConverge(self): 
+        for source in TestTemplates.getPOSourceList():
+            gridsize = self.s.autoConverge(source["name"], TestTemplates.hyperboloid_man_xy["name"])
+
+            self.assertEqual(type(gridsize), np.ndarray)
+            self.assertEqual(gridsize[0], self.s.system[TestTemplates.hyperboloid_man_xy["name"]]["gridsize"][0])
+            self.assertEqual(gridsize[1], self.s.system[TestTemplates.hyperboloid_man_xy["name"]]["gridsize"][1])
+
+            gridsize = self.s.autoConverge(source["name"], TestTemplates.hyperboloid_man_uv["name"])
+
+            self.assertEqual(type(gridsize), np.ndarray)
+            self.assertEqual(gridsize[0], self.s.system[TestTemplates.hyperboloid_man_uv["name"]]["gridsize"][0])
+            self.assertEqual(gridsize[1], self.s.system[TestTemplates.hyperboloid_man_uv["name"]]["gridsize"][1])
+
+
     def _get_runPODictJM(self, source_current, target, name_JM, device="CPU"):
         runPODict = {
                 "t_name"    : target,

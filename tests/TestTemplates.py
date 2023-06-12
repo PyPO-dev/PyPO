@@ -305,6 +305,14 @@ def getEllipsoidList():
     return out
 
 ##
+# Get a list containing all frame dictionaries
+#
+# @returns out List of all frame dictionaries. 
+def getFrameList():
+    out = [TubeRTframe, GaussRTframe]
+    return out
+
+##
 # Get a list containing all PO source dictionaries. Can also be used for scalar sources.
 #
 # @returns out List of all PO source dictionaries. 

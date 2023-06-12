@@ -13,7 +13,7 @@ from PyPO.System import System
 
 ##
 # @file
-# This file contains tests for the plotting functionalities. It tests wether the plotting functions in PyPO.System  
+# This file contains tests for the plotting functionalities. It tests whether the plotting functions in the System behave as expected.
 
 
 stm = TestTemplates.getSystemWithReflectors()

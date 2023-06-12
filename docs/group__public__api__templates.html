@@ -318,15 +318,18 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line"><span class="lineno">    1</span>=  {</div>
-<div class="line"><span class="lineno">    2</span>        <span class="stringliteral">&quot;t_name&quot;</span>    : <span class="stringliteral">&quot;Name of target surface (string)&quot;</span>,</div>
-<div class="line"><span class="lineno">    3</span>        <span class="stringliteral">&quot;s_current&quot;</span> : <span class="stringliteral">&quot;Name of current object in system.currents (string)&quot;</span>,</div>
-<div class="line"><span class="lineno">    4</span>        <span class="stringliteral">&quot;s_field&quot;</span>   : <span class="stringliteral">&quot;Scalar complex field for scalar propagation only (Numpy array)&quot;</span>,</div>
-<div class="line"><span class="lineno">    5</span>        <span class="stringliteral">&quot;epsilon&quot;</span>   : <span class="stringliteral">&quot;Relative permittivity of source surface (real)&quot;</span>,</div>
-<div class="line"><span class="lineno">    6</span>        <span class="stringliteral">&quot;exp&quot;</span>       : <span class="stringliteral">&quot;Divergent or convergent beam (string)&quot;</span>,</div>
-<div class="line"><span class="lineno">    7</span>        <span class="stringliteral">&quot;nThreads&quot;</span>  : <span class="stringliteral">&quot;Number of CPU/GPU threads (int)&quot;</span>,</div>
-<div class="line"><span class="lineno">    8</span>        <span class="stringliteral">&quot;device&quot;</span>    : <span class="stringliteral">&quot;Device to use for calculation&quot;</span>,</div>
-<div class="line"><span class="lineno">    9</span>        <span class="stringliteral">&quot;mode&quot;</span>      : <span class="stringliteral">&quot;Determine return object (string)&quot;</span></div>
-<div class="line"><span class="lineno">   10</span>        }</div>
+<div class="line"><span class="lineno">    2</span>        <span class="stringliteral">&quot;t_name&quot;</span>        : <span class="stringliteral">&quot;Name of target surface (string)&quot;</span>,</div>
+<div class="line"><span class="lineno">    3</span>        <span class="stringliteral">&quot;s_current&quot;</span>     : <span class="stringliteral">&quot;Name of current object in system.currents (string)&quot;</span>,</div>
+<div class="line"><span class="lineno">    4</span>        <span class="stringliteral">&quot;s_scalarfield&quot;</span> : <span class="stringliteral">&quot;Scalar complex field for scalar propagation only (Numpy array)&quot;</span>,</div>
+<div class="line"><span class="lineno">    5</span>        <span class="stringliteral">&quot;epsilon&quot;</span>       : <span class="stringliteral">&quot;Relative permittivity of source surface (real)&quot;</span>,</div>
+<div class="line"><span class="lineno">    6</span>        <span class="stringliteral">&quot;exp&quot;</span>           : <span class="stringliteral">&quot;Divergent or convergent beam (string)&quot;</span>,</div>
+<div class="line"><span class="lineno">    7</span>        <span class="stringliteral">&quot;nThreads&quot;</span>      : <span class="stringliteral">&quot;Number of CPU/GPU threads (int)&quot;</span>,</div>
+<div class="line"><span class="lineno">    8</span>        <span class="stringliteral">&quot;device&quot;</span>        : <span class="stringliteral">&quot;Device to use for calculation&quot;</span>,</div>
+<div class="line"><span class="lineno">    9</span>        <span class="stringliteral">&quot;mode&quot;</span>          : <span class="stringliteral">&quot;Determine return object (string)&quot;</span>,</div>
+<div class="line"><span class="lineno">   10</span>        <span class="stringliteral">&quot;name_JM&quot;</span>       : <span class="stringliteral">&quot;Name of output currents (string). Only relevant if &#39;mode&#39; is set to JM or JMEH.&quot;</span>,</div>
+<div class="line"><span class="lineno">   11</span>        <span class="stringliteral">&quot;name_EH&quot;</span>       : <span class="stringliteral">&quot;Name of output currents (string). Only relevant if &#39;mode&#39; is set to EH, JMEH, EHP or FF.&quot;</span>,</div>
+<div class="line"><span class="lineno">   12</span>        <span class="stringliteral">&quot;name_field&quot;</span>    : <span class="stringliteral">&quot;Name of output scalarfield (string). Only relevant if &#39;mode&#39; is set to scalar.&quot;</span></div>
+<div class="line"><span class="lineno">   13</span>        }</div>
 </div><!-- fragment -->
 <p>Template for a physical optics propagation dictionary. </p>
 <p>The dictionary specifies several important parameters, such as the source currents, target surface and others. </p>

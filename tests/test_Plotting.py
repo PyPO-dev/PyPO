@@ -29,15 +29,21 @@ class Test_SystemOps(unittest.TestCase):
         close('all')
 
     def test_plotBeam2D(self):
+        out_ar = []
+        out_ax = []
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            fig1, ax1 = stm.plotBeam2D(TestTemplates.GPOfield['name'], 'Ex', ret=True, amp_only=True)
-            fig2, ax2 = stm.plotBeam2D(TestTemplates.GPOfield['name'], 'Ex', ret=True)
+            out_ax.append(stm.plotBeam2D(TestTemplates.GPOfield['name'], 'Ex', ret=True, amp_only=True))
+            out_ax.append(stm.plotBeam2D(TestTemplates.GPOfield['name'], 'Ex', ret=True, amp_only=True, mode="linear"))
+            out_ar.append(stm.plotBeam2D(TestTemplates.GPOfield['name'], 'Ex', ret=True))
+            out_ar.append(stm.plotBeam2D(TestTemplates.GPOfield['name'], 'Ex', ret=True, mode="linear"))
 
-        self.assertEqual(type(fig1), Figure)
-        self.assertEqual(type(ax1), Axes)
-        self.assertEqual(type(fig2), Figure)
-        self.assertEqual(type(ax2), ndarray)
+        for entry_ax, entry_ar in zip(out_ax, out_ar):
+            self.assertEqual(type(entry_ax[0]), Figure)
+            self.assertEqual(type(entry_ar[0]), Figure)
+            
+            self.assertEqual(type(entry_ax[1]), Axes)
+            self.assertEqual(type(entry_ar[1]), ndarray)
 
         close('all')
 

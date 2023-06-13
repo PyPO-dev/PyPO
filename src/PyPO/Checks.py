@@ -820,25 +820,46 @@ def check_runRTDict(runRTDict, elements, frames, clog):
     errStr = ""
    
     cuda = has_CUDA()
-    errStr = check_frameSystem(runRTDict["fr_in"], frames, clog, errStr)
-    errStr = check_elemSystem(runRTDict["t_name"], elements, clog, errStr)
 
-    num = getIndex(runRTDict["fr_out"], frames)
+    if "fr_in" not in runRTDict:
+        errStr += errMsg_field("fr_in", "runRTDict")
 
-    if num > 0:
-        runRTDict["fr_out"] = runRTDict["fr_out"] + "_{}".format(num)
+    else:
+        errStr = check_frameSystem(runRTDict["fr_in"], frames, clog, errStr)
+    
+    if "t_name" not in runRTDict:
+        errStr += errMsg_field("t_name", "runRTDict")
+    else:
+        errStr = check_elemSystem(runRTDict["t_name"], elements, clog, errStr)
+
+    if "fr_out" not in runRTDict:
+        errStr += errMsg_field("fr_out", "runRTDict")
+
+    else:
+        num = getIndex(runRTDict["fr_out"], frames)
+
+        if num > 0:
+            runRTDict["fr_out"] = runRTDict["fr_out"] + "_{}".format(num)
 
     if "tol" not in runRTDict:
         runRTDict["tol"] = 1e-3
 
     elif "tol" in runRTDict:
-        if runRTDict["tol"] < 0:
-            clog.warning("Negative tolerances are not allowed. Changing sign.")
-            runRTDict["tol"] *= -1
-
+        if isinstance(runRTDict["tol"], float) or isinstance(runRTDict["tol"], int):
+            if runRTDict["tol"] < 0:
+                clog.warning("Negative tolerances are not allowed. Changing sign.")
+                runRTDict["tol"] *= -1
+        
+        else:
+            runRTDict["tol"] = 1e-3
 
     if "t0" not in runRTDict:
         runRTDict["t0"] = 1
+
+    else:
+        if not isinstance(runRTDict["t0"], float) or not isinstance(runRTDict["t0"], int):
+            runRTDict["t0"] = 1
+
 
     if "device" not in runRTDict:
         runRTDict["device"] = "CPU"
@@ -854,9 +875,10 @@ def check_runRTDict(runRTDict, elements, frames, clog):
 
         if runRTDict["device"] == "CPU":
             if "nThreads" in runRTDict:
-                if runRTDict["nThreads"] > nThreads_cpu:
-                    clog.warning(f"Insufficient CPU threads available, automatically reducing threadcount.")
-                    runRTDict["nThreads"] = nThreads_cpu
+                if isinstance(runRTDict["nThreads"], int):
+                    if runRTDict["nThreads"] > nThreads_cpu:
+                        clog.warning(f"Insufficient CPU threads available, automatically reducing threadcount.")
+                        runRTDict["nThreads"] = nThreads_cpu
 
             else:
                 runRTDict["nThreads"] = nThreads_cpu
@@ -1051,7 +1073,7 @@ def check_runPODict(runPODict, elements, fields, currents, scalarfields, frames,
         errStr += errMsg_field("t_name", "runPODict")
     
     if "mode" not in runPODict:
-        errStr += f"Please provide propagation mode.\n"
+        errStr += errMsg_field("mode", "runPODict")
    
     else:
         if runPODict["mode"] not in PO_modelist:
@@ -1063,78 +1085,84 @@ def check_runPODict(runPODict, elements, fields, currents, scalarfields, frames,
         if "s_scalarfield" in runPODict:
             errStr = check_scalarfieldSystem(runPODict["s_scalarfield"], scalarfields, clog, errStr)
     
-    errStr = check_elemSystem(runPODict["t_name"], elements, clog, errStr)
-  
-    if runPODict["mode"] == "JM":
-        if "name_JM" not in runPODict:
-            errStr += errMsg_field("name_JM", "runPODict")
-        
-        num = getIndex(runPODict["name_JM"], currents)
+        if runPODict["mode"] == "JM":
+            if "name_JM" not in runPODict:
+                errStr += errMsg_field("name_JM", "runPODict")
+            
+            else:
+                num = getIndex(runPODict["name_JM"], currents)
 
-        if num > 0:
-            runPODict["name_JM"] = runPODict["name_JM"] + "_{}".format(num)
+                if num > 0:
+                    runPODict["name_JM"] = runPODict["name_JM"] + "_{}".format(num)
+        
+        if runPODict["mode"] == "EH":
+            if "name_EH" not in runPODict:
+                errStr += errMsg_field("name_EH", "runPODict")
+            
+            else:
+                num = getIndex(runPODict["name_EH"], fields)
+
+                if num > 0:
+                    runPODict["name_EH"] = runPODict["name_EH"] + "_{}".format(num)
+        
+        if runPODict["mode"] == "JMEH":
+            if "name_EH" not in runPODict:
+                errStr += errMsg_field("name_EH", "runPODict")
+            
+            else:
+                num = getIndex(runPODict["name_EH"], fields)
+
+                if num > 0:
+                    runPODict["name_EH"] = runPODict["name_EH"] + "_{}".format(num)
+            
+            if "name_JM" not in runPODict:
+                errStr += errMsg_field("name_JM", "runPODict")
+            
+            num = getIndex(runPODict["name_JM"], currents)
+
+            if num > 0:
+                runPODict["name_JM"] = runPODict["name_JM"] + "_{}".format(num)
+        
+        if runPODict["mode"] == "EHP":
+            if "name_EH" not in runPODict:
+                errStr += errMsg_field("name_EH", "runPODict")
+            
+            num = getIndex(runPODict["name_EH"], fields)
+
+            if num > 0:
+                runPODict["name_EH"] = runPODict["name_EH"] + "_{}".format(num)
+            
+            if "name_P" not in runPODict:
+                errStr += errMsg_field("name_P", "runPODict")
+            
+            num = getIndex(runPODict["name_P"], frames)
+
+            if num > 0:
+                runPODict["name_P"] = runPODict["name_P"] + "_{}".format(num)
+
+        if runPODict["mode"] == "FF":
+            if "name_EH" not in runPODict:
+                errStr += errMsg_field("name_EH", "runPODict")
+            
+            num = getIndex(runPODict["name_EH"], fields)
+
+            if num > 0:
+                runPODict["name_EH"] = runPODict["name_EH"] + "_{}".format(num)
+        
+        if runPODict["mode"] == "scalar":
+            if "name_field" not in runPODict:
+                errStr += errMsg_field("name_field", "runPODict")
+            
+            num = getIndex(runPODict["name_field"], scalarfields)
+
+            if num > 0:
+                runPODict["name_field"] = runPODict["name_field"] + "_{}".format(num)
     
-    if runPODict["mode"] == "EH":
-        if "name_EH" not in runPODict:
-            errStr += errMsg_field("name_EH", "runPODict")
-        
-        num = getIndex(runPODict["name_EH"], fields)
-
-        if num > 0:
-            runPODict["name_EH"] = runPODict["name_EH"] + "_{}".format(num)
+    if "t_name" not in runPODict:
+        errStr += errMsg_field("t_name", "runRTDict")
+    else:
+        errStr = check_elemSystem(runPODict["t_name"], elements, clog, errStr)
     
-    if runPODict["mode"] == "JMEH":
-        if "name_EH" not in runPODict:
-            errStr += errMsg_field("name_EH", "runPODict")
-        
-        num = getIndex(runPODict["name_EH"], fields)
-
-        if num > 0:
-            runPODict["name_EH"] = runPODict["name_EH"] + "_{}".format(num)
-        
-        if "name_JM" not in runPODict:
-            errStr += errMsg_field("name_JM", "runPODict")
-        
-        num = getIndex(runPODict["name_JM"], currents)
-
-        if num > 0:
-            runPODict["name_JM"] = runPODict["name_JM"] + "_{}".format(num)
-    
-    if runPODict["mode"] == "EHP":
-        if "name_EH" not in runPODict:
-            errStr += errMsg_field("name_EH", "runPODict")
-        
-        num = getIndex(runPODict["name_EH"], fields)
-
-        if num > 0:
-            runPODict["name_EH"] = runPODict["name_EH"] + "_{}".format(num)
-        
-        if "name_P" not in runPODict:
-            errStr += errMsg_field("name_P", "runPODict")
-        
-        num = getIndex(runPODict["name_P"], frames)
-
-        if num > 0:
-            runPODict["name_P"] = runPODict["name_P"] + "_{}".format(num)
-
-    if runPODict["mode"] == "FF":
-        if "name_EH" not in runPODict:
-            errStr += errMsg_field("name_EH", "runPODict")
-        
-        num = getIndex(runPODict["name_EH"], fields)
-
-        if num > 0:
-            runPODict["name_EH"] = runPODict["name_EH"] + "_{}".format(num)
-    
-    if runPODict["mode"] == "scalar":
-        if "name_field" not in runPODict:
-            errStr += errMsg_field("name_field", "runPODict")
-        
-        num = getIndex(runPODict["name_field"], scalarfields)
-
-        if num > 0:
-            runPODict["name_field"] = runPODict["name_field"] + "_{}".format(num)
-
     if "epsilon" not in runPODict:
         runPODict["epsilon"] = 1
 
@@ -1157,9 +1185,10 @@ def check_runPODict(runPODict, elements, fields, currents, scalarfields, frames,
         if runPODict["device"] == "CPU":
             
             if "nThreads" in runPODict:
-                if runPODict["nThreads"] > nThreads_cpu:
-                    clog.warning(f"Insufficient CPU threads available, automatically reducing threadcount.")
-                    runPODict["nThreads"] = nThreads_cpu
+                if isinstance(runPODict["nThreads"], int):
+                    if runPODict["nThreads"] > nThreads_cpu:
+                        clog.warning(f"Insufficient CPU threads available, automatically reducing threadcount.")
+                        runPODict["nThreads"] = nThreads_cpu
 
             else:
                 runPODict["nThreads"] = nThreads_cpu
@@ -1186,9 +1215,36 @@ def check_runPODict(runPODict, elements, fields, currents, scalarfields, frames,
 def check_hybridDict(hybridDict, elements, frames, fields, clog):
     errStr = ""
    
-    errStr = check_frameSystem(hybridDict["fr_in"], frames, clog, errStr)
-    errStr = check_elemSystem(hybridDict["t_name"], elements, clog, errStr)
-    errStr = check_fieldSystem(hybridDict["field_in"], fields, clog, errStr)
+    if "fr_in" not in hybridDict:
+        errStr += errMsg_field("fr_in", "hybridDict")
+    else:
+        errStr = check_frameSystem(hybridDict["fr_in"], frames, clog, errStr)
+    
+    if "field_in" not in hybridDict:
+        errStr += errMsg_field("field_in", "hybridDict")
+    else:
+        errStr = check_fieldSystem(hybridDict["field_in"], fields, clog, errStr)
+    
+    if "t_name" not in hybridDict:
+            errStr += errMsg_field("t_name", "hybridDict")
+    else:
+        errStr = check_elemSystem(hybridDict["t_name"], elements, clog, errStr)
+
+    if "fr_out" not in hybridDict:
+        errStr += errMsg_field("fr_out", "hybridDict")
+    else:
+        num = getIndex(hybridDict["fr_out"], frames)
+
+        if num > 0:
+            hybridDict["fr_out"] = hybridDict["fr_out"] + "_{}".format(num)
+   
+    if "field_out" not in hybridDict:
+            errStr += errMsg_field("field_out", "hybridDict")
+    else:
+        num = getIndex(hybridDict["field_out"], fields)
+
+        if num > 0:
+            hybridDict["field_out"] = hybridDict["field_out"] + "_{}".format(num)
 
     if "start" not in hybridDict:
         hybridDict["start"] = None
@@ -1211,15 +1267,6 @@ def check_hybridDict(hybridDict, elements, frames, fields, clog):
         if not isinstance(hybridDict["comp"], str) and hybridDict["comp"] != True:
             errStr += errMsg_type("comp", type(hybridDict["comp"]), "hybridDict", str)
 
-    num = getIndex(hybridDict["fr_out"], frames)
-
-    if num > 0:
-        hybridDict["fr_out"] = hybridDict["fr_out"] + "_{}".format(num)
-    
-    num = getIndex(hybridDict["field_out"], fields)
-
-    if num > 0:
-        hybridDict["field_out"] = hybridDict["field_out"] + "_{}".format(num)
     
     if errStr:
         errList = errStr.split("\n")[:-1]

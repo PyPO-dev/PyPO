@@ -11,7 +11,7 @@ from PyPO.System import System
 
 class Test_Backwards(unittest.TestCase):
     def test_Backwards(self):
-        s = System(override=True, verbose=False)
+        s = System(override=True)#, verbose=False)
         
         source = {
                 "name"      : "source",
@@ -55,7 +55,7 @@ class Test_Backwards(unittest.TestCase):
                     "exp"       : "fwd",
                     "mode"      : "JMEH",
                     "name_JM"   : "JM_up",
-                    "name_EH"   : "EH_up"
+                    "name_EH"   : "EH_up",
                     }
             
             runPODict_bwd = {
@@ -65,7 +65,7 @@ class Test_Backwards(unittest.TestCase):
                     "exp"       : "bwd",
                     "mode"      : "JMEH",
                     "name_JM"   : "JM_down",
-                    "name_EH"   : "EH_down"
+                    "name_EH"   : "EH_down",
                     }
 
             s.runPO(runPODict)

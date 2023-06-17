@@ -58,7 +58,11 @@ class Test_SystemPO_RT(unittest.TestCase):
                         self.assertEqual(type(self.s.currents["test_JM"]), pypotypes.currents)
                     
                     for ellipse in TestTemplates.getEllipsoidList():
-                        runPODict = self._get_runPODictJM(source["name"], ellipse["name"],"test_JM", device=dev)
+                        if "z" in ellipse["name"]:
+                            runPODict = self._get_runPODictJM(source["name"], ellipse["name"],"test_JM", device=dev, direction="bwd")
+                        else:
+                            runPODict = self._get_runPODictJM(source["name"], ellipse["name"],"test_JM", device=dev)
+
                         self.s.runPO(runPODict)
                         self.assertEqual(type(self.s.currents["test_JM"]), pypotypes.currents)
     
@@ -79,7 +83,11 @@ class Test_SystemPO_RT(unittest.TestCase):
                         self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
                     
                     for ellipse in TestTemplates.getEllipsoidList():
-                        runPODict = self._get_runPODictEH(source["name"], ellipse["name"],"test_EH", device=dev)
+                        if "z" in ellipse["name"]:
+                            runPODict = self._get_runPODictEH(source["name"], ellipse["name"],"test_EH", device=dev, direction="bwd")
+                        else:
+                            runPODict = self._get_runPODictEH(source["name"], ellipse["name"],"test_EH", device=dev)
+
                         self.s.runPO(runPODict)
                         self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
 
@@ -102,7 +110,10 @@ class Test_SystemPO_RT(unittest.TestCase):
                         self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
                     
                     for ellipse in TestTemplates.getEllipsoidList():
-                        runPODict = self._get_runPODictJMEH(source["name"], ellipse["name"],"test_JM", "test_EH", device=dev)
+                        if "z" in ellipse["name"]:
+                            runPODict = self._get_runPODictJMEH(source["name"], ellipse["name"],"test_JM", "test_EH", device=dev, direction="bwd")
+                        else:
+                            runPODict = self._get_runPODictJMEH(source["name"], ellipse["name"],"test_JM", "test_EH", device=dev)
                         self.s.runPO(runPODict)
                         self.assertEqual(type(self.s.currents["test_JM"]), pypotypes.currents)
                         self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
@@ -266,12 +277,12 @@ class Test_SystemPO_RT(unittest.TestCase):
             self.assertEqual(gridsize[1], self.s.system[TestTemplates.hyperboloid_man_uv["name"]]["gridsize"][1])
 
 
-    def _get_runPODictJM(self, source_current, target, name_JM, device="CPU"):
+    def _get_runPODictJM(self, source_current, target, name_JM, device="CPU", direction="fwd"):
         runPODict = {
                 "t_name"    : target,
                 "s_current" : source_current,
                 "epsilon"   : 10,
-                "exp"       : "fwd",
+                "exp"       : direction,
                 "device"    : device,
                 "name_JM"   : name_JM,
                 "mode"      : "JM"
@@ -279,12 +290,12 @@ class Test_SystemPO_RT(unittest.TestCase):
 
         return runPODict
     
-    def _get_runPODictEH(self, source_current, target, name_EH, device="CPU"):
+    def _get_runPODictEH(self, source_current, target, name_EH, device="CPU", direction="fwd"):
         runPODict = {
                 "t_name"    : target,
                 "s_current" : source_current,
                 "epsilon"   : 10,
-                "exp"       : "fwd",
+                "exp"       : direction,
                 "device"    : device,
                 "name_EH"   : name_EH,
                 "mode"      : "EH"
@@ -292,12 +303,12 @@ class Test_SystemPO_RT(unittest.TestCase):
 
         return runPODict
     
-    def _get_runPODictJMEH(self, source_current, target, name_JM, name_EH, device="CPU"):
+    def _get_runPODictJMEH(self, source_current, target, name_JM, name_EH, device="CPU", direction="fwd"):
         runPODict = {
                 "t_name"    : target,
                 "s_current" : source_current,
                 "epsilon"   : 10,
-                "exp"       : "fwd",
+                "exp"       : direction,
                 "device"    : device,
                 "name_JM"   : name_JM,
                 "name_EH"   : name_EH,

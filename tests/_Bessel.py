@@ -4,6 +4,7 @@ import os
 
 from pathlib import Path
 from PyPO.System import System
+import matplotlib.pyplot as pt
 
 ##
 # @file 
@@ -15,8 +16,8 @@ from PyPO.System import System
 class Test_Bessel(unittest.TestCase):
     
     def test_Bessel(self):
-        lams = np.array([10, 1, 0.1])
-        
+        lams = np.linspace(1, 2, 3)
+        print(lams) 
         E_l = []
         H_l = []
             
@@ -28,11 +29,16 @@ class Test_Bessel(unittest.TestCase):
         E_l = np.array(E_l)
         H_l = np.array(H_l)
 
-        diff_lim = lams / 10e3 * 1.025 * 180 / np.pi * 3600
+        diff_lim = lams / 1e3 * 1.025 * 180 / np.pi * 3600
+
+        pt.plot(lams, diff_lim)
+        pt.scatter(lams, E_l)
+        pt.scatter(lams, H_l)
+        pt.show()
 
         diff_E = (E_l - diff_lim) / E_l
         diff_H = (H_l - diff_lim) / H_l
-
+        print(diff_E)
         thres = 0.01
 
         for E, H in zip(diff_E, diff_H):
@@ -40,18 +46,18 @@ class Test_Bessel(unittest.TestCase):
             self.assertAlmostEqual(H, 0.0, delta=thres)
 
     def _calc_ff(self, lam):
-        s = System(override=False, verbose=False)
+        s = System(override=False)#, verbose=False)
 
         ring = {
                 "name"      : "ring",
                 "gmode"     : "uv",
-                "lims_u"    : np.array([0, 5000]),
+                "lims_u"    : np.array([0, 500]),
                 "lims_v"    : np.array([0, 360]),
-                "gridsize"  : np.array([501, 501])
+                "gridsize"  : np.array([101, 101])
                 }
 
         a = 0.2
-        b = 40
+        b = 400
 
         ext = (a + b*lam) / 3600
 
@@ -60,7 +66,7 @@ class Test_Bessel(unittest.TestCase):
                 "gmode"     : "AoE",
                 "lims_Az"   : np.array([-ext, ext]),
                 "lims_El"   : np.array([-ext, ext]),
-                "gridsize"  : np.array([201, 201])
+                "gridsize"  : np.array([101, 101])
                 }
 
         UDict = {
@@ -77,7 +83,7 @@ class Test_Bessel(unittest.TestCase):
                 "t_name"        : "ff_plane",
                 "name_EH"       : "ff_EH",
                 "mode"          : "FF",
-                "epsilon"       : 10
+                "epsilon"       : 10,
                 }
 
         s.runPO(source_to_ff)

@@ -68,15 +68,16 @@ def calcEstimates(x, y, area, field_norm):
 
 ##
 # Fit a Gaussian to an amplitude pattern of a field component.
+# First, the center and position angle of the pattern is calculated using the method of image moments.
+# Then, local maxima that might interfere with fitting are removed using the findConnectedSubsets method from MatUtils.py.
 #
 # @param field Component of field to fit.
 # @param surfaceObject Surface on which the field is defined.
 # @param thres Threshold for fitting in decibels.
 # @param mode Whether to fit the Gaussian in linear, decibel or logarithmic space.
-# @param ratio Allowed maximal ratio of fit to actual beam.
+# @param ratio Allowed maximal ratio of fit to actual beam. If "None", will just attempt to fit the Gaussian to supplied pattern. If given, will only accept a fit if the ratio of integrated power in the fitted Gaussian to the supplied beam pattern is less than or equal to the given value. Defaults to 1.
 #
 # @returns popt Optimal parameters for Gaussian.
-# @returns perr Standard deviations of optimal parameters.
 def fitGaussAbs(field, surfaceObject, thres, mode, ratio=1):
     global thres_g
     thres_g = thres
@@ -165,45 +166,12 @@ def fitGaussAbs(field, surfaceObject, thres, mode, ratio=1):
                     thres += 0.5
             
             num += 1
-    
-    perr = np.zeros(len(popt))#np.sqrt(np.diag(pcov))
-    perr = np.append(perr, 0.0)
 
-    return popt, perr
-
-##
-# Generate a Gaussian pattern from Gaussian parameters.
-#
-# @param mask Mask to apply to generated Gaussian.
-# @param mode Whether to generate the Gaussian in linear, decibel or logarithmic space.
-# @param xy Tuple containing x and y grids of surface of Gaussian.
-# @param x0 Gaussian beamwidth in x-direction.
-# @param y0 Gaussian beamwidth in y-direction.
-# @param xs Center in x-direction of Gaussian.
-# @param ys Center in y-direction of Gaussian.
-# @param theta Position angle of Gaussian.
-#
-# @returns Psi The Gaussian distribution.
-#def GaussAbs(mask, mode, xy, x0, y0, xs, ys, theta):
-#    x, y = xy
-#    a = np.cos(theta)**2 / (2 * x0**2) + np.sin(theta)**2 / (2 * y0**2)
-#    c = np.sin(2 * theta) / (4 * x0**2) - np.sin(2 * theta) / (4 * y0**2)
-#    b = np.sin(theta)**2 / (2 * x0**2) + np.cos(theta)**2 / (2 * y0**2)
-#
-#    if mode == "dB":
-#        Psi = 20*np.log10(np.exp(-(a*(x - xs)**2 + 2*c*(x - xs)*(y - ys) + b*(y - ys)**2)))
-#
-#    elif mode == "linear":
-#        Psi = np.exp(-(a*(x - xs)**2 + 2*c*(x - xs)*(y - ys) + b*(y - ys)**2))
-#
-#    elif mode == "log":
-#        Psi = -(a*(x - xs)**2 + 2*c*(x - xs)*(y - ys) + b*(y - ys)**2)
-#
-#    return (Psi).ravel()
+    return popt
 
 ## 
-# Generate Absolute Gaussian from parameters.
-# Called in optimalisation.
+# Generate absolute Gaussian from parameters.
+# Called in optimalisation. This method returns an overlap parameter of the fitted Gaussian .
 #
 # @param p0 Array containing parameters for Gaussian.
 # @param args Extra arguments for defining Gaussian and fit.
@@ -227,12 +195,11 @@ def GaussAbs(p0, *args):
     return epsilon
 
 ##
-# Generate a Gaussian from surface parameters.
+# Generate a Gaussian from Gaussian and surface parameters.
 #
-# @param fgs_out Optimal Gaussian parameters.
+# @param p0 Gaussian parameters.
 # @param surfaceObject Surface on which Gaussian is defined.
-# @param mode Whether to fit Gaussian in linear, decibel or logarithmic space.
-# @param mask Mask to apply to Gaussian distribution.
+# @param mode Whether to generate Gaussian in linear, decibel or logarithmic space.
 #
 # @returns Psi Gaussian distribution.
 def generateGauss(p0, surfaceObject, mode):

@@ -1743,7 +1743,7 @@ class System(object):
         surfaceObj = self.system[self.fields[name_field].surf]
         field = self.copyObj(np.absolute(getattr(self.fields[name_field], comp)))
 
-        popt, perr = fgs.fitGaussAbs(field, surfaceObj, thres, mode, ratio)
+        popt = fgs.fitGaussAbs(field, surfaceObj, thres, mode, ratio)
 
         Psi = scalarfield(fgs.generateGauss(popt, surfaceObj, mode="linear"))
         Psi.setMeta(self.fields[name_field].surf, self.fields[name_field].k)
@@ -1758,7 +1758,7 @@ class System(object):
         self.scalarfields[_name] = Psi
 
         if full_output:
-            return popt, perr
+            return popt
 
     ##
     # Calculate main-beam efficiency of a beam pattern.

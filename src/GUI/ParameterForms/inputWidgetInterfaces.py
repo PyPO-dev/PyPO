@@ -1,4 +1,4 @@
-from PySide2.QtWidgets import QWidget
+from PySide6.QtWidgets import QWidget
 from abc import ABC, abstractclassmethod
 
 ##

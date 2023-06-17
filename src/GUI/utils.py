@@ -1,6 +1,6 @@
-from PySide2.QtWidgets import QLabel, QLineEdit, QPushButton
-from PySide2.QtCore import Qt, QRegExp
-from PySide2.QtGui import QRegExpValidator
+from PySide6.QtWidgets import QLabel, QLineEdit, QPushButton
+from PySide6.QtCore import Qt, QRegularExpression
+from PySide6.QtGui import QRegularExpressionValidator
 from enum import Enum, auto
 
 ##
@@ -52,10 +52,10 @@ def makeLabelFromString(s):
 
 def getValidator(intype):
     if intype == inType.vectorIntegers:
-        return QRegExpValidator(QRegExp("[-+]?[0-9]*"))
+        return QRegularExpressionValidator(QRegularExpression("[-+]?[0-9]*"))
     elif intype == inType.vectorFloats:
-        return  QRegExpValidator(QRegExp("[-+]?[0-9]*[\.,]?[0-9]*(e-?)?[0-9]*"))
+        return  QRegularExpressionValidator(QRegularExpression("[-+]?[0-9]*[\.,]?[0-9]*(e-?)?[0-9]*"))
     elif intype == inType.vectorStrings:
-        return  QRegExpValidator(QRegExp("[A-Za-z0-9_]+"))
+        return  QRegularExpressionValidator(QRegularExpression("[A-Za-z0-9_]+"))
     else:
         raise Exception("No validator available")

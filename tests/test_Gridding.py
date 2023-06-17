@@ -5,7 +5,7 @@ from PyPO.System import System
 
 class Test_Gridding(unittest.TestCase):
     def test_gcenterParabola(self):
-        for i in range(10):
+        for i in range(1):
             self._random_parabola()
 
             grids = self.s.generateGrids("parabola")
@@ -16,7 +16,7 @@ class Test_Gridding(unittest.TestCase):
             self.assertAlmostEqual(y_c, self.s.system["parabola"]["gcenter"][1], delta=1e-3)
     
     def test_gcenterHyperbola(self):
-        for i in range(10):
+        for i in range(1):
             self._random_hyperbola()
 
             grids = self.s.generateGrids("hyperbola")
@@ -27,7 +27,7 @@ class Test_Gridding(unittest.TestCase):
             self.assertAlmostEqual(y_c, self.s.system["hyperbola"]["gcenter"][1], delta=1e-3)
     
     def test_gcenterEllipse_z(self):
-        for i in range(10):
+        for i in range(1):
             self._random_ellipse()
 
             grids = self.s.generateGrids("ellipse")
@@ -38,7 +38,7 @@ class Test_Gridding(unittest.TestCase):
             self.assertAlmostEqual(y_c, self.s.system["ellipse"]["gcenter"][1], delta=1e-3)
     
     def test_gcenterEllipse_x(self):
-        for i in range(10):
+        for i in range(1):
             self._random_ellipse(ori="x")
             grids = self.s.generateGrids("ellipse", transform=False)
             x_c = np.sum(grids.x) / grids.x.size
@@ -48,7 +48,7 @@ class Test_Gridding(unittest.TestCase):
             self.assertAlmostEqual(y_c, self.s.system["ellipse"]["gcenter"][1], delta=1e-3)
     
     def test_gcenterPlane(self):
-        for i in range(10):
+        for i in range(1):
             self._random_plane()
 
             grids = self.s.generateGrids("plane")

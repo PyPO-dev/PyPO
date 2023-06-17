@@ -27,7 +27,7 @@ GaussRTframe =  {
 
 GPOfield =  {
         "name"      : "testGaussField",
-        "lam"       : 1,
+        "lam"       : 0.01,
         "w0x"       : 1,
         "w0y"       : 1,
         "n"         : 1,
@@ -51,7 +51,7 @@ paraboloid_man_xy = {
         "gmode"     : "xy",
         "lims_x"    : np.array([-1, 1]),
         "lims_y"    : np.array([-1, 1]),
-        "gridsize"  : np.array([3, 3])
+        "gridsize"  : np.array([13, 13])
         }
 
 paraboloid_man_uv = {
@@ -61,7 +61,7 @@ paraboloid_man_uv = {
         "gmode"     : "uv",
         "lims_u"    : np.array([0, 1]),
         "lims_v"    : np.array([0, 360]),
-        "gridsize"  : np.array([3, 3])
+        "gridsize"  : np.array([13, 13])
         }
 
 paraboloid_foc_xy = {
@@ -72,7 +72,7 @@ paraboloid_foc_xy = {
         "gmode"     : "xy",
         "lims_x"    : np.array([-1, 1]),
         "lims_y"    : np.array([-1, 1]),
-        "gridsize"  : np.array([3, 3])
+        "gridsize"  : np.array([13, 13])
         }
 
 paraboloid_foc_uv = {
@@ -83,7 +83,7 @@ paraboloid_foc_uv = {
         "gmode"     : "uv",
         "lims_u"    : np.array([0, 1]),
         "lims_v"    : np.array([0, 360]),
-        "gridsize"  : np.array([3, 3])
+        "gridsize"  : np.array([13, 13])
         }
 
 #### HYPERBOLOIDS ####
@@ -95,7 +95,7 @@ hyperboloid_man_xy = {
         "gmode"     : "xy",
         "lims_x"    : np.array([-1, 1]),
         "lims_y"    : np.array([-1, 1]),
-        "gridsize"  : np.array([3, 3])
+        "gridsize"  : np.array([13, 13])
         }
 
 hyperboloid_man_uv = {
@@ -106,7 +106,7 @@ hyperboloid_man_uv = {
         "gmode"     : "uv",
         "lims_u"    : np.array([0, 1]),
         "lims_v"    : np.array([0, 360]),
-        "gridsize"  : np.array([3, 3])
+        "gridsize"  : np.array([13, 13])
         }
 
 hyperboloid_foc_xy = {
@@ -118,7 +118,7 @@ hyperboloid_foc_xy = {
         "gmode"     : "xy",
         "lims_x"    : np.array([-1, 1]),
         "lims_y"    : np.array([-1, 1]),
-        "gridsize"  : np.array([3, 3])
+        "gridsize"  : np.array([13, 13])
         }
 
 hyperboloid_foc_uv = {
@@ -130,7 +130,7 @@ hyperboloid_foc_uv = {
         "gmode"     : "uv",
         "lims_u"    : np.array([0, 1]),
         "lims_v"    : np.array([0, 360]),
-        "gridsize"  : np.array([3, 3])
+        "gridsize"  : np.array([13, 13])
         }
 
 #### ELLIPSOIDS ####
@@ -143,7 +143,7 @@ ellipsoid_z_man_xy = {
         "gmode"     : "xy",
         "lims_x"    : np.array([-1, 1]),
         "lims_y"    : np.array([-1, 1]),
-        "gridsize"  : np.array([3, 3])
+        "gridsize"  : np.array([13, 13])
         }
 
 ellipsoid_z_man_uv = {
@@ -155,7 +155,7 @@ ellipsoid_z_man_uv = {
         "gmode"     : "uv",
         "lims_u"    : np.array([0, 1]),
         "lims_v"    : np.array([0, 360]),
-        "gridsize"  : np.array([3, 3])
+        "gridsize"  : np.array([13, 13])
         }
 
 ellipsoid_z_foc_xy = {
@@ -168,7 +168,7 @@ ellipsoid_z_foc_xy = {
         "gmode"     : "xy",
         "lims_x"    : np.array([-1, 1]),
         "lims_y"    : np.array([-1, 1]),
-        "gridsize"  : np.array([3, 3])
+        "gridsize"  : np.array([13, 13])
         }
 
 ellipsoid_z_foc_uv = {
@@ -181,7 +181,7 @@ ellipsoid_z_foc_uv = {
         "gmode"     : "uv",
         "lims_u"    : np.array([0, 1]),
         "lims_v"    : np.array([0, 360]),
-        "gridsize"  : np.array([3, 3])
+        "gridsize"  : np.array([13, 13])
         }
 
 ellipsoid_x_man_xy = {
@@ -193,7 +193,7 @@ ellipsoid_x_man_xy = {
         "gmode"     : "xy",
         "lims_x"    : np.array([-1, 1]),
         "lims_y"    : np.array([-1, 1]),
-        "gridsize"  : np.array([3, 3])
+        "gridsize"  : np.array([13, 13])
         }
 
 ellipsoid_x_man_uv = {
@@ -205,7 +205,7 @@ ellipsoid_x_man_uv = {
         "gmode"     : "uv",
         "lims_u"    : np.array([0, 1]),
         "lims_v"    : np.array([0, 360]),
-        "gridsize"  : np.array([3, 3])
+        "gridsize"  : np.array([13, 13])
         }
 
 ellipsoid_x_foc_xy = {
@@ -218,7 +218,7 @@ ellipsoid_x_foc_xy = {
         "gmode"     : "xy",
         "lims_x"    : np.array([-1, 1]),
         "lims_y"    : np.array([-1, 1]),
-        "gridsize"  : np.array([3, 3])
+        "gridsize"  : np.array([13, 13])
         }
 
 ellipsoid_x_foc_uv = {
@@ -231,7 +231,7 @@ ellipsoid_x_foc_uv = {
         "gmode"     : "uv",
         "lims_u"    : np.array([0, 1]),
         "lims_v"    : np.array([0, 360]),
-        "gridsize"  : np.array([3, 3])
+        "gridsize"  : np.array([13, 13])
         }
 
 #### PLANES ####
@@ -240,7 +240,7 @@ plane_xy = {
         "gmode"     : "xy",
         "lims_x"    : np.array([-1, 1]),
         "lims_y"    : np.array([-1, 1]),
-        "gridsize"  : np.array([3, 3])
+        "gridsize"  : np.array([13, 13])
         }
 
 plane_uv = {
@@ -248,7 +248,7 @@ plane_uv = {
         "gmode"     : "uv",
         "lims_u"    : np.array([0, 1]),
         "lims_v"    : np.array([0, 360]),
-        "gridsize"  : np.array([3, 3])
+        "gridsize"  : np.array([103, 103])
         }
 
 plane_AoE = {
@@ -256,7 +256,7 @@ plane_AoE = {
         "gmode"     : "AoE",
         "lims_Az"   : np.array([-1, 1]),
         "lims_El"   : np.array([-1, 1]),
-        "gridsize"  : np.array([3, 3])
+        "gridsize"  : np.array([13, 13])
         }
 
 aperDict = {
@@ -271,7 +271,7 @@ aperDict = {
 #
 # @returns out List of all plane dictionaries
 def getPlaneList():
-    out = [plane_xy, plane_uv, plane_AoE]
+    out = [plane_uv, plane_xy, plane_AoE]
     return out
 
 ##

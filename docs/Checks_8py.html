@@ -263,7 +263,7 @@ Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:a1344a1c6f5c97511b48723fc04a59560"><td class="memItemLeft" align="right" valign="top"><a id="a1344a1c6f5c97511b48723fc04a59560" name="a1344a1c6f5c97511b48723fc04a59560"></a>
-os&#160;</td><td class="memItemRight" valign="bottom"><b>PyPO.Checks.nThreads_cpu</b> = os.cpu_count()</td></tr>
+os&#160;</td><td class="memItemRight" valign="bottom"><b>PyPO.Checks.nThreads_cpu</b> = os.cpu_count() - 1 if os.cpu_count() &gt; 1 else 1</td></tr>
 <tr class="separator:a1344a1c6f5c97511b48723fc04a59560"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab14d2ff38d68a695c4ebe94f92688cd8"><td class="memItemLeft" align="right" valign="top"><a id="ab14d2ff38d68a695c4ebe94f92688cd8" name="ab14d2ff38d68a695c4ebe94f92688cd8"></a>
 list&#160;</td><td class="memItemRight" valign="bottom"><b>PyPO.Checks.PO_modelist</b> = [&quot;JM&quot;, &quot;EH&quot;, &quot;JMEH&quot;, &quot;EHP&quot;, &quot;FF&quot;, &quot;scalar&quot;]</td></tr>

@@ -67,9 +67,9 @@ For developers, an automated testing framework is present as well as a documenta
 The prerequisites for these features are not installed through the regular install. 
 Instead, they can be installed separately as needed.
 
-To use the GUI, PySide2 and attrs needs to be installed:
+To use the GUI, PySide6 and attrs need to be installed:
 ```
-pip install PySide2 attrs
+pip install PySide6 attrs
 ```
 
 The automated tests are run using the nose2 framework:

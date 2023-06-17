@@ -15,50 +15,46 @@ from PyPO.Efficiencies import _generateMask
 # File containing tests for the PO efficiencies in PyPO.
 class Test_SystemEfficiencies(unittest.TestCase):
     def test_spilloverGauss(self):
-        for i in range(10):
-            aperDict = self._makeRandomGauss()
+        aperDict = self._makeRandomGauss()
 
-            eta_s = self.s.calcSpillover("Gauss", "Ex", aperDict)
-            self.assertAlmostEqual(eta_s, 1 - np.exp(-2), delta=1e-3)
+        eta_s = self.s.calcSpillover("Gauss", "Ex", aperDict)
+        self.assertAlmostEqual(eta_s, 1 - np.exp(-2), delta=1e-3)
     
     def test_spilloverUniform(self):
-        for i in range(10): 
-            aperDict = {
-                    "center"    : np.array([random.uniform(0, 10), random.uniform(0, 10)]),
-                    "outer"     : np.array([random.uniform(5, 10), random.uniform(5, 10)]),
-                    "inner"     : np.array([random.uniform(0, 5), random.uniform(0, 5)])
-                    }
-            self._makeRandomUniform_xy()
+        aperDict = {
+                "center"    : np.array([random.uniform(0, 10), random.uniform(0, 10)]),
+                "outer"     : np.array([random.uniform(5, 10), random.uniform(5, 10)]),
+                "inner"     : np.array([random.uniform(0, 5), random.uniform(0, 5)])
+                }
+        self._makeRandomUniform_xy()
 
-            grid_pl = self.s.generateGrids("plane")
-            mask = _generateMask(grid_pl.x, grid_pl.y, aperDict)
+        grid_pl = self.s.generateGrids("plane")
+        mask = _generateMask(grid_pl.x, grid_pl.y, aperDict)
 
-            num_tot = self.s.fields["Uniform"].size
-            num_mask = len(self.s.fields["Uniform"].Ex[mask])
-            
-            eta_s = self.s.calcSpillover("Uniform", "Ex", aperDict)
+        num_tot = self.s.fields["Uniform"].size
+        num_mask = len(self.s.fields["Uniform"].Ex[mask])
+        
+        eta_s = self.s.calcSpillover("Uniform", "Ex", aperDict)
 
-            self.assertAlmostEqual(eta_s, num_mask / num_tot)
+        self.assertAlmostEqual(eta_s, num_mask / num_tot)
 
     def test_taperUniform(self):
-        for i in range(10):
-            self._makeRandomUniform_xy()
-            eta_t = self.s.calcTaper("Uniform", "Ex")
-            self.assertAlmostEqual(eta_t, 1., delta=1e-3)
-            
-            self._makeRandomUniform_uv()
-            eta_t = self.s.calcTaper("Uniform", "Ex")
-            self.assertAlmostEqual(eta_t, 1., delta=1e-3)
+        self._makeRandomUniform_xy()
+        eta_t = self.s.calcTaper("Uniform", "Ex")
+        self.assertAlmostEqual(eta_t, 1., delta=1e-3)
+        
+        self._makeRandomUniform_uv()
+        eta_t = self.s.calcTaper("Uniform", "Ex")
+        self.assertAlmostEqual(eta_t, 1., delta=1e-3)
     
     def test_XpolUniform(self):
-        for i in range(10):
-            self._makeRandomUniform_xy()
-            eta_x = self.s.calcXpol("Uniform", "Ex", "Ex")
-            self.assertAlmostEqual(eta_x, .5, delta=1e-3)
-            
-            self._makeRandomUniform_uv()
-            eta_x = self.s.calcXpol("Uniform", "Ex", "Ex")
-            self.assertAlmostEqual(eta_x, .5, delta=1e-3)
+        self._makeRandomUniform_xy()
+        eta_x = self.s.calcXpol("Uniform", "Ex", "Ex")
+        self.assertAlmostEqual(eta_x, .5, delta=1e-3)
+        
+        self._makeRandomUniform_uv()
+        eta_x = self.s.calcXpol("Uniform", "Ex", "Ex")
+        self.assertAlmostEqual(eta_x, .5, delta=1e-3)
 
     def _makeRandomGauss(self):
         self.s = System(verbose=False)

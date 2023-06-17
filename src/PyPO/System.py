@@ -1829,7 +1829,7 @@ class System(object):
         self.snapObj(name_surf, "__pre")
 
         if center or align:
-            popt, perr = self.fitGaussAbs(name_field, comp, mode="linear", full_output=True)
+            popt = self.fitGaussAbs(name_field, comp, mode="linear", full_output=True)
         
         if center:
             self.translateGrids(name_surf, np.array([-popt[2], -popt[3], 0]))
@@ -1942,7 +1942,6 @@ class System(object):
 
         x_interp = np.linspace(np.min(x_strip), np.max(x_strip), num=len(x_strip) * interp)
         y_interp = np.linspace(np.min(y_strip), np.max(y_strip), num=len(y_strip) * interp)
-
         x_cut_interp = interp1d(x_strip, x_cut, kind="cubic")(x_interp)
         y_cut_interp = interp1d(y_strip, y_cut, kind="cubic")(y_interp)
 

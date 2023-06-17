@@ -1,6 +1,8 @@
 import numpy as np
 from scipy.optimize import fmin
 
+import matplotlib.pyplot as pt
+
 from PyPO.PyPOTypes import *
 from PyPO.BindRefl import *
 from PyPO.MatUtils import *
@@ -25,7 +27,6 @@ from PyPO.MatUtils import *
 # @returns theta Position angle of estimate.
 def calcEstimates(x, y, area, field_norm):
     M0 = np.sum(field_norm)
-
     xm = np.sum(x * field_norm) / M0
     ym = np.sum(y * field_norm) / M0
 
@@ -110,10 +111,9 @@ def fitGaussAbs(field, surfaceObject, thres, mode, ratio=1):
     y_max = y[idx_max] 
 
     idx_rows, idx_cols = findConnectedSubsets(mask_f, 1, idx_max)
-   
     _xmin = x[np.min(idx_cols), idx_max[0]]
     _xmax = x[np.max(idx_cols), idx_max[0]]
-    
+   
     _ymin = y[idx_max[1], np.min(idx_rows)]
     _ymax = y[idx_max[1], np.max(idx_rows)]
     
@@ -123,6 +123,10 @@ def fitGaussAbs(field, surfaceObject, thres, mode, ratio=1):
     
     xmask = x[mask_f] - x_max
     ymask = y[mask_f] - y_max
+
+    # Guard: if _mask_f is empty, use no mask
+    if not _mask_f.any():
+        _mask_f = np.ones(_mask_f.shape, dtype=int)
     
     x0, y0, xs, ys, theta = calcEstimates(x[_mask_f], y[_mask_f], area[_mask_f], fit_field[_mask_f])
 

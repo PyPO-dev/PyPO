@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import sys
 import os
 import shutil
@@ -8,41 +7,10 @@ import traceback
 
 ##
 # @file
-# PyPO developer utilities script.
+# PyPO docs generator.
 #
-# This script contains options to build distributions for PyPO and is mostly meant for convenience when developing.
-# Also, documentation can be built through this script. 
-# However, for this function to work properly, you should also have cloned the PyPO-docs and PyPO-tutorials repos into the same root as PyPO.
-# The unittests can also be run from this script.
-# For an overview of the possible flags, run in a terminal:
-#```
-# python DevUtils.py --help
-#```
-def DevUtils():
-    parser = argparse.ArgumentParser(description="development interface script for PyPO")
-    parser.add_argument("-v", "--set-version", type=str, help="set PyPO version for distribution")
-    parser.add_argument("-s", "--sdist", help="generate a PyPO source distribution into dist folder", action="store_true")
-    parser.add_argument("-b", "--bdist", help="generate a PyPO binary wheel into dist folder. EXPERIMENTAL.", action="store_true")
-    parser.add_argument("-d", "--docs", help="generate PyPO documentation with doxygen", action="store_true")
-    parser.add_argument("-t", "--test", help="run PyPO automated tests", action="store_true")
-    parser.add_argument("-c", "--test-coverage", help="run PyPO automated tests and generate coverage report", action="store_true")
-    parser.add_argument("--upload-test", help="upload dist folder to test-pypi using twine. Will ask for username and password", action="store_true")
-    parser.add_argument("--upload-pip", help="upload dist folder to pypi using twine. Will ask for username and password", action="store_true")
-    args = parser.parse_args()
-    
-    if args.sdist:
-        os.system("python3 setup.py sdist")
-
-    if args.bdist:
-        os.system("python3 setup.py bdist_wheel")
-
-    if args.upload_test:
-        os.system("twine upload --repository testpypi dist/*")
-    
-    if args.upload_pip:
-        os.system("twine upload dist/*")
-
-    if args.docs:
+# For this script to work properly, you should have installed the docs prerequisites.
+def GenerateDocs():
         tut_path = "tutorials"
 
         try:
@@ -100,24 +68,5 @@ def DevUtils():
         except Exception as err:
             print(traceback.format_exc())
     
-    if args.test:
-        try:
-            dir_tests = os.path.join(os.getcwd(), "tests")
-
-            os.system(f"nose2 -v")
-        
-        except Exception as err:
-            print(err)
-    
-    if args.test_coverage:
-        try:
-            dir_tests = os.path.join(os.getcwd(), "tests")
-
-            os.system(f"nose2 --with-coverage -v")
-        
-        except Exception as err:
-            print(err)
-
- 
 if __name__ == "__main__":
-	DevUtils()
+    GenerateDocs()

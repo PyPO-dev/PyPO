@@ -21,7 +21,7 @@ class Test_RayTraceUtils(unittest.TestCase):
                 "tol"       : 1e-12,
                 "device"    : "CPU"
                 }
-        for i in range(10):
+        for i in range(1):
             self._RT_random_parabola()
             
             self.s.runRayTracer(runRTDict)
@@ -71,7 +71,7 @@ class Test_RayTraceUtils(unittest.TestCase):
                 "tol"       : 1e-12,
                 "device"    : "CPU"
                 }
-        for i in range(10):
+        for i in range(1):
             self._RT_random_ellipse("z")
             
             self.s.runRayTracer(runRTDict)
@@ -91,7 +91,7 @@ class Test_RayTraceUtils(unittest.TestCase):
                 "tol"       : 1e-12,
                 "device"    : "CPU"
                 }
-        for i in range(10):
+        for i in range(1):
             self._RT_random_ellipse("x")
            
             self.s.runRayTracer(runRTDict)

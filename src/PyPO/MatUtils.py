@@ -51,5 +51,5 @@ def findConnectedSubsets(mat, component, idx_start):
    
     lims_row = np.array(range(idx_start[0] - num_row_low_conn, idx_start[0] + num_row_upp_conn + 1))
     lims_col = np.array(range(idx_start[1] - num_col_low_conn, idx_start[1] + num_col_upp_conn + 1))
-
+    
     return lims_row, lims_col

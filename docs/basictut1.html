@@ -112,7 +112,7 @@ Introduction</h1>
 Rock Bottom: The Bottom Layer</h1>
 <p><code>PyPO</code> is powered by libraries written in C/C++/CUDA. Because the physical optics calculations are quite heavy, these are written in a compiled language. The reasons for choosing C/C++ are twofold:</p><ul>
 <li>The relative ease of interfacing C/C++ using <code>ctypes</code>,</li>
-<li>our own familiarity with these languages. Because of the powerful computational abilities of current day GPUs, we have also written the libraries in CUDA. This does necessitate an Nvidia card and GPU implementations in other frameworks (e.g. Metal for Apple) are always a welcome addition.</li>
+<li>our own familiarity with these languages. Because of the powerful computational abilities of current day GPUs, we have also written the libraries in CUDA. This version is orders of magnitude faster for PO than the parallel CPU version and we highly recommend running <code>PyPO</code> on a system which has acces to an Nvidia card. This does necessitate an Nvidia card and GPU implementations in other frameworks (e.g. Metal for Apple) are always a welcome addition.</li>
 </ul>
 <p>The bottom layer takes care of the following tasks in <code>PyPO</code>:</p><ul>
 <li>generating reflector grids from inputs,</li>

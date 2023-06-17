@@ -2,7 +2,7 @@ from multiprocessing import Process
 from PySide6.QtCore import QThread, Signal, QObject
 from src.GUI.Dialogs import SymDialog
 from copy import deepcopy
-import src.PyPO.System as st
+import PyPO.System as st
 
 ##
 # @file Contains the tools to run a function in a subprocess

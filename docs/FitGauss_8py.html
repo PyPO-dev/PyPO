@@ -120,10 +120,10 @@ Functions</h2></td></tr>
 <tr class="memdesc:aac22ffeb325de0d11a18708d526e7d81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fit a Gaussian to an amplitude pattern of a field component.  <br /></td></tr>
 <tr class="separator:aac22ffeb325de0d11a18708d526e7d81"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a747fa766ecc3242b4f32e586df1267de"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="FitGauss_8py.html#a747fa766ecc3242b4f32e586df1267de">PyPO.FitGauss.GaussAbs</a> (p0, *args)</td></tr>
-<tr class="memdesc:a747fa766ecc3242b4f32e586df1267de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a Gaussian pattern from Gaussian parameters.  <br /></td></tr>
+<tr class="memdesc:a747fa766ecc3242b4f32e586df1267de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate absolute Gaussian from parameters.  <br /></td></tr>
 <tr class="separator:a747fa766ecc3242b4f32e586df1267de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a299f5e8365bbdf5e48ff0a21c7126303"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="FitGauss_8py.html#a299f5e8365bbdf5e48ff0a21c7126303">PyPO.FitGauss.generateGauss</a> (p0, surfaceObject, mode)</td></tr>
-<tr class="memdesc:a299f5e8365bbdf5e48ff0a21c7126303"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a Gaussian from surface parameters.  <br /></td></tr>
+<tr class="memdesc:a299f5e8365bbdf5e48ff0a21c7126303"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a Gaussian from Gaussian and surface parameters.  <br /></td></tr>
 <tr class="separator:a299f5e8365bbdf5e48ff0a21c7126303"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -235,19 +235,18 @@ theta Position angle of estimate. </dd></dl>
 </div><div class="memdoc">
 
 <p>Fit a Gaussian to an amplitude pattern of a field component. </p>
+<p>First, the center and position angle of the pattern is calculated using the method of image moments. Then, local maxima that might interfere with fitting are removed using the findConnectedSubsets method from <a class="el" href="MatUtils_8py.html" title="File containing a method for finding a connected subset, centered around a starting index,...">MatUtils.py</a>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">field</td><td>Component of field to fit. </td></tr>
     <tr><td class="paramname">surfaceObject</td><td>Surface on which the field is defined. </td></tr>
     <tr><td class="paramname">thres</td><td>Threshold for fitting in decibels. </td></tr>
     <tr><td class="paramname">mode</td><td>Whether to fit the Gaussian in linear, decibel or logarithmic space. </td></tr>
-    <tr><td class="paramname">ratio</td><td>Allowed maximal ratio of fit to actual beam.</td></tr>
+    <tr><td class="paramname">ratio</td><td>Allowed maximal ratio of fit to actual beam. If "None", will just attempt to fit the Gaussian to supplied pattern. If given, will only accept a fit if the ratio of integrated power in the fitted Gaussian to the supplied beam pattern is less than or equal to the given value. Defaults to 1.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>popt Optimal parameters for Gaussian. </dd>
-<dd>
-perr Standard deviations of optimal parameters. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>popt Optimal parameters for Gaussian. </dd></dl>
 
 </div>
 </div>
@@ -277,26 +276,8 @@ perr Standard deviations of optimal parameters. </dd></dl>
       </table>
 </div><div class="memdoc">
 
-<p>Generate a Gaussian pattern from Gaussian parameters. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">mask</td><td>Mask to apply to generated Gaussian. </td></tr>
-    <tr><td class="paramname">mode</td><td>Whether to generate the Gaussian in linear, decibel or logarithmic space. </td></tr>
-    <tr><td class="paramname">xy</td><td>Tuple containing x and y grids of surface of Gaussian. </td></tr>
-    <tr><td class="paramname">x0</td><td>Gaussian beamwidth in x-direction. </td></tr>
-    <tr><td class="paramname">y0</td><td>Gaussian beamwidth in y-direction. </td></tr>
-    <tr><td class="paramname">xs</td><td>Center in x-direction of Gaussian. </td></tr>
-    <tr><td class="paramname">ys</td><td>Center in y-direction of Gaussian. </td></tr>
-    <tr><td class="paramname">theta</td><td>Position angle of Gaussian.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Psi The Gaussian distribution. def GaussAbs(mask, mode, xy, x0, y0, xs, ys, theta): x, y = xy a = np.cos(theta)**2 / (2 * x0**2) + np.sin(theta)**2 / (2 * y0**2) c = np.sin(2 * theta) / (4 * x0**2) - np.sin(2 * theta) / (4 * y0**2) b = np.sin(theta)**2 / (2 * x0**2) + np.cos(theta)**2 / (2 * y0**2)</dd></dl>
-<p>if mode == "dB": Psi = 20*np.log10(np.exp(-(a*(x - xs)**2 + 2*c*(x - xs)*(y - ys) + b*(y - ys)**2)))</p>
-<p>elif mode == "linear": Psi = np.exp(-(a*(x - xs)**2 + 2*c*(x - xs)*(y - ys) + b*(y - ys)**2))</p>
-<p>elif mode == "log": Psi = -(a*(x - xs)**2 + 2*c*(x - xs)*(y - ys) + b*(y - ys)**2)</p>
-<p>return (Psi).ravel()</p>
-<p>Generate Absolute Gaussian from parameters. Called in optimalisation.</p>
+<p>Generate absolute Gaussian from parameters. </p>
+<p>Called in optimalisation. This method returns an overlap parameter of the fitted Gaussian .</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">p0</td><td>Array containing parameters for Gaussian. </td></tr>
@@ -340,13 +321,12 @@ perr Standard deviations of optimal parameters. </dd></dl>
       </table>
 </div><div class="memdoc">
 
-<p>Generate a Gaussian from surface parameters. </p>
+<p>Generate a Gaussian from Gaussian and surface parameters. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">fgs_out</td><td>Optimal Gaussian parameters. </td></tr>
+    <tr><td class="paramname">p0</td><td>Gaussian parameters. </td></tr>
     <tr><td class="paramname">surfaceObject</td><td>Surface on which Gaussian is defined. </td></tr>
-    <tr><td class="paramname">mode</td><td>Whether to fit Gaussian in linear, decibel or logarithmic space. </td></tr>
-    <tr><td class="paramname">mask</td><td>Mask to apply to Gaussian distribution.</td></tr>
+    <tr><td class="paramname">mode</td><td>Whether to generate Gaussian in linear, decibel or logarithmic space.</td></tr>
   </table>
   </dd>
 </dl>

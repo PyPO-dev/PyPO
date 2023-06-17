@@ -1,5 +1,5 @@
 from multiprocessing import Process
-from PySide2.QtCore import QThread, Signal, QObject
+from PySide6.QtCore import QThread, Signal, QObject
 from src.GUI.Dialogs import SymDialog
 from copy import deepcopy
 import src.PyPO.System as st

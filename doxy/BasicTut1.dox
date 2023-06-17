@@ -15,6 +15,7 @@ The reasons for choosing C/C++ are twofold:
 - The relative ease of interfacing C/C++ using `ctypes`,
 - our own familiarity with these languages.
 Because of the powerful computational abilities of current day GPUs, we have also written the libraries in CUDA. 
+This version is orders of magnitude faster for PO than the parallel CPU version and we highly recommend running `PyPO` on a system which has acces to an Nvidia card.
 This does necessitate an Nvidia card and GPU implementations in other frameworks (e.g. Metal for Apple) are always a welcome addition.
 
 The bottom layer takes care of the following tasks in `PyPO`:

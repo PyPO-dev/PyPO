@@ -1743,7 +1743,7 @@ class System(object):
         surfaceObj = self.system[self.fields[name_field].surf]
         field = self.copyObj(np.absolute(getattr(self.fields[name_field], comp)))
 
-        popt, perr = fgs.fitGaussAbs(field, surfaceObj, thres, mode, ratio)
+        popt = fgs.fitGaussAbs(field, surfaceObj, thres, mode, ratio)
 
         Psi = scalarfield(fgs.generateGauss(popt, surfaceObj, mode="linear"))
         Psi.setMeta(self.fields[name_field].surf, self.fields[name_field].k)
@@ -1758,7 +1758,7 @@ class System(object):
         self.scalarfields[_name] = Psi
 
         if full_output:
-            return popt, perr
+            return popt
 
     ##
     # Calculate main-beam efficiency of a beam pattern.
@@ -1829,7 +1829,7 @@ class System(object):
         self.snapObj(name_surf, "__pre")
 
         if center or align:
-            popt, perr = self.fitGaussAbs(name_field, comp, mode="linear", full_output=True)
+            popt = self.fitGaussAbs(name_field, comp, mode="linear", full_output=True)
         
         if center:
             self.translateGrids(name_surf, np.array([-popt[2], -popt[3], 0]))
@@ -1942,7 +1942,6 @@ class System(object):
 
         x_interp = np.linspace(np.min(x_strip), np.max(x_strip), num=len(x_strip) * interp)
         y_interp = np.linspace(np.min(y_strip), np.max(y_strip), num=len(y_strip) * interp)
-
         x_cut_interp = interp1d(x_strip, x_cut, kind="cubic")(x_interp)
         y_cut_interp = interp1d(y_strip, y_cut, kind="cubic")(y_interp)
 

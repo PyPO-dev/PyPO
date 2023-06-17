@@ -3,7 +3,7 @@ import os
 import pathlib
 import re
 
-nThreads_cpu = os.cpu_count()
+nThreads_cpu = os.cpu_count() - 1 if os.cpu_count() > 1 else 1
 
 from PyPO.PyPOTypes import *
 import PyPO.Config as Config

@@ -9,6 +9,9 @@ consisting of Azimuth and Elevation angles.
 Since these elements cannot reflect, we use these terms quite interchangeably. However, a far-field element will always be labelled an "element".
 For reflectors, we try to make clear that these are also elements, but sometimes we will use these terms interchangeably.
 
+It should also be noted that we use the term "quadrics" to describe a class of geometries which are commonly called "conics" in optics.
+We do this to stay as mathematically accurate as possible, since a "conic" in the strict sense refers to a one-dimensional "quadric".
+
 In `PyPO`, reflectors or optical elements in general are specified using dictionaries. 
 These dictionaries contain information such as the parameters defining the shape, the type of parametrisation to use for the gridding and the name of the reflector.
 Upon adding a reflector dictionary to the `System` object, it will be stored in the internal dictionary for reflectors and elements, called the system dictionary.

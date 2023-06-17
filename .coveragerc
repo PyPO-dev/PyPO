@@ -5,7 +5,12 @@ branch = True
 omit = 
     build/*
     tests/*
-    DevUtils.py
+    GenerateDocs.py
     GuiApp.py
     setup.py
     src/PyPO/__init__.py
+    src/PyPO/*.swp
+    src/PyPO/__pycache__/*
+    shibokensupport/*
+    pyscript
+    signature_bootstrap.py

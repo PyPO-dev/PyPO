@@ -6,6 +6,7 @@
     <!--<tab type="pages" visible="no" title="" intro=""/>-->
     <tab type="user" url="@ref explanations" visible="yes" title="Explanations"/>
     <tab type="user" url="@ref tutorials" visible="yes" title="Tutorials"/>
+    <tab type="user" url="@ref demos" visible="yes" title="Demonstrations"/>
     <tab type="user" url="@ref pypodocs" visible="yes" title="Documentation"/>
     <tab type="user" url="@ref contribguide" visible="yes" title="Contribution"/>
     <tab type="modules" visible="no" title="" intro=""/>

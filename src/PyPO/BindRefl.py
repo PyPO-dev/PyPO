@@ -13,11 +13,13 @@ from PyPO.PyPOTypes import *
 # Bindings for the ctypes interface for PyPO. 
 # These bindings are concerned with generation of reflector grids from dictionaries.
 
-##
-# Load the PyPOgpu shared library. Will detect the operating system and link the library accordingly.
-#
-# @returns lib The ctypes library containing the C/C++ functions.
 def loadRefllib():
+    """!
+    Load the PyPOrefl shared library. Will detect the operating system and link the library accordingly.
+
+    @returns lib The ctypes library containing the C/C++ functions.
+    """
+
     path_cur = pathlib.Path(__file__).parent.resolve()
     try:
         lib = ctypes.CDLL(os.path.join(path_cur, "libpyporefl.dll"))
@@ -29,20 +31,20 @@ def loadRefllib():
 
     return lib
 
-##
-# Double precision function for generating reflector grids.
-# This is the function called by the CPU PyPO bindings.
-# Also, when called from System, this is the binding that is called.
-# 
-# @param reflparams_py A reflDict dictionary.
-# @param transform Whether to generate the grid in nominal configuration or to apply transformation matrix.
-# @param spheric Convert Az-El co-ordinates to spherical (far-field only).
-#
-# @returns grids A reflGrids object. 
-def generateGrid(reflparams_py, transform=True, spheric=True):
-    
+def generateGrid(reflparams_py, transform=True, spheric=True): 
+    """!
+    Double precision function for generating reflector grids.
+    This is the function called by the CPU PyPO bindings.
+    Also, when called from System, this is the binding that is called.
+
+    @param reflparams_py A reflDict dictionary.
+    @param transform Whether to generate the grid in nominal configuration or to apply transformation matrix.
+    @param spheric Convert Az-El co-ordinates to spherical (far-field only).
+
+    @returns grids A reflGrids object. 
+    """
+
     lib = loadRefllib()
-    
 
     size = reflparams_py["gridsize"][0] * reflparams_py["gridsize"][1]
 
@@ -64,6 +66,3 @@ def generateGrid(reflparams_py, transform=True, spheric=True):
     
 
     return grids
-
-if __name__ == "__main__":
-    print("Bindings for PyPO reflectors.")

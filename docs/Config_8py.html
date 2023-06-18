@@ -113,16 +113,59 @@ $(document).ready(function(){initNavTree('Config_8py.html',''); initResizable();
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ae0a74218a3918b7d4fe6df901f0868af"><td class="memItemLeft" align="right" valign="top"><a id="ae0a74218a3918b7d4fe6df901f0868af" name="ae0a74218a3918b7d4fe6df901f0868af"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>PyPO.Config.setContext</b> (_context=None)</td></tr>
+<tr class="memitem:ae0a74218a3918b7d4fe6df901f0868af"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Config_8py.html#ae0a74218a3918b7d4fe6df901f0868af">PyPO.Config.setContext</a> (_context=None)</td></tr>
+<tr class="memdesc:ae0a74218a3918b7d4fe6df901f0868af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the context in which PyPO is run.  <br /></td></tr>
 <tr class="separator:ae0a74218a3918b7d4fe6df901f0868af"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2208b89cd44ecec30c6e9d06a841b115"><td class="memItemLeft" align="right" valign="top"><a id="a2208b89cd44ecec30c6e9d06a841b115" name="a2208b89cd44ecec30c6e9d06a841b115"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>PyPO.Config.setOverride</b> (_override=None)</td></tr>
+<tr class="memitem:a2208b89cd44ecec30c6e9d06a841b115"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Config_8py.html#a2208b89cd44ecec30c6e9d06a841b115">PyPO.Config.setOverride</a> (_override=None)</td></tr>
+<tr class="memdesc:a2208b89cd44ecec30c6e9d06a841b115"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the override parameter.  <br /></td></tr>
 <tr class="separator:a2208b89cd44ecec30c6e9d06a841b115"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Functions to set context for the logging and error checking. </p>
-</div></div><!-- contents -->
+</div><h2 class="groupheader">Function Documentation</h2>
+<a id="ae0a74218a3918b7d4fe6df901f0868af" name="ae0a74218a3918b7d4fe6df901f0868af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae0a74218a3918b7d4fe6df901f0868af">&#9670;&#160;</a></span>setContext()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def PyPO.Config.setContext </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>_context</em> = <code>None</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the context in which PyPO is run. </p>
+<p>If the context is set to "S", PyPO assumes it is run in scripting mode and use the regular output streams and methods. If the context is set to "G", PyPO assumes it is run in GUI mode and will not output to the standard output. Also, PyPO will use special GUI methods. </p>
+
+</div>
+</div>
+<a id="a2208b89cd44ecec30c6e9d06a841b115" name="a2208b89cd44ecec30c6e9d06a841b115"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2208b89cd44ecec30c6e9d06a841b115">&#9670;&#160;</a></span>setOverride()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def PyPO.Config.setOverride </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>_override</em> = <code>None</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the override parameter. </p>
+<p>If the parameter is set to True, PyPO will overwrite entries with identical names. If False, PyPO will append the number of occurences of the name to the name, so that there are no duplicates anymore. </p>
+
+</div>
+</div>
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

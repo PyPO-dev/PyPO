@@ -109,6 +109,9 @@ $(document).ready(function(){initNavTree('classPyPO_1_1Threadmgr_1_1Manager.html
   <div class="headertitle"><div class="title">PyPO.Threadmgr.Manager Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>This class generates a threadmanager object.  
+ <a href="classPyPO_1_1Threadmgr_1_1Manager.html#details">More...</a></p>
 <div class="dynheader">
 Inheritance diagram for PyPO.Threadmgr.Manager:</div>
 <div class="dyncontent">
@@ -137,7 +140,10 @@ Public Attributes</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><b>callback</b></td></tr>
 <tr class="separator:a419403077437b7e2d72ccf63121dc709"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<hr/>The documentation for this class was generated from the following file:<ul>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>This class generates a threadmanager object. </p>
+<p>This manager can start daemon threads and signal when the thread is finished. This class is only used to spawn calls to the C++/CUDA backend inside a daemon thread so that Python keeps control over the process. This allows users to Ctrl-c a running calculation in C++/CUDA from Python. </p>
+</div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>src/PyPO/<a class="el" href="Threadmgr_8py.html">Threadmgr.py</a></li>
 </ul>
 </div><!-- contents -->

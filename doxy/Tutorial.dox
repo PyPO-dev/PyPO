@@ -8,7 +8,7 @@ This set of tutorials demonstrates how to use `PyPO`, such as for making optical
 The set starts with tutorials on how to build optical systems and perform ray-traces through them.
 Then, the physical optics calculations are demonstrated.
 The final tutorials in this set are concerned with calculating metrics used in `PyPO`, such as aperture efficiency, and importing custom beam patterns.
-These tutorials are HTML renders of Jupyter notebooks. For the interactive versions, see the PyPO-tutorials/tutorials/ directory.
+These tutorials are HTML renders of Jupyter notebooks. For the interactive versions, see the "tutorials" folder in the root directory of `PyPO`.
 
 [Building an optical system and performing ray-traces](tutorials/Tutorial1.html)
 

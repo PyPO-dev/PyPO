@@ -1,6 +1,7 @@
 var NAVTREEINDEX0 =
 {
-"contribguide.html":[4],
+"@ref contribguide":[5],
+"demos.html":[3],
 "explanations.html":[1],
 "index.html":[0],
 "index.html":[],
@@ -19,6 +20,6 @@ var NAVTREEINDEX0 =
 "index.html#sdist":[0,1,0],
 "index.html#windows":[0,1,0,3],
 "pages.html":[],
-"pypodocs.html":[3],
+"pypodocs.html":[4],
 "tutorials.html":[2]
 };

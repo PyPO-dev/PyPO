@@ -11,21 +11,23 @@ from PyPO.MatUtils import *
 # @file
 # File containing methods for fitting Gaussian distributions to field components.
 
-##
-# Calculate estimates for beam parameters from an input field component.
-# These estimates are used as initial values for Gaussian fitting.
-#
-# @param x Grid of x co-ordinates of input field.
-# @param y Grid of y co-ordinates of input field.
-# @param area Grid of area elements.
-# @param field_norm Normalised input field component.
-#
-# @returns x0 Semi-major axis size of estimate.
-# @returns y0 Semi-minor axis size of estimate.
-# @returns xm Mean x-center of estimate.
-# @returns ym Mean y-center of estimate.
-# @returns theta Position angle of estimate.
 def calcEstimates(x, y, area, field_norm):
+    """!
+    Calculate estimates for beam parameters from an input field component.
+    These estimates are used as initial values for Gaussian fitting.
+
+    @param x Grid of x co-ordinates of input field.
+    @param y Grid of y co-ordinates of input field.
+    @param area Grid of area elements.
+    @param field_norm Normalised input field component.
+
+    @returns x0 Semi-major axis size of estimate.
+    @returns y0 Semi-minor axis size of estimate.
+    @returns xm Mean x-center of estimate.
+    @returns ym Mean y-center of estimate.
+    @returns theta Position angle of estimate.
+    """
+
     M0 = np.sum(field_norm)
     xm = np.sum(x * field_norm) / M0
     ym = np.sum(y * field_norm) / M0
@@ -67,19 +69,21 @@ def calcEstimates(x, y, area, field_norm):
     y0 = np.sqrt(_y0)
     return x0, y0, xm, ym, theta
 
-##
-# Fit a Gaussian to an amplitude pattern of a field component.
-# First, the center and position angle of the pattern is calculated using the method of image moments.
-# Then, local maxima that might interfere with fitting are removed using the findConnectedSubsets method from MatUtils.py.
-#
-# @param field Component of field to fit.
-# @param surfaceObject Surface on which the field is defined.
-# @param thres Threshold for fitting in decibels.
-# @param mode Whether to fit the Gaussian in linear, decibel or logarithmic space.
-# @param ratio Allowed maximal ratio of fit to actual beam. If "None", will just attempt to fit the Gaussian to supplied pattern. If given, will only accept a fit if the ratio of integrated power in the fitted Gaussian to the supplied beam pattern is less than or equal to the given value. Defaults to 1.
-#
-# @returns popt Optimal parameters for Gaussian.
 def fitGaussAbs(field, surfaceObject, thres, mode, ratio=1):
+    """!
+    Fit a Gaussian to an amplitude pattern of a field component.
+    First, the center and position angle of the pattern is calculated using the method of image moments.
+    Then, local maxima that might interfere with fitting are removed using the findConnectedSubsets method from MatUtils.py.
+
+    @param field Component of field to fit.
+    @param surfaceObject Surface on which the field is defined.
+    @param thres Threshold for fitting in decibels.
+    @param mode Whether to fit the Gaussian in linear, decibel or logarithmic space.
+    @param ratio Allowed maximal ratio of fit to actual beam. If "None", will just attempt to fit the Gaussian to supplied pattern. If given, will only accept a fit if the ratio of integrated power in the fitted Gaussian to the supplied beam pattern is less than or equal to the given value. Defaults to 1.
+
+    @returns popt Optimal parameters for Gaussian.
+    """
+
     global thres_g
     thres_g = thres
     
@@ -173,15 +177,17 @@ def fitGaussAbs(field, surfaceObject, thres, mode, ratio=1):
 
     return popt
 
-## 
-# Generate absolute Gaussian from parameters.
-# Called in optimalisation. This method returns an overlap parameter of the fitted Gaussian .
-#
-# @param p0 Array containing parameters for Gaussian.
-# @param args Extra arguments for defining Gaussian and fit.
-#
-# @returns epsilon Coupling of field with Gaussian.
 def GaussAbs(p0, *args):
+    """!
+    Generate absolute Gaussian from parameters.
+    Called in optimalisation. This method returns an overlap parameter of the fitted Gaussian .
+
+    @param p0 Array containing parameters for Gaussian.
+    @param args Extra arguments for defining Gaussian and fit.
+
+    @returns epsilon Coupling of field with Gaussian.
+    """
+
     surfaceObject, field_est, mask, mode = args
     Psi = generateGauss(p0, surfaceObject, mode)
     coup = np.sum(np.absolute(Psi[mask])**2) / np.sum(np.absolute(field_est[mask])**2)
@@ -198,15 +204,17 @@ def GaussAbs(p0, *args):
     
     return epsilon
 
-##
-# Generate a Gaussian from Gaussian and surface parameters.
-#
-# @param p0 Gaussian parameters.
-# @param surfaceObject Surface on which Gaussian is defined.
-# @param mode Whether to generate Gaussian in linear, decibel or logarithmic space.
-#
-# @returns Psi Gaussian distribution.
 def generateGauss(p0, surfaceObject, mode):
+    """!
+    Generate a Gaussian from Gaussian and surface parameters.
+
+    @param p0 Gaussian parameters.
+    @param surfaceObject Surface on which Gaussian is defined.
+    @param mode Whether to generate Gaussian in linear, decibel or logarithmic space.
+
+    @returns Psi Gaussian distribution.
+    """
+
     x0, y0, xs, ys, theta, amp = p0
     
     grids = generateGrid(surfaceObject, transform=True, spheric=False)

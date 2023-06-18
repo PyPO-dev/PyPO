@@ -14,11 +14,13 @@ import PyPO.Threadmgr as TManager
 # Bindings for the ctypes interface for PyPO. 
 # These bindings are concerned with propagations for the ray-tracer and the physical optics on the GPU.
 
-##
-# Load the pypogpu shared library. Will detect the operating system and link the library accordingly.
-#
-# @returns lib The ctypes library containing the C/C++ functions.
 def loadGPUlib():
+    """!
+    Load the pypogpu shared library. Will detect the operating system and link the library accordingly.
+
+    @returns lib The ctypes library containing the C/C++ functions.
+    """
+
     path_cur = pathlib.Path(__file__).parent.resolve()
     try:
         lib = ctypes.CDLL(os.path.join(path_cur, "libpypogpu.dll"))
@@ -77,18 +79,20 @@ def loadGPUlib():
 
     return lib
 
-##
-# Perform a PO propagation on the GPU.
-# Note that the calculations are always done in single precision for the GPU.
-# Depending on the 'mode' parameter in the runPODict, this function returns different objects.
-# Please see the dictionary templates for an overview.
-#
-# @param source A reflDict dictionary of the surface on which the source currents/scalarfields are defined.
-# @param target A reflDict dictionary of the target surface on which the results are calculated.
-# @param runPODict A runPODict dictionary containing the relevant propagation parameters.
-#
-# @see runPODict
 def PyPO_GPUf(source, target, runPODict):
+    """!
+    Perform a PO propagation on the GPU.
+    Note that the calculations are always done in single precision for the GPU.
+    Depending on the 'mode' parameter in the runPODict, this function returns different objects.
+    Please see the dictionary templates for an overview.
+
+    @param source A reflDict dictionary of the surface on which the source currents/scalarfields are defined.
+    @param target A reflDict dictionary of the target surface on which the results are calculated.
+    @param runPODict A runPODict dictionary containing the relevant propagation parameters.
+
+    @see runPODict
+    """
+
     lib = loadGPUlib()
     mgr = TManager.Manager(Config.context)
 
@@ -218,14 +222,16 @@ def PyPO_GPUf(source, target, runPODict):
 
         return S
 
-##
-# Perform an RT propagation on the GPU.
-# Note that the calculations are always done in single precision for the GPU.
-#
-# @param runRTDict A runRTDict dictionary containing the relevant propagation parameters.
-#
-# @see runRTDict
 def RT_GPUf(runRTDict):
+    """!
+    Perform an RT propagation on the GPU.
+    Note that the calculations are always done in single precision for the GPU.
+
+    @param runRTDict A runRTDict dictionary containing the relevant propagation parameters.
+
+    @see runRTDict
+    """
+
     lib = loadGPUlib()
     mgr = TManager.Manager(Config.context)
 
@@ -255,5 +261,3 @@ def RT_GPUf(runRTDict):
 
     return fr_out
 
-if __name__ == "__main__":
-    print("Bindings for PyPO GPU.")

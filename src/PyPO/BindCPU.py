@@ -13,11 +13,13 @@ import PyPO.Threadmgr as TManager
 # Bindings for the ctypes interface for PyPO. 
 # These bindings are concerned with propagations for the ray-tracer and the physical optics on the CPU.
 
-##
-# Load the PyPOcpu shared library. Will detect the operating system and link the library accordingly.
-#
-# @returns lib The ctypes library containing the C/C++ functions.
 def loadCPUlib():
+    """!
+    Load the PyPOcpu shared library. Will detect the operating system and link the library accordingly.
+
+    @returns lib The ctypes library containing the C/C++ functions.
+    """
+
     path_cur = pathlib.Path(__file__).parent.resolve()
     try:
         lib = ctypes.CDLL(os.path.join(path_cur, "libpypocpu.dll"))
@@ -76,18 +78,20 @@ def loadCPUlib():
 
     return lib
 
-##
-# Perform a PO propagation on the CPU.
-# Note that the calculations are always done in double precision for the CPU.
-# Depending on the 'mode' parameter in the runPODict, this function returns different objects.
-# Please see the dictionary templates for an overview.
-#
-# @param source A reflDict dictionary of the surface on which the source currents/scalarfields are defined.
-# @param target A reflDict dictionary of the target surface on which the results are calculated.
-# @param runPODict A runPODict dictionary containing the relevant propagation parameters.
-#
-# @see runPODict
 def PyPO_CPUd(source, target, runPODict):
+    """!
+    Perform a PO propagation on the CPU.
+    Note that the calculations are always done in double precision for the CPU.
+    Depending on the 'mode' parameter in the runPODict, this function returns different objects.
+    Please see the dictionary templates for an overview.
+
+    @param source A reflDict dictionary of the surface on which the source currents/scalarfields are defined.
+    @param target A reflDict dictionary of the target surface on which the results are calculated.
+    @param runPODict A runPODict dictionary containing the relevant propagation parameters.
+
+    @see runPODict
+    """
+
     lib = loadCPUlib()
     mgr = TManager.Manager(Config.context)
 
@@ -214,14 +218,16 @@ def PyPO_CPUd(source, target, runPODict):
 
         return EH
 
-##
-# Perform an RT propagation on the CPU.
-# Note that the calculations are always done in double precision for the CPU.
-#
-# @param runRTDict A runRTDict dictionary containing the relevant propagation parameters.
-#
-# @see runRTDict
 def RT_CPUd(runRTDict):
+    """!
+    Perform an RT propagation on the CPU.
+    Note that the calculations are always done in double precision for the CPU.
+
+    @param runRTDict A runRTDict dictionary containing the relevant propagation parameters.
+
+    @see runRTDict
+    """
+
     lib = loadCPUlib()
     mgr = TManager.Manager(Config.context)
 

@@ -1,0 +1,14 @@
+/** 
+\page demos Demonstrations
+These demos are developed to show how to use `PyPO` by carrying out a few validation tests.
+They contain less instructions than the tutorials and are more structured like actual scripts.
+These demos are also included in the "demos" folder of the `PyPO` root directory as interactive Jupyter notebooks.
+
+[Inspecting phase conservation of backwards propagation](demos/Demo1.html)
+
+[Diffraction from a uniform current distribution on a disk](demos/Demo2.html)
+
+[Diffraction from a uniform current distribution on a square](demos/Demo3.html)
+
+[Diffraction from a double slit](demos/Demo4.html)
+*/

@@ -74,7 +74,10 @@ Note that this does not remove the compiled libraries in the "src/PyPO/" folder.
 \subsection gendoc Generating Documentation
 `PyPO` documentation is generated using Doxygen and generated from comment blocks.
 Because of this, there are several rules for developers regarding comments.
-The C/C++/CUDA scripts use the so-called [Javadoc](https://en.wikipedia.org/wiki/Javadoc) style:
+
+\subsubsection cppcuda_docs C/C++ And CUDA Source
+The C/C++/CUDA scripts use the so-called [Javadoc](https://en.wikipedia.org/wiki/Javadoc) style
+for documenting classes and methods:
 ```
 /**
  * Here comes a short description describing in keywords what the function does
@@ -93,32 +96,94 @@ outputObject someFunc(inputObject input) {
 }
 ```
 
-The Python scripts are not documented using docstrings, as Doxygen's special commands are not supported using docstrings.
-Instead, we use another style, called the doxygen style:
+In addition to properly documented classes and methods, each file should include a file description with an appropriate tag, so that doxygen can include the file in the \ref fulldocs "full software documentation". 
+The file description should be given after includes/preprocessor statements, but before the first class or method is declared:
 ```
-##
-# Here comes a short description describing in keywords what the function does
-#
-# Followed by a longer description, placing the function's usage in a broader perspective perhaps.
-#
-# @param input Some input parameter of type inputObject.
-# @return output Some output parameter of type outputObject.
-#
-# @see inputObject
-# @see outputObject
+<includes/preprocessor statements up here...>
+
+/*! \file someFile.cpp
+    \brief A brief description of the file.
+
+    Here a longer description of this file should be placed.
+*/
+
+<rest of script down here...>
+```
+
+\subsubsection python_docs Python Source
+
+The Python classes and methods are documented using docstrings with a slight twist, as Doxygen's special commands are not supported using pure docstrings.
+The trick to making doxygens special commands work with docstrings, is placing an exclamation mark right after the first triple double quotes:
+```
 def someFunc(inputObject):
+    """!
+    Here comes a short description describing in keywords what the function does
+
+    Followed by a longer description, placing the function's usage in a broader perspective perhaps.
+
+    @param input Some input parameter of type inputObject.
+    @return output Some output parameter of type outputObject.
+
+    @see inputObject
+    @see outputObject
+    """
+    
     ...
     return output
 ```
 
+The exclamation mark tells doxygen to parse the docstring as a doxygen documentation block. 
+This allows doxygen to generate documentation, while also allowing the built-in `help()` function of Python to recognise the docstring, albeit with a lone "!" preoending the output of `help()`.
+
+We realise that this is slightly unorthodox, but in this way we can generate documentation using doxygen whilst still using a docstring style that utilises the `__docs__` method of the function being documented. 
+
+Because docstrings cannot be used as file descriptions, we use a different style to describe files.
+Just as for C/C++/CUDA, file descriptions go after import statements and before the classes and/or methods in the file:
+
+```
+<import statements up here...>
+
+##
+# @file
+# Here comes a brief description of the file.
+#
+# If needed, provide a detailed description here.
+
+<rest of script down here...>
+```
+
+Again, adding these file descriptions is important, otherwise the file will not be parsed and added to the \ref fulldocs "full software documentation".
+
+There is one notable exception, however. The "Templates.py" file containing templates for all used dictionary inputs is documented in the following style:
+
+```
+##
+# Description of input dictionary
+#
+# @ingroup public_api_templates
+dict = {
+    "field1"    : "Description of field 1",
+    "field2"    : "Description of field 2",
+    ...
+}
+```
+
+It is important to add the `@ingroup public_api_templates` command to the documentation block, as this puts the documentation on the right page in the final HTML output.
+Also, if you add a new input dictionary type, please document the meaning of each field in the demonstrated way.
+
+\subsubsection extra_reading Extra Reading
+
 For an overview of the mentioned (and other) comment styles for doxygen, see [this link](https://www.doxygen.nl/manual/docblocks.html).
+
+\subsubsection generating_docs Generating Documentation
 
 The documentation can be generated using the `GenerateDocs.py` script:
 ```
-python GenerateDocs.py
+python3 GenerateDocs.py
 ```
 
 This will generate the full `PyPO` user manual and place it in the "docs/" directory.
+Note that this requires a full doxygen install. Please see their [installation page](https://www.doxygen.nl/manual/install.html) for installation instructions.
 
 \subsection runtests Running The Automated Tests
 `PyPO` contains an automated testing suite that can be run quite easily from the command line using nose2.
@@ -148,17 +213,3 @@ nose2 --with-coverage
 ```
 
 and the coverage report will be displayed in the terminal after running the tests.
-
-\subsection mantests Running The Manual Tests
-In addition to automated unit tests, `PyPO` also contains a few manual tests.
-These tests are designed to check the correctness of `PyPO` from the physics perspective and produce plots that can be inspected and checked.
-
-To run a manual test, navigate to the "manual_tests" directory in the `PyPO` root directory and run:
-```
-python <name_of_manual_test>.py
-```
-
-Please note that some of these tests could take some time to calculate, especially if CUDA is not used.
-As new manual tests are often added, there is no definite list of available tests.
-Please have a look in the "manual_tests" folder for currently available tests.
-*/

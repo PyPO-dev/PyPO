@@ -15,39 +15,40 @@ from PyPO.BindRefl import *
 # @file
 # File containing functions for generating plots.
 
-##
-# Generate a 2D plot of a field or current.
-#
-# @param plotObject A reflDict containing surface on which to plot beam. 
-# @param field PyPO field or current component to plot.
-# @param contour A PyPO field or current component to plot as contour.
-# @param vmin Minimum amplitude value to display. Default is -30.
-# @param vmax Maximum amplitude value to display. Default is 0.
-# @param levels Levels for contourplot.
-# @param show Show plot. Default is True.
-# @param amp_only Only plot amplitude pattern. Default is False.
-# @param save Save plot to /images/ folder.
-# @param interpolation What interpolation to use for displaying amplitude pattern. Default is None.
-# @param norm Normalise field (only relevant when plotting linear scale).
-# @param aperDict Plot an aperture defined in an aperDict object along with the field or current patterns. Default is None.
-# @param mode Plot amplitude in decibels ("dB") or on a linear scale ("linear"). Default is "dB".
-# @param project Set abscissa and ordinate of plot. Should be given as a string. Default is "xy".
-# @param units The units of the axes. Default is "", which is millimeters.
-# @param name Name of .png file where plot is saved. Only when save=True. Default is "".
-# @param titleA Title of the amplitude plot. Default is "Amp".
-# @param titleP Title of the phase plot. Default is "Phase".
-# @param savePath Path where plot will be saved if save = True.
-# @param unwrap_phase Unwrap the phase patter. Prevents annular structure in phase pattern. Default is False.
-#
-# @returns fig Figure object containing plot.
-# @returns ax Axes containing the axes of the plot.
-#
-# @see aperDict
 def plotBeam2D(plotObject, field, contour,
                 vmin, vmax, levels, show, amp_only,
                 save, interpolation, norm,
                 aperDict, mode, project,
                 units, name, titleA, titleP, savePath, unwrap_phase):
+    """!
+    Generate a 2D plot of a field or current.
+
+    @param plotObject A reflDict containing surface on which to plot beam. 
+    @param field PyPO field or current component to plot.
+    @param contour A PyPO field or current component to plot as contour.
+    @param vmin Minimum amplitude value to display. Default is -30.
+    @param vmax Maximum amplitude value to display. Default is 0.
+    @param levels Levels for contourplot.
+    @param show Show plot. Default is True.
+    @param amp_only Only plot amplitude pattern. Default is False.
+    @param save Save plot to /images/ folder.
+    @param interpolation What interpolation to use for displaying amplitude pattern. Default is None.
+    @param norm Normalise field (only relevant when plotting linear scale).
+    @param aperDict Plot an aperture defined in an aperDict object along with the field or current patterns. Default is None.
+    @param mode Plot amplitude in decibels ("dB") or on a linear scale ("linear"). Default is "dB".
+    @param project Set abscissa and ordinate of plot. Should be given as a string. Default is "xy".
+    @param units The units of the axes. Default is "", which is millimeters.
+    @param name Name of .png file where plot is saved. Only when save=True. Default is "".
+    @param titleA Title of the amplitude plot. Default is "Amp".
+    @param titleP Title of the phase plot. Default is "Phase".
+    @param savePath Path where plot will be saved if save = True.
+    @param unwrap_phase Unwrap the phase patter. Prevents annular structure in phase pattern. Default is False.
+
+    @returns fig Figure object containing plot.
+    @returns ax Axes containing the axes of the plot.
+
+    @see aperDict
+    """
 
     # With far-field, generate grid without converting to spherical
     max_field = np.max(np.absolute(field))
@@ -264,19 +265,20 @@ def plotBeam2D(plotObject, field, contour,
 
     return fig, ax
 
-##
-# Plot a 3D reflector.
-#
-# @param plotObject A reflDict containing surface on which to plot beam. 
-# @param ax Axis to use for plotting.
-# @param fine Spacing of normals for plotting.
-# @param cmap Colormap of reflector.
-# @param norm Plot reflector normals.
-# @param foc1 Plot focus 1.
-# @param foc2 Plot focus 2.
-# @param plotSystem_f Whether or not plot3D is called from plotSystem.
 def plot3D(plotObject, ax, fine, cmap,
             norm, foc1, foc2, plotSystem_f=False):
+    """!
+    Plot a 3D reflector.
+
+    @param plotObject A reflDict containing surface on which to plot beam. 
+    @param ax Axis to use for plotting.
+    @param fine Spacing of normals for plotting.
+    @param cmap Colormap of reflector.
+    @param norm Plot reflector normals.
+    @param foc1 Plot focus 1.
+    @param foc2 Plot focus 2.
+    @param plotSystem_f Whether or not plot3D is called from plotSystem.
+    """
 
     skip = slice(None,None,fine)
     grids = generateGrid(plotObject, transform=True, spheric=True)
@@ -309,19 +311,20 @@ def plot3D(plotObject, ax, fine, cmap,
 
     del grids
 
-##
-# Plot the system.
-#
-# @param systemDict Dictionary containing the reflectors to be plotted.
-# @param ax Axis of plot.
-# @param fine Spacing of normals for plotting.
-# @param cmap Colormap of reflector.
-# @param norm Plot reflector normals.
-# @param foc1 Plot focus 1.
-# @param foc2 Plot focus 2.
-# @param RTframes List containing frames to be plotted.
 def plotSystem(systemDict, ax, fine, cmap,norm,
             foc1, foc2, RTframes, RTcolor):
+    """!
+    Plot the system.
+
+    @param systemDict Dictionary containing the reflectors to be plotted.
+    @param ax Axis of plot.
+    @param fine Spacing of normals for plotting.
+    @param cmap Colormap of reflector.
+    @param norm Plot reflector normals.
+    @param foc1 Plot focus 1.
+    @param foc2 Plot focus 2.
+    @param RTframes List containing frames to be plotted.
+    """
 
     for i, (key, refl) in enumerate(systemDict.items()):
         if isinstance(cmap, list):
@@ -360,20 +363,22 @@ def plotSystem(systemDict, ax, fine, cmap,norm,
     #ax.set_box_aspect((1,1,1))
     ax.set_box_aspect((world_limits[1]-world_limits[0],world_limits[3]-world_limits[2],world_limits[5]-world_limits[4]))
 
-##
-# Plot two beam cuts in the same figure.
-#
-# @param x_cut E-plane.
-# @param y_cut H-plane.
-# @param x_strip Co-ordinates for plotting E-plane.
-# @param y_strip Co-ordinates for plotting H-plane.
-# @param vmin Minimum for plot range.
-# @param vmax Maximum for plot range.
-# @param unit for x-axis.
-#
-# @returns fig Plot figure.
-# @returns ax Plot axis.
 def plotBeamCut(x_cut, y_cut, x_strip, y_strip, vmin, vmax, unit):
+    """!
+    Plot two beam cuts in the same figure.
+
+    @param x_cut E-plane.
+    @param y_cut H-plane.
+    @param x_strip Co-ordinates for plotting E-plane.
+    @param y_strip Co-ordinates for plotting H-plane.
+    @param vmin Minimum for plot range.
+    @param vmax Maximum for plot range.
+    @param unit for x-axis.
+
+    @returns fig Plot figure.
+    @returns ax Plot axis.
+    """
+
     fig, ax = pt.subplots(1,1, figsize=(5,5))
 
     ax.plot(x_strip * unit[1], x_cut, color="blue", label="E-plane")
@@ -388,17 +393,18 @@ def plotBeamCut(x_cut, y_cut, x_strip, y_strip, vmin, vmax, unit):
 
     return fig, ax
 
-
-##
-# Plot a ray-trace frame spot diagram.
-#
-# @param frame A PyPO frame object.
-# @param project Set abscissa and ordinate of plot. Should be given as a string.
-# @param savePath Path to save plot to.
-# @param returns Whether to return figure object.
-# @param aspect Aspect ratio of plot.
-# @param unit Units of the axes for the plot.
 def plotRTframe(frame, project, savePath, returns, aspect, unit):
+    """!
+    Plot a ray-trace frame spot diagram.
+
+    @param frame A PyPO frame object.
+    @param project Set abscissa and ordinate of plot. Should be given as a string.
+    @param savePath Path to save plot to.
+    @param returns Whether to return figure object.
+    @param aspect Aspect ratio of plot.
+    @param unit Units of the axes for the plot.
+    """
+
     fig, ax = pt.subplots(1,1, figsize=(5,5))
 
     idx_good = np.argwhere((frame.dx**2 + frame.dy**2 + frame.dz**2) > 0.8)

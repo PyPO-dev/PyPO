@@ -10,55 +10,61 @@ import PyPO.Config as Config
 # deallocating data. Also, Python types and PyPO objects are converted to ctypes structs here and vice versa.
 # After converting to a ctypes struct, the struct is passed to the C/C++ source code and converted to a proper C/C++ struct for further usage.
 
-##
-# Convert a PyPO scalarfield object to a ctypes struct. 
-#
-# @params field A PyPO scalarfield object.
-# @params c_field A ctypes arrC1 or arrC1f struct.
-# @param size Number of points in fields object.
-# @param ct_t Type of the floating point numbers for ctypes.
-#
-# @see scalarfield
-# @see arrC1
-# @see arrC1f
 def sfieldConv(field, c_field, size, ct_t):
+    """!
+    Convert a PyPO scalarfield object to a ctypes struct. 
+
+    @params field A PyPO scalarfield object.
+    @params c_field A ctypes arrC1 or arrC1f struct.
+    @param size Number of points in fields object.
+    @param ct_t Type of the floating point numbers for ctypes.
+
+    @see scalarfield
+    @see arrC1
+    @see arrC1f
+    """
+
     c_field.x = (ct_t * size)(*np.real(field.S).ravel().tolist())
     c_field.y = (ct_t * size)(*np.imag(field.S).ravel().tolist())
 
-##
-# Convert a ctypes arrC1 or arrC1f struct to a PyPO scalarfield.
-# 
-# @param res An arrC1 or arrC1f struct containing the scalarfield.
-# @param shape The shape of the scalarfield.
-# @param np_t Type of data in numpy array to be filled.
-#
-# @returns res PyPO scalarfield object.
-#
-# @see arrC1
-# @see arrC1f
-# @see scalarfield
 def arrC1ToObj(res, shape, np_t):
+    """!
+    Convert a ctypes arrC1 or arrC1f struct to a PyPO scalarfield.
+
+    @param res An arrC1 or arrC1f struct containing the scalarfield.
+    @param shape The shape of the scalarfield.
+    @param np_t Type of data in numpy array to be filled.
+
+    @returns res PyPO scalarfield object.
+
+    @see arrC1
+    @see arrC1f
+    @see scalarfield
+    """
+
     obj = np.ctypeslib.as_array(res.x, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.y, shape=shape).astype(np_t)
 
     res = scalarfield(obj)
 
     return res
 
-##
-# Convert a ctypes c2Bundle or c2Bundlef to a PyPO fields or currents object.
-#
-# @param res A c2Bundle or c2Bundlef struct.
-# @param shape Shape of the fields or currents object.
-# @param obj_t Whether to convert to a fields or currents object.
-# @param np_t Type of data in numpy array to be filled.
-#
-# @returns out A fields or currents object filled with incoming EH fields or JM currents..
-#
-# @see c2Bundle 
-# @see c2Bundlef
-# @see fields
-# @see currents
 def c2BundleToObj(res, shape, obj_t, np_t):
+    """!
+    Convert a ctypes c2Bundle or c2Bundlef to a PyPO fields or currents object.
+
+    @param res A c2Bundle or c2Bundlef struct.
+    @param shape Shape of the fields or currents object.
+    @param obj_t Whether to convert to a fields or currents object.
+    @param np_t Type of data in numpy array to be filled.
+
+    @returns out A fields or currents object filled with incoming EH fields or JM currents..
+
+    @see c2Bundle 
+    @see c2Bundlef
+    @see fields
+    @see currents
+    """
+
     x1 = np.ctypeslib.as_array(res.r1x, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i1x, shape=shape).astype(np_t)
     y1 = np.ctypeslib.as_array(res.r1y, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i1y, shape=shape).astype(np_t)
     z1 = np.ctypeslib.as_array(res.r1z, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i1z, shape=shape).astype(np_t)
@@ -75,21 +81,23 @@ def c2BundleToObj(res, shape, obj_t, np_t):
 
     return out
 
-##
-# Convert a ctypes c4Bundle or c4Bundlef to a PyPO fields and currents object.
-#
-# @param res A c4Bundle or c4Bundlef struct.
-# @param shape Shape of the fields and currents object.
-# @param np_t Type of data in numpy array to be filled.
-#
-# @returns out1 A fields object filled with incoming EH fields.
-# @returns out2 A currents object filled with JM currents.
-#
-# @see c4Bundle 
-# @see c4Bundlef
-# @see fields
-# @see currents
 def c4BundleToObj(res, shape, np_t):
+    """!
+    Convert a ctypes c4Bundle or c4Bundlef to a PyPO fields and currents object.
+
+    @param res A c4Bundle or c4Bundlef struct.
+    @param shape Shape of the fields and currents object.
+    @param np_t Type of data in numpy array to be filled.
+
+    @returns out1 A fields object filled with incoming EH fields.
+    @returns out2 A currents object filled with JM currents.
+
+    @see c4Bundle 
+    @see c4Bundlef
+    @see fields
+    @see currents
+    """
+
     x1 = np.ctypeslib.as_array(res.r1x, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i1x, shape=shape).astype(np_t)
     y1 = np.ctypeslib.as_array(res.r1y, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i1y, shape=shape).astype(np_t)
     z1 = np.ctypeslib.as_array(res.r1z, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i1z, shape=shape).astype(np_t)
@@ -111,22 +119,24 @@ def c4BundleToObj(res, shape, np_t):
 
     return out1, out2
 
-##
-# Convert a ctypes c2rBundle or c2rBundlef to a PyPO fields and rfield object.
-# The rfield will be filled by the calculated Poynting vectors.
-#
-# @param res A c2Bundle or c2rBundlef struct.
-# @param shape Shape of the fields and rfield object.
-# @param np_t Type of data in numpy array to be filled.
-#
-# @returns out1 A fields object filled with reflected EH fields.
-# @returns out2 An rfield object filled with reflected Poynting vectors.
-#
-# @see c2rBundle 
-# @see c2rBundlef
-# @see fields
-# @see rfields
 def c2rBundleToObj(res, shape, np_t):
+    """!
+    Convert a ctypes c2rBundle or c2rBundlef to a PyPO fields and rfield object.
+    The rfield will be filled by the calculated Poynting vectors.
+
+    @param res A c2Bundle or c2rBundlef struct.
+    @param shape Shape of the fields and rfield object.
+    @param np_t Type of data in numpy array to be filled.
+
+    @returns out1 A fields object filled with reflected EH fields.
+    @returns out2 An rfield object filled with reflected Poynting vectors.
+
+    @see c2rBundle 
+    @see c2rBundlef
+    @see fields
+    @see rfields
+    """
+
     x1 = np.ctypeslib.as_array(res.r1x, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i1x, shape=shape).astype(np_t)
     y1 = np.ctypeslib.as_array(res.r1y, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i1y, shape=shape).astype(np_t)
     z1 = np.ctypeslib.as_array(res.r1z, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i1z, shape=shape).astype(np_t)
@@ -144,29 +154,33 @@ def c2rBundleToObj(res, shape, np_t):
 
     return out1, out2
 
-##
-# allocate a ctypes arrC1 or arrC1f struct. Struct is then passed to and filled by the C/C++ code.
-#
-# @param res The arrC1 or arrC1f struct.
-# @param size Number of points in struct.
-# @param ct_t Type of point in struct.
-#
-# @see arrC1
-# @see arrC1f
 def allocate_arrC1(res, size, ct_t):
+    """!
+    allocate a ctypes arrC1 or arrC1f struct. Struct is then passed to and filled by the C/C++ code.
+
+    @param res The arrC1 or arrC1f struct.
+    @param size Number of points in struct.
+    @param ct_t Type of point in struct.
+
+    @see arrC1
+    @see arrC1f
+    """
+
     res.x = (ct_t * size)()
     res.y = (ct_t * size)()
 
-##
-# allocate a ctypes c2Bundle or c2Bundlef struct. Struct is then passed to and filled by the C/C++ code.
-#
-# @param res The c2Bundle or c2Bundlef struct.
-# @param size Number of points in struct.
-# @param ct_t Type of point in struct.
-#
-# @see c2Bundle
-# @see c2Bundlef
 def allocate_c2Bundle(res, size, ct_t):
+    """!
+    allocate a ctypes c2Bundle or c2Bundlef struct. Struct is then passed to and filled by the C/C++ code.
+
+    @param res The c2Bundle or c2Bundlef struct.
+    @param size Number of points in struct.
+    @param ct_t Type of point in struct.
+
+    @see c2Bundle
+    @see c2Bundlef
+    """
+
     res.r1x = (ct_t * size)()
     res.r1y = (ct_t * size)()
     res.r1z = (ct_t * size)()
@@ -183,16 +197,18 @@ def allocate_c2Bundle(res, size, ct_t):
     res.i2y = (ct_t * size)()
     res.i2z = (ct_t * size)()
 
-##
-# allocate a ctypes c4Bundle or c4Bundlef struct. Struct is then passed to and filled by the C/C++ code.
-#
-# @param res The c4Bundle or c4Bundlef struct.
-# @param size Number of points in struct.
-# @param ct_t Type of point in struct.
-#
-# @see c4Bundle
-# @see c4Bundlef
 def allocate_c4Bundle(res, size, ct_t):
+    """!
+    allocate a ctypes c4Bundle or c4Bundlef struct. Struct is then passed to and filled by the C/C++ code.
+
+    @param res The c4Bundle or c4Bundlef struct.
+    @param size Number of points in struct.
+    @param ct_t Type of point in struct.
+
+    @see c4Bundle
+    @see c4Bundlef
+    """
+
     res.r1x = (ct_t * size)()
     res.r1y = (ct_t * size)()
     res.r1z = (ct_t * size)()
@@ -225,16 +241,18 @@ def allocate_c4Bundle(res, size, ct_t):
     res.i4y = (ct_t * size)()
     res.i4z = (ct_t * size)()
 
-##
-# allocate a ctypes c2rBundle or c2rBundlef struct. Struct is then passed to and filled by the C/C++ code.
-#
-# @param res The c2rBundle or c2rBundlef struct.
-# @param size Number of points in struct.
-# @param ct_t Type of point in struct.
-#
-# @see c2rBundle
-# @see c2rBundlef
 def allocate_c2rBundle(res, size, ct_t):
+    """!
+    allocate a ctypes c2rBundle or c2rBundlef struct. Struct is then passed to and filled by the C/C++ code.
+
+    @param res The c2rBundle or c2rBundlef struct.
+    @param size Number of points in struct.
+    @param ct_t Type of point in struct.
+
+    @see c2rBundle
+    @see c2rBundlef
+    """
+
     res.r1x = (ct_t * size)()
     res.r1y = (ct_t * size)()
     res.r1z = (ct_t * size)()
@@ -255,17 +273,19 @@ def allocate_c2rBundle(res, size, ct_t):
     res.r3y = (ct_t * size)()
     res.r3z = (ct_t * size)()
 
-##
-# Allocate and fill ctypes reflparams or reflparamsf from a reflDict.
-#
-# @param inp A ctypes reflparams or reflparamsf struct.
-# @param reflparams_py PyPO reflDict dictionary.
-# @param ct_t Type of point in struct.
-#
-# @see reflparams
-# @see reflparamsf
-# @see reflDict
 def allfill_reflparams(inp, reflparams_py, ct_t):
+    """!
+    Allocate and fill ctypes reflparams or reflparamsf from a reflDict.
+
+    @param inp A ctypes reflparams or reflparamsf struct.
+    @param reflparams_py PyPO reflDict dictionary.
+    @param ct_t Type of point in struct.
+
+    @see reflparams
+    @see reflparamsf
+    @see reflDict
+    """
+
     inp.coeffs = (ct_t * 3)()
     inp.type = ctypes.c_int(reflparams_py["type"])
     inp.ecc_uv = ct_t(reflparams_py["ecc_uv"])
@@ -302,17 +322,19 @@ def allfill_reflparams(inp, reflparams_py, ct_t):
     for i in range(16):
         inp.transf[i] = ct_t(reflparams_py["transf"].ravel()[i])
 
-##
-# Allocate ctypes reflcontainer or reflcontainerf.
-#
-# @param res A ctypes reflcontainer or reflcontainerf struct.
-# @param size Number of points on reflector.
-# @param ct_t Type of point in struct.
-#
-# @see reflcontainer
-# @see reflcontainerf
-# @see reflDict
 def allocate_reflcontainer(res, size, ct_t):
+    """!
+    Allocate ctypes reflcontainer or reflcontainerf.
+
+    @param res A ctypes reflcontainer or reflcontainerf struct.
+    @param size Number of points on reflector.
+    @param ct_t Type of point in struct.
+
+    @see reflcontainer
+    @see reflcontainerf
+    @see reflDict
+    """
+
     res.size = size
 
     res.x = (ct_t * size)()
@@ -325,16 +347,18 @@ def allocate_reflcontainer(res, size, ct_t):
 
     res.area = (ct_t * size)()
 
-##
-# Allocate a ctypes cframe or cframef struct.
-#
-# @param res A ctypes cframe or cframef struct.
-# @param size Number of points in struct.
-# @param ct_t Type of point in struct.
-#
-# @see cframe
-# @see cframef
 def allocate_cframe(res, size, ct_t):
+    """!
+    Allocate a ctypes cframe or cframef struct.
+
+    @param res A ctypes cframe or cframef struct.
+    @param size Number of points in struct.
+    @param ct_t Type of point in struct.
+
+    @see cframe
+    @see cframef
+    """
+
     res.size = size
 
     res.x = (ct_t * size)()
@@ -345,18 +369,20 @@ def allocate_cframe(res, size, ct_t):
     res.dy = (ct_t * size)()
     res.dz = (ct_t * size)()
 
-##
-# Allocate and fill a ctypes cframe or cframef struct.
-#
-# @param res A ctypes cframe or cframef struct.
-# @param frame_py A PyPO frame object.
-# @param size Number of points in struct.
-# @param ct_t Type of point in struct.
-#
-# @see cframe
-# @see cframef
-# @see frame
 def allfill_cframe(res, frame_py, size, ct_t):
+    """!
+    Allocate and fill a ctypes cframe or cframef struct.
+
+    @param res A ctypes cframe or cframef struct.
+    @param frame_py A PyPO frame object.
+    @param size Number of points in struct.
+    @param ct_t Type of point in struct.
+
+    @see cframe
+    @see cframef
+    @see frame
+    """
+
     res.size = size
 
     res.x = (ct_t * size)(*(frame_py.x.tolist()))
@@ -367,20 +393,21 @@ def allfill_cframe(res, frame_py, size, ct_t):
     res.dy = (ct_t * size)(*(frame_py.dy.tolist()))
     res.dz = (ct_t * size)(*(frame_py.dz.tolist()))
 
-##
-# Allocate and fill a ctypes c2Bundle or c2Bundleff struct.
-#
-# @param res A ctypes c2Bundle or c2Bundlef struct.
-# @param obj_py a PyPO fields or currents object.
-# @param size Number of points in struct.
-# @param ct_t Type of point in struct.
-#
-# @see c2Bundle
-# @see c2Bundlef
-# @see fields
-# @see currents
 def allfill_c2Bundle(res, obj_py, size, ct_t):
-    #*np.real(field.Ex).ravel().tolist()
+    """!
+    Allocate and fill a ctypes c2Bundle or c2Bundleff struct.
+
+    @param res A ctypes c2Bundle or c2Bundlef struct.
+    @param obj_py a PyPO fields or currents object.
+    @param size Number of points in struct.
+    @param ct_t Type of point in struct.
+
+    @see c2Bundle
+    @see c2Bundlef
+    @see fields
+    @see currents
+    """
+
     res.r1x = (ct_t * size)(*np.real(getattr(obj_py, obj_py.memlist[0])).ravel().tolist())
     res.r1y = (ct_t * size)(*np.real(getattr(obj_py, obj_py.memlist[1])).ravel().tolist())
     res.r1z = (ct_t * size)(*np.real(getattr(obj_py, obj_py.memlist[2])).ravel().tolist())
@@ -397,16 +424,18 @@ def allfill_c2Bundle(res, obj_py, size, ct_t):
     res.i2y = (ct_t * size)(*np.imag(getattr(obj_py, obj_py.memlist[4])).ravel().tolist())
     res.i2z = (ct_t * size)(*np.imag(getattr(obj_py, obj_py.memlist[5])).ravel().tolist())
 
-##
-# Allocate and fill an RTDict struct, for generating a tubular ray-trace frame.
-#
-# @param res A RTDict or RTDictf struct.
-# @param rdict_py A TubeRTDict.
-# @param ct_t Type of point in struct.
-#
-# @see RTDict
-# @see RTDictf
 def allfill_RTDict(res, rdict_py, ct_t):
+    """!
+    Allocate and fill an RTDict struct, for generating a tubular ray-trace frame.
+
+    @param res A RTDict or RTDictf struct.
+    @param rdict_py A TubeRTDict.
+    @param ct_t Type of point in struct.
+
+    @see RTDict
+    @see RTDictf
+    """
+
     res.nRays   = ctypes.c_int(rdict_py["nRays"])
     res.nRing   = ctypes.c_int(rdict_py["nRing"])
 
@@ -415,16 +444,18 @@ def allfill_RTDict(res, rdict_py, ct_t):
     res.x0      = ct_t(rdict_py["x0"])
     res.y0      = ct_t(rdict_py["y0"])
 
-##
-# Allocate and fill a GRTDict, for generating a Gaussian ray-trace frame.
-#
-# @param res A GRTDict or GRTDictf struct.
-# @param grdict_py A GRTDict.
-# @param ct_t Type of field in struct.
-#
-# @see GRTDict
-# @see GRTDictf
 def allfill_GRTDict(res, grdict_py, ct_t):
+    """!
+    Allocate and fill a GRTDict, for generating a Gaussian ray-trace frame.
+
+    @param res A GRTDict or GRTDictf struct.
+    @param grdict_py A GRTDict.
+    @param ct_t Type of field in struct.
+
+    @see GRTDict
+    @see GRTDictf
+    """
+
     res.nRays = ctypes.c_int(grdict_py["nRays"])
 
     res.angx0 = ct_t(np.radians(grdict_py["angx0"]))
@@ -433,16 +464,18 @@ def allfill_GRTDict(res, grdict_py, ct_t):
     res.y0 = ct_t(grdict_py["y0"])
     res.seed = ctypes.c_int(grdict_py["seed"])
 
-##
-# Allocate and fill  a GPODict, for generating a Gaussian beam field and current.
-#
-# @param res A GPODict or GPODictf struct.
-# @param gdict_py A GPODict.
-# @param ct_t Type of field in struct.
-#
-# @see GPODict
-# @see GPODictf
 def allfill_GPODict(res, gdict_py, ct_t):
+    """!
+    Allocate and fill  a GPODict, for generating a Gaussian beam field and current.
+
+    @param res A GPODict or GPODictf struct.
+    @param gdict_py A GPODict.
+    @param ct_t Type of field in struct.
+
+    @see GPODict
+    @see GPODictf
+    """
+
     res.lam = ct_t(gdict_py["lam"])
     res.w0x = ct_t(gdict_py["w0x"])
     res.w0y = ct_t(gdict_py["w0y"])
@@ -452,16 +485,18 @@ def allfill_GPODict(res, gdict_py, ct_t):
 
     res.pol = (ct_t * 3)(*gdict_py["pol"].tolist())
 
-##
-# Allocate and fill  a ScalarGPODict, for generating a scalar Gaussian beam field.
-#
-# @param res A ScalarGPODict or ScalarGPODictf struct.
-# @param sgdict_py A GPODict.
-# @param ct_t Type of field in struct.
-#
-# @see ScalarGPODict
-# @see ScalarGPODictf
 def allfill_SGPODict(res, sgdict_py, ct_t):
+    """!
+    Allocate and fill  a ScalarGPODict, for generating a scalar Gaussian beam field.
+
+    @param res A ScalarGPODict or ScalarGPODictf struct.
+    @param sgdict_py A GPODict.
+    @param ct_t Type of field in struct.
+
+    @see ScalarGPODict
+    @see ScalarGPODictf
+    """
+
     res.lam = ct_t(sgdict_py["lam"])
     res.w0x = ct_t(sgdict_py["w0x"])
     res.w0y = ct_t(sgdict_py["w0y"])
@@ -469,14 +504,16 @@ def allfill_SGPODict(res, sgdict_py, ct_t):
     res.E0 = ct_t(sgdict_py["E0"])
     res.dxyz = ct_t(sgdict_py["dxyz"])
 
-##
-# Allocate and fill a 4D matrix for transforming frames and fields/currents.
-#
-# @param mat Matrix containing transformation.
-# @param ct_t Type of field in matrix.
-#
-# @returns c_mat The ctypes representation of the matrix.
 def allfill_mat4D(mat, ct_t):
+    """!
+    Allocate and fill a 4D matrix for transforming frames and fields/currents.
+
+    @param mat Matrix containing transformation.
+    @param ct_t Type of field in matrix.
+
+    @returns c_mat The ctypes representation of the matrix.
+    """
+
     c_mat = (ct_t * 16)()
     
     for i in range(16):
@@ -484,19 +521,20 @@ def allfill_mat4D(mat, ct_t):
 
     return c_mat
 
-##
-# Convert a reflector grids struct to a PyPO grids object.
-#
-# @param res A reflcontainer or reflcontainerf struct.
-# @param shape Shape of the reflector grid.
-# @param np_t Type of field in PyPO object.
-#
-# @returns out The grids as PyPO object.
-#
-# @see reflcontainer
-# @see reflcontainerf
-# @see reflGrids 
 def creflToObj(res, shape, np_t):
+    """!
+    Convert a reflector grids struct to a PyPO grids object.
+
+    @param res A reflcontainer or reflcontainerf struct.
+    @param shape Shape of the reflector grid.
+    @param np_t Type of field in PyPO object.
+
+    @returns out The grids as PyPO object.
+
+    @see reflcontainer
+    @see reflcontainerf
+    @see reflGrids 
+    """
 
     x = np.ctypeslib.as_array(res.x, shape=shape).astype(np_t)
     y = np.ctypeslib.as_array(res.y, shape=shape).astype(np_t)
@@ -509,19 +547,22 @@ def creflToObj(res, shape, np_t):
     area = np.ctypeslib.as_array(res.area, shape=shape).astype(np_t)
     out = reflGrids(x, y, z, nx, ny, nz, area)
     return out
-##
-# Convert a cframe struct to a PyPO frame object.
-#
-# @param res A cframe or cframef struct.
-# @param np_t Type of field in PyPO frame object.
-# @param shape Shape of resulting PyPO frame.
-#
-# @returns out PyPO frame object.
-#
-# @see cframe
-# @see cframef
-# @see frame
+
 def frameToObj(res, np_t, shape):
+    """!
+    Convert a cframe struct to a PyPO frame object.
+
+    @param res A cframe or cframef struct.
+    @param np_t Type of field in PyPO frame object.
+    @param shape Shape of resulting PyPO frame.
+
+    @returns out PyPO frame object.
+
+    @see cframe
+    @see cframef
+    @see frame
+    """
+
     x = np.ctypeslib.as_array(res.x, shape=shape).astype(np_t)
     y = np.ctypeslib.as_array(res.y, shape=shape).astype(np_t)
     z = np.ctypeslib.as_array(res.z, shape=shape).astype(np_t)

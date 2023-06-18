@@ -132,14 +132,60 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:aea913f64799ce18770a05a7d2104832c"><td class="memItemLeft" align="right" valign="top"><a id="aea913f64799ce18770a05a7d2104832c" name="aea913f64799ce18770a05a7d2104832c"></a>
-def&#160;</td><td class="memItemRight" valign="bottom"><b>PyPO.CustomLogger.addLoggingLevel</b> (levelName, levelNum, methodName=None)</td></tr>
+<tr class="memitem:aea913f64799ce18770a05a7d2104832c"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="CustomLogger_8py.html#aea913f64799ce18770a05a7d2104832c">PyPO.CustomLogger.addLoggingLevel</a> (levelName, levelNum, methodName=None)</td></tr>
+<tr class="memdesc:aea913f64799ce18770a05a7d2104832c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a new logging level.  <br /></td></tr>
 <tr class="separator:aea913f64799ce18770a05a7d2104832c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>This file contains class definitions of the custom logger objects used in PyPO. </p>
 <p>A distinction is made for logging in the terminal and in the GUI. </p>
-</div></div><!-- contents -->
+</div><h2 class="groupheader">Function Documentation</h2>
+<a id="aea913f64799ce18770a05a7d2104832c" name="aea913f64799ce18770a05a7d2104832c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aea913f64799ce18770a05a7d2104832c">&#9670;&#160;</a></span>addLoggingLevel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def PyPO.CustomLogger.addLoggingLevel </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>levelName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>levelNum</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>methodName</em> = <code>None</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Add a new logging level. </p>
+<p>This method takes a name and levelnumber and adds this to the customlogger. Note that a level may only be added once per session, otherwise Python will complain about a certain levelname already being added.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">levelName</td><td>Name of the new level. </td></tr>
+    <tr><td class="paramname">levelNum</td><td>Level number of the new level </td></tr>
+    <tr><td class="paramname">methodName</td><td>Name of method associated with new level. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

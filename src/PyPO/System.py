@@ -28,8 +28,6 @@ import PyPO.FitGauss as fgs
 
 import PyPO.WorldParam as world
 
-# Set PyPO absolute root path
-sysPath = Path(__file__).parents[2]
 logging.getLogger(__name__)
 
 ##
@@ -42,15 +40,15 @@ class System(object):
     customReflPath = os.getcwd()
     savePathSystems = os.getcwd()
 
-
-    ##
-    # Constructor. Initializes system state.
-    #
-    # @param redirect Redirect all print statements within system to given stdout.
-    # @param context Whether system is created in script or in GUI.
-    # @param verbose Enable system logger.
-    # @param override Allow overriding names.
     def __init__(self, redirect=None, context=None, verbose=True, override=True):
+        """!
+        Constructor. Initializes system state.
+        
+        @param redirect Redirect all print statements within system to given stdout.
+        @param context Whether system is created in script or in GUI.
+        @param verbose Enable system logger.
+        @param override Allow overriding names.
+        """
         self.num_ref = 0
         self.num_cam = 0
         self.nThreads_cpu = os.cpu_count()
@@ -61,17 +59,11 @@ class System(object):
         Config.setOverride(override)
 
         self.system = {}
-        
         self.frames = {}
-        
         self.fields = {}
-        
         self.currents = {}
-        
         self.scalarfields = {}
-
         self.groups = {}
-        
         self.assoc = {}
 
         self.EHcomplist = np.array(["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"])
@@ -109,29 +101,33 @@ class System(object):
         if override == True:
             self.clog.warning("System override set to True.")
        
-    ##
-    # Destructor. Deletes any reference to the logger assigned to current system.
     def __del__(self):
+        """!
+        Destructor. Deletes any reference to the logger assigned to current system.
+        """
         if self.context != "G":
             self.clog.info("EXITING SYSTEM.")
             del self.clog_mgr
             del self.clog
     
-    ##
-    # @brief Obtain a reference to the custom logger used by system.
-    #
-    # This method can be called to obtain a reference to the logging object that PyPO uses internally.
-    # Can be convenient in cases one wants to log their own information in the layout of the PyPO logger.
-    #
-    # @ingroup public_api_sysio
-    #
-    # @returns clog Reference to system logger.
     def getSystemLogger(self):
+        """!
+        @brief Obtain a reference to the custom logger used by system.
+        
+        This method can be called to obtain a reference to the logging object that PyPO uses internally.
+        Can be convenient in cases one wants to log their own information in the layout of the PyPO logger.
+        
+        @ingroup public_api_sysio
+        
+        @returns clog Reference to system logger.
+        """
         return self.clog
 
-    ##
-    # Print system contents.
     def __str__(self):
+        """!
+        Print system contents.
+        """
+        
         s = "Contents of system:\n"
         s += f"Reflectors {len(self.system)}:\n"
         for key in self.system.keys():
@@ -153,32 +149,35 @@ class System(object):
             s += f"    {key}\n"
         return s
 
-    ##
-    # @brief Set path to folder containing custom beam patterns.
-    #
-    # Set the path to the directory where PyPO looks for custom beam patterns.
-    # When a custom beam pattern is imported using the readCustomBeam() method, PyPO will look in the specified path for the beam patterns. 
-    #
-    # @ingroup public_api_sysio
-    #
-    # @param path Path to custom beams.
-    # @param append Whether path is relative to current working directory or absolute from home.
     def setCustomBeamPath(self, path, append=False):
+        """!
+        Set path to folder containing custom beam patterns.
+        
+        Set the path to the directory where PyPO looks for custom beam patterns.
+        When a custom beam pattern is imported using the readCustomBeam() method, PyPO will look in the specified path for the beam patterns. 
+        
+        @ingroup public_api_sysio
+        
+        @param path Path to custom beams.
+        @param append Whether path is relative to current working directory or absolute from home.
+        """
         if append:
             self.customBeamPath = os.path.join(self.customBeamPath, path)
         else:
             self.customBeamPath = path
 
-    ##
-    # Set path to folder were to save output plots.
-    #
-    # Set the path to the directory where PyPO saves output plots.
-    #
-    # @ingroup public_api_sysio
-    #
-    # @param path Path to save directory.
-    # @param append Whether path is relative to current working directory or absolute from home.
     def setSavePath(self, path, append=False):
+        """!
+        Set path to folder were to save output plots.
+        
+        Set the path to the directory where PyPO saves output plots.
+        
+        @ingroup public_api_sysio
+        
+        @param path Path to save directory.
+        @param append Whether path is relative to current working directory or absolute from home.
+        """
+        
         if append:
             self.savePath = os.path.join(self.savePath, path)
 
@@ -188,16 +187,18 @@ class System(object):
         if not os.path.isdir(self.savePath):
             os.makedirs(self.savePath)
  
-    ##
-    # Set path to folder were to save systems.
-    #
-    # Set the path to the directory where PyPO saves systems.
-    #
-    # @ingroup public_api_sysio
-    #
-    # @param path Path to save directory.
-    # @param append Whether path is relative to current working directory or absolute from home.
     def setSavePathSystems(self, path, append=False):
+        """!
+        Set path to folder were to save systems.
+        
+        Set the path to the directory where PyPO saves systems.
+        
+        @ingroup public_api_sysio
+        
+        @param path Path to save directory.
+        @param append Whether path is relative to current working directory or absolute from home.
+        """
+        
         if append:
             self.savePathSystems = os.path.join(self.savePathSystems, path)
 
@@ -207,44 +208,49 @@ class System(object):
         if not os.path.isdir(self.savePathSystems):
             os.makedirs(self.savePathSystems)
 
-    ##
-    # Set the verbosity of the logging from within the system.
-    #
-    # Sometimes it is preferrable to not generate logging output to the console, for example when PyPO methods are called in for loops.
-    # This method allows for on/off switching of the logging unit so that the console is not flooded with logging messages.
-    #
-    # @ingroup public_api_sysio
-    #
-    # @param verbose Whether to enable logging or not.
-    # @param handler If multiple handlers are present, select which handler to adjust.
     def setLoggingVerbosity(self, verbose=True, handler=None):
+        """!
+        Set the verbosity of the logging from within the system.
+        
+        Sometimes it is preferrable to not generate logging output to the console, for example when PyPO methods are called in for loops.
+        This method allows for on/off switching of the logging unit so that the console is not flooded with logging messages.
+        
+        @ingroup public_api_sysio
+        
+        @param verbose Whether to enable logging or not.
+        @param handler If multiple handlers are present, select which handler to adjust.
+        """
+
         self.verbosity = verbose
         if verbose == True:
             self.clog.setLevel(logging.DEBUG)
         else:
             self.clog.setLevel(logging.CRITICAL)
 
-    ##
-    # Set the override toggle.
-    #
-    # By setting "override" to False, PyPO will start appending number of occurences of a duplicate name instead of overwriting it.
-    #
-    # @ingroup public_api_sysio
-    #
-    # @param override Whether to override duplicate reflector names or not.
     def setOverride(self, override=True):
+        """!
+        Set the override toggle.
+        
+        By setting "override" to False, PyPO will start appending number of occurences of a duplicate name instead of overwriting it.
+        
+        @ingroup public_api_sysio
+        
+        @param override Whether to override duplicate reflector names or not.
+        """
+
         Config.setOverride(override)
 
-    ##
-    # Add a paraboloid reflector to the System.
-    #
-    # This method takes a dictionary filled with the parameters for a paraboloid reflector and generates an internal dictionary for generating the reflectorgrids. 
-    #
-    # @ingroup public_api_reflmeths
-    #
-    # @param reflDict A filled reflectordictionary. Will raise an exception if not properly filled.
     def addParabola(self, reflDict):
-
+        """!
+        Add a paraboloid reflector to the System.
+        
+        This method takes a dictionary filled with the parameters for a paraboloid reflector and generates an internal dictionary for generating the reflectorgrids. 
+        
+        @ingroup public_api_reflmeths
+        
+        @param reflDict A filled reflectordictionary. Will raise an exception if not properly filled.
+        """
+        
         reflDict["type"] = 0
 
         _reflDict = self.copyObj(reflDict)
@@ -289,16 +295,17 @@ class System(object):
         self.clog.info(f"Added paraboloid {_reflDict['name']} to system.")
         self.num_ref += 1
 
-    ##
-    # Add a hyperboloid reflector to the System.
-    #
-    # This method takes a dictionary filled with the parameters for a hyperboloid reflector and generates an internal dictionary for generating the reflectorgrids. 
-    #
-    # @ingroup public_api_reflmeths
-    #
-    # @param reflDict A filled reflectordictionary. Will raise an exception if not properly filled.
     def addHyperbola(self, reflDict):
-
+        """!
+        Add a hyperboloid reflector to the System.
+        
+        This method takes a dictionary filled with the parameters for a hyperboloid reflector and generates an internal dictionary for generating the reflectorgrids. 
+        
+        @ingroup public_api_reflmeths
+        
+        @param reflDict A filled reflectordictionary. Will raise an exception if not properly filled.
+        """
+        
         reflDict["type"] = 1
         _reflDict = self.copyObj(reflDict)
         check_ElemDict(_reflDict, self.system.keys(), self.clog) 
@@ -350,16 +357,17 @@ class System(object):
         self.clog.info(f"Added hyperboloid {_reflDict['name']} to system.")
         self.num_ref += 1
 
-    ##
-    # Add an ellipsoid reflector to the System.
-    #
-    # This method takes a dictionary filled with the parameters for an ellipsoid reflector and generates an internal dictionary for generating the reflectorgrids. 
-    #
-    # @ingroup public_api_reflmeths
-    #
-    # @param reflDict A filled reflectordictionary. Will raise an exception if not properly filled.
     def addEllipse(self, reflDict):
-
+        """!
+        Add an ellipsoid reflector to the System.
+        
+        This method takes a dictionary filled with the parameters for an ellipsoid reflector and generates an internal dictionary for generating the reflectorgrids. 
+        
+        @ingroup public_api_reflmeths
+        
+        @param reflDict A filled reflectordictionary. Will raise an exception if not properly filled.
+        """
+        
         reflDict["type"] = 2
         _reflDict = self.copyObj(reflDict)
         check_ElemDict(_reflDict, self.system.keys(), self.clog) 
@@ -414,16 +422,17 @@ class System(object):
         self.clog.info(f"Added ellipsoid {_reflDict['name']} to system.")
         self.num_ref += 1
 
-    ##
-    # Add a planar surface to the System.
-    #
-    # This method takes a dictionary filled with the parameters for a planar reflector and generates an internal dictionary for generating the reflectorgrids. 
-    #
-    # @ingroup public_api_reflmeths
-    #
-    # @param reflDict A filled reflectordictionary. Will raise an exception if not properly filled.
     def addPlane(self, reflDict):
-
+        """!
+        Add a planar surface to the System.
+        
+        This method takes a dictionary filled with the parameters for a planar reflector and generates an internal dictionary for generating the reflectorgrids. 
+        
+        @ingroup public_api_reflmeths
+        
+        @param reflDict A filled reflectordictionary. Will raise an exception if not properly filled.
+        """
+        
         reflDict["type"] = 3
         _reflDict = self.copyObj(reflDict)
         check_ElemDict(_reflDict, self.system.keys(), self.clog) 
@@ -447,41 +456,33 @@ class System(object):
         self.system[_reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added plane {_reflDict['name']} to system.")
         self.num_ref += 1
-   
-    ##
-    # Rotate reflector grids.
-    #
-    # Apply a rotation, around a center of rotation, to a reflector, group or frame.
-    # Note that an absolute orientation rotates the orientation such that it is oriented w.r.t. the z-axis.
-    # In this case, the pivot defaults to the origin and not to the specified pivot.
-    # In the case that a PO field and/or a PO current is associated with the reflector, the polarisation of the field and/or current is rotated along as well.
-    # This can be disabled by setting the "keep_pol" parameter to "True".
-    #
-    # @ingroup public_api_common 
-    #
-    # @param name Reflector name or list of reflector names.
-    # @param rotation Numpy ndarray of length 3, containing rotation angles around x, y and z axes, in degrees.
-    # @param obj Whether the name corresponds to a single element or group.
-    # @param mode Apply rotation relative ('relative') to current orientation, or rotate to specified orientation ('absolute').
-    # @param pivot Numpy ndarray of length 3, containing pivot x, y and z co-ordinates, in mm. Defaults to pos. 
-    # @param keep_pol Keep polarisation of a field/current defined on the surface, if present.
-    def rotateGrids(self, name, rotation, obj="element", mode="relative", pivot=None, keep_pol=False):
 
+    def rotateGrids(self, name, rotation, obj="element", mode="relative", pivot=None, keep_pol=False):
+        """!
+        Rotate reflector grids.
+        
+        Apply a rotation, around a center of rotation, to a reflector, group or frame.
+        Note that an absolute orientation rotates the orientation such that it is oriented w.r.t. the z-axis.
+        In this case, the pivot defaults to the origin and not to the specified pivot.
+        In the case that a PO field and/or a PO current is associated with the reflector, the polarisation of the field and/or current is rotated along as well.
+        This can be disabled by setting the "keep_pol" parameter to "True".
+        
+        @ingroup public_api_common 
+        
+        @param name Reflector name or list of reflector names.
+        @param rotation Numpy ndarray of length 3, containing rotation angles around x, y and z axes, in degrees.
+        @param obj Whether the name corresponds to a single element or group.
+        @param mode Apply rotation relative ('relative') to current orientation, or rotate to specified orientation ('absolute').
+        @param pivot Numpy ndarray of length 3, containing pivot x, y and z co-ordinates, in mm. Defaults to pos. 
+        @param keep_pol Keep polarisation of a field/current defined on the surface, if present.
+        """
+        
         if obj == "element":
             check_elemSystem(name, self.system, self.clog, extern=True)
             pivot = self.system[name]["pos"] if pivot is None else pivot
             
             if mode == "absolute":
-                match = world.IAX()
-                match_rot = (MatRotate(rotation))[:-1, :-1] @ match
-                R = self.findRotation(self.system[name]["ori"], match_rot)
-
-                Tp = self.copyObj(world.INITM())
-                Tpm = self.copyObj(world.INITM())
-                Tp[:-1,-1] = pivot
-                Tpm[:-1,-1] = -pivot
-                
-                Rtot = Tp @ R @ Tpm
+                Rtot = self._absRotationMat(rotation, self.system[name]["ori"], pivot)
                 self.system[name]["transf"] = Rtot @ self.system[name]["transf"]
                 self.system[name]["transf"][:-1, :-1] = (MatRotate(rotation, pivot=pivot))[:-1, :-1]
 
@@ -509,16 +510,7 @@ class System(object):
             pivot = self.groups[name]["pos"] if pivot is None else pivot
             
             if mode == "absolute":
-                match = world.IAX()
-                match_rot = (MatRotate(rotation))[:-1, :-1] @ match
-                R = self.findRotation(self.system[name]["ori"], match_rot)
-
-                Tp = self.copyObj(world.INITM())
-                Tpm = self.copyObj(world.INITM())
-                Tp[:-1,-1] = pivot
-                Tpm[:-1,-1] = -pivot
-                
-                Rtot = Tp @ R @ Tpm
+                Rtot = self._absRotationMat(rotation, self.groups[name]["ori"], pivot)
                 
                 for self.system[elem] in self.groups[name]["members"]:
                     self.system[elem]["transf"] = Rtot @ self.system[elem]["transf"]
@@ -555,19 +547,9 @@ class System(object):
             pivot = self.frames[name].pos if pivot is None else pivot
             
             if mode == "absolute":
-                match = world.IAX()
-                match_rot = (MatRotate(rotation))[:-1, :-1] @ match
-                R = self.findRotation(self.frames[name].ori, match_rot)
-
-                Tp = self.copyObj(world.INITM())
-                Tpm = self.copyObj(world.INITM())
-                Tp[:-1,-1] = pivot
-                Tpm[:-1,-1] = -pivot
-                
-                Rtot = Tp @ R @ Tpm
+                Rtot = self._absRotationMat(rotation, self.frames[name].ori, pivot)
 
                 self.frames[name].transf = Rtot
-                #self.frames[name].transf[:-1, :-1] = (MatRotate(rotation, pivot=pivot))[:-1, :-1]
                 _fr = transformRays(self.frames[name])
                 self.frames[name] = self.copyObj(_fr)
 
@@ -585,19 +567,20 @@ class System(object):
             
                 self.clog.info(f"Rotated frame {name} by {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
-    ##
-    # Translate reflector grids.
-    #
-    # Apply a translation to a reflector, group or frame.
-    # If the translation is absolute, the object will be translated such that its internal position parameter coincides with the specified translation.
-    #
-    # @ingroup public_api_common 
-    #
-    # @param name Reflector name or list of reflector names.
-    # @param translation Numpy ndarray of length 3, containing translation x, y and z co-ordinates, in mm.
-    # @param obj Whether the name corresponds to a single element or group.
-    # @param mode Apply translation relative ('relative') to current position, or move to specified position ('absolute').
     def translateGrids(self, name, translation, obj="element", mode="relative"):
+        """!
+        Translate reflector grids.
+        
+        Apply a translation to a reflector, group or frame.
+        If the translation is absolute, the object will be translated such that its internal position parameter coincides with the specified translation.
+        
+        @ingroup public_api_common 
+        
+        @param name Reflector name or list of reflector names.
+        @param translation Numpy ndarray of length 3, containing translation x, y and z co-ordinates, in mm.
+        @param obj Whether the name corresponds to a single element or group.
+        @param mode Apply translation relative ('relative') to current position, or move to specified position ('absolute').
+        """
 
         _translation = self.copyObj(translation)
         
@@ -648,18 +631,20 @@ class System(object):
             else:
                 self.clog.info(f"Translated frame {name} by {*['{:0.3e}'.format(x) for x in list(_translation)],} millimeters.")
     
-    ##
-    # Home a reflector or a group back into default configuration.
-    #
-    # Set internal transformation matrix of a reflector or group to identity. 
-    #
-    # @ingroup public_api_reflmeths
-    #
-    # @param name Reflector name or list of reflector or group to be homed.
-    # @param obj Type of object to be homed.
-    # @param trans Home (translate) back to home position.
-    # @param rot Home (rotate) back to home orientation.
     def homeReflector(self, name, obj="element", trans=True, rot=True):
+        """!
+        Home a reflector or a group back into default configuration.
+        
+        Set internal transformation matrix of a reflector or group to identity. 
+        
+        @ingroup public_api_reflmeths
+        
+        @param name Reflector name or list of reflector or group to be homed.
+        @param obj Type of object to be homed.
+        @param trans Home (translate) back to home position.
+        @param rot Home (rotate) back to home orientation.
+        """
+
         if obj == "group":
             check_groupSystem(name, self.groups, self.clog, extern=True)
             if trans:
@@ -699,17 +684,19 @@ class System(object):
             
             self.clog.info(f"Transforming element {name} to home position.")
  
-    ##
-    # Take and store snapshot of object's current configuration.
-    #
-    # A snapshot consists of the transformation matrix of an element, group of frame.
-    #
-    # @ingroup public_api_reflmeths
-    #
-    # @param name Name of object to be snapped.
-    # @param snap_name Name of snapshot to save.
-    # @param obj Whether object is an element, group or frame.
     def snapObj(self, name, snap_name, obj="element"):
+        """!
+        Take and store snapshot of object's current configuration.
+        
+        A snapshot consists of the transformation matrix of an element, group of frame.
+        
+        @ingroup public_api_reflmeths
+        
+        @param name Name of object to be snapped.
+        @param snap_name Name of snapshot to save.
+        @param obj Whether object is an element, group or frame.
+        """
+
         if obj == "group":
             check_groupSystem(name, self.groups, self.clog, extern=True)
             self.groups[name]["snapshots"][snap_name] = []
@@ -731,17 +718,19 @@ class System(object):
 
             self.clog.info(f"Saved snapshot {snap_name} for frame {name}.")
     
-    ##
-    # Revert object configuration to a saved snapshot.
-    #
-    # Reverting an object to a snapshot replaces the internal transformation matrix with the matrix stored in the snapshot.
-    #
-    # @ingroup public_api_reflmeths
-    #
-    # @param name Name of obj to revert.
-    # @param snap_name Name of snapshot to revert to.
-    # @param obj Whether object is an element, group or frame.
     def revertToSnap(self, name, snap_name, obj="element"):
+        """!
+        Revert object configuration to a saved snapshot.
+        
+        Reverting an object to a snapshot replaces the internal transformation matrix with the matrix stored in the snapshot.
+        
+        @ingroup public_api_reflmeths
+        
+        @param name Name of obj to revert.
+        @param snap_name Name of snapshot to revert to.
+        @param obj Whether object is an element, group or frame.
+        """
+
         if obj == "group":
             check_groupSystem(name, self.groups, self.clog, extern=True)
 
@@ -767,17 +756,19 @@ class System(object):
             
             self.clog.info(f"Reverted frame {name} to snapshot {snap_name}.")
     
-    ##
-    # Delete a saved snapshot belonging to an object.
-    #
-    # This deletes the stored snapshot, including the associated transformation matrix.
-    #
-    # @ingroup public_api_reflmeths
-    #
-    # @param name Name of object.
-    # @param snap_name Name of snapshot to delete.
-    # @param obj Whether object is an element or a group.
     def deleteSnap(self, name, snap_name, obj="element"):
+        """!
+        Delete a saved snapshot belonging to an object.
+        
+        This deletes the stored snapshot, including the associated transformation matrix.
+        
+        @ingroup public_api_reflmeths
+        
+        @param name Name of object.
+        @param snap_name Name of snapshot to delete.
+        @param obj Whether object is an element or a group.
+        """
+
         if obj == "group":
             check_groupSystem(name, self.groups, self.clog, extern=True)
            
@@ -795,20 +786,22 @@ class System(object):
 
             self.clog.info(f"Deleted snapshot {snap_name} belonging to frame {name}.")
     
-    ##
-    # Group elements together into a single block. After grouping, can translate, rotate and characterise as one.
-    #
-    # This method adds a new field to the internal groups dictionary, with the key being the given name of the group.
-    # The item corresponding to this key is, again, a dictionary. The first key, "members", corresponds to a list containing the names of the reflectors added to the group.
-    # The position and orientation trackers of the group are set to the origin and the z-axis, respectively, if not passed as arguments.
-    #
-    # @ingroup public_api_reflmeths
-    #
-    # @param names Names of elements to put in group.
-    # @param name_group Name of the group.
-    # @param pos Position tracker for the group.
-    # @param ori Orientation tracker for group.
     def groupElements(self, name_group, *names, pos=None, ori=None):
+        """!
+        Group elements together into a single block. After grouping, can translate, rotate and characterise as one.
+        
+        This method adds a new field to the internal groups dictionary, with the key being the given name of the group.
+        The item corresponding to this key is, again, a dictionary. The first key, "members", corresponds to a list containing the names of the reflectors added to the group.
+        The position and orientation trackers of the group are set to the origin and the z-axis, respectively, if not passed as arguments.
+        
+        @ingroup public_api_reflmeths
+        
+        @param names Names of elements to put in group.
+        @param name_group Name of the group.
+        @param pos Position tracker for the group.
+        @param ori Orientation tracker for group.
+        """
+        
         num = getIndex(name_group, self.groups.keys())
 
         if num > 0:
@@ -827,50 +820,56 @@ class System(object):
                 }
         self.clog.info(f"Grouped elements {names} into group {name_group}.")
 
-    ##
-    # Remove a group of elements from system. Note that this does not remove the elements inside the group.
-    #
-    # Removing a group only removes the key and item in the internal groups dictionary and does not remove the contained elements.
-    #
-    # @ingroup public_api_reflmeths
-    #
-    # @param name_group Name of the group to be removed.
     def removeGroup(self, name_group):
+        """!
+        Remove a group of elements from system. Note that this does not remove the elements inside the group.
+        
+        Removing a group only removes the key and item in the internal groups dictionary and does not remove the contained elements.
+        
+        @ingroup public_api_reflmeths
+        
+        @param name_group Name of the group to be removed.
+        """
+        
         check_groupSystem(ng, self.groups, self.clog, extern=True)
         del self.groups[name_group]
         
         self.clog.info(f"Removed group {name_group} from system.")
 
-    ##
-    # Generate reflector grids and normals.
-    # 
-    # Evaluate a stored reflector dictionary and return the x, y, z grids, area and normals.
-    # The outputs are grouped together in a grids object.
-    #
-    # @ingroup public_api_reflmeths
-    #
-    # @param name Name of reflector to be gridded.
-    # @param transform Apply internal transformation matrix to reflector.
-    # @param spheric Return spheric or square far-field grid (far-field only).
-    #
-    # @return grids A reflGrids object containing the grids, area and normals.
-    #
-    # @see reflGrids
     def generateGrids(self, name, transform=True, spheric=True):
+        """!
+        Generate reflector grids and normals.
+        
+        Evaluate a stored reflector dictionary and return the x, y, z grids, area and normals.
+        The outputs are grouped together in a grids object.
+        
+        @ingroup public_api_reflmeths
+        
+        @param name Name of reflector to be gridded.
+        @param transform Apply internal transformation matrix to reflector.
+        @param spheric Return spheric or square far-field grid (far-field only).
+        
+        @return grids A reflGrids object containing the grids, area and normals.
+        
+        @see reflGrids
+        """
+
         check_elemSystem(name, self.system, self.clog, extern=True)
         grids = generateGrid(self.system[name], transform, spheric)
         return grids
     
-    ##
-    # Save a system object to disk. 
-    #
-    # The system from which this method is called will be saved in its entirety, e.g. all reflectors, fields, currents and frames, to disk.
-    # The directory to which the system will be saved will either be the current working directory or the directory specified with setSavePathSystems().
-    #
-    # @ingroup public_api_sysio
-    #
-    # @param name Save the current system under this name.
     def saveSystem(self, name):
+        """!
+        Save a system object to disk. 
+        
+        The system from which this method is called will be saved in its entirety, e.g. all reflectors, fields, currents and frames, to disk.
+        The directory to which the system will be saved will either be the current working directory or the directory specified with setSavePathSystems().
+        
+        @ingroup public_api_sysio
+        
+        @param name Save the current system under this name.
+        """
+
         path = os.path.join(self.savePathSystems, name)
         saveExist = os.path.isdir(path)
 
@@ -897,17 +896,19 @@ class System(object):
         
         self.clog.info(f"Saved current system to {name}.")
 
-    ##
-    # Load a system object from /save/systems/. This loads all reflectors, fields, currents and frames in the system from disk.
-    #
-    # The system from which this method is called will be overwritten in its entirety, e.g. all reflectors, fields, currents and frames will be replaced with the 
-    # internal dictionaries of the system to load.
-    # The directory from which the system will be saved will either be the current working directory or the directory specified with setSavePathSystems().
-    #
-    # @ingroup public_api_sysio
-    #
-    # @param name Load the system under this name.
     def loadSystem(self, name):
+        """!
+        Load a system object from the savePathSystems path. This loads all reflectors, fields, currents and frames in the system from disk.
+        
+        The system from which this method is called will be overwritten in its entirety, e.g. all reflectors, fields, currents and frames will be replaced with the 
+        internal dictionaries of the system to load.
+        The directory from which the system will be saved will either be the current working directory or the directory specified with setSavePathSystems().
+        
+        @ingroup public_api_sysio
+        
+        @param name Load the system under this name.
+        """
+
         self.clog.info(f"Loading system {name} from {self.savePathSystems} into current system.")
         path = os.path.join(self.savePathSystems, name)
         loadExist = os.path.isdir(path)
@@ -934,17 +935,19 @@ class System(object):
         with open(os.path.join(path, "scalarfields.pys"), 'rb') as file: 
             self.scalarfields = pickle.load(file)
 
-    ##
-    # Merge multiple systems together into current system.
-    # 
-    # This method takes a arbitrary amount of system objects and updates the internal dictionaries of the system from which this method is called.
-    # This means that the calling system will keep its internal dictionaries. However, if the systems contain a key in the internal dictionaries
-    # matching a key in the calling system, this key and item will be overwritten.
-    #
-    # @ingroup public_api_sysio
-    #
-    # @param systems Systems to be merged into current system
     def mergeSystem(self, *systems):
+        """!
+        Merge multiple systems together into current system.
+        
+        This method takes a arbitrary amount of system objects and updates the internal dictionaries of the system from which this method is called.
+        This means that the calling system will keep its internal dictionaries. However, if the systems contain a key in the internal dictionaries
+        matching a key in the calling system, this key and item will be overwritten.
+        
+        @ingroup public_api_sysio
+        
+        @param systems Systems to be merged into current system
+        """
+
         if len(set(systems)) < len(systems):
             raise Exception("Cannot merge duplicate systems.")
         for sysObject in systems:
@@ -957,17 +960,19 @@ class System(object):
             self.groups.update(sys_copy.groups)
             self.scalarfields.update(sys_copy.scalarfields)
     
-    ##
-    # Remove reflector from system.
-    #
-    # This removes the key and corresponding reflector dictionary in the internal system dictionary.
-    # It also check whether the element is included in a group.
-    # If it is included in a group, the method will also remove the element from the "members" list of the group.
-    #
-    # @ingroup public_api_reflmeths
-    #
-    # @ param name Name of reflector to be removed.
     def removeElement(self, name):
+        """!
+        Remove reflector from system.
+        
+        This removes the key and corresponding reflector dictionary in the internal system dictionary.
+        It also check whether the element is included in a group.
+        If it is included in a group, the method will also remove the element from the "members" list of the group.
+        
+        @ingroup public_api_reflmeths
+        
+        @ param name Name of reflector to be removed.
+        """
+
         check_elemSystem(name, self.system, self.clog, extern=True)
         for group in self.groups.values():
             if name in group["members"]:
@@ -975,113 +980,127 @@ class System(object):
         del self.system[name]
         self.clog.info(f"Removed element {name} from system.")
     
-    ##
-    # Copy reflector.
-    #
-    # This method takes an internal reflector dictionary and generates a deepcopy, i.e. a true copy.
-    # The copy can be adjusted safely without changing the contents of the original.
-    #
-    # @ingroup public_api_reflmeths
-    #
-    # @ param name Name of reflector to be copied.
-    # @ param name_copy Name of new reflector.
     def copyElement(self, name, name_copy):
+        """!
+        Copy reflector.
+        
+        This method takes an internal reflector dictionary and generates a deepcopy, i.e. a true copy.
+        The copy can be adjusted safely without changing the contents of the original.
+        
+        @ingroup public_api_reflmeths
+        
+        @ param name Name of reflector to be copied.
+        @ param name_copy Name of new reflector.
+        """
+
         check_elemSystem(name, self.system, self.clog, extern=True)
         self.system[name_copy] = self.copyObj(self.system[name])
         self.clog.info(f"Copied element {name} to {name_copy}.")
     
-    ##
-    # Copy group.
-    #
-    # This method takes a group name and generates a deepcopy, i.e. a true copy.
-    # The copy can be adjusted safely without changing the contents of the original.
-    # Note however that the elements themselves are not deepcopied.
-    # This might change later on.
-    #
-    # @ingroup public_api_reflmeths
-    #
-    # @ param name Name of group to be copied.
-    # @ param name_copy Name of new group.
     def copyGroup(self, name, name_copy):
+        """!
+        Copy group.
+        
+        This method takes a group name and generates a deepcopy, i.e. a true copy.
+        The copy can be adjusted safely without changing the contents of the original.
+        Note however that the elements themselves are not deepcopied.
+        This might change later on.
+        
+        @ingroup public_api_reflmeths
+        
+        @ param name Name of group to be copied.
+        @ param name_copy Name of new group.
+        """
+
         check_groupSystem(name, self.groups, self.clog, extern=True)
         self.groups[name_copy] = self.copyObj(self.groups[name])
         self.clog.info(f"Copied group {name} to {name_copy}.")
     
-    ##
-    # Remove a ray-trace frame from system.
-    #
-    # This method takes the name of an internally stored frame object and removes it from the internal dictionary.
-    #
-    # @ingroup public_api_frames
-    #
-    # @param frameName Name of frame to be removed.
     def removeFrame(self, frameName):
+        """!
+        Remove a ray-trace frame from system.
+        
+        This method takes the name of an internally stored frame object and removes it from the internal dictionary.
+        
+        @ingroup public_api_frames
+        
+        @param frameName Name of frame to be removed.
+        """
+
         check_frameSystem(frameName, self.frames, self.clog, extern=True)
         del self.frames[frameName]
         
         self.clog.info(f"Removed frame {frameName} from system.")
     
-    ##
-    # Remove a PO field from system.
-    #
-    # This method takes the name of an internally stored PO field object and removes it from the internal dictionary.
-    #
-    # @ingroup public_api_po
-    #
-    # @param fieldName Name of field to be removed.
     def removeField(self, fieldName):
+        """!
+        Remove a PO field from system.
+        
+        This method takes the name of an internally stored PO field object and removes it from the internal dictionary.
+        
+        @ingroup public_api_po
+        
+        @param fieldName Name of field to be removed.
+        """
+
         check_fieldSystem(fieldName, self.fields, self.clog, extern=True)
         del self.fields[fieldName]
         
         self.clog.info(f"Removed PO field {fieldName} from system.")
     
-    ##
-    # Remove a PO current from system.
-    #
-    # This method takes the name of an internally stored PO current object and removes it from the internal dictionary.
-    #
-    # @ingroup public_api_po
-    #
-    # @param curentName Name of current to be removed.
     def removeCurrent(self, currentName):
+        """!
+        Remove a PO current from system.
+        
+        This method takes the name of an internally stored PO current object and removes it from the internal dictionary.
+        
+        @ingroup public_api_po
+        
+        @param curentName Name of current to be removed.
+        """
+
         check_currentSystem(currentName, self.currents, self.clog, extern=True)
         del self.currents[currentName]
         
         self.clog.info(f"Removed PO current {currentName} from system.")
 
-    ##
-    # Remove a scalar PO field from system.
-    #
-    # This method takes the name of an internally stored PO scalarfield object and removes it from the internal dictionary.
-    #
-    # @ingroup public_api_po
-    #
-    # @param fieldName Name of scalar field to be removed.
     def removeScalarField(self, fieldName):
+        """!
+        Remove a scalar PO field from system.
+        
+        This method takes the name of an internally stored PO scalarfield object and removes it from the internal dictionary.
+        
+        @ingroup public_api_po
+        
+        @param fieldName Name of scalar field to be removed.
+        """
+
         check_scalarfieldSystem(fieldName, self.scalarfields, self.clog, extern=True)
         del self.scalarfields[fieldName]
         
         self.clog.info(f"Removed scalar PO field {fieldName} from system.")
     
-    ##
-    # Read a custom beam from disk into the system. 
-    #
-    # The system will look in the customBeamPath, which defaults to the current working directory and can be set with the setCustomBeamPath() method.
-    # Note that the custom beam pattern needs to contain a real and imaginary part, and that these need to be stored in separate .txt files, stored as
-    # such: r<name_beam>.txt and i<name_beam>.txt, where 'r' and 'i' refer to the real and imaginary part, respectively.
-    #
-    # @ingroup public_api_po
-    #
-    # @param name_beam Name of the beam (without the 'r' or 'i' prefixes or '.txt' suffix).
-    # @param name_source Name of source surface on which to define the beam. 
-    # @param comp Polarisation component of beam.
-    # @param lam Wavelength of beam, in mm.
-    # @param normalise Whether or not to normalise beam to its maximum amplitude.
-    # @para mode Which approximation to use. Can choose between Perfect Electrical Conductor ('PEC'), Perfect Magnetic Conductor ('PMC') or full calculation ('full'). Defaults to 'PMC'.
-    # @param scale Scale factor for beam. Defaults to 1.
-    #
-    # @see setCustomBeamPath
     def readCustomBeam(self, name_beam, name_source, comp, lam, normalise=True, mode="PMC", scale=1):
+        """!
+        Read a custom beam from disk into the system. 
+        
+        The system will look in the customBeamPath, which defaults to the current working directory and can be set with the setCustomBeamPath() method.
+        Note that the custom beam pattern needs to contain a real and imaginary part, and that these need to be stored in separate .txt files, stored as
+        such: r<name_beam>.txt and i<name_beam>.txt, where 'r' and 'i' refer to the real and imaginary part, respectively.
+        
+        @ingroup public_api_po
+        
+        @param name_beam Name of the beam (without the 'r' or 'i' prefixes or '.txt' suffix).
+        @param name_source Name of source surface on which to define the beam. 
+        @param comp Polarisation component of beam.
+        @param lam Wavelength of beam, in mm.
+        @param normalise Whether or not to normalise beam to its maximum amplitude.
+        @para mode Which approximation to use. Can choose between Perfect Electrical Conductor ('PEC'), Perfect Magnetic Conductor ('PMC') or full calculation ('full'). Defaults to 'PMC'.
+        @param scale Scale factor for beam. Defaults to 1.
+        
+        @see setCustomBeamPath
+        """
+
         check_elemSystem(name_source, self.system, self.clog, extern=True)
         
         rfield = np.loadtxt(os.path.join(self.customBeamPath, "r" + name_beam + ".txt"))
@@ -1106,42 +1125,46 @@ class System(object):
 
         self.currents[name_beam] = currents_c
 
-    ##
-    # Calculate currents on a surface given a field object.
-    #
-    # Given a surface and a PO field defined on said surface it is possible to calculate the image PO currents, the virtual currents that would give rise to the PO field.
-    # This is also known as the image theorem.
-    # For this, it is necessary to give appropriate boundary conditions on the surface. This depends on the PO field that is present.
-    # If only the electric field is known, the currents can be calculated by assuming a PMC (perfect magnetic conductor)
-    # right behind the surface, which radiated the elctric fields.
-    # In case only the magnetic field is know, the PMC is replaced by a PEC (perfect electric conductor).
-    # In case both electric and magnetic fields are know, the boundary conditions for vectorial EM fields at the surface can be used to calculate the image currents.
-    #
-    # @ingroup public_api_po
-    #
-    # @param name_source Name of surface in which to calculate currents.
-    # @param fields Fields object from which to calculate currents.
-    # @para mode Which approximation to use. Can choose between Perfect Electrical Conductor ('PEC', requires H-field), Perfect Magnetic Conductor ('PMC', requires E-field) or full calculation ('full', requires both). Defaults to 'PMC'.
-    #
-    # @see fields
-    # @see currents
     def calcCurrents(self, name_source, fields, mode="PMC"):
+        """!
+        Calculate currents on a surface given a field object.
+        
+        Given a surface and a PO field defined on said surface it is possible to calculate the image PO currents, the virtual currents that would give rise to the PO field.
+        This is also known as the image theorem.
+        For this, it is necessary to give appropriate boundary conditions on the surface. This depends on the PO field that is present.
+        If only the electric field is known, the currents can be calculated by assuming a PMC (perfect magnetic conductor)
+        right behind the surface, which radiated the elctric fields.
+        In case only the magnetic field is know, the PMC is replaced by a PEC (perfect electric conductor).
+        In case both electric and magnetic fields are know, the boundary conditions for vectorial EM fields at the surface can be used to calculate the image currents.
+        
+        @ingroup public_api_po
+        
+        @param name_source Name of surface in which to calculate currents.
+        @param fields Fields object from which to calculate currents.
+        @para mode Which approximation to use. Can choose between Perfect Electrical Conductor ('PEC', requires H-field), Perfect Magnetic Conductor ('PMC', requires E-field) or full calculation ('full', requires both). Defaults to 'PMC'.
+        
+        @see fields
+        @see currents
+        """
+
         check_elemSystem(name_source, self.system, self.clog, extern=True)
         currents = calcCurrents(fields, self.system[name_source], mode)
         return currents
 
-    ##
-    # Instantiate a PO propagation. 
-    #
-    # Stores desired output in the internal fields and/or internal currents dictionary.
-    # If the 'EHP' mode is selected, the reflected Poynting frame is stored in the internal frame dictionary.
-    #
-    # @ingroup public_api_po
-    #
-    # @param PODict Dictionary containing the PO propagation instructions.
-    #
-    # @see PODict
     def runPO(self, runPODict):
+        """!
+        Instantiate a PO propagation. 
+        
+        Stores desired output in the internal fields and/or internal currents dictionary.
+        If the 'EHP' mode is selected, the reflected Poynting frame is stored in the internal frame dictionary.
+        
+        @ingroup public_api_po
+        
+        @param PODict Dictionary containing the PO propagation instructions.
+        
+        @see PODict
+        """
+
         self.clog.work("*** Starting PO propagation ***")
        
         check_runPODict(runPODict, self.system.keys(), self.fields.keys(), self.currents.keys(),
@@ -1210,18 +1233,20 @@ class System(object):
         self.clog.work(f"*** Finished: {dtime:.3f} seconds ***")
         return out
 
-    ##
-    # Merge multiple beams that are defined on the same surface.
-    #
-    # The beams to be merged are first checked to see if they are all defined on the same surface.
-    # Then, a new PO field or current is defined in the internal dictionary with the new name.
-    #
-    # @ingroup public_api_po
-    #
-    # @param beams Fields or currents objects to merge.
-    # @param obj Whether the beams are PO fields or currents.
-    # @param merged_name Name of merged object.
     def mergeBeams(self, *beams, obj="fields", merged_name="combined"):
+        """!
+        Merge multiple beams that are defined on the same surface.
+        
+        The beams to be merged are first checked to see if they are all defined on the same surface.
+        Then, a new PO field or current is defined in the internal dictionary with the new name.
+        
+        @ingroup public_api_po
+        
+        @param beams Fields or currents objects to merge.
+        @param obj Whether the beams are PO fields or currents.
+        @param merged_name Name of merged object.
+        """
+
         check_sameBound(beams, checkDict=getattr(self, obj), clog=self.clog) 
         ex = getattr(self, obj)[beams[0]]
 
@@ -1256,18 +1281,20 @@ class System(object):
         field.setMeta(ex.surf, ex.k)
         getattr(self, obj)[merged_name] = field
 
-    ##
-    # Create a tube of rays from a TubeRTDict.
-    #
-    # The tube of rays will be placed in the internal frame dictionary. 
-    # Position and orientation trackers for the frame are initialised to the origin and z-axis, respectively.
-    #
-    # @ingroup public_api_frames
-    #
-    # @param argDict A TubeRTDict, filled. If not filled properly, will raise an exception.
-    #
-    # @see TubeRTDict
     def createTubeFrame(self, argDict):
+        """!
+        Create a tube of rays from a TubeRTDict.
+        
+        The tube of rays will be placed in the internal frame dictionary. 
+        Position and orientation trackers for the frame are initialised to the origin and z-axis, respectively.
+        
+        @ingroup public_api_frames
+        
+        @param argDict A TubeRTDict, filled. If not filled properly, will raise an exception.
+        
+        @see TubeRTDict
+        """
+
         if not argDict["name"]:
             argDict["name"] = f"Frame"
         _argDict = self.copyObj(argDict) 
@@ -1279,19 +1306,21 @@ class System(object):
 
         self.clog.info(f"Added tubular frame {_argDict['name']} to system.")
     
-    ##
-    # Create a Gaussian beam distribution of rays from a GRTDict.
-    #
-    # The Gaussian frame will be placed in the internal frame dictionary.
-    # The frame is generated by rejection-sampling a Gaussian distribution in position and direction on an xy-grid.
-    # Position and orientation trackers for the frame are initialised to the origin and z-axis, respectively.
-    #
-    # @ingroup public_api_frames
-    #
-    # @param argDict A GRTDict, filled. If not filled properly, will raise an exception.
-    #
-    # @see GRTDict
     def createGRTFrame(self, argDict): 
+        """!
+        Create a Gaussian beam distribution of rays from a GRTDict.
+        
+        The Gaussian frame will be placed in the internal frame dictionary.
+        The frame is generated by rejection-sampling a Gaussian distribution in position and direction on an xy-grid.
+        Position and orientation trackers for the frame are initialised to the origin and z-axis, respectively.
+        
+        @ingroup public_api_frames
+        
+        @param argDict A GRTDict, filled. If not filled properly, will raise an exception.
+        
+        @see GRTDict
+        """
+
         if not argDict["name"]:
             argDict["name"] = f"Frame"
         
@@ -1313,21 +1342,23 @@ class System(object):
         self.clog.work(f"Succesfully sampled {_argDict['nRays']} rays: {dtime} seconds.")
         self.clog.info(f"Added Gaussian frame {_argDict['name']} to system.")
 
-    ##
-    # Calculate total length of a ray-trace beam.
-    #
-    # Takes multiple frames and calculates the distance for each ray between frames.
-    # If the "start" parameter is set to a len-3 Numpy array, the ray length will also include the 
-    # distance between the position of the ray in the first frame and the given starting point.
-    # This is useful in case the rays emanate from a single point which is not included as a frame in the internal dictionary.
-    #
-    # @ingroup public_api_frames
-    #
-    # @param frames Frames between which to calculate total pathlength.
-    # @param start Point from which to start the calculation, len-3 Numpy array. If given, also calculates distance between point and the first frame. Defaults to None.
-    #
-    # @returns out List containing the distances between frames. Can be summed over to obtain total distance.
     def calcRayLen(self, *frames, start=None):
+        """!
+        Calculate total length of a ray-trace beam.
+        
+        Takes multiple frames and calculates the distance for each ray between frames.
+        If the "start" parameter is set to a len-3 Numpy array, the ray length will also include the 
+        distance between the position of the ray in the first frame and the given starting point.
+        This is useful in case the rays emanate from a single point which is not included as a frame in the internal dictionary.
+        
+        @ingroup public_api_frames
+        
+        @param frames Frames between which to calculate total pathlength.
+        @param start Point from which to start the calculation, len-3 Numpy array. If given, also calculates distance between point and the first frame. Defaults to None.
+        
+        @returns out List containing the distances between frames. Can be summed over to obtain total distance.
+        """
+
         for fr in frames:
             check_frameSystem(fr, self.frames, self.clog, extern=True)
 
@@ -1380,22 +1411,24 @@ class System(object):
 
         return out
 
-    ##
-    # Create a vectorial Gaussian beam.
-    #
-    # This method creates a general, potentially astigmatic, vectorial Gaussian beam.
-    # The beam is evaluated with the focus at z = 0. 
-    # The surface on which the beam is calculated, defined by "name_source", does not have to lie in or be parallel to the xy-plane.
-    # Instead, the Gaussian beam is evaluated on the surface as-is, evaluating the Gaussian beam at the xyz-points on the surface.
-    # Still, the focus is at z = 0. If one wishes to displace the focal point, the PO fields and currents need to be translated after generating the Gaussian beam.
-    #
-    # @ingroup public_api_po
-    #
-    # @param gaussDict A GDict containing parameters for the Gaussian beam.
-    # @param name_surface Name of plane on which to define Gaussian.
-    #
-    # @see GDict
     def createGaussian(self, gaussDict, name_surface):
+        """!
+        Create a vectorial Gaussian beam.
+        
+        This method creates a general, potentially astigmatic, vectorial Gaussian beam.
+        The beam is evaluated with the focus at z = 0. 
+        The surface on which the beam is calculated, defined by "name_source", does not have to lie in or be parallel to the xy-plane.
+        Instead, the Gaussian beam is evaluated on the surface as-is, evaluating the Gaussian beam at the xyz-points on the surface.
+        Still, the focus is at z = 0. If one wishes to displace the focal point, the PO fields and currents need to be translated after generating the Gaussian beam.
+        
+        @ingroup public_api_po
+        
+        @param gaussDict A GDict containing parameters for the Gaussian beam.
+        @param name_surface Name of plane on which to define Gaussian.
+        
+        @see GDict
+        """
+
         check_elemSystem(name_surface, self.system, self.clog, extern=True)
 
         _gaussDict = self.copyObj(gaussDict)
@@ -1411,22 +1444,24 @@ class System(object):
         self.currents[_gaussDict["name"]] = gauss_in[1]
         #return gauss_in
     
-    ##
-    # Create a scalar Gaussian beam.
-    #
-    # This method creates a general, potentially astigmatic, scalar Gaussian beam.
-    # The beam is evaluated with the focus at z = 0. 
-    # The surface on which the beam is calculated, defined by "name_source", does not have to lie in or be parallel to the xy-plane.
-    # Instead, the Gaussian beam is evaluated on the surface as-is, evaluating the Gaussian beam at the xyz-points on the surface.
-    # Still, the focus is at z = 0. If one wishes to displace the focal point, the PO scalarfield needs to be translated after generating the Gaussian beam.
-    #
-    # @ingroup public_api_po
-    #
-    # @param gaussDict A GDict containing parameters for the Gaussian beam.
-    # @param name_surface Name of plane on which to define Gaussian.
-    #
-    # @see SGDict
     def createScalarGaussian(self, gaussDict, name_surface):
+        """!
+        Create a scalar Gaussian beam.
+        
+        This method creates a general, potentially astigmatic, scalar Gaussian beam.
+        The beam is evaluated with the focus at z = 0. 
+        The surface on which the beam is calculated, defined by "name_source", does not have to lie in or be parallel to the xy-plane.
+        Instead, the Gaussian beam is evaluated on the surface as-is, evaluating the Gaussian beam at the xyz-points on the surface.
+        Still, the focus is at z = 0. If one wishes to displace the focal point, the PO scalarfield needs to be translated after generating the Gaussian beam.
+        
+        @ingroup public_api_po
+        
+        @param gaussDict A GDict containing parameters for the Gaussian beam.
+        @param name_surface Name of plane on which to define Gaussian.
+        
+        @see SGDict
+        """
+
         check_elemSystem(name_surface, self.system, self.clog, extern=True)
         
         _gaussDict = self.copyObj(gaussDict)
@@ -1439,15 +1474,17 @@ class System(object):
 
         self.scalarfields[_gaussDict["name"]] = gauss_in
 
-    ##
-    # Run a ray-trace propagation from a frame to a surface.
-    #
-    # The resulting frame is placed in the internal frames dictionary.
-    #
-    # @ingroup public_api_frames
-    #
-    # @param runRTDict A runRTDict object specifying the ray-trace.
     def runRayTracer(self, runRTDict):
+        """!
+        Run a ray-trace propagation from a frame to a surface.
+        
+        The resulting frame is placed in the internal frames dictionary.
+        
+        @ingroup public_api_frames
+        
+        @param runRTDict A runRTDict object specifying the ray-trace.
+        """
+
         self.clog.work("*** Starting RT propagation ***")
         
         _runRTDict = self.copyObj(runRTDict)
@@ -1476,19 +1513,21 @@ class System(object):
         
         self.frames[runRTDict["fr_out"]].setMeta(self.calcRTcenter(runRTDict["fr_out"]), self.calcRTtilt(runRTDict["fr_out"]), self.copyObj(world.INITM()))
     
-    ##
-    # Perform a hybrid RT/PO propagation, starting from a reflected field and set of Poynting vectors.
-    #
-    # The propagation is done by performing a ray trace from the starting frame into the target surface.
-    # Then, the starting reflected field is propagated to the target by multiplying each point on the field by the 
-    # phase factor corresponding to the travel length of the Poynting vector ray associated to the point on the field.
-    # Stores name of resultant field and frame in the internal association dictionary as two associated objects.
-    # The name of the association is the surface on which both the target frame and field are defined.
-    #
-    # @ingroup public_api_hybrid
-    #
-    # @param hybridDict A hybridDict dictionary.
     def runHybridPropagation(self, hybridDict):
+        """!
+        Perform a hybrid RT/PO propagation, starting from a reflected field and set of Poynting vectors.
+        
+        The propagation is done by performing a ray trace from the starting frame into the target surface.
+        Then, the starting reflected field is propagated to the target by multiplying each point on the field by the 
+        phase factor corresponding to the travel length of the Poynting vector ray associated to the point on the field.
+        Stores name of resultant field and frame in the internal association dictionary as two associated objects.
+        The name of the association is the surface on which both the target frame and field are defined.
+        
+        @ingroup public_api_hybrid
+        
+        @param hybridDict A hybridDict dictionary.
+        """
+
         self.clog.work("*** Starting hybrid propagation ***")
         start_time = time.time()
 
@@ -1535,23 +1574,25 @@ class System(object):
         self.assoc[hybridDict["t_name"]] = [hybridDict["field_out"], hybridDict["fr_out"]]
         self.clog.work(f"*** Finished: {dtime:.3f} seconds ***")
 
-    ##
-    # Interpolate a frame and an associated field on a regular surface.
-    #
-    # The surface should be the target on which the input frame is calculated.
-    # The "name_field" should be an associated field, calculated in the same hybrid propagation as "name_fr_in".
-    # 
-    # @ingroup public_api_hybrid
-    #
-    # @param name_fr_in Name of input frame.
-    # @param name_field Name of field object, propagated along with the frame by multiplication.
-    # @param name_target Name of surface on which to interpolate the field.
-    # @param name_out Name of output field object in target surface.
-    # @param comp Component of field to interpolate. If scalar, leave as is.
-    # @param method Method for the interpolation.
-    #
-    # @returns out Complex numpy array containing interpolated field.
     def interpFrame(self, name_fr_in, name_field, name_target, name_out, comp=None, method="nearest"):
+        """!
+        Interpolate a frame and an associated field on a regular surface.
+        
+        The surface should be the target on which the input frame is calculated.
+        The "name_field" should be an associated field, calculated in the same hybrid propagation as "name_fr_in".
+        
+        @ingroup public_api_hybrid
+        
+        @param name_fr_in Name of input frame.
+        @param name_field Name of field object, propagated along with the frame by multiplication.
+        @param name_target Name of surface on which to interpolate the field.
+        @param name_out Name of output field object in target surface.
+        @param comp Component of field to interpolate. If scalar, leave as is.
+        @param method Method for the interpolation.
+        
+        @returns out Complex numpy array containing interpolated field.
+        """
+
         check_frameSystem(name_fr_in, self.frames, self.clog, extern=True)
         check_elemSystem(name_target, self.system, self.clog, extern=True)
         
@@ -1596,69 +1637,77 @@ class System(object):
 
         return out
 
-    ##
-    # Calculate the geometric center of a ray-trace frame.
-    #
-    # The center is calculated by finding the centroid of the given frame.
-    #
-    # @ingroup public_api_frames
-    #
-    # @param name_frame Name of frame to calculate center of.
-    #
-    # @returns c_f Len-3 Numpy array containing x, y and z co-ordinates of frame center.
     def calcRTcenter(self, name_frame):
+        """!
+        Calculate the geometric center of a ray-trace frame.
+        
+        The center is calculated by finding the centroid of the given frame.
+        
+        @ingroup public_api_frames
+        
+        @param name_frame Name of frame to calculate center of.
+        
+        @returns c_f Len-3 Numpy array containing x, y and z co-ordinates of frame center.
+        """
+
         check_frameSystem(name_frame, self.frames, self.clog, extern=True)
         frame = self.frames[name_frame]
         c_f = effs.calcRTcenter(frame)
         return c_f
 
-    ##
-    # Calculate the mean direction normal of a ray-trace frame.
-    #
-    # The mean direction is calculated by taking the mean tilt of every ray in the frame.
-    #
-    # @ingroup public_api_frames
-    #
-    # @param name_frame Name of frame to calculate tilt of.
-    #
-    # @returns t_f Len-3 Numpy array containing x, y and z components of frame tilt direction.
     def calcRTtilt(self, name_frame):
+        """!
+        Calculate the mean direction normal of a ray-trace frame.
+        
+        The mean direction is calculated by taking the mean tilt of every ray in the frame.
+        
+        @ingroup public_api_frames
+        
+        @param name_frame Name of frame to calculate tilt of.
+        
+        @returns t_f Len-3 Numpy array containing x, y and z components of frame tilt direction.
+        """
+
         check_frameSystem(name_frame, self.frames, self.clog, extern=True)
         frame = self.frames[name_frame]
         t_f = effs.calcRTtilt(frame)
         return t_f
     
-    ##
-    # Calculate the RMS spot size of a ray-trace frame.
-    #
-    # The RMS spotsize is calculated by taking the root-mean-square of the positions of the rays in the frame.
-    #
-    # @ingroup public_api_frames
-    #
-    # @param name_frame Name of frame to calculate RMS of.
-    #
-    # @returns rms RMS spot size of frame in mm.
     def calcSpotRMS(self, name_frame):
+        """!
+        Calculate the RMS spot size of a ray-trace frame.
+        
+        The RMS spotsize is calculated by taking the root-mean-square of the positions of the rays in the frame.
+        
+        @ingroup public_api_frames
+        
+        @param name_frame Name of frame to calculate RMS of.
+        
+        @returns rms RMS spot size of frame in mm.
+        """
+
         check_frameSystem(name_frame, self.frames, self.clog, extern=True)
         frame = self.frames[name_frame]
         rms = effs.calcRMS(frame)
         return rms
 
-    ##
-    # Calculate spillover efficiency of a beam defined on a surface.
-    #
-    # The method calculates the spillover using the fraction of the beam that illuminates the region defined in aperDict versus the total beam.
-    #
-    # @ingroup public_api_po
-    #
-    # @param name_field Name of the PO field.
-    # @param comp Component of field to calculate spillover of.
-    # @param aperDict An aperDict dictionary containing the parameters for defining the spillover aperture.
-    #
-    # @returns spill The spillover efficiency.
-    #
-    # @see aperDict
     def calcSpillover(self, name_field, comp, aperDict):
+        """!
+        Calculate spillover efficiency of a beam defined on a surface.
+        
+        The method calculates the spillover using the fraction of the beam that illuminates the region defined in aperDict versus the total beam.
+        
+        @ingroup public_api_po
+        
+        @param name_field Name of the PO field.
+        @param comp Component of field to calculate spillover of.
+        @param aperDict An aperDict dictionary containing the parameters for defining the spillover aperture.
+        
+        @returns spill The spillover efficiency.
+        
+        @see aperDict
+        """
+
         check_fieldSystem(name_field, self.fields, self.clog, extern=True)
         check_aperDict(aperDict, self.clog)
 
@@ -1668,22 +1717,24 @@ class System(object):
 
         return effs.calcSpillover(field_comp, surfaceObj, aperDict)
 
-    ##
-    # Calculate taper efficiency of a beam defined on a surface.
-    #
-    # The method calculates the taper efficiency using the fraction of the beam that illuminates the region defined in aperDict versus the total beam.
-    # If aperDict is not given, it will calculate the taper efficiency on the entire beam.
-    #
-    # @ingroup public_api_po
-    #
-    # @param name_field Name of the PO field.
-    # @param comp Component of field to calculate taper efficiency of.
-    # @param aperDict An aperDict dictionary containing the parameters for defining the taper aperture. Defaults to None.
-    #
-    # @returns taper The taper efficiency.
-    #
-    # @see aperDict
     def calcTaper(self, name_field, comp, aperDict=None):
+        """!
+        Calculate taper efficiency of a beam defined on a surface.
+        
+        The method calculates the taper efficiency using the fraction of the beam that illuminates the region defined in aperDict versus the total beam.
+        If aperDict is not given, it will calculate the taper efficiency on the entire beam.
+        
+        @ingroup public_api_po
+        
+        @param name_field Name of the PO field.
+        @param comp Component of field to calculate taper efficiency of.
+        @param aperDict An aperDict dictionary containing the parameters for defining the taper aperture. Defaults to None.
+        
+        @returns taper The taper efficiency.
+        
+        @see aperDict
+        """
+
         check_fieldSystem(name_field, self.fields, self.clog, extern=True)
         aperDict = {} if aperDict is None else aperDict
 
@@ -1696,19 +1747,22 @@ class System(object):
 
         return effs.calcTaper(field_comp, surfaceObj, aperDict)
 
-    ##
-    # Calculate cross-polar efficiency of a field defined on a surface.
-    #
-    # The cross-polar efficiency is calculated over the entire field extent.
-    #
-    # @ingroup public_api_po
-    #
-    # @param name_field Name of the PO field.
-    # @param comp_co Co-polar component of field.
-    # @param comp_cr Cross-polar component of field.
-    #
-    # @returns crp The cross-polar efficiency.
     def calcXpol(self, name_field, comp_co, comp_cr):
+        """!
+        Calculate cross-polar efficiency of a field defined on a surface.
+       
+        The cross-polar efficiency is described as the ratio of power in the cross-polar component versus the co-polar component.
+        The cross-polar efficiency is calculated over the entire field extent.
+        
+        @ingroup public_api_po
+        
+        @param name_field Name of the PO field.
+        @param comp_co Co-polar component of field.
+        @param comp_cr Cross-polar component of field.
+        
+        @returns crp The cross-polar efficiency.
+        """
+
         check_fieldSystem(name_field, self.fields, self.clog, extern=True)
         field = self.fields[name_field]
         field_co = getattr(field, comp_co)
@@ -1717,24 +1771,26 @@ class System(object):
         
         return effs.calcXpol(field_co, field_cr)
 
-    ##
-    # Fit a Gaussian profile to the amplitude of a field component and adds the result to scalar field in system.
-    #
-    # The resultant Gaussian fit cannot be propagated using vectorial means, but can be propagated using scalar propagation.
-    # Note that this method is very sensitive to initial conditions, especially when the beam pattern to which to fit the Gaussian has multiple maxima or is generally
-    # ill-described by a Gaussian. In the latter case, the method may fail altogether.
-    #
-    # @ingroup public_api_po
-    #
-    # @param name_field Name of field object.
-    # @param comp Component of field object.
-    # @param thres Threshold to fit to, in decibels.
-    # @param mode Fit to amplitude in decibels, linear or logarithmically.
-    # @param full_output Return fitted parameters and standard deviations.
-    #
-    # @returns popt Fitted beam parameters.
-    # @returns perr Standard deviation of fitted parameters.
     def fitGaussAbs(self, name_field, comp, thres=None, mode=None, full_output=False, ratio=1):
+        """!
+        Fit a Gaussian profile to the amplitude of a field component and adds the result to scalar field in system.
+        
+        The resultant Gaussian fit cannot be propagated using vectorial means, but can be propagated using scalar propagation.
+        Note that this method is very sensitive to initial conditions, especially when the beam pattern to which to fit the Gaussian has multiple maxima or is generally
+        ill-described by a Gaussian. In the latter case, the method may fail altogether.
+        
+        @ingroup public_api_po
+        
+        @param name_field Name of field object.
+        @param comp Component of field object.
+        @param thres Threshold to fit to, in decibels.
+        @param mode Fit to amplitude in decibels, linear or logarithmically.
+        @param full_output Return fitted parameters and standard deviations.
+        
+        @returns popt Fitted beam parameters.
+        @returns perr Standard deviation of fitted parameters.
+        """
+
         check_fieldSystem(name_field, self.fields, self.clog, extern=True)
 
         thres = -11 if thres is None else thres
@@ -1760,25 +1816,27 @@ class System(object):
         if full_output:
             return popt
 
-    ##
-    # Calculate main-beam efficiency of a beam pattern.
-    #
-    # The main-beam efficiency is calculated by fitting a Gaussian amplitude profile to the central lobe.
-    # This might reuire fine-tuning the "thres" parameter, or changing the space in whcih to fit by supplying the "mode" parameter.
-    # Then, the efficiency is defined as the fraction of power in the Gaussian w.r.t. the full pattern.
-    # Designed for far-field beam patterns, but also applicable to regular fields.
-    # Note that since this method uses the fitGaussAbs() method, the result is quite sensitive to initial conditions and should therefore be (iteratively) checked for 
-    # robustness.
-    #
-    # @ingroup public_api_po
-    #
-    # @param name_field Name of field object.
-    # @param comp Component of field object.
-    # @param thres Threshold to fit to, in decibels.
-    # @param mode Fit to amplitude in decibels, linear or logarithmically.
-    #
-    # @returns eff Main-beam efficiency.
     def calcMainBeam(self, name_field, comp, thres=None, mode=None):
+        """!
+        Calculate main-beam efficiency of a beam pattern.
+        
+        The main-beam efficiency is calculated by fitting a Gaussian amplitude profile to the central lobe.
+        This might reuire fine-tuning the "thres" parameter, or changing the space in whcih to fit by supplying the "mode" parameter.
+        Then, the efficiency is defined as the fraction of power in the Gaussian w.r.t. the full pattern.
+        Designed for far-field beam patterns, but also applicable to regular fields.
+        Note that since this method uses the fitGaussAbs() method, the result is quite sensitive to initial conditions and should therefore be (iteratively) checked for 
+        robustness.
+        
+        @ingroup public_api_po
+        
+        @param name_field Name of field object.
+        @param comp Component of field object.
+        @param thres Threshold to fit to, in decibels.
+        @param mode Fit to amplitude in decibels, linear or logarithmically.
+        
+        @returns eff Main-beam efficiency.
+        """
+
         check_fieldSystem(name_field, self.fields, self.clog, extern=True)
         thres = -11 if thres is None else thres
         mode = "linear" if mode is None else mode
@@ -1792,30 +1850,33 @@ class System(object):
         eff = effs.calcMainBeam(field, surfaceObj, self.scalarfields[f"fitGauss_{name_field}"].S)
         return eff
     
-    ##
-    # Calculate cross sections of a beam pattern.
-    #
-    # This method calculates cross sections along the cardinal planes of the beam pattern.
-    # The cardinal planes here are defined to lie along the semi-major and semi-minor axes of the beam pattern.
-    # It does this by first finding the center and position angle of the beam pattern.
-    # Then, it creates a snapshot of the current configuration and translates and rotates the beam pattern so that the cardinal planes are 
-    # oriented along the x- and y-axes.
-    # It is also possible to not do this and instead directly calculate the cross sections along the x- and y-axes as-is.
-    #
-    # @ingroup public_api_po
-    #
-    # @param name_field Name of field object.
-    # @param comp Component of field object.
-    # @param phi Manual rotation of cuts w.r.t. to the x-y cardinal planes.
-    # @param center Whether to center the cardinal planes on the peak of the beam pattern.
-    # @param align Whether to align the cardinal planes to the beam pattern minor and major axes.
-    # @param norm Which component to normalise to. Defaults to comp. 
-    #
-    # @returns x_cut Beam cross section along the E-plane.
-    # @returns y_cut Beam cross section along the H-plane.
-    # @returns x_strip Co-ordinate values for x_cut.
-    # @returns y_strip Co-ordinate values for y_cut.
-    def calcBeamCuts(self, name_field, comp, phi=0, center=True, align=True, norm=False):
+    def calcBeamCuts(self, name_field, comp, phi=0, center=True, align=True, norm=False, mode="dB"):
+        """!
+        Calculate cross sections of a beam pattern.
+        
+        This method calculates cross sections along the cardinal planes of the beam pattern.
+        The cardinal planes here are defined to lie along the semi-major and semi-minor axes of the beam pattern.
+        It does this by first finding the center and position angle of the beam pattern.
+        Then, it creates a snapshot of the current configuration and translates and rotates the beam pattern so that the cardinal planes are 
+        oriented along the x- and y-axes.
+        It is also possible to not do this and instead directly calculate the cross sections along the x- and y-axes as-is.
+        
+        @ingroup public_api_po
+        
+        @param name_field Name of field object.
+        @param comp Component of field object.
+        @param phi Manual rotation of cuts w.r.t. to the x-y cardinal planes.
+        @param center Whether to center the cardinal planes on the peak of the beam pattern.
+        @param align Whether to align the cardinal planes to the beam pattern minor and major axes.
+        @param norm Which component to normalise to. Defaults to comp. 
+        @param mode Return beamcuts in linear ("linear"), logarithmic ("log") or decibels ("dB"). Defaults to "dB".
+        
+        @returns x_cut Beam cross section along the E-plane.
+        @returns y_cut Beam cross section along the H-plane.
+        @returns x_strip Co-ordinate values for x_cut.
+        @returns y_strip Co-ordinate values for y_cut.
+        """
+
         check_fieldSystem(name_field, self.fields, self.clog, extern=True)
  
         verbosity_init = self.verbosity
@@ -1857,10 +1918,23 @@ class System(object):
         if not norm:
             x_cut = self.copyObj(20 * np.log10(field[:, idx_c[1]] / np.max(field)))
             y_cut = self.copyObj(20 * np.log10(field[idx_c[0], :] / np.max(field)))
+            if mode == "dB":
+                x_cut = self.copyObj(20 * np.log10(field[:, idx_c[1]] / np.max(field)))
+                y_cut = self.copyObj(20 * np.log10(field[idx_c[0], :] / np.max(field)))
+            
+            elif mode == "linear":
+                x_cut = self.copyObj(field[:, idx_c[1]] / np.max(field))
+                y_cut = self.copyObj(field[idx_c[0], :] / np.max(field))
         
         else:
-            x_cut = self.copyObj(20 * np.log10(field[:, idx_c[1]] / np.max(np.absolute(getattr(self.fields[name_field], norm)))))
-            y_cut = self.copyObj(20 * np.log10(field[idx_c[0], :] / np.max(np.absolute(getattr(self.fields[name_field], norm)))))
+            if mode == "dB":
+                x_cut = self.copyObj(20 * np.log10(field[:, idx_c[1]] / np.max(np.absolute(getattr(self.fields[name_field], norm)))))
+                y_cut = self.copyObj(20 * np.log10(field[idx_c[0], :] / np.max(np.absolute(getattr(self.fields[name_field], norm)))))
+            
+            elif mode == "linear":
+                x_cut = self.copyObj(field[:, idx_c[1]] / np.max(np.absolute(getattr(self.fields[name_field], norm))))
+                y_cut = self.copyObj(field[idx_c[0], :] / np.max(np.absolute(getattr(self.fields[name_field], norm))))
+
 
         x_strip = self.copyObj(grids_orig.x[:, idx_c[1]])
         y_strip = self.copyObj(grids_orig.y[idx_c[0], :])
@@ -1873,31 +1947,33 @@ class System(object):
 
         return x_cut, y_cut, x_strip, y_strip
    
-    ##
-    # Plot beam pattern cross sections.
-    #
-    # Plot the beam cross sections for a PO field.
-    # In this case, calcBeamCuts() will try to translate and rotate the supplied beam pattern to lie along the x- and y-axes.
-    # Note that using the "center" and "align" arguments sgould not be done when plotting beam cuts of very non-Gaussian beams. For these patterns, it is advised to set the arguments to False and calculate the beam cuts as-is. 
-    #
-    # @ingroup public_api_vis
-    #
-    # @param name_field Name of field object.
-    # @param comp Component of field object.
-    # @param comp_cross Cross-polar component. If given, is plotted as well. Defaults to None.
-    # @param vmin Minimum amplitude value to display. Default is -30.
-    # @param vmax Maximum amplitude value to display. Default is 0.
-    # @param center Whether to calculate beam center and center the beam cuts on this point.
-    # @param align Whether to find position angle of beam cuts and align cut axes to this.
-    # @param units The units of the axes. Default is "", which is degrees.
-    # @param name Name of .png file where plot is saved. Only when save=True. Default is "".
-    # @param show Show plot. Default is True.
-    # @param save Save plot to savePath.
-    # @param ret Return the Figure and Axis object. Only called by GUI. Default is False.
-    #
-    # @returns fig Figure object.
-    # @returns ax Axes object.
     def plotBeamCut(self, name_field, comp, comp_cross=None, vmin=None, vmax=None, center=True, align=True, units='', name="", show=True, save=False, ret=False):
+        """!
+        Plot beam pattern cross sections.
+        
+        Plot the beam cross sections for a PO field.
+        In this case, calcBeamCuts() will try to translate and rotate the supplied beam pattern to lie along the x- and y-axes.
+        Note that using the "center" and "align" arguments sgould not be done when plotting beam cuts of very non-Gaussian beams. For these patterns, it is advised to set the arguments to False and calculate the beam cuts as-is. 
+        
+        @ingroup public_api_vis
+        
+        @param name_field Name of field object.
+        @param comp Component of field object.
+        @param comp_cross Cross-polar component. If given, is plotted as well. Defaults to None.
+        @param vmin Minimum amplitude value to display. Default is -30.
+        @param vmax Maximum amplitude value to display. Default is 0.
+        @param center Whether to calculate beam center and center the beam cuts on this point.
+        @param align Whether to find position angle of beam cuts and align cut axes to this.
+        @param units The units of the axes. Default is "", which is degrees.
+        @param name Name of .png file where plot is saved. Only when save=True. Default is "".
+        @param show Show plot. Default is True.
+        @param save Save plot to savePath.
+        @param ret Return the Figure and Axis object. Only called by GUI. Default is False.
+        
+        @returns fig Figure object.
+        @returns ax Axes object.
+        """
+
         E_cut, H_cut, E_strip, H_strip = self.calcBeamCuts(name_field, comp, center=center, align=align)
 
         #if comp_cross is not None:
@@ -1923,21 +1999,23 @@ class System(object):
         elif show:
             pt.show()
 
-    ##
-    # Calculate half-power beamwidth.
-    #
-    # This is done by directly evaluating the -3 dB points along both cardinal planes of the beam pattern.
-    # Then, the distance between antipodal half-power points is calculated on an interpolation of the supplied PO field.
-    #
-    # @ingroup public_api_po
-    #
-    # @param name_field Name of field object.
-    # @param comp Component of field object.
-    # @param interp Interpolation factor for finding the HPBW. Defaults to 50.
-    #
-    # @returns HPBW_E Half-power beamwidth along E-plane.
-    # @returns HPBW_H Half-power beamwidth along H-plane.
     def calcHPBW(self, name_field, comp, interp=50):
+        """
+        Calculate half-power beamwidth.
+        
+        This is done by directly evaluating the -3 dB points along both cardinal planes of the beam pattern.
+        Then, the distance between antipodal half-power points is calculated on an interpolation of the supplied PO field.
+        
+        @ingroup public_api_po
+        
+        @param name_field Name of field object.
+        @param comp Component of field object.
+        @param interp Interpolation factor for finding the HPBW. Defaults to 50.
+        
+        @returns HPBW_E Half-power beamwidth along E-plane in units of surface of beam.
+        @returns HPBW_H Half-power beamwidth along H-plane in units of surface of beam.
+        """
+
         x_cut, y_cut, x_strip, y_strip = self.calcBeamCuts(name_field, comp)#, center=False, align=False)
 
         x_interp = np.linspace(np.min(x_strip), np.max(x_strip), num=len(x_strip) * interp)
@@ -1948,26 +2026,28 @@ class System(object):
         mask_x = (x_cut_interp > -3.01) & (x_cut_interp < -2.99)
         mask_y = (y_cut_interp > -3.01) & (y_cut_interp < -2.99)
 
-        HPBW_E = np.mean(np.absolute(x_interp[mask_x])) * 2 * 3600
-        HPBW_H = np.mean(np.absolute(y_interp[mask_y])) * 2 * 3600
+        HPBW_E = np.mean(np.absolute(x_interp[mask_x]))
+        HPBW_H = np.mean(np.absolute(y_interp[mask_y]))
 
         return HPBW_E, HPBW_H
 
-    ##
-    # Generate point-source PO fields and currents.
-    #
-    # The point source is generated in the center of the source surface given by "name_surface".
-    # It is generally a good idea to make this source surface as small as possible, in order to create a "nice" point source.
-    # If this is too big, the resulting PO field more closely resembles a uniformly illuminated square.
-    # The H-field is set to 0.
-    #
-    # @ingroup public_api_po
-    #
-    # @param PSDict A PSDict dictionary, containing parameters for the point source.
-    # @param name_surface Name of surface on which to define the point-source.
-    #
-    # @see PSDict
     def createPointSource(self, PSDict, name_surface):
+        """!
+        Generate point-source PO fields and currents.
+        
+        The point source is generated in the center of the source surface given by "name_surface".
+        It is generally a good idea to make this source surface as small as possible, in order to create a "nice" point source.
+        If this is too big, the resulting PO field more closely resembles a uniformly illuminated square.
+        The H-field is set to 0.
+        
+        @ingroup public_api_po
+        
+        @param PSDict A PSDict dictionary, containing parameters for the point source.
+        @param name_surface Name of surface on which to define the point-source.
+        
+        @see PSDict
+        """
+
         check_elemSystem(name_surface, self.system, self.clog, extern=True)
         _PSDict = self.copyObj(PSDict)
         check_PSDict(_PSDict, self.fields, self.clog)
@@ -1999,19 +2079,21 @@ class System(object):
         self.fields[_PSDict["name"]] = field
         self.currents[_PSDict["name"]] = current
 
-    ##
-    # Generate uniform PO fields and currents.
-    #
-    # The uniform field is generated by defining a PO field on the source surface and setting all values to the amplitude specified in 
-    # the input dictionary. The H-field is set to 0.
-    #
-    # @ingroup public_api_po
-    #
-    # @param UDict A UDict dictionary, containing parameters for the uniform pattern.
-    # @param name_surface Name of surface on which to define the uniform pattern.
-    #
-    # @see PSDict
     def createUniformSource(self, UDict, name_surface):
+        """!
+        Generate uniform PO fields and currents.
+        
+        The uniform field is generated by defining a PO field on the source surface and setting all values to the amplitude specified in 
+        the input dictionary. The H-field is set to 0.
+        
+        @ingroup public_api_po
+        
+        @param UDict A UDict dictionary, containing parameters for the uniform pattern.
+        @param name_surface Name of surface on which to define the uniform pattern.
+        
+        @see PSDict
+        """
+
         check_elemSystem(name_surface, self.system, self.clog, extern=True)
         _UDict = self.copyObj(UDict)
         check_PSDict(_UDict, self.fields, self.clog)
@@ -2038,21 +2120,23 @@ class System(object):
         self.fields[_UDict["name"]] = field
         self.currents[_UDict["name"]] = current
     
-    ##
-    # Generate point-source scalar PO field.
-    #
-    # The point source is generated in the center of the source surface given by "name_surface".
-    # It is generally a good idea to make this source surface as small as possible, in order to create a "nice" point source.
-    # If this is too big, the resulting PO field more closely resembles a uniformly illuminated square.
-    # The H-field is set to 0.
-    #
-    # @ingroup public_api_po
-    #
-    # @param PSDict A PSDict dictionary, containing parameters for the point source.
-    # @param name_surface Name of surface on which to define the point-source.
-    #
-    # @see PSDict
     def createPointSourceScalar(self, PSDict, name_surface):
+        """!
+        Generate point-source scalar PO field.
+        
+        The point source is generated in the center of the source surface given by "name_surface".
+        It is generally a good idea to make this source surface as small as possible, in order to create a "nice" point source.
+        If this is too big, the resulting PO field more closely resembles a uniformly illuminated square.
+        The H-field is set to 0.
+        
+        @ingroup public_api_po
+        
+        @param PSDict A PSDict dictionary, containing parameters for the point source.
+        @param name_surface Name of surface on which to define the point-source.
+        
+        @see PSDict
+        """
+
         check_elemSystem(name_surface, self.system, self.clog, extern=True)
         
         _PSDict = self.copyObj(PSDict)
@@ -2073,19 +2157,21 @@ class System(object):
 
         self.scalarfields[_PSDict["name"]] = sfield
     
-    ##
-    # Generate scalar uniform PO fields and currents.
-    #
-    # The uniform field is generated by defining a PO field on the source surface and setting all values to the amplitude specified in 
-    # the input dictionary. The H-field is set to 0.
-    #
-    # @ingroup public_api_po
-    #
-    # @param UDict A UDict dictionary, containing parameters for the uniform pattern.
-    # @param name_surface Name of surface on which to define the uniform pattern.
-    #
-    # @see UDict
     def createUniformSourceScalar(self, UDict, name_surface):
+        """!
+        Generate scalar uniform PO fields and currents.
+        
+        The uniform field is generated by defining a PO field on the source surface and setting all values to the amplitude specified in 
+        the input dictionary. The H-field is set to 0.
+        
+        @ingroup public_api_po
+        
+        @param UDict A UDict dictionary, containing parameters for the uniform pattern.
+        @param name_surface Name of surface on which to define the uniform pattern.
+        
+        @see UDict
+        """
+
         check_elemSystem(name_surface, self.system, self.clog, extern=True)
         _UDict = self.copyObj(UDict)
         check_PSDict(_UDict, self.scalarfields, self.clog)
@@ -2101,19 +2187,21 @@ class System(object):
 
         self.scalarfields[_UDict["name"]] = sfield
    
-    ##
-    # Interpolate a PO beam. Only for beams defined on planar surfaces.
-    #
-    # Can interpolate PO fields and currents separately.
-    # Results are stored in a new PO fields/currents object with the original name appended by 'interp'.
-    # Also, a new plane will be created with the updated gridsize and name appended by 'interp'.
-    #
-    # @ingroup public_api_po
-    #
-    # @param name Name of beam to be interpolated.
-    # @param gridsize_new New gridsizes for interpolation.
-    # @param obj Whether to interpolate currents or fields.
     def interpBeam(self, name, gridsize_new, obj_t="fields"):
+        """!
+        Interpolate a PO beam. Only for beams defined on planar surfaces.
+        
+        Can interpolate PO fields and currents separately.
+        Results are stored in a new PO fields/currents object with the original name appended by 'interp'.
+        Also, a new plane will be created with the updated gridsize and name appended by 'interp'.
+        
+        @ingroup public_api_po
+        
+        @param name Name of beam to be interpolated.
+        @param gridsize_new New gridsizes for interpolation.
+        @param obj Whether to interpolate currents or fields.
+        """
+
         if obj_t == "fields":
             check_fieldSystem(name, self.fields, self.clog, extern=True)
             obj = self.fields[name]
@@ -2155,43 +2243,44 @@ class System(object):
             obj_interp.setMeta(obj.surf + "_interp", obj.k)
             self.currents[name + "_interp"] = obj_interp
 
-    ##
-    # Generate a 2D plot of a PO (scalar)field or current.
-    #
-    # Note that matplotlib offers custom control over figures in the matplotlib window.
-    # This means that most parameters described for this method can be adjusted in the matplotlib plotting window.
-    #
-    # @ingroup public_api_vis
-    #
-    # @param name_obj Name of field or current to plot.
-    # @param comp Component of field or current to plot. String of two characters; an uppercase {E, H, J, M} for field followed by a lowercase {x, y, z} for component. (e.g: 'Jz')
-    # @param contour A PyPO field or current component to plot as contour.
-    # @param contour_comp Component of contour to plot as contour. If None, looks is scalarfields.
-    # @param vmin Minimum amplitude value to display. Default is -30.
-    # @param vmax Maximum amplitude value to display. Default is 0.
-    # @param levels Levels for contourplot.
-    # @param show Show plot. Default is True.
-    # @param amp_only Only plot amplitude pattern. Default is False.
-    # @param save Save plot to /images/ folder.
-    # @param interpolation What interpolation to use for displaying amplitude pattern. Default is None.
-    # @param norm Normalise field (only relevant when plotting linear scale). Default is True.
-    # @param aperDict Plot an aperture defined in an aperDict object along with the field or current patterns. Default is None.
-    # @param mode Plot amplitude in decibels ("dB") or on a linear scale ("linear"). Default is "dB".
-    # @param project Set abscissa and ordinate of plot. Should be given as a string. Default is "xy".
-    # @param units The units of the axes. Default is "", which is millimeters.
-    # @param name Name of .png file where plot is saved. Only when save=True. Default is "".
-    # @param titleA Title of the amplitude plot. Default is "Amp".
-    # @param titleP Title of the phase plot. Default is "Phase".
-    # @param unwrap_phase Unwrap the phase patter. Prevents annular structure in phase pattern. Default is False.
-    # @param ret Return the Figure and Axis object. Only called by GUI. Default is False.
-    #
-    # @see aperDict
     def plotBeam2D(self, name_obj, comp=None, contour=None, contour_comp=None,
                     vmin=None, vmax=None, levels=None, show=True, amp_only=False,
                     save=False, interpolation=None, norm=True,
                     aperDict=None, mode='dB', project='xy',
                     units="", name="", titleA="Power", titleP="Phase",
                     unwrap_phase=False, ret=False):
+        """!
+        Generate a 2D plot of a PO (scalar)field or current.
+        
+        Note that matplotlib offers custom control over figures in the matplotlib window.
+        This means that most parameters described for this method can be adjusted in the matplotlib plotting window.
+        
+        @ingroup public_api_vis
+        
+        @param name_obj Name of field or current to plot.
+        @param comp Component of field or current to plot. String of two characters; an uppercase {E, H, J, M} for field followed by a lowercase {x, y, z} for component. (e.g: 'Jz')
+        @param contour A PyPO field or current component to plot as contour.
+        @param contour_comp Component of contour to plot as contour. If None, looks is scalarfields.
+        @param vmin Minimum amplitude value to display. Default is -30.
+        @param vmax Maximum amplitude value to display. Default is 0.
+        @param levels Levels for contourplot.
+        @param show Show plot. Default is True.
+        @param amp_only Only plot amplitude pattern. Default is False.
+        @param save Save plot to /images/ folder.
+        @param interpolation What interpolation to use for displaying amplitude pattern. Default is None.
+        @param norm Normalise field (only relevant when plotting linear scale). Default is True.
+        @param aperDict Plot an aperture defined in an aperDict object along with the field or current patterns. Default is None.
+        @param mode Plot amplitude in decibels ("dB") or on a linear scale ("linear"). Default is "dB".
+        @param project Set abscissa and ordinate of plot. Should be given as a string. Default is "xy".
+        @param units The units of the axes. Default is "", which is millimeters.
+        @param name Name of .png file where plot is saved. Only when save=True. Default is "".
+        @param titleA Title of the amplitude plot. Default is "Amp".
+        @param titleP Title of the phase plot. Default is "Phase".
+        @param unwrap_phase Unwrap the phase patter. Prevents annular structure in phase pattern. Default is False.
+        @param ret Return the Figure and Axis object. Only called by GUI. Default is False.
+        
+        @see aperDict
+        """
 
         aperDict = {"plot":False} if aperDict is None else aperDict
 
@@ -2255,26 +2344,27 @@ class System(object):
         elif show:
             pt.show()
 
-    ##
-    # Plot a 3D reflector.
-    #
-    # Note that matplotlib offers custom control over figures in the matplotlib window.
-    # This means that most parameters described for this method can be adjusted in the matplotlib plotting window.
-    #
-    # @ingroup public_api_vis
-    #
-    # @param name_surface Name of reflector to plot.
-    # @param cmap Colormap of reflector. Default is cool.
-    # @param norm Plot reflector normals. Default is False.
-    # @param fine Spacing of normals for plotting. Default is 2.
-    # @param show Show plot. Default is True.
-    # @param foc1 Plot focus 1. Default is False.
-    # @param foc2 Plot focus 2. Default is False.
-    # @param save Save the plot.
-    # @param ret Return Figure and Axis. Only used in GUI.
     def plot3D(self, name_surface, cmap=cm.cool,
             norm=False, fine=2, show=True, foc1=False, foc2=False, save=False, ret=False):
+        """!
+        Plot a 3D reflector.
         
+        Note that matplotlib offers custom control over figures in the matplotlib window.
+        This means that most parameters described for this method can be adjusted in the matplotlib plotting window.
+        
+        @ingroup public_api_vis
+        
+        @param name_surface Name of reflector to plot.
+        @param cmap Colormap of reflector. Default is cool.
+        @param norm Plot reflector normals. Default is False.
+        @param fine Spacing of normals for plotting. Default is 2.
+        @param show Show plot. Default is True.
+        @param foc1 Plot focus 1. Default is False.
+        @param foc2 Plot focus 2. Default is False.
+        @param save Save the plot.
+        @param ret Return Figure and Axis. Only used in GUI.
+        """
+
         fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
         
         if isinstance(name_surface, list) or isinstance(name_surface, np.ndarray):
@@ -2298,28 +2388,30 @@ class System(object):
         elif show:
             pt.show()
 
-    ##
-    # Plot the current system. Plots the reflectors and optionally ray-trace frames in a 3D plot.
-    #
-    # The ray-trace frames to plot are supplied as a list to the "RTframes" parameter.
-    # Note that matplotlib offers custom control over figures in the matplotlib window.
-    # This means that most parameters described for this method can be adjusted in the matplotlib plotting window.
-    #
-    # @ingroup public_api_vis
-    #
-    # @param name_surface Name of reflector to plot.
-    # @param cmap Colormap of reflector. Default is cool.
-    # @param norm Plot reflector normals. Default is False.
-    # @param fine Spacing of normals for plotting. Default is 2.
-    # @param show Show plot. Default is True.
-    # @param foc1 Plot focus 1. Default is False.
-    # @param foc2 Plot focus 2. Default is False.
-    # @param save Save the plot.
-    # @param ret Return Figure and Axis. Only used in GUI.
-    # @param select A list of names of reflectors to plot. If not given, plot all reflectors.
-    # @param RTframes A list of names of frame to plot. If not given, plot no ray-trace frames.
     def plotSystem(self, cmap=cm.cool,
                 norm=False, fine=2, show=True, foc1=False, foc2=False, save=False, ret=False, select=None, RTframes=None, RTcolor="black"):
+        """!
+        Plot the current system. Plots the reflectors and optionally ray-trace frames in a 3D plot.
+        
+        The ray-trace frames to plot are supplied as a list to the "RTframes" parameter.
+        Note that matplotlib offers custom control over figures in the matplotlib window.
+        This means that most parameters described for this method can be adjusted in the matplotlib plotting window.
+        
+        @ingroup public_api_vis
+        
+        @param name_surface Name of reflector to plot.
+        @param cmap Colormap of reflector. Default is cool.
+        @param norm Plot reflector normals. Default is False.
+        @param fine Spacing of normals for plotting. Default is 2.
+        @param show Show plot. Default is True.
+        @param foc1 Plot focus 1. Default is False.
+        @param foc2 Plot focus 2. Default is False.
+        @param save Save the plot.
+        @param ret Return Figure and Axis. Only used in GUI.
+        @param select A list of names of reflectors to plot. If not given, plot all reflectors.
+        @param RTframes A list of names of frame to plot. If not given, plot no ray-trace frames.
+        """
+
 
         select = [] if select is None else select
         RTframes = [] if RTframes is None else RTframes
@@ -2353,18 +2445,20 @@ class System(object):
         elif show:
             pt.show()
     
-    ##
-    # Plot a group of reflectors.
-    #
-    # Note that matplotlib offers custom control over figures in the matplotlib window.
-    # This means that most parameters described for this method can be adjusted in the matplotlib plotting window.
-    #
-    # @ingroup public_api_vis
-    #
-    # @param name_group Name of group to be plotted.
-    # @param show Show the plot.
-    # @param ret Whether to return figure and axis.
     def plotGroup(self, name_group, show=True, ret=False):
+        """!
+        Plot a group of reflectors.
+        
+        Note that matplotlib offers custom control over figures in the matplotlib window.
+        This means that most parameters described for this method can be adjusted in the matplotlib plotting window.
+        
+        @ingroup public_api_vis
+        
+        @param name_group Name of group to be plotted.
+        @param show Show the plot.
+        @param ret Whether to return figure and axis.
+        """
+
         select = [x for x in self.groups[name_group]["members"]]
 
         if ret:
@@ -2373,20 +2467,22 @@ class System(object):
         else:
             self.plotSystem(select=select, show=show)
 
-    ##
-    # Create a spot diagram of a ray-trace frame.
-    #
-    # Note that matplotlib offers custom control over figures in the matplotlib window.
-    # This means that most parameters described for this method can be adjusted in the matplotlib plotting window.
-    #
-    # @ingroup public_api_vis
-    #
-    # @param name_frame Name of frame to plot.
-    # @param project Set abscissa and ordinate of plot. Should be given as a string. Default is "xy".
-    # @param ret Return Figure and Axis. Default is False.
-    # @param aspect Aspect ratio of plot. Default is 1.
-    # @param unit Units of the axes for the plot.
     def plotRTframe(self, name_frame, project="xy", ret=False, aspect=1, unit="mm"):
+        """!
+        Create a spot diagram of a ray-trace frame.
+        
+        Note that matplotlib offers custom control over figures in the matplotlib window.
+        This means that most parameters described for this method can be adjusted in the matplotlib plotting window.
+        
+        @ingroup public_api_vis
+        
+        @param name_frame Name of frame to plot.
+        @param project Set abscissa and ordinate of plot. Should be given as a string. Default is "xy".
+        @param ret Return Figure and Axis. Default is False.
+        @param aspect Aspect ratio of plot. Default is 1.
+        @param unit Units of the axes for the plot.
+        """
+
         unit = self._units(unit)
         check_frameSystem(name_frame, self.frames, self.clog, extern=True)
         if ret:
@@ -2394,23 +2490,24 @@ class System(object):
         else:
             plt.plotRTframe(self.frames[name_frame], project, self.savePath, ret, aspect, unit)
 
-
-    ##
-    # Find the focus of a ray-trace frame.
-    #
-    # Adds a new plane to the System, perpendicular to the mean ray-trace tilt of the input frame.
-    # The new plane is called focal_plane_<name_frame> and stored in the internal system dictionary.
-    # After completion, the new plane is centered at the ray-trace focus.
-    # The focus frame is stored as focus_<name_frame> in the internal frames dictionary.
-    #
-    # @ingroup public_api_frames
-    #
-    # @param name_frame Name of the input frame.
-    # @param f0 Initial try for focal distance.
-    # @param verbose Allow verbose System logging.
-    #
-    # @returns out The focus co-ordinate.
     def findRTfocus(self, name_frame, f0=None, tol=1e-12):
+        """!
+        Find the focus of a ray-trace frame.
+        
+        Adds a new plane to the System, perpendicular to the mean ray-trace tilt of the input frame.
+        The new plane is called focal_plane_<name_frame> and stored in the internal system dictionary.
+        After completion, the new plane is centered at the ray-trace focus.
+        The focus frame is stored as focus_<name_frame> in the internal frames dictionary.
+        
+        @ingroup public_api_frames
+        
+        @param name_frame Name of the input frame.
+        @param f0 Initial try for focal distance.
+        @param verbose Allow verbose System logging.
+        
+        @returns out The focus co-ordinate.
+        """
+
         check_frameSystem(name_frame, self.frames, self.clog, extern=True)
         f0 = 0 if f0 is None else f0
        
@@ -2463,22 +2560,26 @@ class System(object):
 
         return out
         
-    ##
-    # Create a deep copy of any object.
-    # 
-    # @param obj Object do be deepcopied.
-    #
-    # @returns copy A deepcopy of obj.
     def copyObj(self, obj=None):
+        """!
+        Create a deep copy of any object.
+        
+        @param obj Object do be deepcopied.
+        
+        @returns copy A deepcopy of obj.
+        """
+
         obj = self if obj is None else obj
         return copy.deepcopy(obj)
 
-    ##
-    # Find rotation matrix to rotate v onto u.
-    #
-    # @param v Numpy array of length 3. 
-    # @param u Numpy array of length 3.
     def findRotation(self, v, u):
+        """!
+        Find rotation matrix to rotate v onto u.
+        
+        @param v Numpy array of length 3. 
+        @param u Numpy array of length 3.
+        """
+
         I = np.eye(3)
         if np.array_equal(v, u):
             return self.copyObj(world.INITM())
@@ -2503,15 +2604,17 @@ class System(object):
         
         return R_transf
     
-    ##
-    # Find x, y and z rotation angles from general rotation matrix.
-    # Note that the angles are not necessarily the same as the original angles of the matrix.
-    # However, the matrix constructed by the found angles applies the same 3D rotation as the input matrix.
-    #
-    # @param M Numpy array of shape (3,3) containg a general rotation matrix.
-    #
-    # @returns r Numpy array of length 3 containing rotation angles around x, y and z.
     def getAnglesFromMatrix(self, M):
+        """!
+        Find x, y and z rotation angles from general rotation matrix.
+        Note that the angles are not necessarily the same as the original angles of the matrix.
+        However, the matrix constructed by the found angles applies the same 3D rotation as the input matrix.
+        
+        @param M Numpy array of shape (3,3) containg a general rotation matrix.
+        
+        @returns r Numpy array of length 3 containing rotation angles around x, y and z.
+        """
+
         if M[2,0] < 1:
             if M[2,0] > -1:
                 ry = np.arcsin(-M[2,0])
@@ -2532,30 +2635,32 @@ class System(object):
 
         return r#, testM
     
-    ##
-    # Calculate gridsize for which problem converges.
-    #
-    # This function calculates the gridsize for a target surface in order to obtain a convergent solution.
-    # First, a small patch is selected from the middle of the target surface and given a starting gridsize.
-    # The brightest component of the source distribution is then selected and copied into a PO scalarfield object.
-    # The scalarfield is propagated to the target patch and the total incident power is calculated.
-    # Then, the propagation is performed again but now the gridsize of the patch is smaller.
-    # The power is calculated again and compared with the previous result.
-    # If this result is smaller than the given tolerance, the new gridsize is accepted as the converged gridsize.
-    # If not, another iteration is started.
-    # If the maximal number of iterations is exceeded, `PyPO` will throw an error and stop.
-    #
-    # @ingroup public_api_po
-    #
-    # @param source_field Name of field to use for auto convergence. Should be the field that is to be propagated.
-    # @param name_target Name of target surface.
-    # @param tol Tolerance for specifying when convergence has been reached.
-    # @param add Increment in gridsize for each iteration.
-    # @param patch_size Factor for reducing size of target in order to save time. Should be smaller than 1.
-    # @param max_iter Maximum number of iterations before auto convergence errors.
-    #
-    # @param returns gridsize Gridsize, scaled to full target, for which solution converged.
     def autoConverge(self, source_field, name_target, tol=1e-2, add=10, patch_size=1/9, max_iter=1000):
+        """!
+        Calculate gridsize for which calculation converges.
+        
+        This function calculates the gridsize for a target surface in order to obtain a convergent solution.
+        First, a small patch is selected from the middle of the target surface and given a starting gridsize.
+        The brightest component of the source distribution is then selected and copied into a PO scalarfield object.
+        The scalarfield is propagated to the target patch and the total incident power is calculated.
+        Then, the propagation is performed again but now the gridsize of the patch is smaller.
+        The power is calculated again and compared with the previous result.
+        If this result is smaller than the given tolerance, the new gridsize is accepted as the converged gridsize.
+        If not, another iteration is started.
+        If the maximal number of iterations is exceeded, `PyPO` will throw an error and stop.
+        
+        @ingroup public_api_po
+        
+        @param source_field Name of field to use for auto convergence. Should be the field that is to be propagated.
+        @param name_target Name of target surface.
+        @param tol Tolerance for specifying when convergence has been reached.
+        @param add Increment in gridsize for each iteration.
+        @param patch_size Factor for reducing size of target in order to save time. Should be smaller than 1.
+        @param max_iter Maximum number of iterations before auto convergence errors.
+        
+        @param returns gridsize Gridsize, scaled to full target, for which solution converged.
+        """
+
         self.clog.work(f"*** Starting auto-convergence *** ")
         logstate = self.verbosity
         self.setLoggingVerbosity(False)
@@ -2639,14 +2744,16 @@ class System(object):
     #                                                           #
     #############################################################
     
-    ##
-    # Instantiate a GUI PO propagation. Stores desired output in the system.fields and/or system.currents lists.
-    # If the 'EHP' mode is selected, the reflected Poynting frame is stored in system.frames.
-    #
-    # @param PODict Dictionary containing the PO propagation instructions.
-    #
-    # @see PODict
     def runGUIPO(self, runPODict):
+        """!
+        Instantiate a GUI PO propagation. Stores desired output in the system.fields and/or system.currents lists.
+        If the 'EHP' mode is selected, the reflected Poynting frame is stored in system.frames.
+        
+        @param PODict Dictionary containing the PO propagation instructions.
+        
+        @see PODict
+        """
+
         _runPODict = self.copyObj(runPODict)
 
         if _runPODict["mode"] != "scalar":
@@ -2697,11 +2804,13 @@ class System(object):
 
         return out
     
-    ##
-    # Run a ray-trace propagation from a frame to a surface in the GUI.
-    #
-    # @param runRTDict A runRTDict object specifying the ray-trace.
     def runGUIRayTracer(self, runRTDict):
+        """!
+        Run a ray-trace propagation from a frame to a surface in the GUI.
+        
+        @param runRTDict A runRTDict object specifying the ray-trace.
+        """
+
         _runRTDict = self.copyObj(runRTDict)
 
         _runRTDict["fr_in"] = self.frames[_runRTDict["fr_in"]]
@@ -2716,11 +2825,13 @@ class System(object):
         self.frames[runRTDict["fr_out"]] = frameObj
         self.frames[runRTDict["fr_out"]].setMeta(self.calcRTcenter(runRTDict["fr_out"]), self.calcRTtilt(runRTDict["fr_out"]), self.copyObj(world.INITM()))
     
-    ##
-    # Perform a hybrid RT/PO GUI propagation, starting from a reflected field and set of Poynting vectors.
-    #
-    # @param hybridDict A hybridDict dictionary.
     def hybridGUIPropagation(self, hybridDict):
+        """!
+        Perform a hybrid RT/PO GUI propagation, starting from a reflected field and set of Poynting vectors.
+        
+        @param hybridDict A hybridDict dictionary.
+        """
+
         field = self.copyObj(self.fields[hybridDict["field_in"]])
 
         runRTDict = {
@@ -2750,23 +2861,26 @@ class System(object):
 
         if interp:
             self.interpFrame(hybridDict["fr_out"], hybridDict["field_out"], hybridDict["t_name"], hybridDict["field_out"], comp=hybridDict["comp"])
+    
     #############################################################
     #                                                           #
     #                       PRIVATE METHODS                     #
     #                                                           #
     #############################################################
     
-    ##
-    # Convert a Poynting vector grid to a frame object.
-    # 
-    # @param Poynting An rfield object containing reflected Poynting vectors.
-    # @param name_source Name of reflector on which reflected Poynting vectors are defined
-    #
-    # @returns frame_in Frame object containing the Poynting vectors and base points.
-    #
-    # @see rfield
-    # @see frame
     def _loadFramePoynt(self, Poynting, name_source):
+        """!
+        Convert a Poynting vector grid to a frame object.
+        
+        @param Poynting An rfield object containing reflected Poynting vectors.
+        @param name_source Name of reflector on which reflected Poynting vectors are defined
+        
+        @returns frame_in Frame object containing the Poynting vectors and base points.
+        
+        @see rfield
+        @see frame
+        """
+
         check_elemSystem(name_source, self.system, self.clog, extern=True)
         grids = generateGrid(self.system[name_source])
 
@@ -2776,15 +2890,17 @@ class System(object):
 
         return frame_in
     
-    ##
-    # Cost function for finding a ray-trace frame focus.
-    # Optimises RMS spot size as function of tilt multiple f0.
-    #
-    # @param f0 Tilt multiple for finding focus.
-    # @param args The runRTDict for propagation and ray-trace tilt of input frame.
-    #
-    # @returns RMS The RMS spot size of the frame at f0 times the tilt.
     def _optimiseFocus(self, f0, *args):
+        """!
+        Cost function for finding a ray-trace frame focus.
+        Optimises RMS spot size as function of tilt multiple f0.
+        
+        @param f0 Tilt multiple for finding focus.
+        @param args The runRTDict for propagation and ray-trace tilt of input frame.
+        
+        @returns RMS The RMS spot size of the frame at f0 times the tilt.
+        """
+
         runRTDict, tilt = args
 
         trans = f0 * tilt
@@ -2798,13 +2914,14 @@ class System(object):
         #self.removeFrame() 
         return RMS
     
-    ##
-    # Check if an element to be rotated is bound to a PO field/current.
-    # If so, rotate vectorial field/current components along.
-    #
-    # @param name Name of reflector to be rotated.
-    # @param transf Array containing the transformation of the reflector.
     def _checkBoundPO(self, name, transf):
+        """!
+        Check if an element to be rotated is bound to a PO field/current.
+        If so, rotate vectorial field/current components along.
+        
+        @param name Name of reflector to be rotated.
+        @param transf Array containing the transformation of the reflector.
+        """
 
         bound_fields = []
         bound_currents = []
@@ -2829,14 +2946,16 @@ class System(object):
                 out = transformPO(self.currents[current], transf)
                 self.currents[current] = self.copyObj(out)
    
-    ##
-    # Transform a single component to a filled fields object by setting all other components to zero.
-    #
-    # @param comp Name of component.
-    # @param field Array to be inserted in fields object.
-    #
-    # @returns field_c Filled fields object with one component filled.
     def _compToFields(self, comp, field):
+        """!
+        Transform a single component to a filled fields object by setting all other components to zero.
+        
+        @param comp Name of component.
+        @param field Array to be inserted in fields object.
+        
+        @returns field_c Filled fields object with one component filled.
+        """
+
         null = np.zeros(field.shape, dtype=complex)
 
         if comp == "Ex":
@@ -2854,16 +2973,18 @@ class System(object):
 
         return field_c
 
-    ##
-    # Convert a string representation of a unit to a list containing the unit and conversion factor.
-    # The conversion is done with respect of the standard PyPO units, which are millimeters.
-    # This method is only used for plotting.
-    #
-    # @param unit String representation of the unit.
-    # @param default Default unit, millimeters.
-    #
-    # @returns out List containing the string unit and the corresponding conversion factor.
     def _units(self, unit, default="mm"):
+        """!
+        Convert a string representation of a unit to a list containing the unit and conversion factor.
+        The conversion is done with respect of the standard PyPO units, which are millimeters.
+        This method is only used for plotting.
+        
+        @param unit String representation of the unit.
+        @param default Default unit, millimeters.
+        
+        @returns out List containing the string unit and the corresponding conversion factor.
+        """
+
         if unit == "m":
             return [unit, 1e-3]
 
@@ -2890,5 +3011,30 @@ class System(object):
 
         else:
             return [default, 1.]
+   
+    def _absRotationMat(self, rotation, ori, pivot):
+        """!
+        Calculate an absolute rotation matrix. Private method.
+
+        The matrix is calculated with respect to the object's orientation, with respect to the z-axis.
+
+        @param rotation Orientation wit respect to the z-axis to rotate to.
+        @param ori Orientation of object.
+        @param pivot Pivot of object.
+        
+        @returns Rtot Absolute rotation matrix of dimensions 4 x 4.
+        """
+
+        match = world.IAX()
+        match_rot = (MatRotate(rotation))[:-1, :-1] @ match
+        R = self.findRotation(ori, match_rot)
+
+        Tp = self.copyObj(world.INITM())
+        Tpm = self.copyObj(world.INITM())
+        Tp[:-1,-1] = pivot
+        Tpm[:-1,-1] = -pivot
+        
+        Rtot = Tp @ R @ Tpm
+        return Rtot
 
 

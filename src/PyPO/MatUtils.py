@@ -5,15 +5,17 @@ import numpy as np
 # File containing a method for finding a connected subset, centered around a starting index, in a matrix.
 # Used for creating masks for fitting Gaussians.
 
-##
-# Find extent of centered connected subset in a matrix.
-#
-# @param mat Matrix of which to find largest connected subset.
-# @param component Value on which to differentiate subset.
-# @param idx_start Matrix index on which to center the subset.
-# 
-# @returns Indices of row and column of limits of subset.
 def findConnectedSubsets(mat, component, idx_start):
+    """!
+    Find extent of centered connected subset in a matrix.
+
+    @param mat Matrix of which to find largest connected subset.
+    @param component Value on which to differentiate subset.
+    @param idx_start Matrix index on which to center the subset.
+
+    @returns Indices of row and column of limits of subset.
+    """
+
     row_start_upp = mat[idx_start[0],(idx_start[1]+1):]
     row_start_low = mat[idx_start[0],:idx_start[1]]
     

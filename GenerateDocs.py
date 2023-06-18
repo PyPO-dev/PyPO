@@ -12,6 +12,7 @@ import traceback
 # For this script to work properly, you should have installed the docs prerequisites.
 def GenerateDocs():
         tut_path = "tutorials"
+        demo_path = "demos"
 
         try:
             try:
@@ -35,6 +36,24 @@ def GenerateDocs():
                     os.rename(html_path, html_dest_path)
                 
                 break
+            
+            # Convert demos to html format for inclusion in the documentation.
+            for (dirpath, dirnames, filenames) in os.walk(demo_path):
+                dest_path = os.path.join("docs", "demos")
+                os.makedirs(dest_path)
+                for file in filenames:
+                    if file.split('.')[1] != "ipynb":
+                        continue
+
+                    _path = os.path.join(demo_path, file)
+                    html_path = os.path.join(demo_path, f"{file.split('.')[0]}.html")
+                    html_dest_path = os.path.join(dest_path, f"{file.split('.')[0]}.html")
+
+                    os.system(f"jupyter nbconvert --to html --template lab --theme dark {_path}")
+                    os.rename(html_path, html_dest_path)
+                
+                break
+            
             # Convert md for GUI tutorials to html and copy to /docs
             dest_path = os.path.join("docs", "Gui")
             guitut_path = os.path.join(tut_path, "Gui")

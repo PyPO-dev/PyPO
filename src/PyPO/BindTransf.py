@@ -15,11 +15,13 @@ import PyPO.Threadmgr as TManager
 # Bindings for the ctypes interface for PyPO. 
 # These bindings are concerned with transforming frame and fields/currents.
 
-##
-# Load the pypotransf shared library. Will detect the operating system and link the library accordingly.
-#
-# @returns lib The ctypes library containing the C/C++ functions.
 def loadTransflib():
+    """!
+    Load the pypotransf shared library. Will detect the operating system and link the library accordingly.
+
+    @returns lib The ctypes library containing the C/C++ functions.
+    """
+
     path_cur = pathlib.Path(__file__).parent.resolve()
     try:
         lib = ctypes.CDLL(os.path.join(path_cur, "libpypotransf.dll"))
@@ -37,13 +39,15 @@ def loadTransflib():
     
     return lib
 
-##
-# Transform a frame of rays. 
-#
-# @param fr A frame object.
-#
-# @see frame
 def transformRays(fr):
+    """!
+    Transform a frame of rays. 
+
+    @param fr A frame object.
+
+    @see frame
+    """
+
     lib = loadTransflib()
 
     res = cframe()
@@ -60,13 +64,15 @@ def transformRays(fr):
     out.snapshots = fr.snapshots
     return out
 
-##
-# Transform a frame of rays. 
-#
-# @param fr A frame object.
-#
-# @see frame
 def transformPO(obj, transf):
+    """!
+    Transform a frame of rays. 
+
+    @param fr A frame object.
+
+    @see frame
+    """
+
     lib = loadTransflib()
 
     res = c2Bundle()

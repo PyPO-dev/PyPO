@@ -155,12 +155,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ga7f9e302018f039ad330dff46b4c49f2a"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__po.html#ga7f9e302018f039ad330dff46b4c49f2a">PyPO.System.System.calcMainBeam</a> (self, name_field, comp, thres=None, mode=None)</td></tr>
 <tr class="memdesc:ga7f9e302018f039ad330dff46b4c49f2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate main-beam efficiency of a beam pattern.  <br /></td></tr>
 <tr class="separator:ga7f9e302018f039ad330dff46b4c49f2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaa99735806ab6723df8107460c06a15d5"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__po.html#gaa99735806ab6723df8107460c06a15d5">PyPO.System.System.calcBeamCuts</a> (self, name_field, comp, phi=0, center=True, align=True, norm=False)</td></tr>
-<tr class="memdesc:gaa99735806ab6723df8107460c06a15d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate cross sections of a beam pattern.  <br /></td></tr>
-<tr class="separator:gaa99735806ab6723df8107460c06a15d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaf5d63b02b08afe46465783e6e271cd46"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__po.html#gaf5d63b02b08afe46465783e6e271cd46">PyPO.System.System.calcHPBW</a> (self, name_field, comp, interp=50)</td></tr>
-<tr class="memdesc:gaf5d63b02b08afe46465783e6e271cd46"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate half-power beamwidth.  <br /></td></tr>
-<tr class="separator:gaf5d63b02b08afe46465783e6e271cd46"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaecd240ae4a72da96ef3d569ce75376bc"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__po.html#gaecd240ae4a72da96ef3d569ce75376bc">PyPO.System.System.calcBeamCuts</a> (self, name_field, comp, phi=0, center=True, align=True, norm=False, mode=&quot;dB&quot;)</td></tr>
+<tr class="memdesc:gaecd240ae4a72da96ef3d569ce75376bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate cross sections of a beam pattern.  <br /></td></tr>
+<tr class="separator:gaecd240ae4a72da96ef3d569ce75376bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga0df4f35ded77084223c1b314ce2375c6"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__po.html#ga0df4f35ded77084223c1b314ce2375c6">PyPO.System.System.createPointSource</a> (self, PSDict, name_surface)</td></tr>
 <tr class="memdesc:ga0df4f35ded77084223c1b314ce2375c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate point-source PO fields and currents.  <br /></td></tr>
 <tr class="separator:ga0df4f35ded77084223c1b314ce2375c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -177,7 +174,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:gab0b62bd1bfc8e7103b5eb3e105d5e28f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interpolate a PO beam.  <br /></td></tr>
 <tr class="separator:gab0b62bd1bfc8e7103b5eb3e105d5e28f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga9fed5a1920ada927ea8712fae363d31f"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__po.html#ga9fed5a1920ada927ea8712fae363d31f">PyPO.System.System.autoConverge</a> (self, source_field, name_target, tol=1e-2, add=10, patch_size=1/9, max_iter=1000)</td></tr>
-<tr class="memdesc:ga9fed5a1920ada927ea8712fae363d31f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate gridsize for which problem converges.  <br /></td></tr>
+<tr class="memdesc:ga9fed5a1920ada927ea8712fae363d31f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate gridsize for which calculation converges.  <br /></td></tr>
 <tr class="separator:ga9fed5a1920ada927ea8712fae363d31f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -239,7 +236,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Calculate gridsize for which problem converges. </p>
+<p>Calculate gridsize for which calculation converges. </p>
 <p>This function calculates the gridsize for a target surface in order to obtain a convergent solution. First, a small patch is selected from the middle of the target surface and given a starting gridsize. The brightest component of the source distribution is then selected and copied into a PO scalarfield object. The scalarfield is propagated to the target patch and the total incident power is calculated. Then, the propagation is performed again but now the gridsize of the patch is smaller. The power is calculated again and compared with the previous result. If this result is smaller than the given tolerance, the new gridsize is accepted as the converged gridsize. If not, another iteration is started. If the maximal number of iterations is exceeded, <code>PyPO</code> will throw an error and stop.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -256,8 +253,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="gaa99735806ab6723df8107460c06a15d5" name="gaa99735806ab6723df8107460c06a15d5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaa99735806ab6723df8107460c06a15d5">&#9670;&#160;</a></span>calcBeamCuts()</h2>
+<a id="gaecd240ae4a72da96ef3d569ce75376bc" name="gaecd240ae4a72da96ef3d569ce75376bc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaecd240ae4a72da96ef3d569ce75376bc">&#9670;&#160;</a></span>calcBeamCuts()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -302,7 +299,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>norm</em> = <code>False</code>&#160;</td>
+          <td class="paramname"><em>norm</em> = <code>False</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>mode</em> = <code>&quot;dB&quot;</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -321,7 +324,8 @@ Functions</h2></td></tr>
     <tr><td class="paramname">phi</td><td>Manual rotation of cuts w.r.t. to the x-y cardinal planes. </td></tr>
     <tr><td class="paramname">center</td><td>Whether to center the cardinal planes on the peak of the beam pattern. </td></tr>
     <tr><td class="paramname">align</td><td>Whether to align the cardinal planes to the beam pattern minor and major axes. </td></tr>
-    <tr><td class="paramname">norm</td><td>Which component to normalise to. Defaults to comp.</td></tr>
+    <tr><td class="paramname">norm</td><td>Which component to normalise to. Defaults to comp. </td></tr>
+    <tr><td class="paramname">mode</td><td>Return beamcuts in linear ("linear"), logarithmic ("log") or decibels ("dB"). Defaults to "dB".</td></tr>
   </table>
   </dd>
 </dl>
@@ -385,60 +389,6 @@ y_strip Co-ordinate values for y_cut. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd>fields </dd>
 <dd>
 currents </dd></dl>
-
-</div>
-</div>
-<a id="gaf5d63b02b08afe46465783e6e271cd46" name="gaf5d63b02b08afe46465783e6e271cd46"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaf5d63b02b08afe46465783e6e271cd46">&#9670;&#160;</a></span>calcHPBW()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">def PyPO.System.System.calcHPBW </td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>self</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>name_field</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>comp</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>interp</em> = <code>50</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Calculate half-power beamwidth. </p>
-<p>This is done by directly evaluating the -3 dB points along both cardinal planes of the beam pattern. Then, the distance between antipodal half-power points is calculated on an interpolation of the supplied PO field.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">name_field</td><td>Name of field object. </td></tr>
-    <tr><td class="paramname">comp</td><td>Component of field object. </td></tr>
-    <tr><td class="paramname">interp</td><td>Interpolation factor for finding the HPBW. Defaults to 50.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>HPBW_E Half-power beamwidth along E-plane. </dd>
-<dd>
-HPBW_H Half-power beamwidth along H-plane. </dd></dl>
 
 </div>
 </div>
@@ -646,7 +596,7 @@ HPBW_H Half-power beamwidth along H-plane. </dd></dl>
 </div><div class="memdoc">
 
 <p>Calculate cross-polar efficiency of a field defined on a surface. </p>
-<p>The cross-polar efficiency is calculated over the entire field extent.</p>
+<p>The cross-polar efficiency is described as the ratio of power in the cross-polar component versus the co-polar component. The cross-polar efficiency is calculated over the entire field extent.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">name_field</td><td>Name of the PO field. </td></tr>

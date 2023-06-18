@@ -15,15 +15,17 @@ PO_modelist = ["JM", "EH", "JMEH", "EHP", "FF", "scalar"]
 # @file
 # File containing all commonly used checks for PyPO user input.
 
-##
-# Get the regular expression for checking if an object already exists.
-# Counts the amount of occurrences in order to avoid conflicting names.
-#
-# @param name Name of object.
-# @param nameList List of names to check.
-#
-# @returns num Increment of highest occurrence of number.
 def getIndex(name, nameList):
+    """!
+    Get the regular expression for checking if an object already exists.
+    Counts the amount of occurrences in order to avoid conflicting names.
+
+    @param name Name of object.
+    @param nameList List of names to check.
+
+    @returns num Increment of highest occurrence of number.
+    """
+
     regex = f"(?<!.){name}(_(\d*(?![ -~])))*(?![ -~])"
     l = re.compile(regex)
     match = list(filter(l.match, nameList))
@@ -34,10 +36,12 @@ def getIndex(name, nameList):
 
     return num
 
-##
-# Check if the CUDA dynamically linked libraries exist.
-# Checks the paths for Windows, Linux and Mac OS.
 def has_CUDA():
+    """!
+    Check if the CUDA dynamically linked libraries exist.
+    Checks the paths for Windows, Linux and Mac OS.
+    """
+
     has = False
     path_cur = pathlib.Path(__file__).parent.resolve()
 
@@ -49,17 +53,19 @@ def has_CUDA():
 
     return has
 
-##
-# Check if a specified element is in the system dictionary.
-#
-# @param name Name of element.
-# @param elements The system dictionary containing all elements.
-# @param clog CustomLogger object.
-# @param errStr Error string for appending error messages.
-# @param extern Whether this function is called from System or from here.
-#
-# @returns errStr The error string with any new entries appended.
 def check_elemSystem(name, elements, clog, errStr="", extern=False):
+    """!
+    Check if a specified element is in the system dictionary.
+
+    @param name Name of element.
+    @param elements The system dictionary containing all elements.
+    @param clog CustomLogger object.
+    @param errStr Error string for appending error messages.
+    @param extern Whether this function is called from System or from here.
+
+    @returns errStr The error string with any new entries appended.
+    """
+
     if name not in elements:
         errStr += errMsg_noelem(name)
     
@@ -74,17 +80,19 @@ def check_elemSystem(name, elements, clog, errStr="", extern=False):
     else:
         return errStr
 
-##
-# Check if a specified field is in the fields dictionary.
-#
-# @param name Name of field.
-# @param fields The fields dictionary containing all fields.
-# @param clog CustomLogger object.
-# @param errStr Error string for appending error messages.
-# @param extern Whether this function is called from System or from here.
-#
-# @returns errStr The error string with any new entries appended.
 def check_fieldSystem(name, fields, clog, errStr="", extern=False):
+    """!
+    Check if a specified field is in the fields dictionary.
+
+    @param name Name of field.
+    @param fields The fields dictionary containing all fields.
+    @param clog CustomLogger object.
+    @param errStr Error string for appending error messages.
+    @param extern Whether this function is called from System or from here.
+
+    @returns errStr The error string with any new entries appended.
+    """
+
     if name not in fields:
         errStr += errMsg_nofield(name)
 
@@ -99,17 +107,19 @@ def check_fieldSystem(name, fields, clog, errStr="", extern=False):
     else:
         return errStr
 
-##
-# Check if a specified current is in the currents dictionary.
-#
-# @param name Name of current.
-# @param currents The currents dictionary containing all currents.
-# @param clog CustomLogger object.
-# @param errStr Error string for appending error messages.
-# @param extern Whether this function is called from System or from here.
-#
-# @returns errStr The error string with any new entries appended.
 def check_currentSystem(name, currents, clog, errStr="", extern=False):
+    """!
+    Check if a specified current is in the currents dictionary.
+
+    @param name Name of current.
+    @param currents The currents dictionary containing all currents.
+    @param clog CustomLogger object.
+    @param errStr Error string for appending error messages.
+    @param extern Whether this function is called from System or from here.
+
+    @returns errStr The error string with any new entries appended.
+    """
+
     if name not in currents:
         errStr += errMsg_nocurrent(name)
 
@@ -124,17 +134,19 @@ def check_currentSystem(name, currents, clog, errStr="", extern=False):
     else:
         return errStr
 
-##
-# Check if a specified scalarfield is in the scalarfields dictionary.
-#
-# @param name Name of scalarfield.
-# @param scalarfields The scalarfields dictionary containing all scalarfields.
-# @param clog CustomLogger object.
-# @param errStr Error string for appending error messages.
-# @param extern Whether this function is called from System or from here.
-#
-# @returns errStr The error string with any new entries appended.
 def check_scalarfieldSystem(name, scalarfields, clog, errStr="", extern=False):
+    """!
+    Check if a specified scalarfield is in the scalarfields dictionary.
+
+    @param name Name of scalarfield.
+    @param scalarfields The scalarfields dictionary containing all scalarfields.
+    @param clog CustomLogger object.
+    @param errStr Error string for appending error messages.
+    @param extern Whether this function is called from System or from here.
+
+    @returns errStr The error string with any new entries appended.
+    """
+
     if name not in scalarfields:
         errStr += errMsg_noscalarfield(name)
 
@@ -149,17 +161,19 @@ def check_scalarfieldSystem(name, scalarfields, clog, errStr="", extern=False):
     else:
         return errStr
 
-##
-# Check if a specified frame is in the frames dictionary.
-#
-# @param name Name of frame.
-# @param frames The frames dictionary containing all frames.
-# @param clog CustomLogger object.
-# @param errStr Error string for appending error messages.
-# @param extern Whether this function is called from System or from here.
-#
-# @returns errStr The error string with any new entries appended.
 def check_frameSystem(name, frames, clog, errStr="", extern=False):
+    """!
+    Check if a specified frame is in the frames dictionary.
+
+    @param name Name of frame.
+    @param frames The frames dictionary containing all frames.
+    @param clog CustomLogger object.
+    @param errStr Error string for appending error messages.
+    @param extern Whether this function is called from System or from here.
+
+    @returns errStr The error string with any new entries appended.
+    """
+
     if name not in frames:
         errStr += errMsg_noframe(name)
 
@@ -174,17 +188,19 @@ def check_frameSystem(name, frames, clog, errStr="", extern=False):
     else:
         return errStr
 
-##
-# Check if a specified group is in the groups dictionary.
-#
-# @param name Name of group.
-# @param groups The groups dictionary containing all groups.
-# @param clog CustomLogger object.
-# @param errStr Error string for appending error messages.
-# @param extern Whether this function is called from System or from here.
-#
-# @returns errStr The error string with any new entries appended.
 def check_groupSystem(name, groups, clog, errStr="", extern=False):
+    """!
+    Check if a specified group is in the groups dictionary.
+
+    @param name Name of group.
+    @param groups The groups dictionary containing all groups.
+    @param clog CustomLogger object.
+    @param errStr Error string for appending error messages.
+    @param extern Whether this function is called from System or from here.
+
+    @returns errStr The error string with any new entries appended.
+    """
+
     if name not in groups:
         errStr += errMsg_nogroup(name)
 
@@ -199,211 +215,265 @@ def check_groupSystem(name, groups, clog, errStr="", extern=False):
     else:
         return errStr
 
-##
-# Input reflector error. Raised when an error is encountered in an input reflector dictionary.
 class InputReflError(Exception):
+    """!
+    Input reflector error. Raised when an error is encountered in an input reflector dictionary.
+    """
+
     pass
 
-##
-# Input ray-trace error. Raised when an error is encountered in an input ray-trace dictionary.
 class InputRTError(Exception):
+    """!
+    Input ray-trace error. Raised when an error is encountered in an input ray-trace dictionary.
+    """
+
     pass
 
-##
-# Propagate ray-trace error. Raised when an error is encountered in a ray-trace propagation dictionary.
 class RunRTError(Exception):
+    """!
+    Propagate ray-trace error. Raised when an error is encountered in a ray-trace propagation dictionary.
+    """
+
     pass
 
-##
-# Input physical optics error. Raised when an error is encountered in an input PO beam dictionary.
 class InputPOError(Exception):
+    """!
+    Input physical optics error. Raised when an error is encountered in an input PO beam dictionary.
+    """
+
     pass
 
-##
-# Propagate physical optics error. Raised when an error is encountered in a physical optics propagation dictionary.
 class RunPOError(Exception):
+    """!
+    Propagate physical optics error. Raised when an error is encountered in a physical optics propagation dictionary.
+    """
+
     pass
 
-##
-# Hybrid propagation error. Raised when an error is encountered in a hybrid propagation dictionary. 
 class HybridPropError(Exception):
+    """!
+    Hybrid propagation error. Raised when an error is encountered in a hybrid propagation dictionary. 
+    """
+
     pass
 
-##
-# Element name error. Raised when specified element cannot be found in the system dictionary. 
 class ElemNameError(Exception):
+    """!
+    Element name error. Raised when specified element cannot be found in the system dictionary. 
+    """
+
     pass
 
-##
-# Field name error. Raised when specified field cannot be found in the fields dictionary. 
 class FieldNameError(Exception):
+    """!
+    Field name error. Raised when specified field cannot be found in the fields dictionary. 
+    """
+
     pass
 
-##
-# Current name error. Raised when specified current cannot be found in the currents dictionary. 
 class CurrentNameError(Exception):
+    """!
+    Current name error. Raised when specified current cannot be found in the currents dictionary. 
+    """
+
     pass
 
-##
-# Frame name error. Raised when specified frame cannot be found in the frames dictionary. 
 class FrameNameError(Exception):
+    """!
+    Frame name error. Raised when specified frame cannot be found in the frames dictionary. 
+    """
+
     pass
 
-##
-# Scalarfield name error. Raised when specified scalarfield cannot be found in the scalarfields dictionary. 
 class ScalarFieldNameError(Exception):
+    """!
+    Scalarfield name error. Raised when specified scalarfield cannot be found in the scalarfields dictionary. 
+    """
+
     pass
 
-##
-# Group name error. Raised when specified group cannot be found in the groups dictionary. 
 class GroupNameError(Exception):
+    """!
+    Group name error. Raised when specified group cannot be found in the groups dictionary. 
+    """
+
     pass
 
-##
-# Merge beamerror. Raised when beams are to be merged but are not on same surface. 
 class MergeBeamError(Exception):
+    """!
+    Merge beamerror. Raised when beams are to be merged but are not on same surface. 
+    """
+
     pass
 
-##
-# ApertureError. Raised when aperDict is filled incorrectly.
 class ApertureError(Exception):
+    """!
+    ApertureError. Raised when aperDict is filled incorrectly.
+    """
+
     pass
 
-##
-# Error message when a mandatory field has not been filled in a dictionary.
-#
-# @param fieldName Name of field in dictionary that is not filled.
-# @param elemName Name of dictionary where error occurred. 
-#
-# @returns errStr The errorstring.
 def errMsg_field(fieldName, elemName):
+    """!
+    Error message when a mandatory field has not been filled in a dictionary.
+
+    @param fieldName Name of field in dictionary that is not filled.
+    @param elemName Name of dictionary where error occurred. 
+
+    @returns errStr The errorstring.
+    """
+
     return f"Missing field \"{fieldName}\", element {elemName}.\n"
 
-##
-# Error message when a field has not been filled has been filled with an incorrect type.
-#
-# @param fieldName Name of field in dictionary that is incorrectly filled.
-# @param inpType Type of given input.
-# @param elemName Name of dictionary where error occurred. 
-# @param fieldType Expected type of input.
-#
-# @returns errStr The errorstring.
 def errMsg_type(fieldName, inpType, elemName, fieldType):
+    """!
+    Error message when a field has not been filled has been filled with an incorrect type.
+
+    @param fieldName Name of field in dictionary that is incorrectly filled.
+    @param inpType Type of given input.
+    @param elemName Name of dictionary where error occurred. 
+    @param fieldType Expected type of input.
+
+    @returns errStr The errorstring.
+    """
+
     return f"Wrong type {inpType} in field \"{fieldName}\", element {elemName}. Expected {fieldType}.\n"
 
-##
-# Error message when a field has an unknown option.
-#
-# @param fieldName Name of field in dictionary.
-# @param option Given option.
-# @param elemName Name of dictionary where error occurred. 
-# @param args Expected options.
-#
-# @returns errStr The errorstring.
 def errMsg_option(fieldName, option, elemName, args):
+    """!
+    Error message when a field has an unknown option.
+
+    @param fieldName Name of field in dictionary.
+    @param option Given option.
+    @param elemName Name of dictionary where error occurred. 
+    @param args Expected options.
+
+    @returns errStr The errorstring.
+    """
+
     if len(args) == 2:
         return f"Unknown option \"{option}\" in field \"{fieldName}\", element {elemName}. Expected \"{args[0]}\" or \"{args[1]}\".\n"
 
     elif len(args) == 3:
         return f"Unknown option \"{option}\" in field \"{fieldName}\", element {elemName}. Expected \"{args[0]}\", \"{args[1]}\" or \"{args[2]}\".\n"
 
-##
-# Error message when a field has an incorrect shape.
-#
-# @param fieldName Name of field in dictionary.
-# @param shape Shape of input.
-# @param elemName Name of dictionary where error occurred.
-# @param shapeExpect Expected input shape for field.
-#
-# @returns errStr The errorstring.
 def errMsg_shape(fieldName, shape, elemName, shapeExpect):
+    """!
+    Error message when a field has an incorrect shape.
+
+    @param fieldName Name of field in dictionary.
+    @param shape Shape of input.
+    @param elemName Name of dictionary where error occurred.
+    @param shapeExpect Expected input shape for field.
+
+    @returns errStr The errorstring.
+    """
+
     return f"Incorrect input shape of {shape} for field \"{fieldName}\", element {elemName}. Expected {shapeExpect}.\n"
 
-##
-# Error message when a wrong input value is encountered.
-#
-# @param fieldName Name of field where incorrect value is encountered.
-# @param value Input value.
-# @param Name of dictionary where error occurred.
-#
-# @returns errStr The errorstring.
 def errMsg_value(fieldName, value, elemName):
+    """!
+    Error message when a wrong input value is encountered.
+
+    @param fieldName Name of field where incorrect value is encountered.
+    @param value Input value.
+    @param Name of dictionary where error occurred.
+
+    @returns errStr The errorstring.
+    """
+
     return f"Incorrect value {value} encountered in field \"{fieldName}\", element {elemName}.\n"
 
-##
-# Error message when a reflector element is not present in System.
-#
-# @param elemName Name of element.
-#
-# @returns errStr The errorstring.
 def errMsg_noelem(elemName):
+    """!
+    Error message when a reflector element is not present in System.
+
+    @param elemName Name of element.
+
+    @returns errStr The errorstring.
+    """
+
     return f"Element {elemName} not in system.\n"
 
-##
-# Error message when a frame object is not present in System.
-#
-# @param frameName Name of frame.
-#
-# @returns errStr The errorstring.
 def errMsg_noframe(frameName):
+    """!
+    Error message when a frame object is not present in System.
+
+    @param frameName Name of frame.
+
+    @returns errStr The errorstring.
+    """
+
     return f"Frame {frameName} not in system.\n"
 
-##
-# Error message when a field object is not present in System.
-#
-# @param fieldName Name of field.
-#
-# @returns errStr The errorstring.
 def errMsg_nofield(fieldName):
+    """!
+    Error message when a field object is not present in System.
+
+    @param fieldName Name of field.
+
+    @returns errStr The errorstring.
+    """
+
     return f"Field {fieldName} not in system.\n"
 
-##
-# Error message when a current object is not present in System.
-#
-# @param currentName Name of current.
-#
-# @returns errStr The errorstring.
 def errMsg_nocurrent(currentName):
+    """!
+    Error message when a current object is not present in System.
+
+    @param currentName Name of current.
+
+    @returns errStr The errorstring.
+    """
+
     return f"Current {currentName} not in system.\n"
 
-##
-# Error message when a scalarfield object is not present in System.
-#
-# @param scalarfieldName Name of scalarfield.
-#
-# @returns errStr The errorstring.
 def errMsg_noscalarfield(scalarfieldName):
+    """!
+    Error message when a scalarfield object is not present in System.
+
+    @param scalarfieldName Name of scalarfield.
+
+    @returns errStr The errorstring.
+    """
+
     return f"Scalar field {scalarfieldName} not in system.\n"
 
-##
-# Error message when a group is not present in System.
-#
-# @param groupName Name of group.
-#
-# @returns errStr The errorstring.
 def errMsg_nogroup(groupName):
+    """!
+    Error message when a group is not present in System.
+
+    @param groupName Name of group.
+
+    @returns errStr The errorstring.
+    """
+
     return f"Group {groupName} not in system.\n"
 
-##
-# Error message when beams are to be merged but are not on the same surface.
-#
-# @param beamName Name of field/current that is not on surface.
-# @param surf0 Zeroth surface, taken as the merging surface.
-# @param surfd Surface on which current beam is defined.
-#
-# @returns errStr The errorstring.
 def errMsg_mergebeam(beamName, surf0, surfd):
+    """!
+    Error message when beams are to be merged but are not on the same surface.
+
+    @param beamName Name of field/current that is not on surface.
+    @param surf0 Zeroth surface, taken as the merging surface.
+    @param surfd Surface on which current beam is defined.
+
+    @returns errStr The errorstring.
+    """
+
     return f"Cannot merge {beamName}, defined on {surfd}, on merging surface {surf0}.\n"
 
-## 
-# Check if an input array has correct shape.
-#
-# @param fieldName Name of field containing array.
-# @param elemDict Dictionary containing field.
-# @param shape Expected shape of input array.
-#
-# @returns errStr The errorstring.
 def block_ndarray(fieldName, elemDict, shape, cust_name=False):
+    """!
+    Check if an input array has correct shape.
+
+    @param fieldName Name of field containing array.
+    @param elemDict Dictionary containing field.
+    @param shape Expected shape of input array.
+
+    @returns errStr The errorstring.
+    """
+
     _errStr = ""
 
     if not cust_name:
@@ -419,15 +489,18 @@ def block_ndarray(fieldName, elemDict, shape, cust_name=False):
     
     return _errStr
 
-##
-# Check element input dictionary.
-#
-# Checks the input dictionary for errors. Raises exceptions when encountered.
-#
-# @param elemName Name of element, string.
-# @param nameList List of names in system dictionary.
-# @param clog CustomLogger object.
 def check_ElemDict(elemDict, nameList, clog): 
+    """!
+    Check element input dictionary.
+
+    Checks the input dictionary for errors. Raises exceptions when encountered.
+    Also fills in defaults if these are not supplied.
+
+    @param elemName Name of element, string.
+    @param nameList List of names in system dictionary.
+    @param clog CustomLogger object.
+    """
+
     errStr = ""
    
     elemDict["transf"] = world.INITM() 
@@ -642,15 +715,17 @@ def check_ElemDict(elemDict, nameList, clog):
     else:
         return 0
 
-##
-# Check a tubular input frame dictionary.
-#
-# @param TubeRTDict A TubeRTDict object.
-# @param namelist List containing names of frames in System.
-# @param clog CustomLogger object.
-#
-# @see TubeRTDict
 def check_TubeRTDict(TubeRTDict, nameList, clog):
+    """!
+    Check a tubular input frame dictionary.
+
+    @param TubeRTDict A TubeRTDict object.
+    @param namelist List containing names of frames in System.
+    @param clog CustomLogger object.
+
+    @see TubeRTDict
+    """
+
     errStr = ""
     
     if "name" not in TubeRTDict:
@@ -730,15 +805,17 @@ def check_TubeRTDict(TubeRTDict, nameList, clog):
             clog.error(err)
         raise InputRTError()
 
-##
-# Check a Gaussian input frame dictionary.
-#
-# @param GRTDict A GRTDict object.
-# @param namelist List containing names of frames in System.
-# @param clog CustomLogger object.
-#
-# @see GRTDict
 def check_GRTDict(GRTDict, nameList, clog):
+    """!
+    Check a Gaussian input frame dictionary.
+
+    @param GRTDict A GRTDict object.
+    @param namelist List containing names of frames in System.
+    @param clog CustomLogger object.
+
+    @see GRTDict
+    """
+
     errStr = ""
     
     if "name" not in GRTDict:
@@ -809,14 +886,16 @@ def check_GRTDict(GRTDict, nameList, clog):
             clog.error(err)
         raise InputRTError()
 
-##
-# Check a ray-trace propagation input dictionary.
-#
-# @param runRTDict A runRTDict.
-# @param elements List containing names of surfaces in System.
-# @param frames List containing names of frames in System.
-# @param clog CustomLogger object.
 def check_runRTDict(runRTDict, elements, frames, clog):
+    """!
+    Check a ray-trace propagation input dictionary.
+
+    @param runRTDict A runRTDict.
+    @param elements List containing names of surfaces in System.
+    @param frames List containing names of frames in System.
+    @param clog CustomLogger object.
+    """
+
     errStr = ""
    
     cuda = has_CUDA()
@@ -895,15 +974,17 @@ def check_runRTDict(runRTDict, elements, frames, clog):
             clog.error(err)
         raise RunRTError()
 
-##
-# Check a point source input beam dictionary.
-#
-# @param PSDict A PSDict object.
-# @param namelist List containing names of fields in System.
-# @param clog CustomLogger object.
-#
-# @see PSDict
 def check_PSDict(PSDict, nameList, clog):
+    """!
+    Check a point source input beam dictionary.
+
+    @param PSDict A PSDict object.
+    @param namelist List containing names of fields in System.
+    @param clog CustomLogger object.
+
+    @see PSDict
+    """
+
     errStr = ""
     
     if "name" not in PSDict:
@@ -956,15 +1037,17 @@ def check_PSDict(PSDict, nameList, clog):
             clog.error(err)
         raise InputPOError()
 
-##
-# Check a Gaussian input beam dictionary.
-#
-# @param GPODict A GPODict object.
-# @param namelist List containing names of fields in System.
-# @param clog CustomLogger object.
-#
-# @see GPODict
 def check_GPODict(GPODict, nameList, clog):
+    """!
+    Check a Gaussian input beam dictionary.
+
+    @param GPODict A GPODict object.
+    @param namelist List containing names of fields in System.
+    @param clog CustomLogger object.
+
+    @see GPODict
+    """
+
     errStr = ""
     
     if "name" not in GPODict:
@@ -1050,15 +1133,17 @@ def check_GPODict(GPODict, nameList, clog):
             clog.error(err)
         raise InputPOError()
 
-##
-# Check a physical optics propagation input dictionary.
-#
-# @param runPODict A runPODict.
-# @param elements List containing names of surfaces in System.
-# @param currents List containing names of currents in System.
-# @param scalarfields List containing names of scalarfields in System.
-# @param clog CustomLogger object.
 def check_runPODict(runPODict, elements, fields, currents, scalarfields, frames, clog):
+    """!
+    Check a physical optics propagation input dictionary.
+
+    @param runPODict A runPODict.
+    @param elements List containing names of surfaces in System.
+    @param currents List containing names of currents in System.
+    @param scalarfields List containing names of scalarfields in System.
+    @param clog CustomLogger object.
+    """
+
     errStr = ""
 
     cuda = has_CUDA()
@@ -1204,15 +1289,17 @@ def check_runPODict(runPODict, elements, fields, currents, scalarfields, frames,
         
         raise RunPOError()
 
-##
-# Check a hybrid propagation input dictionary.
-#
-# @param hybridDict A hybridDict.
-# @param elements List containing names of surfaces in System.
-# @param frames List containing names of frames in System.
-# @param fields List containing names of frames in System.
-# @param clog CustomLogger object.
 def check_hybridDict(hybridDict, elements, frames, fields, clog):
+    """!
+    Check a hybrid propagation input dictionary.
+
+    @param hybridDict A hybridDict.
+    @param elements List containing names of surfaces in System.
+    @param frames List containing names of frames in System.
+    @param fields List containing names of frames in System.
+    @param clog CustomLogger object.
+    """
+
     errStr = ""
    
     if "fr_in" not in hybridDict:
@@ -1275,14 +1362,16 @@ def check_hybridDict(hybridDict, elements, frames, fields, clog):
             clog.error(err)
         raise HybridPropError()
 
-##
-# CHeck if aperture dictionary is valid.
-#
-# @param aperDict An aperture dictionary.
-# @param clog CustomLogger object.
-#
-# @see aperDict
 def check_aperDict(aperDict, clog):
+    """!
+    CHeck if aperture dictionary is valid.
+
+    @param aperDict An aperture dictionary.
+    @param clog CustomLogger object.
+
+    @see aperDict
+    """
+
     errStr = ""
 
     if "plot" in aperDict:
@@ -1310,13 +1399,16 @@ def check_aperDict(aperDict, clog):
         for err in errList:
             clog.error(err)
         raise ApertureError()
-##
-# Check if ellipsoid limits are valid points.
-# If not, reduces limits to acceptable values.
-#
-# @param ellipsoid A reflDict containing description of ellipsoid surface.
-# @param clog CustomLogger object.
+
 def check_ellipseLimits(ellipsoid, clog):
+    """!
+    Check if ellipsoid limits are valid points.
+    If not, reduces limits to acceptable values.
+
+    @param ellipsoid A reflDict containing description of ellipsoid surface.
+    @param clog CustomLogger object.
+    """
+
     buff = 1000
     idx_lim = 0
     if ellipsoid["coeffs"][1] < ellipsoid["coeffs"][0]:
@@ -1352,14 +1444,16 @@ def check_ellipseLimits(ellipsoid, clog):
             clog.warning(f"Upper u-limit of {ellipsoid['lims_u'][1]:.3f} incompatible with ellipsoid {ellipsoid['name']}. Changing to {ellipsoid['coeffs'][idx_lim]}.")
             ellipsoid["lims_u"][1] = ellipsoid["coeffs"][idx_lim] - ellipsoid["lims_u"][1] / buff
 
-##
-# Check if beams to be merged are defined on same surface.
-# If not, raise MergeBeam Error.
-#
-# @param beams Fields/currents to be merged.
-# @param checkDict System c=dictionary containing fields/currents.
-# @param clog CustomLogger object.
 def check_sameBound(beams, checkDict, clog):
+    """!
+    Check if beams to be merged are defined on same surface.
+    If not, raise MergeBeam Error.
+
+    @param beams Fields/currents to be merged.
+    @param checkDict System c=dictionary containing fields/currents.
+    @param clog CustomLogger object.
+    """
+
     errStr = ""
     surf0 = checkDict[beams[0]].surf
     for i in range(len(beams) - 1):
@@ -1373,17 +1467,19 @@ def check_sameBound(beams, checkDict, clog):
         
         raise MergeBeamError()
 
-##
-# Check if field and frame are associated on the same surface.
-# Used for hybrid propagations.
-# Currently, can only have one single association per surface!
-#
-# @param associations All present associations in system.
-# @param fieldName Name of field to be propagated.
-# @param frameName Name of frame to be propagated.
-# @param surf Name of surface from which a hybrid propagation is performed.
-# @param clog CustomLogger object.
 def check_associations(associations, fieldName, frameName, surf, clog):
+    """!
+    Check if field and frame are associated on the same surface.
+    Used for hybrid propagations.
+    Currently, can only have one single association per surface!
+
+    @param associations All present associations in system.
+    @param fieldName Name of field to be propagated.
+    @param frameName Name of frame to be propagated.
+    @param surf Name of surface from which a hybrid propagation is performed.
+    @param clog CustomLogger object.
+    """
+
     if surf not in associations.keys():
         clog.error(f"Surface {surf} not found in associations.")
         

@@ -135,7 +135,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:ga3f28dd605141dd9d4932e9441cfb14dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save a system object to disk.  <br /></td></tr>
 <tr class="separator:ga3f28dd605141dd9d4932e9441cfb14dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gae622c9e52028247509a83e282c27cdbd"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__sysio.html#gae622c9e52028247509a83e282c27cdbd">PyPO.System.System.loadSystem</a> (self, name)</td></tr>
-<tr class="memdesc:gae622c9e52028247509a83e282c27cdbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load a system object from /save/systems/.  <br /></td></tr>
+<tr class="memdesc:gae622c9e52028247509a83e282c27cdbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load a system object from the savePathSystems path.  <br /></td></tr>
 <tr class="separator:gae622c9e52028247509a83e282c27cdbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gad3439da34a04c1afb2996184af91f92e"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__sysio.html#gad3439da34a04c1afb2996184af91f92e">PyPO.System.System.mergeSystem</a> (self, *systems)</td></tr>
 <tr class="memdesc:gad3439da34a04c1afb2996184af91f92e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Merge multiple systems together into current system.  <br /></td></tr>
@@ -192,7 +192,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Load a system object from /save/systems/. </p>
+<p>Load a system object from the savePathSystems path. </p>
 <p>This loads all reflectors, fields, currents and frames in the system from disk.</p>
 <p>The system from which this method is called will be overwritten in its entirety, e.g. all reflectors, fields, currents and frames will be replaced with the internal dictionaries of the system to load. The directory from which the system will be saved will either be the current working directory or the directory specified with setSavePathSystems().</p>
 <dl class="params"><dt>Parameters</dt><dd>

@@ -14905,9 +14905,9 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 
 
 
-<div id="e7a469de-7d0e-41c1-9988-2c036e4bed4c" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="f4c9f46c-f11c-4cd1-b5e8-a9f5b1da57c0" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('e7a469de-7d0e-41c1-9988-2c036e4bed4c');
+var element = document.getElementById('f4c9f46c-f11c-4cd1-b5e8-a9f5b1da57c0');
 /* Put everything inside the global mpl namespace */
 /* global mpl */
 window.mpl = {};
@@ -15994,9 +15994,9 @@ if (IPython.notebook.kernel !== null) {
 
 
 
-<div id="dba1bb86-b9f1-4419-9107-2e5c02be2305" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="5c62f93a-e535-482c-b274-271e8be4995c" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('dba1bb86-b9f1-4419-9107-2e5c02be2305');
+var element = document.getElementById('5c62f93a-e535-482c-b274-271e8be4995c');
 /* Put everything inside the global mpl namespace */
 /* global mpl */
 window.mpl = {};
@@ -17157,9 +17157,9 @@ if (IPython.notebook.kernel !== null) {
 
 
 
-<div id="7dd75ce3-d285-4e18-bccb-7f2a4d2f3464" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="6cd0ea7d-72bd-45ef-bbc6-4b3917ab4bec" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7dd75ce3-d285-4e18-bccb-7f2a4d2f3464');
+var element = document.getElementById('6cd0ea7d-72bd-45ef-bbc6-4b3917ab4bec');
 /* Put everything inside the global mpl namespace */
 /* global mpl */
 window.mpl = {};
@@ -18206,7 +18206,7 @@ if (IPython.notebook.kernel !== null) {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>We can also calculate some more parameters. For example, we could calculate the main beam efficiency. This is a metric quantifying the amount of power in the main lobe with respect to the entire beam pattern. Another metric we can calculate is the half-power beamwidth (or more generally, for ellipsoidal beam patterns, the half-power beamwidths), HPBW for short. These represent the widths of the beam in both cardinal planes (the cross sections where the beam is the fattest and the slimmest). PyPO calculates these in arcseconds, so to convert to degrees, we have to divide by 3600. We also calculate diffraction-limited HPBW, to compare.</p>
+<p>We can also calculate some more parameters. For example, we could calculate the main beam efficiency. This is a metric quantifying the amount of power in the main lobe with respect to the entire beam pattern. Another metric we can calculate is the half-power beamwidth (or more generally, for ellipsoidal beam patterns, the half-power beamwidths), HPBW for short. These represent the widths of the beam in both cardinal planes (the cross sections where the beam is the fattest and the slimmest). PyPO calculates these in degrees as these are the units of the plane on which we calculate the HPBW. We also calculate diffraction-limited HPBW, to compare.</p>
 <p>We can also calculate the taper efficiency from the main beam efficiency and HPBWs:
 $$ \eta_\mathrm{t} = \frac{\lambda^2}{A} \frac{\eta_\mathrm{mb}}{\Omega_\mathrm{mb}}, $$
 where $\lambda$ is the wavelength of light, $A$ the area of the aperture, $\eta_\mathrm{mb}$ the main beam efficiency and $\Omega_\mathrm{mb}$ the main beam solid angle, defined as:
@@ -18230,7 +18230,7 @@ where $\theta$ is the HPBW in the E or H-plane, in radians.</p>
 
 <span class="n">diff_lim</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mf">10e3</span><span class="p">)</span> <span class="o">*</span> <span class="mi">180</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mi">3600</span>
 
-<span class="n">Omega</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="p">(</span><span class="mi">180</span><span class="o">*</span><span class="mi">3600</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">Ebw</span> <span class="o">*</span> <span class="n">Hbw</span> <span class="o">/</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">Omega</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="p">(</span><span class="mi">180</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">Ebw</span> <span class="o">*</span> <span class="n">Hbw</span> <span class="o">/</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
 <span class="n">eta_ap</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="mf">5e3</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">eta_mb</span> <span class="o">/</span> <span class="n">Omega</span> <span class="o">*</span> <span class="n">eta_s</span> <span class="o">*</span> <span class="n">eta_X</span>
 </pre></div>
 
@@ -18352,9 +18352,9 @@ Total aperture efficiency from Main beam efficiency: 0.745
 
 
 
-<div id="1861c09d-bd6a-40be-97ad-f5a0fcd89c04" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="447706d2-b410-4ac3-9908-959f496ee7b8" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('1861c09d-bd6a-40be-97ad-f5a0fcd89c04');
+var element = document.getElementById('447706d2-b410-4ac3-9908-959f496ee7b8');
 /* Put everything inside the global mpl namespace */
 /* global mpl */
 window.mpl = {};

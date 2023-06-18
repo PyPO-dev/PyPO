@@ -13,7 +13,7 @@ import PyPO.PyPOTypes as pypotypes
 import PyPO.Templates as pytemp
 
 from PyPO.System import System
-from PyPO.Checks import RunPOError, RunRTError, HybridPropError
+from PyPO.Checks import RunPOError, RunRTError, HybridPropError, check_runPODict, check_hybridDict, check_runRTDict
 
 ##
 # @file
@@ -41,7 +41,7 @@ class Test_SystemPO_RT(unittest.TestCase):
             print("No GPU libraries found... Not testing GPU functionalities.")
 
     def test_runPO_JM(self):
-        for dev in ["CPU", "GPU"]:
+        for dev, func in zip(["CPU", "GPU", "CPU"], [self.s.runPO, self.s.runPO, self.s.runGUIPO]):
             if dev == "GPU" and not self.GPU_flag:
                 return
             
@@ -49,12 +49,20 @@ class Test_SystemPO_RT(unittest.TestCase):
                 for source in TestTemplates.getPOSourceList():
                     for hyperbola in TestTemplates.getHyperboloidList():
                         runPODict = self._get_runPODictJM(source["name"], hyperbola["name"],"test_JM", device=dev)
-                        self.s.runPO(runPODict)
+                        
+                        check_runPODict(runPODict, self.s.system.keys(), self.s.fields.keys(), self.s.currents.keys(),
+                                    self.s.scalarfields.keys(), self.s.frames.keys(), self.s.clog)
+                        
+                        func(runPODict)
                         self.assertEqual(type(self.s.currents["test_JM"]), pypotypes.currents)
 
                     for parabola in TestTemplates.getParaboloidList():
                         runPODict = self._get_runPODictJM(source["name"], parabola["name"],"test_JM", device=dev)
-                        self.s.runPO(runPODict)
+                        
+                        check_runPODict(runPODict, self.s.system.keys(), self.s.fields.keys(), self.s.currents.keys(),
+                                    self.s.scalarfields.keys(), self.s.frames.keys(), self.s.clog)
+                        
+                        func(runPODict)
                         self.assertEqual(type(self.s.currents["test_JM"]), pypotypes.currents)
                     
                     for ellipse in TestTemplates.getEllipsoidList():
@@ -63,23 +71,37 @@ class Test_SystemPO_RT(unittest.TestCase):
                         else:
                             runPODict = self._get_runPODictJM(source["name"], ellipse["name"],"test_JM", device=dev)
 
-                        self.s.runPO(runPODict)
+                        
+                        check_runPODict(runPODict, self.s.system.keys(), self.s.fields.keys(), self.s.currents.keys(),
+                                    self.s.scalarfields.keys(), self.s.frames.keys(), self.s.clog)
+                        
+                        func(runPODict)
                         self.assertEqual(type(self.s.currents["test_JM"]), pypotypes.currents)
-    
+   
+                
+
     def test_runPO_EH(self):
-        for dev in ["CPU", "GPU"]:
+        for dev, func in zip(["CPU", "GPU", "CPU"], [self.s.runPO, self.s.runPO, self.s.runGUIPO]):
             if dev == "GPU" and not self.GPU_flag:
                 return
             for plane in TestTemplates.getPlaneList():
                 for source in TestTemplates.getPOSourceList():
                     for hyperbola in TestTemplates.getHyperboloidList():
                         runPODict = self._get_runPODictEH(source["name"], hyperbola["name"],"test_EH", device=dev)
-                        self.s.runPO(runPODict)
+                        
+                        check_runPODict(runPODict, self.s.system.keys(), self.s.fields.keys(), self.s.currents.keys(),
+                                    self.s.scalarfields.keys(), self.s.frames.keys(), self.s.clog)
+                        
+                        func(runPODict)
                         self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
 
                     for parabola in TestTemplates.getParaboloidList():
                         runPODict = self._get_runPODictEH(source["name"], parabola["name"],"test_EH", device=dev)
-                        self.s.runPO(runPODict)
+                        
+                        check_runPODict(runPODict, self.s.system.keys(), self.s.fields.keys(), self.s.currents.keys(),
+                                    self.s.scalarfields.keys(), self.s.frames.keys(), self.s.clog)
+                        
+                        func(runPODict)
                         self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
                     
                     for ellipse in TestTemplates.getEllipsoidList():
@@ -88,24 +110,36 @@ class Test_SystemPO_RT(unittest.TestCase):
                         else:
                             runPODict = self._get_runPODictEH(source["name"], ellipse["name"],"test_EH", device=dev)
 
+                        
+                        check_runPODict(runPODict, self.s.system.keys(), self.s.fields.keys(), self.s.currents.keys(),
+                                    self.s.scalarfields.keys(), self.s.frames.keys(), self.s.clog)
+                        
                         self.s.runPO(runPODict)
                         self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
 
     def test_runPO_JMEH(self):
-        for dev in ["CPU", "GPU"]:
+        for dev, func in zip(["CPU", "GPU", "CPU"], [self.s.runPO, self.s.runPO, self.s.runGUIPO]):
             if dev == "GPU" and not self.GPU_flag:
                 return
             for plane in TestTemplates.getPlaneList():
                 for source in TestTemplates.getPOSourceList():
                     for hyperbola in TestTemplates.getHyperboloidList():
                         runPODict = self._get_runPODictJMEH(source["name"], hyperbola["name"],"test_JM", "test_EH", device=dev)
-                        self.s.runPO(runPODict)
+                        
+                        check_runPODict(runPODict, self.s.system.keys(), self.s.fields.keys(), self.s.currents.keys(),
+                                    self.s.scalarfields.keys(), self.s.frames.keys(), self.s.clog)
+                        
+                        func(runPODict)
                         self.assertEqual(type(self.s.currents["test_JM"]), pypotypes.currents)
                         self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
 
                     for parabola in TestTemplates.getParaboloidList():
                         runPODict = self._get_runPODictJMEH(source["name"], parabola["name"],"test_JM", "test_EH", device=dev)
-                        self.s.runPO(runPODict)
+                        
+                        check_runPODict(runPODict, self.s.system.keys(), self.s.fields.keys(), self.s.currents.keys(),
+                                    self.s.scalarfields.keys(), self.s.frames.keys(), self.s.clog)
+                        
+                        func(runPODict)
                         self.assertEqual(type(self.s.currents["test_JM"]), pypotypes.currents)
                         self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
                     
@@ -114,30 +148,36 @@ class Test_SystemPO_RT(unittest.TestCase):
                             runPODict = self._get_runPODictJMEH(source["name"], ellipse["name"],"test_JM", "test_EH", device=dev, direction="bwd")
                         else:
                             runPODict = self._get_runPODictJMEH(source["name"], ellipse["name"],"test_JM", "test_EH", device=dev)
-                        self.s.runPO(runPODict)
+                        
+                        check_runPODict(runPODict, self.s.system.keys(), self.s.fields.keys(), self.s.currents.keys(),
+                                    self.s.scalarfields.keys(), self.s.frames.keys(), self.s.clog)
+                        
+                        func(runPODict)
                         self.assertEqual(type(self.s.currents["test_JM"]), pypotypes.currents)
                         self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
     
     def test_runPO_EHP_Hybrid(self):
-        for interp, dev in zip([False, True], ["CPU", "GPU"]):
+        for interp, dev in zip([False, True], ["CPU", "GPU"]): 
             if dev == "GPU" and not self.GPU_flag:
                 return
             for plane in TestTemplates.getPlaneList():
                 for source in TestTemplates.getPOSourceList():
                     for hyperbola in TestTemplates.getHyperboloidList():
                         runPODict = self._get_runPODictEHP(source["name"], hyperbola["name"],"test_EH", "test_P", device=dev)
+                        
                         self.s.runPO(runPODict)
                         self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
                         self.assertEqual(type(self.s.frames["test_P"]), pypotypes.frame)
 
                         runHybridDict = self._get_runPODictHybrid("test_P", "test_EH", plane["name"], "test_fr_out", "test_field_out", interp=interp)
-                       
+                         
                         self.s.runHybridPropagation(runHybridDict)
                         self.assertEqual(type(self.s.fields["test_field_out"]), pypotypes.fields)
                         self.assertEqual(type(self.s.frames["test_fr_out"]), pypotypes.frame)
 
                     for parabola in TestTemplates.getParaboloidList():
                         runPODict = self._get_runPODictEHP(source["name"], parabola["name"],"test_EH", "test_P", device=dev)
+                        
                         self.s.runPO(runPODict)
                         self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
                         self.assertEqual(type(self.s.frames["test_P"]), pypotypes.frame)
@@ -150,6 +190,7 @@ class Test_SystemPO_RT(unittest.TestCase):
                     
                     for ellipse in TestTemplates.getEllipsoidList():
                         runPODict = self._get_runPODictEHP(source["name"], ellipse["name"],"test_EH", "test_P", device=dev)
+                        
                         self.s.runPO(runPODict)
                         self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
                         self.assertEqual(type(self.s.frames["test_P"]), pypotypes.frame)
@@ -162,7 +203,7 @@ class Test_SystemPO_RT(unittest.TestCase):
             
 
     def test_runPO_FF(self):
-        for dev in ["CPU", "GPU"]:
+        for dev, func in zip(["CPU", "GPU", "CPU"], [self.s.runPO, self.s.runPO, self.s.runGUIPO]):
             if dev == "GPU" and not self.GPU_flag:
                 return
             for i, plane in enumerate(TestTemplates.getPlaneList()):
@@ -171,32 +212,48 @@ class Test_SystemPO_RT(unittest.TestCase):
 
                 for source in TestTemplates.getPOSourceList():
                     runPODict = self._get_runPODictFF(source["name"], TestTemplates.getPlaneList()[-1]["name"],"test_EH", device=dev)
-                    self.s.runPO(runPODict)
+                    
+                    check_runPODict(runPODict, self.s.system.keys(), self.s.fields.keys(), self.s.currents.keys(),
+                                self.s.scalarfields.keys(), self.s.frames.keys(), self.s.clog)
+                    
+                    func(runPODict)
                     self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
     
     def test_runPO_Scalar(self):
-        for dev in ["CPU", "GPU"]:
+        for dev, func in zip(["CPU", "GPU", "CPU"], [self.s.runPO, self.s.runPO, self.s.runGUIPO]):
             if dev == "GPU" and not self.GPU_flag:
                 return
             for plane in TestTemplates.getPlaneList():
                 for source in TestTemplates.getPOSourceList():
                     for hyperbola in TestTemplates.getHyperboloidList():
                         runPODict = self._get_runPODictScalar(source["name"], hyperbola["name"],"test_EH", device=dev)
-                        self.s.runPO(runPODict)
+                        
+                        check_runPODict(runPODict, self.s.system.keys(), self.s.fields.keys(), self.s.currents.keys(),
+                                    self.s.scalarfields.keys(), self.s.frames.keys(), self.s.clog)
+                        
+                        func(runPODict)
                         self.assertEqual(type(self.s.scalarfields["test_EH"]), pypotypes.scalarfield)
 
                     for parabola in TestTemplates.getParaboloidList():
                         runPODict = self._get_runPODictScalar(source["name"], parabola["name"],"test_EH", device=dev)
-                        self.s.runPO(runPODict)
+                        
+                        check_runPODict(runPODict, self.s.system.keys(), self.s.fields.keys(), self.s.currents.keys(),
+                                    self.s.scalarfields.keys(), self.s.frames.keys(), self.s.clog)
+                        
+                        func(runPODict)
                         self.assertEqual(type(self.s.scalarfields["test_EH"]), pypotypes.scalarfield)
                     
                     for ellipse in TestTemplates.getEllipsoidList():
                         runPODict = self._get_runPODictScalar(source["name"], ellipse["name"],"test_EH", device=dev)
-                        self.s.runPO(runPODict)
+                        
+                        check_runPODict(runPODict, self.s.system.keys(), self.s.fields.keys(), self.s.currents.keys(),
+                                    self.s.scalarfields.keys(), self.s.frames.keys(), self.s.clog)
+                        
+                        func(runPODict)
                         self.assertEqual(type(self.s.scalarfields["test_EH"]), pypotypes.scalarfield)
 
     def test_runRT(self):
-        for dev in ["CPU", "GPU"]:
+        for dev, func in zip(["CPU", "GPU", "CPU"], [self.s.runRayTracer, self.s.runRayTracer, self.s.runGUIRayTracer]):
             if dev == "GPU" and not self.GPU_flag:
                 return
             self.s.translateGrids(TestTemplates.TubeRTframe["name"], np.array([0, 0, -1]), obj="frame")
@@ -204,7 +261,10 @@ class Test_SystemPO_RT(unittest.TestCase):
             
             for hyperbola in TestTemplates.getHyperboloidList():
                 runRTDict = self._get_runRTDict(TestTemplates.TubeRTframe["name"], hyperbola["name"],"test_fr", device=dev)
-                self.s.runRayTracer(runRTDict)
+        
+                check_runRTDict(runRTDict, self.s.system, self.s.frames, self.s.clog)
+
+                func(runRTDict)
                 self.assertEqual(type(self.s.frames["test_fr"]), pypotypes.frame)
                 
                 runRTDict = self._get_runRTDict(TestTemplates.GaussRTframe["name"], hyperbola["name"],"test_fr", device=dev)
@@ -213,7 +273,10 @@ class Test_SystemPO_RT(unittest.TestCase):
 
             for parabola in TestTemplates.getParaboloidList():
                 runRTDict = self._get_runRTDict(TestTemplates.TubeRTframe["name"], parabola["name"],"test_fr", device=dev)
-                self.s.runRayTracer(runRTDict)
+        
+                check_runRTDict(runRTDict, self.s.system, self.s.frames, self.s.clog)
+
+                func(runRTDict)
                 self.assertEqual(type(self.s.frames["test_fr"]), pypotypes.frame)
                 
                 runRTDict = self._get_runRTDict(TestTemplates.GaussRTframe["name"], parabola["name"],"test_fr", device=dev)
@@ -222,11 +285,17 @@ class Test_SystemPO_RT(unittest.TestCase):
             
             for ellipse in TestTemplates.getEllipsoidList():
                 runRTDict = self._get_runRTDict(TestTemplates.TubeRTframe["name"], ellipse["name"],"test_fr", device=dev)
-                self.s.runRayTracer(runRTDict)
+        
+                check_runRTDict(runRTDict, self.s.system, self.s.frames, self.s.clog)
+
+                func(runRTDict)
                 self.assertEqual(type(self.s.frames["test_fr"]), pypotypes.frame)
                 
                 runRTDict = self._get_runRTDict(TestTemplates.GaussRTframe["name"], ellipse["name"],"test_fr", device=dev)
-                self.s.runRayTracer(runRTDict)
+        
+                check_runRTDict(runRTDict, self.s.system, self.s.frames, self.s.clog)
+
+                func(runRTDict)
                 self.assertEqual(type(self.s.frames["test_fr"]), pypotypes.frame)
 
     def test_invalidRunPODict(self):

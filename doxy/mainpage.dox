@@ -16,9 +16,10 @@ All other necessary prerequisites are fetched and installed upon installing `PyP
 
 \subsection sdist Install From Source
 \subsubsection General Prerequisites
-`PyPO` uses [CMake](https://cmake.org/) to build from source and if a source distribution is desired, it needs to be installed:
+`PyPO` uses [CMake](https://cmake.org/) to build from source and if a source distribution is desired, it needs to be installed.
+In addition, wheel is required as well:
 ```
-pip install cmake
+pip install cmake wheel
 ```
 
 \subsubsection linux Linux

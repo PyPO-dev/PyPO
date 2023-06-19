@@ -5,9 +5,10 @@ from PySide6.QtCore import Qt
 # @file An implementation of an accordion component.
 #  
 
-##
-# Class to implement an Accordion widget.
 class Accordion(QWidget):
+    """!
+    Class to implement an Accordion widget.
+    """
     def __init__(self, parent=None):
         super().__init__(parent)
         layout = QVBoxLayout()
@@ -21,9 +22,10 @@ class Accordion(QWidget):
         layout.addWidget(self.POCurrents)
         layout.addWidget(self.SPOFields)
             
-    ##
-    # Define section of Accordian.
     class AccordionSection(QWidget):
+        """!
+        Define section of Accordion.
+        """
         def __init__(self, text, parent=None):
             super().__init__(parent)
 
@@ -51,7 +53,6 @@ class Accordion(QWidget):
             self.contentLayout = QVBoxLayout(self.content)
             layout.addWidget(self.content)
 
-            # self.hideContent()
             self.showContent()
 
         def toggle(self, event):

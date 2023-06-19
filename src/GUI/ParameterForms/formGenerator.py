@@ -12,21 +12,24 @@ from src.GUI.ParameterForms.inputWidgetInterfaces import *
 #
 # This script contains the form generator and dynamic inputWidgets.
 
-##
-# FormGenerator.
-#
-# Generate an input form for interacting with PyPO.
+
 class FormGenerator(QWidget):
+    """!
+    FormGenerator.
+    
+    Generate an input form for interacting with PyPO.
+    """
     closed = Signal()
-    ##
-    # Constructor. Creates a form widget given a list of InputDescription.
-    #
-    # @param ElementData List of InputDescription objects.
-    # @param readAction Function to be called upon clicking OK button.
-    # @param addButtons Boolean. Determines weather there will be buttons in the bottom of the form.
-    # @param test Boolean. If true, buttons can be added without the need to provide a readAction.
-    # @param okText String. Text used as label for the OK button. Defaults to "add"
     def __init__ (self, ElementData, readAction = None, addButtons=True, test=False, okText=None):
+        """!
+        Constructor. Creates a form widget given a list of InputDescription.
+        
+        @param ElementData List of InputDescription objects.
+        @param readAction Function to be called upon clicking OK button.
+        @param addButtons Boolean. Determines weather there will be buttons in the bottom of the form.
+        @param test Boolean. If true, buttons can be added without the need to provide a readAction.
+        @param okText String. Text used as label for the OK button. Defaults to "add"
+        """
         super().__init__()
         if addButtons and readAction == None and not test:
             raise Exception("Trying to add buttons with no action provided!")
@@ -46,10 +49,10 @@ class FormGenerator(QWidget):
         if addButtons:
             self.setupButtons()
             
-    ##
-    # Calls constructor of inputWidget for each InputDescription depending on its inType.
-    #
     def setupInputs(self):
+        """!
+        Calls constructor of inputWidget for each InputDescription depending on its inType.
+        """
         for inp in self.formData:
             if inp.inType == inType.static:
                 input = StaticInput(inp)
@@ -88,10 +91,10 @@ class FormGenerator(QWidget):
                 self.inputs.append(input)
                 self.layout.addRow(input)
 
-    ##
-    # Creates close, clear and read buttons in the bottom of the form.
-    #
     def setupButtons(self):
+        """!
+        Creates close, clear and read buttons in the bottom of the form.
+        """
         addBtn = QPushButton(self.okText)
         closeBtn = QPushButton("Close")
         clearBtn = QPushButton("Clear")
@@ -117,39 +120,42 @@ class FormGenerator(QWidget):
         spacerLayout.addItem(QSpacerItem(0,0, QSizePolicy.Expanding, QSizePolicy.MinimumExpanding))
         self.layout.addRow(spacerWidget)
 
-    ##
-    # Close the form.
-    #
     def closeAction(self):
+        """!
+        Close the form.
+        """
         self.closed.emit()
 
-    ##
-    # Clears all inputs of the form.
-    #
     def clear(self):
+        """!
+        Clears all inputs of the form.
+        """
         for input in self.inputs:
             input.clear()
 
-    ##
-    # Reads the form.
-    #
-    # @return A dictionary containing the values read form the form.
     def read(self):
+        """!
+        Reads the form.
+        
+        @return A dictionary containing the values read form the form.
+        """
         paramDict = {}
         for input in self.inputs:
             paramDict.update(input.read())
         return paramDict
 
-##
-# Dynamic dropdown.
-#
-# Dropdown followed by a dynamic section that changes depending on users selection in the dropdown.
 class DynamicDropdownWidget(inputWidgetInterface):
-    ##
-    # Constructor. Creates the form section.
-    #
-    # @param inp InputDescription object received from formData.
+    """!
+    Dynamic dropdown.
+
+    Dropdown followed by a dynamic section that changes depending on users selection in the dropdown.
+    """
     def __init__ (self, inp):
+        """!
+        Constructor. Creates the form section.
+        
+        @param inp InputDescription object received from formData.
+        """
         super().__init__()
         self.inputDescription = inp
         self.setSizePolicy(QSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed))
@@ -174,10 +180,10 @@ class DynamicDropdownWidget(inputWidgetInterface):
         self.setLayout(self.layout)
         self.modeUpdate(0)
 
-    ##
-    # Creates the nested forms.
-    #
     def makeChildren(self):
+        """!
+        Creates the nested forms.
+        """
         self.stackedWidget = QStackedWidget()
         self.stackedWidget.addWidget(QWidget())
         self.layout.addRow(self.stackedWidget)
@@ -187,29 +193,31 @@ class DynamicDropdownWidget(inputWidgetInterface):
             self.stackedWidget.addWidget(child)
             self.children.append(child)
 
-    ##
-    # Updates the dynamic widget according to users selection.
-    #
-    # @param index Index of the option.
     @Slot(int)
     def modeUpdate(self, index):
+        """!
+        Updates the dynamic widget according to users selection.
+        
+        @param index Index of the option.
+        """
         if self.hasChildren:
             self.stackedWidget.setCurrentIndex(index)
             self.currentChild = self.children[index-1]
 
-    ##
-    # Clears all inputs of the form.
-    #
     def clear(self):
+        """!
+        Clears all inputs of the form.
+        """
         self.mode.clear()
         for child in self.children:
             child.clear()
 
-    ##
-    # Reads the inputs.
-    #
-    # @return A dictionary containing the values read form the inputs.
     def read(self):
+        """!
+        Reads the inputs.
+        
+        @return A dictionary containing the values read form the inputs.
+        """
         try:
             ind = self.mode.currentIndex()-1
             if self.hasChildren:
@@ -230,16 +238,18 @@ class DynamicDropdownWidget(inputWidgetInterface):
         return paramDict
         
         
-##
-# Dynamic radio button.
-#
-# radio button group followed by a dynamic section that changes depending on users selection in the dropdown.
 class DynamicRadioWidget(inputWidgetInterface):
-    ##
-    # Constructor. Creates the form section.
-    #
-    # @param inp InputDescription object received from formData.
+    """!
+    Dynamic radio button.
+
+    radio button group followed by a dynamic section that changes depending on users selection in the dropdown.
+    """
     def __init__ (self, inp):
+        """!
+        Constructor. Creates the form section.
+        
+        @param inp InputDescription object received from formData.
+        """
         super().__init__()
         self.inputDescription = inp
         self.setSizePolicy(QSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed))
@@ -267,10 +277,10 @@ class DynamicRadioWidget(inputWidgetInterface):
         self.setLayout(self.layout)
         self.modeUpdate(-1)
 
-    ##
-    # Creates the nested forms.
-    #
     def makeChildren(self):
+        """!
+        Creates the nested forms.
+        """
         self.stackedWidget = QStackedWidget()
         placeholder = QWidget()
         placeholder.setFixedSize(0,0)
@@ -282,29 +292,31 @@ class DynamicRadioWidget(inputWidgetInterface):
             self.stackedWidget.addWidget(child)
             self.children.append(child)
 
-    ##
-    # Updates the dynamic widget according to users selection.
-    #
-    # @param index Index of the option.
     @Slot(int)
     def modeUpdate(self, index):
+        """!
+        Updates the dynamic widget according to users selection.
+        
+        @param index Index of the option.
+        """
         if self.hasChildren:
             self.stackedWidget.setCurrentIndex(index+1)
             self.currentChild = self.children[index]
 
-    ##
-    # Clears all inputs of the form.
-    #
     def clear(self):
+        """!
+        Clears all inputs of the form.
+        """
         self.mode.clear()
         for child in self.children:
             child.clear()
 
-    ##
-    # Reads the inputs.
-    #
-    # @return A dictionary containing the values read from the inputs.
     def read(self):
+        """!
+        Reads the inputs.
+        
+        @return A dictionary containing the values read from the inputs.
+        """
         try:
             ind = self.mode.currentIndex()
             if self.hasChildren:

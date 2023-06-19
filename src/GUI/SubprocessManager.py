@@ -6,28 +6,35 @@ import PyPO.System as st
 
 ##
 # @file Contains the tools to run a function in a subprocess
+
+
 class SubprocessManager():
+    """!
+    Manager for running functions in subprocess
+    """
     def __init__(self, parentWidget) -> None:
         self.parentWidget = parentWidget
         self.subProcessRunning = False
 
-    ##
-    # To be connected to the finished signal of the waiter object 
-    # 
-    # @param success Boolean, determines wether calculation finished successfully 
     def waiterFinished(self , success):
+        """!
+        To be connected to the finished signal of the waiter object 
+        
+        @param success Boolean, determines wether calculation finished successfully 
+        """
         if success:
             self.currentCalculationDialog.accept()
         else:
             self.currentCalculationDialog.reject()
         self.subProcessRunning = False
 
-    ## 
-    # Runs a function in a subprocess
-    # @param work Function to be run in subprocess 
-    # @param args Tuple of the arguments work takes 
-    # @param dialogText String to be shown in the waiting dialog; defaults to "Calculating"
     def runInSubprocess(self, work, args, dialogText = ""):
+        """!
+        Runs a function in a subprocess
+        @param work Function to be run in subprocess 
+        @param args Tuple of the arguments work takes 
+        @param dialogText String to be shown in the waiting dialog; defaults to "Calculating"
+        """
         if self.subProcessRunning:
             return
         self.subProcessRunning = True
@@ -52,9 +59,10 @@ class SubprocessManager():
         self.waiterThread.quit()
         return res
             
-## 
-# QObject Waits until process is finished and emits a signal
 class Waiter(QObject):
+    """!
+    QObject Waits until process is finished and emits a signal
+    """
     finished = Signal(int)
 
     def setProcess(self, process):
@@ -64,15 +72,17 @@ class Waiter(QObject):
         self.process.join()
         self.finished.emit(self.process.exitcode==0)
 
-##
-# Makes a copy of system, deep copies some dictionaries.
-# @param system The System object to be copied
-# @param cSystem Boolean determines wether to copy the system.system dictionary
-# @param cFrames list of Frames to copy
-# @param cFields list of Fields to copy
-# @param cCurrents list of Currents to copy
-# @param cScalarFields list of ScalarFields to copy
 def copySystem(system :st.System, cSystem = True, cFrames = None, cFields = None, cCurrents = None, cScalarFields = None, cAssoc = None):
+    """!
+    Makes a copy of system, deep copies some dictionaries.
+    
+    @param system The System object to be copied
+    @param cSystem Boolean determines wether to copy the system.system dictionary
+    @param cFrames list of Frames to copy
+    @param cFields list of Fields to copy
+    @param cCurrents list of Currents to copy
+    @param cScalarFields list of ScalarFields to copy
+    """
     cFrames = [] if cFrames is None else cFrames
     cFields = [] if cFields is None else cFields
     cCurrents = [] if cCurrents is None else cCurrents

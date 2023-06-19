@@ -4,9 +4,10 @@ from PySide6.QtCore import Qt
 ##
 # @file Defines dialogs for the GUI.
 
-##
-# Dialog to be shown during long calculations. 
 class SymDialog(QDialog):
+    """!
+    Dialog to be shown during long calculations. 
+    """
     def __init__(self, stopSlot, clog, msg=None):
         self.msg = "" if msg is None else msg
         super().__init__()
@@ -31,9 +32,10 @@ class SymDialog(QDialog):
         print("ABORTED.")
         super().reject()
 
-##
-# Dialog to be shown when trying to delete an element.
 class RemoveElementDialog(QDialog):
+    """!
+    Dialog to be shown when trying to delete an element.
+    """
     def __init__(self, elementName):
         super().__init__()
         layout = QGridLayout()
@@ -47,12 +49,13 @@ class RemoveElementDialog(QDialog):
         self.setLayout(layout)
 
 
-##
-# Frameless dialog containing element options.
-# 
-# This dialog is typically shown at the position of the button that triggers it and closed when the 
-# mouse hovers away from it.
 class selfClosingDialog(QDialog):
+    """!
+    Frameless dialog containing element options.
+    
+    This dialog is typically shown at the position of the button that triggers it and closed when the 
+    mouse hovers away from it.
+    """
     def __init__(self, closeFunc, parent=None):
         super().__init__(parent)
         self.closeFunc = closeFunc

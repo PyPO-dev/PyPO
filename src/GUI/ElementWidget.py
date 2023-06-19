@@ -8,14 +8,15 @@ from src.GUI.Dialogs import RemoveElementDialog
 ##
 # @file Defines ElementWidget and its subclasses for the workspace.
 
-##
-# Defines elementWidgets form the workspace.
-# 
-# Defines ElementWidgets consisting of a name label and an options button. These element widgets are 
-# subclassed into their own type and styled in a distinct color in style.css. The subclasses handle 
-# passing the required parameters to the parent. The parent accepts all possible options (actions) that 
-# could be given by a subclass. The parent should have a function for each of the possible action.  
 class ElementWidget(QWidget):
+    """!
+    Defines elementWidgets form the workspace.
+    
+    Defines ElementWidgets consisting of a name label and an options button. These element widgets are 
+    subclassed into their own type and styled in a distinct color in style.css. The subclasses handle 
+    passing the required parameters to the parent. The parent accepts all possible options (actions) that 
+    could be given by a subclass. The parent should have a function for each of the possible action.  
+    """
     def __init__ (self, name, plotAction, removeAction, transformAction = None, RMSAction = None, 
                     snapAction = None, copyAction = None, removeWid = None, infoAction = None, p=None):
 

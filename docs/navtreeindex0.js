@@ -1,6 +1,6 @@
 var NAVTREEINDEX0 =
 {
-"@ref contribguide":[5],
+"contribguide.html":[5],
 "demos.html":[3],
 "explanations.html":[1],
 "index.html":[0],

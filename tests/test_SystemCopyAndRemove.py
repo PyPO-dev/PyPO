@@ -1,6 +1,8 @@
 import unittest
 from PyPO.Checks import InputReflError, InputRTError, InputPOError
 
+from nose2.tools import params
+
 try:
     from . import TestTemplates
 except ImportError:
@@ -13,30 +15,12 @@ class Test_SystemCopyAndRemove(unittest.TestCase):
         self.s = TestTemplates.getSystemWithReflectors()
         self.s.setOverride(False) 
 
-    def test_copyElement(self):
-        for plane in TestTemplates.getPlaneList():
-            self.s.copyElement(plane["name"], plane["name"] + "_copy")
-            self.assertTrue(plane["name"] + "_copy" in self.s.system)
+    @params(*TestTemplates.getAllReflectorList())
+    def test_copyElement(self, element):
+        self.s.copyElement(element["name"], element["name"] + "_copy")
+        self.assertTrue(element["name"] + "_copy" in self.s.system)
 
-            self._assert_copy(plane["name"], plane["name"] + "_copy")
-        
-        for parabola in TestTemplates.getParaboloidList():
-            self.s.copyElement(parabola["name"], parabola["name"] + "_copy")
-            self.assertTrue(parabola["name"] + "_copy" in self.s.system)
-
-            self._assert_copy(parabola["name"], parabola["name"] + "_copy")
-        
-        for hyperbola in TestTemplates.getHyperboloidList():
-            self.s.copyElement(hyperbola["name"], hyperbola["name"] + "_copy")
-            self.assertTrue(hyperbola["name"] + "_copy" in self.s.system)
-
-            self._assert_copy(hyperbola["name"], hyperbola["name"] + "_copy")
-        
-        for ellipse in TestTemplates.getEllipsoidList():
-            self.s.copyElement(ellipse["name"], ellipse["name"] + "_copy")
-            self.assertTrue(ellipse["name"] + "_copy" in self.s.system)
-
-            self._assert_copy(ellipse["name"], ellipse["name"] + "_copy")
+        self._assert_copy(element["name"], element["name"] + "_copy")
 
     def test_removeElement(self):
         self.s.groupElements("testgroup", TestTemplates.paraboloid_man_xy["name"], TestTemplates.ellipsoid_z_man_xy["name"])
@@ -59,26 +43,25 @@ class Test_SystemCopyAndRemove(unittest.TestCase):
         
         self._assert_copy("testgroup", "testgroup_copy", sdict="groups")
 
-
-    def test_removeFrame(self):
-        for frame in TestTemplates.getFrameList():
-            self.s.removeFrame(frame["name"])
-            self.assertFalse(frame["name"] in self.s.frames)
+    @params(*TestTemplates.getFrameList())
+    def test_removeFrame(self, frame):
+        self.s.removeFrame(frame["name"])
+        self.assertFalse(frame["name"] in self.s.frames)
     
-    def test_removeField(self):
-        for field in TestTemplates.getPOSourceList():
-            self.s.removeField(field["name"])
-            self.assertFalse(field["name"] in self.s.fields)
+    @params(*TestTemplates.getPOSourceList())
+    def test_removeField(self, field):
+        self.s.removeField(field["name"])
+        self.assertFalse(field["name"] in self.s.fields)
     
-    def test_removeCurrent(self):
-        for current in TestTemplates.getPOSourceList():
-            self.s.removeCurrent(current["name"])
-            self.assertFalse(current["name"] in self.s.currents)
+    @params(*TestTemplates.getPOSourceList())
+    def test_removeCurrent(self, current):
+        self.s.removeCurrent(current["name"])
+        self.assertFalse(current["name"] in self.s.currents)
 
-    def test_removeScalarField(self):
-        for field in TestTemplates.getPOSourceList():
-            self.s.removeScalarField(field["name"])
-            self.assertFalse(field["name"] in self.s.scalarfields)
+    @params(*TestTemplates.getPOSourceList())
+    def test_removeScalarField(self, field):
+        self.s.removeScalarField(field["name"])
+        self.assertFalse(field["name"] in self.s.scalarfields)
 
     def _assert_copy(self, name, name_copy, sdict="system"):
         if sdict == "system":
@@ -100,7 +83,5 @@ class Test_SystemCopyAndRemove(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
-        
-
-
+    import nose2
+    nose2.main()

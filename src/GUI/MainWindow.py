@@ -138,8 +138,9 @@ class MainWidget(QWidget):
         if hasattr(self, "ParameterWid"):
             try:
                 self.ParameterWid.setParent(None)
-            except:
-                pass
+            except Exception as err:
+                print_tb(err.__traceback__)
+        
         self.ParameterWid = formGenerator.FormGenerator(formData, readAction, okText=okText)
 
         self.ParameterWid.closed.connect(self.removeForm)

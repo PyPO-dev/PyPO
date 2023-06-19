@@ -213,3 +213,4 @@ nose2 --with-coverage
 ```
 
 and the coverage report will be displayed in the terminal after running the tests.
+*/

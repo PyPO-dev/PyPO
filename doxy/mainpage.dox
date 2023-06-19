@@ -83,10 +83,14 @@ Please see their [installation page](https://www.doxygen.nl/manual/install.html)
 
 \section man User Manual
 For a basic understanding of `PyPO` and its design, we refer to the \ref expl_head "explanations page".
+These explanations are less related to using `PyPO`, but more to how `PyPO` works under the hood.
 
 Several \ref tutorials "tutorials" have been developed in order to demonstrate the usage and functionality of `PyPO`:
 - the first set of tutorials showcase the functionalities of the package,
 - the second and final set show how to use the GUI.
+
+Notebooks demonstrating usage in the context of validation tests are grouped together in the \ref demos "demonstrations page".
+These can serve as good starting points for experimenting with `PyPO` in actual physical simulations.
 
 The \ref pypodocs "software documentation" for `PyPO` is split into two parts:
 - the first part forms a comprehensive API reference for all public methods of `PyPO`,
@@ -96,6 +100,7 @@ In addition, the documentations page contains a comprehensive overview of the co
 
 \section main_contribguidelines Contributor Guidelines
 The contributor and development guidelines can be found \ref contribguide "here".
+These guidelines contain information on how to raise issues concerning `PyPO`, how to contribute code but also how to run the unit tests and how to generate documentation. 
 
 \section license License
 This project is released under the [MIT License](https://opensource.org/licenses/MIT).

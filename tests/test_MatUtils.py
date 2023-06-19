@@ -1,10 +1,5 @@
-import sys
-import random
-
 import unittest
 import numpy as np
-
-import matplotlib.pyplot as pt
 
 from PyPO.MatUtils import findConnectedSubsets
 ##
@@ -39,4 +34,5 @@ class Test_MatUtils(unittest.TestCase):
             self.assertEqual(l1, yy)
         
 if __name__ == "__main__":
-    unittest.main()
+    import nose2
+    nose2.main()

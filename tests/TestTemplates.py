@@ -191,8 +191,8 @@ ellipsoid_x_man_xy = {
         "coeffs"    : np.array([1, 10, 10]),
         "ecc"       : 0.5,
         "gmode"     : "xy",
-        "lims_x"    : np.array([-1, 1]),
-        "lims_y"    : np.array([-1, 1]),
+        "lims_x"    : np.array([-0.1, 0.1]),
+        "lims_y"    : np.array([-0.1, 0.1]),
         "gridsize"  : np.array([13, 13])
         }
 
@@ -203,7 +203,7 @@ ellipsoid_x_man_uv = {
         "coeffs"    : np.array([1, 10, 10]),
         "ecc"       : 0.5,
         "gmode"     : "uv",
-        "lims_u"    : np.array([0, 1]),
+        "lims_u"    : np.array([0, 0.1]),
         "lims_v"    : np.array([0, 360]),
         "gridsize"  : np.array([13, 13])
         }
@@ -275,6 +275,14 @@ def getPlaneList():
     return out
 
 ##
+# Get a list of reflector plane dictionaries. No far-field plane.
+#
+# @returns out List of all plane dictionaries
+def getReflectorPlaneList():
+    out = [plane_uv, plane_xy]
+    return out
+
+##
 # Get a list of paraboloid dictionaries.
 #
 # @returns out List of all paraboloid dictionaries
@@ -298,6 +306,32 @@ def getHyperboloidList():
 # @returns out List of all ellipsoid dictionaries
 def getEllipsoidList():
     out = [ellipsoid_x_man_xy, ellipsoid_x_man_uv, 
+            ellipsoid_x_foc_xy, ellipsoid_x_foc_uv,
+            ellipsoid_z_man_xy, ellipsoid_z_man_uv,
+            ellipsoid_z_foc_xy, ellipsoid_z_foc_uv
+            ]
+    return out
+
+##
+# Get all surfaces
+def getAllSurfList():
+    out = []
+    out.extend(getPlaneList())
+    out.extend(getParaboloidList())
+    out.extend(getHyperboloidList())
+    out.extend(getEllipsoidList())
+    
+    return out
+
+##
+# Get all reflectors
+def getAllReflectorList():
+    out = [plane_uv, plane_xy,
+            paraboloid_man_xy, paraboloid_man_uv, 
+            paraboloid_foc_xy, paraboloid_foc_uv,
+            hyperboloid_man_xy, hyperboloid_man_uv, 
+            hyperboloid_foc_xy, hyperboloid_foc_uv,
+            ellipsoid_x_man_xy, ellipsoid_x_man_uv, 
             ellipsoid_x_foc_xy, ellipsoid_x_foc_uv,
             ellipsoid_z_man_xy, ellipsoid_z_man_uv,
             ellipsoid_z_foc_xy, ellipsoid_z_foc_uv

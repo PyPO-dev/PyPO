@@ -1,8 +1,6 @@
-import sys
-import os
-import shutil
 import unittest
-import numpy as np
+
+from nose2.tools import params
 
 from PyPO.System import System
 from PyPO.FitGauss import fitGaussAbs, generateGauss
@@ -11,6 +9,7 @@ try:
     from . import TestTemplates
 except ImportError:
     import TestTemplates
+
 ##
 # @file
 # File containing tests for Gaussian fitting in PyPO.
@@ -19,9 +18,8 @@ class Test_FitGauss(unittest.TestCase):
         self.s = TestTemplates.getSystemWithReflectors()
         self.s.setOverride(False) 
     
-    def test_fitGauss(self):
-
-        for mode in ["linear", "dB", "log"]:
+    @params("linear", "dB", "log")
+    def test_fitGauss(self, mode):
             popt = self.s.fitGaussAbs(TestTemplates.GPOfield["name"], "Ex", thres=-100, mode=mode, full_output=True, ratio=None)
             self.assertTrue(len(popt) == 6)
             self.assertTrue(f"fitGauss_{TestTemplates.GPOfield['name']}" in self.s.scalarfields)
@@ -36,5 +34,5 @@ class Test_FitGauss(unittest.TestCase):
         self.assertTrue(isinstance(H, float))
 
 if __name__ == "__main__":
-    unittest.main()
-
+    import nose2
+    nose2.main()

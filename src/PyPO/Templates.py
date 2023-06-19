@@ -158,5 +158,9 @@ hybridDict = {
         "field_out" : "Name of output field",
         "start"     : "Starting point of rays, for spherical attenuation",
         "interp"    : "Whether to interpolate resulting field on surface",
-        "comp"      : "If interp is True, which component to interpolate"
+        "comp"      : "If interp is True, which component to interpolate",
+        "tol"       : "Tolerance of ray-tracer",
+        "nThreads"  : "Number of CPU/GPU threads (int)",
+        "t0"        : "Initial guess for propagation",
+        "device"    : "Device to use for calculation"
         }

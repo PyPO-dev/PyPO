@@ -4,9 +4,8 @@ import os
 import pathlib
 import traceback
 
-from PyPO.BindUtils import *
-from PyPO.Structs import *
-from PyPO.PyPOTypes import *
+import PyPO.BindUtils as BUtils
+import PyPO.Structs as PStructs
 import PyPO.Config as Config
 import PyPO.Threadmgr as TManager
 
@@ -31,20 +30,20 @@ def loadBeamlib():
         except:
             lib = ctypes.CDLL(os.path.join(path_cur, "libpypobeam.dylib"))
 
-    lib.makeRTframe.argtypes = [RTDict, ctypes.POINTER(cframe)]
+    lib.makeRTframe.argtypes = [PStructs.RTDict, ctypes.POINTER(PStructs.cframe)]
     lib.makeRTframe.restype = None
     
-    lib.makeGRTframe.argtypes = [GRTDict, ctypes.POINTER(cframe)]
+    lib.makeGRTframe.argtypes = [PStructs.GRTDict, ctypes.POINTER(PStructs.cframe)]
     lib.makeGRTframe.restype = None
 
-    lib.makeGauss.argtypes = [GPODict, reflparams, ctypes.POINTER(c2Bundle), ctypes.POINTER(c2Bundle)]
+    lib.makeGauss.argtypes = [PStructs.GPODict, PStructs.reflparams, ctypes.POINTER(PStructs.c2Bundle), ctypes.POINTER(PStructs.c2Bundle)]
     lib.makeGauss.restype = None
 
-    lib.makeScalarGauss.argtypes = [ScalarGPODict, reflparams, ctypes.POINTER(arrC1)]
+    lib.makeScalarGauss.argtypes = [PStructs.ScalarGPODict, PStructs.reflparams, ctypes.POINTER(PStructs.arrC1)]
     lib.makeScalarGauss.restype = None
     
-    lib.calcCurrents.argtypes = [ctypes.POINTER(c2Bundle), ctypes.POINTER(c2Bundle),
-                                reflparams, ctypes.c_int]
+    lib.calcCurrents.argtypes = [ctypes.POINTER(PStructs.c2Bundle), ctypes.POINTER(PStructs.c2Bundle),
+                                PStructs.reflparams, ctypes.c_int]
     lib.calcCurrents.restype = None
 
     return lib
@@ -66,16 +65,16 @@ def makeRTframe(RTDict_py):
 
     nTot = 1 + RTDict_py["nRays"] * 4 * RTDict_py["nRing"]
 
-    RTDict_c = RTDict()
-    res = cframe()
+    RTDict_c = PStructs.RTDict()
+    res = PStructs.cframe()
 
-    allocate_cframe(res, nTot, ctypes.c_double)
-    allfill_RTDict(RTDict_c, RTDict_py, ctypes.c_double)
+    BUtils.allocate_cframe(res, nTot, ctypes.c_double)
+    BUtils.allfill_RTDict(RTDict_c, RTDict_py, ctypes.c_double)
 
     lib.makeRTframe(RTDict_c, ctypes.byref(res))
 
     shape = (nTot,)
-    out = frameToObj(res, np_t=np.float64, shape=shape)
+    out = BUtils.frameToObj(res, np_t=np.float64, shape=shape)
 
     return out
 
@@ -97,18 +96,18 @@ def makeGRTframe(grdict_py):
 
     nTot = grdict_py["nRays"]
 
-    c_grdict = GRTDict()
-    res = cframe()
+    c_grdict = PStructs.GRTDict()
+    res = PStructs.cframe()
    
 
-    allocate_cframe(res, nTot, ctypes.c_double)
-    allfill_GRTDict(c_grdict, grdict_py, ctypes.c_double)
+    BUtils.allocate_cframe(res, nTot, ctypes.c_double)
+    BUtils.allfill_GRTDict(c_grdict, grdict_py, ctypes.c_double)
     
     args = [c_grdict, ctypes.byref(res)]
     mgr.new_sthread(target=lib.makeGRTframe, args=args)
     
     shape = (nTot,)
-    out = frameToObj(res, np_t=np.float64, shape=shape)
+    out = BUtils.frameToObj(res, np_t=np.float64, shape=shape)
 
     return out
 
@@ -135,21 +134,21 @@ def makeGauss(gdict_py, source):
     source_shape = (source["gridsize"][0], source["gridsize"][1])
     source_size = source["gridsize"][0] * source["gridsize"][1]
 
-    c_gdict = GPODict()
-    c_source = reflparams()
+    c_gdict = PStructs.GPODict()
+    c_source = PStructs.reflparams()
 
-    allfill_GPODict(c_gdict, gdict_py, ctypes.c_double)
-    allfill_reflparams(c_source, source, ctypes.c_double)
+    BUtils.allfill_GPODict(c_gdict, gdict_py, ctypes.c_double)
+    BUtils.allfill_reflparams(c_source, source, ctypes.c_double)
 
-    res_field = c2Bundle()
-    res_current = c2Bundle()
-    allocate_c2Bundle(res_field, source_size, ctypes.c_double)
-    allocate_c2Bundle(res_current, source_size, ctypes.c_double)
+    res_field = PStructs.c2Bundle()
+    res_current = PStructs.c2Bundle()
+    BUtils.allocate_c2Bundle(res_field, source_size, ctypes.c_double)
+    BUtils.allocate_c2Bundle(res_current, source_size, ctypes.c_double)
 
     lib.makeGauss(c_gdict, c_source, ctypes.byref(res_field), ctypes.byref(res_current))
 
-    out_field = c2BundleToObj(res_field, shape=source_shape, obj_t='fields', np_t=np.float64)
-    out_current = c2BundleToObj(res_current, shape=source_shape, obj_t='currents', np_t=np.float64)
+    out_field = BUtils.c2BundleToObj(res_field, shape=source_shape, obj_t='fields', np_t=np.float64)
+    out_current = BUtils.c2BundleToObj(res_current, shape=source_shape, obj_t='currents', np_t=np.float64)
 
     return out_field, out_current
 
@@ -174,16 +173,16 @@ def makeScalarGauss(gdict_py, source):
     source_shape = (source["gridsize"][0], source["gridsize"][1])
     source_size = source["gridsize"][0] * source["gridsize"][1]
 
-    c_gdict = ScalarGPODict()
-    c_source = reflparams()
-    allfill_SGPODict(c_gdict, gdict_py, ctypes.c_double)
-    allfill_reflparams(c_source, source, ctypes.c_double)
+    c_gdict = PStructs.ScalarGPODict()
+    c_source = PStructs.reflparams()
+    BUtils.allfill_SGPODict(c_gdict, gdict_py, ctypes.c_double)
+    BUtils.allfill_reflparams(c_source, source, ctypes.c_double)
     
-    res_field = arrC1()
-    allocate_arrC1(res_field, source_size, ctypes.c_double)
+    res_field = PStructs.arrC1()
+    BUtils.allocate_arrC1(res_field, source_size, ctypes.c_double)
     lib.makeScalarGauss(c_gdict, c_source, ctypes.byref(res_field))
     
-    out_field = arrC1ToObj(res_field, shape=source_shape, np_t=np.float64)
+    out_field = BUtils.arrC1ToObj(res_field, shape=source_shape, np_t=np.float64)
 
     return out_field
 
@@ -205,14 +204,14 @@ def calcCurrents(fields, source, mode):
     source_shape = (source["gridsize"][0], source["gridsize"][1])
     source_size = source["gridsize"][0] * source["gridsize"][1]
 
-    c_source = reflparams()
+    c_source = PStructs.reflparams()
 
-    allfill_reflparams(c_source, source, ctypes.c_double)
+    BUtils.allfill_reflparams(c_source, source, ctypes.c_double)
 
-    res_field = c2Bundle()
-    res_current = c2Bundle()
-    allfill_c2Bundle(res_field, fields, fields.size, ctypes.c_double)
-    allocate_c2Bundle(res_current, source_size, ctypes.c_double)
+    res_field = PStructs.c2Bundle()
+    res_current = PStructs.c2Bundle()
+    BUtils.allfill_c2Bundle(res_field, fields, fields.size, ctypes.c_double)
+    BUtils.allocate_c2Bundle(res_current, source_size, ctypes.c_double)
 
     if mode == "full":
         mode = 0
@@ -228,6 +227,6 @@ def calcCurrents(fields, source, mode):
     lib.calcCurrents(ctypes.byref(res_field), ctypes.byref(res_current),
                     c_source, mode)
 
-    out_current = c2BundleToObj(res_current, shape=source_shape, obj_t='currents', np_t=np.float64)
+    out_current = BUtils.c2BundleToObj(res_current, shape=source_shape, obj_t='currents', np_t=np.float64)
 
     return out_current

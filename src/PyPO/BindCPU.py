@@ -2,9 +2,9 @@ import ctypes
 import numpy as np
 import os
 import pathlib
-from PyPO.BindUtils import *
-from PyPO.Structs import *
-from PyPO.PyPOTypes import *
+
+import PyPO.BindUtils as BUtils
+import PyPO.Structs as PStructs
 import PyPO.Config as Config
 import PyPO.Threadmgr as TManager
 
@@ -29,50 +29,50 @@ def loadCPUlib():
         except:
             lib = ctypes.CDLL(os.path.join(path_cur, "libpypocpu.dylib"))
 
-    lib.propagateToGrid_JM.argtypes = [ctypes.POINTER(c2Bundle), reflparams, reflparams,
-                                        ctypes.POINTER(reflcontainer), ctypes.POINTER(reflcontainer),
-                                        ctypes.POINTER(c2Bundle),ctypes.c_double, ctypes.c_int,
+    lib.propagateToGrid_JM.argtypes = [ctypes.POINTER(PStructs.c2Bundle), PStructs.reflparams, PStructs.reflparams,
+                                        ctypes.POINTER(PStructs.reflcontainer), ctypes.POINTER(PStructs.reflcontainer),
+                                        ctypes.POINTER(PStructs.c2Bundle),ctypes.c_double, ctypes.c_int,
                                         ctypes.c_double, ctypes.c_double]
 
     lib.propagateToGrid_JM.restype = None
 
-    lib.propagateToGrid_EH.argtypes = [ctypes.POINTER(c2Bundle), reflparams, reflparams,
-                                        ctypes.POINTER(reflcontainer), ctypes.POINTER(reflcontainer),
-                                        ctypes.POINTER(c2Bundle),ctypes.c_double, ctypes.c_int,
+    lib.propagateToGrid_EH.argtypes = [ctypes.POINTER(PStructs.c2Bundle), PStructs.reflparams, PStructs.reflparams,
+                                        ctypes.POINTER(PStructs.reflcontainer), ctypes.POINTER(PStructs.reflcontainer),
+                                        ctypes.POINTER(PStructs.c2Bundle),ctypes.c_double, ctypes.c_int,
                                         ctypes.c_double, ctypes.c_double]
 
     lib.propagateToGrid_EH.restype = None
 
-    lib.propagateToGrid_JMEH.argtypes = [ctypes.POINTER(c4Bundle), reflparams, reflparams,
-                                        ctypes.POINTER(reflcontainer), ctypes.POINTER(reflcontainer),
-                                        ctypes.POINTER(c2Bundle),ctypes.c_double, ctypes.c_int,
+    lib.propagateToGrid_JMEH.argtypes = [ctypes.POINTER(PStructs.c4Bundle), PStructs.reflparams, PStructs.reflparams,
+                                        ctypes.POINTER(PStructs.reflcontainer), ctypes.POINTER(PStructs.reflcontainer),
+                                        ctypes.POINTER(PStructs.c2Bundle),ctypes.c_double, ctypes.c_int,
                                         ctypes.c_double, ctypes.c_double]
 
     lib.propagateToGrid_JMEH.restype = None
 
-    lib.propagateToGrid_EHP.argtypes = [ctypes.POINTER(c2rBundle), reflparams, reflparams,
-                                        ctypes.POINTER(reflcontainer), ctypes.POINTER(reflcontainer),
-                                        ctypes.POINTER(c2Bundle),ctypes.c_double, ctypes.c_int,
+    lib.propagateToGrid_EHP.argtypes = [ctypes.POINTER(PStructs.c2rBundle), PStructs.reflparams, PStructs.reflparams,
+                                        ctypes.POINTER(PStructs.reflcontainer), ctypes.POINTER(PStructs.reflcontainer),
+                                        ctypes.POINTER(PStructs.c2Bundle),ctypes.c_double, ctypes.c_int,
                                         ctypes.c_double, ctypes.c_double]
 
     lib.propagateToGrid_EHP.restype = None
 
-    lib.propagateToGrid_scalar.argtypes = [ctypes.POINTER(arrC1), reflparams, reflparams,
-                                        ctypes.POINTER(reflcontainer), ctypes.POINTER(reflcontainer),
-                                        ctypes.POINTER(arrC1),ctypes.c_double, ctypes.c_int,
+    lib.propagateToGrid_scalar.argtypes = [ctypes.POINTER(PStructs.arrC1), PStructs.reflparams, PStructs.reflparams,
+                                        ctypes.POINTER(PStructs.reflcontainer), ctypes.POINTER(PStructs.reflcontainer),
+                                        ctypes.POINTER(PStructs.arrC1),ctypes.c_double, ctypes.c_int,
                                         ctypes.c_double, ctypes.c_double]
 
     lib.propagateToGrid_scalar.restype = None
 
-    lib.propagateToFarField.argtypes = [ctypes.POINTER(c2Bundle), reflparams, reflparams,
-                                        ctypes.POINTER(reflcontainer), ctypes.POINTER(reflcontainer),
-                                        ctypes.POINTER(c2Bundle),ctypes.c_double, ctypes.c_int,
+    lib.propagateToFarField.argtypes = [ctypes.POINTER(PStructs.c2Bundle), PStructs.reflparams, PStructs.reflparams,
+                                        ctypes.POINTER(PStructs.reflcontainer), ctypes.POINTER(PStructs.reflcontainer),
+                                        ctypes.POINTER(PStructs.c2Bundle),ctypes.c_double, ctypes.c_int,
                                         ctypes.c_double, ctypes.c_double]
 
     lib.propagateToFarField.restype = None
 
-    lib.propagateRays.argtypes = [reflparams, ctypes.POINTER(cframe),
-                                ctypes.POINTER(cframe), ctypes.c_int, ctypes.c_double, ctypes.c_double]
+    lib.propagateRays.argtypes = [PStructs.reflparams, ctypes.POINTER(PStructs.cframe),
+                                ctypes.POINTER(PStructs.cframe), ctypes.c_int, ctypes.c_double, ctypes.c_double]
 
     lib.propagateRays.restype = None
 
@@ -96,20 +96,20 @@ def PyPO_CPUd(source, target, runPODict):
     mgr = TManager.Manager(Config.context)
 
     # Create structs with pointers for source and target
-    csp = reflparams()
-    ctp = reflparams()
+    csp = PStructs.reflparams()
+    ctp = PStructs.reflparams()
 
-    cs = reflcontainer()
-    ct = reflcontainer()
+    cs = PStructs.reflcontainer()
+    ct = PStructs.reflcontainer()
 
     gs = source["gridsize"][0] * source["gridsize"][1]
     gt = target["gridsize"][0] * target["gridsize"][1]
 
-    allfill_reflparams(csp, source, ctypes.c_double)
-    allfill_reflparams(ctp, target, ctypes.c_double)
+    BUtils.allfill_reflparams(csp, source, ctypes.c_double)
+    BUtils.allfill_reflparams(ctp, target, ctypes.c_double)
 
-    allocate_reflcontainer(cs, gs, ctypes.c_double)
-    allocate_reflcontainer(ct, gt, ctypes.c_double)
+    BUtils.allocate_reflcontainer(cs, gs, ctypes.c_double)
+    BUtils.allocate_reflcontainer(ct, gt, ctypes.c_double)
 
     target_shape = (target["gridsize"][0], target["gridsize"][1])
 
@@ -125,15 +125,15 @@ def PyPO_CPUd(source, target, runPODict):
     t_direction = ctypes.c_double(exp_prop)
     
     if runPODict["mode"] == "scalar":
-        c_field = arrC1()
-        sfieldConv(runPODict["s_scalarfield"], c_field, gs, ctypes.c_double)
+        c_field = PStructs.arrC1()
+        BUtils.sfieldConv(runPODict["s_scalarfield"], c_field, gs, ctypes.c_double)
         args = [csp, ctp, ctypes.byref(cs), ctypes.byref(ct),
                 ctypes.byref(c_field), k, nThreads, epsilon,
                 t_direction]
 
     else:
-        c_currents = c2Bundle()
-        allfill_c2Bundle(c_currents, runPODict["s_current"], gs, ctypes.c_double)
+        c_currents = PStructs.c2Bundle()
+        BUtils.allfill_c2Bundle(c_currents, runPODict["s_current"], gs, ctypes.c_double)
         args = [csp, ctp, ctypes.byref(cs), ctypes.byref(ct),
                 ctypes.byref(c_currents), k, nThreads, epsilon,
                 t_direction]
@@ -141,80 +141,80 @@ def PyPO_CPUd(source, target, runPODict):
 
 
     if runPODict["mode"] == "JM":
-        res = c2Bundle()
+        res = PStructs.c2Bundle()
         args.insert(0, res)
 
-        allocate_c2Bundle(res, gt, ctypes.c_double)
+        BUtils.allocate_c2Bundle(res, gt, ctypes.c_double)
 
         mgr.new_sthread(target=lib.propagateToGrid_JM, args=args)
 
         # Unpack filled struct
-        JM = c2BundleToObj(res, shape=target_shape, obj_t='currents', np_t=np.float64)
+        JM = BUtils.c2BundleToObj(res, shape=target_shape, obj_t='currents', np_t=np.float64)
 
         return JM
 
     elif runPODict["mode"] == "EH":
-        res = c2Bundle()
+        res = PStructs.c2Bundle()
         args.insert(0, res)
 
-        allocate_c2Bundle(res, gt, ctypes.c_double)
+        BUtils.allocate_c2Bundle(res, gt, ctypes.c_double)
 
         mgr.new_sthread(target=lib.propagateToGrid_EH, args=args)
 
         # Unpack filled struct
-        EH = c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
+        EH = BUtils.c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
 
         return EH
 
     elif runPODict["mode"] == "JMEH":
-        res = c4Bundle()
+        res = PStructs.c4Bundle()
         args.insert(0, res)
 
-        allocate_c4Bundle(res, gt, ctypes.c_double)
+        BUtils.allocate_c4Bundle(res, gt, ctypes.c_double)
 
         mgr.new_sthread(target=lib.propagateToGrid_JMEH, args=args)
 
         # Unpack filled struct
-        JM, EH = c4BundleToObj(res, shape=target_shape, np_t=np.float64)
+        JM, EH = BUtils.c4BundleToObj(res, shape=target_shape, np_t=np.float64)
 
         return [JM, EH]
 
     elif runPODict["mode"] == "EHP":
-        res = c2rBundle()
+        res = PStructs.c2rBundle()
         args.insert(0, res)
 
-        allocate_c2rBundle(res, gt, ctypes.c_double)
+        BUtils.allocate_c2rBundle(res, gt, ctypes.c_double)
 
         mgr.new_sthread(target=lib.propagateToGrid_EHP, args=args)
 
         # Unpack filled struct
-        EH, Pr = c2rBundleToObj(res, shape=target_shape, np_t=np.float64)
+        EH, Pr = BUtils.c2rBundleToObj(res, shape=target_shape, np_t=np.float64)
 
         return [EH, Pr]
 
     elif runPODict["mode"] == "scalar":
-        res = arrC1()
+        res = PStructs.arrC1()
         args.insert(0, res)
 
-        allocate_arrC1(res, gt, ctypes.c_double)
+        BUtils.allocate_arrC1(res, gt, ctypes.c_double)
 
         mgr.new_sthread(target=lib.propagateToGrid_scalar, args=args)
 
         # Unpack filled struct
-        S = arrC1ToObj(res, shape=target_shape, np_t=np.float64)
+        S = BUtils.arrC1ToObj(res, shape=target_shape, np_t=np.float64)
 
         return S
 
     elif runPODict["mode"] == "FF":
-        res = c2Bundle()
+        res = PStructs.c2Bundle()
         args.insert(0, res)
 
-        allocate_c2Bundle(res, gt, ctypes.c_double)
+        BUtils.allocate_c2Bundle(res, gt, ctypes.c_double)
 
         mgr.new_sthread(target=lib.propagateToFarField, args=args)
 
         # Unpack filled struct
-        EH = c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
+        EH = BUtils.c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
 
         return EH
 
@@ -231,14 +231,14 @@ def RT_CPUd(runRTDict):
     lib = loadCPUlib()
     mgr = TManager.Manager(Config.context)
 
-    inp = cframe()
-    res = cframe()
+    inp = PStructs.cframe()
+    res = PStructs.cframe()
 
-    allocate_cframe(res, runRTDict["fr_in"].size, ctypes.c_double)
-    allfill_cframe(inp, runRTDict["fr_in"], runRTDict["fr_in"].size, ctypes.c_double)
+    BUtils.allocate_cframe(res, runRTDict["fr_in"].size, ctypes.c_double)
+    BUtils.allfill_cframe(inp, runRTDict["fr_in"], runRTDict["fr_in"].size, ctypes.c_double)
 
-    ctp = reflparams()
-    allfill_reflparams(ctp, runRTDict["t_name"], ctypes.c_double)
+    ctp = PStructs.reflparams()
+    BUtils.allfill_reflparams(ctp, runRTDict["t_name"], ctypes.c_double)
     nThreads    = ctypes.c_int(runRTDict["nThreads"])
     tol         = ctypes.c_double(runRTDict["tol"])
     t0          = ctypes.c_double(runRTDict["t0"])
@@ -249,5 +249,5 @@ def RT_CPUd(runRTDict):
     mgr.new_sthread(target=lib.propagateRays, args=args)
 
     shape = (runRTDict["fr_in"].size,)
-    fr_out = frameToObj(res, np_t=np.float64, shape=shape)
+    fr_out = BUtils.frameToObj(res, np_t=np.float64, shape=shape)
     return fr_out

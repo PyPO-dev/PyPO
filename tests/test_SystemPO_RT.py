@@ -85,19 +85,27 @@ class Test_SystemPO_RT(unittest.TestCase):
             self.assertEqual(type(self.s.currents["test_JM"]), pypotypes.currents)
             self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
     
-    @params(("CPU", False), ("GPU", True))
-    def test_runPO_EHP_Hybrid(self, dev, interp):
+    @params(("CPU", False, System.runPO, System.runHybridPropagation), 
+            ("GPU", True, System.runPO, System.runHybridPropagation), 
+            ("CPU", False, System.runGUIPO, System.hybridGUIPropagation))
+    def test_runPO_EHP_Hybrid(self, dev, interp, funcPO, funcHybrid):
         if dev == "GPU" and not self.GPU_flag:
             return
 
         runPODict = self._get_runPODictEHP(TestTemplates.GPOfield["name"], TestTemplates.paraboloid_man_xy["name"],"test_EH", "test_P", device=dev)
             
-        self.s.runPO(runPODict)
+        check_runPODict(runPODict, self.s.system.keys(), self.s.fields.keys(), self.s.currents.keys(),
+                    self.s.scalarfields.keys(), self.s.frames.keys(), self.s.clog)
+        
+        funcPO(self.s, runPODict)
         self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
         self.assertEqual(type(self.s.frames["test_P"]), pypotypes.frame)
         
         runHybridDict = self._get_runPODictHybrid("test_P", "test_EH", TestTemplates.paraboloid_man_xy["name"], "test_fr_out", "test_field_out", interp=interp)
-        self.s.runHybridPropagation(runHybridDict)
+        
+        check_hybridDict(runHybridDict, self.s.system.keys(), self.s.frames.keys(), self.s.fields.keys(), self.s.clog)
+        
+        funcHybrid(self.s, runHybridDict)
         self.assertEqual(type(self.s.fields["test_field_out"]), pypotypes.fields)
         self.assertEqual(type(self.s.frames["test_fr_out"]), pypotypes.frame)
             

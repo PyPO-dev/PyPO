@@ -10,7 +10,7 @@ warnings.filterwarnings("ignore")
 
 import PyPO.PlotConfig
 import PyPO.Colormaps as cmaps
-from PyPO.BindRefl import *
+import PyPO.BindRefl as BRefl
 
 ##
 # @file
@@ -53,7 +53,7 @@ def plotBeam2D(plotObject, field, contour,
 
     # With far-field, generate grid without converting to spherical
     max_field = np.max(np.absolute(field))
-    grids = generateGrid(plotObject, transform=True, spheric=False)
+    grids = BRefl.generateGrid(plotObject, transform=True, spheric=False)
     if not plotObject["gmode"] == 2:
         if project == 'xy':
             grid_x1 = grids.x
@@ -282,7 +282,7 @@ def plot3D(plotObject, ax, fine, cmap,
     """
 
     skip = slice(None,None,fine)
-    grids = generateGrid(plotObject, transform=True, spheric=True)
+    grids = BRefl.generateGrid(plotObject, transform=True, spheric=True)
 
     ax.plot_surface(grids.x[skip], grids.y[skip], grids.z[skip],
                    linewidth=0, antialiased=False, alpha=1, cmap=cmap)

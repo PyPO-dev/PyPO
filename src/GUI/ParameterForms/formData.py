@@ -494,6 +494,7 @@ def propPOHybridInp(fieldDict, frameDict, elemDict):
         for key, item in elemDict.items():
             if item["gmode"] != 2:
                 sublist_target.append(key)
+    sublist_dev = ["CPU", "GPU"]
 
     propFields = [
             InputDescription(inType.dropdown, "fr_in", label="Poynting", options = sublist_frames),
@@ -509,6 +510,10 @@ def propPOHybridInp(fieldDict, frameDict, elemDict):
                     "yes" : [InputDescription(inType.dropdown, "comp", label="Component", options = complist)],
                     "no" : [InputDescription(inType.static, "comp", label="", staticValue=True, hidden=True)]
                 }), 
+            InputDescription(inType.vectorFloats, "tol", label="Accuracy", hints=[1e-3], numFields=1),
+            InputDescription(inType.vectorIntegers, "nThreads", label="Number of threads", hints=[1], numFields=1),
+            InputDescription(inType.vectorFloats, "t0", label="Initial guess", hints=[1], numFields=1),
+            InputDescription(inType.dropdown, "device", label="Hardware to use", options = sublist_dev)
             ]
 
     return propFields

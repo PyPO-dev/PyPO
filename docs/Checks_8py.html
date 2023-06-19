@@ -232,9 +232,9 @@ Functions</h2></td></tr>
 <tr class="memitem:aa4d8a5b7d487abb7a5b6ba0ba925cc94"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Checks_8py.html#aa4d8a5b7d487abb7a5b6ba0ba925cc94">PyPO.Checks.check_GRTDict</a> (<a class="el" href="structGRTDict.html">GRTDict</a>, nameList, clog)</td></tr>
 <tr class="memdesc:aa4d8a5b7d487abb7a5b6ba0ba925cc94"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check a Gaussian input frame dictionary.  <br /></td></tr>
 <tr class="separator:aa4d8a5b7d487abb7a5b6ba0ba925cc94"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a695b4c364620a80592ef7c98d9722bf5"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Checks_8py.html#a695b4c364620a80592ef7c98d9722bf5">PyPO.Checks.check_runRTDict</a> (runRTDict, elements, frames, clog)</td></tr>
-<tr class="memdesc:a695b4c364620a80592ef7c98d9722bf5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check a ray-trace propagation input dictionary.  <br /></td></tr>
-<tr class="separator:a695b4c364620a80592ef7c98d9722bf5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab446f5681368d57fa32e45caf2ce490a"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Checks_8py.html#ab446f5681368d57fa32e45caf2ce490a">PyPO.Checks.check_runRTDict</a> (runRTDict, elements, frames, clog, extern=True)</td></tr>
+<tr class="memdesc:ab446f5681368d57fa32e45caf2ce490a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check a ray-trace propagation input dictionary.  <br /></td></tr>
+<tr class="separator:ab446f5681368d57fa32e45caf2ce490a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a489859d98a7a986586b0ac5229e64338"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Checks_8py.html#a489859d98a7a986586b0ac5229e64338">PyPO.Checks.check_PSDict</a> (PSDict, nameList, clog)</td></tr>
 <tr class="memdesc:a489859d98a7a986586b0ac5229e64338"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check a point source input beam dictionary.  <br /></td></tr>
 <tr class="separator:a489859d98a7a986586b0ac5229e64338"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1061,8 +1061,8 @@ list&#160;</td><td class="memItemRight" valign="bottom"><b>PyPO.Checks.PO_modeli
 
 </div>
 </div>
-<a id="a695b4c364620a80592ef7c98d9722bf5" name="a695b4c364620a80592ef7c98d9722bf5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a695b4c364620a80592ef7c98d9722bf5">&#9670;&#160;</a></span>check_runRTDict()</h2>
+<a id="ab446f5681368d57fa32e45caf2ce490a" name="ab446f5681368d57fa32e45caf2ce490a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab446f5681368d57fa32e45caf2ce490a">&#9670;&#160;</a></span>check_runRTDict()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1089,7 +1089,13 @@ list&#160;</td><td class="memItemRight" valign="bottom"><b>PyPO.Checks.PO_modeli
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>clog</em>&#160;</td>
+          <td class="paramname"><em>clog</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>extern</em> = <code>True</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1106,9 +1112,11 @@ list&#160;</td><td class="memItemRight" valign="bottom"><b>PyPO.Checks.PO_modeli
     <tr><td class="paramname">elements</td><td>List containing names of surfaces in System. </td></tr>
     <tr><td class="paramname">frames</td><td>List containing names of frames in System. </td></tr>
     <tr><td class="paramname">clog</td><td>CustomLogger object. </td></tr>
+    <tr><td class="paramname">extern</td><td>Do not raise InputRTError if "extern" = False.</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>errStr The errorstring. Only returned if "extern" = True. </dd></dl>
 
 </div>
 </div>

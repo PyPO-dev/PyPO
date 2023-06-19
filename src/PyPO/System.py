@@ -1850,7 +1850,7 @@ class System(object):
         eff = effs.calcMainBeam(field, surfaceObj, self.scalarfields[f"fitGauss_{name_field}"].S)
         return eff
     
-    def calcBeamCuts(self, name_field, comp, phi=0, center=True, align=True, norm=False, mode="dB"):
+    def calcBeamCuts(self, name_field, comp, phi=0, center=True, align=True, norm=False, transform=False, mode="dB"):
         """!
         Calculate cross sections of a beam pattern.
         
@@ -1869,6 +1869,7 @@ class System(object):
         @param center Whether to center the cardinal planes on the peak of the beam pattern.
         @param align Whether to align the cardinal planes to the beam pattern minor and major axes.
         @param norm Which component to normalise to. Defaults to comp. 
+        @param transform Transform surface on which beam is defined. If False, will evaluate beam cuts as if surface is in restframe.
         @param mode Return beamcuts in linear ("linear"), logarithmic ("log") or decibels ("dB"). Defaults to "dB".
         
         @returns x_cut Beam cross section along the E-plane.
@@ -1895,7 +1896,7 @@ class System(object):
         if center:
             self.translateGrids(name_surf, np.array([-popt[2], -popt[3], 0]))
         
-        grids_orig = self.generateGrids(name_surf, spheric=False)
+        grids_orig = self.generateGrids(name_surf, transform=False, spheric=False)
             
         
         if align:

@@ -239,7 +239,6 @@ def RT_CPUd(runRTDict):
 
     ctp = reflparams()
     allfill_reflparams(ctp, runRTDict["t_name"], ctypes.c_double)
-
     nThreads    = ctypes.c_int(runRTDict["nThreads"])
     tol         = ctypes.c_double(runRTDict["tol"])
     t0          = ctypes.c_double(runRTDict["t0"])

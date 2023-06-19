@@ -11,4 +11,8 @@ These demos are also included in the "demos" folder of the `PyPO` root directory
 [Diffraction from a uniform current distribution on a square](demos/Demo3.html)
 
 [Diffraction from a double slit](demos/Demo4.html)
+
+[Inspecting the focus finder tool](demos/Demo5.html)
+
+[Validating a Dragonian dual reflector design](demos/Demo6.html)
 */

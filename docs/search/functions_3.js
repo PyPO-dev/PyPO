@@ -3,7 +3,7 @@ var searchData=
   ['c2bundletoobj_0',['c2BundleToObj',['../BindUtils_8py.html#aedeed7f24649566adee19e8803f0ff1d',1,'PyPO::BindUtils']]],
   ['c2rbundletoobj_1',['c2rBundleToObj',['../BindUtils_8py.html#a4740d9a7dbdc597e214d7fbcd6809817',1,'PyPO::BindUtils']]],
   ['c4bundletoobj_2',['c4BundleToObj',['../BindUtils_8py.html#a85dff121b46833a66233bf4fcd00dfd0',1,'PyPO::BindUtils']]],
-  ['calcbeamcuts_3',['calcBeamCuts',['../group__public__api__po.html#gaecd240ae4a72da96ef3d569ce75376bc',1,'PyPO::System::System']]],
+  ['calcbeamcuts_3',['calcBeamCuts',['../group__public__api__po.html#ga3f9bcd647128a26e892bca72b881a412',1,'PyPO::System::System']]],
   ['calccurrents_4',['calcCurrents',['../group__public__api__po.html#ga636df260c78f635864ec5f7de5219954',1,'PyPO.System.System.calcCurrents()'],['../BindBeam_8py.html#a9f9f13dfdff79c82656701068248cca4',1,'PyPO.BindBeam.calcCurrents()'],['../InterfaceBeam_8h.html#a3482394fcfe3386ba0852d7bc0662d01',1,'calcCurrents(c2Bundle *res_field, c2Bundle *res_current, reflparams rdict, int mode):&#160;InterfaceBeam.cpp'],['../InterfaceBeam_8cpp.html#ae0d4eee58a54fac7b914f5356055f421',1,'calcCurrents(c2Bundle *res_field, c2Bundle *res_current, reflparams refldict, int mode):&#160;InterfaceBeam.cpp']]],
   ['calcestimates_5',['calcEstimates',['../FitGauss_8py.html#a9104adc8fbdcc2620bb978710d3b5c2e',1,'PyPO::FitGauss']]],
   ['calchpbw_6',['calcHPBW',['../formData_8py.html#adb9623eeb16d2d9c6dff8a611a95325f',1,'GUI.ParameterForms.formData.calcHPBW()'],['../classPyPO_1_1System_1_1System.html#af5d63b02b08afe46465783e6e271cd46',1,'PyPO.System.System.calcHPBW()']]],

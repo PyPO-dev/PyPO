@@ -5,6 +5,7 @@ import matplotlib as mpl
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import matplotlib.ticker as ticker
 import warnings
+from traceback import print_tb
 warnings.filterwarnings("ignore")
 
 import PyPO.PlotConfig
@@ -248,11 +249,11 @@ def plotBeam2D(plotObject, field, contour,
         Ro = 2*aperDict["outer"]
         Ri = 2*aperDict["inner"]
 
+        circleo=mpl.patches.Ellipse((xc,yc),Ro[0], Ro[1], color='black', fill=False)
+        circlei=mpl.patches.Ellipse((xc,yc),Ri[0], Ri[1], color='black', fill=False)
 
         try:
             for axx in ax:
-                circleo=mpl.patches.Ellipse((xc,yc),Ro[0], Ro[1], color='black', fill=False)
-                circlei=mpl.patches.Ellipse((xc,yc),Ri[0], Ri[1], color='black', fill=False)
                 
                 axx.add_patch(circleo)
                 axx.add_patch(circlei)
@@ -287,10 +288,17 @@ def plot3D(plotObject, ax, fine, cmap,
                    linewidth=0, antialiased=False, alpha=1, cmap=cmap)
 
     if foc1:
-        ax.scatter(plotObject["focus_1"][0], plotObject["focus_1"][1], plotObject["focus_1"][2], color='black')
+        try:
+            ax.scatter(plotObject["focus_1"][0], plotObject["focus_1"][1], plotObject["focus_1"][2], color='black')
+        except KeyError as err:
+            print_tb(err.__traceback__)
+
 
     if foc2:
-        ax.scatter(plotObject["focus_2"][0], plotObject["focus_2"][1], plotObject["focus_2"][2], color='black')
+        try:
+            ax.scatter(plotObject["focus_2"][0], plotObject["focus_2"][1], plotObject["focus_2"][2], color='black')
+        except KeyError as err:
+            print_tb(err.__traceback__)
 
     if norm:
         length = 10# np.sqrt(np.dot(plotObject["focus_1"], plotObject["focus_1"])) / 5

@@ -36,4 +36,5 @@ class TestCustomLogger(unittest.TestCase):
         self.assertEqual(type(test_gl), GUILogger)
 
 if __name__ == "__main__":
-    unittest.main()
+    import nose2
+    nose2.main()

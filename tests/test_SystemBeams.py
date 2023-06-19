@@ -1,6 +1,7 @@
 import unittest
-import numpy as np
 import ctypes
+
+from nose2.tools import params
 
 try:
     from . import TestTemplates
@@ -49,53 +50,39 @@ class Test_SystemBeams(unittest.TestCase):
         self.s.createGRTFrame(TestTemplates.GaussRTframe)
         self.assertEqual(type(self.s.frames["testGaussRTframe"]), pypotypes.frame)
 
-    def test_createGauss(self):
-        self.s.createGaussian(TestTemplates.GPOfield, "testPlane_xy")
+    @params(*TestTemplates.getReflectorPlaneList())
+    def test_createGauss(self, plane):
+        self.s.createGaussian(TestTemplates.GPOfield, plane["name"])
         self.assertEqual(type(self.s.fields["testGaussField"]), pypotypes.fields)
         self.assertEqual(type(self.s.currents["testGaussField"]), pypotypes.currents)
 
-        self.s.createGaussian(TestTemplates.GPOfield, "testPlane_uv")
-        self.assertEqual(type(self.s.fields["testGaussField"]), pypotypes.fields)
-        self.assertEqual(type(self.s.currents["testGaussField"]), pypotypes.currents)
-    
-    def test_createScalarGauss(self):
-        self.s.createScalarGaussian(TestTemplates.GPOfield, "testPlane_xy")
+    @params(*TestTemplates.getReflectorPlaneList())
+    def test_createScalarGauss(self, plane):
+        self.s.createScalarGaussian(TestTemplates.GPOfield, plane["name"])
         self.assertEqual(type(self.s.scalarfields["testGaussField"]), pypotypes.scalarfield)
 
-        self.s.createScalarGaussian(TestTemplates.GPOfield, "testPlane_uv")
-        self.assertEqual(type(self.s.scalarfields["testGaussField"]), pypotypes.scalarfield)
-
-    def test_createPointSource(self):
-        self.s.createPointSource(TestTemplates.PS_Ufield, "testPlane_xy")
-        self.assertEqual(type(self.s.fields["testPS_UField"]), pypotypes.fields)
-        self.assertEqual(type(self.s.currents["testPS_UField"]), pypotypes.currents)
-
-        self.s.createPointSource(TestTemplates.PS_Ufield, "testPlane_uv")
+    @params(*TestTemplates.getReflectorPlaneList())
+    def test_createPointSource(self, plane):
+        self.s.createPointSource(TestTemplates.PS_Ufield, plane["name"])
         self.assertEqual(type(self.s.fields["testPS_UField"]), pypotypes.fields)
         self.assertEqual(type(self.s.currents["testPS_UField"]), pypotypes.currents)
     
-    def test_createScalarPointSource(self):
-        self.s.createPointSourceScalar(TestTemplates.PS_Ufield, "testPlane_xy")
-        self.assertEqual(type(self.s.scalarfields["testPS_UField"]), pypotypes.scalarfield)
-
-        self.s.createPointSourceScalar(TestTemplates.PS_Ufield, "testPlane_uv")
+    @params(*TestTemplates.getReflectorPlaneList())
+    def test_createScalarPointSource(self, plane):
+        self.s.createPointSourceScalar(TestTemplates.PS_Ufield, plane["name"])
         self.assertEqual(type(self.s.scalarfields["testPS_UField"]), pypotypes.scalarfield)
     
-    def test_createUniformSource(self):
-        self.s.createUniformSource(TestTemplates.PS_Ufield, "testPlane_xy")
-        self.assertEqual(type(self.s.fields["testPS_UField"]), pypotypes.fields)
-        self.assertEqual(type(self.s.currents["testPS_UField"]), pypotypes.currents)
-
-        self.s.createUniformSource(TestTemplates.PS_Ufield, "testPlane_uv")
+    @params(*TestTemplates.getReflectorPlaneList())
+    def test_createUniformSource(self, plane):
+        self.s.createUniformSource(TestTemplates.PS_Ufield, plane["name"])
         self.assertEqual(type(self.s.fields["testPS_UField"]), pypotypes.fields)
         self.assertEqual(type(self.s.currents["testPS_UField"]), pypotypes.currents)
     
-    def test_createScalarUniformSource(self):
-        self.s.createUniformSourceScalar(TestTemplates.PS_Ufield, "testPlane_xy")
-        self.assertEqual(type(self.s.scalarfields["testPS_UField"]), pypotypes.scalarfield)
-
-        self.s.createUniformSourceScalar(TestTemplates.PS_Ufield, "testPlane_uv")
+    @params(*TestTemplates.getReflectorPlaneList())
+    def test_createScalarUniformSource(self, plane):
+        self.s.createUniformSourceScalar(TestTemplates.PS_Ufield, plane["name"])
         self.assertEqual(type(self.s.scalarfields["testPS_UField"]), pypotypes.scalarfield)
 
 if __name__ == "__main__":
-    unittest.main()
+    import nose2
+    nose2.main()

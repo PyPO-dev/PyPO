@@ -1,5 +1,9 @@
 import unittest
 import warnings
+import sys
+
+from nose2.tools import params
+
 try:
     from . import TestTemplates
 except ImportError: 
@@ -8,6 +12,7 @@ except ImportError:
 from numpy import ndarray 
 from matplotlib.figure import Figure
 from matplotlib.pyplot import Axes, close
+
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 from PyPO.System import System
 
@@ -15,28 +20,33 @@ from PyPO.System import System
 # @file
 # This file contains tests for the plotting functionalities. It tests whether the plotting functions in the System behave as expected.
 
-
-stm = TestTemplates.getSystemWithReflectors()
-
-class Test_SystemOps(unittest.TestCase):
-
+class Test_Plotting(unittest.TestCase):
+    def setUp(self):
+        self.s = TestTemplates.getSystemWithReflectors()
+        self.s.setOverride(False)
+        self.projects = ["xy", "yx", "xz", "zx", "yz", "zy"]
+    
     def test_plotBeamCut(self):
-        fig, ax = stm.plotBeamCut(TestTemplates.GPOfield['name'], 'Ex', center=False, align=False, ret=True)
+        fig, ax = self.s.plotBeamCut(TestTemplates.GPOfield['name'], 'Ex', center=False, align=False, ret=True)
 
         self.assertEqual(type(fig), Figure)
         self.assertEqual(type(ax), Axes)
 
         close('all')
 
-    def test_plotBeam2D(self):
+    @params("xy", "yx", "xz", "zx", "yz", "zy")
+    def test_plotBeam2D(self, project):
         out_ar = []
         out_ax = []
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            out_ax.append(stm.plotBeam2D(TestTemplates.GPOfield['name'], 'Ex', ret=True, amp_only=True))
-            out_ax.append(stm.plotBeam2D(TestTemplates.GPOfield['name'], 'Ex', ret=True, amp_only=True, mode="linear"))
-            out_ar.append(stm.plotBeam2D(TestTemplates.GPOfield['name'], 'Ex', ret=True))
-            out_ar.append(stm.plotBeam2D(TestTemplates.GPOfield['name'], 'Ex', ret=True, mode="linear"))
+            aperDict_plot = self.s.copyObj(TestTemplates.aperDict)
+            aperDict_plot["plot"] = True
+
+            out_ax.append(self.s.plotBeam2D(TestTemplates.GPOfield['name'], 'Ex', ret=True, amp_only=True, project=project, aperDict=aperDict_plot))
+            out_ax.append(self.s.plotBeam2D(TestTemplates.GPOfield['name'], 'Ex', ret=True, amp_only=True, mode="linear", project=project))
+            out_ar.append(self.s.plotBeam2D(TestTemplates.GPOfield['name'], 'Ex', ret=True, project=project, aperDict=TestTemplates.aperDict, contour=TestTemplates.GPOfield['name'], contour_comp="Ex", levels=[0.5, 1]))
+            out_ar.append(self.s.plotBeam2D(TestTemplates.GPOfield['name'], 'Ex', ret=True, mode="linear", project=project, contour=TestTemplates.GPOfield['name'], contour_comp="Ex", levels=[0.5, 1]))
 
         for entry_ax, entry_ar in zip(out_ax, out_ar):
             self.assertEqual(type(entry_ax[0]), Figure)
@@ -47,25 +57,23 @@ class Test_SystemOps(unittest.TestCase):
 
         close('all')
 
-    def test_plotBeam3D(self):
-        fig1, ax1 = stm.plot3D(TestTemplates.paraboloid_man_uv['name'], ret=True)
-        self.assertEqual(type(fig1), Figure)
-        self.assertEqual(type(ax1), Axes3D)
+    @params(*TestTemplates.getAllSurfList())
+    def test_plotBeam3D(self, element):
+        sys.tracebacklimit = 0
+        try:
+            fig, ax = self.s.plot3D(element['name'], ret=True, foc1=True, foc2=True, norm=True)
 
-        for refl in (TestTemplates.getPlaneList() + 
-                     TestTemplates.getParaboloidList() + 
-                     TestTemplates.getHyperboloidList() +
-                     TestTemplates.getEllipsoidList()):
-            fig, ax = stm.plot3D(refl['name'], ret=True)
+        except KeyError:
+            fig, ax = self.s.plot3D(element['name'], ret=True, norm=True)
+            
+        self.assertEqual(type(fig), Figure)
+        self.assertEqual(type(ax), Axes3D)
 
-            self.assertEqual(type(fig), Figure)
-            self.assertEqual(type(ax), Axes3D)
-
-            close('all')
+        close('all')
 
             
     def test_plotSystem(self):
-        fig, ax = stm.plotSystem(ret=True)
+        fig, ax = self.s.plotSystem(ret=True)
 
         self.assertEqual(type(fig), Figure)
         self.assertEqual(type(ax), Axes3D)
@@ -81,7 +89,7 @@ class Test_SystemOps(unittest.TestCase):
         
         
     def test_plotGroup(self):
-        stm.groupElements('testGroup', 
+        self.s.groupElements('testGroup', 
                           TestTemplates.paraboloid_man_xy['name'],
                           TestTemplates.hyperboloid_man_uv['name'],
                           TestTemplates.ellipsoid_z_foc_xy['name'],
@@ -90,7 +98,7 @@ class Test_SystemOps(unittest.TestCase):
                           TestTemplates.plane_AoE['name'],
                           )
         
-        fig, ax = stm.plotGroup('testGroup', ret=True)
+        fig, ax = self.s.plotGroup('testGroup', ret=True)
 
         self.assertEqual(type(fig), Figure)
         self.assertEqual(type(ax), Axes3D)
@@ -98,15 +106,15 @@ class Test_SystemOps(unittest.TestCase):
         close('all')
         
         
-    def test_plotRTframe(self):
+    @params("xy", "yx", "xz", "zx", "yz", "zy")
+    def test_plotRTframe(self, project):
         for frameName in [TestTemplates.TubeRTframe['name'], TestTemplates.GaussRTframe['name']]:
-            fig = stm.plotRTframe(frameName, ret=True)
+            fig = self.s.plotRTframe(frameName, ret=True, project=project)
 
             self.assertEqual(type(fig), Figure)
 
             close('all')        
 
 if __name__ == '__main__':
-    unittest.main()
-
-
+    import nose2
+    nose2.main()

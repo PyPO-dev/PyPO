@@ -1,10 +1,7 @@
-import sys
 import os
-import random
 import shutil
 
 import unittest
-import numpy as np
 from pathlib import Path
 
 from PyPO.System import System
@@ -44,4 +41,5 @@ class Test_SystemPaths(unittest.TestCase):
             self.assertFalse(os.path.exists(os.path.join(self.path_test, self.path_app)))
 
 if __name__ == "__main__":
-    unittest.main()
+    import nose2
+    nose2.main()

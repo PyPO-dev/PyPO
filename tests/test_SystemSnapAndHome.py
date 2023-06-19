@@ -1,11 +1,5 @@
-import sys
-import os
-import random
-import shutil
-
 import unittest
 import numpy as np
-from pathlib import Path
 
 from PyPO.System import System
 
@@ -27,8 +21,8 @@ class Test_SystemSnapAndHome(unittest.TestCase):
         self.s.groupElements("testgroup", *self.names)
 
     def test_snapObj(self):
-        trans = np.random.rand(3) * 100
-        rot = np.random.rand(3) * 300
+        trans = np.array([-3, 42.42, 666])
+        rot = np.array([359, -69, 69])
 
         for name in self.names:
             self.s.translateGrids(name, trans)
@@ -125,8 +119,8 @@ class Test_SystemSnapAndHome(unittest.TestCase):
             self.assertFalse("test" in self.s.frames[fr_n].snapshots)
 
     def test_homeReflector(self):
-        trans = np.random.rand(3) * 100
-        rot = np.random.rand(3) * 300
+        trans = np.array([-3, 42.42, 666])
+        rot = np.array([359, -69, 69])
 
         for name in self.names:
             self.s.translateGrids(name, trans)
@@ -153,4 +147,5 @@ class Test_SystemSnapAndHome(unittest.TestCase):
                 self.assertEqual(ti, te)
 
 if __name__ == "__main__":
-    unittest.main()
+    import nose2
+    nose2.main()

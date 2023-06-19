@@ -1,11 +1,7 @@
-import sys
 import os
-import random
 import shutil
 
 import unittest
-import numpy as np
-from pathlib import Path
 
 from PyPO.System import System
 
@@ -59,5 +55,9 @@ class Test_SystemOps(unittest.TestCase):
         shutil.rmtree(os.path.join(self.s1.savePathSystems, "s0"))
         self.assertFalse(os.path.exists(os.path.join(self.s0.savePathSystems, "s0"))) 
 
+    def test_deleteSystem(self):
+        del self.s0
+
 if __name__ == "__main__":
-    unittest.main() 
+    import nose2
+    nose2.main()

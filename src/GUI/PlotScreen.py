@@ -9,9 +9,11 @@ class MplCanvas(FigureCanvasQTAgg):
     def __init__(self, fig):
         super(MplCanvas, self).__init__(fig)
 
-##
-# Generate plot widget.
+
 class PlotScreen(QWidget):
+    """!
+    Plot widget for the GUI.
+    """
     def __init__(self, fig, parent = None):
         super().__init__(parent=parent)
         canvas = MplCanvas(fig)

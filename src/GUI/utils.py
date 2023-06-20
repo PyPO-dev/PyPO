@@ -4,13 +4,20 @@ from PySide6.QtGui import QRegularExpressionValidator
 from enum import Enum, auto
 
 ##
-# Raised when an inputDescription is created incorrectly  
+# @file
+# Contains utilities for the GUI. 
+
+
 class InputDescriptionError(Exception):
+    """!
+    Raised when an inputDescription is created incorrectly  
+    """
     pass
 
-##
-# Enum containing the possible types for an inputDescription 
 class inType(Enum):
+    """!
+    Enum containing the possible types for an inputDescription 
+    """
     static = 0
     vectorStrings = 1
     vectorIntegers = 2
@@ -23,9 +30,10 @@ class inType(Enum):
     dynamicRadio = 9
     elementSelector = 10
 
-##
-# Enum containing workspace sections  
 class WSSections(Enum):
+    """!
+    Enum containing workspace sections  
+    """
     Element = 0
     RayTraceFrame = 1
     POField = 2

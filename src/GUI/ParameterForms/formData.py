@@ -5,39 +5,45 @@ from src.GUI.ParameterForms.InputDescription import inType, InputDescription
 # This file contains all forms used by the GUI for interaction with the user.
 # Because all functions return lists containing forms, the return will not be explicitly stated per form.
 
-##
-# Options for generating an element from an xy parametrisation.
+
 def xy_opts():
+    """!
+    Options for generating an element from an xy parametrisation.
+    """
     return [InputDescription(inType.vectorFloats, "lims_x", label="X limits", oArray=True, numFields=2),
             InputDescription(inType.vectorFloats, "lims_y", label="Y limits", oArray=True, numFields=2)]
 
-##
-# Options for generating an element from a uv parametrisation.
 def uv_opts():
+    """!
+    Options for generating an element from a uv parametrisation.
+    """
     return [InputDescription(inType.vectorFloats, "lims_u", label="U limits", oArray=True, numFields=2, toolTip = "U limits: inner and outer diameter."),
             InputDescription(inType.vectorFloats, "lims_v", label="V limits", prefill = True, hints=[0., 360.], oArray=True, numFields=2, toolTip = "V angle in degrees."),
             InputDescription(inType.vectorFloats, "gcenter", label="XY center", hints = [0.,0.], oArray=True, numFields=2, prefill = True),
             InputDescription(inType.vectorFloats, "ecc_uv", label="UV eccentricity", numFields=1, hints = [0.], prefill = True),
             InputDescription(inType.vectorFloats, "rot_uv", label="UV position angle", numFields=1, hints = [0.], prefill = True)]
 
-##
-# Options for generating a far-field element from an AoE (Azimuth-over-Elevation) parametrisation.
 def AoE_opts():
+    """!
+    Options for generating a far-field element from an AoE (Azimuth-over-Elevation) parametrisation.
+    """
     return [InputDescription(inType.vectorFloats, "lims_Az", label="Azimuth limits", oArray=True, numFields=2),
             InputDescription(inType.vectorFloats, "lims_El", label="Elevation limits", oArray=True, numFields=2)]
 
-##
-# Extra options for hyperboloids and ellipsoids for supplying quadric parameters and gridding options.
 def focus_opts_hyp_ell():
+    """!
+    Extra options for hyperboloids and ellipsoids for supplying quadric parameters and gridding options.
+    """
     return [
         InputDescription(inType.vectorFloats, "focus_1", label="Upper focus xyz", oArray=True, numFields=3),
             InputDescription(inType.vectorFloats, "focus_2", label="Lower focus xyz", oArray=True, numFields=3),
             InputDescription(inType.vectorFloats, "ecc", label="Eccentricity", numFields=1)
     ]
 
-##
-# Form for generating a paraboloid element.
 def makeParabolaInp():
+    """!
+    Form for generating a paraboloid element.
+    """
     return [
         InputDescription(inType.vectorStrings, "name", hints = ["Parabola"], prefill = True),
         InputDescription(inType.dynamicRadio, "pmode", label="Parameter mode", subDict={
@@ -53,9 +59,10 @@ def makeParabolaInp():
         })
     ]
 
-##
-# Form for generating a hyperboloid element.
 def makeHyperbolaInp():
+    """!
+    Form for generating a hyperboloid element.
+    """
     return [InputDescription(inType.vectorStrings, "name", hints = ["Hyperbola"], prefill = True),
             InputDescription(inType.dynamicRadio, "pmode", label="Parameter mode", subDict={
                 "focus"     : focus_opts_hyp_ell(),
@@ -68,9 +75,10 @@ def makeHyperbolaInp():
                 "uv" : uv_opts()
             })]
 
-##
-# Form for generating an ellipsoid element.
 def makeEllipseInp():
+    """!
+    Form for generating an ellipsoid element.
+    """
     return [InputDescription(inType.vectorStrings, "name", hints = ["Ellipse"], prefill = True),
             InputDescription(inType.dynamicRadio, "pmode", label="Parameter mode", subDict={
                 "focus"     : focus_opts_hyp_ell(),
@@ -83,9 +91,10 @@ def makeEllipseInp():
                 "xy" : xy_opts(),
                 "uv" : uv_opts()
             })]
-##
-# Menu for generating quadric elements.
 def makeQuadricSurfaceInp():
+    """!
+    Menu for generating quadric elements.
+    """
     return [
         InputDescription(inType.dynamicDropdown, "type", subDict={
             "Parabola": makeParabolaInp(),
@@ -94,9 +103,10 @@ def makeQuadricSurfaceInp():
         })
     ]
 
-##
-# Menu for generating planar elements.
 def makePlaneInp():
+    """!
+    Menu for generating planar elements.
+    """
     return [InputDescription(inType.vectorStrings, "name"),
             InputDescription(inType.vectorIntegers, "gridsize", label="Grid size", hints=[101,101], numFields=2, oArray=True),
             InputDescription(inType.checkbox, "flip", label="Flip Normal Vectors"),
@@ -107,12 +117,13 @@ def makePlaneInp():
                 })
             ]
 
-##
-# Options for transforming elements and groups. Also used for transforming frames.
-#
-# @param name Name of element/group/frame in system.
-# @param obj Type of object to transform. Defaults to "element".
 def makeTransformationForm(name, obj="element"):
+    """!
+    Options for transforming elements and groups. Also used for transforming frames.
+    
+    @param name Name of element/group/frame in system.
+    @param obj Type of object to transform. Defaults to "element".
+    """
     return[
         InputDescription(inType.static, obj, staticValue=name),
         InputDescription(inType.radio, "mode", label="Transformation mode", options=[
@@ -128,9 +139,10 @@ def makeTransformationForm(name, obj="element"):
         })
     ]
 
-##
-# Options for generating a tubular ray-trace frame.
 def initTubeFrameInp():
+    """!
+    Options for generating a tubular ray-trace frame.
+    """
     return [InputDescription(inType.vectorStrings, "name", label="Name of frame", numFields=1),
             InputDescription(inType.vectorIntegers, "nRays", label="Number of rays", hints=[0], numFields=1),
             InputDescription(inType.vectorIntegers, "nRing", label="Number of rings", hints=[0], numFields=1),
@@ -140,9 +152,10 @@ def initTubeFrameInp():
             InputDescription(inType.vectorFloats, "y0", label="Y radius of outer ring", hints=[0], numFields=1)
             ]
 
-##
-# Options for generating a Gaussian ray-trace frame.
 def initGaussianFrameInp():
+    """!
+    Options for generating a Gaussian ray-trace frame.
+    """
     return [InputDescription(inType.vectorStrings, "name", label="Name of frame", numFields=1),
             InputDescription(inType.vectorIntegers, "nRays", label="Number of rays", hints=[0], numFields=1),
             InputDescription(inType.vectorFloats, "n", label="Refractive index of medium", hints=[1], numFields=1),
@@ -154,11 +167,12 @@ def initGaussianFrameInp():
                 "set" : [InputDescription(inType.vectorIntegers, "seed", label="", hints=[0], numFields=1)]
             })]
 
-##
-# Options for plotting a ray-trace frame.
-#
-# @param frameName Name of frame to plot.
 def plotFrameOpt(frameName):
+    """!
+    Options for plotting a ray-trace frame.
+    
+    @param frameName Name of frame to plot.
+    """
     plotFrame = [
             InputDescription(inType.static, "frame", label="Frame", staticValue=frameName),
             InputDescription(inType.xyzRadio, "project", label="Abscissa - ordinate")
@@ -166,11 +180,12 @@ def plotFrameOpt(frameName):
 
     return plotFrame
 
-##
-# Options for plotting a set of frames in a plotSystem figure.
-#
-# @param frames List containing names of available frames.
 def plotRayTraceForm(frames):
+    """!
+    Options for plotting a set of frames in a plotSystem figure.
+    
+    @param frames List containing names of available frames.
+    """
     return [
         InputDescription(inType.dynamicRadio, "frames", subDict = {
             "All" : [],
@@ -179,12 +194,13 @@ def plotRayTraceForm(frames):
     ]
 
 
-##
-# Options for propagating a frame of rays to a target element.
-#
-# @param frameDict System dictionary containing all frames.
-# @param elemDict System dictionary containing all elements.
 def propRaysInp(frameDict, elemDict):
+    """!
+    Options for propagating a frame of rays to a target element.
+    
+    @param frameDict System dictionary containing all frames.
+    @param elemDict System dictionary containing all elements.
+    """
     sublist_frames = []
     sublist_target = []
     if frameDict:
@@ -210,11 +226,12 @@ def propRaysInp(frameDict, elemDict):
 
     return propRays
     
-##
-# Options for generating a vectorial point-source field/current for PO calculations.
-#
-# @param elemDict System dictionary containing all elements.
 def initPSInp(elemDict):
+    """!
+    Options for generating a vectorial point-source field/current for PO calculations.
+    
+    @param elemDict System dictionary containing all elements.
+    """
     sublist_surf = []
 
     if elemDict:
@@ -233,11 +250,12 @@ def initPSInp(elemDict):
     
     return initPS
 
-##
-# Options for generating a scalar point-source field for PO calculations.
-#
-# @param elemDict System dictionary containing all elements.
 def initSPSInp(elemDict):
+    """!
+    Options for generating a scalar point-source field for PO calculations.
+    
+    @param elemDict System dictionary containing all elements.
+    """
     sublist_surf = []
 
     if elemDict:
@@ -255,11 +273,12 @@ def initSPSInp(elemDict):
     
     return initSPS
 
-##
-# Options for generating a vectorial complex-valued Gaussian field/current for PO calculations.
-#
-# @param elemDict System dictionary containing all elements.
 def initGaussianInp(elemDict):
+    """!
+    Options for generating a vectorial complex-valued Gaussian field/current for PO calculations.
+    
+    @param elemDict System dictionary containing all elements.
+    """
     sublist_surf = []
 
     if elemDict:
@@ -281,11 +300,12 @@ def initGaussianInp(elemDict):
     
     return initGauss
 
-##
-# Options for generating a scalar complex-valued Gaussian field for PO calculations.
-#
-# @param elemDict System dictionary containing all elements.
 def initSGaussianInp(elemDict):
+    """!
+    Options for generating a scalar complex-valued Gaussian field for PO calculations.
+    
+    @param elemDict System dictionary containing all elements.
+    """
     sublist_surf = []
 
     if elemDict:
@@ -306,11 +326,12 @@ def initSGaussianInp(elemDict):
     
     return initSGauss
 
-##
-# Options for plotting a field object. Also contains possibility for plotting beam cross sections.
-#
-# @param fieldName Name of field object to plot.
 def plotField(fieldName):
+    """!
+    Options for plotting a field object. Also contains possibility for plotting beam cross sections.
+    
+    @param fieldName Name of field object to plot.
+    """
     complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
     plotField = [
             InputDescription(inType.dynamicDropdown, "plot_type", label="Type", subDict = {
@@ -328,11 +349,12 @@ def plotField(fieldName):
 
     return plotField
 
-##
-# Options for plotting a scalarfield object.
-#
-# @param fieldName Name of field object to plot.
 def plotSField(fieldName):
+    """!
+    Options for plotting a scalarfield object.
+    
+    @param fieldName Name of field object to plot.
+    """
     complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
     
     plotSField = [
@@ -342,12 +364,13 @@ def plotSField(fieldName):
     
     return plotSField
 
-##
-# Options for plotting a field object defined on a far-field grid. 
-# Also contains possibility for plotting beam cross sections.
-#
-# @param fieldName Name of field object to plot.
 def plotFarField(fieldName):
+    """!
+    Options for plotting a field object defined on a far-field grid. 
+    Also contains possibility for plotting beam cross sections.
+    
+    @param fieldName Name of field object to plot.
+    """
     complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
     
     plotField = [
@@ -365,11 +388,12 @@ def plotFarField(fieldName):
             ]
     return plotField
 
-##
-# Options for plotting a current object.
-#
-# @param fieldName Name of current object to plot.
 def plotCurrentOpt(currentName):
+    """!
+    Options for plotting a current object.
+    
+    @param fieldName Name of current object to plot.
+    """
     complist = ["Jx", "Jy", "Jz", "Mx", "My", "Mz"]
     
     plotCurrent = [
@@ -379,14 +403,15 @@ def plotCurrentOpt(currentName):
 
     return plotCurrent
 
-##
-# Options for propagating the field generated by a current distribution to a target element.
-# If propagating a scalarfield, the propagation is done using the Lipmann-Schwinger equation.
-#
-# @param currentDict System dictionary containing all currents.
-# @param scalarFieldDict System dictionary containing all scalarfields.
-# @param elemDict System dictionary containing all elements.
 def propPOInp(currentDict, scalarFieldDict, elemDict):
+    """!
+    Options for propagating the field generated by a current distribution to a target element.
+    If propagating a scalarfield, the propagation is done using the Lipmann-Schwinger equation.
+    
+    @param currentDict System dictionary containing all currents.
+    @param scalarFieldDict System dictionary containing all scalarfields.
+    @param elemDict System dictionary containing all elements.
+    """
     sublist_currents = []
     sublist_sfields = []
     sublist_target = []
@@ -438,12 +463,13 @@ def propPOInp(currentDict, scalarFieldDict, elemDict):
 
     return propFields
 
-##
-# Options for propagating the field generated by a current distribution to a far-field target element.
-#
-# @param currentDict System dictionary containing all currents.
-# @param elemDict System dictionary containing all elements.
 def propPOFFInp(currentDict, elemDict):
+    """!
+    Options for propagating the field generated by a current distribution to a far-field target element.
+    
+    @param currentDict System dictionary containing all currents.
+    @param elemDict System dictionary containing all elements.
+    """
     sublist_currents = []
     sublist_target = []
     if currentDict:
@@ -470,13 +496,14 @@ def propPOFFInp(currentDict, elemDict):
 
     return propFields
 
-##
-# Options for propagating the reflected field using the associated Poynting vectors to a target element.
-#
-# @param fieldDict System dictionary containing all fields.
-# @param frameDict System dictionary containing all frames.
-# @param elemDict System dictionary containing all elements.
 def propPOHybridInp(fieldDict, frameDict, elemDict):
+    """!
+    Options for propagating the reflected field using the associated Poynting vectors to a target element.
+    
+    @param fieldDict System dictionary containing all fields.
+    @param frameDict System dictionary containing all frames.
+    @param elemDict System dictionary containing all elements.
+    """
     sublist_fields = []
     sublist_frames = []
     sublist_target = []
@@ -518,12 +545,13 @@ def propPOHybridInp(fieldDict, frameDict, elemDict):
 
     return propFields
 
-##
-# Options for calculating the spillover efficiency on a surface by using an aperture mask.
-#
-# @param fieldDict System dictionary containing all fields.
-# @param elemDict System dictionary containing all elements.
 def calcSpillEff(fieldDict, elemDict):
+    """!
+    Options for calculating the spillover efficiency on a surface by using an aperture mask.
+    
+    @param fieldDict System dictionary containing all fields.
+    @param elemDict System dictionary containing all elements.
+    """
     complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
    
     sublist_fields = []
@@ -542,12 +570,13 @@ def calcSpillEff(fieldDict, elemDict):
 
     return formTaper
 
-##
-# Options for calculating the taper efficiency on a planar surface.
-#
-# @param fieldDict System dictionary containing all fields.
-# @param elemDict System dictionary containing all elements.
 def calcTaperEff(fieldDict, elemDict):
+    """!
+    Options for calculating the taper efficiency on a planar surface.
+    
+    @param fieldDict System dictionary containing all fields.
+    @param elemDict System dictionary containing all elements.
+    """
     complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
     
     sublist_fields = []
@@ -563,12 +592,13 @@ def calcTaperEff(fieldDict, elemDict):
 
     return formTaper
 
-##
-# Options for calculating the cross-polar efficiency on a far-field element.
-#
-# @param fieldDict System dictionary containing all fields.
-# @param elemDict System dictionary containing all elements.
 def calcXpolEff(fieldDict, elemDict):
+    """!
+    Options for calculating the cross-polar efficiency on a far-field element.
+    
+    @param fieldDict System dictionary containing all fields.
+    @param elemDict System dictionary containing all elements.
+    """
     complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
     
     sublist_fields = []
@@ -585,12 +615,13 @@ def calcXpolEff(fieldDict, elemDict):
 
     return formXpol
 
-##
-# Options for calculating the main-beam efficiency on a planar element.
-#
-# @param fieldDict System dictionary containing all fields.
-# @param elemDict System dictionary containing all elements.
 def calcMBEff(fieldDict, elemDict):
+    """!
+    Options for calculating the main-beam efficiency on a planar element.
+    
+    @param fieldDict System dictionary containing all fields.
+    @param elemDict System dictionary containing all elements.
+    """
     complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
     
     sublist_fields = []
@@ -610,12 +641,13 @@ def calcMBEff(fieldDict, elemDict):
 
     return formMB
 
-##
-# Options for calculating the half-power beamwidths of a field component in the E and H-planes.
-# The field component is first transformed so that it is centered in the origin and aligned with the x and y axes.
-#
-# @param fieldDict System dictionary containing all fields.
 def calcHPBW(fieldDict):
+    """!
+    Options for calculating the half-power beamwidths of a field component in the E and H-planes.
+    The field component is first transformed so that it is centered in the origin and aligned with the x and y axes.
+    
+    @param fieldDict System dictionary containing all fields.
+    """
     complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
    
     sublist_fields = []
@@ -630,12 +662,13 @@ def calcHPBW(fieldDict):
 
     return formHPBW
 
-##
-# Options for merging beams/currents.
-#
-# @param itemDict Dictionary containing fields or currents in system.
-# @param surf Selected surface for beam merging.
 def mergeBeamsForm(itemDict, surf):
+    """!
+    Options for merging beams/currents.
+    
+    @param itemDict Dictionary containing fields or currents in system.
+    @param surf Selected surface for beam merging.
+    """
     listBound = _selectBound(itemDict, surf)
 
     mergeList = [InputDescription(inType.elementSelector, "beams", "Merge", options = listBound),
@@ -643,24 +676,26 @@ def mergeBeamsForm(itemDict, surf):
 
     return mergeList
 
-##
-# Select a surface form.
-# Used for merging beams on a surface.
-#
-# @param elemDict Dictionary containing all elements in system.
 def selectSurface(elemDict):
+    """!
+    Select a surface form.
+    Used for merging beams on a surface.
+    
+    @param elemDict Dictionary containing all elements in system.
+    """
     optlist = ["Fields", "Currents"]
     
     selectSurf = [InputDescription(inType.dropdown, "surf", label="Merge surface", options=list(elemDict.keys())),
             InputDescription(inType.radio, "mode", label="Merge object", options = optlist)]
     return selectSurf
 
-##
-# Private method for finding bound PO fields and currents given a surface.
-#
-# @param itemDict Dictionary containing the items to be checked.
-# @param surf Surface to find fields or currents on.
 def _selectBound(itemDict, surf):
+    """!
+    Private method for finding bound PO fields and currents given a surface.
+    
+    @param itemDict Dictionary containing the items to be checked.
+    @param surf Surface to find fields or currents on.
+    """
     listBound = []
     for key, item in itemDict.items():
         if item.surf == surf:
@@ -668,32 +703,36 @@ def _selectBound(itemDict, surf):
 
     return listBound
 
-##
-# Options for saving the current system in the PyPO/save/systems/ folder.
 def saveSystemForm():
+    """!
+    Options for saving the current system in the PyPO/save/systems/ folder.
+    """
     return [InputDescription(inType.vectorStrings, "name", label="Name of system", numFields=1)]
 
-##
-# Options for loading a system in the PyPO/save/systems/ folder into the current system.
-#
-# @param systemList List of systems present in PyPO/save/systems/.
 def loadSystemForm(systemList):
+    """!
+    Options for loading a system in the PyPO/save/systems/ folder into the current system.
+    
+    @param systemList List of systems present in PyPO/save/systems/.
+    """
     return [InputDescription(inType.dropdown, "name", label="Name of system", options=systemList)]
 
-##
-# Options for finding the focus of a ray-trace frame.
-#
-# @param frameList List of names of frames in system.
 def focusFind(frameList):
+    """!
+    Options for finding the focus of a ray-trace frame.
+    
+    @param frameList List of names of frames in system.
+    """
     return [InputDescription(inType.dropdown, outputName="name_frame", label="Name of frame", options=frameList)]
 
-##
-# Options for taking/reverting/deleting a snapshot of an object.
-#
-# @param elem Name of object to snap.
-# @param snapList List of current snapshots belonging to the object.
-# @param obj Type of object to be snapped.
 def snapForm(elem, snapList, obj="element"):
+    """!
+    Options for taking/reverting/deleting a snapshot of an object.
+    
+    @param elem Name of object to snap.
+    @param snapList List of current snapshots belonging to the object.
+    @param obj Type of object to be snapped.
+    """
     optionDict = {
             "Take" : [InputDescription(inType.vectorStrings, "snap_name", label="Snapshot name", numFields=1)],
             "Revert" : [InputDescription(inType.dropdown, "snap_name", label="Snapshot name", options=snapList)],
@@ -708,20 +747,22 @@ def snapForm(elem, snapList, obj="element"):
 
     return form
 
-##
-# Options for creating a group of elements.
-# 
-# @param elementList List of all element names.
 def addGroupForm(elementList):
+    """!
+    Options for creating a group of elements.
+    
+    @param elementList List of all element names.
+    """
     return[
         InputDescription(inType.vectorStrings, "name", toolTip= "Give the group a name"),
         InputDescription(inType.elementSelector, "selected", "elements", options = elementList)
     ]
 
-##
-# Options for copying an object to another object, potentially under a new name.
-#
-# @param name Name of object to be copied.
 def copyForm(name):
+    """!
+    Options for copying an object to another object, potentially under a new name.
+    
+    @param name Name of object to be copied.
+    """
     return [InputDescription(inType.static, "name", staticValue=name, hidden=True),
             InputDescription(inType.vectorStrings, "name_copy", label="Name of copy", numFields=1)]

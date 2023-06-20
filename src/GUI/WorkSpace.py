@@ -7,9 +7,10 @@ from src.GUI.Accordion import Accordion
 # @file
 # Defines the workspace widget 
 
-##
-# Generate workspace widget for PyPO Gui.
 class Workspace(QTabWidget):
+    """!
+    Generate workspace widget for the GUI.
+    """
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUI()

@@ -936,7 +936,7 @@ def check_runRTDict(runRTDict, elements, frames, clog):
         runRTDict["t0"] = 1
 
     else:
-        if not isinstance(runRTDict["t0"], float) or not isinstance(runRTDict["t0"], int):
+        if not (isinstance(runRTDict["t0"], float) or isinstance(runRTDict["t0"], int)):
             runRTDict["t0"] = 1
 
 

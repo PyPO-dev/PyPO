@@ -90,7 +90,7 @@ def fitGaussAbs(field, surfaceObject, thres, mode, ratio=1):
     # Normalize
     _field = np.absolute(field) / np.max(np.absolute(field))
     #grids = generateGrid(surfaceObject, transform=True, spheric=False)
-    grids = generateGrid(surfaceObject, transform=True, spheric=False)
+    grids = generateGrid(surfaceObject, transform=False, spheric=False)
 
     x = grids.x
     y = grids.y
@@ -217,7 +217,7 @@ def generateGauss(p0, surfaceObject, mode):
 
     x0, y0, xs, ys, theta, amp = p0
     
-    grids = generateGrid(surfaceObject, transform=True, spheric=False)
+    grids = generateGrid(surfaceObject, transform=False, spheric=False)
     x = grids.x
     y = grids.y
     

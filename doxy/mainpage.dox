@@ -12,6 +12,7 @@ In addition, it can calculate common metrics to assess performance of the optica
 
 This homepage contains general information regarding installation instructions, the content of the user manual, contributor guidelines and contact information.
 After installing, the best place to start for new users would be the \ref funds "PyPO fundamentals" tutorials, after which the rest of the tutorials can be studied.
+`PyPO` also comes with a suite of demonstrations that show the application of the program in the context of validation tests.
 For contributor guidelines and general development instructions, please see the \ref contribguide "instructions for developers" page.
 
 \section inst Installation
@@ -59,6 +60,7 @@ After this is installed, `PyPO` can be installed just like on \ref linux "Linux"
 In order to develop `PyPO`, we recommend to install `PyPO` in edit mode. See \ref devinstall_page "this section" of the developers guidelines page for more info.
 
 \subsection cuda Using PyPO On GPU
+The full power of `PyPO` shines through when running on the GPU. 
 In order to use the GPU accelerated libraries for `PyPO`, a working CUDA installation should be present.
 For Linux, [this article](https://linuxconfig.org/how-to-install-cuda-on-ubuntu-20-04-focal-fossa-linux) describes nicely how to install CUDA through the apt repository.
 

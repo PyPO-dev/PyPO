@@ -3,12 +3,10 @@ import os
 import pathlib
 import re
 
-nThreads_cpu = os.cpu_count() - 1 if os.cpu_count() > 1 else 1
-
-from PyPO.PyPOTypes import *
 import PyPO.Config as Config
 import PyPO.WorldParam as world
 
+nThreads_cpu = os.cpu_count() - 1 if os.cpu_count() > 1 else 1
 PO_modelist = ["JM", "EH", "JMEH", "EHP", "FF", "scalar"]
 
 ##
@@ -886,7 +884,7 @@ def check_GRTDict(GRTDict, nameList, clog):
             clog.error(err)
         raise InputRTError()
 
-def check_runRTDict(runRTDict, elements, frames, clog):
+def check_runRTDict(runRTDict, elements, frames, clog, extern=True):
     """!
     Check a ray-trace propagation input dictionary.
 
@@ -894,6 +892,9 @@ def check_runRTDict(runRTDict, elements, frames, clog):
     @param elements List containing names of surfaces in System.
     @param frames List containing names of frames in System.
     @param clog CustomLogger object.
+    @param extern Do not raise InputRTError if "extern" = False.
+
+    @returns errStr The errorstring. Only returned if "extern" = True.
     """
 
     errStr = ""
@@ -966,13 +967,16 @@ def check_runRTDict(runRTDict, elements, frames, clog):
             if "nThreads" not in runRTDict:
                 runRTDict["nThreads"] = 256
 
+    if extern:
+        if errStr:
+            errList = errStr.split("\n")[:-1]
 
-    if errStr:
-        errList = errStr.split("\n")[:-1]
-
-        for err in errList:
-            clog.error(err)
-        raise RunRTError()
+            for err in errList:
+                clog.error(err)
+            raise RunRTError()
+    
+    else:
+        return errStr
 
 def check_PSDict(PSDict, nameList, clog):
     """!
@@ -1301,29 +1305,13 @@ def check_hybridDict(hybridDict, elements, frames, fields, clog):
     """
 
     errStr = ""
-   
-    if "fr_in" not in hybridDict:
-        errStr += errMsg_field("fr_in", "hybridDict")
-    else:
-        errStr = check_frameSystem(hybridDict["fr_in"], frames, clog, errStr)
-    
+  
+    errStr += check_runRTDict(hybridDict, elements, frames, clog, extern=False)
+
     if "field_in" not in hybridDict:
         errStr += errMsg_field("field_in", "hybridDict")
     else:
         errStr = check_fieldSystem(hybridDict["field_in"], fields, clog, errStr)
-    
-    if "t_name" not in hybridDict:
-            errStr += errMsg_field("t_name", "hybridDict")
-    else:
-        errStr = check_elemSystem(hybridDict["t_name"], elements, clog, errStr)
-
-    if "fr_out" not in hybridDict:
-        errStr += errMsg_field("fr_out", "hybridDict")
-    else:
-        num = getIndex(hybridDict["fr_out"], frames)
-
-        if num > 0:
-            hybridDict["fr_out"] = hybridDict["fr_out"] + "_{}".format(num)
    
     if "field_out" not in hybridDict:
             errStr += errMsg_field("field_out", "hybridDict")
@@ -1353,7 +1341,6 @@ def check_hybridDict(hybridDict, elements, frames, fields, clog):
     elif "comp" in hybridDict:
         if not isinstance(hybridDict["comp"], str) and hybridDict["comp"] != True:
             errStr += errMsg_type("comp", type(hybridDict["comp"]), "hybridDict", str)
-
     
     if errStr:
         errList = errStr.split("\n")[:-1]

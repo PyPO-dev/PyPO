@@ -1,11 +1,8 @@
 import numpy as np
 from scipy.optimize import fmin
 
-import matplotlib.pyplot as pt
-
-from PyPO.PyPOTypes import *
-from PyPO.BindRefl import *
-from PyPO.MatUtils import *
+import PyPO.BindRefl as BRefl
+import PyPO.MatUtils as MUtils
 
 ##
 # @file
@@ -90,7 +87,7 @@ def fitGaussAbs(field, surfaceObject, thres, mode, ratio=1):
     # Normalize
     _field = np.absolute(field) / np.max(np.absolute(field))
     #grids = generateGrid(surfaceObject, transform=True, spheric=False)
-    grids = generateGrid(surfaceObject, transform=False, spheric=False)
+    grids = BRefl.generateGrid(surfaceObject, transform=False, spheric=False)
 
     x = grids.x
     y = grids.y
@@ -114,7 +111,7 @@ def fitGaussAbs(field, surfaceObject, thres, mode, ratio=1):
     x_max = x[idx_max]
     y_max = y[idx_max] 
 
-    idx_rows, idx_cols = findConnectedSubsets(mask_f, 1, idx_max)
+    idx_rows, idx_cols = MUtils.findConnectedSubsets(mask_f, 1, idx_max)
     _xmin = x[np.min(idx_cols), idx_max[0]]
     _xmax = x[np.max(idx_cols), idx_max[0]]
    
@@ -217,7 +214,7 @@ def generateGauss(p0, surfaceObject, mode):
 
     x0, y0, xs, ys, theta, amp = p0
     
-    grids = generateGrid(surfaceObject, transform=False, spheric=False)
+    grids = BRefl.generateGrid(surfaceObject, transform=False, spheric=False)
     x = grids.x
     y = grids.y
     

@@ -3,6 +3,13 @@
 
 \section intro_sec Introduction
 Welcome to the `PyPO` user manual. Here you can find several resources that will assist in using and/or developing `PyPO`.
+`PyPO` is optical simulation software, aimed at engineers/students in the field of (quasi)-optical design that have access to CUDA-capable GPUs.
+The software can be run multi-threaded, but the real power shines through when running `PyPO` on the GPU.
+
+Originally, `PyPO` was developed for laboratory characterisation and optical alignment of wideband integrated superconducting spectrometers operating at sub-mm wavelengths.
+It is specifically designed to model forward and backward propagation of electromagnetic fields through systems containing (off-axis) quadric and planar reflector surfaces.
+In addition, it can calculate common metrics to assess performance of the optical system and can also visualise the systems and results.
+
 This homepage contains general information regarding installation instructions, the content of the user manual, contributor guidelines and contact information.
 After installing, the best place to start for new users would be the \ref funds "PyPO fundamentals" tutorials, after which the rest of the tutorials can be studied.
 For contributor guidelines and general development instructions, please see the \ref contribguide "instructions for developers" page.

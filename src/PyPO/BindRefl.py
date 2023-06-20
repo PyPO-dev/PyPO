@@ -4,9 +4,8 @@ import os
 import sys
 import pathlib
 
-from PyPO.BindUtils import allfill_reflparams, allocate_reflcontainer, creflToObj
-from PyPO.Structs import *
-from PyPO.PyPOTypes import *
+import PyPO.BindUtils as BUtils
+import PyPO.Structs as PStructs
 
 ##
 # @file
@@ -48,21 +47,21 @@ def generateGrid(reflparams_py, transform=True, spheric=True):
 
     size = reflparams_py["gridsize"][0] * reflparams_py["gridsize"][1]
 
-    inp = reflparams()
-    res = reflcontainer()
+    inp = PStructs.reflparams()
+    res = PStructs.reflcontainer()
     
 
-    allfill_reflparams(inp, reflparams_py, ctypes.c_double)
-    allocate_reflcontainer(res, size, ctypes.c_double)
+    BUtils.allfill_reflparams(inp, reflparams_py, ctypes.c_double)
+    BUtils.allocate_reflcontainer(res, size, ctypes.c_double)
 
-    lib.generateGrid.argtypes = [reflparams, ctypes.POINTER(reflcontainer),
+    lib.generateGrid.argtypes = [PStructs.reflparams, ctypes.POINTER(PStructs.reflcontainer),
                                 ctypes.c_bool, ctypes.c_bool]
     lib.generateGrid.restype = None
 
     lib.generateGrid(inp, ctypes.byref(res), transform, spheric)
     
 
-    grids = creflToObj(res, reflparams_py["gridsize"], np.float64)
+    grids = BUtils.creflToObj(res, reflparams_py["gridsize"], np.float64)
     
 
     return grids

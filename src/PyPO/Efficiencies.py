@@ -1,7 +1,6 @@
 import numpy as np
-from PyPO.PyPOTypes import *
-from PyPO.BindRefl import *
-from PyPO.FitGauss import fitGaussAbs
+
+import PyPO.BindRefl as BRefl
 
 ##
 # @file
@@ -105,7 +104,7 @@ def calcSpillover(field, surfaceObject, aperDict):
     """
 
     # Generate the grid in restframe
-    grids = generateGrid(surfaceObject, transform=False, spheric=True)
+    grids = BRefl.generateGrid(surfaceObject, transform=False, spheric=True)
 
     x = grids.x
     y = grids.y
@@ -131,7 +130,7 @@ def calcTaper(field, surfaceObject, aperDict):
     @returns eff_t Taper efficiency
     """
 
-    grids = generateGrid(surfaceObject, transform=False, spheric=True)
+    grids = BRefl.generateGrid(surfaceObject, transform=False, spheric=True)
     area = grids.area
     
     if aperDict:

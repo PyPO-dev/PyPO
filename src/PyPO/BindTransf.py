@@ -4,9 +4,8 @@ import os
 import pathlib
 import traceback
 
-from PyPO.BindUtils import *
-from PyPO.Structs import *
-from PyPO.PyPOTypes import *
+import PyPO.BindUtils as BUtils
+import PyPO.Structs as PStructs
 import PyPO.Config as Config
 import PyPO.Threadmgr as TManager
 
@@ -31,10 +30,10 @@ def loadTransflib():
         except:
             lib = ctypes.CDLL(os.path.join(path_cur, "libpypotransf.dylib"))
 
-    lib.transformRays.argtypes = [ctypes.POINTER(cframe), ctypes.POINTER(ctypes.c_double)]
+    lib.transformRays.argtypes = [ctypes.POINTER(PStructs.cframe), ctypes.POINTER(ctypes.c_double)]
     lib.transformRays.restype = None
 
-    lib.transformFields.argtypes = [ctypes.POINTER(c2Bundle), ctypes.POINTER(ctypes.c_double), ctypes.c_int]
+    lib.transformFields.argtypes = [ctypes.POINTER(PStructs.c2Bundle), ctypes.POINTER(ctypes.c_double), ctypes.c_int]
     lib.transformFields.restype = None
     
     return lib
@@ -50,15 +49,15 @@ def transformRays(fr):
 
     lib = loadTransflib()
 
-    res = cframe()
+    res = PStructs.cframe()
 
-    allfill_cframe(res, fr, fr.size, ctypes.c_double)
-    c_mat = allfill_mat4D(fr.transf, ctypes.c_double)
+    BUtils.allfill_cframe(res, fr, fr.size, ctypes.c_double)
+    c_mat = BUtils.allfill_mat4D(fr.transf, ctypes.c_double)
 
     lib.transformRays(ctypes.byref(res), c_mat)
 
     shape = (fr.size,)
-    out = frameToObj(res, np_t=np.float64, shape=shape)
+    out = BUtils.frameToObj(res, np_t=np.float64, shape=shape)
     
     out.setMeta(fr.pos, fr.ori, fr.transf)
     out.snapshots = fr.snapshots
@@ -75,9 +74,9 @@ def transformPO(obj, transf):
 
     lib = loadTransflib()
 
-    res = c2Bundle()
-    allfill_c2Bundle(res, obj, obj.size, ctypes.c_double)
-    c_mat = allfill_mat4D(transf, ctypes.c_double)
+    res = PStructs.c2Bundle()
+    BUtils.allfill_c2Bundle(res, obj, obj.size, ctypes.c_double)
+    c_mat = BUtils.allfill_mat4D(transf, ctypes.c_double)
 
     obj_type = "fields"
     
@@ -88,7 +87,7 @@ def transformPO(obj, transf):
 
     lib.transformFields(ctypes.byref(res), c_mat, nTot)
 
-    out = c2BundleToObj(res, shape=obj.shape, obj_t=obj_type, np_t=np.float64)
+    out = BUtils.c2BundleToObj(res, shape=obj.shape, obj_t=obj_type, np_t=np.float64)
     
     out.setMeta(obj.surf, obj.k)
     return out

@@ -3,9 +3,9 @@ import math
 import numpy as np
 import os
 import pathlib
-from PyPO.BindUtils import *
-from PyPO.Structs import *
-from PyPO.PyPOTypes import *
+
+import PyPO.BindUtils as BUtils
+import PyPO.Structs as PStructs
 import PyPO.Config as Config
 import PyPO.Threadmgr as TManager
 
@@ -30,49 +30,49 @@ def loadGPUlib():
         except:
             lib = ctypes.CDLL(os.path.join(path_cur, "libpypogpu.dylib"))
     
-    lib.callKernelf_JM.argtypes = [ctypes.POINTER(c2Bundlef), reflparamsf, reflparamsf,
-                                   ctypes.POINTER(reflcontainerf), ctypes.POINTER(reflcontainerf),
-                                   ctypes.POINTER(c2Bundlef), ctypes.c_float, ctypes.c_float,
+    lib.callKernelf_JM.argtypes = [ctypes.POINTER(PStructs.c2Bundlef), PStructs.reflparamsf, PStructs.reflparamsf,
+                                   ctypes.POINTER(PStructs.reflcontainerf), ctypes.POINTER(PStructs.reflcontainerf),
+                                   ctypes.POINTER(PStructs.c2Bundlef), ctypes.c_float, ctypes.c_float,
                                    ctypes.c_float, ctypes.c_int, ctypes.c_int]
 
     lib.callKernelf_JM.restype = None
 
-    lib.callKernelf_EH.argtypes = [ctypes.POINTER(c2Bundlef), reflparamsf, reflparamsf,
-                                   ctypes.POINTER(reflcontainerf), ctypes.POINTER(reflcontainerf),
-                                   ctypes.POINTER(c2Bundlef), ctypes.c_float, ctypes.c_float,
+    lib.callKernelf_EH.argtypes = [ctypes.POINTER(PStructs.c2Bundlef), PStructs.reflparamsf, PStructs.reflparamsf,
+                                   ctypes.POINTER(PStructs.reflcontainerf), ctypes.POINTER(PStructs.reflcontainerf),
+                                   ctypes.POINTER(PStructs.c2Bundlef), ctypes.c_float, ctypes.c_float,
                                    ctypes.c_float, ctypes.c_int, ctypes.c_int]
 
     lib.callKernelf_EH.restype = None
 
-    lib.callKernelf_JMEH.argtypes = [ctypes.POINTER(c4Bundlef), reflparamsf, reflparamsf,
-                                   ctypes.POINTER(reflcontainerf), ctypes.POINTER(reflcontainerf),
-                                   ctypes.POINTER(c2Bundlef), ctypes.c_float, ctypes.c_float,
+    lib.callKernelf_JMEH.argtypes = [ctypes.POINTER(PStructs.c4Bundlef), PStructs.reflparamsf, PStructs.reflparamsf,
+                                   ctypes.POINTER(PStructs.reflcontainerf), ctypes.POINTER(PStructs.reflcontainerf),
+                                   ctypes.POINTER(PStructs.c2Bundlef), ctypes.c_float, ctypes.c_float,
                                    ctypes.c_float, ctypes.c_int, ctypes.c_int]
 
     lib.callKernelf_JMEH.restype = None
 
-    lib.callKernelf_EHP.argtypes = [ctypes.POINTER(c2rBundlef), reflparamsf, reflparamsf,
-                                   ctypes.POINTER(reflcontainerf), ctypes.POINTER(reflcontainerf),
-                                   ctypes.POINTER(c2Bundlef), ctypes.c_float, ctypes.c_float,
+    lib.callKernelf_EHP.argtypes = [ctypes.POINTER(PStructs.c2rBundlef), PStructs.reflparamsf, PStructs.reflparamsf,
+                                   ctypes.POINTER(PStructs.reflcontainerf), ctypes.POINTER(PStructs.reflcontainerf),
+                                   ctypes.POINTER(PStructs.c2Bundlef), ctypes.c_float, ctypes.c_float,
                                    ctypes.c_float, ctypes.c_int, ctypes.c_int]
 
     lib.callKernelf_EHP.restype = None
 
-    lib.callKernelf_FF.argtypes = [ctypes.POINTER(c2Bundlef), reflparamsf, reflparamsf,
-                                   ctypes.POINTER(reflcontainerf), ctypes.POINTER(reflcontainerf),
-                                   ctypes.POINTER(c2Bundlef), ctypes.c_float, ctypes.c_float,
+    lib.callKernelf_FF.argtypes = [ctypes.POINTER(PStructs.c2Bundlef), PStructs.reflparamsf, PStructs.reflparamsf,
+                                   ctypes.POINTER(PStructs.reflcontainerf), ctypes.POINTER(PStructs.reflcontainerf),
+                                   ctypes.POINTER(PStructs.c2Bundlef), ctypes.c_float, ctypes.c_float,
                                    ctypes.c_float, ctypes.c_int, ctypes.c_int]
 
     lib.callKernelf_FF.restype = None
     
-    lib.callKernelf_scalar.argtypes = [ctypes.POINTER(arrC1f), reflparamsf, reflparamsf,
-                                   ctypes.POINTER(reflcontainerf), ctypes.POINTER(reflcontainerf),
-                                   ctypes.POINTER(arrC1f), ctypes.c_float, ctypes.c_float,
+    lib.callKernelf_scalar.argtypes = [ctypes.POINTER(PStructs.arrC1f), PStructs.reflparamsf, PStructs.reflparamsf,
+                                   ctypes.POINTER(PStructs.reflcontainerf), ctypes.POINTER(PStructs.reflcontainerf),
+                                   ctypes.POINTER(PStructs.arrC1f), ctypes.c_float, ctypes.c_float,
                                    ctypes.c_float, ctypes.c_int, ctypes.c_int]
 
     lib.callKernelf_scalar.restype = None
 
-    lib.callRTKernel.argtypes = [reflparamsf, ctypes.POINTER(cframef), ctypes.POINTER(cframef),
+    lib.callRTKernel.argtypes = [PStructs.reflparamsf, ctypes.POINTER(PStructs.cframef), ctypes.POINTER(PStructs.cframef),
                                 ctypes.c_float, ctypes.c_float, ctypes.c_int, ctypes.c_int]
 
     lib.callRTKernel.restype = None
@@ -97,20 +97,20 @@ def PyPO_GPUf(source, target, runPODict):
     mgr = TManager.Manager(Config.context)
 
     # Create structs with pointers for source and target
-    csp = reflparamsf()
-    ctp = reflparamsf()
+    csp = PStructs.reflparamsf()
+    ctp = PStructs.reflparamsf()
 
-    cs = reflcontainerf()
-    ct = reflcontainerf()
+    cs = PStructs.reflcontainerf()
+    ct = PStructs.reflcontainerf()
 
     gs = source["gridsize"][0] * source["gridsize"][1]
     gt = target["gridsize"][0] * target["gridsize"][1]
 
-    allfill_reflparams(csp, source, ctypes.c_float)
-    allfill_reflparams(ctp, target, ctypes.c_float)
+    BUtils.allfill_reflparams(csp, source, ctypes.c_float)
+    BUtils.allfill_reflparams(ctp, target, ctypes.c_float)
 
-    allocate_reflcontainer(cs, gs, ctypes.c_float)
-    allocate_reflcontainer(ct, gt, ctypes.c_float)
+    BUtils.allocate_reflcontainer(cs, gs, ctypes.c_float)
+    BUtils.allocate_reflcontainer(ct, gt, ctypes.c_float)
 
     target_shape = (target["gridsize"][0], target["gridsize"][1])
 
@@ -129,96 +129,96 @@ def PyPO_GPUf(source, target, runPODict):
     t_direction = ctypes.c_float(exp_prop)
     
     if runPODict["mode"] == "scalar":
-        c_field = arrC1f()
-        sfieldConv(runPODict["s_scalarfield"], c_field, gs, ctypes.c_float)
+        c_field = PStructs.arrC1f()
+        BUtils.sfieldConv(runPODict["s_scalarfield"], c_field, gs, ctypes.c_float)
         args = [csp, ctp, ctypes.byref(cs), ctypes.byref(ct),
                 ctypes.byref(c_field), k, epsilon,
                 t_direction, nBlocks, nThreads]
 
     else:
-        c_currents = c2Bundlef()
-        allfill_c2Bundle(c_currents, runPODict["s_current"], gs, ctypes.c_float)
+        c_currents = PStructs.c2Bundlef()
+        BUtils.allfill_c2Bundle(c_currents, runPODict["s_current"], gs, ctypes.c_float)
         args = [csp, ctp, ctypes.byref(cs), ctypes.byref(ct),
                 ctypes.byref(c_currents), k, epsilon,
                 t_direction, nBlocks, nThreads]
 
     if runPODict["mode"] == "JM":
-        res = c2Bundlef()
+        res = PStructs.c2Bundlef()
 
         args.insert(0, res)
 
-        allocate_c2Bundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
+        BUtils.allocate_c2Bundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
 
         #t = mgr.new_sthread(target=lib.callKernelf_JM, args=args)
         mgr.new_sthread(target=lib.callKernelf_JM, args=args)
         
         # Unpack filled struct
-        JM = c2BundleToObj(res, shape=target_shape, obj_t='currents', np_t=np.float64)
+        JM = BUtils.c2BundleToObj(res, shape=target_shape, obj_t='currents', np_t=np.float64)
 
         return JM
 
     elif runPODict["mode"] == "EH":
-        res = c2Bundlef()
+        res = PStructs.c2Bundlef()
 
         args.insert(0, res)
 
-        allocate_c2Bundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
+        BUtils.allocate_c2Bundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
 
         mgr.new_sthread(target=lib.callKernelf_EH, args=args)
         # Unpack filled struct
-        EH = c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
+        EH = BUtils.c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
 
         return EH
 
     elif runPODict["mode"] == "JMEH":
-        res = c4Bundlef()
+        res = PStructs.c4Bundlef()
 
         args.insert(0, res)
 
-        allocate_c4Bundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
+        BUtils.allocate_c4Bundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
 
         mgr.new_sthread(target=lib.callKernelf_JMEH, args=args)
         
         # Unpack filled struct
-        JM, EH = c4BundleToObj(res, shape=target_shape, np_t=np.float64)
+        JM, EH = BUtils.c4BundleToObj(res, shape=target_shape, np_t=np.float64)
 
         return [JM, EH]
 
     elif runPODict["mode"] == "EHP":
-        res = c2rBundlef()
+        res = PStructs.c2rBundlef()
 
         args.insert(0, res)
 
-        allocate_c2rBundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
+        BUtils.allocate_c2rBundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
 
         mgr.new_sthread(target=lib.callKernelf_EHP, args=args)
 
         # Unpack filled struct
-        EH, Pr = c2rBundleToObj(res, shape=target_shape, np_t=np.float64)
+        EH, Pr = BUtils.c2rBundleToObj(res, shape=target_shape, np_t=np.float64)
 
         return [EH, Pr]
 
     elif runPODict["mode"] == "FF":
-        res = c2Bundlef()
+        res = PStructs.c2Bundlef()
         args.insert(0, res)
 
-        allocate_c2Bundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
+        BUtils.allocate_c2Bundle(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
 
         mgr.new_sthread(target=lib.callKernelf_FF, args=args)
         # Unpack filled struct
-        EH = c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
+        EH = BUtils.c2BundleToObj(res, shape=target_shape, obj_t='fields', np_t=np.float64)
 
         return EH
     
     elif runPODict["mode"] == "scalar":
-        res = arrC1f()
+        res = PStructs.arrC1f()
         args.insert(0, res)
 
-        allocate_arrC1(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
+        BUtils.allocate_arrC1(res, target["gridsize"][0] * target["gridsize"][1], ctypes.c_float)
 
         mgr.new_sthread(target=lib.callKernelf_scalar, args=args)
         # Unpack filled struct
-        S = arrC1ToObj(res, shape=target_shape, np_t=np.float64)
+        S = BUtils.arrC1ToObj(res, shape=target_shape, np_t=np.float64)
 
         return S
 
@@ -235,14 +235,14 @@ def RT_GPUf(runRTDict):
     lib = loadGPUlib()
     mgr = TManager.Manager(Config.context)
 
-    ctp = reflparamsf()
-    allfill_reflparams(ctp, runRTDict["t_name"], ctypes.c_float)
+    ctp = PStructs.reflparamsf()
+    BUtils.allfill_reflparams(ctp, runRTDict["t_name"], ctypes.c_float)
 
-    inp = cframef()
-    res = cframef()
+    inp = PStructs.cframef()
+    res = PStructs.cframef()
 
-    allocate_cframe(res, runRTDict["fr_in"].size, ctypes.c_float)
-    allfill_cframe(inp, runRTDict["fr_in"], runRTDict["fr_in"].size, ctypes.c_float)
+    BUtils.allocate_cframe(res, runRTDict["fr_in"].size, ctypes.c_float)
+    BUtils.allfill_cframe(inp, runRTDict["fr_in"], runRTDict["fr_in"].size, ctypes.c_float)
 
     nBlocks = math.ceil(runRTDict["fr_in"].size / runRTDict["nThreads"])
 
@@ -257,7 +257,7 @@ def RT_GPUf(runRTDict):
     mgr.new_sthread(target=lib.callRTKernel, args=args)
     
     shape = (runRTDict["fr_in"].size,)
-    fr_out = frameToObj(res, np_t=np.float32, shape=shape)
+    fr_out = BUtils.frameToObj(res, np_t=np.float32, shape=shape)
 
     return fr_out
 

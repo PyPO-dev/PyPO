@@ -1,7 +1,7 @@
 import ctypes
 import numpy as np
 
-from PyPO.PyPOTypes import *
+import PyPO.PyPOTypes as PTypes
 import PyPO.Config as Config
 
 ##
@@ -44,7 +44,7 @@ def arrC1ToObj(res, shape, np_t):
 
     obj = np.ctypeslib.as_array(res.x, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.y, shape=shape).astype(np_t)
 
-    res = scalarfield(obj)
+    res = PTypes.scalarfield(obj)
 
     return res
 
@@ -74,10 +74,10 @@ def c2BundleToObj(res, shape, obj_t, np_t):
     z2 = np.ctypeslib.as_array(res.r2z, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i2z, shape=shape).astype(np_t)
 
     if obj_t == 'currents':
-        out = currents(x1, y1, z1, x2, y2, z2)
+        out = PTypes.currents(x1, y1, z1, x2, y2, z2)
 
     elif obj_t == 'fields':
-        out = fields(x1, y1, z1, x2, y2, z2)
+        out = PTypes.fields(x1, y1, z1, x2, y2, z2)
 
     return out
 
@@ -114,8 +114,8 @@ def c4BundleToObj(res, shape, np_t):
     y4 = np.ctypeslib.as_array(res.r4y, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i4y, shape=shape).astype(np_t)
     z4 = np.ctypeslib.as_array(res.r4z, shape=shape).astype(np_t) + 1j * np.ctypeslib.as_array(res.i4z, shape=shape).astype(np_t)
 
-    out1 = currents(x1, y1, z1, x2, y2, z2)
-    out2 = fields(x3, y3, z3, x4, y4, z4)
+    out1 = PTypes.currents(x1, y1, z1, x2, y2, z2)
+    out2 = PTypes.fields(x3, y3, z3, x4, y4, z4)
 
     return out1, out2
 
@@ -149,8 +149,8 @@ def c2rBundleToObj(res, shape, np_t):
     y3 = np.ctypeslib.as_array(res.r3y, shape=shape).astype(np_t)
     z3 = np.ctypeslib.as_array(res.r3z, shape=shape).astype(np_t)
 
-    out1 = fields(x1, y1, z1, x2, y2, z2)
-    out2 = rfield(x3, y3, z3)
+    out1 = PTypes.fields(x1, y1, z1, x2, y2, z2)
+    out2 = PTypes.rfield(x3, y3, z3)
 
     return out1, out2
 
@@ -545,7 +545,7 @@ def creflToObj(res, shape, np_t):
     nz = np.ctypeslib.as_array(res.nz, shape=shape).astype(np_t)
 
     area = np.ctypeslib.as_array(res.area, shape=shape).astype(np_t)
-    out = reflGrids(x, y, z, nx, ny, nz, area)
+    out = PTypes.reflGrids(x, y, z, nx, ny, nz, area)
     return out
 
 def frameToObj(res, np_t, shape):
@@ -571,7 +571,7 @@ def frameToObj(res, np_t, shape):
     dy = np.ctypeslib.as_array(res.dy, shape=shape).astype(np_t)
     dz = np.ctypeslib.as_array(res.dz, shape=shape).astype(np_t)
     
-    out = frame(shape[0], x, y, z, dx, dy, dz)
+    out = PTypes.frame(shape[0], x, y, z, dx, dy, dz)
 
     return out 
 

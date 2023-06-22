@@ -1,0 +1,29 @@
+/** 
+\page common_issues Common Issues
+This page contains a, possibly growing, list of commonly encountered issues during installing or running `PyPO`.
+This list is structured somewhat in a Q&A format. If you encounter an issue which is not listed here, please open an issue in the [issue tracker](https://github.com/PyPO-dev/PyPO/issues) of the `PyPO` repository.
+When the issue is resolved, we will add it to this list for bookkeeping and future reference.
+
+\section qterrors Qt Errors
+<b>Q: When trying to run the GUI or the unittests on Linux, I get the following error:
+
+qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "" even though it was found.
+This application failed to start because no Qt platform plugin could be initialized. Reinstalling the application may fix this problem.
+Available platform plugins are: vkkhrdisplay, offscreen, minimal, vnc, wayland, eglfs, wayland-egl, xcb, linuxfb, minimalegl.</b>
+
+A: This is due to the `xcb` library missing certain dependencies. In most cases, this can be resolved by running:
+```
+sudo apt install libxcb-cursor-dev
+```
+
+A generally useful tip for dealing with these Qt related bugs, is to first enable debugging in Qt.
+From the command line:
+```
+export QT_DEBUG_PLUGINS=1
+```
+
+This enables debugging when plugins for Qt are loaded and will give a list of libraries it could not load.
+With this information, it is then relatively easy to figure out what libraries are missing and should be installed.
+
+*/
+

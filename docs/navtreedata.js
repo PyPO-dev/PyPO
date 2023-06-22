@@ -30,13 +30,14 @@ var NAVTREE =
     [ "Tutorials", "tutorials.html", null ],
     [ "Demonstrations", "demos.html", null ],
     [ "Documentation", "pypodocs.html", null ],
-    [ "Contribution", "contribguide.html", null ]
+    [ "Contribution", "contribguide.html", null ],
+    [ "Common Issues", "common_issues.html", null ]
   ] ]
 ];
 
 var NAVTREEINDEX =
 [
-"contribguide.html"
+"common_issues.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

@@ -44,6 +44,7 @@ git push --delete origin <new-branch-name>
 
 \section issues Issues, Feauture Requests & Bugs
 Issues, feature requests and bugs can be reported in the `PyPO` [issue tracker](https://github.com/arend95/PyPO/issues).
+In addition to the online issue tracker in the git repo, we maintain a \ref common_issues "list of commonly encountered issues" for quick reference.
 
 \section devinstructions Instructions For Developers
 As mentioned in the contributor guidelines, contributions to `PyPO` are more than welcome. 

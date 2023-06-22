@@ -42,7 +42,7 @@ var searchData=
   ['initusbeamaction_39',['initUSBeamAction',['../classGUI_1_1MainWindow_1_1MainWidget.html#aae5a5ab340637ca126a525bb46cde7c4',1,'GUI::MainWindow::MainWidget']]],
   ['initusbeamform_40',['initUSBeamForm',['../classGUI_1_1MainWindow_1_1MainWidget.html#a9839745c84b926288c708f964d3e9478',1,'GUI::MainWindow::MainWidget']]],
   ['input_20dictionary_20reference_41',['Input Dictionary Reference',['../group__public__api__templates.html',1,'']]],
-  ['inputdescription_42',['InputDescription',['../classGUI_1_1ParameterForms_1_1InputDescription_1_1InputDescription.html',1,'GUI::ParameterForms::InputDescription']]],
+  ['inputdescription_42',['InputDescription',['../classGUI_1_1ParameterForms_1_1InputDescription_1_1InputDescription.html',1,'']]],
   ['inputdescription_2epy_43',['InputDescription.py',['../InputDescription_8py.html',1,'']]],
   ['inputdescriptionerror_44',['InputDescriptionError',['../classGUI_1_1utils_1_1InputDescriptionError.html',1,'GUI::utils']]],
   ['inputpoerror_45',['InputPOError',['../classPyPO_1_1Checks_1_1InputPOError.html',1,'PyPO::Checks']]],
@@ -61,7 +61,7 @@ var searchData=
   ['interpbeam_58',['interpBeam',['../group__public__api__po.html#gab0b62bd1bfc8e7103b5eb3e105d5e28f',1,'PyPO::System::System']]],
   ['interpframe_59',['interpFrame',['../group__public__api__hybrid.html#ga3b3530f655e1d050d9219a9c2545d46e',1,'PyPO::System::System']]],
   ['introduction_20to_20pypo_20_26_20design_20principles_60',['Introduction To PyPO &amp; Design Principles',['../basictut1.html',1,'']]],
-  ['intype_61',['inType',['../classGUI_1_1utils_1_1inType.html',1,'GUI.utils.inType'],['../classGUI_1_1ParameterForms_1_1InputDescription_1_1InputDescription.html#a4e5e2927f2c508d1dc34f39f25cb9d05',1,'GUI.ParameterForms.InputDescription.InputDescription.inType()']]],
+  ['intype_61',['inType',['../classGUI_1_1utils_1_1inType.html',1,'GUI::utils']]],
   ['invertmat_62',['InvertMat',['../MatTransform_8py.html#a486d1817bff4550b50b565c8b4852235',1,'PyPO::MatTransform']]],
   ['invmatvec4_63',['invmatVec4',['../KernelsRTf_8cu.html#a649d89f5441887504550b7ea70fa7dc8',1,'invmatVec4():&#160;KernelsRTf.cu'],['../classUtils.html#a35cba5ab0f77ff7a2d96ca9b72dbc5fd',1,'Utils::invmatVec4()']]]
 ];

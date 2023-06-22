@@ -3,9 +3,9 @@
 ## Starting The GUI
 Before we can use the GUI, we have to start it up.
 The GUI can only ben used if `PyPO` is installed from source because the GUI source code is only included if directly obtained from Github.
-Also make sure that PySide6 and attrs are installed, otherwise the GUI will not launch:
+Also make sure that PySide6, qdarktheme and attrs are installed, otherwise the GUI will not launch:
 ```
-pip install PySide6 attrs
+pip install PySide6 qdarktheme attrs
 ```
 
 Navigate to the location of the `PyPO` root directory and run:

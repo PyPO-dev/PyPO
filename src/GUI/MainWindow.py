@@ -7,7 +7,7 @@ from multiprocessing import Manager
 
 from PySide6.QtWidgets import QLabel, QTextEdit, QMainWindow, QGridLayout, QWidget, QSizePolicy, QVBoxLayout, QTabWidget, QScrollArea, QFileDialog
 from PySide6.QtGui import QTextCursor, QPixmap, QAction
-from PySide6.QtCore import Qt, QThreadPool
+from PySide6.QtCore import Qt
 import qdarktheme
 
 from src.GUI.ParameterForms import formGenerator
@@ -405,12 +405,12 @@ class MainWidget(QWidget):
             print_tb(err.__traceback__)
             self.clog.error(err)
     
-    def deleteSavedSystemForm(self):
-        """!
-        Opens a form that allows user to delete a saved System.
-        """
-        systemList = [os.path.split(x[0])[-1] for x in os.walk(self.stm.savePathSystems) if os.path.split(x[0])[-1] != "systems"]
-        self.setForm(fData.loadSystemForm(systemList), readAction=self.deleteSavedSystemAction, okText="Delete System")
+    # def deleteSavedSystemForm(self):
+    #     """!
+    #     Opens a form that allows user to delete a saved System.
+    #     """
+    #     systemList = [os.path.split(x[0])[-1] for x in os.walk(self.stm.savePathSystems) if os.path.split(x[0])[-1] != "systems"]
+    #     self.setForm(fData.loadSystemForm(systemList), readAction=self.deleteSavedSystemAction, okText="Delete System")
 
     def deleteSavedSystemAction(self):
         """!
@@ -437,11 +437,18 @@ class MainWidget(QWidget):
         try:
             diag = QFileDialog(self)
             diag.setFileMode(QFileDialog.FileMode.AnyFile)
-            diag.setFilter("*.pyposystem")
+            diag.setNameFilter("*.pyposystem")
             homedir = os.path.expanduser('~')
+            diag.setDirectory(homedir)
             if diag.exec_():
                 
-                print(diag.selectedFiles())
+                str_l = diag.selectedFiles()[0]
+                print(str_l)
+
+                str_l = str_l.rsplit(sep = os.sep, maxsplit = 1)
+                self.stm.setSavePathSystems(str_l[0])
+                self.stm.loadSystem(str_l[1].split(".")[0])
+
 
                 
 
@@ -454,12 +461,12 @@ class MainWidget(QWidget):
             # self._mkWorkSpace()
 
             # self.stm.loadSystem(loadDict["name"]) 
-            # self.refreshWorkspaceSection(self.stm.system, "elements")
-            # self.refreshWorkspaceSection(self.stm.frames, "frames")
-            # self.refreshWorkspaceSection(self.stm.fields, "fields")
-            # self.refreshWorkspaceSection(self.stm.currents, "currents")
-            # self.refreshWorkspaceSection(self.stm.scalarfields, "scalarfields")
-            # self.refreshWorkspaceSection(self.stm.groups, "groups")
+            self.refreshWorkspaceSection(self.stm.system, "elements")
+            self.refreshWorkspaceSection(self.stm.frames, "frames")
+            self.refreshWorkspaceSection(self.stm.fields, "fields")
+            self.refreshWorkspaceSection(self.stm.currents, "currents")
+            self.refreshWorkspaceSection(self.stm.scalarfields, "scalarfields")
+            self.refreshWorkspaceSection(self.stm.groups, "groups")
 
             self.removeForm()
         except Exception as err:
@@ -1631,10 +1638,10 @@ class PyPOMainWindow(QMainWindow):
         loadSystem.triggered.connect(self.mainWid.loadSystem)
         SystemsMenu.addAction(loadSystem)
         
-        removeSystem = QAction("Remove system", self)
-        removeSystem.setStatusTip("Remove a saved system from disk.")
-        removeSystem.triggered.connect(self.mainWid.deleteSavedSystemForm)
-        SystemsMenu.addAction(removeSystem)
+        # removeSystem = QAction("Remove system", self)
+        # removeSystem.setStatusTip("Remove a saved system from disk.")
+        # removeSystem.triggered.connect(self.mainWid.deleteSavedSystemForm)
+        # SystemsMenu.addAction(removeSystem)
         
         makeFrame = RaytraceMenu.addMenu("Make frame")
         initTubeFrameAction = QAction("Tube", self)

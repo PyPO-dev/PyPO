@@ -8,6 +8,7 @@ from multiprocessing import Manager
 from PySide6.QtWidgets import QLabel, QTextEdit, QMainWindow, QGridLayout, QWidget, QSizePolicy, QVBoxLayout, QTabWidget, QScrollArea
 from PySide6.QtGui import QTextCursor, QPixmap, QAction
 from PySide6.QtCore import Qt, QThreadPool
+import qdarktheme
 
 from src.GUI.ParameterForms import formGenerator
 from src.GUI.ParameterForms.InputDescription import InputDescription
@@ -1551,6 +1552,7 @@ class PyPOMainWindow(QMainWindow):
         self._createMenuBar()
         self.setCentralWidget(self.mainWid)
         self.showMaximized()
+        qdarktheme.setup_theme("auto")
         with open('src/GUI/style.css') as f:
             style = f.read()
         self.setStyleSheet(style)
@@ -1599,7 +1601,7 @@ class PyPOMainWindow(QMainWindow):
         
         saveSystem = QAction("Save system", self)
         saveSystem.setStatusTip("Save the current system to disk.")
-        saveSystem.triggered.connect(self.mainWid.saveSystemForm)
+        saveSystem.triggered.connect(self.mainWid.saveSystemAction)
         SystemsMenu.addAction(saveSystem)
 
         loadSystem = QAction("Load system", self)

@@ -5,9 +5,10 @@ from threading import Event
 from traceback import print_tb
 from multiprocessing import Manager
 
-from PySide6.QtWidgets import QLabel, QTextEdit, QMainWindow, QGridLayout, QWidget, QSizePolicy, QVBoxLayout, QTabWidget, QScrollArea
+from PySide6.QtWidgets import QLabel, QTextEdit, QMainWindow, QGridLayout, QWidget, QSizePolicy, QVBoxLayout, QTabWidget, QScrollArea, QFileDialog
 from PySide6.QtGui import QTextCursor, QPixmap, QAction
-from PySide6.QtCore import Qt, QThreadPool
+from PySide6.QtCore import Qt
+import qdarktheme
 
 from src.GUI.ParameterForms import formGenerator
 from src.GUI.ParameterForms.InputDescription import InputDescription
@@ -383,26 +384,33 @@ class MainWidget(QWidget):
         """!
         Opens a form that allows user to save the System.
         """
-        self.setForm(fData.saveSystemForm(), readAction=self.saveSystemAction, okText="Save System")
+        
+        # self.setForm(fData.saveSystemForm(), readAction=self.saveSystemAction, okText="Save System") ##TODO delete form
     
     def saveSystemAction(self):
         """!
         Saves the current system state under the name given in form.
         """
         try:
-            saveDict = self.ParameterWid.read()
-            self.stm.saveSystem(saveDict["name"]) 
+            diag = QFileDialog(self)
+            diag.setFileMode(QFileDialog.FileMode.AnyFile)
+            homedir = os.path.expanduser('~')
+            out, _ = diag.getSaveFileName(self, filter="*.pyposystem", dir = homedir)
+            str_l = out.rsplit(sep = os.sep, maxsplit = 1)
+            self.stm.setSavePathSystems(str_l[0])
+            self.stm.saveSystem(str_l[1])
+
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
             self.clog.error(err)
     
-    def deleteSavedSystemForm(self):
-        """!
-        Opens a form that allows user to delete a saved System.
-        """
-        systemList = [os.path.split(x[0])[-1] for x in os.walk(self.stm.savePathSystems) if os.path.split(x[0])[-1] != "systems"]
-        self.setForm(fData.loadSystemForm(systemList), readAction=self.deleteSavedSystemAction, okText="Delete System")
+    # def deleteSavedSystemForm(self):
+    #     """!
+    #     Opens a form that allows user to delete a saved System.
+    #     """
+    #     systemList = [os.path.split(x[0])[-1] for x in os.walk(self.stm.savePathSystems) if os.path.split(x[0])[-1] != "systems"]
+    #     self.setForm(fData.loadSystemForm(systemList), readAction=self.deleteSavedSystemAction, okText="Delete System")
 
     def deleteSavedSystemAction(self):
         """!
@@ -422,15 +430,37 @@ class MainWidget(QWidget):
         systemList = [os.path.split(x[0])[-1] for x in os.walk(self.stm.savePathSystems) if os.path.split(x[0])[-1] != "systems"]
         self.setForm(fData.loadSystemForm(systemList), readAction=self.loadSystemAction, okText="Load System")
     
-    def loadSystemAction(self):
+    def loadSystem(self):
         """!
         Loads system selected in from form.
         """
         try:
-            loadDict = self.ParameterWid.read()
-            self._mkWorkSpace()
+            diag = QFileDialog(self)
+            diag.setFileMode(QFileDialog.FileMode.AnyFile)
+            diag.setNameFilter("*.pyposystem")
+            homedir = os.path.expanduser('~')
+            diag.setDirectory(homedir)
+            if diag.exec_():
+                
+                str_l = diag.selectedFiles()[0]
+                print(str_l)
 
-            self.stm.loadSystem(loadDict["name"]) 
+                str_l = str_l.rsplit(sep = os.sep, maxsplit = 1)
+                self.stm.setSavePathSystems(str_l[0])
+                self.stm.loadSystem(str_l[1].split(".")[0])
+
+
+                
+
+            # out, _ = diag.getSaveFileName(self, filter="*.pyposystem", dir = homedir)
+            # str_l = out.rsplit(sep = os.sep, maxsplit = 1)
+            # self.stm.setSavePath(str_l[0])
+            # self.stm.saveSystem(str_l[1])
+
+            # loadDict = self.ParameterWid.read()
+            # self._mkWorkSpace()
+
+            # self.stm.loadSystem(loadDict["name"]) 
             self.refreshWorkspaceSection(self.stm.system, "elements")
             self.refreshWorkspaceSection(self.stm.frames, "frames")
             self.refreshWorkspaceSection(self.stm.fields, "fields")
@@ -1551,6 +1581,7 @@ class PyPOMainWindow(QMainWindow):
         self._createMenuBar()
         self.setCentralWidget(self.mainWid)
         self.showMaximized()
+        qdarktheme.setup_theme("auto")
         with open('src/GUI/style.css') as f:
             style = f.read()
         self.setStyleSheet(style)
@@ -1599,18 +1630,18 @@ class PyPOMainWindow(QMainWindow):
         
         saveSystem = QAction("Save system", self)
         saveSystem.setStatusTip("Save the current system to disk.")
-        saveSystem.triggered.connect(self.mainWid.saveSystemForm)
+        saveSystem.triggered.connect(self.mainWid.saveSystemAction)
         SystemsMenu.addAction(saveSystem)
 
         loadSystem = QAction("Load system", self)
         loadSystem.setStatusTip("Load a saved system from disk.")
-        loadSystem.triggered.connect(self.mainWid.loadSystemForm)
+        loadSystem.triggered.connect(self.mainWid.loadSystem)
         SystemsMenu.addAction(loadSystem)
         
-        removeSystem = QAction("Remove system", self)
-        removeSystem.setStatusTip("Remove a saved system from disk.")
-        removeSystem.triggered.connect(self.mainWid.deleteSavedSystemForm)
-        SystemsMenu.addAction(removeSystem)
+        # removeSystem = QAction("Remove system", self)
+        # removeSystem.setStatusTip("Remove a saved system from disk.")
+        # removeSystem.triggered.connect(self.mainWid.deleteSavedSystemForm)
+        # SystemsMenu.addAction(removeSystem)
         
         makeFrame = RaytraceMenu.addMenu("Make frame")
         initTubeFrameAction = QAction("Tube", self)

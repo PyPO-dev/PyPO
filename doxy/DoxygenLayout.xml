@@ -9,6 +9,7 @@
     <tab type="user" url="@ref demos" visible="yes" title="Demonstrations"/>
     <tab type="user" url="@ref pypodocs" visible="yes" title="Documentation"/>
     <tab type="user" url="@ref contribguide" visible="yes" title="Contribution"/>
+    <tab type="user" url="@ref common_issues" visible="yes" title="Common Issues"/>
     <tab type="modules" visible="no" title="" intro=""/>
     <tab type="namespaces" visible="no" title="">
       <tab type="namespacelist" visible="no" title="" intro=""/>

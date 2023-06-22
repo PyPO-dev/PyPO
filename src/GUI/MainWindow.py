@@ -5,7 +5,7 @@ from threading import Event
 from traceback import print_tb
 from multiprocessing import Manager
 
-from PySide6.QtWidgets import QLabel, QTextEdit, QMainWindow, QGridLayout, QWidget, QSizePolicy, QVBoxLayout, QTabWidget, QScrollArea
+from PySide6.QtWidgets import QLabel, QTextEdit, QMainWindow, QGridLayout, QWidget, QSizePolicy, QVBoxLayout, QTabWidget, QScrollArea, QFileDialog
 from PySide6.QtGui import QTextCursor, QPixmap, QAction
 from PySide6.QtCore import Qt, QThreadPool
 import qdarktheme
@@ -384,15 +384,22 @@ class MainWidget(QWidget):
         """!
         Opens a form that allows user to save the System.
         """
-        self.setForm(fData.saveSystemForm(), readAction=self.saveSystemAction, okText="Save System")
+        
+        # self.setForm(fData.saveSystemForm(), readAction=self.saveSystemAction, okText="Save System") ##TODO delete form
     
     def saveSystemAction(self):
         """!
         Saves the current system state under the name given in form.
         """
         try:
-            saveDict = self.ParameterWid.read()
-            self.stm.saveSystem(saveDict["name"]) 
+            diag = QFileDialog(self)
+            diag.setFileMode(QFileDialog.FileMode.AnyFile)
+            homedir = os.path.expanduser('~')
+            out, _ = diag.getSaveFileName(self, filter="*.pyposystem", dir = homedir)
+            str_l = out.rsplit(sep = os.sep, maxsplit = 1)
+            self.stm.setSavePathSystems(str_l[0])
+            self.stm.saveSystem(str_l[1])
+
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -423,21 +430,36 @@ class MainWidget(QWidget):
         systemList = [os.path.split(x[0])[-1] for x in os.walk(self.stm.savePathSystems) if os.path.split(x[0])[-1] != "systems"]
         self.setForm(fData.loadSystemForm(systemList), readAction=self.loadSystemAction, okText="Load System")
     
-    def loadSystemAction(self):
+    def loadSystem(self):
         """!
         Loads system selected in from form.
         """
         try:
-            loadDict = self.ParameterWid.read()
-            self._mkWorkSpace()
+            diag = QFileDialog(self)
+            diag.setFileMode(QFileDialog.FileMode.AnyFile)
+            diag.setFilter("*.pyposystem")
+            homedir = os.path.expanduser('~')
+            if diag.exec_():
+                
+                print(diag.selectedFiles())
 
-            self.stm.loadSystem(loadDict["name"]) 
-            self.refreshWorkspaceSection(self.stm.system, "elements")
-            self.refreshWorkspaceSection(self.stm.frames, "frames")
-            self.refreshWorkspaceSection(self.stm.fields, "fields")
-            self.refreshWorkspaceSection(self.stm.currents, "currents")
-            self.refreshWorkspaceSection(self.stm.scalarfields, "scalarfields")
-            self.refreshWorkspaceSection(self.stm.groups, "groups")
+                
+
+            # out, _ = diag.getSaveFileName(self, filter="*.pyposystem", dir = homedir)
+            # str_l = out.rsplit(sep = os.sep, maxsplit = 1)
+            # self.stm.setSavePath(str_l[0])
+            # self.stm.saveSystem(str_l[1])
+
+            # loadDict = self.ParameterWid.read()
+            # self._mkWorkSpace()
+
+            # self.stm.loadSystem(loadDict["name"]) 
+            # self.refreshWorkspaceSection(self.stm.system, "elements")
+            # self.refreshWorkspaceSection(self.stm.frames, "frames")
+            # self.refreshWorkspaceSection(self.stm.fields, "fields")
+            # self.refreshWorkspaceSection(self.stm.currents, "currents")
+            # self.refreshWorkspaceSection(self.stm.scalarfields, "scalarfields")
+            # self.refreshWorkspaceSection(self.stm.groups, "groups")
 
             self.removeForm()
         except Exception as err:
@@ -1606,7 +1628,7 @@ class PyPOMainWindow(QMainWindow):
 
         loadSystem = QAction("Load system", self)
         loadSystem.setStatusTip("Load a saved system from disk.")
-        loadSystem.triggered.connect(self.mainWid.loadSystemForm)
+        loadSystem.triggered.connect(self.mainWid.loadSystem)
         SystemsMenu.addAction(loadSystem)
         
         removeSystem = QAction("Remove system", self)

@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['demonstrations_0',['Demonstrations',['../demos.html',1,'']]],
-  ['documentation_1',['Documentation',['../pypodocs.html',1,'']]]
+  ['common_20issues_0',['Common Issues',['../common_issues.html',1,'']]]
 ];

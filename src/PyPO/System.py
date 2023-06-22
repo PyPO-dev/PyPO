@@ -28,6 +28,8 @@ import PyPO.FitGauss as FGauss
 
 import PyPO.WorldParam as world
 
+from traceback import print_tb
+
 logging.getLogger(__name__)
 
 ##
@@ -868,30 +870,28 @@ class System(object):
         
         @param name Save the current system under this name.
         """
-
-        path = os.path.join(self.savePathSystems, name)
-        saveExist = os.path.isdir(path)
-
-        if not saveExist:
-            os.makedirs(path)
-        
-        with open(os.path.join(path, "system.pys"), 'wb') as file: 
-            pickle.dump(self.system, file)
-        
-        with open(os.path.join(path, "groups.pys"), 'wb') as file: 
-            pickle.dump(self.groups, file)
-        
-        with open(os.path.join(path, "frames.pys"), 'wb') as file: 
-            pickle.dump(self.frames, file)
-        
-        with open(os.path.join(path, "fields.pys"), 'wb') as file: 
-            pickle.dump(self.fields, file)
        
-        with open(os.path.join(path, "currents.pys"), 'wb') as file: 
-            pickle.dump(self.currents, file)
+        with open(os.path.join(self.savePathSystems, f"{name}.pyposystem"), 'wb') as file:
+            pickle.dump(self.__dict__, file)
+
         
-        with open(os.path.join(path, "scalarfields.pys"), 'wb') as file: 
-            pickle.dump(self.scalarfields, file)
+        #with open(os.path.join(path, "system.pys"), 'wb') as file: 
+        #    pickle.dump(self.system, file)
+        #
+        #with open(os.path.join(path, "groups.pys"), 'wb') as file: 
+        #    pickle.dump(self.groups, file)
+        #
+        #with open(os.path.join(path, "frames.pys"), 'wb') as file: 
+        #    pickle.dump(self.frames, file)
+        #
+        #with open(os.path.join(path, "fields.pys"), 'wb') as file: 
+        #    pickle.dump(self.fields, file)
+       
+        #with open(os.path.join(path, "currents.pys"), 'wb') as file: 
+        #    pickle.dump(self.currents, file)
+        #
+        #with open(os.path.join(path, "scalarfields.pys"), 'wb') as file: 
+        #    pickle.dump(self.scalarfields, file)
         
         self.clog.info(f"Saved current system to {name}.")
 
@@ -909,30 +909,37 @@ class System(object):
         """
 
         self.clog.info(f"Loading system {name} from {self.savePathSystems} into current system.")
-        path = os.path.join(self.savePathSystems, name)
-        loadExist = os.path.isdir(path)
+        path = os.path.join(self.savePathSystems, f"{name}.pyposystem")
+        loadExist = os.path.isfile(path)
 
         if not loadExist:
             self.clog.error("Specified system does not exist.")
             exit(1)
 
-        with open(os.path.join(path, "system.pys"), 'rb') as file: 
-            self.system = pickle.load(file)
-        
-        with open(os.path.join(path, "groups.pys"), 'rb') as file: 
-            self.groups = pickle.load(file)
-        
-        with open(os.path.join(path, "frames.pys"), 'rb') as file: 
-            self.frames = pickle.load(file)
-        
-        with open(os.path.join(path, "fields.pys"), 'rb') as file: 
-            self.fields = pickle.load(file)
-        
-        with open(os.path.join(path, "currents.pys"), 'rb') as file: 
-            self.currents = pickle.load(file)
-        
-        with open(os.path.join(path, "scalarfields.pys"), 'rb') as file: 
-            self.scalarfields = pickle.load(file)
+        try:
+            with open(os.path.join(self.savePathSystems, f"{name}.pyposystem"), 'rb') as file: 
+                self.__dict__ = pickle.load(file)
+        except Exception as err:
+            print_tb(err.__traceback__)
+            
+
+        #with open(os.path.join(path, "system.pys"), 'rb') as file: 
+        #    self.system = pickle.load(file)
+        #
+        #with open(os.path.join(path, "groups.pys"), 'rb') as file: 
+        #    self.groups = pickle.load(file)
+        #
+        #with open(os.path.join(path, "frames.pys"), 'rb') as file: 
+        #    self.frames = pickle.load(file)
+        #
+        #with open(os.path.join(path, "fields.pys"), 'rb') as file: 
+        #    self.fields = pickle.load(file)
+        #
+        #with open(os.path.join(path, "currents.pys"), 'rb') as file: 
+        #    self.currents = pickle.load(file)
+        #
+        #with open(os.path.join(path, "scalarfields.pys"), 'rb') as file: 
+        #    self.scalarfields = pickle.load(file)
 
     def mergeSystem(self, *systems):
         """!

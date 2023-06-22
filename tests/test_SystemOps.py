@@ -33,27 +33,25 @@ class Test_SystemOps(unittest.TestCase):
         self.s0.saveSystem("s0")
         self.s1.saveSystem("s1")
         
-        for con in self.content:
-            self.assertTrue(os.path.exists(os.path.join(self.s0.savePathSystems, "s0", con))) 
-            self.assertTrue(os.path.exists(os.path.join(self.s1.savePathSystems, "s1", con)))
+        self.assertTrue(os.path.exists(os.path.join(self.s0.savePathSystems, "s0.pyposystem"))) 
+        self.assertTrue(os.path.exists(os.path.join(self.s1.savePathSystems, "s1.pyposystem")))
 
-        shutil.rmtree(os.path.join(self.s0.savePathSystems, "s0"))
-        shutil.rmtree(os.path.join(self.s1.savePathSystems, "s1"))
+        os.remove(os.path.join(self.s0.savePathSystems, "s0.pyposystem"))
+        os.remove(os.path.join(self.s1.savePathSystems, "s1.pyposystem"))
 
-        self.assertFalse(os.path.exists(os.path.join(self.s0.savePathSystems, "s0"))) 
-        self.assertFalse(os.path.exists(os.path.join(self.s1.savePathSystems, "s1")))
+        self.assertFalse(os.path.exists(os.path.join(self.s0.savePathSystems, "s0.pyposystem"))) 
+        self.assertFalse(os.path.exists(os.path.join(self.s1.savePathSystems, "s1.pyposystem")))
 
     def test_loadSystem(self):
         self.s0.mergeSystem(self.s1)
         self.s0.saveSystem("s0")
        
         self.s1.loadSystem("s0")
-
         for par in self.params:
             self.assertEqual(getattr(self.s1, par[0])[par[0]], par[1])
         
-        shutil.rmtree(os.path.join(self.s1.savePathSystems, "s0"))
-        self.assertFalse(os.path.exists(os.path.join(self.s0.savePathSystems, "s0"))) 
+        os.remove(os.path.join(self.s1.savePathSystems, "s0.pyposystem"))
+        self.assertFalse(os.path.exists(os.path.join(self.s0.savePathSystems, "s0.pyposystem"))) 
 
     def test_deleteSystem(self):
         del self.s0

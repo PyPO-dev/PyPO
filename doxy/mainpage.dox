@@ -77,9 +77,9 @@ For developers, an automated testing framework is present as well as a documenta
 The prerequisites for these features are not installed through the regular install. 
 Instead, they can be installed separately as needed.
 
-To use the GUI, PySide6 and attrs need to be installed:
+To use the GUI, PySide6, pyqtdarktheme and attrs need to be installed:
 ```
-pip install PySide6 attrs
+pip install PySide6 pyqtdarktheme attrs
 ```
 
 The automated tests are run using the nose2 framework:

@@ -45,6 +45,7 @@ class MainWidget(QWidget):
         super().__init__(parent)
         # Window settings
         self.setWindowTitle("PyPO")
+        self.currentFileName = ""
 
         # GridParameters
         self.grid = QGridLayout()
@@ -380,25 +381,47 @@ class MainWidget(QWidget):
     
     ### Functionalities: Systems 
 
-    def saveSystemForm(self):
+    def saveSystem(self):
         """!
         Opens a form that allows user to save the System.
         """
+        try:
+            if not self.currentFileName:
+                self.saveSystemAs()
+                return
+            self.stm.saveSystem(self.currentFileName)
+        except Exception as err:
+            print(err)
+            print_tb(err.__traceback__)
+            self.clog.error(err)
         
         # self.setForm(fData.saveSystemForm(), readAction=self.saveSystemAction, okText="Save System") ##TODO delete form
     
-    def saveSystemAction(self):
+    def saveSystemAs(self):
         """!
         Saves the current system state under the name given in form.
         """
+        
         try:
             diag = QFileDialog(self)
             diag.setFileMode(QFileDialog.FileMode.AnyFile)
             homedir = os.path.expanduser('~')
-            out, _ = diag.getSaveFileName(self, filter="*.pyposystem", dir = homedir)
-            str_l = out.rsplit(sep = os.sep, maxsplit = 1)
-            self.stm.setSavePathSystems(str_l[0])
-            self.stm.saveSystem(str_l[1])
+            filePath, _ = diag.getSaveFileName(self, filter="*.pyposystem", dir = homedir)
+            if not filePath:
+                return
+            pathFileList = filePath.rsplit(sep = os.sep, maxsplit = 1)
+            if pathFileList[1] == (self.currentFileName + ".pyposystem"):
+                pathFileList[1] = self.currentFileName
+            
+            self.currentFileName = pathFileList[1]
+            # print(pathFileList)
+            # print(self.currentFileName)
+            # sss = pathFileList.split('.')
+            # if len() == 3:
+            #     pathFileList = 
+
+            self.stm.setSavePathSystems(pathFileList[0])
+            self.saveSystem()
 
         except Exception as err:
             print(err)
@@ -423,13 +446,7 @@ class MainWidget(QWidget):
             print(err)
             print_tb(err.__traceback__)
             self.clog.error(err)
-    def loadSystemForm(self):
-        """!
-        Opens a form that allows user to load a saved System.
-        """
-        systemList = [os.path.split(x[0])[-1] for x in os.walk(self.stm.savePathSystems) if os.path.split(x[0])[-1] != "systems"]
-        self.setForm(fData.loadSystemForm(systemList), readAction=self.loadSystemAction, okText="Load System")
-    
+ 
     def loadSystem(self):
         """!
         Loads system selected in from form.
@@ -443,32 +460,16 @@ class MainWidget(QWidget):
             if diag.exec_():
                 
                 str_l = diag.selectedFiles()[0]
-                print(str_l)
 
                 str_l = str_l.rsplit(sep = os.sep, maxsplit = 1)
                 self.stm.setSavePathSystems(str_l[0])
                 self.stm.loadSystem(str_l[1].split(".")[0])
+                self.currentFileName = str_l[1].split(".")[0]
 
-
+                self.refreshWorkspaceSection()
                 
-
-            # out, _ = diag.getSaveFileName(self, filter="*.pyposystem", dir = homedir)
-            # str_l = out.rsplit(sep = os.sep, maxsplit = 1)
-            # self.stm.setSavePath(str_l[0])
-            # self.stm.saveSystem(str_l[1])
-
-            # loadDict = self.ParameterWid.read()
-            # self._mkWorkSpace()
-
-            # self.stm.loadSystem(loadDict["name"]) 
-            self.refreshWorkspaceSection(self.stm.system, "elements")
-            self.refreshWorkspaceSection(self.stm.frames, "frames")
-            self.refreshWorkspaceSection(self.stm.fields, "fields")
-            self.refreshWorkspaceSection(self.stm.currents, "currents")
-            self.refreshWorkspaceSection(self.stm.scalarfields, "scalarfields")
-            self.refreshWorkspaceSection(self.stm.groups, "groups")
-
-            self.removeForm()
+                self.removeForm()
+                # print(self.stm.system)
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -562,31 +563,19 @@ class MainWidget(QWidget):
             print_tb(err.__traceback__)
             self.clog.error(err)
 
-    def refreshWorkspaceSection(self, columnDict, section):
+    def refreshWorkspaceSection(self):
         """!
         Refresh the workspace and update contents.
         
         @param columnDict Dictionary containing keys to be added.
         @param section Denotes what section the key should be added to.
         """
-        for key in columnDict.keys():
-            if section == "elements":
-                self.addReflectorWidget(key)
-            
-            elif section == "frames":
-                self.addFrameWidget(key)
-            
-            elif section == "fields":
-                self.addFieldWidget(key)
-            
-            elif section == "currents":
-                self.addCurrentWidget(key)
-
-            elif section == "scalarfields":
-                self.addSFieldWidget(key)
-                
-            elif section == "groups":
-                self.addGroupWidget(key)
+        self._mkWorkSpace()
+        for s, func in zip(["system", "frames", "fields", "currents", "scalarfields", "groups"],
+                  [self.addReflectorWidget, self.addFrameWidget, self.addFieldWidget, self.addCurrentWidget, self.addSFieldWidget, self.addGroupWidget]):
+            systemDict = getattr(self.stm, s)
+            for key in systemDict.keys():
+                func(key)
 
     ### Functionalities: Adding widgets to workspace
     
@@ -1589,12 +1578,40 @@ class PyPOMainWindow(QMainWindow):
     def _createMenuBar(self):
         menuBar = self.menuBar()
 
+        SystemMenu      = menuBar.addMenu("System")
         ElementsMenu    = menuBar.addMenu("Elements")
-        SystemsMenu     = menuBar.addMenu("Systems")
         RaytraceMenu    = menuBar.addMenu("Ray-tracer")
         PhysOptMenu     = menuBar.addMenu("Physical-optics")
         ToolsMenu       = menuBar.addMenu("Tools")
 
+        ### File 
+
+        saveSystem = QAction("Save system", self)
+        saveSystem.setStatusTip("Save the current system to disk.")
+        saveSystem.triggered.connect(self.mainWid.saveSystem)
+        SystemMenu.addAction(saveSystem)
+
+        saveSystem = QAction("Save system As", self)
+        saveSystem.setStatusTip("Save the current system to disk.")
+        saveSystem.triggered.connect(self.mainWid.saveSystemAs)
+        SystemMenu.addAction(saveSystem)
+
+        loadSystem = QAction("Load system", self)
+        loadSystem.setStatusTip("Load a saved system from disk.")
+        loadSystem.triggered.connect(self.mainWid.loadSystem)
+        SystemMenu.addAction(loadSystem)
+
+        PlotMenu = SystemMenu.addMenu("Plot..")
+        plotSystem = QAction("system", self)
+        plotSystem.setStatusTip("Plot all elements in the current system.")
+        plotSystem.triggered.connect(self.mainWid.plotSystem)
+        PlotMenu.addAction(plotSystem)
+
+        plotRaytrace = QAction("system with rays", self)
+        plotSystem.setStatusTip("Plot selected elements in the current system, including ray-traces.")
+        plotRaytrace.triggered.connect(self.mainWid.plotSystemWithRaytraceForm)
+        PlotMenu.addAction(plotRaytrace)
+        
         ### Add Element
         reflectorSelector = ElementsMenu.addMenu("Add Reflector")
         
@@ -1618,30 +1635,6 @@ class PyPOMainWindow(QMainWindow):
         ElementsMenu.addAction(addGroupAction)
         
         ### System actions
-        plotSystem = QAction("Plot system", self)
-        plotSystem.setStatusTip("Plot all elements in the current system.")
-        plotSystem.triggered.connect(self.mainWid.plotSystem)
-        SystemsMenu.addAction(plotSystem)
-
-        plotRaytrace = QAction("Plot ray-trace", self)
-        plotSystem.setStatusTip("Plot selected elements in the current system, including ray-traces.")
-        plotRaytrace.triggered.connect(self.mainWid.plotSystemWithRaytraceForm)
-        SystemsMenu.addAction(plotRaytrace)
-        
-        saveSystem = QAction("Save system", self)
-        saveSystem.setStatusTip("Save the current system to disk.")
-        saveSystem.triggered.connect(self.mainWid.saveSystemAction)
-        SystemsMenu.addAction(saveSystem)
-
-        loadSystem = QAction("Load system", self)
-        loadSystem.setStatusTip("Load a saved system from disk.")
-        loadSystem.triggered.connect(self.mainWid.loadSystem)
-        SystemsMenu.addAction(loadSystem)
-        
-        # removeSystem = QAction("Remove system", self)
-        # removeSystem.setStatusTip("Remove a saved system from disk.")
-        # removeSystem.triggered.connect(self.mainWid.deleteSavedSystemForm)
-        # SystemsMenu.addAction(removeSystem)
         
         makeFrame = RaytraceMenu.addMenu("Make frame")
         initTubeFrameAction = QAction("Tube", self)

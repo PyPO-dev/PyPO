@@ -134,7 +134,7 @@ def someFunc(inputObject):
 ```
 
 The exclamation mark tells doxygen to parse the docstring as a doxygen documentation block. 
-This allows doxygen to generate documentation, while also allowing the built-in `help()` function of Python to recognise the docstring, albeit with a lone "!" preoending the output of `help()`.
+This allows doxygen to generate documentation, while also allowing the built-in `help()` function of Python to recognise the docstring, albeit with a lone "!" prepending the output of `help()`.
 
 We realise that this is slightly unorthodox, but in this way we can generate documentation using doxygen whilst still using a docstring style that utilises the `__docs__` method of the function being documented. 
 

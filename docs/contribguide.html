@@ -176,7 +176,7 @@ Python Source</h3>
 <div class="line">    </div>
 <div class="line">    ...</div>
 <div class="line">    return output</div>
-</div><!-- fragment --><p>The exclamation mark tells doxygen to parse the docstring as a doxygen documentation block. This allows doxygen to generate documentation, while also allowing the built-in <code>help()</code> function of Python to recognise the docstring, albeit with a lone "!" preoending the output of <code>help()</code>.</p>
+</div><!-- fragment --><p>The exclamation mark tells doxygen to parse the docstring as a doxygen documentation block. This allows doxygen to generate documentation, while also allowing the built-in <code>help()</code> function of Python to recognise the docstring, albeit with a lone "!" prepending the output of <code>help()</code>.</p>
 <p>We realise that this is slightly unorthodox, but in this way we can generate documentation using doxygen whilst still using a docstring style that utilises the <code>__docs__</code> method of the function being documented.</p>
 <p>Because docstrings cannot be used as file descriptions, we use a different style to describe files. Just as for C/C++/CUDA, file descriptions go after import statements and before the classes and/or methods in the file:</p>
 <div class="fragment"><div class="line">&lt;<span class="keyword">import</span> statements up here...&gt;</div>

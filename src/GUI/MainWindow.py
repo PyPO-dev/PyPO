@@ -47,6 +47,8 @@ class MainWidget(QWidget):
         self.setWindowTitle("PyPO")
         self.currentFileName = ""
 
+        self.currentFilePath = os.path.expanduser('~') 
+
         # GridParameters
         self.grid = QGridLayout()
         self.GPWorkSpace      = [0, 0, 2, 1]
@@ -405,8 +407,7 @@ class MainWidget(QWidget):
         try:
             diag = QFileDialog(self)
             diag.setFileMode(QFileDialog.FileMode.AnyFile)
-            homedir = os.path.expanduser('~')
-            filePath, _ = diag.getSaveFileName(self, filter="*.pyposystem", dir = homedir)
+            filePath, _ = diag.getSaveFileName(self, filter="*.pyposystem", dir = self.currentFilePath)
             if not filePath:
                 return
             pathFileList = filePath.rsplit(sep = os.sep, maxsplit = 1)
@@ -414,34 +415,11 @@ class MainWidget(QWidget):
                 pathFileList[1] = self.currentFileName
             
             self.currentFileName = pathFileList[1]
-            # print(pathFileList)
-            # print(self.currentFileName)
-            # sss = pathFileList.split('.')
-            # if len() == 3:
-            #     pathFileList = 
+            self.currentFilePath = pathFileList[0]
 
             self.stm.setSavePathSystems(pathFileList[0])
             self.saveSystem()
 
-        except Exception as err:
-            print(err)
-            print_tb(err.__traceback__)
-            self.clog.error(err)
-    
-    # def deleteSavedSystemForm(self):
-    #     """!
-    #     Opens a form that allows user to delete a saved System.
-    #     """
-    #     systemList = [os.path.split(x[0])[-1] for x in os.walk(self.stm.savePathSystems) if os.path.split(x[0])[-1] != "systems"]
-    #     self.setForm(fData.loadSystemForm(systemList), readAction=self.deleteSavedSystemAction, okText="Delete System")
-
-    def deleteSavedSystemAction(self):
-        """!
-        Deletes system selected in form.
-        """
-        try:
-            removeDict = self.ParameterWid.read()
-            shutil.rmtree(os.path.join(self.stm.savePathSystems, removeDict["name"]))
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -455,8 +433,7 @@ class MainWidget(QWidget):
             diag = QFileDialog(self)
             diag.setFileMode(QFileDialog.FileMode.AnyFile)
             diag.setNameFilter("*.pyposystem")
-            homedir = os.path.expanduser('~')
-            diag.setDirectory(homedir)
+            diag.setDirectory(self.currentFilePath)
             if diag.exec_():
                 
                 str_l = diag.selectedFiles()[0]

@@ -43,7 +43,7 @@ Custom beam patterns can also be imported to, for example, model the propagation
 `PyPO` can be used through either a scripting-based approach, where simulations are defined in Python scripts, or through the graphical user interface (GUI).
 It only carries core dependencies on NumPy [@Harris:2020], Matplotlib [@Hunter:2007] and SciPy [@Virtanen:2020]. 
 The unittesting framework carries a dependency on nose2. 
-The GUI carries dependencies on PySide6 and attrs.
+The GUI carries dependencies on PySide6, pyqtdarktheme and attrs.
 
 # Statement of need
 Development of `PyPO` started with the need for alignment strategies for the wideband sub-mm spectrometer DESHIMA 2.0 [@Taniguchi:2022]. 

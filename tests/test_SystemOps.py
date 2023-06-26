@@ -1,9 +1,12 @@
 import os
 import shutil
+import numpy as np
 
 import unittest
+from nose2.tools import params
 
 from PyPO.System import System
+from PyPO.PyPOTypes import fields
 
 class Test_SystemOps(unittest.TestCase):
     def setUp(self):
@@ -56,6 +59,23 @@ class Test_SystemOps(unittest.TestCase):
     def test_deleteSystem(self):
         del self.s0
 
+    def test_printSystem(self):
+        test_str = self.s0.__str__()
+        self.assertTrue(isinstance(test_str, str))
+
+    @params("Ex", "Ey", "Ez", "Hx", "Hy", "Hz") 
+    def test_compToFields(self, comp):
+        test_arr = np.zeros((3,3))
+        out = self.s0._compToFields(comp, test_arr)
+        
+        self.assertTrue(isinstance(out, fields))
+
+    @params("m", "cm", "mm", "um", "nm", "deg", "am", "as") 
+    def test_units(self, unit):
+        out = self.s0._units(unit)
+        self.assertEqual(out[0], unit)
+        self.assertEqual(len(out), 2)
+        
 if __name__ == "__main__":
     import nose2
     nose2.main()

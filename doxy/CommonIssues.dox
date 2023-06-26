@@ -24,6 +24,5 @@ export QT_DEBUG_PLUGINS=1
 
 This enables debugging when plugins for Qt are loaded and will give a list of libraries it could not load.
 With this information, it is then relatively easy to figure out what libraries are missing and should be installed.
-
 */
 

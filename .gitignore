@@ -165,6 +165,9 @@ log
 !docs/Gui/README_Resources/ResourcesT2/*.png
 !docs/Gui/README_Resources/ResourcesT3/*.png
 
+# PyPO systems
+*.pyposystem
+
 # Personal projects/files
 personal/
 literature/

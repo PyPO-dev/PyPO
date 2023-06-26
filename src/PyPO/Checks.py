@@ -1336,10 +1336,10 @@ def check_hybridDict(hybridDict, elements, frames, fields, clog):
             errStr += errMsg_type("interp", type(hybridDict["interp"]), "hybridDict", bool)
     
     if "comp" not in hybridDict:
-        hybridDict["comp"] = True
+        hybridDict["comp"] = None
         
     elif "comp" in hybridDict:
-        if not isinstance(hybridDict["comp"], str) and hybridDict["comp"] != True:
+        if not isinstance(hybridDict["comp"], str) and hybridDict["comp"] is not None:
             errStr += errMsg_type("comp", type(hybridDict["comp"]), "hybridDict", str)
     
     if errStr:

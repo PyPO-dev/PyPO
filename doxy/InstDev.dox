@@ -214,4 +214,11 @@ nose2 --with-coverage
 ```
 
 and the coverage report will be displayed in the terminal after running the tests.
+
+If desired, further coverage info can be obtained by running:
+```
+coverage html
+```
+
+in the `PyPO` root directory. Then, in-depth coverage information can be viewed by running the `index.html` file in the `htmlconv/` folder in the `PyPO` root directory.
 */

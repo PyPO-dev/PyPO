@@ -85,10 +85,10 @@ class Test_SystemPO_RT(unittest.TestCase):
             self.assertEqual(type(self.s.currents["test_JM"]), pypotypes.currents)
             self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
     
-    @params(("CPU", False, System.runPO, System.runHybridPropagation), 
-            ("GPU", True, System.runPO, System.runHybridPropagation), 
-            ("CPU", False, System.runGUIPO, System.hybridGUIPropagation))
-    def test_runPO_EHP_Hybrid(self, dev, interp, funcPO, funcHybrid):
+    @params(("CPU", False, System.runPO, System.runHybridPropagation, None), 
+            ("GPU", True, System.runPO, System.runHybridPropagation, "Ex"), 
+            ("CPU", False, System.runGUIPO, System.hybridGUIPropagation, "Ex"))
+    def test_runPO_EHP_Hybrid(self, dev, interp, funcPO, funcHybrid, comp):
         if dev == "GPU" and not self.GPU_flag:
             return
 
@@ -101,7 +101,7 @@ class Test_SystemPO_RT(unittest.TestCase):
         self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
         self.assertEqual(type(self.s.frames["test_P"]), pypotypes.frame)
         
-        runHybridDict = self._get_runPODictHybrid("test_P", "test_EH", TestTemplates.paraboloid_man_xy["name"], "test_fr_out", "test_field_out", interp=interp)
+        runHybridDict = self._get_runPODictHybrid("test_P", "test_EH", TestTemplates.paraboloid_man_xy["name"], "test_fr_out", "test_field_out", interp=interp, comp=comp)
         
         check_hybridDict(runHybridDict, self.s.system.keys(), self.s.frames.keys(), self.s.fields.keys(), self.s.clog)
         
@@ -202,6 +202,16 @@ class Test_SystemPO_RT(unittest.TestCase):
         self.assertTrue("test" in self.s.fields)
         self.assertTrue("test" in self.s.currents)
     
+    @params(*TestTemplates.getPOSourceList())
+    def test_interpBeam(self, source):
+        name = source["name"]
+        gridsize_new = np.array([101, 101])
+        self.s.interpBeam(name, gridsize_new, obj_t="fields")
+        self.s.interpBeam(name, gridsize_new, obj_t="currents")
+    
+        self.assertTrue(f"{name}_interp" in self.s.fields)
+        self.assertTrue(f"{name}_interp" in self.s.currents)
+
     def _get_runPODictJM(self, source_current, target, name_JM, device="CPU", direction="fwd"):
         runPODict = {
                 "t_name"    : target,
@@ -269,7 +279,7 @@ class Test_SystemPO_RT(unittest.TestCase):
 
         return runPODict
     
-    def _get_runPODictHybrid(self, fr_in, field_in, target, fr_out, field_out, interp=False):
+    def _get_runPODictHybrid(self, fr_in, field_in, target, fr_out, field_out, interp=False, comp=None):
         runPODict = {
                 "fr_in"     : fr_in,
                 "t_name"    : target,
@@ -277,7 +287,7 @@ class Test_SystemPO_RT(unittest.TestCase):
                 "fr_out"    : fr_out,
                 "field_out" : field_out,
                 "interp"    : interp,
-                "comp"      : "Ex"
+                "comp"      : comp
                 }
 
         return runPODict

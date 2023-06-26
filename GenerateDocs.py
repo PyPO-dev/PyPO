@@ -1,8 +1,5 @@
-import sys
 import os
 import shutil
-import platform
-import argparse
 import traceback
 
 ##

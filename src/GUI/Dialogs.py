@@ -1,5 +1,6 @@
+from typing import Optional
 from PySide6.QtWidgets import QDialog, QGridLayout, QPushButton, QLabel
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Signal
 
 ##
 # @file Defines dialogs for the GUI.
@@ -62,3 +63,35 @@ class selfClosingDialog(QDialog):
 
     def leaveEvent(self, event):
         self.closeFunc()
+
+
+class UnsavedChangesDialog(QDialog):
+    """!
+    Warning: unsaved changes
+    """
+    save = Signal()
+
+    def __init__(self, parent, saveAction) -> None:
+        super().__init__(parent)
+        self.saveAction = saveAction
+        layout = QGridLayout()
+        saveBtn = QPushButton("Save")
+        saveBtn.clicked.connect(self.saveAndClose)
+        dontSaveBtn = QPushButton("Don't save")
+        dontSaveBtn.clicked.connect(self.accept)
+        cancelBtn = QPushButton("Cancel")
+        cancelBtn.clicked.connect(self.reject)
+
+        layout.addWidget(QLabel("The current system contains unsaved changed. Do you want to save?"), 0,0,1,3)
+        layout.addWidget(cancelBtn, 1,0)
+        layout.addWidget(dontSaveBtn, 1,1)
+        layout.addWidget(saveBtn, 1,2)
+        self.setLayout(layout)
+
+    def saveAndClose(self):
+        if self.saveAction():
+            self.accept()
+        else:
+            self.reject()
+
+

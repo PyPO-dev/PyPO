@@ -47,6 +47,9 @@ class Test_Plotting(unittest.TestCase):
             out_ax.append(self.s.plotBeam2D(TestTemplates.GPOfield['name'], 'Ex', ret=True, amp_only=True, mode="linear", project=project))
             out_ar.append(self.s.plotBeam2D(TestTemplates.GPOfield['name'], 'Ex', ret=True, project=project, aperDict=TestTemplates.aperDict, contour=TestTemplates.GPOfield['name'], contour_comp="Ex", levels=[0.5, 1]))
             out_ar.append(self.s.plotBeam2D(TestTemplates.GPOfield['name'], 'Ex', ret=True, mode="linear", project=project, contour=TestTemplates.GPOfield['name'], contour_comp="Ex", levels=[0.5, 1]))
+            
+            out_ax.append(self.s.plotBeam2D(TestTemplates.PS_Ufield_FF["name"], "Ex", ret=True, project="xy"))
+            out_ax.append(self.s.plotBeam2D(TestTemplates.PS_Ufield_FF["name"], "Ex", ret=True, amp_only=True, project="yx"))
 
         for entry_ax, entry_ar in zip(out_ax, out_ar):
             self.assertEqual(type(entry_ax[0]), Figure)
@@ -54,11 +57,11 @@ class Test_Plotting(unittest.TestCase):
             
             self.assertEqual(type(entry_ax[1]), Axes)
             self.assertEqual(type(entry_ar[1]), ndarray)
-
+        
         close('all')
 
     @params(*TestTemplates.getAllSurfList())
-    def test_plotBeam3D(self, element):
+    def test_plot3D(self, element):
         sys.tracebacklimit = 0
         try:
             fig, ax = self.s.plot3D(element['name'], ret=True, foc1=True, foc2=True, norm=True)
@@ -84,6 +87,10 @@ class Test_Plotting(unittest.TestCase):
         self.assertEqual(type(figE), Figure)
         self.assertEqual(type(axE), Axes3D)
         
+        figRT, axRT = self.s.plotSystem(ret=True, RTframes=[TestTemplates.TubeRTframe["name"]])
+
+        self.assertEqual(type(figRT), Figure)
+        self.assertEqual(type(axRT), Axes3D)
 
         close('all')
         

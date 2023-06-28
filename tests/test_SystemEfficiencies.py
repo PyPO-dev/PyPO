@@ -23,6 +23,9 @@ class Test_SystemEfficiencies(unittest.TestCase):
     def test_taper(self):
         eta_t = self.s.calcTaper(TestTemplates.GPOfield["name"], "Ex")
         self.assertTrue(isinstance(eta_t, float))
+        
+        eta_t = self.s.calcTaper(TestTemplates.GPOfield["name"], "Ex", aperDict=TestTemplates.aperDict)
+        self.assertTrue(isinstance(eta_t, float))
 
     def test_Xpol(self):
         eta_x = self.s.calcXpol(TestTemplates.GPOfield["name"], "Ex", "Ex")

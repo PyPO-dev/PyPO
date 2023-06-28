@@ -50,7 +50,7 @@ class Test_SystemDictsAndAddElement(unittest.TestCase):
 
     @params(System.createGaussian, System.createPointSource, System.createUniformSource)
     def test_addPOFields(self, func):
-        ltot = len(TestTemplates.getPOSourceList())
+        ltot = len(TestTemplates.getPOSourceList()) + 1
 
         self.assertEqual(len(self.s.fields), ltot)
         self.assertEqual(len(self.s.currents), ltot)

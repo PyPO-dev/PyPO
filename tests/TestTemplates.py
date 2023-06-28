@@ -43,6 +43,13 @@ PS_Ufield =  {
         "pol"       : np.array([1,0,0])
         }
 
+PS_Ufield_FF =  {
+        "name"      : "testPS_UField_FF",
+        "lam"       : 1,
+        "E0"        : 1,
+        "pol"       : np.array([1,0,0])
+        }
+
 #### PARABOLOIDS ####
 paraboloid_man_xy = {
         "name"      : "testParaboloid_man_xy",
@@ -371,6 +378,9 @@ def getSystemWithReflectors():
             s.createPointSourceScalar(PS_Ufield, plane["name"])
             s.createUniformSourceScalar(PS_Ufield, plane["name"])
             s.createScalarGaussian(GPOfield, plane["name"])
+
+        else:
+            s.createPointSource(PS_Ufield_FF, plane["name"])
 
     for parabola in getParaboloidList():
         s.addParabola(parabola)

@@ -1,3 +1,9 @@
+"""!
+@file
+Bindings for the ctypes interface for PyPO. 
+These bindings are concerned with propagations for the ray-tracer and the physical optics on the GPU.
+"""
+
 import ctypes
 import math
 import numpy as np
@@ -8,11 +14,6 @@ import PyPO.BindUtils as BUtils
 import PyPO.Structs as PStructs
 import PyPO.Config as Config
 import PyPO.Threadmgr as TManager
-
-##
-# @file
-# Bindings for the ctypes interface for PyPO. 
-# These bindings are concerned with propagations for the ray-tracer and the physical optics on the GPU.
 
 def loadGPUlib():
     """!

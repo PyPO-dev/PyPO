@@ -1,13 +1,15 @@
+"""!
+@file
+PyPO docs generator.
+
+For this script to work properly, you should have installed the docs prerequisites.
+"""
+
 import os
 import shutil
 import traceback
 import argparse
 
-##
-# @file
-# PyPO docs generator.
-#
-# For this script to work properly, you should have installed the docs prerequisites.
 def GenerateDocs():
     docPath = os.path.join(os.path.dirname(os.path.realpath(__file__)), "docs")
     tutPath = os.path.join(os.path.dirname(os.path.realpath(__file__)), "tutorials")

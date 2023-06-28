@@ -1,10 +1,11 @@
-import threading
+"""
+@file 
+File containing the threadmanager class for PyPO.
+This class is responsible for launching heavy calculations on a separate daemon thread,
+preventing the program from becoming unresponsive.
+"""
 
-##
-# @file 
-# File containing the threadmanager class for PyPO.
-# This class is responsible for launching heavy calculations on a separate daemon thread,
-# preventing the program from becoming unresponsive.
+import threading
 
 class Manager(object):
     """!

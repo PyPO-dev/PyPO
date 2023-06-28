@@ -1,10 +1,10 @@
+"""!
+@file
+This file contains all forms used by the GUI for interaction with the user.
+Because all functions return lists containing forms, the return will not be explicitly stated per form.
+"""
+
 from src.GUI.ParameterForms.InputDescription import inType, InputDescription
-
-##
-# @file
-# This file contains all forms used by the GUI for interaction with the user.
-# Because all functions return lists containing forms, the return will not be explicitly stated per form.
-
 
 def xy_opts():
     """!

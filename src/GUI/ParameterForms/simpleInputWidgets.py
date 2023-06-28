@@ -1,12 +1,14 @@
+"""!
+@file 
+Provides implementation of form inputs.
+"""
+
 from PySide6.QtWidgets import QHBoxLayout, QCheckBox, QFormLayout, QGridLayout, QWidget, QButtonGroup, QRadioButton, QComboBox, QListWidget, QSizePolicy, QLabel
 from PySide6.QtCore import Signal
 from src.GUI.utils import MyLabel, MyEdit, makeLabelFromString, inType, getValidator
 from src.GUI.ParameterForms.InputDescription import InputDescription
 from src.GUI.ParameterForms.inputWidgetInterfaces import inputWidgetInterface, selectionWidgetInterface
 from numpy import array 
-
-##
-# @file provides implementation of form inputs
 
 class EmptyFieldException(Exception):
     """!

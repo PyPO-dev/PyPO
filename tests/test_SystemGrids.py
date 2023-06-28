@@ -1,3 +1,8 @@
+"""!
+@file
+Tests for checking if grids in PyPO are correct
+"""
+
 import unittest
 import ctypes
 
@@ -12,10 +17,6 @@ import PyPO.BindRefl as refllibs
 import PyPO.PyPOTypes as pypotypes
 
 from PyPO.System import System
-
-##
-# @file
-# Tests for checking if grids in PyPO are correct
 
 class Test_SystemGrids(unittest.TestCase):
     def setUp(self):

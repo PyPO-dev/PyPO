@@ -178,19 +178,17 @@ Python Source</h3>
 <div class="line">    ...</div>
 <div class="line">    return output</div>
 </div><!-- fragment --><p>The exclamation mark tells doxygen to parse the docstring as a doxygen documentation block. This allows doxygen to generate documentation, while also allowing the built-in <code>help()</code> function of Python to recognise the docstring, albeit with a lone "!" prepending the output of <code>help()</code>.</p>
-<p>We realise that this is slightly unorthodox, but in this way we can generate documentation using doxygen whilst still using a docstring style that utilises the <code>__docs__</code> method of the function being documented.</p>
-<p>Because docstrings cannot be used as file descriptions, we use a different style to describe files. Just as for C/C++/CUDA, file descriptions go after import statements and before the classes and/or methods in the file:</p>
-<div class="fragment"><div class="line">&lt;<span class="keyword">import</span> statements up here...&gt;</div>
+<p>File descriptions go on the top of the file: </p><div class="fragment"><div class="line"><span class="stringliteral">&quot;&quot;</span><span class="stringliteral">&quot;!</span></div>
+<div class="line"><span class="stringliteral">@file</span></div>
+<div class="line"><span class="stringliteral">Here comes a brief description of the file.</span></div>
+<div class="line"><span class="stringliteral"></span> </div>
+<div class="line"><span class="stringliteral">If needed, provide a detailed description here.</span></div>
+<div class="line"><span class="stringliteral">&quot;</span><span class="stringliteral">&quot;&quot;</span></div>
 <div class="line"> </div>
-<div class="line"><span class="preprocessor">##</span></div>
-<div class="line"><span class="preprocessor"># @file</span></div>
-<div class="line"><span class="preprocessor"># Here comes a brief description of the file.</span></div>
-<div class="line"><span class="preprocessor">#</span></div>
-<div class="line"><span class="preprocessor"># If needed, provide a detailed description here.</span></div>
-<div class="line"> </div>
+<div class="line">&lt;<span class="keyword">import</span> statements here...&gt;</div>
 <div class="line">&lt;rest of script down here...&gt;</div>
-</div><!-- fragment --><p>Again, adding these file descriptions is important, otherwise the file will not be parsed and added to the <a class="el" href="pypodocs.html#fulldocs">full software documentation</a>.</p>
-<p>There is one notable exception, however. The "Templates.py" file containing templates for all used dictionary inputs is documented in the following style:</p>
+</div><!-- fragment --><p>Again, adding these file descriptions is important, otherwise the file will not be parsed and added to the <a class="el" href="pypodocs.html#fulldocs">full software documentation</a>. Tests are also supposed to carry a file description, but the test functions do not need a full documentation.</p>
+<p>The "Templates.py" file containing templates for all used dictionary inputs is documented in the following style:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">##</span></div>
 <div class="line"><span class="preprocessor"># Description of input dictionary</span></div>
 <div class="line"><span class="preprocessor">#</span></div>
@@ -223,10 +221,11 @@ Python</h3>
 </div><!-- fragment --><p>in the <code>PyPO</code> root directory. Then, in-depth coverage information can be viewed by running the <code>index.html</code> file in the <code>htmlconv/</code> folder in the <code>PyPO</code> root directory.</p>
 <h3><a class="anchor" id="runtests_cpp"></a>
 C/C++/CUDA</h3>
-<p>A small suite of unittests for the C/C++/CUDA backend is also present. These tests are mostly testing the vector operations, but might be extended as <code>PyPO</code> keeps developing. The C/C++/CUDA source code is tested using <a href="https://google.github.io/googletest/">googletest</a>. Please see the <a href="https://github.com/google/googletest/blob/main/googletest/README.md">installation instructions</a> for building googletest on your specific platform.</p>
+<p>A small suite of unittests for the C/C++/CUDA backend is also present and is tested using <a href="https://google.github.io/googletest/">googletest</a>. These tests are mostly testing the vector operations, but might be extended as <code>PyPO</code> keeps developing. If you intend to work on the backend, it might be a good thing to be able to run these tests. Please see the <a href="https://github.com/google/googletest/blob/main/googletest/README.md">installation instructions</a> for building googletest on your specific platform.</p>
 <p>After installing googletest, the tests need to be built. Navigate to the <code>src/</code> folder and run: </p><div class="fragment"><div class="line">python3 SetupGTest.py -bmr</div>
 </div><!-- fragment --><p>which should generate build scripts, make them and run the unittests in one go. For more options for the <code>SetupGTest.py</code> script, run: </p><div class="fragment"><div class="line">python3 SetupGTest.py -h</div>
-</div><!-- fragment --> </div></div><!-- contents -->
+</div><!-- fragment --><p>Note that most backend functionality is implicitly tested through the (larger) Python unittesting suite, and if not developing in the C/C++/CUDA backend, the Python unittesting suite should be sufficient to test correct functioning of <code>PyPO</code>. </p>
+</div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->
 <!-- start footer part -->

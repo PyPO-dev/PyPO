@@ -122,12 +122,12 @@ Functions</h2></td></tr>
 <tr class="memitem:ad813c81466a3a75d4cc60ef11c5970cd"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Plotter_8py.html#ad813c81466a3a75d4cc60ef11c5970cd">PyPO.Plotter.plotSystem</a> (systemDict, ax, fine, cmap, norm, foc1, foc2, RTframes, RTcolor)</td></tr>
 <tr class="memdesc:ad813c81466a3a75d4cc60ef11c5970cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Plot the system.  <br /></td></tr>
 <tr class="separator:ad813c81466a3a75d4cc60ef11c5970cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a75e6dae9b9ab60048e4001de60c7c542"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Plotter_8py.html#a75e6dae9b9ab60048e4001de60c7c542">PyPO.Plotter.plotBeamCut</a> (x_cut, y_cut, x_strip, y_strip, vmin, vmax, unit)</td></tr>
-<tr class="memdesc:a75e6dae9b9ab60048e4001de60c7c542"><td class="mdescLeft">&#160;</td><td class="mdescRight">Plot two beam cuts in the same figure.  <br /></td></tr>
-<tr class="separator:a75e6dae9b9ab60048e4001de60c7c542"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a611967fdd19bd3111709c8fc01b9e540"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Plotter_8py.html#a611967fdd19bd3111709c8fc01b9e540">PyPO.Plotter.plotRTframe</a> (frame, project, savePath, returns, aspect, unit)</td></tr>
-<tr class="memdesc:a611967fdd19bd3111709c8fc01b9e540"><td class="mdescLeft">&#160;</td><td class="mdescRight">Plot a ray-trace frame spot diagram.  <br /></td></tr>
-<tr class="separator:a611967fdd19bd3111709c8fc01b9e540"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afdf515e2708f3117ef928ac4815afab7"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Plotter_8py.html#afdf515e2708f3117ef928ac4815afab7">PyPO.Plotter.plotBeamCut</a> (x_cut, y_cut, x_strip, y_strip, vmin, vmax, units)</td></tr>
+<tr class="memdesc:afdf515e2708f3117ef928ac4815afab7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Plot two beam cuts in the same figure.  <br /></td></tr>
+<tr class="separator:afdf515e2708f3117ef928ac4815afab7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ee9f6a90f1c8bd5a4c669ef0ca65e45"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Plotter_8py.html#a9ee9f6a90f1c8bd5a4c669ef0ca65e45">PyPO.Plotter.plotRTframe</a> (frame, project, savePath, returns, aspect, units)</td></tr>
+<tr class="memdesc:a9ee9f6a90f1c8bd5a4c669ef0ca65e45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Plot a ray-trace frame spot diagram.  <br /></td></tr>
+<tr class="separator:a9ee9f6a90f1c8bd5a4c669ef0ca65e45"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>File containing functions for generating plots. </p>
@@ -360,9 +360,9 @@ Functions</h2></td></tr>
     <tr><td class="paramname">interpolation</td><td>What interpolation to use for displaying amplitude pattern. Default is None. </td></tr>
     <tr><td class="paramname">norm</td><td>Normalise field (only relevant when plotting linear scale). </td></tr>
     <tr><td class="paramname">aperDict</td><td>Plot an aperture defined in an aperDict object along with the field or current patterns. Default is None. </td></tr>
-    <tr><td class="paramname">mode</td><td>Plot amplitude in decibels ("dB") or on a linear scale ("linear"). Default is "dB". </td></tr>
-    <tr><td class="paramname">project</td><td>Set abscissa and ordinate of plot. Should be given as a string. Default is "xy". </td></tr>
-    <tr><td class="paramname">units</td><td>The units of the axes. Default is "", which is millimeters. </td></tr>
+    <tr><td class="paramname">mode</td><td>Plot amplitude in decibels, logarithmic or linear scale. Instance of Modes enum object. </td></tr>
+    <tr><td class="paramname">project</td><td>Set abscissa and ordinate of plot. Should be given as an instance of the Projection enum. </td></tr>
+    <tr><td class="paramname">units</td><td>The units of the axes. Instance of Units enum object. </td></tr>
     <tr><td class="paramname">name</td><td>Name of .png file where plot is saved. Only when save=True. Default is "". </td></tr>
     <tr><td class="paramname">titleA</td><td>Title of the amplitude plot. Default is "Amp". </td></tr>
     <tr><td class="paramname">titleP</td><td>Title of the phase plot. Default is "Phase". </td></tr>
@@ -378,8 +378,8 @@ ax Axes containing the axes of the plot.</dd></dl>
 
 </div>
 </div>
-<a id="a75e6dae9b9ab60048e4001de60c7c542" name="a75e6dae9b9ab60048e4001de60c7c542"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a75e6dae9b9ab60048e4001de60c7c542">&#9670;&#160;</a></span>plotBeamCut()</h2>
+<a id="afdf515e2708f3117ef928ac4815afab7" name="afdf515e2708f3117ef928ac4815afab7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afdf515e2708f3117ef928ac4815afab7">&#9670;&#160;</a></span>plotBeamCut()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -424,7 +424,7 @@ ax Axes containing the axes of the plot.</dd></dl>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>unit</em>&#160;</td>
+          <td class="paramname"><em>units</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -443,7 +443,7 @@ ax Axes containing the axes of the plot.</dd></dl>
     <tr><td class="paramname">y_strip</td><td>Co-ordinates for plotting H-plane. </td></tr>
     <tr><td class="paramname">vmin</td><td>Minimum for plot range. </td></tr>
     <tr><td class="paramname">vmax</td><td>Maximum for plot range. </td></tr>
-    <tr><td class="paramname">unit</td><td>for x-axis.</td></tr>
+    <tr><td class="paramname">units</td><td>Unit for x-axis. Instance of Units enum object.</td></tr>
   </table>
   </dd>
 </dl>
@@ -453,8 +453,8 @@ ax Plot axis. </dd></dl>
 
 </div>
 </div>
-<a id="a611967fdd19bd3111709c8fc01b9e540" name="a611967fdd19bd3111709c8fc01b9e540"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a611967fdd19bd3111709c8fc01b9e540">&#9670;&#160;</a></span>plotRTframe()</h2>
+<a id="a9ee9f6a90f1c8bd5a4c669ef0ca65e45" name="a9ee9f6a90f1c8bd5a4c669ef0ca65e45"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9ee9f6a90f1c8bd5a4c669ef0ca65e45">&#9670;&#160;</a></span>plotRTframe()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -493,7 +493,7 @@ ax Plot axis. </dd></dl>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>unit</em>&#160;</td>
+          <td class="paramname"><em>units</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -507,11 +507,11 @@ ax Plot axis. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">frame</td><td>A PyPO frame object. </td></tr>
-    <tr><td class="paramname">project</td><td>Set abscissa and ordinate of plot. Should be given as a string. </td></tr>
+    <tr><td class="paramname">project</td><td>Set abscissa and ordinate of plot. Should be given as an instance of the Projection enum. </td></tr>
     <tr><td class="paramname">savePath</td><td>Path to save plot to. </td></tr>
     <tr><td class="paramname">returns</td><td>Whether to return figure object. </td></tr>
     <tr><td class="paramname">aspect</td><td>Aspect ratio of plot. </td></tr>
-    <tr><td class="paramname">unit</td><td>Units of the axes for the plot. </td></tr>
+    <tr><td class="paramname">units</td><td>Units of the axes for the plot. Instance of Units enum object. </td></tr>
   </table>
   </dd>
 </dl>

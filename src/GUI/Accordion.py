@@ -1,9 +1,10 @@
+"""!
+@file 
+An implementation of an accordion component.
+"""
+
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout
 from PySide6.QtCore import Qt
-
-##
-# @file An implementation of an accordion component.
-#  
 
 class Accordion(QWidget):
     """!

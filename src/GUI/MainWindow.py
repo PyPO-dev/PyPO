@@ -1,3 +1,10 @@
+"""!
+@file 
+defines classes PyPOMainWindow and MainWidget.
+PyPOMainWindow is responsible for setting up the window and toolbars.
+MainWidget is responsible for all gui functionalities.
+"""
+
 import os
 import shutil
 from time import time
@@ -22,13 +29,6 @@ from PyPO.CustomLogger import CustomGUILogger
 
 import PyPO.System as st
 import PyPO.Checks as chk
-
-##
-# @file 
-# defines classes PyPOMainWindow and MainWidget.
-# PyPOMainWindow is responsible for setting up the window and toolbars.
-# MainWidget is responsible for all gui functionalities.
-
 
 class MainWidget(QWidget):    
     """!

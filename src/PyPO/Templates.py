@@ -1,8 +1,9 @@
-##
-# @file
-# Templates for commonly used PyPO dictionaries.
-#
-# For each key, a short summary of the key is given.
+"""!
+@file
+Templates for commonly used PyPO dictionaries.
+
+For each key, a short summary of the key is given.
+"""
 
 ##
 # Template for a reflDict, containing reflector parameters. Note that some fields are only relevent when a certain reflectortype, gmode or pmode is chosen.

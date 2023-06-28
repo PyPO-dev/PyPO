@@ -1,3 +1,8 @@
+"""!
+@file
+Tests for checking if objects are properly added to the system.
+"""
+
 import unittest
 from PyPO.Checks import InputReflError, InputRTError, InputPOError
 import PyPO.Templates as pypotemp

@@ -14632,7 +14632,7 @@ These fields are propagated to a plane above the point sources and propagated ba
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[4]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[1]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#%matplotlib notebook # Uncomment for interactive plots when running the notebook!</span>
@@ -14643,6 +14643,7 @@ These fields are propagated to a plane above the point sources and propagated ba
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">from</span> <span class="nn">PyPO.System</span> <span class="kn">import</span> <span class="n">System</span>
+
 
 <span class="n">s</span> <span class="o">=</span> <span class="n">System</span><span class="p">()</span>
 
@@ -14743,44 +14744,43 @@ These fields are propagated to a plane above the point sources and propagated ba
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre><span class="ansi-yellow-intense-fg ansi-bold">2023-06-18 18:21:43 - WARNING - System override set to True. </span>
-<span class="ansi-green-fg">2023-06-18 18:21:43 - INFO - EXITING SYSTEM. </span>
-<span class="ansi-green-fg">2023-06-18 18:21:43 - INFO - Added plane source to system. </span>
-<span class="ansi-green-fg">2023-06-18 18:21:43 - INFO - Added plane plane_up to system. </span>
-<span class="ansi-green-fg">2023-06-18 18:21:43 - INFO - Added plane plane_down to system. </span>
-<span class="ansi-green-fg">2023-06-18 18:21:43 - INFO - Translated element plane_up by (&#39;0.000e+00&#39;, &#39;0.000e+00&#39;, &#39;1.000e+02&#39;) millimeters. </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:43 - WORK - *** Starting PO propagation *** </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:43 - WORK - Propagating PS_source on source to plane_up, propagation mode: JMEH. </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:43 - WORK - Hardware: running 256 CUDA threads per block. </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:43 - WORK - ... Calculating ... </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:43 - WORK - *** Finished: 0.085 seconds *** </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:43 - WORK - *** Starting PO propagation *** </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:43 - WORK - Propagating JM_up on plane_up to plane_down, propagation mode: JMEH. </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:43 - WORK - Hardware: running 256 CUDA threads per block. </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:43 - WORK - ... Calculating ... </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:43 - WORK - *** Finished: 0.136 seconds *** </span>
-<span class="ansi-green-fg">2023-06-18 18:21:43 - INFO - Translated element plane_up by (&#39;0.000e+00&#39;, &#39;0.000e+00&#39;, &#39;1.000e+02&#39;) millimeters. </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:43 - WORK - *** Starting PO propagation *** </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:43 - WORK - Propagating PS_source on source to plane_up, propagation mode: JMEH. </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:43 - WORK - Hardware: running 256 CUDA threads per block. </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:43 - WORK - ... Calculating ... </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:43 - WORK - *** Finished: 0.070 seconds *** </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:43 - WORK - *** Starting PO propagation *** </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:43 - WORK - Propagating JM_up on plane_up to plane_down, propagation mode: JMEH. </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:43 - WORK - Hardware: running 256 CUDA threads per block. </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:43 - WORK - ... Calculating ... </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:43 - WORK - *** Finished: 0.155 seconds *** </span>
-<span class="ansi-green-fg">2023-06-18 18:21:43 - INFO - Translated element plane_up by (&#39;0.000e+00&#39;, &#39;0.000e+00&#39;, &#39;1.000e+02&#39;) millimeters. </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:43 - WORK - *** Starting PO propagation *** </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:43 - WORK - Propagating PS_source on source to plane_up, propagation mode: JMEH. </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:43 - WORK - Hardware: running 256 CUDA threads per block. </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:43 - WORK - ... Calculating ... </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:44 - WORK - *** Finished: 0.095 seconds *** </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:44 - WORK - *** Starting PO propagation *** </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:44 - WORK - Propagating JM_up on plane_up to plane_down, propagation mode: JMEH. </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:44 - WORK - Hardware: running 256 CUDA threads per block. </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:44 - WORK - ... Calculating ... </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-18 18:21:44 - WORK - *** Finished: 0.129 seconds *** </span>
+<pre><span class="ansi-yellow-intense-fg ansi-bold">2023-06-28 18:50:18 - WARNING - System override set to True. </span>
+<span class="ansi-green-fg">2023-06-28 18:50:18 - INFO - Added plane source to system. </span>
+<span class="ansi-green-fg">2023-06-28 18:50:18 - INFO - Added plane plane_up to system. </span>
+<span class="ansi-green-fg">2023-06-28 18:50:18 - INFO - Added plane plane_down to system. </span>
+<span class="ansi-green-fg">2023-06-28 18:50:18 - INFO - Translated element plane_up by (&#39;0.000e+00&#39;, &#39;0.000e+00&#39;, &#39;1.000e+02&#39;) millimeters. </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:18 - WORK - *** Starting PO propagation *** </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:18 - WORK - Propagating PS_source on source to plane_up, propagation mode: JMEH. </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:18 - WORK - Hardware: running 256 CUDA threads per block. </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:18 - WORK - ... Calculating ... </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:18 - WORK - *** Finished: 0.113 seconds *** </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:18 - WORK - *** Starting PO propagation *** </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:18 - WORK - Propagating JM_up on plane_up to plane_down, propagation mode: JMEH. </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:18 - WORK - Hardware: running 256 CUDA threads per block. </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:18 - WORK - ... Calculating ... </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:18 - WORK - *** Finished: 0.139 seconds *** </span>
+<span class="ansi-green-fg">2023-06-28 18:50:18 - INFO - Translated element plane_up by (&#39;0.000e+00&#39;, &#39;0.000e+00&#39;, &#39;1.000e+02&#39;) millimeters. </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:18 - WORK - *** Starting PO propagation *** </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:18 - WORK - Propagating PS_source on source to plane_up, propagation mode: JMEH. </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:18 - WORK - Hardware: running 256 CUDA threads per block. </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:18 - WORK - ... Calculating ... </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:18 - WORK - *** Finished: 0.080 seconds *** </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:18 - WORK - *** Starting PO propagation *** </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:18 - WORK - Propagating JM_up on plane_up to plane_down, propagation mode: JMEH. </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:18 - WORK - Hardware: running 256 CUDA threads per block. </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:18 - WORK - ... Calculating ... </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:19 - WORK - *** Finished: 0.146 seconds *** </span>
+<span class="ansi-green-fg">2023-06-28 18:50:19 - INFO - Translated element plane_up by (&#39;0.000e+00&#39;, &#39;0.000e+00&#39;, &#39;1.000e+02&#39;) millimeters. </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:19 - WORK - *** Starting PO propagation *** </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:19 - WORK - Propagating PS_source on source to plane_up, propagation mode: JMEH. </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:19 - WORK - Hardware: running 256 CUDA threads per block. </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:19 - WORK - ... Calculating ... </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:19 - WORK - *** Finished: 0.089 seconds *** </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:19 - WORK - *** Starting PO propagation *** </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:19 - WORK - Propagating JM_up on plane_up to plane_down, propagation mode: JMEH. </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:19 - WORK - Hardware: running 256 CUDA threads per block. </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:19 - WORK - ... Calculating ... </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:50:19 - WORK - *** Finished: 0.141 seconds *** </span>
 </pre>
 </div>
 </div>

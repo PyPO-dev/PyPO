@@ -1,3 +1,8 @@
+"""!
+@file
+Script for testing the transformational formalism of PyPO.
+"""
+
 import unittest
 import numpy as np
 
@@ -9,10 +14,6 @@ except ImportError:
 from nose2.tools import params
 
 from PyPO.System import System
-##
-# @file
-# 
-# Script for testing the transformational formalism of PyPO.
 
 class Test_MatTransform(unittest.TestCase):
     def setUp(self):

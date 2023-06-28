@@ -1,9 +1,10 @@
-import numpy as np
+"""!
+@file
+File containing a method for finding a connected subset, centered around a starting index, in a matrix.
+Used for creating masks for fitting Gaussians.
+"""
 
-##
-# @file
-# File containing a method for finding a connected subset, centered around a starting index, in a matrix.
-# Used for creating masks for fitting Gaussians.
+import numpy as np
 
 def findConnectedSubsets(mat, component, idx_start):
     """!

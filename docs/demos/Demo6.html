@@ -14641,6 +14641,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 <span class="kn">import</span> <span class="nn">matplotlib.cm</span> <span class="k">as</span> <span class="nn">cm</span>
 
 <span class="kn">from</span> <span class="nn">PyPO.System</span> <span class="kn">import</span> <span class="n">System</span>
+<span class="kn">from</span> <span class="nn">PyPO.Enums</span> <span class="kn">import</span> <span class="n">FieldComponents</span><span class="p">,</span> <span class="n">Projections</span>
 
 <span class="c1"># Ellipsoidal reflector: note that these parameters are for the 2D case.</span>
 <span class="n">_A_ELLIPSE</span>  <span class="o">=</span> <span class="mf">3689.3421</span> <span class="o">/</span> <span class="mi">2</span>             <span class="c1"># Semi-major axis in mm</span>
@@ -14776,25 +14777,25 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre><span class="ansi-yellow-intense-fg ansi-bold">2023-06-19 19:17:20 - WARNING - System override set to True. </span>
-<span class="ansi-green-fg">2023-06-19 19:17:20 - INFO - Added hyperboloid h_wo to system. </span>
-<span class="ansi-green-fg">2023-06-19 19:17:20 - INFO - Added ellipsoid e_wo to system. </span>
-<span class="ansi-green-fg">2023-06-19 19:17:20 - INFO - Rotated element h_wo by (&#39;1.800e+02&#39;, &#39;0.000e+00&#39;, &#39;0.000e+00&#39;) degrees around (&#39;0.000e+00&#39;, &#39;0.000e+00&#39;, &#39;0.000e+00&#39;). </span>
-<span class="ansi-green-fg">2023-06-19 19:17:20 - INFO - Translated element h_wo by (&#39;0.000e+00&#39;, &#39;0.000e+00&#39;, &#39;1.268e+03&#39;) millimeters. </span>
-<span class="ansi-green-fg">2023-06-19 19:17:20 - INFO - Rotated element h_wo by (&#39;0.000e+00&#39;, &#39;6.500e+01&#39;, &#39;0.000e+00&#39;) degrees around (&#39;0.000e+00&#39;, &#39;0.000e+00&#39;, &#39;0.000e+00&#39;). </span>
-<span class="ansi-green-fg">2023-06-19 19:17:20 - INFO - Rotated element e_wo by (&#39;1.800e+02&#39;, &#39;9.000e+01&#39;, &#39;0.000e+00&#39;) degrees around (&#39;0.000e+00&#39;, &#39;0.000e+00&#39;, &#39;0.000e+00&#39;). </span>
-<span class="ansi-green-fg">2023-06-19 19:17:20 - INFO - Translated element e_wo by (&#39;1.392e+03&#39;, &#39;0.000e+00&#39;, &#39;1.222e+03&#39;) millimeters. </span>
-<span class="ansi-green-fg">2023-06-19 19:17:20 - INFO - Rotated element e_wo by (&#39;0.000e+00&#39;, &#39;9.390e+00&#39;, &#39;0.000e+00&#39;) degrees around (&#39;1.392e+03&#39;, &#39;0.000e+00&#39;, &#39;1.222e+03&#39;). </span>
-<span class="ansi-green-fg">2023-06-19 19:17:20 - INFO - Added plane focus1 to system. </span>
-<span class="ansi-green-fg">2023-06-19 19:17:20 - INFO - Rotated element focus1 by (&#39;0.000e+00&#39;, &#39;9.000e+01&#39;, &#39;0.000e+00&#39;) degrees around (&#39;0.000e+00&#39;, &#39;0.000e+00&#39;, &#39;0.000e+00&#39;). </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:17:20 - WORK - *** Starting auto-convergence ***  </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:17:20 - WORK - Difference : 1e+99 at gridsize (&#39;1.100e+01&#39;, &#39;1.100e+01&#39;) </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:17:20 - WORK - Difference : 0.03347716923834443 at gridsize (&#39;2.100e+01&#39;, &#39;2.100e+01&#39;) </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:17:20 - WORK - Difference : 0.012439868698890244 at gridsize (&#39;3.100e+01&#39;, &#39;3.100e+01&#39;) </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:17:21 - WORK - Difference : 0.003614588046865874 at gridsize (&#39;4.100e+01&#39;, &#39;4.100e+01&#39;) </span>
-<span class="ansi-magenta-intense-fg ansi-bold">2023-06-19 19:17:21 - RESULT - Found converged solution, gridsize: (&#39;3.690e+02&#39;, &#39;3.690e+02&#39;) </span>
-<span class="ansi-green-fg">2023-06-19 19:17:21 - INFO - Added plane focus2 to system. </span>
-<span class="ansi-green-fg">2023-06-19 19:17:21 - INFO - Translated element focus2 by (&#39;4.864e+02&#39;, &#39;0.000e+00&#39;, &#39;1.371e+03&#39;) millimeters. </span>
+<pre><span class="ansi-yellow-intense-fg ansi-bold">2023-06-28 18:58:19 - WARNING - System override set to True. </span>
+<span class="ansi-green-fg">2023-06-28 18:58:19 - INFO - Added hyperboloid h_wo to system. </span>
+<span class="ansi-green-fg">2023-06-28 18:58:19 - INFO - Added ellipsoid e_wo to system. </span>
+<span class="ansi-green-fg">2023-06-28 18:58:19 - INFO - Rotated element h_wo by (&#39;1.800e+02&#39;, &#39;0.000e+00&#39;, &#39;0.000e+00&#39;) degrees around (&#39;0.000e+00&#39;, &#39;0.000e+00&#39;, &#39;0.000e+00&#39;). </span>
+<span class="ansi-green-fg">2023-06-28 18:58:19 - INFO - Translated element h_wo by (&#39;0.000e+00&#39;, &#39;0.000e+00&#39;, &#39;1.268e+03&#39;) millimeters. </span>
+<span class="ansi-green-fg">2023-06-28 18:58:19 - INFO - Rotated element h_wo by (&#39;0.000e+00&#39;, &#39;6.500e+01&#39;, &#39;0.000e+00&#39;) degrees around (&#39;0.000e+00&#39;, &#39;0.000e+00&#39;, &#39;0.000e+00&#39;). </span>
+<span class="ansi-green-fg">2023-06-28 18:58:19 - INFO - Rotated element e_wo by (&#39;1.800e+02&#39;, &#39;9.000e+01&#39;, &#39;0.000e+00&#39;) degrees around (&#39;0.000e+00&#39;, &#39;0.000e+00&#39;, &#39;0.000e+00&#39;). </span>
+<span class="ansi-green-fg">2023-06-28 18:58:19 - INFO - Translated element e_wo by (&#39;1.392e+03&#39;, &#39;0.000e+00&#39;, &#39;1.222e+03&#39;) millimeters. </span>
+<span class="ansi-green-fg">2023-06-28 18:58:19 - INFO - Rotated element e_wo by (&#39;0.000e+00&#39;, &#39;9.390e+00&#39;, &#39;0.000e+00&#39;) degrees around (&#39;1.392e+03&#39;, &#39;0.000e+00&#39;, &#39;1.222e+03&#39;). </span>
+<span class="ansi-green-fg">2023-06-28 18:58:19 - INFO - Added plane focus1 to system. </span>
+<span class="ansi-green-fg">2023-06-28 18:58:19 - INFO - Rotated element focus1 by (&#39;0.000e+00&#39;, &#39;9.000e+01&#39;, &#39;0.000e+00&#39;) degrees around (&#39;0.000e+00&#39;, &#39;0.000e+00&#39;, &#39;0.000e+00&#39;). </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:58:19 - WORK - *** Starting auto-convergence ***  </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:58:19 - WORK - Difference : 1e+99 at gridsize (&#39;1.100e+01&#39;, &#39;1.100e+01&#39;) </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:58:20 - WORK - Difference : 0.03347716923834443 at gridsize (&#39;2.100e+01&#39;, &#39;2.100e+01&#39;) </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:58:20 - WORK - Difference : 0.012439868698890244 at gridsize (&#39;3.100e+01&#39;, &#39;3.100e+01&#39;) </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:58:20 - WORK - Difference : 0.003614588046865874 at gridsize (&#39;4.100e+01&#39;, &#39;4.100e+01&#39;) </span>
+<span class="ansi-magenta-intense-fg ansi-bold">2023-06-28 18:58:20 - RESULT - Found converged solution, gridsize: (&#39;3.690e+02&#39;, &#39;3.690e+02&#39;) </span>
+<span class="ansi-green-fg">2023-06-28 18:58:20 - INFO - Added plane focus2 to system. </span>
+<span class="ansi-green-fg">2023-06-28 18:58:20 - INFO - Translated element focus2 by (&#39;4.864e+02&#39;, &#39;0.000e+00&#39;, &#39;1.371e+03&#39;) millimeters. </span>
 </pre>
 </div>
 </div>
@@ -14894,27 +14895,27 @@ class="
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre><span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:17:23 - WORK - *** Starting PO propagation *** </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:17:23 - WORK - Propagating Gauss1 on focus1 to h_wo, propagation mode: JMEH. </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:17:23 - WORK - Hardware: running 256 CUDA threads per block. </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:17:23 - WORK - ... Calculating ... </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:17:24 - WORK - *** Finished: 0.552 seconds *** </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:17:24 - WORK - *** Starting auto-convergence ***  </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:17:24 - WORK - Difference : 1e+99 at gridsize (&#39;1.100e+01&#39;, &#39;1.100e+01&#39;) </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:17:24 - WORK - Difference : 0.04200939638509821 at gridsize (&#39;2.100e+01&#39;, &#39;2.100e+01&#39;) </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:17:24 - WORK - Difference : 0.013628446728928656 at gridsize (&#39;3.100e+01&#39;, &#39;3.100e+01&#39;) </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:17:24 - WORK - Difference : 0.006722749651820514 at gridsize (&#39;4.100e+01&#39;, &#39;4.100e+01&#39;) </span>
-<span class="ansi-magenta-intense-fg ansi-bold">2023-06-19 19:17:24 - RESULT - Found converged solution, gridsize: (&#39;3.690e+02&#39;, &#39;3.690e+02&#39;) </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:17:24 - WORK - *** Starting PO propagation *** </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:17:24 - WORK - Propagating JM_h on h_wo to e_wo, propagation mode: JMEH. </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:17:24 - WORK - Hardware: running 256 CUDA threads per block. </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:17:24 - WORK - ... Calculating ... </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:17:29 - WORK - *** Finished: 4.267 seconds *** </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:17:29 - WORK - *** Starting PO propagation *** </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:17:29 - WORK - Propagating JM_e on e_wo to focus2, propagation mode: EH. </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:17:29 - WORK - Hardware: running 256 CUDA threads per block. </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:17:29 - WORK - ... Calculating ... </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:17:29 - WORK - *** Finished: 0.618 seconds *** </span>
+<pre><span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:58:23 - WORK - *** Starting PO propagation *** </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:58:23 - WORK - Propagating Gauss1 on focus1 to h_wo, propagation mode: JMEH. </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:58:23 - WORK - Hardware: running 256 CUDA threads per block. </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:58:23 - WORK - ... Calculating ... </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:58:24 - WORK - *** Finished: 0.487 seconds *** </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:58:24 - WORK - *** Starting auto-convergence ***  </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:58:24 - WORK - Difference : 1e+99 at gridsize (&#39;1.100e+01&#39;, &#39;1.100e+01&#39;) </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:58:24 - WORK - Difference : 0.04200939638509821 at gridsize (&#39;2.100e+01&#39;, &#39;2.100e+01&#39;) </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:58:25 - WORK - Difference : 0.013628446728928656 at gridsize (&#39;3.100e+01&#39;, &#39;3.100e+01&#39;) </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:58:25 - WORK - Difference : 0.006722749651820514 at gridsize (&#39;4.100e+01&#39;, &#39;4.100e+01&#39;) </span>
+<span class="ansi-magenta-intense-fg ansi-bold">2023-06-28 18:58:25 - RESULT - Found converged solution, gridsize: (&#39;3.690e+02&#39;, &#39;3.690e+02&#39;) </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:58:25 - WORK - *** Starting PO propagation *** </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:58:25 - WORK - Propagating JM_h on h_wo to e_wo, propagation mode: JMEH. </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:58:25 - WORK - Hardware: running 256 CUDA threads per block. </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:58:25 - WORK - ... Calculating ... </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:58:29 - WORK - *** Finished: 4.314 seconds *** </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:58:29 - WORK - *** Starting PO propagation *** </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:58:29 - WORK - Propagating JM_e on e_wo to focus2, propagation mode: EH. </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:58:29 - WORK - Hardware: running 256 CUDA threads per block. </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:58:29 - WORK - ... Calculating ... </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:58:30 - WORK - *** Finished: 0.645 seconds *** </span>
 </pre>
 </div>
 </div>
@@ -14926,7 +14927,7 @@ class="
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&lt;PyPO.PyPOTypes.fields at 0x7f03e8201820&gt;</pre>
+<pre>&lt;PyPO.PyPOTypes.fields at 0x7f5d083521f0&gt;</pre>
 </div>
 
 </div>
@@ -14940,14 +14941,14 @@ class="
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[3]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">s</span><span class="o">.</span><span class="n">plotBeam2D</span><span class="p">(</span><span class="s2">&quot;Gauss1&quot;</span><span class="p">,</span> <span class="s2">&quot;Ez&quot;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="s2">&quot;yz&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">30</span><span class="p">)</span>
-<span class="n">s</span><span class="o">.</span><span class="n">plotBeam2D</span><span class="p">(</span><span class="s2">&quot;EH_f2&quot;</span><span class="p">,</span> <span class="s2">&quot;Ex&quot;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="s2">&quot;xy&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">30</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">s</span><span class="o">.</span><span class="n">plotBeam2D</span><span class="p">(</span><span class="s2">&quot;Gauss1&quot;</span><span class="p">,</span> <span class="n">FieldComponents</span><span class="o">.</span><span class="n">Ez</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="n">Projections</span><span class="o">.</span><span class="n">yz</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">30</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">plotBeam2D</span><span class="p">(</span><span class="s2">&quot;EH_f2&quot;</span><span class="p">,</span> <span class="n">FieldComponents</span><span class="o">.</span><span class="n">Ex</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="n">Projections</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">30</span><span class="p">)</span>
 
-<span class="n">E1</span><span class="p">,</span> <span class="n">H1</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">calcHPBW</span><span class="p">(</span><span class="s2">&quot;Gauss1&quot;</span><span class="p">,</span> <span class="s2">&quot;Ex&quot;</span><span class="p">)</span>
-<span class="n">E2</span><span class="p">,</span> <span class="n">H2</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">calcHPBW</span><span class="p">(</span><span class="s2">&quot;EH_f2&quot;</span><span class="p">,</span> <span class="s2">&quot;Ex&quot;</span><span class="p">)</span>
+<span class="n">E1</span><span class="p">,</span> <span class="n">H1</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">calcHPBW</span><span class="p">(</span><span class="s2">&quot;Gauss1&quot;</span><span class="p">,</span> <span class="n">FieldComponents</span><span class="o">.</span><span class="n">Ex</span><span class="p">)</span>
+<span class="n">E2</span><span class="p">,</span> <span class="n">H2</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">calcHPBW</span><span class="p">(</span><span class="s2">&quot;EH_f2&quot;</span><span class="p">,</span> <span class="n">FieldComponents</span><span class="o">.</span><span class="n">Ex</span><span class="p">)</span>
 
 <span class="n">mean_mag</span> <span class="o">=</span> <span class="p">(</span><span class="n">E2</span><span class="o">/</span><span class="n">E1</span> <span class="o">+</span> <span class="n">H2</span><span class="o">/</span><span class="n">H1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
 

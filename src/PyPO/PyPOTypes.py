@@ -1,6 +1,7 @@
-## 
-# @file
-# Definitions of PyPO data structures.
+"""!
+@file
+Definitions of PyPO data structures.
+""" 
 
 class resContainer(object):
     """!

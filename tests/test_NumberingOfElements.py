@@ -1,3 +1,8 @@
+"""!
+@file
+Check whether automatic numbering (override=False) works properly.
+"""
+
 import unittest
 from PyPO.System import System
 from PyPO.Checks import InputReflError, InputRTError, InputPOError

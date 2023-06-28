@@ -1,10 +1,11 @@
+"""!
+@file
+File containing functions for calculating efficiencies and other metrics.
+"""
+
 import numpy as np
 
 import PyPO.BindRefl as BRefl
-
-##
-# @file
-# File containing functions for calculating efficiencies and other metrics.
 
 def _generateMask(x, y, aperDict):
     """!

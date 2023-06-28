@@ -1,8 +1,10 @@
+"""!
+@file 
+Defines dialogs for the GUI.
+"""
+
 from PySide6.QtWidgets import QDialog, QGridLayout, QPushButton, QLabel
 from PySide6.QtCore import Qt
-
-##
-# @file Defines dialogs for the GUI.
 
 class SymDialog(QDialog):
     """!

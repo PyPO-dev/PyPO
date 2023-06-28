@@ -1,3 +1,8 @@
+"""!
+@file
+Test custom logger of PyPO.
+"""
+
 import unittest
 import logging
 

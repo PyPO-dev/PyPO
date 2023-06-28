@@ -1,8 +1,9 @@
-import numpy as np
+"""!
+@file
+Set global world parameters for PyPO.
+"""
 
-##
-# @file
-# Set global world parameters for PyPO.
+import numpy as np
 
 ORIGIN      = np.zeros(3)
 XAX       = np.array([1, 0, 0])

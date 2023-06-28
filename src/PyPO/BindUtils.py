@@ -1,14 +1,15 @@
+"""!
+@file
+Utilities for the ctypes interface. These methods are mostly for allocating and 
+deallocating data. Also, Python types and PyPO objects are converted to ctypes structs here and vice versa.
+After converting to a ctypes struct, the struct is passed to the C/C++ source code and converted to a proper C/C++ struct for further usage.
+"""
+
 import ctypes
 import numpy as np
 
 import PyPO.PyPOTypes as PTypes
 import PyPO.Config as Config
-
-##
-# @file
-# Utilities for the ctypes interface. These methods are mostly for allocating and 
-# deallocating data. Also, Python types and PyPO objects are converted to ctypes structs here and vice versa.
-# After converting to a ctypes struct, the struct is passed to the C/C++ source code and converted to a proper C/C++ struct for further usage.
 
 def sfieldConv(field, c_field, size, ct_t):
     """!

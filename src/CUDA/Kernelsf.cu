@@ -28,7 +28,6 @@ __constant__ int g_t;               // Gridsize on target
  *
  * @return BT Array of two dim3 objects, containing number of blocks per grid and number of threads per block.
  */
-
  __host__ std::array<dim3, 2> initCUDA(float k, float epsilon, int gt, int gs, float t_direction, int nBlocks, int nThreads)
  {
      // Calculate nr of blocks per grid and nr of threads per block
@@ -44,18 +43,11 @@ __constant__ int g_t;               // Gridsize on target
      float EPS = EPS_VAC * epsilon;
 
      // Fill ID matrix
-     float _eye[3][3];
+     float _eye[3][3] = {};
      _eye[0][0] = 1.;
      _eye[1][1] = 1.;
      _eye[2][2] = 1.;
-
-     _eye[0][1] = 0.;
-     _eye[0][2] = 0.;
-     _eye[1][0] = 0.;
-     _eye[1][2] = 0.;
-     _eye[2][0] = 0.;
-     _eye[2][1] = 0.;
-
+     
      // Pack constant array
      cuFloatComplex _con[CSIZE] = {make_cuFloatComplex(k, 0.),
                                      make_cuFloatComplex(EPS, 0.),

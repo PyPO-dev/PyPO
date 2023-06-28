@@ -16,13 +16,12 @@ var searchData=
   ['rotategrids_13',['rotateGrids',['../group__public__api__common.html#ga69f3e4729480772a95be6c7944be1def',1,'PyPO::System::System']]],
   ['rt_5fcpud_14',['RT_CPUd',['../BindCPU_8py.html#acee434aa040090daea9ff94b7d132307',1,'PyPO::BindCPU']]],
   ['rt_5fgpuf_15',['RT_GPUf',['../BindGPU_8py.html#abbda57e192dd2872aa310d47e3581f5f',1,'PyPO::BindGPU']]],
-  ['rtrefls_16',['RTRefls',['../classRTRefls.html#af12c61211b9f8bf494b68f4d4935644f',1,'RTRefls']]],
-  ['runguipo_17',['runGUIPO',['../classPyPO_1_1System_1_1System.html#abb8ade06959f6810987c2d848ec2b6fb',1,'PyPO::System::System']]],
-  ['runguiraytracer_18',['runGUIRayTracer',['../classPyPO_1_1System_1_1System.html#a69a92937b1426bb6f2111f8aabb8ec88',1,'PyPO::System::System']]],
-  ['runhybridpropagation_19',['runHybridPropagation',['../group__public__api__hybrid.html#gac91555c8ca298cd98041a87de231d7d1',1,'PyPO::System::System']]],
-  ['runinsubprocess_20',['runInSubprocess',['../classGUI_1_1SubprocessManager_1_1SubprocessManager.html#aca582ea2cb498a69cc918405b68f732e',1,'GUI::SubprocessManager::SubprocessManager']]],
-  ['runpo_21',['runPO',['../group__public__api__po.html#ga1632938e4cddce095271eba8fcc30910',1,'PyPO::System::System']]],
-  ['runpohybridworker_22',['runPOHybridWorker',['../classGUI_1_1MainWindow_1_1MainWidget.html#ac12697bcc46261975731fbc3bf47a432',1,'GUI::MainWindow::MainWidget']]],
-  ['runpoworker_23',['runPOWorker',['../classGUI_1_1MainWindow_1_1MainWidget.html#ac5879726b5c0565a37303e186c69a084',1,'GUI::MainWindow::MainWidget']]],
-  ['runraytracer_24',['runRayTracer',['../group__public__api__frames.html#gac3aa9332414533e7ed91697ab0a9ba3c',1,'PyPO::System::System']]]
+  ['runguipo_16',['runGUIPO',['../classPyPO_1_1System_1_1System.html#abb8ade06959f6810987c2d848ec2b6fb',1,'PyPO::System::System']]],
+  ['runguiraytracer_17',['runGUIRayTracer',['../classPyPO_1_1System_1_1System.html#a69a92937b1426bb6f2111f8aabb8ec88',1,'PyPO::System::System']]],
+  ['runhybridpropagation_18',['runHybridPropagation',['../group__public__api__hybrid.html#gac91555c8ca298cd98041a87de231d7d1',1,'PyPO::System::System']]],
+  ['runinsubprocess_19',['runInSubprocess',['../classGUI_1_1SubprocessManager_1_1SubprocessManager.html#aca582ea2cb498a69cc918405b68f732e',1,'GUI::SubprocessManager::SubprocessManager']]],
+  ['runpo_20',['runPO',['../group__public__api__po.html#ga1632938e4cddce095271eba8fcc30910',1,'PyPO::System::System']]],
+  ['runpohybridworker_21',['runPOHybridWorker',['../classGUI_1_1MainWindow_1_1MainWidget.html#ac12697bcc46261975731fbc3bf47a432',1,'GUI::MainWindow::MainWidget']]],
+  ['runpoworker_22',['runPOWorker',['../classGUI_1_1MainWindow_1_1MainWidget.html#ac5879726b5c0565a37303e186c69a084',1,'GUI::MainWindow::MainWidget']]],
+  ['runraytracer_23',['runRayTracer',['../group__public__api__frames.html#gac3aa9332414533e7ed91697ab0a9ba3c',1,'PyPO::System::System']]]
 ];

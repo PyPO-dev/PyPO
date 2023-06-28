@@ -187,6 +187,7 @@ This will generate the full `PyPO` user manual and place it in the "docs/" direc
 Note that this requires a full doxygen install. Please see their [installation page](https://www.doxygen.nl/manual/install.html) for installation instructions.
 
 \subsection runtests Running The Automated Tests
+\subsubsection runtests_python Python
 `PyPO` contains an automated testing suite that can be run quite easily from the command line using nose2.
 Note that, in order to run the unit tests, `PyPO` should be installed in \ref devinstall_page "development mode".
 
@@ -221,4 +222,21 @@ coverage html
 ```
 
 in the `PyPO` root directory. Then, in-depth coverage information can be viewed by running the `index.html` file in the `htmlconv/` folder in the `PyPO` root directory.
+
+\subsubsection runtests_cpp C/C++/CUDA
+The C/C++/CUDA source code is tested using [googletest](https://google.github.io/googletest/).
+Please see the [installation instructions](https://github.com/google/googletest/blob/main/googletest/README.md) for building googletest on your specific platform.
+
+After installing googletest, the tests need to be built. 
+Navigate to the `src/` folder and run:
+```
+python3 SetupGTest.py -bmr
+```
+
+which should generate build scripts, make them and run the unittests in one go.
+For more options for the `SetupGTest.py` script, run:
+```
+python3 SetupGTest.py -h
+```
+
 */

@@ -231,7 +231,6 @@ void initRTGauss(T grdict, U *fr)
            // Rotate chief ray by tilt angles found
            rotation  = {xi[3], xi[2], 0};
            ut.matRot(rotation, nomChief, zero, direction);
-           //std::cout << ddirection[2] << std::endl;
            pos = {xi[0], xi[1], 0};
 
            fr->x[n_suc] = pos[0];

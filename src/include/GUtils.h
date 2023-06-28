@@ -215,22 +215,6 @@ __device__ __inline__ void conja(cuFloatComplex (&cv)[3], cuFloatComplex (&out)[
 }
 
 /**
- * Absolute value.
- *
- * Calculate absolute value of complex valued vector of size 3.
- * 
- * @param cv Array of 3 complex float.
- * @param out Scalar complex float.
- */
-__device__ __inline__ void abs(cuFloatComplex (&cv)[3], cuFloatComplex &out)
-{
-    cuFloatComplex cv_conj[3];
-    conja(cv, cv_conj);
-    dot(cv, cv_conj, out);
-    out = make_cuFloatComplex(cuCabsf(out), 0);
-}
-
-/**
  * Normalize vector.
  *
  * Normalize real valued vector of size 3.
@@ -256,21 +240,19 @@ __device__ __inline__ void normalize(float (&v)[3], float (&out)[3])
 }
 
 /**
- * Normalize vector.
+ * Vector addition.
  *
- * Normalize complex valued vector of size 3.
+ * Add two real valued vectors of size 3 element-wise.
  * 
- * @param cv Array of 3 complex float.
+ * @param v1 Array of 3 float.
+ * @param v2 Array of 3 float.
  * @param out Array of 3 complex float.
  */
-__device__ __inline__ void normalize(cuFloatComplex (&cv)[3], cuFloatComplex (&out)[3])
+__device__ __inline__ void add(float (&v1)[3], float (&v2)[3], float (&out)[3])
 {
-    cuFloatComplex cnorm;
-    abs(cv, cnorm);
-
-    for( int n=0; n<3; n++)
+    for(int n=0; n<3; n++)
     {
-        out[n] = cuCdivf(cv[n], cnorm);
+        out[n] = v1[n] + v2[n];
     }
 }
 
@@ -396,12 +378,12 @@ __device__ __inline__ void snell(float (&vin)[3], float (&normal)[3], float (&ou
  * @param mu Ratio of n1 to n2.
  * @param out Array of 3 double/float.
  */
-__device__ __inline__ void snell(float (&vin)[3], float (&normal)[3], float mu, float (&out)[3])
+__device__ __inline__ void snell_t(float (&vin)[3], float (&normal)[3], float mu, float (&out)[3])
 {
     float in_dot_n, factor1;
     float term1[3], term2[3], temp1[3], temp2[3];
 
-    dot(vin, normal, in_dot_n);
+    dot(normal, vin, in_dot_n);
     
     factor1 = sqrt(1 - mu*mu * (1 - in_dot_n*in_dot_n));
     s_mult(normal, factor1, term1);
@@ -410,7 +392,7 @@ __device__ __inline__ void snell(float (&vin)[3], float (&normal)[3], float mu, 
     diff(vin, temp1, temp2);
     s_mult(temp2, mu, term2);
 
-    diff(term1, term2, out);
+    add(term1, term2, out);
 }
 
 /**
@@ -484,6 +466,64 @@ __device__ __inline__ void matVec(float (&m1)[3][3], cuFloatComplex (&cv1)[3], c
         out[n] = cuCaddf(cuCmulf(make_cuFloatComplex(m1[n][0],0), cv1[0]),
                 cuCaddf(cuCmulf(make_cuFloatComplex(m1[n][1],0), cv1[1]),
                 cuCmulf(make_cuFloatComplex(m1[n][2],0), cv1[2])));
+    }
+}
+
+/**
+  Matrix-vector multiplication.
+
+  Uses mat from constant memory.
+
+  @param cv1 Array of 3 float.
+  @param out Array of 3 float.
+  @param vec Whether to rotate as a vector or as a point.
+  */
+__device__ __inline__ void matVec4(float (&mat)[16], float (&cv1)[3], float (&out)[3], bool vec = false)
+{
+    if (vec)
+    {
+        for(int n=0; n<3; n++)
+        {
+            out[n] = mat[n*4] * cv1[0] + mat[1+n*4] * cv1[1] + mat[2+n*4] * cv1[2];
+        }
+    }
+
+    else
+    {
+        for(int n=0; n<3; n++)
+        {
+            out[n] = mat[n*4] * cv1[0] + mat[1+n*4] * cv1[1] + mat[2+n*4] * cv1[2] + mat[3+n*4];
+        }
+    }
+}
+
+/**
+  Matrix-vector multiplication.
+
+  Multiply a vector by the inverse of a matrix.
+
+  @param cv1 Array of 3 float.
+  @param out Array of 3 float.
+  @param vec Whether to rotate as a vector or as a point.
+  */
+__device__ __inline__ void invmatVec4(float (&mat)[16], float (&cv1)[3], float (&out)[3], bool vec = false)
+{
+    if (vec)
+    {
+        for(int n=0; n<3; n++)
+        {
+            out[n] = mat[n] * cv1[0] + mat[n+4] * cv1[1] + mat[n+8] * cv1[2];
+        }
+    }
+
+    else
+    {
+        float temp;
+        for(int n=0; n<3; n++)
+        {
+            temp = -mat[n]*mat[3] - mat[n+4]*mat[7] - mat[n+8]*mat[11];
+            out[n] = mat[n] * cv1[0] + mat[n+4] * cv1[1] + mat[n+8] * cv1[2] + temp;
+        }
     }
 }
 

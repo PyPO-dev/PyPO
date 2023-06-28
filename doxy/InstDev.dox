@@ -224,6 +224,8 @@ coverage html
 in the `PyPO` root directory. Then, in-depth coverage information can be viewed by running the `index.html` file in the `htmlconv/` folder in the `PyPO` root directory.
 
 \subsubsection runtests_cpp C/C++/CUDA
+A small suite of unittests for the C/C++/CUDA backend is also present. 
+These tests are mostly testing the vector operations, but might be extended as `PyPO` keeps developing.
 The C/C++/CUDA source code is tested using [googletest](https://google.github.io/googletest/).
 Please see the [installation instructions](https://github.com/google/googletest/blob/main/googletest/README.md) for building googletest on your specific platform.
 

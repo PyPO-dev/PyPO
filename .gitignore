@@ -195,8 +195,5 @@ src/GUI/Tests
 .GUIWidgetTester.py
 
 # Temporary: C++ unittest stuff
-src/CMakeLists.txt
-src/SetupGTest.py
-src/include/tests/*
 src/build/*
 src/bin/*

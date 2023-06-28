@@ -1,5 +1,7 @@
 import unittest
 import ctypes
+import numpy as np
+import os
 
 from nose2.tools import params
 
@@ -82,6 +84,21 @@ class Test_SystemBeams(unittest.TestCase):
     def test_createScalarUniformSource(self, plane):
         self.s.createUniformSourceScalar(TestTemplates.PS_Ufield, plane["name"])
         self.assertEqual(type(self.s.scalarfields["testPS_UField"]), pypotypes.scalarfield)
+
+    def test_readCustomBeam(self):
+        root = os.path.dirname(os.path.realpath(__file__))
+        rcbeamPath = os.path.join(root, "rtest_cbeam.txt")
+        icbeamPath = os.path.join(root, "itest_cbeam.txt")
+        np.savetxt(rcbeamPath, np.ones((13, 13)))
+        np.savetxt(icbeamPath, np.ones((13, 13)))
+
+        self.s.setCustomBeamPath(root)
+        self.s.readCustomBeam("test_cbeam", TestTemplates.plane_xy["name"], "Ex", lam=1)
+        self.assertTrue("test_cbeam" in self.s.fields)
+        self.assertTrue("test_cbeam" in self.s.currents)
+
+        os.remove(rcbeamPath)
+        os.remove(icbeamPath)
 
 if __name__ == "__main__":
     import nose2

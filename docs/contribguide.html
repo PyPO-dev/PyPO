@@ -223,7 +223,7 @@ Python</h3>
 </div><!-- fragment --><p>in the <code>PyPO</code> root directory. Then, in-depth coverage information can be viewed by running the <code>index.html</code> file in the <code>htmlconv/</code> folder in the <code>PyPO</code> root directory.</p>
 <h3><a class="anchor" id="runtests_cpp"></a>
 C/C++/CUDA</h3>
-<p>The C/C++/CUDA source code is tested using <a href="https://google.github.io/googletest/">googletest</a>. Please see the <a href="https://github.com/google/googletest/blob/main/googletest/README.md">installation instructions</a> for building googletest on your specific platform.</p>
+<p>A small suite of unittests for the C/C++/CUDA backend is also present. These tests are mostly testing the vector operations, but might be extended as <code>PyPO</code> keeps developing. The C/C++/CUDA source code is tested using <a href="https://google.github.io/googletest/">googletest</a>. Please see the <a href="https://github.com/google/googletest/blob/main/googletest/README.md">installation instructions</a> for building googletest on your specific platform.</p>
 <p>After installing googletest, the tests need to be built. Navigate to the <code>src/</code> folder and run: </p><div class="fragment"><div class="line">python3 SetupGTest.py -bmr</div>
 </div><!-- fragment --><p>which should generate build scripts, make them and run the unittests in one go. For more options for the <code>SetupGTest.py</code> script, run: </p><div class="fragment"><div class="line">python3 SetupGTest.py -h</div>
 </div><!-- fragment --> </div></div><!-- contents -->

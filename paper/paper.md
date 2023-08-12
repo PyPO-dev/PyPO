@@ -54,7 +54,7 @@ A software package capable of efficient GO and PO calulations through optical sy
 Currently, `PyPO` is also being used in simulations of measured beam patterns of DESHIMA 2.0 at the ASTE [@ASTE] telescope for the analysis of instrument and optical system performance.
 
 Commercial software for GO/PO calculations and analysis, such as OpticStudio (Zemax) and GRASP (TICRA), has already been developed.
-Open-source optical simulation software packages such as POPPy (Perrin & others, 2012) and Prysm (Dube, 2019) are also available. 
+Open-source optical simulation software packages such as POPPy [@Perrin:2012] and Prysm [@Dube:2019] are also available. 
 These open-source software packages use Fourier methods to solve the Rayleigh-Sommerfeld integral equation.
 `PyPO` aims to contribute to this open-source optical simulation ecosystem by offering a software package working on the principle of the equivalent surface currents.
 

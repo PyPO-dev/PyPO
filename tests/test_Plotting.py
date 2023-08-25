@@ -26,13 +26,14 @@ class Test_Plotting(unittest.TestCase):
     def setUp(self):
         self.s = TestTemplates.getSystemWithReflectors()
         self.s.setOverride(False)
-    
-    def test_plotBeamCut(self):
-        fig, ax = self.s.plotBeamCut(TestTemplates.GPOfield['name'], FieldComponents.Ex, center=False, align=False, ret=True)
+
+    @params(Modes.dB, Modes.LIN)
+    def test_plotBeamCut(self, mode):
+        fig, ax = self.s.plotBeamCut(TestTemplates.GPOfield['name'], FieldComponents.Ex, center=False, align=False, ret=True, mode=mode)
 
         self.assertEqual(type(fig), Figure)
         self.assertEqual(type(ax), Axes)
-
+        
         close('all')
 
     @params(Projections.xy, Projections.yz, Projections.zx,

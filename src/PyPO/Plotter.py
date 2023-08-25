@@ -98,13 +98,13 @@ def plotBeam2D(plotObject, field, contour,
             grid_x1 = grids.x
             grid_x2 = grids.y
             ff_flag = True
-            comps = ["Az", "El"]
+            comps = ["\mathrm{Az}", "\mathrm{El}"]
 
         elif project == Projections.yx:
             grid_x1 = grids.y
             grid_x2 = grids.x
             ff_flag = True
-            comps = ["El", "Az"]
+            comps = ["\mathrm{El}", "\mathrm{Az}"]
 
     if not amp_only:
         fig, ax = pt.subplots(1,2, figsize=(10,5), gridspec_kw={'wspace':0.5})

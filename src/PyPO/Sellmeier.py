@@ -58,3 +58,27 @@ class FS:
                 self.B1, self.B2, self.B3, self.lam_um)
 
 
+class F2:
+    """!
+    Class for representing Schott flint glass (F2).
+    """
+
+    A1 = 1.34533359
+    A2 = 0.209073176
+    A3 = 0.937357162
+
+    B1 = 0.00997743871
+    B2 = 0.0470450767
+    B3 = 111.886764
+
+    def __init__(self, lam):
+        """!
+        Constructor. Sets the wavelength at which refractive index will be calculated.
+        Note that the wavelength has to be given in millimeters, otherwise PyPO will not return the correct refractive index.
+        """
+
+        self.lam_um = lam * 1e3
+        self.n = Sellmeier(self.A1, self.A2, self.A3,
+                self.B1, self.B2, self.B3, self.lam_um)
+
+

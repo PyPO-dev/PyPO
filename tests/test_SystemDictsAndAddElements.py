@@ -44,6 +44,13 @@ class Test_SystemDictsAndAddElement(unittest.TestCase):
         self.s.groupElements(TestTemplates.paraboloid_man_xy["name"], TestTemplates.ellipsoid_z_man_xy["name"])
         self.assertEqual(len(self.s.groups), ltot + 1)
 
+    def test_removeGroup(self):
+        self.s.groupElements("test", TestTemplates.paraboloid_man_xy["name"], TestTemplates.ellipsoid_z_man_xy["name"])
+        self.assertTrue("test" in self.s.groups)
+
+        self.s.removeGroup("test")
+        self.assertFalse("test" in self.s.groups)
+
     @params(System.createTubeFrame, System.createGRTFrame)
     def test_addRTFrame(self, func):
         ltot = len(TestTemplates.getFrameList())

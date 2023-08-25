@@ -54,9 +54,6 @@ class System(object):
         @param verbose Enable system logger.
         @param override Allow overriding names.
         """
-        self.num_ref = 0
-        self.num_cam = 0
-        self.nThreads_cpu = os.cpu_count()
         self.context = context
         self.verbosity = verbose
 
@@ -70,12 +67,6 @@ class System(object):
         self.scalarfields = {}
         self.groups = {}
         self.assoc = {}
-
-        self.EHcomplist = np.array(["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"])
-        self.JMcomplist = np.array(["Jx", "Jy", "Jz", "Mx", "My", "Mz"])
-
-        self.cl = 2.99792458e11 # mm / s
-        #self.savePathElem = "./save/elements/"
 
         saveSystemsExist = os.path.isdir(self.savePathSystems)
 
@@ -117,7 +108,7 @@ class System(object):
     
     def getSystemLogger(self):
         """!
-        @brief Obtain a reference to the custom logger used by system.
+        Obtain a reference to the custom logger used by system.
         
         This method can be called to obtain a reference to the logging object that PyPO uses internally.
         Can be convenient in cases one wants to log their own information in the layout of the PyPO logger.
@@ -283,9 +274,7 @@ class System(object):
             self.system[_reflDict["name"]]["pos"] = (self.system[_reflDict["name"]]["transf"] @ np.append(self.system[_reflDict["name"]]["pos"], 1))[:-1]
             self.system[_reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[_reflDict["name"]]["ori"]
 
-            self.system[_reflDict["name"]]["coeffs"][0] = a
-            self.system[_reflDict["name"]]["coeffs"][1] = b
-            self.system[_reflDict["name"]]["coeffs"][2] = -1
+            self._fillCoeffs(_reflDict["name"], a, b, -1)
 
         elif _reflDict["pmode"] == "manual":
             self.system[_reflDict["name"]]["coeffs"] = np.array([_reflDict["coeffs"][0], _reflDict["coeffs"][1], -1])
@@ -298,7 +287,6 @@ class System(object):
         
         self.system[_reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added paraboloid {_reflDict['name']} to system.")
-        self.num_ref += 1
 
     def addHyperbola(self, reflDict):
         """!
@@ -348,9 +336,7 @@ class System(object):
             self.system[_reflDict["name"]]["pos"] = (self.system[_reflDict["name"]]["transf"] @ np.append(self.system[_reflDict["name"]]["pos"], 1))[:-1]
             self.system[_reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[_reflDict["name"]]["ori"]
 
-            self.system[_reflDict["name"]]["coeffs"][0] = a3
-            self.system[_reflDict["name"]]["coeffs"][1] = b3
-            self.system[_reflDict["name"]]["coeffs"][2] = c3
+            self._fillCoeffs(_reflDict["name"], a3, b3, c3)
 
         if _reflDict["gmode"] == "xy" or _reflDict["gmode"] == 0:
             self.system[_reflDict["name"]]["gmode"] = 0
@@ -360,7 +346,6 @@ class System(object):
 
         self.system[_reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added hyperboloid {_reflDict['name']} to system.")
-        self.num_ref += 1
 
     def addEllipse(self, reflDict):
         """!
@@ -405,14 +390,10 @@ class System(object):
             self.system[_reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[_reflDict["name"]]["ori"]
 
             if _reflDict["orient"] == "x":
-                self.system[_reflDict["name"]]["coeffs"][0] = a
-                self.system[_reflDict["name"]]["coeffs"][1] = b
-                self.system[_reflDict["name"]]["coeffs"][2] = b
+                self._fillCoeffs(_reflDict["name"], a, b, b)
             
             if _reflDict["orient"] == "z":
-                self.system[_reflDict["name"]]["coeffs"][0] = b
-                self.system[_reflDict["name"]]["coeffs"][1] = b
-                self.system[_reflDict["name"]]["coeffs"][2] = a
+                self._fillCoeffs(_reflDict["name"], b, b, a)
 
         if _reflDict["gmode"] == "xy" or _reflDict["gmode"] == 0:
             self.system[_reflDict["name"]]["gmode"] = 0
@@ -424,7 +405,6 @@ class System(object):
 
         self.system[_reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added ellipsoid {_reflDict['name']} to system.")
-        self.num_ref += 1
 
     def addPlane(self, reflDict):
         """!
@@ -444,10 +424,6 @@ class System(object):
         self.system[_reflDict["name"]] = _reflDict
         self.system[_reflDict["name"]]["coeffs"] = np.zeros(3)
 
-        self.system[_reflDict["name"]]["coeffs"][0] = -1
-        self.system[_reflDict["name"]]["coeffs"][1] = -1
-        self.system[_reflDict["name"]]["coeffs"][2] = -1
-
         if _reflDict["gmode"] == "xy" or _reflDict["gmode"] == 0:
             self.system[_reflDict["name"]]["gmode"] = 0
 
@@ -459,7 +435,6 @@ class System(object):
 
         self.system[_reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added plane {_reflDict['name']} to system.")
-        self.num_ref += 1
 
     def rotateGrids(self, name, rotation, obj="element", mode="relative", pivot=None, keep_pol=False):
         """!
@@ -516,7 +491,7 @@ class System(object):
             if mode == "absolute":
                 Rtot = self._absRotationMat(rotation, self.groups[name]["ori"], pivot)
                 
-                for self.system[elem] in self.groups[name]["members"]:
+                for elem in self.groups[name]["members"]:
                     self.system[elem]["transf"] = Rtot @ self.system[elem]["transf"]
                     self.system[elem]["transf"][:-1, :-1] = (MatTransf.MatRotate(rotation, pivot=pivot))[:-1, :-1]
 
@@ -835,7 +810,7 @@ class System(object):
         @param name_group Name of the group to be removed.
         """
         
-        PChecks.check_groupSystem(ng, self.groups, self.clog, extern=True)
+        PChecks.check_groupSystem(name_group, self.groups, self.clog, extern=True)
         del self.groups[name_group]
         
         self.clog.info(f"Removed group {name_group} from system.")
@@ -1930,7 +1905,7 @@ class System(object):
 
         return x_cut, y_cut, x_strip, y_strip
    
-    def plotBeamCut(self, name_field, comp, comp_cross=FieldComponents.NONE, vmin=None, vmax=None, center=True, align=True, units=Units.DEG, name="", show=True, save=False, ret=False):
+    def plotBeamCut(self, name_field, comp, comp_cross=FieldComponents.NONE, vmin=None, vmax=None, center=True, align=True, mode=Modes.dB, units=Units.DEG, name="", show=True, save=False, ret=False):
         """!
         Plot beam pattern cross sections.
         
@@ -1947,6 +1922,7 @@ class System(object):
         @param vmax Maximum amplitude value to display. Default is 0.
         @param center Whether to calculate beam center and center the beam cuts on this point.
         @param align Whether to find position angle of beam cuts and align cut axes to this.
+        @param mode Plot in decibels or linear.
         @param units The units of the axes. Instance of Units enum object.
         @param name Name of .png file where plot is saved. Only when save=True. Default is "".
         @param show Show plot. Default is True.
@@ -1957,7 +1933,7 @@ class System(object):
         @returns ax Axes object.
         """
 
-        E_cut, H_cut, E_strip, H_strip = self.calcBeamCuts(name_field, comp, center=center, align=align)
+        E_cut, H_cut, E_strip, H_strip = self.calcBeamCuts(name_field, comp, center=center, align=align, mode=mode)
 
         #if comp_cross is not None:
             #cr45_cut, cr135_cut, cr45_strip, cr135_strip = self.calcBeamCuts(name_field, comp_cross, phi=45, align=False, center=False, norm="Ex")
@@ -2284,7 +2260,7 @@ class System(object):
             field = self.currents[name_obj] 
             name_surface = field.surf
             field_comp = field[comp.value]
-        
+
         if contour is not None:
             if contour_comp == FieldComponents.NONE:
                 contour_pl = self.scalarfields[contour].S
@@ -2695,7 +2671,7 @@ class System(object):
             n += 1
             if n >= max_iter:
                 self.setLoggingVerbosity(logstate)
-                self.clog.error("Could not find converging solution.")
+                self.clog.error("Could not find converged solution.")
                 self.system[name_target][xu] /= patch_size
                 self.system[name_target][yv] /= patch_size
                 self.system[name_target]["gridsize"] = (self.system[name_target]["gridsize"] / patch).astype(int)
@@ -2962,4 +2938,17 @@ class System(object):
         Rtot = Tp @ R @ Tpm
         return Rtot
 
+    def _fillCoeffs(self, name, a, b, c):
+        """!
+        Fill the coeffs values for an internal reflector dictionary.
+        
+        @param name Name of reflector in system.
+        @param a The a coefficient.
+        @param b The b coefficient.
+        @param c The c coefficient.
+        """
+        
+        self.system[name]["coeffs"][0] = a
+        self.system[name]["coeffs"][1] = b
+        self.system[name]["coeffs"][2] = c
 

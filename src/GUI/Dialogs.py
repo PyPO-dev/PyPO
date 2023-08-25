@@ -1,12 +1,9 @@
-<<<<<<< HEAD
 """!
 @file 
 Defines dialogs for the GUI.
 """
 
-=======
 from typing import Optional
->>>>>>> 8fba94360fa8022a046380da00e8207820a64342
 from PySide6.QtWidgets import QDialog, QGridLayout, QPushButton, QLabel
 from PySide6.QtCore import Qt, Signal
 

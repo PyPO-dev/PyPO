@@ -36,7 +36,6 @@ public:
 
     // Overloaded absolute value
     void abs(const std::array<T, 3> &v, T &out);
-    void abs(const std::array<std::complex<T>, 3> &cv, std::complex<T> &out);
 
     // Difference vectors
     void diff(const std::array<T, 3> &v1, const std::array<T, 3> &v2, std::array<T, 3> &out);
@@ -44,7 +43,9 @@ public:
 
     // Normalization
     void normalize(const std::array<T, 3> &v, std::array<T, 3> &out);
-    void normalize(const std::array<std::complex<T>, 3> &cv, std::array<std::complex<T>, 3> &out);
+
+    // Addition
+    void add(const std::array<T, 3> &v1, const std::array<T, 3> &v2, std::array<T, 3> &out);
 
     // Scalar multiplication
     void s_mult(const std::array<T, 3> &v, const T &s, std::array<T, 3> &out);
@@ -56,7 +57,6 @@ public:
     void conj(const std::array<std::complex<T>, 3> &cv, std::array<std::complex<T>, 3> &out);
 
     // Snell's function
-    void snell(const std::array<std::complex<T>, 3> &cvin, const std::array<T, 3> &normal, std::array<std::complex<T>, 3> &out);
     void snell(const std::array<T, 3> &vin, const std::array<T, 3> &normal, std::array<T, 3> &out);
     void snell_t(const std::array<T, 3> &vin, const std::array<T, 3> &normal, T mu, std::array<T, 3> &out);
 
@@ -277,23 +277,6 @@ void Utils<T>::abs(const std::array<T, 3> &v, T &out)
 }
 
 /**
- * Absolute value.
- *
- * Calculate absolute value of complex valued vector of size 3.
- * 
- * @param cv Array of 3 complex double/float.
- * @param out Scalar complex double/float.
- */
-template <typename T> inline
-void Utils<T>::abs(const std::array<std::complex<T>, 3> &cv, std::complex<T> &out)
-{
-    std::array<std::complex<T>, 3> cv_conj;
-    conj(cv, cv_conj);
-    dot(cv, cv_conj, out);
-    out = std::sqrt(out);
-}
-
-/**
  * Normalize vector.
  *
  * Normalize real valued vector of size 3.
@@ -319,22 +302,20 @@ void Utils<T>::normalize(const std::array<T, 3> &v, std::array<T, 3> &out)
 }
 
 /**
- * Normalize vector.
+ * Vector addition.
  *
- * Normalize complex valued vector of size 3.
+ * Add two real valued vectors of size 3 element-wise.
  * 
- * @param cv Array of 3 complex double/float.
+ * @param v1 Array of 3 double/float.
+ * @param v2 Array of 3 double/float.
  * @param out Array of 3 complex double/float.
  */
 template <typename T> inline
-void Utils<T>::normalize(const std::array<std::complex<T>, 3> &cv, std::array<std::complex<T>, 3> &out)
+void Utils<T>::add(const std::array<T, 3> &v1, const std::array<T, 3> &v2, std::array<T, 3> &out)
 {
-    std::complex<T> cnorm;
-    abs(cv, cnorm);
-
-    for( int n=0; n<3; n++)
+    for(int n=0; n<3; n++)
     {
-        out[n] = cv[n] / cnorm;
+        out[n] = v1[n] + v2[n];
     }
 }
 
@@ -428,29 +409,6 @@ void Utils<T>::conj(const std::array<std::complex<T>, 3> &cv, std::array<std::co
 }
 
 /**
- * Snell's law.
- *
- * Calculate reflected direction vector from incoming direction and normal vector.
- * 
- * @param cvin Array of 3 complex double/float, incoming direction vector.
- * @param normal Array of 3 double/float, normal vector of surface.
- * @param out Array of 3 complex double/float.
- */
-template <typename T> inline
-void Utils<T>::snell(const std::array<std::complex<T>, 3> &cvin, const std::array<T, 3> &normal, std::array<std::complex<T>, 3> &out)
-{
-    std::complex<T> cfactor;
-    dot(cvin, normal, cfactor);
-
-    cfactor = 2. * cfactor;
-
-    std::array<std::complex<T>, 3> rhs;
-    s_mult(normal, cfactor, rhs);
-
-    diff(cvin, rhs, out);
-}
-
-/**
  * Snell's law for reflection.
  *
  * Calculate reflected direction vector from incoming direction and normal vector.
@@ -489,7 +447,7 @@ void Utils<T>::snell_t(const std::array<T, 3> &vin, const std::array<T, 3> &norm
     T in_dot_n, factor1;
     std::array<T, 3> term1, term2, temp1, temp2;
 
-    dot(vin, normal, in_dot_n);
+    dot(normal, vin, in_dot_n);
     
     factor1 = sqrt(1 - mu*mu * (1 - in_dot_n*in_dot_n));
     s_mult(normal, factor1, term1);
@@ -498,7 +456,7 @@ void Utils<T>::snell_t(const std::array<T, 3> &vin, const std::array<T, 3> &norm
     diff(vin, temp1, temp2);
     s_mult(temp2, mu, term2);
 
-    diff(term1, term2, out);
+    add(term1, term2, out);
 }
 
 /**

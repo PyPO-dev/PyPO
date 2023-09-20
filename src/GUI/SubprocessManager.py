@@ -1,12 +1,13 @@
+"""!
+@file 
+Contains the tools to run a function in a subprocess
+"""
+
 from multiprocessing import Process
 from PySide6.QtCore import QThread, Signal, QObject
 from src.GUI.Dialogs import SymDialog
 from copy import deepcopy
 import PyPO.System as st
-
-##
-# @file Contains the tools to run a function in a subprocess
-
 
 class SubprocessManager():
     """!

@@ -1,10 +1,11 @@
+"""!
+@file
+This file contains class definitions of the custom logger objects used in PyPO.
+A distinction is made for logging in the terminal and in the GUI.
+"""
+
 import sys
 import logging
-
-##
-# @file
-# This file contains class definitions of the custom logger objects used in PyPO.
-# A distinction is made for logging in the terminal and in the GUI.
 
 def addLoggingLevel(levelName, levelNum, methodName=None):
     """!

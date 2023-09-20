@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['vectorinput_0',['VectorInput',['../classGUI_1_1ParameterForms_1_1simpleInputWidgets_1_1VectorInput.html',1,'GUI::ParameterForms::simpleInputWidgets']]]
+  ['units_0',['Units',['../classPyPO_1_1Enums_1_1Units.html',1,'PyPO::Enums']]],
+  ['utils_1',['Utils',['../classUtils.html',1,'']]],
+  ['utils_3c_20v_20_3e_2',['Utils&lt; V &gt;',['../classUtils.html',1,'']]]
 ];

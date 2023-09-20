@@ -11,7 +11,6 @@
 
 #define CSIZE 10
 #define CSIZERT 5
-#define MILLISECOND 1000
 
 #ifdef _WIN32
 #   define PYPO_DLL __declspec(dllexport);

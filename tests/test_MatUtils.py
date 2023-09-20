@@ -1,11 +1,12 @@
+"""!
+@file
+Script for testing the matrix utilities of PyPO.
+"""
+
 import unittest
 import numpy as np
 
 from PyPO.MatUtils import findConnectedSubsets
-##
-# @file
-# 
-# Script for testing the matrix utilities of PyPO.
 
 class Test_MatUtils(unittest.TestCase):
     def test_findConnectedSubsets(self): 

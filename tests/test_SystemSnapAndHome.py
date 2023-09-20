@@ -1,3 +1,8 @@
+"""!
+@file
+Test snapshot and homing functionality of PyPO.
+"""
+
 import unittest
 import numpy as np
 

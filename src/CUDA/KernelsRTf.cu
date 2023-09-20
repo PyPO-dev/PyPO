@@ -1,16 +1,17 @@
 #include "InterfaceCUDA.h"
 
 /*! \file KernelsRTf.cu
-    \brief Kernels for CUDA RT calculations.
+    \brief Kernel for CUDA RT calculations.
     
-    Contains kernels for RT calculations. Multiple kernels are defined, each one optimized for a certain calculation.
-*/
+    Contains kernel for RT calculations.
+ */
 
 // Declare constant memory for Device
 __constant__ float conrt[CSIZERT]; // a, b, c, t0, epsilon
 __constant__ float mat[16]; //
 __constant__ int nTot;
 __constant__ int cflip;
+__constant__ int ctype;
 
 /**
   Calculate common factor 1.
@@ -194,64 +195,6 @@ __device__ __inline__ void npl(float xr, float yr, float zr, float (&out)[3])
 }
 
 /**
-  Matrix-vector multiplication.
-
-  Uses mat from constant memory.
-
-  @param cv1 Array of 3 float.
-  @param out Array of 3 float.
-  @param vec Whether to rotate as a vector or as a point.
-  */
-__device__ __inline__ void matVec4(float (&cv1)[3], float (&out)[3], bool vec = false)
-{
-    if (vec)
-    {
-        for(int n=0; n<3; n++)
-        {
-            out[n] = mat[n*4] * cv1[0] + mat[1+n*4] * cv1[1] + mat[2+n*4] * cv1[2];
-        }
-    }
-
-    else
-    {
-        for(int n=0; n<3; n++)
-        {
-            out[n] = mat[n*4] * cv1[0] + mat[1+n*4] * cv1[1] + mat[2+n*4] * cv1[2] + mat[3+n*4];
-        }
-    }
-}
-
-/**
-  Matrix-vector multiplication.
-
-  Uses mat from constant memory.
-
-  @param cv1 Array of 3 float.
-  @param out Array of 3 float.
-  @param vec Whether to rotate as a vector or as a point.
-  */
-__device__ __inline__ void invmatVec4(float (&cv1)[3], float (&out)[3], bool vec = false)
-{
-    if (vec)
-    {
-        for(int n=0; n<3; n++)
-        {
-            out[n] = mat[n] * cv1[0] + mat[n+4] * cv1[1] + mat[n+8] * cv1[2];
-        }
-    }
-
-    else
-    {
-        float temp;
-        for(int n=0; n<3; n++)
-        {
-            temp = -mat[n]*mat[3] - mat[n+4]*mat[7] - mat[n+8]*mat[11];
-            out[n] = mat[n] * cv1[0] + mat[n+4] * cv1[1] + mat[n+8] * cv1[2] + temp;
-        }
-    }
-}
-
-/**
   Transform rays to surface restframe.
 
   @param x Array of ray x co-ordinates.
@@ -276,8 +219,8 @@ __device__ __inline__ void transfRays(float *x, float *y, float *z,
     inp[1] = y[i];
     inp[2] = z[i];
 
-    if (inv) {invmatVec4(inp, out);}
-    else {matVec4(inp, out);}
+    if (inv) {invmatVec4(mat, inp, out);}
+    else {matVec4(mat, inp, out);}
 
     x[i] = out[0];
     y[i] = out[1];
@@ -287,8 +230,8 @@ __device__ __inline__ void transfRays(float *x, float *y, float *z,
     inp[1] = dy[i];
     inp[2] = dz[i];
 
-    if (inv) {invmatVec4(inp, out, vec);}
-    else {matVec4(inp, out, vec);}
+    if (inv) {invmatVec4(mat, inp, out, vec);}
+    else {matVec4(mat, inp, out, vec);}
 
     dx[i] = out[0];
     dy[i] = out[1];
@@ -328,6 +271,7 @@ __host__ std::array<dim3, 2> _initCUDA(reflparamsf ctp, float epsilon, float t0,
     gpuErrchk( cudaMemcpyToSymbol(mat, ctp.transf, 16 * sizeof(float)) );
     gpuErrchk( cudaMemcpyToSymbol(nTot, &_nTot, sizeof(int)) );
     gpuErrchk( cudaMemcpyToSymbol(cflip, &iflip, sizeof(int)) );
+    gpuErrchk( cudaMemcpyToSymbol(ctype, &(ctp.type), sizeof(int)) );
 
     std::array<dim3, 2> BT;
     BT[0] = nrb;
@@ -337,7 +281,7 @@ __host__ std::array<dim3, 2> _initCUDA(reflparamsf ctp, float epsilon, float t0,
 }
 
 /**
-  Optimize ray-paraboloid distance.
+  Optimize ray-target distance.
 
   Uses a Newton Rhapson (NR) method to find the point of ray-surface intersection.
 
@@ -354,7 +298,7 @@ __host__ std::array<dim3, 2> _initCUDA(reflparamsf ctp, float epsilon, float t0,
   @param dyt Array of ray y directions, to be filled.
   @param dzt Array of ray z directions, to be filled.
   */
-__global__ void propagateRaysToP(float *xs, float *ys, float *zs,
+__global__ void propagateRaysToTarget(float *xs, float *ys, float *zs,
                                 float *dxs, float *dys, float *dzs,
                                 float *xt, float *yt, float *zt,
                                 float *dxt, float *dyt, float *dzt)
@@ -362,250 +306,33 @@ __global__ void propagateRaysToP(float *xs, float *ys, float *zs,
     float norms[3];
     bool inv = true;
 
-    int idx = blockDim.x*blockIdx.x + threadIdx.x;
-    if (idx < nTot)
+    float (*refl_func_ptr)(float, float, float, float, float, float, float);
+    void (*refl_norm_ptr)(float, float, float, float (&arr)[3]);
+
+    if (ctype == 0) 
     {
-        transfRays(xs, ys, zs, dxs, dys, dzs, idx, inv);
-
-        float _t = conrt[3];
-        float t1 = 1e99;
-
-        float check = fabs(t1 - _t);
-
-        float x = xs[idx];
-        float y = ys[idx];
-        float z = zs[idx];
-
-        float dx = dxs[idx];
-        float dy = dys[idx];
-        float dz = dzs[idx];
-
-        while (check > conrt[4])
-        {
-            t1 = gp(_t, x, y, z, dx, dy, dz);
-
-            check = fabs(t1 - _t);
-
-            _t = t1;
-        }
-        
-        if ((abs(round(dx)) == 0 && abs(round(dy)) == 0 && abs(round(dz)) == 0) || std::isnan(_t)) 
-        {
-            xt[idx] = x;
-            yt[idx] = y;
-            zt[idx] = z;
-        
-            dxt[idx] = 0; // Set at 2: since beta should be normalized, can select on 2
-            dyt[idx] = 0;
-            dzt[idx] = 0;
-        } 
-       
-        else
-        {
-            xt[idx] = x + _t*dx;
-            yt[idx] = y + _t*dy;
-            zt[idx] = z + _t*dz;
-
-            np(xt[idx], yt[idx], zt[idx], norms);
-            check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
-
-            dxt[idx] = dx - 2*check*norms[0];
-            dyt[idx] = dy - 2*check*norms[1];
-            dzt[idx] = dz - 2*check*norms[2];
-        }
-        transfRays(xs, ys, zs, dxs, dys, dzs, idx);
-        transfRays(xt, yt, zt, dxt, dyt, dzt, idx);
+        refl_func_ptr = &gp;
+        refl_norm_ptr = &np;
     }
-}
 
-/**
-  Optimize ray-hyperboloid distance.
-
-  Uses a Newton Rhapson (NR) method to find the point of ray-surface intersection.
-
-  @param xs Array of ray x co-ordinates.
-  @param ys Array of ray y co-ordinates.
-  @param zs Array of ray z co-ordinates.
-  @param dxs Array of ray x directions.
-  @param dys Array of ray y directions.
-  @param dzs Array of ray z directions.
-  @param xt Array of ray x co-ordinates, to be filled.
-  @param yt Array of ray y co-ordinates, to be filled.
-  @param zt Array of ray z co-ordinates, to be filled.
-  @param dxt Array of ray x directions, to be filled.
-  @param dyt Array of ray y directions, to be filled.
-  @param dzt Array of ray z directions, to be filled.
-  */
-__global__ void propagateRaysToH(float *xs, float *ys, float *zs,
-                                float *dxs, float *dys, float *dzs,
-                                float *xt, float *yt, float *zt,
-                                float *dxt, float *dyt, float *dzt)
-{
-    float norms[3];
-    bool inv = true;
-
-    int idx = blockDim.x*blockIdx.x + threadIdx.x;
-    if (idx < nTot)
+    if (ctype == 1) 
     {
-        transfRays(xs, ys, zs, dxs, dys, dzs, idx, inv);
-
-        float _t = conrt[3];
-        float t1 = 1e99;
-
-        float check = fabs(t1 - _t);
-
-        float x = xs[idx];
-        float y = ys[idx];
-        float z = zs[idx];
-
-        float dx = dxs[idx];
-        float dy = dys[idx];
-        float dz = dzs[idx];
-
-        while (check > conrt[4])
-        {
-            t1 = gh(_t, x, y, z, dx, dy, dz);
-
-            check = fabs(t1 - _t);
-
-            _t = t1;
-        }
-        
-        if ((abs(round(dx)) == 0 && abs(round(dy)) == 0 && abs(round(dz)) == 0) || std::isnan(_t)) 
-        {
-            xt[idx] = x;
-            yt[idx] = y;
-            zt[idx] = z;
-        
-            dxt[idx] = 0; // Set at 2: since beta should be normalized, can select on 2
-            dyt[idx] = 0;
-            dzt[idx] = 0;
-        } 
-        
-        else
-        {
-            xt[idx] = x + _t*dx;
-            yt[idx] = y + _t*dy;
-            zt[idx] = z + _t*dz;
-
-            nh(xt[idx], yt[idx], zt[idx], norms);
-            check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
-
-            dxt[idx] = dx - 2*check*norms[0];
-            dyt[idx] = dy - 2*check*norms[1];
-            dzt[idx] = dz - 2*check*norms[2];
-        }
-        transfRays(xs, ys, zs, dxs, dys, dzs, idx);
-        transfRays(xt, yt, zt, dxt, dyt, dzt, idx);
+        refl_func_ptr = &gh;
+        refl_norm_ptr = &nh;
     }
-}
-
-/**
-  Optimize ray-ellipsoid distance.
-
-  Uses a Newton Rhapson (NR) method to find the point of ray-surface intersection.
-
-  @param xs Array of ray x co-ordinates.
-  @param ys Array of ray y co-ordinates.
-  @param zs Array of ray z co-ordinates.
-  @param dxs Array of ray x directions.
-  @param dys Array of ray y directions.
-  @param dzs Array of ray z directions.
-  @param xt Array of ray x co-ordinates, to be filled.
-  @param yt Array of ray y co-ordinates, to be filled.
-  @param zt Array of ray z co-ordinates, to be filled.
-  @param dxt Array of ray x directions, to be filled.
-  @param dyt Array of ray y directions, to be filled.
-  @param dzt Array of ray z directions, to be filled.
-  */
-__global__ void propagateRaysToE(float *xs, float *ys, float *zs,
-                                float *dxs, float *dys, float *dzs,
-                                float *xt, float *yt, float *zt,
-                                float *dxt, float *dyt, float *dzt)
-{
-    float norms[3];
-    bool inv = true;
-
-    int idx = blockDim.x*blockIdx.x + threadIdx.x;
-    if (idx < nTot)
+    
+    else if (ctype == 2) 
     {
-        transfRays(xs, ys, zs, dxs, dys, dzs, idx, inv);
-
-        float _t = conrt[3];
-        float t1 = 1e99;
-
-        float check = fabs(t1 - _t);
-
-        float x = xs[idx];
-        float y = ys[idx];
-        float z = zs[idx];
-
-        float dx = dxs[idx];
-        float dy = dys[idx];
-        float dz = dzs[idx];
-
-        while (check > conrt[4])
-        {
-            t1 = ge(_t, x, y, z, dx, dy, dz);
-
-            check = fabs(t1 - _t);
-
-            _t = t1;
-        }
-
-        if ((abs(round(dx)) == 0 && abs(round(dy)) == 0 && abs(round(dz)) == 0) || std::isnan(_t)) 
-        {
-            xt[idx] = x;
-            yt[idx] = y;
-            zt[idx] = z;
-        
-            dxt[idx] = 0; // Set at 2: since beta should be normalized, can select on 2
-            dyt[idx] = 0;
-            dzt[idx] = 0;
-        } 
-        else
-        {
-            xt[idx] = x + _t*dx;
-            yt[idx] = y + _t*dy;
-            zt[idx] = z + _t*dz;
-
-            ne(xt[idx], yt[idx], zt[idx], norms);
-            check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
-
-            dxt[idx] = dx - 2*check*norms[0];
-            dyt[idx] = dy - 2*check*norms[1];
-            dzt[idx] = dz - 2*check*norms[2];
-        }
-        transfRays(xs, ys, zs, dxs, dys, dzs, idx);
-        transfRays(xt, yt, zt, dxt, dyt, dzt, idx);
+        refl_func_ptr = &ge;
+        refl_norm_ptr = &ne;
     }
-}
+    
+    else if (ctype == 3) 
+    {
+        refl_func_ptr = &gpl;
+        refl_norm_ptr = &npl;
+    }
 
-/**
-  Optimize ray-plane distance.
-
-  Uses a Newton Rhapson (NR) method to find the point of ray-surface intersection.
-
-  @param xs Array of ray x co-ordinates.
-  @param ys Array of ray y co-ordinates.
-  @param zs Array of ray z co-ordinates.
-  @param dxs Array of ray x directions.
-  @param dys Array of ray y directions.
-  @param dzs Array of ray z directions.
-  @param xt Array of ray x co-ordinates, to be filled.
-  @param yt Array of ray y co-ordinates, to be filled.
-  @param zt Array of ray z co-ordinates, to be filled.
-  @param dxt Array of ray x directions, to be filled.
-  @param dyt Array of ray y directions, to be filled.
-  @param dzt Array of ray z directions, to be filled.
-  */
-__global__ void propagateRaysToPl(float *xs, float *ys, float *zs,
-                                float *dxs, float *dys, float *dzs,
-                                float *xt, float *yt, float *zt,
-                                float *dxt, float *dyt, float *dzt)
-{
-    float norms[3];
-    bool inv = true;
     int idx = blockDim.x*blockIdx.x + threadIdx.x;
 
     if (idx < nTot)
@@ -628,7 +355,7 @@ __global__ void propagateRaysToPl(float *xs, float *ys, float *zs,
 
         while (check > conrt[4])
         {
-            t1 = gpl(_t, x, y, z, dx, dy, dz);
+            t1 = refl_func_ptr(_t, x, y, z, dx, dy, dz);
 
             check = fabs(t1 - _t);
 
@@ -651,7 +378,7 @@ __global__ void propagateRaysToPl(float *xs, float *ys, float *zs,
             yt[idx] = y + _t*dy;
             zt[idx] = z + _t*dz;
 
-            npl(xt[idx], yt[idx], zt[idx], norms);
+            refl_norm_ptr(xt[idx], yt[idx], zt[idx], norms);
             check = (dx*norms[0] + dy*norms[1] + dz*norms[2]);
 
             dxt[idx] = dx - 2*check*norms[0];
@@ -662,11 +389,10 @@ __global__ void propagateRaysToPl(float *xs, float *ys, float *zs,
         transfRays(xt, yt, zt, dxt, dyt, dzt, idx);
     }
 }
-
 /**
   Call ray-trace Kernel.
 
-  Calculate a new frame of rays. Several kernels can be called, depending on surface type.
+  Calculate a new frame of rays on a target, given an input frame of rays.
 
   @param ctp reflparamsf object containing target surface parameters.
   @param fr_in Pointer to input cframef object.
@@ -699,29 +425,10 @@ void callRTKernel(reflparamsf ctp, cframef *fr_in,
     
     std::vector<float*> vec_fro = memutil.cuMallFloat(n_dt, fr_in->size);
 
-    if (ctp.type == 0)
-    {
-        propagateRaysToP<<<BT[0], BT[1]>>>(vec_frs[0], vec_frs[1], vec_frs[2], vec_frs[3], vec_frs[4], vec_frs[5],
-                                           vec_fro[0], vec_fro[1], vec_fro[2], vec_fro[3], vec_fro[4], vec_fro[5]);
-    }
-
-    else if (ctp.type == 1)
-    {
-        propagateRaysToH<<<BT[0], BT[1]>>>(vec_frs[0], vec_frs[1], vec_frs[2], vec_frs[3], vec_frs[4], vec_frs[5],
-                                           vec_fro[0], vec_fro[1], vec_fro[2], vec_fro[3], vec_fro[4], vec_fro[5]);
-    }
-
-    else if (ctp.type == 2)
-    {
-        propagateRaysToE<<<BT[0], BT[1]>>>(vec_frs[0], vec_frs[1], vec_frs[2], vec_frs[3], vec_frs[4], vec_frs[5],
-                                           vec_fro[0], vec_fro[1], vec_fro[2], vec_fro[3], vec_fro[4], vec_fro[5]);
-    }
-
-    else if (ctp.type == 3)
-    {
-        propagateRaysToPl<<<BT[0], BT[1]>>>(vec_frs[0], vec_frs[1], vec_frs[2], vec_frs[3], vec_frs[4], vec_frs[5],
-                                            vec_fro[0], vec_fro[1], vec_fro[2], vec_fro[3], vec_fro[4], vec_fro[5]);
-    }
+    propagateRaysToTarget<<<BT[0], BT[1]>>>(vec_frs[0], vec_frs[1], vec_frs[2], 
+                                            vec_frs[3], vec_frs[4], vec_frs[5],
+                                            vec_fro[0], vec_fro[1], vec_fro[2], 
+                                            vec_fro[3], vec_fro[4], vec_fro[5]);
     
     gpuErrchk( cudaDeviceSynchronize() );
 

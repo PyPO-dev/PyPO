@@ -1,12 +1,14 @@
+"""!
+@file 
+Defines ElementWidget and its subclasses for the workspace.
+"""
+
 from PySide6.QtWidgets import QLabel, QWidget, QHBoxLayout, QPushButton, QVBoxLayout
 from PySide6.QtCore import Qt
                                         
 from src.GUI.Dialogs import selfClosingDialog
 from src.GUI.utils import MyButton
 from src.GUI.Dialogs import RemoveElementDialog
-
-##
-# @file Defines ElementWidget and its subclasses for the workspace.
 
 class ElementWidget(QWidget):
     """!

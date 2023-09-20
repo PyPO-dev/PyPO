@@ -28,13 +28,12 @@ __constant__ int g_t;               // Gridsize on target
  *
  * @return BT Array of two dim3 objects, containing number of blocks per grid and number of threads per block.
  */
-
  __host__ std::array<dim3, 2> initCUDA(float k, float epsilon, int gt, int gs, float t_direction, int nBlocks, int nThreads)
  {
      // Calculate nr of blocks per grid and nr of threads per block
      dim3 nrb(nBlocks); dim3 nrt(nThreads);
 
-     float M_PIf = 3.1415926; /* pi */
+     float PIf = 3.1415926; /* pi */
      float C_L = 2.9979246e11; // mm s^-1
      float MU_0 = 1.256637e-3; // kg mm s^-2 A^-2
      float EPS_VAC = 1 / (MU_0 * C_L*C_L);
@@ -44,24 +43,17 @@ __constant__ int g_t;               // Gridsize on target
      float EPS = EPS_VAC * epsilon;
 
      // Fill ID matrix
-     float _eye[3][3];
+     float _eye[3][3] = {};
      _eye[0][0] = 1.;
      _eye[1][1] = 1.;
      _eye[2][2] = 1.;
-
-     _eye[0][1] = 0.;
-     _eye[0][2] = 0.;
-     _eye[1][0] = 0.;
-     _eye[1][2] = 0.;
-     _eye[2][0] = 0.;
-     _eye[2][1] = 0.;
-
+     
      // Pack constant array
      cuFloatComplex _con[CSIZE] = {make_cuFloatComplex(k, 0.),
                                      make_cuFloatComplex(EPS, 0.),
                                      make_cuFloatComplex(MU_0, 0.),
                                      make_cuFloatComplex(ZETA_0_INV, 0.),
-                                     make_cuFloatComplex(M_PIf, 0.),
+                                     make_cuFloatComplex(PIf, 0.),
                                      make_cuFloatComplex(C_L, 0.),
                                      make_cuFloatComplex(t_direction, 0.),
                                      make_cuFloatComplex(0., 1.),

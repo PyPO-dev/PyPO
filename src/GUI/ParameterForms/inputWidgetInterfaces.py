@@ -1,10 +1,10 @@
+"""!
+@file 
+Defines interfaces for input widgets to inherit from to ensure certain behavior.
+"""
+
 from PySide6.QtWidgets import QWidget
 from abc import ABC, abstractclassmethod
-
-##
-# @file 
-# Defines interfaces for input widgets to inherit from to ensure certain behavior.
-
 
 class MetaCombinerInputWidget(type(QWidget), type(ABC)): 
     """!

@@ -1,9 +1,11 @@
+"""!
+@file 
+Defines dialogs for the GUI.
+"""
+
 from typing import Optional
 from PySide6.QtWidgets import QDialog, QGridLayout, QPushButton, QLabel
 from PySide6.QtCore import Qt, Signal
-
-##
-# @file Defines dialogs for the GUI.
 
 class SymDialog(QDialog):
     """!

@@ -1,3 +1,8 @@
+"""!
+@file
+File containing all commonly used checks for PyPO user input.
+"""
+
 import numpy as np
 import os
 import pathlib
@@ -5,13 +10,10 @@ import re
 
 import PyPO.Config as Config
 import PyPO.WorldParam as world
+from PyPO.Enums import FieldComponents, CurrentComponents
 
 nThreads_cpu = os.cpu_count() - 1 if os.cpu_count() > 1 else 1
 PO_modelist = ["JM", "EH", "JMEH", "EHP", "FF", "scalar"]
-
-##
-# @file
-# File containing all commonly used checks for PyPO user input.
 
 def getIndex(name, nameList):
     """!
@@ -1336,11 +1338,7 @@ def check_hybridDict(hybridDict, elements, frames, fields, clog):
             errStr += errMsg_type("interp", type(hybridDict["interp"]), "hybridDict", bool)
     
     if "comp" not in hybridDict:
-        hybridDict["comp"] = None
-        
-    elif "comp" in hybridDict:
-        if not isinstance(hybridDict["comp"], str) and hybridDict["comp"] is not None:
-            errStr += errMsg_type("comp", type(hybridDict["comp"]), "hybridDict", str)
+        hybridDict["comp"] = FieldComponents.NONE
     
     if errStr:
         errList = errStr.split("\n")[:-1]

@@ -1,13 +1,10 @@
 var searchData=
 [
-  ['mainwidget_0',['MainWidget',['../classGUI_1_1MainWindow_1_1MainWidget.html',1,'GUI::MainWindow']]],
-  ['manager_1',['Manager',['../classPyPO_1_1Threadmgr_1_1Manager.html',1,'PyPO::Threadmgr']]],
-  ['memutils_2',['MemUtils',['../classMemUtils.html',1,'']]],
-  ['mergebeamerror_3',['MergeBeamError',['../classPyPO_1_1Checks_1_1MergeBeamError.html',1,'PyPO::Checks']]],
-  ['metacombinerinputwidget_4',['MetaCombinerInputWidget',['../classGUI_1_1ParameterForms_1_1inputWidgetInterfaces_1_1MetaCombinerInputWidget.html',1,'GUI::ParameterForms::inputWidgetInterfaces']]],
-  ['metacombinerselectionwidget_5',['MetaCombinerSelectionWidget',['../classGUI_1_1ParameterForms_1_1inputWidgetInterfaces_1_1MetaCombinerSelectionWidget.html',1,'GUI::ParameterForms::inputWidgetInterfaces']]],
-  ['mplcanvas_6',['MplCanvas',['../classGUI_1_1PlotScreen_1_1MplCanvas.html',1,'GUI::PlotScreen']]],
-  ['mybutton_7',['MyButton',['../classGUI_1_1utils_1_1MyButton.html',1,'GUI::utils']]],
-  ['myedit_8',['MyEdit',['../classGUI_1_1utils_1_1MyEdit.html',1,'GUI::utils']]],
-  ['mylabel_9',['MyLabel',['../classGUI_1_1utils_1_1MyLabel.html',1,'GUI::utils']]]
+  ['inputdescription_0',['InputDescription',['../classGUI_1_1ParameterForms_1_1InputDescription_1_1InputDescription.html',1,'']]],
+  ['inputdescriptionerror_1',['InputDescriptionError',['../classGUI_1_1utils_1_1InputDescriptionError.html',1,'GUI::utils']]],
+  ['inputpoerror_2',['InputPOError',['../classPyPO_1_1Checks_1_1InputPOError.html',1,'PyPO::Checks']]],
+  ['inputreflerror_3',['InputReflError',['../classPyPO_1_1Checks_1_1InputReflError.html',1,'PyPO::Checks']]],
+  ['inputrterror_4',['InputRTError',['../classPyPO_1_1Checks_1_1InputRTError.html',1,'PyPO::Checks']]],
+  ['inputwidgetinterface_5',['inputWidgetInterface',['../classGUI_1_1ParameterForms_1_1inputWidgetInterfaces_1_1inputWidgetInterface.html',1,'GUI::ParameterForms::inputWidgetInterfaces']]],
+  ['intype_6',['inType',['../classGUI_1_1utils_1_1inType.html',1,'GUI::utils']]]
 ];

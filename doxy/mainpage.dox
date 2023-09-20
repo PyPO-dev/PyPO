@@ -87,6 +87,11 @@ The automated tests are run using the nose2 framework:
 pip install nose2
 ```
 
+For running the interactive notebooks for the tutorials and demos, Jupyter notebook needs to be installed:
+```
+pip install notebook
+```
+
 Documentation in `PyPO` is generated using [Doxygen](https://www.doxygen.nl/index.html).
 Please see their [installation page](https://www.doxygen.nl/manual/install.html) for instructions regarding installation.
 

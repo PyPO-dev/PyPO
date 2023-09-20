@@ -1,3 +1,8 @@
+"""!
+@file
+Script for testing the ray-trace functionalities of PyPO.
+"""
+
 from scipy.stats import special_ortho_group
 
 try:
@@ -10,10 +15,6 @@ import numpy as np
 
 from PyPO.System import System
 import PyPO.MatTransform as mt
-##
-# @file
-# 
-# Script for testing the ray-trace functionalities of PyPO.
 
 class Test_RayTraceUtils(unittest.TestCase):
     def setUp(self):

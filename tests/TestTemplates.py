@@ -1,9 +1,10 @@
+"""!
+@file
+This file contains commonly used input templates so that we do not have to type them over and over again.
+"""
+
 import numpy as np
 from PyPO.System import System
-
-##
-# @file
-# This file contains commonly used input templates so that we do not have to type them over and over again.
 
 TubeRTframe =  {
         "name"      : "testTubeRTframe",
@@ -38,6 +39,13 @@ GPOfield =  {
 
 PS_Ufield =  {
         "name"      : "testPS_UField",
+        "lam"       : 1,
+        "E0"        : 1,
+        "pol"       : np.array([1,0,0])
+        }
+
+PS_Ufield_FF =  {
+        "name"      : "testPS_UField_FF",
         "lam"       : 1,
         "E0"        : 1,
         "pol"       : np.array([1,0,0])
@@ -371,6 +379,9 @@ def getSystemWithReflectors():
             s.createPointSourceScalar(PS_Ufield, plane["name"])
             s.createUniformSourceScalar(PS_Ufield, plane["name"])
             s.createScalarGaussian(GPOfield, plane["name"])
+
+        else:
+            s.createPointSource(PS_Ufield_FF, plane["name"])
 
     for parabola in getParaboloidList():
         s.addParabola(parabola)

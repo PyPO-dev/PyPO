@@ -1372,11 +1372,28 @@ def check_aperDict(aperDict, clog):
     else:
         aperDict["center"] = np.zeros(2)
 
-    if not "outer" in aperDict:
-        errStr += errMsg_field("outer", "aperDict")
+    if aperDict.get("shape") is None:
+        aperDict["shape"] = "ellipse"
     
-    if not "inner" in aperDict:
-        errStr += errMsg_field("inner", "aperDict")
+    if aperDict["shape"] == "ellipse":
+        if not "outer" in aperDict:
+            errStr += errMsg_field("outer", "aperDict")
+        
+        if not "inner" in aperDict:
+            errStr += errMsg_field("inner", "aperDict")
+    
+    elif aperDict["shape"] == "rectangle":
+        if not "outer_x" in aperDict:
+            errStr += errMsg_field("outer_x", "aperDict")
+        
+        if not "outer_y" in aperDict:
+            errStr += errMsg_field("outer_y", "aperDict")
+        
+        if not "inner_x" in aperDict:
+            errStr += errMsg_field("inner_x", "aperDict")
+        
+        if not "inner_y" in aperDict:
+            errStr += errMsg_field("inner_y", "aperDict")
 
     if errStr:
         errList = errStr.split("\n")[:-1]

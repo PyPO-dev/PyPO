@@ -239,25 +239,56 @@ def plotBeam2D(plotObject, field, contour,
         c = fig.colorbar(ampfig, cax=cax, orientation='vertical')
     
     if aperDict["plot"]:
-        xc = aperDict["center"][0]
-        yc = aperDict["center"][1]
-        Ro = 2*aperDict["outer"]
-        Ri = 2*aperDict["inner"]
+        if aperDict["shape"] == "ellipse":
+            xc = aperDict["center"][0]
+            yc = aperDict["center"][1]
+            Ro = 2*aperDict["outer"]
+            Ri = 2*aperDict["inner"]
 
-        circleo=mpl.patches.Ellipse((xc,yc),Ro[0], Ro[1], color='black', fill=False)
-        circlei=mpl.patches.Ellipse((xc,yc),Ri[0], Ri[1], color='black', fill=False)
 
-        try:
-            for axx in ax:
-                
-                axx.add_patch(circleo)
-                axx.add_patch(circlei)
-                axx.scatter(xc, yc, color='black', marker='x')
+            if ax.size > 1:
+                for axx in ax:
+                    circleo=mpl.patches.Ellipse((xc,yc),Ro[0], Ro[1], color='black', fill=False)
+                    circlei=mpl.patches.Ellipse((xc,yc),Ri[0], Ri[1], color='black', fill=False)
+                    
+                    axx.add_patch(circleo)
+                    axx.add_patch(circlei)
+                    axx.scatter(xc, yc, color='black', marker='x')
+            
+            else:
+                circleo=mpl.patches.Ellipse((xc,yc),Ro[0], Ro[1], color='black', fill=False)
+                circlei=mpl.patches.Ellipse((xc,yc),Ri[0], Ri[1], color='black', fill=False)
+                ax.add_patch(circleo)
+                ax.add_patch(circlei)
+                ax.scatter(xc, yc, color='black', marker='x')
         
-        except:
-            ax.add_patch(circleo)
-            ax.add_patch(circlei)
-            ax.scatter(xc, yc, color='black', marker='x')
+        elif aperDict["shape"] == "rectangle":
+            xco = aperDict["center"][0] + aperDict["outer_x"][0]
+            yco = aperDict["center"][1] + aperDict["outer_y"][0]
+            ho = aperDict["outer_y"][1] - aperDict["outer_y"][0]
+            wo = aperDict["outer_x"][1] - aperDict["outer_x"][0]
+            
+            xci = aperDict["center"][0] + aperDict["inner_x"][0]
+            yci = aperDict["center"][1] + aperDict["inner_y"][0]
+            hi = aperDict["inner_y"][1] - aperDict["inner_y"][0]
+            wi = aperDict["inner_x"][1] - aperDict["inner_x"][0]
+
+
+            if ax.size > 1:
+                for axx in ax:
+                    recto=mpl.patches.Rectangle((xco,yco),wo, ho, color='black', fill=False)
+                    recti=mpl.patches.Rectangle((xci,yci),wi, hi, color='black', fill=False)
+                    
+                    axx.add_patch(recto)
+                    axx.add_patch(recti)
+                    axx.scatter(xco, yco, color='black', marker='x')
+            
+            else:
+                recto=mpl.patches.Rectangle((xco,yco),wo, ho, color='black', fill=False)
+                recti=mpl.patches.Rectangle((xci,yci),wi, hi, color='black', fill=False)
+                ax.add_patch(recto)
+                ax.add_patch(recti)
+                ax.scatter(xco, yco, color='black', marker='x')
 
     return fig, ax
 

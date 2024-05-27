@@ -111,8 +111,13 @@ PSDict = {
 aperDict = {
         "plot"      : "Whether to include the aperDict in a plot or not (boolean)",
         "center"    : "Center of aperture, with respect to the origin of the xy plane, in mm (Numpy array of length 2)",
-        "outer"     : "Outer semi-major (x) and minor (y) axes of aperture, in mm (Numpy array of length 2)",
-        "inner"     : "Inner semi-major (x) and minor (y) axes of aperture, in mm (Numpy array of length 2)",
+        "outer"     : "Outer semi-major (x) and minor (y) axes of aperture, in mm (Numpy array of length 2). Only when shape=='ellipse'.",
+        "inner"     : "Inner semi-major (x) and minor (y) axes of aperture, in mm (Numpy array of length 2). Only when shape=='ellipse'.",
+        "outer_x"   : "Outer  min x and max x values of aperture, in mm (Numpy array of length 2). Only when shape=='rectangle'.",
+        "inner_x"   : "Inner min x and max x values of aperture, in mm (Numpy array of length 2). Only when shape=='rectangle'.",
+        "outer_y"   : "Outer  min y and max y values of aperture, in mm (Numpy array of length 2). Only when shape=='rectangle'.",
+        "inner_y"   : "Inner min x and max x values of aperture,, in mm (Numpy array of length 2). Only when shape=='rectangle'.",
+        "shape"     : "Whether aperture is ellipse or rectangle."
         }
 
 ##

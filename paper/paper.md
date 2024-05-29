@@ -31,32 +31,35 @@ date: 26 April 2023
 bibliography: paper.bib
 ---
 
+
 # Summary
-`PyPO` is a Python interface for end-to-end design, simulation and analysis of (quasi-)optical reflector systems. 
+`PyPO` is a Python interface for end-to-end design, simulation, and analysis of (quasi-)optical reflector systems. 
 It can model the forward and backward propagation of electromagnetic field distributions between multiple planar and (off-axis) quadric surfaces, as well as far-field propagation.
 Simulations are performed using either geometrical optics (GO) or the equivalent surface current approach, belonging to the field of physical optics (PO) [@Balanis:1989].
 The GO and PO calculations are performed using libraries written in C++ and CUDA, allowing for multi-threading and GPU acceleration.
 Common figures of merit, such as aperture efficiency and half-power beamwidth, can be calculated and used for quantitative analysis of the designed system.
-Input beam patterns can be selected from a range of models, such as Gaussian beams, point sources and uniform current distributions. 
+Input beam patterns can be selected from a range of models, such as Gaussian beams, point sources, and uniform current distributions. 
 Custom beam patterns can also be imported to, for example, model the propagation of measured beam patterns through simulated optical systems.
 
+
 `PyPO` can be used through either a scripting-based approach, where simulations are defined in Python scripts, or through the graphical user interface (GUI).
-It only carries core dependencies on NumPy [@Harris:2020], Matplotlib [@Hunter:2007] and SciPy [@Virtanen:2020]. 
+It only carries core dependencies on NumPy [@Harris:2020], Matplotlib [@Hunter:2007], and SciPy [@Virtanen:2020]. 
 The unittesting framework carries a dependency on nose2. 
-The GUI carries dependencies on PySide6, pyqtdarktheme and attrs.
+The GUI carries dependencies on PySide6, pyqtdarktheme, and attrs.
+
 
 # Statement of need
 Development of `PyPO` started with the need for alignment strategies for the wideband sub-mm spectrometer DESHIMA 2.0 [@Taniguchi:2022]. 
 A software package capable of efficient GO and PO calulations through optical systems consisting of off-axis quadric surfaces was necessary for calculating the configuration of the corrective optics. 
 Currently, `PyPO` is also being used in simulations of measured beam patterns of DESHIMA 2.0 at the ASTE [@ASTE] telescope for the analysis of instrument and optical system performance.
 
-Commercial software for GO/PO calculations and analysis, such as OpticStudio (Zemax) and GRASP (TICRA), has already been developed. 
-Open-source optical simulation software packages such as POPPy (Perrin & others, 2012) and Prysm (Dube, 2019) are also available. 
+Commercial software for GO/PO calculations and analysis, such as OpticStudio (Zemax) and GRASP (TICRA), has already been developed.
+Open-source optical simulation software packages such as POPPy [@Perrin:2012] and Prysm [@Dube:2019] are also available. 
 These open-source software packages use Fourier methods to solve the Rayleigh-Sommerfeld integral equation.
 `PyPO` aims to contribute to this open-source optical simulation ecosystem by offering a software package working on the principle of the equivalent surface currents.
 
 # Availability
-`PyPO` can be found on [Github](https://github.com/PyPO-dev/PyPO) and is available for Linux, MacOS and Windows.
+`PyPO` can be found on [GitHub](https://github.com/PyPO-dev/PyPO) and is available for Linux, MacOS, and Windows.
 Software documentation and instructions regarding installation, contributing and issue tracking can be found in the [documentation](https://pypo-dev.github.io/PyPO/).
 The package comes with several Jupyter Notebook tutorials illustrating the workflow and features, and can be used as building blocks for new reflector systems.
 Several tutorials for using the GUI features are also included and can be found in the software documentation.

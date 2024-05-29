@@ -5,6 +5,7 @@ Provides implementation of form inputs.
 
 from PySide6.QtWidgets import QHBoxLayout, QCheckBox, QFormLayout, QGridLayout, QWidget, QButtonGroup, QRadioButton, QComboBox, QListWidget, QSizePolicy, QLabel
 from PySide6.QtCore import Signal
+from PyPO.Enums import Projections
 from src.GUI.utils import MyLabel, MyEdit, makeLabelFromString, inType, getValidator
 from src.GUI.ParameterForms.InputDescription import InputDescription
 from src.GUI.ParameterForms.inputWidgetInterfaces import inputWidgetInterface, selectionWidgetInterface
@@ -384,7 +385,10 @@ class XYZRadio(inputWidgetInterface):
         if self.r2.group.checkedButton()==None:
             raise EmptyFieldException("Empty field at Ordinate") 
         try:
-            return {self.inputDescription.outputName:self.r1.group.checkedButton().text() + self.r2.group.checkedButton().text()}
+            outputString = self.r1.group.checkedButton().text() + self.r2.group.checkedButton().text()
+            for projection in Projections:
+                if projection.name == outputString:
+                    return {self.inputDescription.outputName:projection}
         except:
             raise Exception(f"Failed to read input: {self.inputDescription.label}")
         

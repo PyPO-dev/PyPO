@@ -5,7 +5,11 @@ File containing enum types for PyPO methods.
 
 from enum import Enum
 
-class FieldComponents(Enum):
+class CustomEnum(Enum):
+    def __str__(self):
+        return self.name
+
+class FieldComponents(CustomEnum):
     """!
     Enum types for electric and magnetic field components.
    
@@ -30,9 +34,9 @@ class FieldComponents(Enum):
     Hx = 3
     Hy = 4
     Hz = 5
-    NONE = 6
+    NONE = None
 
-class CurrentComponents(Enum):
+class CurrentComponents(CustomEnum):
     """!
     These are special options that are used whenever a specific component of a field or current distribution is required.
     This could be, for example, for visualisation or an efficiency calculation.
@@ -55,7 +59,7 @@ class CurrentComponents(Enum):
     My = 4
     Mz = 5
 
-class Projections(Enum):
+class Projections(CustomEnum):
     """!
     Enum types for projections on two axes for plotting purposes.
     

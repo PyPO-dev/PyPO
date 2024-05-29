@@ -14629,6 +14629,7 @@ We shall demonstrate the custom beam pattern functionality using the same simula
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">from</span> <span class="nn">PyPO.System</span> <span class="kn">import</span> <span class="n">System</span>
+<span class="kn">from</span> <span class="nn">PyPO.Enums</span> <span class="kn">import</span> <span class="n">FieldComponents</span>
 
 <span class="n">s</span> <span class="o">=</span> <span class="n">System</span><span class="p">()</span>
 <span class="n">s</span><span class="o">.</span><span class="n">setCustomBeamPath</span><span class="p">(</span><span class="s2">&quot;custom_beam&quot;</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -14651,7 +14652,7 @@ We shall demonstrate the custom beam pattern functionality using the same simula
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre><span class="ansi-yellow-intense-fg ansi-bold">2023-06-19 19:48:51 - WARNING - System override set to True. </span>
+<pre><span class="ansi-yellow-intense-fg ansi-bold">2023-06-28 18:49:18 - WARNING - System override set to True. </span>
 </pre>
 </div>
 </div>
@@ -14711,11 +14712,11 @@ We shall demonstrate the custom beam pattern functionality using the same simula
 <span class="n">s</span><span class="o">.</span><span class="n">addPlane</span><span class="p">(</span><span class="n">plane_up</span><span class="p">)</span>
 <span class="n">s</span><span class="o">.</span><span class="n">addPlane</span><span class="p">(</span><span class="n">plane_down</span><span class="p">)</span>
 
-<span class="n">s</span><span class="o">.</span><span class="n">readCustomBeam</span><span class="p">(</span><span class="s2">&quot;PyPO&quot;</span><span class="p">,</span> <span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;Ex&quot;</span><span class="p">,</span> <span class="n">lam</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">readCustomBeam</span><span class="p">(</span><span class="s2">&quot;PyPO&quot;</span><span class="p">,</span> <span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="n">FieldComponents</span><span class="o">.</span><span class="n">Ex</span><span class="p">,</span> <span class="n">lam</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="n">s</span><span class="o">.</span><span class="n">translateGrids</span><span class="p">(</span><span class="s2">&quot;plane_up&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]))</span>
 
-<span class="n">s</span><span class="o">.</span><span class="n">plotBeam2D</span><span class="p">(</span><span class="s2">&quot;PyPO&quot;</span><span class="p">,</span> <span class="s2">&quot;Ex&quot;</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">plotBeam2D</span><span class="p">(</span><span class="s2">&quot;PyPO&quot;</span><span class="p">,</span> <span class="n">FieldComponents</span><span class="o">.</span><span class="n">Ex</span><span class="p">)</span>
 </pre></div>
 
      </div>
@@ -14735,10 +14736,10 @@ We shall demonstrate the custom beam pattern functionality using the same simula
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre><span class="ansi-green-fg">2023-06-19 19:48:52 - INFO - Added plane source to system. </span>
-<span class="ansi-green-fg">2023-06-19 19:48:52 - INFO - Added plane plane_up to system. </span>
-<span class="ansi-green-fg">2023-06-19 19:48:52 - INFO - Added plane plane_down to system. </span>
-<span class="ansi-green-fg">2023-06-19 19:48:52 - INFO - Translated element plane_up by (&#39;0.000e+00&#39;, &#39;0.000e+00&#39;, &#39;1.000e+02&#39;) millimeters. </span>
+<pre><span class="ansi-green-fg">2023-06-28 18:49:20 - INFO - Added plane source to system. </span>
+<span class="ansi-green-fg">2023-06-28 18:49:20 - INFO - Added plane plane_up to system. </span>
+<span class="ansi-green-fg">2023-06-28 18:49:20 - INFO - Added plane plane_down to system. </span>
+<span class="ansi-green-fg">2023-06-28 18:49:20 - INFO - Translated element plane_up by (&#39;0.000e+00&#39;, &#39;0.000e+00&#39;, &#39;1.000e+02&#39;) millimeters. </span>
 </pre>
 </div>
 </div>
@@ -14825,16 +14826,16 @@ class="
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre><span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:48:55 - WORK - *** Starting PO propagation *** </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:48:55 - WORK - Propagating PyPO on source to plane_up, propagation mode: JMEH. </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:48:55 - WORK - Hardware: running 256 CUDA threads per block. </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:48:55 - WORK - ... Calculating ... </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:49:00 - WORK - *** Finished: 5.221 seconds *** </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:49:00 - WORK - *** Starting PO propagation *** </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:49:00 - WORK - Propagating JM_up on plane_up to plane_down, propagation mode: JMEH. </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:49:00 - WORK - Hardware: running 256 CUDA threads per block. </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:49:00 - WORK - ... Calculating ... </span>
-<span class="ansi-blue-intense-fg ansi-bold">2023-06-19 19:49:06 - WORK - *** Finished: 5.447 seconds *** </span>
+<pre><span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:49:24 - WORK - *** Starting PO propagation *** </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:49:24 - WORK - Propagating PyPO on source to plane_up, propagation mode: JMEH. </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:49:24 - WORK - Hardware: running 256 CUDA threads per block. </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:49:24 - WORK - ... Calculating ... </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:49:29 - WORK - *** Finished: 5.195 seconds *** </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:49:29 - WORK - *** Starting PO propagation *** </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:49:29 - WORK - Propagating JM_up on plane_up to plane_down, propagation mode: JMEH. </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:49:29 - WORK - Hardware: running 256 CUDA threads per block. </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:49:29 - WORK - ... Calculating ... </span>
+<span class="ansi-blue-intense-fg ansi-bold">2023-06-28 18:49:35 - WORK - *** Finished: 5.271 seconds *** </span>
 </pre>
 </div>
 </div>
@@ -14846,8 +14847,8 @@ class="
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>[&lt;PyPO.PyPOTypes.currents at 0x7f87e65d5dc0&gt;,
- &lt;PyPO.PyPOTypes.fields at 0x7f87e65d5b80&gt;]</pre>
+<pre>[&lt;PyPO.PyPOTypes.currents at 0x7fad686acaf0&gt;,
+ &lt;PyPO.PyPOTypes.fields at 0x7fad68699a00&gt;]</pre>
 </div>
 
 </div>
@@ -14864,7 +14865,7 @@ class="
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[4]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">s</span><span class="o">.</span><span class="n">plotBeam2D</span><span class="p">(</span><span class="s2">&quot;EH_up&quot;</span><span class="p">,</span> <span class="s2">&quot;Ex&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">30</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">s</span><span class="o">.</span><span class="n">plotBeam2D</span><span class="p">(</span><span class="s2">&quot;EH_up&quot;</span><span class="p">,</span> <span class="n">FieldComponents</span><span class="o">.</span><span class="n">Ex</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">30</span><span class="p">)</span>
 </pre></div>
 
      </div>
@@ -14907,7 +14908,7 @@ class="
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">s</span><span class="o">.</span><span class="n">plotBeam2D</span><span class="p">(</span><span class="s2">&quot;EH_down&quot;</span><span class="p">,</span> <span class="s2">&quot;Ex&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">30</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">s</span><span class="o">.</span><span class="n">plotBeam2D</span><span class="p">(</span><span class="s2">&quot;EH_down&quot;</span><span class="p">,</span> <span class="n">FieldComponents</span><span class="o">.</span><span class="n">Ex</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">30</span><span class="p">)</span>
 </pre></div>
 
      </div>

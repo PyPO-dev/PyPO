@@ -116,15 +116,15 @@ Functions</h2></td></tr>
 <tr class="memitem:gac91555c8ca298cd98041a87de231d7d1"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__hybrid.html#gac91555c8ca298cd98041a87de231d7d1">PyPO.System.System.runHybridPropagation</a> (self, hybridDict)</td></tr>
 <tr class="memdesc:gac91555c8ca298cd98041a87de231d7d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform a hybrid RT/PO propagation, starting from a reflected field and set of Poynting vectors.  <br /></td></tr>
 <tr class="separator:gac91555c8ca298cd98041a87de231d7d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga3b3530f655e1d050d9219a9c2545d46e"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__hybrid.html#ga3b3530f655e1d050d9219a9c2545d46e">PyPO.System.System.interpFrame</a> (self, name_fr_in, name_field, name_target, name_out, comp=None, method=&quot;nearest&quot;)</td></tr>
-<tr class="memdesc:ga3b3530f655e1d050d9219a9c2545d46e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interpolate a frame and an associated field on a regular surface.  <br /></td></tr>
-<tr class="separator:ga3b3530f655e1d050d9219a9c2545d46e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6507dd824903c6aef59114aa65496c41"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__hybrid.html#ga6507dd824903c6aef59114aa65496c41">PyPO.System.System.interpFrame</a> (self, name_fr_in, name_field, name_target, name_out, comp=FieldComponents.NONE, method=&quot;nearest&quot;)</td></tr>
+<tr class="memdesc:ga6507dd824903c6aef59114aa65496c41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interpolate a frame and an associated field on a regular surface.  <br /></td></tr>
+<tr class="separator:ga6507dd824903c6aef59114aa65496c41"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>This section contains a list of public <code>PyPO</code> methods which employ both ray tracing (RT) and physical optics (PO). </p>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="ga3b3530f655e1d050d9219a9c2545d46e" name="ga3b3530f655e1d050d9219a9c2545d46e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga3b3530f655e1d050d9219a9c2545d46e">&#9670;&#160;</a></span>interpFrame()</h2>
+<a id="ga6507dd824903c6aef59114aa65496c41" name="ga6507dd824903c6aef59114aa65496c41"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga6507dd824903c6aef59114aa65496c41">&#9670;&#160;</a></span>interpFrame()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -163,7 +163,7 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>comp</em> = <code>None</code>, </td>
+          <td class="paramname"><em>comp</em> = <code>FieldComponents.NONE</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -187,7 +187,7 @@ Functions</h2></td></tr>
     <tr><td class="paramname">name_field</td><td>Name of field object, propagated along with the frame by multiplication. </td></tr>
     <tr><td class="paramname">name_target</td><td>Name of surface on which to interpolate the field. </td></tr>
     <tr><td class="paramname">name_out</td><td>Name of output field object in target surface. </td></tr>
-    <tr><td class="paramname">comp</td><td>Component of field to interpolate. If scalar, leave as is. </td></tr>
+    <tr><td class="paramname">comp</td><td>Component of field to interpolate. Instance of FieldComponents enum object. </td></tr>
     <tr><td class="paramname">method</td><td>Method for the interpolation.</td></tr>
   </table>
   </dd>

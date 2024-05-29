@@ -1,3 +1,8 @@
+"""!
+@file
+Tests for checking if beams in PyPO are correct
+"""
+
 import unittest
 import ctypes
 import numpy as np
@@ -14,10 +19,7 @@ import PyPO.BindBeam as beamlibs
 import PyPO.PyPOTypes as pypotypes
 
 from PyPO.System import System
-
-##
-# @file
-# Tests for checking if beams in PyPO are correct
+from PyPO.Enums import FieldComponents, CurrentComponents
 
 class Test_SystemBeams(unittest.TestCase):
     
@@ -93,7 +95,7 @@ class Test_SystemBeams(unittest.TestCase):
         np.savetxt(icbeamPath, np.ones((13, 13)))
 
         self.s.setCustomBeamPath(root)
-        self.s.readCustomBeam("test_cbeam", TestTemplates.plane_xy["name"], "Ex", lam=1)
+        self.s.readCustomBeam("test_cbeam", TestTemplates.plane_xy["name"], FieldComponents.Ex, lam=1)
         self.assertTrue("test_cbeam" in self.s.fields)
         self.assertTrue("test_cbeam" in self.s.currents)
 

@@ -1,0 +1,11 @@
+/**
+\defgroup public_api_argopts Special Option Arguments
+\brief Here you can find information on the special options `PyPO` that can be passed as arguments to functions.
+
+Several `PyPO` functions expect special arguments.
+For example, plotting a field or current distribution usually involves selecting a plane on which to project the object for visualisation.
+Also, for polarised fields and currents, the component of the field needs to be specified. 
+What makes these special is the fact that only a few options are allowed per argument, but between the available options, the choice is free. 
+`PyPO` provides built-in enumerable types that contain the special options.
+These can be imported and used as inpit to functions that require one.
+*/

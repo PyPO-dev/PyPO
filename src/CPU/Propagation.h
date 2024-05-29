@@ -47,7 +47,7 @@ class Propagation
     float MU_0;         /**<Magnetic permeability.*/
     float EPS_VAC;      /**<Vacuum electric permittivity.*/
     float ZETA_0_INV;   /**<Conductance of surrounding medium.*/
-    float M_PIf;        /**<Floating point pi (redundant?).*/
+    float PIf;        /**<Floating point pi (redundant?).*/
 
 
     std::complex<T> j;  /**<Complex unit.*/
@@ -144,7 +144,7 @@ public:
 template <class T, class U, class V, class W>
 Propagation<T, U, V, W>::Propagation(T k, int numThreads, int gs, int gt, T epsilon, T t_direction, bool verbose)
 {
-    this->M_PIf = 3.14159265359f;
+    this->PIf = 3.14159265359f;
     this->C_L = 2.99792458e11f; // mm s^-1
     this->MU_0 = 1.2566370614e-3f; // kg mm s^-2 A^-2
     this->EPS_VAC = 1 / (MU_0 * C_L*C_L);
@@ -811,7 +811,7 @@ std::array<std::array<std::complex<T>, 3>, 2> Propagation<T, U, V, W>::fieldAtPo
 
         //printf("%.16g\n", r);
 
-        Green = exp(this->t_direction * j * k * r) / (4 * M_PIf * r) * cs->area[i] * j;
+        Green = exp(this->t_direction * j * k * r) / (4 * PIf * r) * cs->area[i] * j;
 
         for( int n=0; n<3; n++)
         {
@@ -867,7 +867,7 @@ std::complex<T> Propagation<T, U, V, W>::fieldScalarAtPoint(V *cs,
         ut.diff(point_target, source_point, r_vec);
         ut.abs(r_vec, r);
 
-        out += - k * k * _field * exp(this->t_direction * j * k * r) / (4 * M_PIf * r) * cs->area[i];
+        out += - k * k * _field * exp(this->t_direction * j * k * r) / (4 * PIf * r) * cs->area[i];
 
     }
     return out;

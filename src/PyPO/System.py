@@ -1,3 +1,10 @@
+"""!
+@file
+System interface for PyPO.
+
+This script contains the System class definition.
+"""
+
 # Standard Python imports
 from scipy.optimize import fmin
 from scipy.interpolate import interp1d, griddata
@@ -25,6 +32,7 @@ from PyPO.CustomLogger import CustomLogger
 import PyPO.Plotter as PPlot
 import PyPO.Efficiencies as Effs
 import PyPO.FitGauss as FGauss
+from PyPO.Enums import Projections, FieldComponents, CurrentComponents, Units, Modes
 
 import PyPO.WorldParam as world
 
@@ -32,11 +40,6 @@ from traceback import print_tb
 
 logging.getLogger(__name__)
 
-##
-# @file
-# System interface for PyPO.
-#
-# This script contains the System class definition.
 class System(object):
     customBeamPath = os.getcwd()
     customReflPath = os.getcwd()
@@ -51,9 +54,6 @@ class System(object):
         @param verbose Enable system logger.
         @param override Allow overriding names.
         """
-        self.num_ref = 0
-        self.num_cam = 0
-        self.nThreads_cpu = os.cpu_count()
         self.context = context
         self.verbosity = verbose
 
@@ -67,12 +67,6 @@ class System(object):
         self.scalarfields = {}
         self.groups = {}
         self.assoc = {}
-
-        self.EHcomplist = np.array(["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"])
-        self.JMcomplist = np.array(["Jx", "Jy", "Jz", "Mx", "My", "Mz"])
-
-        self.cl = 2.99792458e11 # mm / s
-        #self.savePathElem = "./save/elements/"
 
         saveSystemsExist = os.path.isdir(self.savePathSystems)
 
@@ -114,7 +108,7 @@ class System(object):
     
     def getSystemLogger(self):
         """!
-        @brief Obtain a reference to the custom logger used by system.
+        Obtain a reference to the custom logger used by system.
         
         This method can be called to obtain a reference to the logging object that PyPO uses internally.
         Can be convenient in cases one wants to log their own information in the layout of the PyPO logger.
@@ -280,9 +274,7 @@ class System(object):
             self.system[_reflDict["name"]]["pos"] = (self.system[_reflDict["name"]]["transf"] @ np.append(self.system[_reflDict["name"]]["pos"], 1))[:-1]
             self.system[_reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[_reflDict["name"]]["ori"]
 
-            self.system[_reflDict["name"]]["coeffs"][0] = a
-            self.system[_reflDict["name"]]["coeffs"][1] = b
-            self.system[_reflDict["name"]]["coeffs"][2] = -1
+            self._fillCoeffs(_reflDict["name"], a, b, -1)
 
         elif _reflDict["pmode"] == "manual":
             self.system[_reflDict["name"]]["coeffs"] = np.array([_reflDict["coeffs"][0], _reflDict["coeffs"][1], -1])
@@ -295,7 +287,6 @@ class System(object):
         
         self.system[_reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added paraboloid {_reflDict['name']} to system.")
-        self.num_ref += 1
 
     def addHyperbola(self, reflDict):
         """!
@@ -345,9 +336,7 @@ class System(object):
             self.system[_reflDict["name"]]["pos"] = (self.system[_reflDict["name"]]["transf"] @ np.append(self.system[_reflDict["name"]]["pos"], 1))[:-1]
             self.system[_reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[_reflDict["name"]]["ori"]
 
-            self.system[_reflDict["name"]]["coeffs"][0] = a3
-            self.system[_reflDict["name"]]["coeffs"][1] = b3
-            self.system[_reflDict["name"]]["coeffs"][2] = c3
+            self._fillCoeffs(_reflDict["name"], a3, b3, c3)
 
         if _reflDict["gmode"] == "xy" or _reflDict["gmode"] == 0:
             self.system[_reflDict["name"]]["gmode"] = 0
@@ -357,7 +346,6 @@ class System(object):
 
         self.system[_reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added hyperboloid {_reflDict['name']} to system.")
-        self.num_ref += 1
 
     def addEllipse(self, reflDict):
         """!
@@ -402,14 +390,10 @@ class System(object):
             self.system[_reflDict["name"]]["ori"] = R[:-1, :-1] @ self.system[_reflDict["name"]]["ori"]
 
             if _reflDict["orient"] == "x":
-                self.system[_reflDict["name"]]["coeffs"][0] = a
-                self.system[_reflDict["name"]]["coeffs"][1] = b
-                self.system[_reflDict["name"]]["coeffs"][2] = b
+                self._fillCoeffs(_reflDict["name"], a, b, b)
             
             if _reflDict["orient"] == "z":
-                self.system[_reflDict["name"]]["coeffs"][0] = b
-                self.system[_reflDict["name"]]["coeffs"][1] = b
-                self.system[_reflDict["name"]]["coeffs"][2] = a
+                self._fillCoeffs(_reflDict["name"], b, b, a)
 
         if _reflDict["gmode"] == "xy" or _reflDict["gmode"] == 0:
             self.system[_reflDict["name"]]["gmode"] = 0
@@ -421,7 +405,6 @@ class System(object):
 
         self.system[_reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added ellipsoid {_reflDict['name']} to system.")
-        self.num_ref += 1
 
     def addPlane(self, reflDict):
         """!
@@ -441,10 +424,6 @@ class System(object):
         self.system[_reflDict["name"]] = _reflDict
         self.system[_reflDict["name"]]["coeffs"] = np.zeros(3)
 
-        self.system[_reflDict["name"]]["coeffs"][0] = -1
-        self.system[_reflDict["name"]]["coeffs"][1] = -1
-        self.system[_reflDict["name"]]["coeffs"][2] = -1
-
         if _reflDict["gmode"] == "xy" or _reflDict["gmode"] == 0:
             self.system[_reflDict["name"]]["gmode"] = 0
 
@@ -456,7 +435,6 @@ class System(object):
 
         self.system[_reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added plane {_reflDict['name']} to system.")
-        self.num_ref += 1
 
     def rotateGrids(self, name, rotation, obj="element", mode="relative", pivot=None, keep_pol=False):
         """!
@@ -513,7 +491,7 @@ class System(object):
             if mode == "absolute":
                 Rtot = self._absRotationMat(rotation, self.groups[name]["ori"], pivot)
                 
-                for self.system[elem] in self.groups[name]["members"]:
+                for elem in self.groups[name]["members"]:
                     self.system[elem]["transf"] = Rtot @ self.system[elem]["transf"]
                     self.system[elem]["transf"][:-1, :-1] = (MatTransf.MatRotate(rotation, pivot=pivot))[:-1, :-1]
 
@@ -832,7 +810,7 @@ class System(object):
         @param name_group Name of the group to be removed.
         """
         
-        PChecks.check_groupSystem(ng, self.groups, self.clog, extern=True)
+        PChecks.check_groupSystem(name_group, self.groups, self.clog, extern=True)
         del self.groups[name_group]
         
         self.clog.info(f"Removed group {name_group} from system.")
@@ -1086,22 +1064,23 @@ class System(object):
         
         self.clog.info(f"Removed scalar PO field {fieldName} from system.")
     
-    def readCustomBeam(self, name_beam, name_source, comp, lam, normalise=True, mode="PMC", scale=1):
+    def readCustomBeam(self, name_beam, name_source, comp, lam, normalise=True, scale=1):
         """!
         Read a custom beam from disk into the system. 
         
         The system will look in the customBeamPath, which defaults to the current working directory and can be set with the setCustomBeamPath() method.
         Note that the custom beam pattern needs to contain a real and imaginary part, and that these need to be stored in separate .txt files, stored as
         such: r<name_beam>.txt and i<name_beam>.txt, where 'r' and 'i' refer to the real and imaginary part, respectively.
-        
+        If the beam pattern is a component of the E-field, the currents will be calculated assuming a PMC surface.
+        If, on the other hand, the beam pattern is a component of the H-field, the currents will be calculated assuming a PEC surface.
+
         @ingroup public_api_po
         
         @param name_beam Name of the beam (without the 'r' or 'i' prefixes or '.txt' suffix).
         @param name_source Name of source surface on which to define the beam. 
-        @param comp Polarisation component of beam.
+        @param comp Polarisation component of beam. Instance of FieldComponents enum object.
         @param lam Wavelength of beam, in mm.
         @param normalise Whether or not to normalise beam to its maximum amplitude.
-        @para mode Which approximation to use. Can choose between Perfect Electrical Conductor ('PEC'), Perfect Magnetic Conductor ('PMC') or full calculation ('full'). Defaults to 'PMC'.
         @param scale Scale factor for beam. Defaults to 1.
         
         @see setCustomBeamPath
@@ -1123,6 +1102,12 @@ class System(object):
  
         shape = self.system[name_source]["gridsize"]
 
+        if comp.value < 4:
+            mode = "PMC"
+        
+        else:
+            mode = "PEC"
+
         fields_c = self._compToFields(comp, field)
         fields_c.setMeta(name_source, k)
         self.fields[name_beam] = fields_c#.H()
@@ -1130,32 +1115,6 @@ class System(object):
         currents_c.setMeta(name_source, k)
 
         self.currents[name_beam] = currents_c
-
-    def calcCurrents(self, name_source, fields, mode="PMC"):
-        """!
-        Calculate currents on a surface given a field object.
-        
-        Given a surface and a PO field defined on said surface it is possible to calculate the image PO currents, the virtual currents that would give rise to the PO field.
-        This is also known as the image theorem.
-        For this, it is necessary to give appropriate boundary conditions on the surface. This depends on the PO field that is present.
-        If only the electric field is known, the currents can be calculated by assuming a PMC (perfect magnetic conductor)
-        right behind the surface, which radiated the elctric fields.
-        In case only the magnetic field is know, the PMC is replaced by a PEC (perfect electric conductor).
-        In case both electric and magnetic fields are know, the boundary conditions for vectorial EM fields at the surface can be used to calculate the image currents.
-        
-        @ingroup public_api_po
-        
-        @param name_source Name of surface in which to calculate currents.
-        @param fields Fields object from which to calculate currents.
-        @para mode Which approximation to use. Can choose between Perfect Electrical Conductor ('PEC', requires H-field), Perfect Magnetic Conductor ('PMC', requires E-field) or full calculation ('full', requires both). Defaults to 'PMC'.
-        
-        @see fields
-        @see currents
-        """
-
-        PChecks.check_elemSystem(name_source, self.system, self.clog, extern=True)
-        currents = BBeam.calcCurrents(fields, self.system[name_source], mode)
-        return currents
 
     def runPO(self, runPODict):
         """!
@@ -1573,7 +1532,7 @@ class System(object):
         self.assoc[hybridDict["t_name"]] = [hybridDict["field_out"], hybridDict["fr_out"]]
         self.clog.work(f"*** Finished: {dtime:.3f} seconds ***")
 
-    def interpFrame(self, name_fr_in, name_field, name_target, name_out, comp=None, method="nearest"):
+    def interpFrame(self, name_fr_in, name_field, name_target, name_out, comp=FieldComponents.NONE, method="nearest"):
         """!
         Interpolate a frame and an associated field on a regular surface.
         
@@ -1586,7 +1545,7 @@ class System(object):
         @param name_field Name of field object, propagated along with the frame by multiplication.
         @param name_target Name of surface on which to interpolate the field.
         @param name_out Name of output field object in target surface.
-        @param comp Component of field to interpolate. If scalar, leave as is.
+        @param comp Component of field to interpolate. Instance of FieldComponents enum object.
         @param method Method for the interpolation.
         
         @returns out Complex numpy array containing interpolated field.
@@ -1599,7 +1558,7 @@ class System(object):
 
         points = (self.frames[name_fr_in].x, self.frames[name_fr_in].y, self.frames[name_fr_in].z)
 
-        if comp is None:
+        if comp is FieldComponents.NONE:
             _comps = []
             for i in range(6):
                 rfield = np.real(self.fields[name_field][i]).ravel()
@@ -1619,8 +1578,8 @@ class System(object):
             out = field
        
         else:
-            rfield = np.real(getattr(self.fields[name_field], comp)).ravel()
-            ifield = np.imag(getattr(self.fields[name_field], comp)).ravel()
+            rfield = np.real(self.fields[name_field][comp.value]).ravel()
+            ifield = np.imag(self.fields[name_field][comp.value]).ravel()
 
             grid_interp = (grids.x, grids.y, grids.z)
 
@@ -1699,7 +1658,7 @@ class System(object):
         @ingroup public_api_po
         
         @param name_field Name of the PO field.
-        @param comp Component of field to calculate spillover of.
+        @param comp Component of field to calculate spillover of. Instance of FieldComponents enum object.
         @param aperDict An aperDict dictionary containing the parameters for defining the spillover aperture.
         
         @returns spill The spillover efficiency.
@@ -1711,7 +1670,7 @@ class System(object):
         PChecks.check_aperDict(aperDict, self.clog)
 
         field = self.fields[name_field]
-        field_comp = getattr(field, comp)
+        field_comp = field[comp.value]
         surfaceObj = self.system[field.surf]
 
         return Effs.calcSpillover(field_comp, surfaceObj, aperDict)
@@ -1726,7 +1685,7 @@ class System(object):
         @ingroup public_api_po
         
         @param name_field Name of the PO field.
-        @param comp Component of field to calculate taper efficiency of.
+        @param comp Component of field to calculate taper efficiency of. Instance of FieldComponents enum object.
         @param aperDict An aperDict dictionary containing the parameters for defining the taper aperture. Defaults to None.
         
         @returns taper The taper efficiency.
@@ -1741,7 +1700,7 @@ class System(object):
             PChecks.check_aperDict(aperDict, self.clog)
 
         field = self.fields[name_field]
-        field_comp = getattr(field, comp)
+        field_comp = field[comp.value]
         surfaceObj = self.system[field.surf]
 
         return Effs.calcTaper(field_comp, surfaceObj, aperDict)
@@ -1756,21 +1715,21 @@ class System(object):
         @ingroup public_api_po
         
         @param name_field Name of the PO field.
-        @param comp_co Co-polar component of field.
-        @param comp_cr Cross-polar component of field.
+        @param comp_co Co-polar component of field. Instance of FieldComponents enum object.
+        @param comp_cr Cross-polar component of field. Instance of FieldComponents enum object.
         
         @returns crp The cross-polar efficiency.
         """
 
         PChecks.check_fieldSystem(name_field, self.fields, self.clog, extern=True)
         field = self.fields[name_field]
-        field_co = getattr(field, comp_co)
+        field_co = field[comp_co.value]
         
-        field_cr = getattr(field, comp_cr)
+        field_cr = field[comp_cr.value]
         
         return Effs.calcXpol(field_co, field_cr)
 
-    def fitGaussAbs(self, name_field, comp, thres=None, mode=None, full_output=False, ratio=1):
+    def fitGaussAbs(self, name_field, comp, thres=None, mode=Modes.LIN, full_output=False, ratio=1):
         """!
         Fit a Gaussian profile to the amplitude of a field component and adds the result to scalar field in system.
         
@@ -1781,9 +1740,9 @@ class System(object):
         @ingroup public_api_po
         
         @param name_field Name of field object.
-        @param comp Component of field object.
+        @param comp Component of field object. Instance of FieldComponents enum object.
         @param thres Threshold to fit to, in decibels.
-        @param mode Fit to amplitude in decibels, linear or logarithmically.
+        @param mode Fit to amplitude in decibels, linear or logarithmically. Instance of Modes enum object.
         @param full_output Return fitted parameters and standard deviations.
         
         @returns popt Fitted beam parameters.
@@ -1793,14 +1752,13 @@ class System(object):
         PChecks.check_fieldSystem(name_field, self.fields, self.clog, extern=True)
 
         thres = -11 if thres is None else thres
-        mode = "linear" if mode is None else mode
 
         surfaceObj = self.system[self.fields[name_field].surf]
-        field = self.copyObj(np.absolute(getattr(self.fields[name_field], comp)))
+        field = self.copyObj(np.absolute(self.fields[name_field][comp.value]))
 
         popt = FGauss.fitGaussAbs(field, surfaceObj, thres, mode, ratio)
 
-        Psi = PTypes.scalarfield(FGauss.generateGauss(popt, surfaceObj, mode="linear"))
+        Psi = PTypes.scalarfield(FGauss.generateGauss(popt, surfaceObj, mode=Modes.LIN))
         Psi.setMeta(self.fields[name_field].surf, self.fields[name_field].k)
        
         _name = f"fitGauss_{name_field}"
@@ -1815,7 +1773,7 @@ class System(object):
         if full_output:
             return popt
 
-    def calcMainBeam(self, name_field, comp, thres=None, mode=None):
+    def calcMainBeam(self, name_field, comp, thres=None, mode=Modes.LIN):
         """!
         Calculate main-beam efficiency of a beam pattern.
         
@@ -1829,7 +1787,7 @@ class System(object):
         @ingroup public_api_po
         
         @param name_field Name of field object.
-        @param comp Component of field object.
+        @param comp Component of field object. Instance of FieldComponents enum object.
         @param thres Threshold to fit to, in decibels.
         @param mode Fit to amplitude in decibels, linear or logarithmically.
         
@@ -1838,18 +1796,17 @@ class System(object):
 
         PChecks.check_fieldSystem(name_field, self.fields, self.clog, extern=True)
         thres = -11 if thres is None else thres
-        mode = "linear" if mode is None else mode
 
         _thres = self.copyObj(thres)
 
         self.fitGaussAbs(name_field, comp, thres, mode)
-        field = self.copyObj(getattr(self.fields[name_field], comp))
+        field = self.copyObj(self.fields[name_field][comp.value])
         surfaceObj = self.system[self.fields[name_field].surf]
         
         eff = Effs.calcMainBeam(field, surfaceObj, self.scalarfields[f"fitGauss_{name_field}"].S)
         return eff
     
-    def calcBeamCuts(self, name_field, comp, phi=0, center=True, align=True, norm=False, transform=False, mode="dB"):
+    def calcBeamCuts(self, name_field, comp, phi=0, center=True, align=True, norm=False, transform=False, mode=Modes.dB):
         """!
         Calculate cross sections of a beam pattern.
         
@@ -1863,13 +1820,13 @@ class System(object):
         @ingroup public_api_po
         
         @param name_field Name of field object.
-        @param comp Component of field object.
+        @param comp Component of field object. Instance of FieldComponents enum object.
         @param phi Manual rotation of cuts w.r.t. to the x-y cardinal planes.
         @param center Whether to center the cardinal planes on the peak of the beam pattern.
         @param align Whether to align the cardinal planes to the beam pattern minor and major axes.
         @param norm Which component to normalise to. Defaults to comp. 
         @param transform Transform surface on which beam is defined. If False, will evaluate beam cuts as if surface is in restframe.
-        @param mode Return beamcuts in linear ("linear"), logarithmic ("log") or decibels ("dB"). Defaults to "dB".
+        @param mode Return beamcuts in linear or decibel values. Instance of Modes enum object.
         
         @returns x_cut Beam cross section along the E-plane.
         @returns y_cut Beam cross section along the H-plane.
@@ -1884,13 +1841,13 @@ class System(object):
         self.setLoggingVerbosity(verbose=False)
 
         name_surf = self.fields[name_field].surf
-        field = np.absolute(getattr(self.fields[name_field], comp))
+        field = np.absolute(self.fields[name_field][comp.value])
         _field = self.copyObj(self.fields[name_field])
 
         self.snapObj(name_surf, "__pre")
 
         if center or align:
-            popt = self.fitGaussAbs(name_field, comp, mode="linear", full_output=True)
+            popt = self.fitGaussAbs(name_field, comp, mode=Modes.LIN, full_output=True)
         
         if center:
             self.translateGrids(name_surf, np.array([-popt[2], -popt[3], 0]))
@@ -1918,20 +1875,21 @@ class System(object):
         if not norm:
             x_cut = self.copyObj(20 * np.log10(field[:, idx_c[1]] / np.max(field)))
             y_cut = self.copyObj(20 * np.log10(field[idx_c[0], :] / np.max(field)))
-            if mode == "dB":
+            
+            if mode == Modes.dB:
                 x_cut = self.copyObj(20 * np.log10(field[:, idx_c[1]] / np.max(field)))
                 y_cut = self.copyObj(20 * np.log10(field[idx_c[0], :] / np.max(field)))
             
-            elif mode == "linear":
+            elif mode == Modes.LIN:
                 x_cut = self.copyObj(field[:, idx_c[1]] / np.max(field))
                 y_cut = self.copyObj(field[idx_c[0], :] / np.max(field))
         
         else:
-            if mode == "dB":
+            if mode == Modes.dB:
                 x_cut = self.copyObj(20 * np.log10(field[:, idx_c[1]] / np.max(np.absolute(getattr(self.fields[name_field], norm)))))
                 y_cut = self.copyObj(20 * np.log10(field[idx_c[0], :] / np.max(np.absolute(getattr(self.fields[name_field], norm)))))
             
-            elif mode == "linear":
+            elif mode == Modes.LIN:
                 x_cut = self.copyObj(field[:, idx_c[1]] / np.max(np.absolute(getattr(self.fields[name_field], norm))))
                 y_cut = self.copyObj(field[idx_c[0], :] / np.max(np.absolute(getattr(self.fields[name_field], norm))))
 
@@ -1947,7 +1905,7 @@ class System(object):
 
         return x_cut, y_cut, x_strip, y_strip
    
-    def plotBeamCut(self, name_field, comp, comp_cross=None, vmin=None, vmax=None, center=True, align=True, units='', name="", show=True, save=False, ret=False):
+    def plotBeamCut(self, name_field, comp, comp_cross=FieldComponents.NONE, vmin=None, vmax=None, center=True, align=True, mode=Modes.dB, units=Units.DEG, name="", show=True, save=False, ret=False):
         """!
         Plot beam pattern cross sections.
         
@@ -1958,13 +1916,14 @@ class System(object):
         @ingroup public_api_vis
         
         @param name_field Name of field object.
-        @param comp Component of field object.
+        @param comp Component of field object. Instance of FieldComponents enum object.
         @param comp_cross Cross-polar component. If given, is plotted as well. Defaults to None.
         @param vmin Minimum amplitude value to display. Default is -30.
         @param vmax Maximum amplitude value to display. Default is 0.
         @param center Whether to calculate beam center and center the beam cuts on this point.
         @param align Whether to find position angle of beam cuts and align cut axes to this.
-        @param units The units of the axes. Default is "", which is degrees.
+        @param mode Plot in decibels or linear.
+        @param units The units of the axes. Instance of Units enum object.
         @param name Name of .png file where plot is saved. Only when save=True. Default is "".
         @param show Show plot. Default is True.
         @param save Save plot to savePath.
@@ -1974,19 +1933,15 @@ class System(object):
         @returns ax Axes object.
         """
 
-        E_cut, H_cut, E_strip, H_strip = self.calcBeamCuts(name_field, comp, center=center, align=align)
+        E_cut, H_cut, E_strip, H_strip = self.calcBeamCuts(name_field, comp, center=center, align=align, mode=mode)
 
         #if comp_cross is not None:
             #cr45_cut, cr135_cut, cr45_strip, cr135_strip = self.calcBeamCuts(name_field, comp_cross, phi=45, align=False, center=False, norm="Ex")
 
-        default = "deg"
-
-        unitl = self._units(units, default)
-
         vmin = np.min([np.min(E_cut), np.min(H_cut)]) if vmin is None else vmin
         vmax = np.max([np.max(E_cut), np.max(H_cut)]) if vmax is None else vmax
         
-        fig, ax = PPlot.plotBeamCut(E_cut, H_cut, E_strip, H_strip, vmin, vmax, unitl)
+        fig, ax = PPlot.plotBeamCut(E_cut, H_cut, E_strip, H_strip, vmin, vmax, units)
 
         if ret:
             return fig, ax
@@ -1999,7 +1954,7 @@ class System(object):
         elif show:
             pt.show()
 
-    def calcHPBW(self, name_field, comp, interp=50):
+    def calcHPBW(self, name_field, comp, interp=50, center=False, align=False):
         """
         Calculate half-power beamwidth.
         
@@ -2009,14 +1964,16 @@ class System(object):
         @ingroup public_api_po
         
         @param name_field Name of field object.
-        @param comp Component of field object.
+        @param comp Component of field object. Instance of FieldComponents enum object.
         @param interp Interpolation factor for finding the HPBW. Defaults to 50.
+        @param center Whether to center the beam cuts on amplitude center. Use only if beam has well defined amplitude center.
+        @param align Whether to take beam cuts along cardinal planes rotated by the position angle.
         
         @returns HPBW_E Half-power beamwidth along E-plane in units of surface of beam.
         @returns HPBW_H Half-power beamwidth along H-plane in units of surface of beam.
         """
 
-        x_cut, y_cut, x_strip, y_strip = self.calcBeamCuts(name_field, comp)#, center=False, align=False)
+        x_cut, y_cut, x_strip, y_strip = self.calcBeamCuts(name_field, comp, center, align)
 
         x_interp = np.linspace(np.min(x_strip), np.max(x_strip), num=len(x_strip) * interp)
         y_interp = np.linspace(np.min(y_strip), np.max(y_strip), num=len(y_strip) * interp)
@@ -2052,6 +2009,8 @@ class System(object):
         _PSDict = self.copyObj(PSDict)
         PChecks.check_PSDict(_PSDict, self.fields, self.clog)
 
+        mode = "PMC"
+        
         surfaceObj = self.system[name_surface]
         ps = np.zeros(surfaceObj["gridsize"], dtype=complex)
 
@@ -2069,8 +2028,8 @@ class System(object):
         Hz = ps * 0
 
         field = PTypes.fields(Ex, Ey, Ez, Hx, Hy, Hz) 
-        current = self.calcCurrents(name_surface, field)
-
+        #current = self.calcCurrents(name_surface, field)
+        current = BBeam.calcCurrents(field, self.system[name_surface], mode)
         k =  2 * np.pi / _PSDict["lam"]
 
         field.setMeta(name_surface, k)
@@ -2097,6 +2056,8 @@ class System(object):
         PChecks.check_elemSystem(name_surface, self.system, self.clog, extern=True)
         _UDict = self.copyObj(UDict)
         PChecks.check_PSDict(_UDict, self.fields, self.clog)
+        
+        mode = "PMC"
 
         surfaceObj = self.system[name_surface]
         us = np.ones(surfaceObj["gridsize"], dtype=complex) * _UDict["E0"] * np.exp(1j * _UDict["phase"])
@@ -2110,7 +2071,7 @@ class System(object):
         Hz = us * 0
 
         field = PTypes.fields(Ex, Ey, Ez, Hx, Hy, Hz) 
-        current = self.calcCurrents(name_surface, field)
+        current = BBeam.calcCurrents(field, self.system[name_surface], mode)
 
         k =  2 * np.pi / _UDict["lam"]
 
@@ -2243,11 +2204,11 @@ class System(object):
             obj_interp.setMeta(obj.surf + "_interp", obj.k)
             self.currents[name + "_interp"] = obj_interp
 
-    def plotBeam2D(self, name_obj, comp=None, contour=None, contour_comp=None,
+    def plotBeam2D(self, name_obj, comp=FieldComponents.NONE, contour=None, contour_comp=FieldComponents.NONE,
                     vmin=None, vmax=None, levels=None, show=True, amp_only=False,
                     save=False, interpolation=None, norm=True,
-                    aperDict=None, mode='dB', project='xy',
-                    units="", name="", titleA="Power", titleP="Phase",
+                    aperDict=None, mode=Modes.dB, project=Projections.xy,
+                    units=Units.MM, name="", titleA="Power", titleP="Phase",
                     unwrap_phase=False, ret=False):
         """!
         Generate a 2D plot of a PO (scalar)field or current.
@@ -2270,9 +2231,9 @@ class System(object):
         @param interpolation What interpolation to use for displaying amplitude pattern. Default is None.
         @param norm Normalise field (only relevant when plotting linear scale). Default is True.
         @param aperDict Plot an aperture defined in an aperDict object along with the field or current patterns. Default is None.
-        @param mode Plot amplitude in decibels ("dB") or on a linear scale ("linear"). Default is "dB".
-        @param project Set abscissa and ordinate of plot. Should be given as a string. Default is "xy".
-        @param units The units of the axes. Default is "", which is millimeters.
+        @param mode Plot amplitude in linear or decibel values. Instance of Modes enum object.
+    @param project Set abscissa and ordinate of plot. Should be given as an instance of the Projection enum. Default is Projection.xy.
+        @param units The units of the axes. Instance of Units enum object.
         @param name Name of .png file where plot is saved. Only when save=True. Default is "".
         @param titleA Title of the amplitude plot. Default is "Amp".
         @param titleP Title of the phase plot. Default is "Phase".
@@ -2284,54 +2245,44 @@ class System(object):
 
         aperDict = {"plot":False} if aperDict is None else aperDict
 
-        if comp is None:
+        if comp == FieldComponents.NONE:
             field_comp = self.scalarfields[name_obj].S
             name_surface = self.scalarfields[name_obj].surf
         
-        elif comp[0] == "E" or comp[0] == "H":
+        elif isinstance(comp, FieldComponents):
             PChecks.check_fieldSystem(name_obj, self.fields, self.clog, extern=True)
             field = self.fields[name_obj]
             name_surface = field.surf
-        
-            if comp in self.EHcomplist:
-                field_comp = getattr(field, comp)
+            field_comp = field[comp.value]
 
-        elif comp[0] == "J" or comp[0] == "M":
+        elif isinstance(comp, CurrentComponents):
             PChecks.check_currentSystem(name_obj, self.currents, self.clog, extern=True)
             field = self.currents[name_obj] 
             name_surface = field.surf
-            
-            if comp in self.JMcomplist:
-                field_comp = getattr(field, comp)
-        
+            field_comp = field[comp.value]
+
         if contour is not None:
-            if contour_comp is None:
+            if contour_comp == FieldComponents.NONE:
                 contour_pl = self.scalarfields[contour].S
             
             else:
-                if contour_comp[0] == "E" or contour_comp[0] == "H":
+                if isinstance(contour_comp, FieldComponents):
                     PChecks.check_fieldSystem(contour, self.fields, self.clog, extern=True)
-                    contour_pl = getattr(self.fields[contour], contour_comp)
+                    contour_pl = self.fields[contour][contour_comp.value]
             
-                elif contour_comp[0] == "J" or contour_comp[0] == "M":
+                elif isinstance(contour_comp, CurrentComponents):
                     PChecks.check_currentSystem(contour, self.currents, self.clog, extern=True)
-                    contour_pl = getattr(self.currents[contour], contour_comp)
+                    contour_pl = self.currents[contour][contour_comp.value]
         else:
             contour_pl = contour
 
         plotObject = self.system[name_surface]
-        
-        default = "mm"
-        if plotObject["gmode"] == 2 and not units:
-            default = "deg"
 
-        unitl = self._units(units, default)
-        
         fig, ax = PPlot.plotBeam2D(plotObject, field_comp, contour_pl,
                         vmin, vmax, levels, show, amp_only,
                         save, interpolation, norm,
                         aperDict, mode, project,
-                        unitl, name, titleA, titleP, self.savePath, unwrap_phase)
+                        units, name, titleA, titleP, self.savePath, unwrap_phase)
 
         if ret:
             return fig, ax
@@ -2467,7 +2418,7 @@ class System(object):
         else:
             self.plotSystem(select=select, show=show)
 
-    def plotRTframe(self, name_frame, project="xy", ret=False, aspect=1, unit="mm"):
+    def plotRTframe(self, name_frame, project=Projections.xy, ret=False, aspect=1, units=Units.MM):
         """!
         Create a spot diagram of a ray-trace frame.
         
@@ -2477,18 +2428,17 @@ class System(object):
         @ingroup public_api_vis
         
         @param name_frame Name of frame to plot.
-        @param project Set abscissa and ordinate of plot. Should be given as a string. Default is "xy".
+        @param project Set abscissa and ordinate of plot. Should be given as an instance of the Projection enum. Default is Projection.xy.
         @param ret Return Figure and Axis. Default is False.
         @param aspect Aspect ratio of plot. Default is 1.
-        @param unit Units of the axes for the plot.
+        @param units Units of the axes for the plot. Instance of Units enum object.
         """
 
-        unit = self._units(unit)
         PChecks.check_frameSystem(name_frame, self.frames, self.clog, extern=True)
         if ret:
-            return PPlot.plotRTframe(self.frames[name_frame], project, self.savePath, ret, aspect, unit)
+            return PPlot.plotRTframe(self.frames[name_frame], project, self.savePath, ret, aspect, units)
         else:
-            PPlot.plotRTframe(self.frames[name_frame], project, self.savePath, ret, aspect, unit)
+            PPlot.plotRTframe(self.frames[name_frame], project, self.savePath, ret, aspect, units)
 
     def findRTfocus(self, name_frame, f0=None, tol=1e-12):
         """!
@@ -2721,7 +2671,7 @@ class System(object):
             n += 1
             if n >= max_iter:
                 self.setLoggingVerbosity(logstate)
-                self.clog.error("Could not find converging solution.")
+                self.clog.error("Could not find converged solution.")
                 self.system[name_target][xu] /= patch_size
                 self.system[name_target][yv] /= patch_size
                 self.system[name_target]["gridsize"] = (self.system[name_target]["gridsize"] / patch).astype(int)
@@ -2943,67 +2893,25 @@ class System(object):
         """!
         Transform a single component to a filled fields object by setting all other components to zero.
         
-        @param comp Name of component.
+        @param comp Name of component. Instance of FieldComponents enum object.
         @param field Array to be inserted in fields object.
         
         @returns field_c Filled fields object with one component filled.
         """
 
         null = np.zeros(field.shape, dtype=complex)
+        
+        clist = []
+        for i in range(6):
+            if i == comp.value:
+                clist.append(field)
 
-        if comp == "Ex":
-            field_c = PTypes.fields(field, null, null, null, null, null)
-        elif comp == "Ey":
-            field_c = PTypes.fields(null, field, null, null, null, null)
-        elif comp == "Ez":
-            field_c = PTypes.fields(null, null, field, null, null, null)
-        elif comp == "Hx":
-            field_c = PTypes.fields(null, null, null, field, null, null)
-        elif comp == "Hy":
-            field_c = PTypes.fields(null, null, null, null, field, null)
-        elif comp == "Hz":
-            field_c = PTypes.fields(null, null, null, null, null, field)
+            else:
+                clist.append(null)
+
+        field_c = PTypes.fields(*clist)
 
         return field_c
-
-    def _units(self, unit, default="mm"):
-        """!
-        Convert a string representation of a unit to a list containing the unit and conversion factor.
-        The conversion is done with respect of the standard PyPO units, which are millimeters.
-        This method is only used for plotting.
-        
-        @param unit String representation of the unit.
-        @param default Default unit, millimeters.
-        
-        @returns out List containing the string unit and the corresponding conversion factor.
-        """
-
-        if unit == "m":
-            return [unit, 1e-3]
-
-        elif unit == "mm":
-            return [unit, 1.]
-
-        elif unit == "cm":
-            return [unit, 1e-2]
-        
-        elif unit == "um":
-            return [unit, 1e3]
-        
-        elif unit == "nm":
-            return [unit, 1e6]
-
-        elif unit == "deg":
-            return [unit, 1.]
-
-        elif unit == "am":
-            return [unit, 60]
-
-        elif unit == "as":
-            return [unit, 3600]
-
-        else:
-            return [default, 1.]
    
     def _absRotationMat(self, rotation, ori, pivot):
         """!
@@ -3030,4 +2938,17 @@ class System(object):
         Rtot = Tp @ R @ Tpm
         return Rtot
 
+    def _fillCoeffs(self, name, a, b, c):
+        """!
+        Fill the coeffs values for an internal reflector dictionary.
+        
+        @param name Name of reflector in system.
+        @param a The a coefficient.
+        @param b The b coefficient.
+        @param c The c coefficient.
+        """
+        
+        self.system[name]["coeffs"][0] = a
+        self.system[name]["coeffs"][1] = b
+        self.system[name]["coeffs"][2] = c
 

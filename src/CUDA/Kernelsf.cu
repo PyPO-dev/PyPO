@@ -33,7 +33,7 @@ __constant__ int g_t;               // Gridsize on target
      // Calculate nr of blocks per grid and nr of threads per block
      dim3 nrb(nBlocks); dim3 nrt(nThreads);
 
-     float M_PIf = 3.1415926; /* pi */
+     float PIf = 3.1415926; /* pi */
      float C_L = 2.9979246e11; // mm s^-1
      float MU_0 = 1.256637e-3; // kg mm s^-2 A^-2
      float EPS_VAC = 1 / (MU_0 * C_L*C_L);
@@ -53,7 +53,7 @@ __constant__ int g_t;               // Gridsize on target
                                      make_cuFloatComplex(EPS, 0.),
                                      make_cuFloatComplex(MU_0, 0.),
                                      make_cuFloatComplex(ZETA_0_INV, 0.),
-                                     make_cuFloatComplex(M_PIf, 0.),
+                                     make_cuFloatComplex(PIf, 0.),
                                      make_cuFloatComplex(C_L, 0.),
                                      make_cuFloatComplex(t_direction, 0.),
                                      make_cuFloatComplex(0., 1.),

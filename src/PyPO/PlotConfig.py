@@ -1,11 +1,12 @@
+"""!
+@file
+File containing the definitions for plotting style.
+Also enables LaTeX backend if present.
+"""
+
 import matplotlib.pyplot as pt
 import matplotlib
 from distutils.spawn import find_executable
-
-##
-# @file
-# File containing the definitions for plotting style.
-# Also enables LaTeX backend if present.
 
 if find_executable('latex'):
 

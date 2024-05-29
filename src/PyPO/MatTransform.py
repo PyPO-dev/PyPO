@@ -1,11 +1,12 @@
+"""!
+@file
+Transformation formalism for PyPO.
+
+This script contains the methods for applying matrix transformations to objects.
+"""
+
 import numpy as np
 import PyPO.WorldParam as world
-
-##
-# @file
-# Transformation formalism for PyPO.
-#
-# This script contains the methods for applying matrix transformations to objects.
 
 def MatRotate(theta, matAppend=None, pivot=None, radians=False):
     """!

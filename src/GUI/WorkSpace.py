@@ -1,11 +1,12 @@
+"""!
+@file
+Defines the workspace widget 
+"""
+
 from PySide6.QtWidgets import QWidget, QTabWidget, QScrollArea, QVBoxLayout, QSizePolicy
 from PySide6.QtCore import Qt
 from src.GUI.ElementWidget import ReflectorWidget, GroupWidget, FrameWidget, CurrentWidget, FieldsWidget, CurrentWidget, SFieldsWidget
 from src.GUI.Accordion import Accordion
-
-##
-# @file
-# Defines the workspace widget 
 
 class Workspace(QTabWidget):
     """!

@@ -1,3 +1,10 @@
+"""!
+@file 
+defines classes PyPOMainWindow and MainWidget.
+PyPOMainWindow is responsible for setting up the window and toolbars.
+MainWidget is responsible for all gui functionalities.
+"""
+
 import os
 import shutil
 from time import time
@@ -16,19 +23,13 @@ from src.GUI.utils import inType
 import src.GUI.ParameterForms.formData as fData
 from src.GUI.PlotScreen import PlotScreen
 from src.GUI.WorkSpace import Workspace
+from src.GUI.Dialogs import UnsavedChangesDialog
 from src.GUI.SubprocessManager import SubprocessManager, copySystem
 
 from PyPO.CustomLogger import CustomGUILogger
 
 import PyPO.System as st
 import PyPO.Checks as chk
-
-##
-# @file 
-# defines classes PyPOMainWindow and MainWidget.
-# PyPOMainWindow is responsible for setting up the window and toolbars.
-# MainWidget is responsible for all gui functionalities.
-
 
 class MainWidget(QWidget):    
     """!
@@ -46,6 +47,8 @@ class MainWidget(QWidget):
         # Window settings
         self.setWindowTitle("PyPO")
         self.currentFileName = ""
+        self.unsavedChanges = False
+        self.darkTheme  = True
 
         self.currentFilePath = os.path.expanduser('~') 
 
@@ -75,12 +78,7 @@ class MainWidget(QWidget):
         self._mkPlotScreen()
         self.setLayout(self.grid)
         
-        self.event_stop = Event()
-
-        # self.threadpool = QThreadPool()
         self.subprocessManager = SubprocessManager(self)
-
-        self.frameDict = {}
 
     ### GUI setup functions
     
@@ -116,8 +114,11 @@ class MainWidget(QWidget):
             self.WorkSpace.setParent(None)
         # rebuild 
         logo = QLabel()
-        pixmap = QPixmap('src/GUI/resources/logo.png')
-        pixmap = pixmap.scaledToWidth(250)
+        imgUrl = 'src/GUI/resources/logo.png'
+        if self.darkTheme:
+            imgUrl = 'src/GUI/resources/logo_dark_bg.png'
+        pixmap = QPixmap(imgUrl)
+        pixmap = pixmap.scaledToWidth(300)
         logo.setPixmap(pixmap)
         logo.resize(300, 150)
         self.WorkSpace = Workspace()
@@ -271,6 +272,7 @@ class MainWidget(QWidget):
             
             self.stm.copyElement(copyDict["name"], copyDict["name_copy"])
             self.addReflectorWidget(copyDict["name_copy"])
+            self.unsavedChanges = True
 
 
         except Exception as err:
@@ -294,6 +296,7 @@ class MainWidget(QWidget):
             
             self.stm.copyGroup(copyDict["name"], copyDict["name_copy"])
             self.addGroupWidget(copyDict["name_copy"])
+            self.unsavedChanges = True
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -382,6 +385,11 @@ class MainWidget(QWidget):
             self.clog.error(err)
     
     ### Functionalities: Systems 
+    def saveBeforeClosing(self):
+        if self.unsavedChanges:
+            return UnsavedChangesDialog(self, self.saveSystem).exec_()
+        return True
+                
 
     def saveSystem(self):
         """!
@@ -389,9 +397,10 @@ class MainWidget(QWidget):
         """
         try:
             if not self.currentFileName:
-                self.saveSystemAs()
-                return
+                return self.saveSystemAs()
             self.stm.saveSystem(self.currentFileName)
+            self.unsavedChanges = False
+            return True
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -409,7 +418,7 @@ class MainWidget(QWidget):
             diag.setFileMode(QFileDialog.FileMode.AnyFile)
             filePath, _ = diag.getSaveFileName(self, filter="*.pyposystem", dir = self.currentFilePath)
             if not filePath:
-                return
+                return False
             pathFileList = filePath.rsplit(sep = os.sep, maxsplit = 1)
             if pathFileList[1] == (self.currentFileName + ".pyposystem"):
                 pathFileList[1] = self.currentFileName
@@ -418,18 +427,22 @@ class MainWidget(QWidget):
             self.currentFilePath = pathFileList[0]
 
             self.stm.setSavePathSystems(pathFileList[0])
-            self.saveSystem()
+            return self.saveSystem()
 
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
             self.clog.error(err)
- 
+            
     def loadSystem(self):
         """!
         Loads system selected in from form.
         """
         try:
+            if self.unsavedChanges:
+                UCDialog = UnsavedChangesDialog(self, self.saveSystem)
+                if not UCDialog.exec_():
+                    return
             diag = QFileDialog(self)
             diag.setFileMode(QFileDialog.FileMode.AnyFile)
             diag.setNameFilter("*.pyposystem")
@@ -443,7 +456,8 @@ class MainWidget(QWidget):
                 self.stm.loadSystem(str_l[1].split(".")[0])
                 self.currentFileName = str_l[1].split(".")[0]
 
-                self.refreshWorkspaceSection()
+                self.refreshWorkspace()
+                self.unsavedChanges = False
                 
                 self.removeForm()
                 # print(self.stm.system)
@@ -460,6 +474,7 @@ class MainWidget(QWidget):
         """
         try:
             self.stm.removeElement(element)
+            self.unsavedChanges = True
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -473,6 +488,7 @@ class MainWidget(QWidget):
         """
         try:
             self.stm.removeFrame(frame)
+            self.unsavedChanges = True
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -499,9 +515,8 @@ class MainWidget(QWidget):
             self.stm.groupElements(groupDict["name"], *groupDict["selected"])
 
             self.addGroupWidget(list(self.stm.groups.keys())[-1])
-            # self.refreshWorkspaceSection(self.stm.groups, "groups")
-
-
+            self.unsavedChanges = True
+            self.refreshWorkspace()
 
         except Exception as err:
             print(err)
@@ -540,7 +555,7 @@ class MainWidget(QWidget):
             print_tb(err.__traceback__)
             self.clog.error(err)
 
-    def refreshWorkspaceSection(self):
+    def refreshWorkspace(self):
         """!
         Refresh the workspace and update contents.
         
@@ -625,6 +640,7 @@ class MainWidget(QWidget):
 
             self.stm.addPlane(elementDict) 
             name = list(self.stm.system.keys())[-1]
+            self.unsavedChanges = True
             self.addReflectorWidget(name)
         except Exception as err:
             print(err)
@@ -651,6 +667,7 @@ class MainWidget(QWidget):
             elif elementDict["type"] == "Ellipse":
                 self.stm.addEllipse(elementDict)
             name = list(self.stm.system.keys())[-1]
+            self.unsavedChanges = True
             self.addReflectorWidget(name)
         except Exception as err:
             print(err)
@@ -726,6 +743,7 @@ class MainWidget(QWidget):
                 self.stm.translateGrids(dd["element"], vector, mode=dd["mode"].lower())
             elif transformationType == "Rotation":
                 self.stm.rotateGrids(dd["element"], vector, pivot=dd["pivot"], mode=dd["mode"].lower())
+            self.unsavedChanges = True
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -752,6 +770,7 @@ class MainWidget(QWidget):
                 self.stm.translateGrids(dd["group"], vector, mode=dd["mode"].lower(), obj="group")
             elif transformationType == "Rotation":
                 self.stm.rotateGrids(dd["group"], vector, pivot=dd["pivot"], mode=dd["mode"].lower(), obj="group")
+            self.unsavedChanges = True
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -770,6 +789,7 @@ class MainWidget(QWidget):
                 self.stm.translateGrids(dd["frame"], vector, mode=dd["mode"].lower(), obj="frame")
             elif transformationType == "Rotation":
                 self.stm.rotateGrids(dd["frame"], vector, pivot=dd["pivot"], mode=dd["mode"].lower(), obj="frame")
+            self.unsavedChanges = True
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -800,6 +820,7 @@ class MainWidget(QWidget):
 
             if transfDict["type"] == "Rotation":
                 self.stm.rotateGrids(transfDict["elements"], transfDict["vector"], transfDict["pivot"])
+            self.unsavedChanges = True
 
         except Exception as err:
             print(err)
@@ -824,6 +845,7 @@ class MainWidget(QWidget):
             self.stm.createTubeFrame(RTDict)
             name = list(self.stm.frames.keys())[-1]
             self.addFrameWidget(name)
+            self.unsavedChanges = True
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -841,6 +863,7 @@ class MainWidget(QWidget):
             s_copy.createGRTFrame(GRTDict)
 
             returnDict["system"] = s_copy
+            self.unsavedChanges = True
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -873,6 +896,7 @@ class MainWidget(QWidget):
 
                 name = list(self.stm.frames.keys())[-1]
                 self.addFrameWidget(name) 
+                self.unsavedChanges = True
         
         except Exception as err:
             print(err)
@@ -895,6 +919,7 @@ class MainWidget(QWidget):
         
             self.stm.runRayTracer(propRaysDict)
             self.addFrameWidget(propRaysDict["fr_out"])
+            self.unsavedChanges = True
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -944,6 +969,7 @@ class MainWidget(QWidget):
             namec = list(self.stm.currents.keys())[-1]
             self.addFieldWidget(namef)
             self.addCurrentWidget(namec)
+            self.unsavedChanges = True
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -965,6 +991,7 @@ class MainWidget(QWidget):
             self.stm.createScalarGaussian(GDict, GDict["surface"])
             name = list(self.stm.scalarfields.keys())[-1]
             self.addSFieldWidget(name)
+            self.unsavedChanges = True
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -994,6 +1021,7 @@ class MainWidget(QWidget):
             namec = list(self.stm.currents.keys())[-1]
             self.addFieldWidget(namef)
             self.addCurrentWidget(namec)
+            self.unsavedChanges = True
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -1011,6 +1039,7 @@ class MainWidget(QWidget):
             namec = list(self.stm.currents.keys())[-1]
             self.addFieldWidget(namef)
             self.addCurrentWidget(namec)
+            self.unsavedChanges = True
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -1038,6 +1067,7 @@ class MainWidget(QWidget):
             self.stm.createPointSourceScalar(SPSDict, SPSDict["surface"])
             namef = list(self.stm.scalarfields.keys())[-1]
             self.addSFieldWidget(namef)
+            self.unsavedChanges = True
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -1053,6 +1083,7 @@ class MainWidget(QWidget):
             self.stm.createUniformSourceScalar(SPSDict, SPSDict["surface"])
             name = list(self.stm.scalarfields.keys())[-1]
             self.addSFieldWidget(name)
+            self.unsavedChanges = True
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -1157,12 +1188,12 @@ class MainWidget(QWidget):
         """
         self.setForm(fData.propPOHybridInp(self.stm.fields, self.stm.frames, self.stm.system), self.propPOHybridAction, okText="GO")
     
-    #
+    def _addToWidgets(self, propBeamDict):
         """!
         Add PO calculation results to widget menu.
+
+        @param propBeamDict Dictionary containing the names of objects to be put in widgets.
         """
-    # @param propBeamDict Dictionary containing the names of objects to be put in widgets.
-    def _addToWidgets(self, propBeamDict):
         print(f"{propBeamDict = }")
         print(self.stm.frames)
         try:
@@ -1265,7 +1296,7 @@ class MainWidget(QWidget):
             args = (s_copy, propBeamDict, returnDict)
             calcSuccess = self.subprocessManager.runInSubprocess(self.runPOWorker, args, dialStr)
 
-            print(f"{calcSuccess = }")
+            # print(f"{calcSuccess = }")
             if calcSuccess:
                 s_copy = returnDict["system"]
                 print(s_copy.assoc)
@@ -1278,6 +1309,7 @@ class MainWidget(QWidget):
                 dtime = time() - start_time
                 self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
                 self._addToWidgets(propBeamDict)
+                self.unsavedChanges = True
 
         except Exception as err:
             print(err)
@@ -1342,6 +1374,7 @@ class MainWidget(QWidget):
                 dtime = time() - start_time
                 self.clog.info(f"*** Finished: {dtime:.3f} seconds ***")
                 self._addToWidgets(hybridDict)
+                self.unsavedChanges = True
 
         except Exception as err:
             print(err)
@@ -1389,7 +1422,6 @@ class MainWidget(QWidget):
         Shows form to select surface for beam merging.
         """
         SurfDict = self.ParameterWid.read()
-        print(SurfDict)
         if SurfDict["mode"] == "Fields":
             self.setForm(fData.mergeBeamsForm(self.stm.fields, SurfDict["surf"]), self.BMergeActionFields, okText="Merge")
         
@@ -1405,6 +1437,7 @@ class MainWidget(QWidget):
             self.stm.mergeBeams(*MergeDict["beams"], obj="fields", merged_name=MergeDict["merged_name"])
             
             self.addFieldWidget(MergeDict["merged_name"])
+            self.unsavedChanges = True
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -1419,6 +1452,7 @@ class MainWidget(QWidget):
             mergeBeams(*MergeDict["beams"], obj="currents", merged_name=MergeDict["merged_name"])
             
             self.addCurrentWidget(MergeDict["merged_name"])
+            self.unsavedChanges = True
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -1481,6 +1515,9 @@ class MainWidget(QWidget):
             eff_mb = self.stm.calcMainBeam(MBDict["f_name"], MBDict["comp"], MBDict["thres"], MBDict["mode"])
             self.clog.info(f'Main beam efficiency of {MBDict["f_name"]}, component {MBDict["comp"]} : {eff_mb}')
             self.addSFieldWidget(f"fitGauss_{MBDict['f_name']}")
+            self.unsavedChanges = True
+            # TODO klopt het dat Tools>Efficiencies>Main beam een scalar field genereert?
+
         except Exception as err:
             print(err)
             print_tb(err.__traceback__)
@@ -1518,9 +1555,10 @@ class MainWidget(QWidget):
         """
         try:
             findFocusDict = self.ParameterWid.read()
-            focus = self.stm.findRTfocus(findFocusDict["name_frame"])
+            focus = self.stm.findRTfocus(findFocusDict["name_frame"]) ##TODO: focus wordt niet gebruikt!!
             self.addReflectorWidget(f"focal_plane_{findFocusDict['name_frame']}")
             self.addFrameWidget(f"focus_{findFocusDict['name_frame']}")
+            self.unsavedChanges = True
             
             #self.clog.info(f"Focus of {findFocusDict['name_frame']} : {focus}")
 
@@ -1552,6 +1590,12 @@ class PyPOMainWindow(QMainWindow):
             style = f.read()
         self.setStyleSheet(style)
 
+    def closeEvent(self, event):
+        if self.mainWid.saveBeforeClosing():
+            event.accept()
+        else:
+            event.ignore()
+
     def _createMenuBar(self):
         menuBar = self.menuBar()
 
@@ -1561,7 +1605,7 @@ class PyPOMainWindow(QMainWindow):
         PhysOptMenu     = menuBar.addMenu("Physical-optics")
         ToolsMenu       = menuBar.addMenu("Tools")
 
-        ### File 
+        ### System
 
         saveSystem = QAction("Save system", self)
         saveSystem.setStatusTip("Save the current system to disk.")
@@ -1715,3 +1759,4 @@ class PyPOMainWindow(QMainWindow):
         BMerge.triggered.connect(self.mainWid.setBMergeSurfForm)
         ToolsMenu.addAction(BMerge)
 
+        

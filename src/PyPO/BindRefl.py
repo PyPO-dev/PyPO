@@ -1,3 +1,9 @@
+"""!
+@file
+Bindings for the ctypes interface for PyPO. 
+These bindings are concerned with generation of reflector grids from dictionaries.
+"""
+
 import ctypes
 import numpy as np
 import os
@@ -6,11 +12,6 @@ import pathlib
 
 import PyPO.BindUtils as BUtils
 import PyPO.Structs as PStructs
-
-##
-# @file
-# Bindings for the ctypes interface for PyPO. 
-# These bindings are concerned with generation of reflector grids from dictionaries.
 
 def loadRefllib():
     """!

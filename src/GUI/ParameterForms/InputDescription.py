@@ -1,10 +1,10 @@
+"""!
+@file 
+Defines an attr dataclass used to store the data of parameter forms.
+"""
+
 from attrs import define, field, Factory
 from src.GUI.utils import inType, InputDescriptionError
-
-##
-# @file 
-# Defines an attr dataclass used to store the data of parameter forms.
-# 
 
 @define
 class InputDescription:

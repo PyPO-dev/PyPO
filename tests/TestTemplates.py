@@ -1,9 +1,10 @@
+"""!
+@file
+This file contains commonly used input templates so that we do not have to type them over and over again.
+"""
+
 import numpy as np
 from PyPO.System import System
-
-##
-# @file
-# This file contains commonly used input templates so that we do not have to type them over and over again.
 
 TubeRTframe =  {
         "name"      : "testTubeRTframe",

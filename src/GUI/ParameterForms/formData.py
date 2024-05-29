@@ -1,10 +1,17 @@
+"""!
+@file
+This file contains all forms used by the GUI for interaction with the user.
+Because all functions return lists containing forms, the return will not be explicitly stated per form.
+"""
+
 from src.GUI.ParameterForms.InputDescription import inType, InputDescription
+from PyPO.Enums import FieldComponents, CurrentComponents, Projections
 
-##
-# @file
-# This file contains all forms used by the GUI for interaction with the user.
-# Because all functions return lists containing forms, the return will not be explicitly stated per form.
-
+FieldComponentList = [o for o in FieldComponents]
+FieldComponentList.pop()
+FieldComponentListStrings = [do.name for do in FieldComponentList] 
+CurrentComponentList = [o for o in CurrentComponents]
+CurrentComponentListStrings = [do.name for do in CurrentComponents] 
 
 def xy_opts():
     """!
@@ -332,17 +339,17 @@ def plotField(fieldName):
     
     @param fieldName Name of field object to plot.
     """
-    complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
+
     plotField = [
             InputDescription(inType.dynamicDropdown, "plot_type", label="Type", subDict = {
                 "Pattern" : [
                     InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
-                    InputDescription(inType.dropdown, "comp", label="Component", options = complist),
+                    InputDescription(inType.dropdown, "comp", label="Component", options = FieldComponentList, hints= FieldComponentListStrings),
                     InputDescription(inType.xyzRadio, "project", label="Abscissa - ordinate"),
                     InputDescription(inType.checkbox, "phase", label="Include phase", prefill=True)],
                 "Cross-sections" : [
                     InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
-                    InputDescription(inType.dropdown, "comp", label="Component", options = complist),
+                    InputDescription(inType.dropdown, "comp", label="Component", options = FieldComponentList, hints= FieldComponentListStrings),
                     ]
                 })
             ]
@@ -355,7 +362,6 @@ def plotSField(fieldName):
     
     @param fieldName Name of field object to plot.
     """
-    complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
     
     plotSField = [
             InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
@@ -371,18 +377,17 @@ def plotFarField(fieldName):
     
     @param fieldName Name of field object to plot.
     """
-    complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
     
     plotField = [
             InputDescription(inType.dynamicDropdown, "plot_type", label="Type", subDict = {
                 "Pattern" : [
                     InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
-                    InputDescription(inType.dropdown, "comp", label="Component", options = complist),
-                    InputDescription(inType.static, "project", staticValue="xy", hidden=True),
+                    InputDescription(inType.dropdown, "comp", label="Component", options = FieldComponentList, hints= FieldComponentListStrings),
+                    InputDescription(inType.static, "project", staticValue=Projections.xy, hidden=True),
                     InputDescription(inType.checkbox, "phase", label="Include phase", prefill=False)],
                 "Cross-sections" : [
                     InputDescription(inType.static, "field", label="Field", staticValue=fieldName),
-                    InputDescription(inType.dropdown, "comp", label="Component", options = complist),
+                    InputDescription(inType.dropdown, "comp", label="Component", options = FieldComponentList, hints= FieldComponentListStrings),
                     ]
                 })
             ]
@@ -394,11 +399,10 @@ def plotCurrentOpt(currentName):
     
     @param fieldName Name of current object to plot.
     """
-    complist = ["Jx", "Jy", "Jz", "Mx", "My", "Mz"]
     
     plotCurrent = [
                     InputDescription(inType.static, "field", label="Field", staticValue=currentName),
-                    InputDescription(inType.dropdown, "comp", label="Component", options = complist),
+                    InputDescription(inType.dropdown, "comp", label="Component", options = CurrentComponentList, hints= CurrentComponentListStrings),
                     InputDescription(inType.xyzRadio, "project", label="Abscissa - ordinate")]
 
     return plotCurrent
@@ -508,7 +512,6 @@ def propPOHybridInp(fieldDict, frameDict, elemDict):
     sublist_frames = []
     sublist_target = []
     
-    complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz", "All"]
     if fieldDict:
         for key, item in fieldDict.items():
             sublist_fields.append(key)
@@ -534,7 +537,7 @@ def propPOHybridInp(fieldDict, frameDict, elemDict):
                     "no" : [InputDescription(inType.static, "start", label="", staticValue=None, hidden=True)]
                 }), 
             InputDescription(inType.dynamicRadio, "_interp", label="Interpolate", subDict={
-                    "yes" : [InputDescription(inType.dropdown, "comp", label="Component", options = complist)],
+                    "yes" : [InputDescription(inType.dropdown, "comp", label="Component", options = FieldComponentList, hints = FieldComponentListStrings)],##TODO Set 'ALL components' option 
                     "no" : [InputDescription(inType.static, "comp", label="", staticValue=True, hidden=True)]
                 }), 
             InputDescription(inType.vectorFloats, "tol", label="Accuracy", hints=[1e-3], numFields=1),
@@ -552,7 +555,6 @@ def calcSpillEff(fieldDict, elemDict):
     @param fieldDict System dictionary containing all fields.
     @param elemDict System dictionary containing all elements.
     """
-    complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
    
     sublist_fields = []
     if fieldDict:
@@ -562,7 +564,7 @@ def calcSpillEff(fieldDict, elemDict):
     
     formTaper = [
         InputDescription(inType.dropdown, "f_name", label="Field", options = sublist_fields),
-        InputDescription(inType.dropdown, "comp", label="Component", options = complist),
+        InputDescription(inType.dropdown, "comp", label="Component", options = FieldComponentList, hints = FieldComponentListStrings),
         InputDescription(inType.vectorFloats, "center", label="Center", numFields=2, oArray=True),
         InputDescription(inType.vectorFloats, "inner", label="Inner axes", numFields=2),
         InputDescription(inType.vectorFloats, "outer", label="Outer axes", numFields=2)
@@ -577,7 +579,6 @@ def calcTaperEff(fieldDict, elemDict):
     @param fieldDict System dictionary containing all fields.
     @param elemDict System dictionary containing all elements.
     """
-    complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
     
     sublist_fields = []
     if fieldDict:
@@ -587,7 +588,7 @@ def calcTaperEff(fieldDict, elemDict):
     
     formTaper = [
         InputDescription(inType.dropdown, "f_name", label="Field", options = sublist_fields),
-        InputDescription(inType.dropdown, "comp", label="Component", options = complist),
+        InputDescription(inType.dropdown, "comp", label="Component", options = FieldComponentList, hints = FieldComponentListStrings),
         ]
 
     return formTaper
@@ -599,7 +600,6 @@ def calcXpolEff(fieldDict, elemDict):
     @param fieldDict System dictionary containing all fields.
     @param elemDict System dictionary containing all elements.
     """
-    complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
     
     sublist_fields = []
     if fieldDict:
@@ -609,8 +609,8 @@ def calcXpolEff(fieldDict, elemDict):
     
     formXpol = [
         InputDescription(inType.dropdown, "f_name", label="Field", options = sublist_fields),
-        InputDescription(inType.dropdown, "co_comp", label="Co-component", options = complist),
-        InputDescription(inType.dropdown, "cr_comp", label="X-component", options = complist),
+        InputDescription(inType.dropdown, "co_comp", label="Co-component", options = FieldComponentList, hints = FieldComponentListStrings),
+        InputDescription(inType.dropdown, "cr_comp", label="X-component", options = FieldComponentList, hints = FieldComponentListStrings),
         ]
 
     return formXpol
@@ -622,7 +622,6 @@ def calcMBEff(fieldDict, elemDict):
     @param fieldDict System dictionary containing all fields.
     @param elemDict System dictionary containing all elements.
     """
-    complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
     
     sublist_fields = []
     if fieldDict:
@@ -634,7 +633,7 @@ def calcMBEff(fieldDict, elemDict):
 
     formMB = [
         InputDescription(inType.dropdown, "f_name", label="Field", options = sublist_fields),
-        InputDescription(inType.dropdown, "comp", label="Component", options = complist),
+        InputDescription(inType.dropdown, "comp", label="Component", options = FieldComponentList, hints = FieldComponentListStrings),
         InputDescription(inType.vectorFloats, "thres", label="Threshold", numFields=1),
         InputDescription(inType.radio, "mode", label="Fitting mode", options=mode_options)
         ]
@@ -648,7 +647,6 @@ def calcHPBW(fieldDict):
     
     @param fieldDict System dictionary containing all fields.
     """
-    complist = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
    
     sublist_fields = []
     if fieldDict:
@@ -657,7 +655,7 @@ def calcHPBW(fieldDict):
 
     formHPBW = [
         InputDescription(inType.dropdown, "f_name", label="Field", options = sublist_fields),
-        InputDescription(inType.dropdown, "comp", label="Component", options = complist)
+        InputDescription(inType.dropdown, "comp", label="Component", options = FieldComponentList, hints = FieldComponentListStrings)
         ]
 
     return formHPBW

@@ -1,3 +1,8 @@
+"""!
+@file
+This file contains tests for the plotting functionalities. It tests whether the plotting functions in the System behave as expected.
+"""
+
 import unittest
 import warnings
 import sys
@@ -15,26 +20,24 @@ from matplotlib.pyplot import Axes, close
 
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 from PyPO.System import System
-
-##
-# @file
-# This file contains tests for the plotting functionalities. It tests whether the plotting functions in the System behave as expected.
+from PyPO.Enums import Projections, FieldComponents, CurrentComponents, Modes
 
 class Test_Plotting(unittest.TestCase):
     def setUp(self):
         self.s = TestTemplates.getSystemWithReflectors()
         self.s.setOverride(False)
-        self.projects = ["xy", "yx", "xz", "zx", "yz", "zy"]
-    
-    def test_plotBeamCut(self):
-        fig, ax = self.s.plotBeamCut(TestTemplates.GPOfield['name'], 'Ex', center=False, align=False, ret=True)
+
+    @params(Modes.dB, Modes.LIN)
+    def test_plotBeamCut(self, mode):
+        fig, ax = self.s.plotBeamCut(TestTemplates.GPOfield['name'], FieldComponents.Ex, center=False, align=False, ret=True, mode=mode)
 
         self.assertEqual(type(fig), Figure)
         self.assertEqual(type(ax), Axes)
-
+        
         close('all')
 
-    @params("xy", "yx", "xz", "zx", "yz", "zy")
+    @params(Projections.xy, Projections.yz, Projections.zx,
+            Projections.yx, Projections.zy, Projections.xz)
     def test_plotBeam2D(self, project):
         out_ar = []
         out_ax = []
@@ -43,13 +46,22 @@ class Test_Plotting(unittest.TestCase):
             aperDict_plot = self.s.copyObj(TestTemplates.aperDict)
             aperDict_plot["plot"] = True
 
-            out_ax.append(self.s.plotBeam2D(TestTemplates.GPOfield['name'], 'Ex', ret=True, amp_only=True, project=project, aperDict=aperDict_plot))
-            out_ax.append(self.s.plotBeam2D(TestTemplates.GPOfield['name'], 'Ex', ret=True, amp_only=True, mode="linear", project=project))
-            out_ar.append(self.s.plotBeam2D(TestTemplates.GPOfield['name'], 'Ex', ret=True, project=project, aperDict=TestTemplates.aperDict, contour=TestTemplates.GPOfield['name'], contour_comp="Ex", levels=[0.5, 1]))
-            out_ar.append(self.s.plotBeam2D(TestTemplates.GPOfield['name'], 'Ex', ret=True, mode="linear", project=project, contour=TestTemplates.GPOfield['name'], contour_comp="Ex", levels=[0.5, 1]))
+            out_ax.append(self.s.plotBeam2D(TestTemplates.GPOfield['name'], FieldComponents.Ex, 
+                ret=True, amp_only=True, project=project, aperDict=aperDict_plot))
             
-            out_ax.append(self.s.plotBeam2D(TestTemplates.PS_Ufield_FF["name"], "Ex", ret=True, project="xy"))
-            out_ax.append(self.s.plotBeam2D(TestTemplates.PS_Ufield_FF["name"], "Ex", ret=True, amp_only=True, project="yx"))
+            out_ax.append(self.s.plotBeam2D(TestTemplates.GPOfield['name'], FieldComponents.Ex, 
+                ret=True, amp_only=True, mode=Modes.LIN, project=project))
+
+            out_ar.append(self.s.plotBeam2D(TestTemplates.GPOfield['name'], FieldComponents.Ex, 
+                ret=True, project=project, aperDict=TestTemplates.aperDict, contour=TestTemplates.GPOfield['name'], 
+                contour_comp=FieldComponents.Ex, levels=[0.5, 1]))
+            
+            out_ar.append(self.s.plotBeam2D(TestTemplates.GPOfield['name'], FieldComponents.Ex, 
+                ret=True, mode=Modes.LIN, project=project, contour=TestTemplates.GPOfield['name'], 
+                contour_comp=FieldComponents.Ex, levels=[0.5, 1]))
+            
+            out_ax.append(self.s.plotBeam2D(TestTemplates.PS_Ufield_FF["name"], FieldComponents.Ex, ret=True, project=Projections.xy))
+            out_ax.append(self.s.plotBeam2D(TestTemplates.PS_Ufield_FF["name"], FieldComponents.Ex, ret=True, amp_only=True, project=Projections.xy))
 
         for entry_ax, entry_ar in zip(out_ax, out_ar):
             self.assertEqual(type(entry_ax[0]), Figure)
@@ -113,7 +125,8 @@ class Test_Plotting(unittest.TestCase):
         close('all')
         
         
-    @params("xy", "yx", "xz", "zx", "yz", "zy")
+    @params(Projections.xy, Projections.yz, Projections.zx,
+            Projections.yx, Projections.zy, Projections.xz)
     def test_plotRTframe(self, project):
         for frameName in [TestTemplates.TubeRTframe['name'], TestTemplates.GaussRTframe['name']]:
             fig = self.s.plotRTframe(frameName, ret=True, project=project)

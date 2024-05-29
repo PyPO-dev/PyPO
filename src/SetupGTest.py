@@ -1,3 +1,8 @@
+"""!
+@file
+File for building, making and running the C++ unittests.
+"""
+
 import os
 
 import shutil

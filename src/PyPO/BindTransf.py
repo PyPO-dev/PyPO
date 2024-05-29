@@ -1,3 +1,9 @@
+"""!
+@file
+Bindings for the ctypes interface for PyPO. 
+These bindings are concerned with transforming frame and fields/currents.
+"""
+
 import ctypes
 import numpy as np
 import os
@@ -8,11 +14,6 @@ import PyPO.BindUtils as BUtils
 import PyPO.Structs as PStructs
 import PyPO.Config as Config
 import PyPO.Threadmgr as TManager
-
-##
-# @file
-# Bindings for the ctypes interface for PyPO. 
-# These bindings are concerned with transforming frame and fields/currents.
 
 def loadTransflib():
     """!

@@ -1,15 +1,15 @@
 var searchData=
 [
   ['gaussabs_0',['GaussAbs',['../FitGauss_8py.html#a747fa766ecc3242b4f32e586df1267de',1,'PyPO::FitGauss']]],
-  ['gcenter_1',['gcenter',['../structreflparamsf.html#a230a70811a8bf6135a7b93d83c133436',1,'reflparamsf::gcenter()'],['../structreflparams.html#a4611bf2bf9cead78987049c7241b84b5',1,'reflparams::gcenter()']]],
+  ['gcenter_1',['gcenter',['../structreflparams.html#a4611bf2bf9cead78987049c7241b84b5',1,'reflparams::gcenter()'],['../structreflparamsf.html#a230a70811a8bf6135a7b93d83c133436',1,'reflparamsf::gcenter()']]],
   ['ge_2',['ge',['../KernelsRTf_8cu.html#a350b15b51a4c71456225db25a9fcc604',1,'ge():&#160;KernelsRTf.cu'],['../classRTRefls.html#a13f4461eb4b4bc89e227d608ca7b141f',1,'RTRefls::ge()']]],
   ['generategauss_3',['generateGauss',['../FitGauss_8py.html#a299f5e8365bbdf5e48ff0a21c7126303',1,'PyPO::FitGauss']]],
-  ['generategrid_4',['generateGrid',['../InterfaceReflector_8cpp.html#a8a80fa7c30c6a5599a71cc0a95e0c89a',1,'generateGrid():&#160;InterfaceReflector.cpp'],['../BindRefl_8py.html#aa9dfeca7a9859e01ee39da1059f6cc42',1,'PyPO.BindRefl.generateGrid()'],['../InterfaceReflector_8h.html#a594992f45990be7f641bdebe67b86ac5',1,'generateGrid(reflparams refl, reflcontainer *container, bool transform=true, bool spheric=true):&#160;InterfaceReflector.cpp']]],
+  ['generategrid_4',['generateGrid',['../InterfaceReflector_8cpp.html#a8a80fa7c30c6a5599a71cc0a95e0c89a',1,'generateGrid(reflparams refl, reflcontainer *container, bool transform, bool spheric):&#160;InterfaceReflector.cpp'],['../InterfaceReflector_8h.html#a594992f45990be7f641bdebe67b86ac5',1,'generateGrid(reflparams refl, reflcontainer *container, bool transform=true, bool spheric=true):&#160;InterfaceReflector.cpp'],['../BindRefl_8py.html#aa9dfeca7a9859e01ee39da1059f6cc42',1,'PyPO.BindRefl.generateGrid()']]],
   ['generategridf_5',['generateGridf',['../InterfaceReflector_8h.html#a249d2e73bd32bd263541de114deac9b6',1,'generateGridf(reflparamsf refl, reflcontainerf *container, bool transform=true, bool spheric=true):&#160;InterfaceReflector.cpp'],['../InterfaceReflector_8cpp.html#a22344e70eab920880e0bf3a52afdf55e',1,'generateGridf(reflparamsf refl, reflcontainerf *container, bool transform, bool spheric):&#160;InterfaceReflector.cpp']]],
   ['generategrids_6',['generateGrids',['../group__public__api__reflmeths.html#ga8b0b3786b3e6593c2f77b51dd9909591',1,'PyPO::System::System']]],
   ['generateuniform_7',['generateUniform',['../classRandom.html#a041dc26bf10da0973ad573585955198e',1,'Random::generateUniform(T lower=-1.0)'],['../classRandom.html#af11ff22501905edd215208b052c29953',1,'Random::generateUniform(int num, T lower=-1.0)']]],
   ['generating_20reflectors_2felements_8',['Generating Reflectors/Elements',['../basictut3.html',1,'']]],
-  ['getanglesfrommatrix_9',['getAnglesFromMatrix',['../classPyPO_1_1System_1_1System.html#afcc555ca0df753904f74f2bd30125f04',1,'PyPO::System::System']]],
+  ['getanglesfrommatrix_9',['getAnglesFromMatrix',['../classPyPO_1_1System_1_1System.html#afcc555ca0df753904f74f2bd30125f04',1,'PyPO.System.System.getAnglesFromMatrix()'],['../MatUtils_8py.html#a22fb319dd5af18db092f7299ed4b589f',1,'PyPO.MatUtils.getAnglesFromMatrix()']]],
   ['getindex_10',['getIndex',['../Checks_8py.html#ac10d88c0a0e11af3aecd3df396961041',1,'PyPO::Checks']]],
   ['getrayplotnr_11',['getRayPlotNr',['../classGUI_1_1MainWindow_1_1MainWidget.html#a845478318b3020633221154776069290',1,'GUI::MainWindow::MainWidget']]],
   ['getsysplotnr_12',['getSysPlotNr',['../classGUI_1_1MainWindow_1_1MainWidget.html#a4b395605c8b29da45a0ea7cf19a5ae93',1,'GUI::MainWindow::MainWidget']]],

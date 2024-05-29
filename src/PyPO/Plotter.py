@@ -246,7 +246,7 @@ def plotBeam2D(plotObject, field, contour,
             Ri = 2*aperDict["inner"]
 
 
-            if ax.size > 1:
+            if isinstance(ax, np.ndarray):
                 for axx in ax:
                     circleo=mpl.patches.Ellipse((xc,yc),Ro[0], Ro[1], color='black', fill=False)
                     circlei=mpl.patches.Ellipse((xc,yc),Ri[0], Ri[1], color='black', fill=False)
@@ -274,7 +274,7 @@ def plotBeam2D(plotObject, field, contour,
             wi = aperDict["inner_x"][1] - aperDict["inner_x"][0]
 
 
-            if ax.size > 1:
+            if isinstance(ax, np.ndarray):
                 for axx in ax:
                     recto=mpl.patches.Rectangle((xco,yco),wo, ho, color='black', fill=False)
                     recti=mpl.patches.Rectangle((xci,yci),wi, hi, color='black', fill=False)

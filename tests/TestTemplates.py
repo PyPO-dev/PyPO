@@ -267,11 +267,22 @@ plane_AoE = {
         "gridsize"  : np.array([13, 13])
         }
 
-aperDict = {
+aperDictEll = {
+        "shape"     : "ellipse",
         "plot"      : False,
         "center"    : np.array([0, 0]),
         "outer"     : np.array([0.5, 0.5]),
         "inner"     : np.array([0, 0])
+        }
+
+aperDictRect = {
+        "shape"     : "rectangle",
+        "plot"      : False,
+        "center"    : np.array([0, 0]),
+        "outer_x"   : np.array([-0.5, 0.5]),
+        "inner_x"   : np.array([-0.2, 0.2]),
+        "outer_y"   : np.array([-0.5, 0.5]),
+        "inner_y"   : np.array([-0.2, 0.2]),
         }
 
 ##

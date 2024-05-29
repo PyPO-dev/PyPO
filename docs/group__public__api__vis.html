@@ -113,9 +113,12 @@ $(document).ready(function(){initNavTree('group__public__api__vis.html',''); ini
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:gaef7cb7407660fa9ddd40b5a208a09446"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__vis.html#gaef7cb7407660fa9ddd40b5a208a09446">PyPO.System.System.plotBeamCut</a> (self, name_field, comp, comp_cross=FieldComponents.NONE, vmin=None, vmax=None, center=True, align=True, units=Units.DEG, name=&quot;&quot;, show=True, save=False, ret=False)</td></tr>
-<tr class="memdesc:gaef7cb7407660fa9ddd40b5a208a09446"><td class="mdescLeft">&#160;</td><td class="mdescRight">Plot beam pattern cross sections.  <br /></td></tr>
-<tr class="separator:gaef7cb7407660fa9ddd40b5a208a09446"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga27b7a33eff7afb12f134108fac11a65d"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__vis.html#ga27b7a33eff7afb12f134108fac11a65d">PyPO.System.System.plotBeamCut</a> (self, name_field, comp, comp_cross=FieldComponents.NONE, vmin=None, vmax=None, center=True, align=True, mode=Modes.dB, units=Units.DEG, name=&quot;&quot;, show=True, save=False, ret=False)</td></tr>
+<tr class="memdesc:ga27b7a33eff7afb12f134108fac11a65d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Plot beam pattern cross sections.  <br /></td></tr>
+<tr class="separator:ga27b7a33eff7afb12f134108fac11a65d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga637045fa05771b756f2540fc180dcd0b"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__vis.html#ga637045fa05771b756f2540fc180dcd0b">PyPO.System.System.plotBeam2D</a> (self, name_obj, comp=FieldComponents.NONE, contour=None, contour_comp=FieldComponents.NONE, vmin=None, vmax=None, levels=None, show=True, amp_only=False, save=False, interpolation=None, norm=True, aperDict=None, mode=Modes.dB, project=Projections.xy, units=Units.MM, name=&quot;&quot;, titleA=&quot;Power&quot;, titleP=&quot;Phase&quot;, unwrap_phase=False, ret=False)</td></tr>
+<tr class="memdesc:ga637045fa05771b756f2540fc180dcd0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a 2D plot of a PO (scalar)field or current.  <br /></td></tr>
+<tr class="separator:ga637045fa05771b756f2540fc180dcd0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaec433284697826854072723d27cd1341"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__vis.html#gaec433284697826854072723d27cd1341">PyPO.System.System.plot3D</a> (self, name_surface, cmap=cm.cool, norm=False, fine=2, show=True, foc1=False, foc2=False, save=False, ret=False)</td></tr>
 <tr class="memdesc:gaec433284697826854072723d27cd1341"><td class="mdescLeft">&#160;</td><td class="mdescRight">Plot a 3D reflector.  <br /></td></tr>
 <tr class="separator:gaec433284697826854072723d27cd1341"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -225,8 +228,186 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="gaef7cb7407660fa9ddd40b5a208a09446" name="gaef7cb7407660fa9ddd40b5a208a09446"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaef7cb7407660fa9ddd40b5a208a09446">&#9670;&#160;</a></span>plotBeamCut()</h2>
+<a id="ga637045fa05771b756f2540fc180dcd0b" name="ga637045fa05771b756f2540fc180dcd0b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga637045fa05771b756f2540fc180dcd0b">&#9670;&#160;</a></span>plotBeam2D()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def PyPO.System.System.plotBeam2D </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>name_obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>comp</em> = <code>FieldComponents.NONE</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>contour</em> = <code>None</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>contour_comp</em> = <code>FieldComponents.NONE</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>vmin</em> = <code>None</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>vmax</em> = <code>None</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>levels</em> = <code>None</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>show</em> = <code>True</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>amp_only</em> = <code>False</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>save</em> = <code>False</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>interpolation</em> = <code>None</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>norm</em> = <code>True</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>aperDict</em> = <code>None</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>mode</em> = <code>Modes.dB</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>project</em> = <code>Projections.xy</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>units</em> = <code>Units.MM</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>name</em> = <code>&quot;&quot;</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>titleA</em> = <code>&quot;Power&quot;</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>titleP</em> = <code>&quot;Phase&quot;</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>unwrap_phase</em> = <code>False</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>ret</em> = <code>False</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Generate a 2D plot of a PO (scalar)field or current. </p>
+<p>Note that matplotlib offers custom control over figures in the matplotlib window. This means that most parameters described for this method can be adjusted in the matplotlib plotting window.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name_obj</td><td>Name of field or current to plot. </td></tr>
+    <tr><td class="paramname">comp</td><td>Component of field or current to plot. String of two characters; an uppercase {E, H, J, M} for field followed by a lowercase {x, y, z} for component. (e.g: 'Jz') </td></tr>
+    <tr><td class="paramname">contour</td><td>A PyPO field or current component to plot as contour. </td></tr>
+    <tr><td class="paramname">contour_comp</td><td>Component of contour to plot as contour. If None, assumes the contour is a scalarfield. </td></tr>
+    <tr><td class="paramname">vmin</td><td>Minimum amplitude value to display. Default is -30. </td></tr>
+    <tr><td class="paramname">vmax</td><td>Maximum amplitude value to display. Default is 0. </td></tr>
+    <tr><td class="paramname">levels</td><td>Levels for contourplot. </td></tr>
+    <tr><td class="paramname">show</td><td>Show plot. Default is True. </td></tr>
+    <tr><td class="paramname">amp_only</td><td>Only plot amplitude pattern. Default is False. </td></tr>
+    <tr><td class="paramname">save</td><td>Save plot to /images/ folder. </td></tr>
+    <tr><td class="paramname">interpolation</td><td>What interpolation to use for displaying amplitude pattern. Default is None. </td></tr>
+    <tr><td class="paramname">norm</td><td>Normalise field (only relevant when plotting linear scale). Default is True. </td></tr>
+    <tr><td class="paramname">aperDict</td><td>Plot an aperture defined in an aperDict object along with the field or current patterns. Default is None. </td></tr>
+    <tr><td class="paramname">mode</td><td>Plot amplitude in linear or decibel values. Instance of Modes enum object. </td></tr>
+    <tr><td class="paramname">project</td><td>Set abscissa and ordinate of plot. Should be given as an instance of the Projection enum. Default is Projection.xy. </td></tr>
+    <tr><td class="paramname">units</td><td>The units of the axes. Instance of Units enum object. </td></tr>
+    <tr><td class="paramname">name</td><td>Name of .png file where plot is saved. Only when save=True. Default is "". </td></tr>
+    <tr><td class="paramname">titleA</td><td>Title of the amplitude plot. Default is "Amp". </td></tr>
+    <tr><td class="paramname">titleP</td><td>Title of the phase plot. Default is "Phase". </td></tr>
+    <tr><td class="paramname">unwrap_phase</td><td>Unwrap the phase patter. Prevents annular structure in phase pattern. Default is False. </td></tr>
+    <tr><td class="paramname">ret</td><td>Return the Figure and Axis object. Only called by GUI. Default is False.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd>aperDict </dd></dl>
+
+</div>
+</div>
+<a id="ga27b7a33eff7afb12f134108fac11a65d" name="ga27b7a33eff7afb12f134108fac11a65d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga27b7a33eff7afb12f134108fac11a65d">&#9670;&#160;</a></span>plotBeamCut()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -283,6 +464,12 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>mode</em> = <code>Modes.dB</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
           <td class="paramname"><em>units</em> = <code>Units.DEG</code>, </td>
         </tr>
         <tr>
@@ -328,6 +515,7 @@ Functions</h2></td></tr>
     <tr><td class="paramname">vmax</td><td>Maximum amplitude value to display. Default is 0. </td></tr>
     <tr><td class="paramname">center</td><td>Whether to calculate beam center and center the beam cuts on this point. </td></tr>
     <tr><td class="paramname">align</td><td>Whether to find position angle of beam cuts and align cut axes to this. </td></tr>
+    <tr><td class="paramname">mode</td><td>Plot in decibels or linear. </td></tr>
     <tr><td class="paramname">units</td><td>The units of the axes. Instance of Units enum object. </td></tr>
     <tr><td class="paramname">name</td><td>Name of .png file where plot is saved. Only when save=True. Default is "". </td></tr>
     <tr><td class="paramname">show</td><td>Show plot. Default is True. </td></tr>

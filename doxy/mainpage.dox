@@ -66,7 +66,7 @@ For Linux, [this article](https://linuxconfig.org/how-to-install-cuda-on-ubuntu-
 
 For Windows, see the [official instructions](https://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/index.html) on the Nvidia website.
 
-Unfortunately, [Apple has stopped supporing Nvidia cards since 2015](https://appleinsider.com/articles/19/01/18/apples-management-doesnt-want-nvidia-support-in-macos-and-thats-a-bad-sign-for-the-mac-pro) and therefore, the CUDA libraries for `PyPO` cannot be installed on MacOS currently.
+Unfortunately, [Apple has stopped supporting Nvidia cards since 2015](https://appleinsider.com/articles/19/01/18/apples-management-doesnt-want-nvidia-support-in-macos-and-thats-a-bad-sign-for-the-mac-pro) and therefore, the CUDA libraries for `PyPO` cannot be installed on MacOS currently.
 
 After installing CUDA, `PyPO` will detect this and, upon building, will build the CUDA libraries.
 It is therefore important to re-install `PyPO` if you installed it before installing CUDA, otherwise the libraries will not be built.

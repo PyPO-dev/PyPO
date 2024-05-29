@@ -28,7 +28,7 @@ var searchData=
   ['reflgrids_25',['reflGrids',['../classPyPO_1_1PyPOTypes_1_1reflGrids.html',1,'PyPO::PyPOTypes']]],
   ['reflparams_26',['reflparams',['../classPyPO_1_1Structs_1_1reflparams.html',1,'PyPO.Structs.reflparams'],['../structreflparams.html',1,'reflparams']]],
   ['reflparamsf_27',['reflparamsf',['../classPyPO_1_1Structs_1_1reflparamsf.html',1,'PyPO.Structs.reflparamsf'],['../structreflparamsf.html',1,'reflparamsf']]],
-  ['refreshworkspacesection_28',['refreshWorkspaceSection',['../classGUI_1_1MainWindow_1_1MainWidget.html#a7a30b2997e4434ee51fe00316b3519b7',1,'GUI::MainWindow::MainWidget']]],
+  ['refreshworkspace_28',['refreshWorkspace',['../classGUI_1_1MainWindow_1_1MainWidget.html#a2bd99c56fbae264db4dc9f2d440a3938',1,'GUI::MainWindow::MainWidget']]],
   ['removecurrent_29',['removeCurrent',['../group__public__api__po.html#gaff726434bebd8ed64fd20f1cc141a080',1,'PyPO::System::System']]],
   ['removeelement_30',['removeElement',['../classGUI_1_1MainWindow_1_1MainWidget.html#abd7e20e3470f9ade5312764539b36ab5',1,'GUI.MainWindow.MainWidget.removeElement()'],['../group__public__api__reflmeths.html#gacdf5ed5bdd28c431abb436df8f8b5be3',1,'PyPO.System.System.removeElement()']]],
   ['removeelementdialog_31',['RemoveElementDialog',['../classGUI_1_1Dialogs_1_1RemoveElementDialog.html',1,'GUI::Dialogs']]],

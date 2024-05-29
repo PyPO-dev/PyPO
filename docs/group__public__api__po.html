@@ -155,6 +155,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ga4f8e0bc6a4c9273a1e41897d5da6166a"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__po.html#ga4f8e0bc6a4c9273a1e41897d5da6166a">PyPO.System.System.calcBeamCuts</a> (self, name_field, comp, phi=0, center=True, align=True, norm=False, transform=False, mode=Modes.dB)</td></tr>
 <tr class="memdesc:ga4f8e0bc6a4c9273a1e41897d5da6166a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate cross sections of a beam pattern.  <br /></td></tr>
 <tr class="separator:ga4f8e0bc6a4c9273a1e41897d5da6166a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga70b301243f7f2b4db848e244c729876a"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__po.html#ga70b301243f7f2b4db848e244c729876a">PyPO.System.System.calcHPBW</a> (self, name_field, comp, interp=50, center=False, align=False)</td></tr>
+<tr class="memdesc:ga70b301243f7f2b4db848e244c729876a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate half-power beamwidth.  <br /></td></tr>
+<tr class="separator:ga70b301243f7f2b4db848e244c729876a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga0df4f35ded77084223c1b314ce2375c6"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__po.html#ga0df4f35ded77084223c1b314ce2375c6">PyPO.System.System.createPointSource</a> (self, PSDict, name_surface)</td></tr>
 <tr class="memdesc:ga0df4f35ded77084223c1b314ce2375c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate point-source PO fields and currents.  <br /></td></tr>
 <tr class="separator:ga0df4f35ded77084223c1b314ce2375c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -340,6 +343,74 @@ y_cut Beam cross section along the H-plane. </dd>
 x_strip Co-ordinate values for x_cut. </dd>
 <dd>
 y_strip Co-ordinate values for y_cut. </dd></dl>
+
+</div>
+</div>
+<a id="ga70b301243f7f2b4db848e244c729876a" name="ga70b301243f7f2b4db848e244c729876a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga70b301243f7f2b4db848e244c729876a">&#9670;&#160;</a></span>calcHPBW()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def PyPO.System.System.calcHPBW </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>name_field</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>comp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>interp</em> = <code>50</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>center</em> = <code>False</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>align</em> = <code>False</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Calculate half-power beamwidth. </p>
+<p>This is done by directly evaluating the -3 dB points along both cardinal planes of the beam pattern. Then, the distance between antipodal half-power points is calculated on an interpolation of the supplied PO field.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name_field</td><td>Name of field object. </td></tr>
+    <tr><td class="paramname">comp</td><td>Component of field object. Instance of FieldComponents enum object. </td></tr>
+    <tr><td class="paramname">interp</td><td>Interpolation factor for finding the HPBW. Defaults to 50. </td></tr>
+    <tr><td class="paramname">center</td><td>Whether to center the beam cuts on amplitude center. Use only if beam has well defined amplitude center. </td></tr>
+    <tr><td class="paramname">align</td><td>Whether to take beam cuts along cardinal planes rotated by the position angle.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>HPBW_E Half-power beamwidth along E-plane in units of surface of beam. </dd>
+<dd>
+HPBW_H Half-power beamwidth along H-plane in units of surface of beam. </dd></dl>
 
 </div>
 </div>

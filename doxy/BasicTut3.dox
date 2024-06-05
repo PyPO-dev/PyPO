@@ -105,5 +105,5 @@ If the reflector is then generated from an xy-plane parameterisation, the result
 
 \section basictut3_plane Planar Geometries
 The simplest of all, reflector dictionaries for planes do not contain a "pmode" field. Rather, all planes are defined in the xy-plane, with the z co-ordinate set to 0.
-Planes do play a very special role, however, which can be read abput in the \ref basictut4 "next tutorial".
+Planes do play a very special role, however, which can be read about in the \ref basictut4 "next tutorial".
 */

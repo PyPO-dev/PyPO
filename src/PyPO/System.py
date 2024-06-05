@@ -1955,7 +1955,7 @@ class System(object):
             pt.show()
 
     def calcHPBW(self, name_field, comp, interp=50, center=False, align=False):
-        """
+        """!
         Calculate half-power beamwidth.
         
         This is done by directly evaluating the -3 dB points along both cardinal planes of the beam pattern.
@@ -2232,7 +2232,7 @@ class System(object):
         @param norm Normalise field (only relevant when plotting linear scale). Default is True.
         @param aperDict Plot an aperture defined in an aperDict object along with the field or current patterns. Default is None.
         @param mode Plot amplitude in linear or decibel values. Instance of Modes enum object.
-    @param project Set abscissa and ordinate of plot. Should be given as an instance of the Projection enum. Default is Projection.xy.
+        @param project Set abscissa and ordinate of plot. Should be given as an instance of the Projection enum. Default is Projection.xy.
         @param units The units of the axes. Instance of Units enum object.
         @param name Name of .png file where plot is saved. Only when save=True. Default is "".
         @param titleA Title of the amplitude plot. Default is "Amp".
@@ -2688,12 +2688,6 @@ class System(object):
         self.clog.result(f"Found converged solution, gridsize: {*['{:0.3e}'.format(x) for x in list(gridsize)],}")
         return gridsize
     
-    #############################################################
-    #                                                           #
-    #                         GUI METHODS                       #
-    #                                                           #
-    #############################################################
-    
     def runGUIPO(self, runPODict):
         """!
         Instantiate a GUI PO propagation. Stores desired output in the system.fields and/or system.currents lists.
@@ -2805,12 +2799,6 @@ class System(object):
         if hybridDict["interp"]:
             self.interpFrame(hybridDict["fr_out"], hybridDict["field_out"], hybridDict["t_name"], hybridDict["field_out"], comp=hybridDict["comp"])
     
-    #############################################################
-    #                                                           #
-    #                       PRIVATE METHODS                     #
-    #                                                           #
-    #############################################################
-    
     def _loadFramePoynt(self, Poynting, name_source):
         """!
         Convert a Poynting vector grid to a frame object.
@@ -2851,7 +2839,6 @@ class System(object):
         self.translateGrids(f"focal_plane_{runRTDict['fr_in']}", trans)
         
         self.runRayTracer(runRTDict)
-        #self.plotSystem(RTframes=["start", "pri", f"focus_{runRTDict['fr_in']}"])
         RMS = self.calcSpotRMS(f"focus_{runRTDict['fr_in']}")
         self.translateGrids(f"focal_plane_{runRTDict['fr_in']}", -trans)
         #self.removeFrame() 

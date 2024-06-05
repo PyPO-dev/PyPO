@@ -39,38 +39,42 @@ class Test_Plotting(unittest.TestCase):
     @params(Projections.xy, Projections.yz, Projections.zx,
             Projections.yx, Projections.zy, Projections.xz)
     def test_plotBeam2D(self, project):
-        out_ar = []
-        out_ax = []
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            aperDict_plot = self.s.copyObj(TestTemplates.aperDict)
-            aperDict_plot["plot"] = True
 
-            out_ax.append(self.s.plotBeam2D(TestTemplates.GPOfield['name'], FieldComponents.Ex, 
-                ret=True, amp_only=True, project=project, aperDict=aperDict_plot))
-            
-            out_ax.append(self.s.plotBeam2D(TestTemplates.GPOfield['name'], FieldComponents.Ex, 
-                ret=True, amp_only=True, mode=Modes.LIN, project=project))
+            aper_l = [TestTemplates.aperDictEll, TestTemplates.aperDictRect]
 
-            out_ar.append(self.s.plotBeam2D(TestTemplates.GPOfield['name'], FieldComponents.Ex, 
-                ret=True, project=project, aperDict=TestTemplates.aperDict, contour=TestTemplates.GPOfield['name'], 
-                contour_comp=FieldComponents.Ex, levels=[0.5, 1]))
-            
-            out_ar.append(self.s.plotBeam2D(TestTemplates.GPOfield['name'], FieldComponents.Ex, 
-                ret=True, mode=Modes.LIN, project=project, contour=TestTemplates.GPOfield['name'], 
-                contour_comp=FieldComponents.Ex, levels=[0.5, 1]))
-            
-            out_ax.append(self.s.plotBeam2D(TestTemplates.PS_Ufield_FF["name"], FieldComponents.Ex, ret=True, project=Projections.xy))
-            out_ax.append(self.s.plotBeam2D(TestTemplates.PS_Ufield_FF["name"], FieldComponents.Ex, ret=True, amp_only=True, project=Projections.xy))
+            for aper in aper_l:
+                out_ar = []
+                out_ax = []
+                aperDict_plot = self.s.copyObj(aper)
+                aperDict_plot["plot"] = True
 
-        for entry_ax, entry_ar in zip(out_ax, out_ar):
-            self.assertEqual(type(entry_ax[0]), Figure)
-            self.assertEqual(type(entry_ar[0]), Figure)
+                out_ax.append(self.s.plotBeam2D(TestTemplates.GPOfield['name'], FieldComponents.Ex, 
+                    ret=True, amp_only=True, project=project, aperDict=aperDict_plot))
+                
+                out_ax.append(self.s.plotBeam2D(TestTemplates.GPOfield['name'], FieldComponents.Ex, 
+                    ret=True, amp_only=True, mode=Modes.LIN, project=project))
+
+                out_ar.append(self.s.plotBeam2D(TestTemplates.GPOfield['name'], FieldComponents.Ex, 
+                    ret=True, project=project, aperDict=aper, contour=TestTemplates.GPOfield['name'], 
+                    contour_comp=FieldComponents.Ex, levels=[0.5, 1]))
+                
+                out_ar.append(self.s.plotBeam2D(TestTemplates.GPOfield['name'], FieldComponents.Ex, 
+                    ret=True, mode=Modes.LIN, project=project, contour=TestTemplates.GPOfield['name'], 
+                    contour_comp=FieldComponents.Ex, levels=[0.5, 1]))
+                
+                out_ax.append(self.s.plotBeam2D(TestTemplates.PS_Ufield_FF["name"], FieldComponents.Ex, ret=True, project=Projections.xy))
+                out_ax.append(self.s.plotBeam2D(TestTemplates.PS_Ufield_FF["name"], FieldComponents.Ex, ret=True, amp_only=True, project=Projections.xy))
+
+            for entry_ax, entry_ar in zip(out_ax, out_ar):
+                self.assertEqual(type(entry_ax[0]), Figure)
+                self.assertEqual(type(entry_ar[0]), Figure)
+               
+                self.assertEqual(type(entry_ax[1]), Axes)
+                self.assertEqual(type(entry_ar[1]), ndarray)
             
-            self.assertEqual(type(entry_ax[1]), Axes)
-            self.assertEqual(type(entry_ar[1]), ndarray)
-        
-        close('all')
+            close('all')
 
     @params(*TestTemplates.getAllSurfList())
     def test_plot3D(self, element):

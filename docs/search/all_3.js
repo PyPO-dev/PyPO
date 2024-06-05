@@ -12,7 +12,7 @@ var searchData=
   ['calcbeamcuts_9',['calcBeamCuts',['../group__public__api__po.html#ga4f8e0bc6a4c9273a1e41897d5da6166a',1,'PyPO::System::System']]],
   ['calccurrents_10',['calcCurrents',['../BindBeam_8py.html#a9f9f13dfdff79c82656701068248cca4',1,'PyPO.BindBeam.calcCurrents()'],['../InterfaceBeam_8cpp.html#ae0d4eee58a54fac7b914f5356055f421',1,'calcCurrents(c2Bundle *res_field, c2Bundle *res_current, reflparams refldict, int mode):&#160;InterfaceBeam.cpp'],['../InterfaceBeam_8h.html#a3482394fcfe3386ba0852d7bc0662d01',1,'calcCurrents(c2Bundle *res_field, c2Bundle *res_current, reflparams rdict, int mode):&#160;InterfaceBeam.cpp']]],
   ['calcestimates_11',['calcEstimates',['../FitGauss_8py.html#a9104adc8fbdcc2620bb978710d3b5c2e',1,'PyPO::FitGauss']]],
-  ['calchpbw_12',['calcHPBW',['../formData_8py.html#adb9623eeb16d2d9c6dff8a611a95325f',1,'GUI.ParameterForms.formData.calcHPBW()'],['../classPyPO_1_1System_1_1System.html#a70b301243f7f2b4db848e244c729876a',1,'PyPO.System.System.calcHPBW()']]],
+  ['calchpbw_12',['calcHPBW',['../formData_8py.html#adb9623eeb16d2d9c6dff8a611a95325f',1,'GUI.ParameterForms.formData.calcHPBW()'],['../group__public__api__po.html#ga70b301243f7f2b4db848e244c729876a',1,'PyPO.System.System.calcHPBW()']]],
   ['calchpbwaction_13',['calcHPBWAction',['../classGUI_1_1MainWindow_1_1MainWidget.html#aaaf1236cc1557b3563895b12eef1c21c',1,'GUI::MainWindow::MainWidget']]],
   ['calcjm_14',['calcJM',['../BeamInit_8h.html#aafe19b6a388a2d2ea2c69943a1a7c00b',1,'BeamInit.h']]],
   ['calcmainbeam_15',['calcMainBeam',['../Efficiencies_8py.html#aef7795abfafd77ae83654f12fa445776',1,'PyPO.Efficiencies.calcMainBeam()'],['../group__public__api__po.html#gab2c4eedbc5e3aa4a675261751a4f865e',1,'PyPO.System.System.calcMainBeam()']]],

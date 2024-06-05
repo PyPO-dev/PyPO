@@ -7,7 +7,7 @@ var searchData=
   ['generategridf_4',['generateGridf',['../InterfaceReflector_8h.html#a249d2e73bd32bd263541de114deac9b6',1,'generateGridf(reflparamsf refl, reflcontainerf *container, bool transform=true, bool spheric=true):&#160;InterfaceReflector.cpp'],['../InterfaceReflector_8cpp.html#a22344e70eab920880e0bf3a52afdf55e',1,'generateGridf(reflparamsf refl, reflcontainerf *container, bool transform, bool spheric):&#160;InterfaceReflector.cpp']]],
   ['generategrids_5',['generateGrids',['../group__public__api__reflmeths.html#ga8b0b3786b3e6593c2f77b51dd9909591',1,'PyPO::System::System']]],
   ['generateuniform_6',['generateUniform',['../classRandom.html#af11ff22501905edd215208b052c29953',1,'Random::generateUniform(int num, T lower=-1.0)'],['../classRandom.html#a041dc26bf10da0973ad573585955198e',1,'Random::generateUniform(T lower=-1.0)']]],
-  ['getanglesfrommatrix_7',['getAnglesFromMatrix',['../classPyPO_1_1System_1_1System.html#afcc555ca0df753904f74f2bd30125f04',1,'PyPO::System::System']]],
+  ['getanglesfrommatrix_7',['getAnglesFromMatrix',['../classPyPO_1_1System_1_1System.html#afcc555ca0df753904f74f2bd30125f04',1,'PyPO.System.System.getAnglesFromMatrix()'],['../MatUtils_8py.html#a22fb319dd5af18db092f7299ed4b589f',1,'PyPO.MatUtils.getAnglesFromMatrix()']]],
   ['getindex_8',['getIndex',['../Checks_8py.html#ac10d88c0a0e11af3aecd3df396961041',1,'PyPO::Checks']]],
   ['getrayplotnr_9',['getRayPlotNr',['../classGUI_1_1MainWindow_1_1MainWidget.html#a845478318b3020633221154776069290',1,'GUI::MainWindow::MainWidget']]],
   ['getsysplotnr_10',['getSysPlotNr',['../classGUI_1_1MainWindow_1_1MainWidget.html#a4b395605c8b29da45a0ea7cf19a5ae93',1,'GUI::MainWindow::MainWidget']]],

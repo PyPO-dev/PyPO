@@ -4,6 +4,7 @@ File containing tests for the PO efficiencies in PyPO.
 """
 
 import unittest
+from nose2.tools import params
 
 try:
     from . import TestTemplates
@@ -18,15 +19,17 @@ class Test_SystemEfficiencies(unittest.TestCase):
         self.s = TestTemplates.getSystemWithReflectors()
         self.s.setLoggingVerbosity(False)
     
-    def test_spillover(self):
-        eta_s = self.s.calcSpillover(TestTemplates.GPOfield["name"], FieldComponents.Ex, TestTemplates.aperDict)
+    @params(TestTemplates.aperDictEll, TestTemplates.aperDictRect)
+    def test_spillover(self, aper):
+        eta_s = self.s.calcSpillover(TestTemplates.GPOfield["name"], FieldComponents.Ex, aper)
         self.assertTrue(isinstance(eta_s, float))
     
-    def test_taper(self):
+    @params(TestTemplates.aperDictEll, TestTemplates.aperDictRect)
+    def test_taper(self, aper):
         eta_t = self.s.calcTaper(TestTemplates.GPOfield["name"], FieldComponents.Ex)
         self.assertTrue(isinstance(eta_t, float))
         
-        eta_t = self.s.calcTaper(TestTemplates.GPOfield["name"], FieldComponents.Ex, aperDict=TestTemplates.aperDict)
+        eta_t = self.s.calcTaper(TestTemplates.GPOfield["name"], FieldComponents.Ex, aperDict=aper)
         self.assertTrue(isinstance(eta_t, float))
 
     def test_Xpol(self):

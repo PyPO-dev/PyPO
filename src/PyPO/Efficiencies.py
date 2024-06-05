@@ -6,6 +6,7 @@ File containing functions for calculating efficiencies and other metrics.
 import numpy as np
 
 import PyPO.BindRefl as BRefl
+from PyPO.Enums import AperShapes
 
 def _generateMask(x, y, aperDict):
     """!
@@ -22,13 +23,22 @@ def _generateMask(x, y, aperDict):
 
     t = np.arctan2(y, x) + np.pi
 
-    outer = (aperDict["outer"][0] * np.cos(t))**2 + (aperDict["outer"][1] * np.sin(t))**2
-    inner = (aperDict["inner"][0] * np.cos(t))**2 + (aperDict["inner"][1] * np.sin(t))**2
+    if aperDict["shape"] == AperShapes.ELL:
+        outer = (aperDict["outer"][0] * np.cos(t))**2 + (aperDict["outer"][1] * np.sin(t))**2
+        inner = (aperDict["inner"][0] * np.cos(t))**2 + (aperDict["inner"][1] * np.sin(t))**2
 
-    cond1 = (x - aperDict["center"][0])**2 + (y - aperDict["center"][1])**2 < outer
-    cond2 = (x - aperDict["center"][0])**2 + (y - aperDict["center"][1])**2 > inner
+        cond1 = (x - aperDict["center"][0])**2 + (y - aperDict["center"][1])**2 < outer
+        cond2 = (x - aperDict["center"][0])**2 + (y - aperDict["center"][1])**2 > inner
  
-    return cond1 & cond2
+    elif aperDict["shape"] == AperShapes.RECT:
+        cond1x = ((x - aperDict["center"][0]) > aperDict["outer_x"][0]) & ((x - aperDict["center"][0]) < aperDict["outer_x"][1])
+        cond1y = ((y - aperDict["center"][1]) > aperDict["outer_y"][0]) & ((y - aperDict["center"][1]) < aperDict["outer_y"][1])
+        cond2x = ((x - aperDict["center"][0]) < aperDict["inner_x"][0]) & ((x - aperDict["center"][0]) > aperDict["inner_x"][1])
+        cond2y = ((y - aperDict["center"][1]) < aperDict["inner_y"][0]) & ((y - aperDict["center"][1]) > aperDict["inner_y"][1])
+        
+        cond1 = cond1x & cond1y
+        cond2 = cond2x & cond2y
+    return cond1# & cond2
 
 def calcRTcenter(frame):
     """!

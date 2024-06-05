@@ -131,6 +131,22 @@ class Modes(Enum):
     LIN = 0
     dB = 2
 
+class AperShapes(Enum):
+    """!
+    Enum types for aperture object shapes.
+
+    The apertures used for efficiency calculations and plotting can be created in elliptical and rectangular shapes.
+
+    Options:\n
+    ELL       : Use elliptical aperture\n
+    RECT      : Use rectangular aperture
+
+    @ingroup public_api_argopts
+    """
+
+    ELL = 0
+    RECT = 1
+
 class Dielectrics(Enum):
     """!
     Enum types for commonly used dielectrics for lens materials.

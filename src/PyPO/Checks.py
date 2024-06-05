@@ -10,7 +10,7 @@ import re
 
 import PyPO.Config as Config
 import PyPO.WorldParam as world
-from PyPO.Enums import FieldComponents, CurrentComponents
+from PyPO.Enums import FieldComponents, CurrentComponents, AperShapes
 
 nThreads_cpu = os.cpu_count() - 1 if os.cpu_count() > 1 else 1
 PO_modelist = ["JM", "EH", "JMEH", "EHP", "FF", "scalar"]
@@ -1373,16 +1373,16 @@ def check_aperDict(aperDict, clog):
         aperDict["center"] = np.zeros(2)
 
     if aperDict.get("shape") is None:
-        aperDict["shape"] = "ellipse"
+        aperDict["shape"] = AperShapes.ELL
     
-    if aperDict["shape"] == "ellipse":
+    if aperDict["shape"] == AperShapes.ELL:
         if not "outer" in aperDict:
             errStr += errMsg_field("outer", "aperDict")
         
         if not "inner" in aperDict:
             errStr += errMsg_field("inner", "aperDict")
     
-    elif aperDict["shape"] == "rectangle":
+    elif aperDict["shape"] == AperShapes.RECT:
         if not "outer_x" in aperDict:
             errStr += errMsg_field("outer_x", "aperDict")
         

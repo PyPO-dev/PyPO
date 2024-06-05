@@ -1,5 +1,12 @@
+"""!
+@file
+Tests for checking if beams in PyPO are correct
+"""
+
 import unittest
 import ctypes
+import numpy as np
+import os
 
 from nose2.tools import params
 
@@ -12,10 +19,7 @@ import PyPO.BindBeam as beamlibs
 import PyPO.PyPOTypes as pypotypes
 
 from PyPO.System import System
-
-##
-# @file
-# Tests for checking if beams in PyPO are correct
+from PyPO.Enums import FieldComponents, CurrentComponents
 
 class Test_SystemBeams(unittest.TestCase):
     
@@ -82,6 +86,21 @@ class Test_SystemBeams(unittest.TestCase):
     def test_createScalarUniformSource(self, plane):
         self.s.createUniformSourceScalar(TestTemplates.PS_Ufield, plane["name"])
         self.assertEqual(type(self.s.scalarfields["testPS_UField"]), pypotypes.scalarfield)
+
+    def test_readCustomBeam(self):
+        root = os.path.dirname(os.path.realpath(__file__))
+        rcbeamPath = os.path.join(root, "rtest_cbeam.txt")
+        icbeamPath = os.path.join(root, "itest_cbeam.txt")
+        np.savetxt(rcbeamPath, np.ones((13, 13)))
+        np.savetxt(icbeamPath, np.ones((13, 13)))
+
+        self.s.setCustomBeamPath(root)
+        self.s.readCustomBeam("test_cbeam", TestTemplates.plane_xy["name"], FieldComponents.Ex, lam=1)
+        self.assertTrue("test_cbeam" in self.s.fields)
+        self.assertTrue("test_cbeam" in self.s.currents)
+
+        os.remove(rcbeamPath)
+        os.remove(icbeamPath)
 
 if __name__ == "__main__":
     import nose2

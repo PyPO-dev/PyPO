@@ -1,3 +1,8 @@
+"""!
+@file
+File containing tests for copy and remove methods for reflectors, fields, currents, frames and scalar fields.
+"""
+
 import unittest
 from PyPO.Checks import InputReflError, InputRTError, InputPOError
 
@@ -7,9 +12,6 @@ try:
     from . import TestTemplates
 except ImportError:
     import TestTemplates
-##
-# @file
-# File containing tests for copy and remove methods for reflectors, fields, currents, frames and scalar fields.
 class Test_SystemCopyAndRemove(unittest.TestCase):
     def setUp(self):
         self.s = TestTemplates.getSystemWithReflectors()

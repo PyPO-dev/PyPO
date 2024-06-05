@@ -1,3 +1,9 @@
+"""!
+@file
+
+Script for testing the path setting functionality in PyPO.
+"""
+
 import os
 import shutil
 
@@ -5,11 +11,6 @@ import unittest
 from pathlib import Path
 
 from PyPO.System import System
-##
-# @file
-# 
-# Script for testing the path setting functionality in PyPO.
-
 class Test_SystemPaths(unittest.TestCase):
     def setUp(self):
         self.s = System(verbose=False)

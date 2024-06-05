@@ -1,9 +1,10 @@
+"""!
+@file
+This file contains commonly used input templates so that we do not have to type them over and over again.
+"""
+
 import numpy as np
 from PyPO.System import System
-
-##
-# @file
-# This file contains commonly used input templates so that we do not have to type them over and over again.
 
 TubeRTframe =  {
         "name"      : "testTubeRTframe",
@@ -38,6 +39,13 @@ GPOfield =  {
 
 PS_Ufield =  {
         "name"      : "testPS_UField",
+        "lam"       : 1,
+        "E0"        : 1,
+        "pol"       : np.array([1,0,0])
+        }
+
+PS_Ufield_FF =  {
+        "name"      : "testPS_UField_FF",
         "lam"       : 1,
         "E0"        : 1,
         "pol"       : np.array([1,0,0])
@@ -259,11 +267,22 @@ plane_AoE = {
         "gridsize"  : np.array([13, 13])
         }
 
-aperDict = {
+aperDictEll = {
+        "shape"     : "ellipse",
         "plot"      : False,
         "center"    : np.array([0, 0]),
         "outer"     : np.array([0.5, 0.5]),
         "inner"     : np.array([0, 0])
+        }
+
+aperDictRect = {
+        "shape"     : "rectangle",
+        "plot"      : False,
+        "center"    : np.array([0, 0]),
+        "outer_x"   : np.array([-0.5, 0.5]),
+        "inner_x"   : np.array([-0.2, 0.2]),
+        "outer_y"   : np.array([-0.5, 0.5]),
+        "inner_y"   : np.array([-0.2, 0.2]),
         }
 
 ##
@@ -371,6 +390,9 @@ def getSystemWithReflectors():
             s.createPointSourceScalar(PS_Ufield, plane["name"])
             s.createUniformSourceScalar(PS_Ufield, plane["name"])
             s.createScalarGaussian(GPOfield, plane["name"])
+
+        else:
+            s.createPointSource(PS_Ufield_FF, plane["name"])
 
     for parabola in getParaboloidList():
         s.addParabola(parabola)

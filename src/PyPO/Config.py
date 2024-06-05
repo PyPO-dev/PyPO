@@ -1,6 +1,7 @@
-##
-# @file
-# Functions to set context for the logging and error checking.
+"""!
+@file
+Functions to set context for the logging and error checking.
+"""
 
 def setContext(_context=None):
     """!

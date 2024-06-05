@@ -116,6 +116,12 @@ Functions</h2></td></tr>
 <tr class="memitem:ae6db24331ae4d7b0f837c9081500686a"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="MatUtils_8py.html#ae6db24331ae4d7b0f837c9081500686a">PyPO.MatUtils.findConnectedSubsets</a> (mat, component, idx_start)</td></tr>
 <tr class="memdesc:ae6db24331ae4d7b0f837c9081500686a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find extent of centered connected subset in a matrix.  <br /></td></tr>
 <tr class="separator:ae6db24331ae4d7b0f837c9081500686a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace62d54e22fa3493136ee0c5751c7615"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="MatUtils_8py.html#ace62d54e22fa3493136ee0c5751c7615">PyPO.MatUtils.findRotation</a> (self, v, u)</td></tr>
+<tr class="memdesc:ace62d54e22fa3493136ee0c5751c7615"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find rotation matrix to rotate v onto u.  <br /></td></tr>
+<tr class="separator:ace62d54e22fa3493136ee0c5751c7615"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a22fb319dd5af18db092f7299ed4b589f"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="MatUtils_8py.html#a22fb319dd5af18db092f7299ed4b589f">PyPO.MatUtils.getAnglesFromMatrix</a> (self, M)</td></tr>
+<tr class="memdesc:a22fb319dd5af18db092f7299ed4b589f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find x, y and z rotation angles from general rotation matrix.  <br /></td></tr>
+<tr class="separator:a22fb319dd5af18db092f7299ed4b589f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>File containing a method for finding a connected subset, centered around a starting index, in a matrix. </p>
@@ -163,6 +169,87 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Indices of row and column of limits of subset. </dd></dl>
+
+</div>
+</div>
+<a id="ace62d54e22fa3493136ee0c5751c7615" name="ace62d54e22fa3493136ee0c5751c7615"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace62d54e22fa3493136ee0c5751c7615">&#9670;&#160;</a></span>findRotation()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def PyPO.MatUtils.findRotation </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>v</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>u</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Find rotation matrix to rotate v onto u. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">v</td><td>Numpy array of length 3. </td></tr>
+    <tr><td class="paramname">u</td><td>Numpy array of length 3. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a22fb319dd5af18db092f7299ed4b589f" name="a22fb319dd5af18db092f7299ed4b589f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a22fb319dd5af18db092f7299ed4b589f">&#9670;&#160;</a></span>getAnglesFromMatrix()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def PyPO.MatUtils.getAnglesFromMatrix </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>M</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Find x, y and z rotation angles from general rotation matrix. </p>
+<p>Note that the angles are not necessarily the same as the original angles of the matrix. However, the matrix constructed by the found angles applies the same 3D rotation as the input matrix.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">M</td><td>Numpy array of shape (3,3) containg a general rotation matrix.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>r Numpy array of length 3 containing rotation angles around x, y and z. </dd></dl>
 
 </div>
 </div>

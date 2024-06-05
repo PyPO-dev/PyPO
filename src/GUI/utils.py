@@ -1,12 +1,12 @@
+"""!
+@file
+Contains utilities for the GUI. 
+"""
+
 from PySide6.QtWidgets import QLabel, QLineEdit, QPushButton
 from PySide6.QtCore import Qt, QRegularExpression
 from PySide6.QtGui import QRegularExpressionValidator
 from enum import Enum, auto
-
-##
-# @file
-# Contains utilities for the GUI. 
-
 
 class InputDescriptionError(Exception):
     """!

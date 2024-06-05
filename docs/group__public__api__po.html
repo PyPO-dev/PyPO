@@ -122,12 +122,9 @@ Functions</h2></td></tr>
 <tr class="memitem:gaf38481699a40b1e3044083a8382b8e7b"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__po.html#gaf38481699a40b1e3044083a8382b8e7b">PyPO.System.System.removeScalarField</a> (self, fieldName)</td></tr>
 <tr class="memdesc:gaf38481699a40b1e3044083a8382b8e7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove a scalar PO field from system.  <br /></td></tr>
 <tr class="separator:gaf38481699a40b1e3044083a8382b8e7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga4a348a60e806604b8dc25125ca29db0c"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__po.html#ga4a348a60e806604b8dc25125ca29db0c">PyPO.System.System.readCustomBeam</a> (self, name_beam, name_source, comp, lam, normalise=True, mode=&quot;PMC&quot;, scale=1)</td></tr>
-<tr class="memdesc:ga4a348a60e806604b8dc25125ca29db0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a custom beam from disk into the system.  <br /></td></tr>
-<tr class="separator:ga4a348a60e806604b8dc25125ca29db0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga636df260c78f635864ec5f7de5219954"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__po.html#ga636df260c78f635864ec5f7de5219954">PyPO.System.System.calcCurrents</a> (self, name_source, fields, mode=&quot;PMC&quot;)</td></tr>
-<tr class="memdesc:ga636df260c78f635864ec5f7de5219954"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate currents on a surface given a field object.  <br /></td></tr>
-<tr class="separator:ga636df260c78f635864ec5f7de5219954"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga4cdcd5c907622e6f18bfabcf32dec6f6"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__po.html#ga4cdcd5c907622e6f18bfabcf32dec6f6">PyPO.System.System.readCustomBeam</a> (self, name_beam, name_source, comp, lam, normalise=True, scale=1)</td></tr>
+<tr class="memdesc:ga4cdcd5c907622e6f18bfabcf32dec6f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a custom beam from disk into the system.  <br /></td></tr>
+<tr class="separator:ga4cdcd5c907622e6f18bfabcf32dec6f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga1632938e4cddce095271eba8fcc30910"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__po.html#ga1632938e4cddce095271eba8fcc30910">PyPO.System.System.runPO</a> (self, runPODict)</td></tr>
 <tr class="memdesc:ga1632938e4cddce095271eba8fcc30910"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiate a PO propagation.  <br /></td></tr>
 <tr class="separator:ga1632938e4cddce095271eba8fcc30910"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -149,15 +146,18 @@ Functions</h2></td></tr>
 <tr class="memitem:ga07727e8bdbf38d793002b6b4ee3df315"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__po.html#ga07727e8bdbf38d793002b6b4ee3df315">PyPO.System.System.calcXpol</a> (self, name_field, comp_co, comp_cr)</td></tr>
 <tr class="memdesc:ga07727e8bdbf38d793002b6b4ee3df315"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate cross-polar efficiency of a field defined on a surface.  <br /></td></tr>
 <tr class="separator:ga07727e8bdbf38d793002b6b4ee3df315"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga7097a1c5e8de5453d59084bf64cba08a"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__po.html#ga7097a1c5e8de5453d59084bf64cba08a">PyPO.System.System.fitGaussAbs</a> (self, name_field, comp, thres=None, mode=None, full_output=False, ratio=1)</td></tr>
-<tr class="memdesc:ga7097a1c5e8de5453d59084bf64cba08a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fit a Gaussian profile to the amplitude of a field component and adds the result to scalar field in system.  <br /></td></tr>
-<tr class="separator:ga7097a1c5e8de5453d59084bf64cba08a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga7f9e302018f039ad330dff46b4c49f2a"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__po.html#ga7f9e302018f039ad330dff46b4c49f2a">PyPO.System.System.calcMainBeam</a> (self, name_field, comp, thres=None, mode=None)</td></tr>
-<tr class="memdesc:ga7f9e302018f039ad330dff46b4c49f2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate main-beam efficiency of a beam pattern.  <br /></td></tr>
-<tr class="separator:ga7f9e302018f039ad330dff46b4c49f2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga3f9bcd647128a26e892bca72b881a412"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__po.html#ga3f9bcd647128a26e892bca72b881a412">PyPO.System.System.calcBeamCuts</a> (self, name_field, comp, phi=0, center=True, align=True, norm=False, transform=False, mode=&quot;dB&quot;)</td></tr>
-<tr class="memdesc:ga3f9bcd647128a26e892bca72b881a412"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate cross sections of a beam pattern.  <br /></td></tr>
-<tr class="separator:ga3f9bcd647128a26e892bca72b881a412"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9ec40a858972caccad3905b94c964aa3"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__po.html#ga9ec40a858972caccad3905b94c964aa3">PyPO.System.System.fitGaussAbs</a> (self, name_field, comp, thres=None, mode=Modes.LIN, full_output=False, ratio=1)</td></tr>
+<tr class="memdesc:ga9ec40a858972caccad3905b94c964aa3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fit a Gaussian profile to the amplitude of a field component and adds the result to scalar field in system.  <br /></td></tr>
+<tr class="separator:ga9ec40a858972caccad3905b94c964aa3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab2c4eedbc5e3aa4a675261751a4f865e"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__po.html#gab2c4eedbc5e3aa4a675261751a4f865e">PyPO.System.System.calcMainBeam</a> (self, name_field, comp, thres=None, mode=Modes.LIN)</td></tr>
+<tr class="memdesc:gab2c4eedbc5e3aa4a675261751a4f865e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate main-beam efficiency of a beam pattern.  <br /></td></tr>
+<tr class="separator:gab2c4eedbc5e3aa4a675261751a4f865e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga4f8e0bc6a4c9273a1e41897d5da6166a"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__po.html#ga4f8e0bc6a4c9273a1e41897d5da6166a">PyPO.System.System.calcBeamCuts</a> (self, name_field, comp, phi=0, center=True, align=True, norm=False, transform=False, mode=Modes.dB)</td></tr>
+<tr class="memdesc:ga4f8e0bc6a4c9273a1e41897d5da6166a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate cross sections of a beam pattern.  <br /></td></tr>
+<tr class="separator:ga4f8e0bc6a4c9273a1e41897d5da6166a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga70b301243f7f2b4db848e244c729876a"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__po.html#ga70b301243f7f2b4db848e244c729876a">PyPO.System.System.calcHPBW</a> (self, name_field, comp, interp=50, center=False, align=False)</td></tr>
+<tr class="memdesc:ga70b301243f7f2b4db848e244c729876a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate half-power beamwidth.  <br /></td></tr>
+<tr class="separator:ga70b301243f7f2b4db848e244c729876a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga0df4f35ded77084223c1b314ce2375c6"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__po.html#ga0df4f35ded77084223c1b314ce2375c6">PyPO.System.System.createPointSource</a> (self, PSDict, name_surface)</td></tr>
 <tr class="memdesc:ga0df4f35ded77084223c1b314ce2375c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate point-source PO fields and currents.  <br /></td></tr>
 <tr class="separator:ga0df4f35ded77084223c1b314ce2375c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -173,7 +173,7 @@ Functions</h2></td></tr>
 <tr class="memitem:gab0b62bd1bfc8e7103b5eb3e105d5e28f"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__po.html#gab0b62bd1bfc8e7103b5eb3e105d5e28f">PyPO.System.System.interpBeam</a> (self, name, gridsize_new, obj_t=&quot;fields&quot;)</td></tr>
 <tr class="memdesc:gab0b62bd1bfc8e7103b5eb3e105d5e28f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interpolate a PO beam.  <br /></td></tr>
 <tr class="separator:gab0b62bd1bfc8e7103b5eb3e105d5e28f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga9fed5a1920ada927ea8712fae363d31f"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__po.html#ga9fed5a1920ada927ea8712fae363d31f">PyPO.System.System.autoConverge</a> (self, source_field, name_target, tol=1e-2, add=10, patch_size=1/9, max_iter=1000)</td></tr>
+<tr class="memitem:ga9fed5a1920ada927ea8712fae363d31f"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__po.html#ga9fed5a1920ada927ea8712fae363d31f">PyPO.System.System.autoConverge</a> (self, source_field, name_target, tol=1e-2, <a class="el" href="GUtils_8h.html#a8ef9560cf95b6226aebec0b889ef1460">add</a>=10, patch_size=1/9, max_iter=1000)</td></tr>
 <tr class="memdesc:ga9fed5a1920ada927ea8712fae363d31f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate gridsize for which calculation converges.  <br /></td></tr>
 <tr class="separator:ga9fed5a1920ada927ea8712fae363d31f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -253,8 +253,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ga3f9bcd647128a26e892bca72b881a412" name="ga3f9bcd647128a26e892bca72b881a412"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga3f9bcd647128a26e892bca72b881a412">&#9670;&#160;</a></span>calcBeamCuts()</h2>
+<a id="ga4f8e0bc6a4c9273a1e41897d5da6166a" name="ga4f8e0bc6a4c9273a1e41897d5da6166a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga4f8e0bc6a4c9273a1e41897d5da6166a">&#9670;&#160;</a></span>calcBeamCuts()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -311,7 +311,7 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>mode</em> = <code>&quot;dB&quot;</code>&#160;</td>
+          <td class="paramname"><em>mode</em> = <code>Modes.dB</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -326,13 +326,13 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">name_field</td><td>Name of field object. </td></tr>
-    <tr><td class="paramname">comp</td><td>Component of field object. </td></tr>
+    <tr><td class="paramname">comp</td><td>Component of field object. Instance of FieldComponents enum object. </td></tr>
     <tr><td class="paramname">phi</td><td>Manual rotation of cuts w.r.t. to the x-y cardinal planes. </td></tr>
     <tr><td class="paramname">center</td><td>Whether to center the cardinal planes on the peak of the beam pattern. </td></tr>
     <tr><td class="paramname">align</td><td>Whether to align the cardinal planes to the beam pattern minor and major axes. </td></tr>
     <tr><td class="paramname">norm</td><td>Which component to normalise to. Defaults to comp. </td></tr>
     <tr><td class="paramname">transform</td><td>Transform surface on which beam is defined. If False, will evaluate beam cuts as if surface is in restframe. </td></tr>
-    <tr><td class="paramname">mode</td><td>Return beamcuts in linear ("linear"), logarithmic ("log") or decibels ("dB"). Defaults to "dB".</td></tr>
+    <tr><td class="paramname">mode</td><td>Return beamcuts in linear or decibel values. Instance of Modes enum object.</td></tr>
   </table>
   </dd>
 </dl>
@@ -346,14 +346,14 @@ y_strip Co-ordinate values for y_cut. </dd></dl>
 
 </div>
 </div>
-<a id="ga636df260c78f635864ec5f7de5219954" name="ga636df260c78f635864ec5f7de5219954"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga636df260c78f635864ec5f7de5219954">&#9670;&#160;</a></span>calcCurrents()</h2>
+<a id="ga70b301243f7f2b4db848e244c729876a" name="ga70b301243f7f2b4db848e244c729876a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga70b301243f7f2b4db848e244c729876a">&#9670;&#160;</a></span>calcHPBW()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">def PyPO.System.System.calcCurrents </td>
+          <td class="memname">def PyPO.System.System.calcHPBW </td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname"><em>self</em>, </td>
@@ -362,19 +362,31 @@ y_strip Co-ordinate values for y_cut. </dd></dl>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>name_source</em>, </td>
+          <td class="paramname"><em>name_field</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>fields</em>, </td>
+          <td class="paramname"><em>comp</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>mode</em> = <code>&quot;PMC&quot;</code>&#160;</td>
+          <td class="paramname"><em>interp</em> = <code>50</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>center</em> = <code>False</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>align</em> = <code>False</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -384,23 +396,26 @@ y_strip Co-ordinate values for y_cut. </dd></dl>
       </table>
 </div><div class="memdoc">
 
-<p>Calculate currents on a surface given a field object. </p>
-<p>Given a surface and a PO field defined on said surface it is possible to calculate the image PO currents, the virtual currents that would give rise to the PO field. This is also known as the image theorem. For this, it is necessary to give appropriate boundary conditions on the surface. This depends on the PO field that is present. If only the electric field is known, the currents can be calculated by assuming a PMC (perfect magnetic conductor) right behind the surface, which radiated the elctric fields. In case only the magnetic field is know, the PMC is replaced by a PEC (perfect electric conductor). In case both electric and magnetic fields are know, the boundary conditions for vectorial EM fields at the surface can be used to calculate the image currents.</p>
+<p>Calculate half-power beamwidth. </p>
+<p>This is done by directly evaluating the -3 dB points along both cardinal planes of the beam pattern. Then, the distance between antipodal half-power points is calculated on an interpolation of the supplied PO field.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">name_source</td><td>Name of surface in which to calculate currents. </td></tr>
-    <tr><td class="paramname">fields</td><td>Fields object from which to calculate currents. @para mode Which approximation to use. Can choose between Perfect Electrical Conductor ('PEC', requires H-field), Perfect Magnetic Conductor ('PMC', requires E-field) or full calculation ('full', requires both). Defaults to 'PMC'.</td></tr>
+    <tr><td class="paramname">name_field</td><td>Name of field object. </td></tr>
+    <tr><td class="paramname">comp</td><td>Component of field object. Instance of FieldComponents enum object. </td></tr>
+    <tr><td class="paramname">interp</td><td>Interpolation factor for finding the HPBW. Defaults to 50. </td></tr>
+    <tr><td class="paramname">center</td><td>Whether to center the beam cuts on amplitude center. Use only if beam has well defined amplitude center. </td></tr>
+    <tr><td class="paramname">align</td><td>Whether to take beam cuts along cardinal planes rotated by the position angle.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also</dt><dd>fields </dd>
+<dl class="section return"><dt>Returns</dt><dd>HPBW_E Half-power beamwidth along E-plane in units of surface of beam. </dd>
 <dd>
-currents </dd></dl>
+HPBW_H Half-power beamwidth along H-plane in units of surface of beam. </dd></dl>
 
 </div>
 </div>
-<a id="ga7f9e302018f039ad330dff46b4c49f2a" name="ga7f9e302018f039ad330dff46b4c49f2a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga7f9e302018f039ad330dff46b4c49f2a">&#9670;&#160;</a></span>calcMainBeam()</h2>
+<a id="gab2c4eedbc5e3aa4a675261751a4f865e" name="gab2c4eedbc5e3aa4a675261751a4f865e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gab2c4eedbc5e3aa4a675261751a4f865e">&#9670;&#160;</a></span>calcMainBeam()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -433,7 +448,7 @@ currents </dd></dl>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>mode</em> = <code>None</code>&#160;</td>
+          <td class="paramname"><em>mode</em> = <code>Modes.LIN</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -448,7 +463,7 @@ currents </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">name_field</td><td>Name of field object. </td></tr>
-    <tr><td class="paramname">comp</td><td>Component of field object. </td></tr>
+    <tr><td class="paramname">comp</td><td>Component of field object. Instance of FieldComponents enum object. </td></tr>
     <tr><td class="paramname">thres</td><td>Threshold to fit to, in decibels. </td></tr>
     <tr><td class="paramname">mode</td><td>Fit to amplitude in decibels, linear or logarithmically.</td></tr>
   </table>
@@ -501,7 +516,7 @@ currents </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">name_field</td><td>Name of the PO field. </td></tr>
-    <tr><td class="paramname">comp</td><td>Component of field to calculate spillover of. </td></tr>
+    <tr><td class="paramname">comp</td><td>Component of field to calculate spillover of. Instance of FieldComponents enum object. </td></tr>
     <tr><td class="paramname">aperDict</td><td>An aperDict dictionary containing the parameters for defining the spillover aperture.</td></tr>
   </table>
   </dd>
@@ -554,7 +569,7 @@ currents </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">name_field</td><td>Name of the PO field. </td></tr>
-    <tr><td class="paramname">comp</td><td>Component of field to calculate taper efficiency of. </td></tr>
+    <tr><td class="paramname">comp</td><td>Component of field to calculate taper efficiency of. Instance of FieldComponents enum object. </td></tr>
     <tr><td class="paramname">aperDict</td><td>An aperDict dictionary containing the parameters for defining the taper aperture. Defaults to None.</td></tr>
   </table>
   </dd>
@@ -607,8 +622,8 @@ currents </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">name_field</td><td>Name of the PO field. </td></tr>
-    <tr><td class="paramname">comp_co</td><td>Co-polar component of field. </td></tr>
-    <tr><td class="paramname">comp_cr</td><td>Cross-polar component of field.</td></tr>
+    <tr><td class="paramname">comp_co</td><td>Co-polar component of field. Instance of FieldComponents enum object. </td></tr>
+    <tr><td class="paramname">comp_cr</td><td>Cross-polar component of field. Instance of FieldComponents enum object.</td></tr>
   </table>
   </dd>
 </dl>
@@ -886,8 +901,8 @@ currents </dd></dl>
 
 </div>
 </div>
-<a id="ga7097a1c5e8de5453d59084bf64cba08a" name="ga7097a1c5e8de5453d59084bf64cba08a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga7097a1c5e8de5453d59084bf64cba08a">&#9670;&#160;</a></span>fitGaussAbs()</h2>
+<a id="ga9ec40a858972caccad3905b94c964aa3" name="ga9ec40a858972caccad3905b94c964aa3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga9ec40a858972caccad3905b94c964aa3">&#9670;&#160;</a></span>fitGaussAbs()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -920,7 +935,7 @@ currents </dd></dl>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>mode</em> = <code>None</code>, </td>
+          <td class="paramname"><em>mode</em> = <code>Modes.LIN</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -947,9 +962,9 @@ currents </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">name_field</td><td>Name of field object. </td></tr>
-    <tr><td class="paramname">comp</td><td>Component of field object. </td></tr>
+    <tr><td class="paramname">comp</td><td>Component of field object. Instance of FieldComponents enum object. </td></tr>
     <tr><td class="paramname">thres</td><td>Threshold to fit to, in decibels. </td></tr>
-    <tr><td class="paramname">mode</td><td>Fit to amplitude in decibels, linear or logarithmically. </td></tr>
+    <tr><td class="paramname">mode</td><td>Fit to amplitude in decibels, linear or logarithmically. Instance of Modes enum object. </td></tr>
     <tr><td class="paramname">full_output</td><td>Return fitted parameters and standard deviations.</td></tr>
   </table>
   </dd>
@@ -1063,8 +1078,8 @@ perr Standard deviation of fitted parameters. </dd></dl>
 
 </div>
 </div>
-<a id="ga4a348a60e806604b8dc25125ca29db0c" name="ga4a348a60e806604b8dc25125ca29db0c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga4a348a60e806604b8dc25125ca29db0c">&#9670;&#160;</a></span>readCustomBeam()</h2>
+<a id="ga4cdcd5c907622e6f18bfabcf32dec6f6" name="ga4cdcd5c907622e6f18bfabcf32dec6f6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga4cdcd5c907622e6f18bfabcf32dec6f6">&#9670;&#160;</a></span>readCustomBeam()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1109,12 +1124,6 @@ perr Standard deviation of fitted parameters. </dd></dl>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>mode</em> = <code>&quot;PMC&quot;</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
           <td class="paramname"><em>scale</em> = <code>1</code>&#160;</td>
         </tr>
         <tr>
@@ -1126,14 +1135,14 @@ perr Standard deviation of fitted parameters. </dd></dl>
 </div><div class="memdoc">
 
 <p>Read a custom beam from disk into the system. </p>
-<p>The system will look in the customBeamPath, which defaults to the current working directory and can be set with the setCustomBeamPath() method. Note that the custom beam pattern needs to contain a real and imaginary part, and that these need to be stored in separate .txt files, stored as such: r&lt;name_beam&gt;.txt and i&lt;name_beam&gt;.txt, where 'r' and 'i' refer to the real and imaginary part, respectively.</p>
+<p>The system will look in the customBeamPath, which defaults to the current working directory and can be set with the setCustomBeamPath() method. Note that the custom beam pattern needs to contain a real and imaginary part, and that these need to be stored in separate .txt files, stored as such: r&lt;name_beam&gt;.txt and i&lt;name_beam&gt;.txt, where 'r' and 'i' refer to the real and imaginary part, respectively. If the beam pattern is a component of the E-field, the currents will be calculated assuming a PMC surface. If, on the other hand, the beam pattern is a component of the H-field, the currents will be calculated assuming a PEC surface.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">name_beam</td><td>Name of the beam (without the 'r' or 'i' prefixes or '.txt' suffix). </td></tr>
     <tr><td class="paramname">name_source</td><td>Name of source surface on which to define the beam. </td></tr>
-    <tr><td class="paramname">comp</td><td>Polarisation component of beam. </td></tr>
+    <tr><td class="paramname">comp</td><td>Polarisation component of beam. Instance of FieldComponents enum object. </td></tr>
     <tr><td class="paramname">lam</td><td>Wavelength of beam, in mm. </td></tr>
-    <tr><td class="paramname">normalise</td><td>Whether or not to normalise beam to its maximum amplitude. @para mode Which approximation to use. Can choose between Perfect Electrical Conductor ('PEC'), Perfect Magnetic Conductor ('PMC') or full calculation ('full'). Defaults to 'PMC'. </td></tr>
+    <tr><td class="paramname">normalise</td><td>Whether or not to normalise beam to its maximum amplitude. </td></tr>
     <tr><td class="paramname">scale</td><td>Scale factor for beam. Defaults to 1.</td></tr>
   </table>
   </dd>

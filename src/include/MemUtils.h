@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <cuda.h>
+#include <cuComplex.h>
 
 #ifndef __MemUtils_h
 #define __MemUtils_h

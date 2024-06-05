@@ -1,3 +1,8 @@
+"""!
+@file
+Tests for checking if objects are properly added to the system.
+"""
+
 import unittest
 from PyPO.Checks import InputReflError, InputRTError, InputPOError
 import PyPO.Templates as pypotemp
@@ -39,6 +44,13 @@ class Test_SystemDictsAndAddElement(unittest.TestCase):
         self.s.groupElements(TestTemplates.paraboloid_man_xy["name"], TestTemplates.ellipsoid_z_man_xy["name"])
         self.assertEqual(len(self.s.groups), ltot + 1)
 
+    def test_removeGroup(self):
+        self.s.groupElements("test", TestTemplates.paraboloid_man_xy["name"], TestTemplates.ellipsoid_z_man_xy["name"])
+        self.assertTrue("test" in self.s.groups)
+
+        self.s.removeGroup("test")
+        self.assertFalse("test" in self.s.groups)
+
     @params(System.createTubeFrame, System.createGRTFrame)
     def test_addRTFrame(self, func):
         ltot = len(TestTemplates.getFrameList())
@@ -50,7 +62,7 @@ class Test_SystemDictsAndAddElement(unittest.TestCase):
 
     @params(System.createGaussian, System.createPointSource, System.createUniformSource)
     def test_addPOFields(self, func):
-        ltot = len(TestTemplates.getPOSourceList())
+        ltot = len(TestTemplates.getPOSourceList()) + 1
 
         self.assertEqual(len(self.s.fields), ltot)
         self.assertEqual(len(self.s.currents), ltot)

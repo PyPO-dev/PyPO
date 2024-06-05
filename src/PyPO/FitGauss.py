@@ -1,12 +1,14 @@
+"""!
+@file
+File containing methods for fitting Gaussian distributions to field components.
+"""
+
 import numpy as np
 from scipy.optimize import fmin
 
 import PyPO.BindRefl as BRefl
 import PyPO.MatUtils as MUtils
-
-##
-# @file
-# File containing methods for fitting Gaussian distributions to field components.
+from PyPO.Enums import Modes
 
 def calcEstimates(x, y, area, field_norm):
     """!
@@ -75,7 +77,7 @@ def fitGaussAbs(field, surfaceObject, thres, mode, ratio=1):
     @param field Component of field to fit.
     @param surfaceObject Surface on which the field is defined.
     @param thres Threshold for fitting in decibels.
-    @param mode Whether to fit the Gaussian in linear, decibel or logarithmic space.
+    @param mode Whether to fit the Gaussian in linear or logarithmic space.
     @param ratio Allowed maximal ratio of fit to actual beam. If "None", will just attempt to fit the Gaussian to supplied pattern. If given, will only accept a fit if the ratio of integrated power in the fitted Gaussian to the supplied beam pattern is less than or equal to the given value. Defaults to 1.
 
     @returns popt Optimal parameters for Gaussian.
@@ -94,17 +96,13 @@ def fitGaussAbs(field, surfaceObject, thres, mode, ratio=1):
     
     area = grids.area
 
-    if mode == "dB":
+    if mode == Modes.dB:
         fit_field = 20 * np.log10(_field)
         mask_f = fit_field >= thres 
 
-    elif mode == "linear":
+    elif mode == Modes.LIN:
         fit_field = _field
         mask_f = fit_field >= 10**(thres/20)
-
-    elif mode == "log":
-        fit_field = np.log(_field)
-        mask_f = fit_field >= np.log(10**(thres/20))
 
     idx_max = np.unravel_index(np.argmax(fit_field), fit_field.shape)
 
@@ -143,18 +141,14 @@ def fitGaussAbs(field, surfaceObject, thres, mode, ratio=1):
 
     else:
         while _ratio >= ratio:
-            if mode == "dB":
+            if mode == Modes.dB:
                 fit_field = 20 * np.log10(_field)
                 mask_f = fit_field >= thres 
 
-            elif mode == "linear":
+            elif mode == Modes.LIN:
                 fit_field = _field
                 mask_f = fit_field >= 10**(thres/20)
 
-            elif mode == "log":
-                fit_field = np.log(_field)
-                mask_f = fit_field >= np.log(10**(thres/20))
-            
             if num >= 1:
                 _mask_f = mask_f & x_cond & y_cond
             else:
@@ -163,7 +157,7 @@ def fitGaussAbs(field, surfaceObject, thres, mode, ratio=1):
             args = (surfaceObject, fit_field, _mask_f, mode)
             popt = fmin(GaussAbs, p0, args, disp=False)
 
-            _Psi = generateGauss(popt, surfaceObject, mode="linear")
+            _Psi = generateGauss(popt, surfaceObject, mode=Modes.LIN)
             _ratio = np.sum(_Psi**2) / np.sum(_field**2)
             
             if num > 1:
@@ -207,7 +201,7 @@ def generateGauss(p0, surfaceObject, mode):
 
     @param p0 Gaussian parameters.
     @param surfaceObject Surface on which Gaussian is defined.
-    @param mode Whether to generate Gaussian in linear, decibel or logarithmic space.
+    @param mode Whether to generate Gaussian in linear or decibel space.
 
     @returns Psi Gaussian distribution.
     """
@@ -222,13 +216,10 @@ def generateGauss(p0, surfaceObject, mode):
     c = np.sin(2 * theta) / (4 * x0**2) - np.sin(2 * theta) / (4 * y0**2)
     b = np.sin(theta)**2 / (2 * x0**2) + np.cos(theta)**2 / (2 * y0**2)
 
-    if mode == "dB":
+    if mode == Modes.dB:
         Psi = 20*np.log10(np.exp(-(a*(x - xs)**2 + 2*c*(x - xs)*(y - ys) + b*(y - ys)**2)))
 
-    elif mode == "linear":
+    elif mode == Modes.LIN:
         Psi = np.exp(-(a*(x - xs)**2 + 2*c*(x - xs)*(y - ys) + b*(y - ys)**2))
-
-    elif mode == "log":
-        Psi = -(a*(x - xs)**2 + 2*c*(x - xs)*(y - ys) + b*(y - ys)**2)
     
     return Psi.reshape(x.shape)

@@ -1,3 +1,8 @@
+"""!
+@file
+Tests for checking if CPU and GPU operations in PyPO are correct
+"""
+
 import unittest
 import numpy as np
 import ctypes
@@ -16,10 +21,7 @@ import PyPO.Templates as pytemp
 
 from PyPO.System import System
 from PyPO.Checks import RunPOError, RunRTError, HybridPropError, check_runPODict, check_hybridDict, check_runRTDict
-
-##
-# @file
-# Tests for checking if CPU and GPU operations in PyPO are correct
+from PyPO.Enums import FieldComponents, CurrentComponents
 
 class Test_SystemPO_RT(unittest.TestCase):
     def setUp(self):
@@ -85,10 +87,10 @@ class Test_SystemPO_RT(unittest.TestCase):
             self.assertEqual(type(self.s.currents["test_JM"]), pypotypes.currents)
             self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
     
-    @params(("CPU", False, System.runPO, System.runHybridPropagation, None), 
-            ("GPU", True, System.runPO, System.runHybridPropagation, "Ex"), 
-            ("CPU", False, System.runGUIPO, System.hybridGUIPropagation, "Ex"))
-    def test_runPO_EHP_Hybrid(self, dev, interp, funcPO, funcHybrid, comp):
+    @params(("CPU", True, System.runPO, System.runHybridPropagation, FieldComponents.NONE, np.ones(3)), 
+            ("GPU", True, System.runPO, System.runHybridPropagation, FieldComponents.Ex, None), 
+            ("CPU", False, System.runGUIPO, System.hybridGUIPropagation, FieldComponents.Ex, None))
+    def test_runPO_EHP_Hybrid(self, dev, interp, funcPO, funcHybrid, comp, start):
         if dev == "GPU" and not self.GPU_flag:
             return
 
@@ -101,7 +103,7 @@ class Test_SystemPO_RT(unittest.TestCase):
         self.assertEqual(type(self.s.fields["test_EH"]), pypotypes.fields)
         self.assertEqual(type(self.s.frames["test_P"]), pypotypes.frame)
         
-        runHybridDict = self._get_runPODictHybrid("test_P", "test_EH", TestTemplates.paraboloid_man_xy["name"], "test_fr_out", "test_field_out", interp=interp, comp=comp)
+        runHybridDict = self._get_runPODictHybrid("test_P", "test_EH", TestTemplates.paraboloid_man_xy["name"], "test_fr_out", "test_field_out", interp=interp, comp=comp, start=start)
         
         check_hybridDict(runHybridDict, self.s.system.keys(), self.s.frames.keys(), self.s.fields.keys(), self.s.clog)
         
@@ -279,7 +281,7 @@ class Test_SystemPO_RT(unittest.TestCase):
 
         return runPODict
     
-    def _get_runPODictHybrid(self, fr_in, field_in, target, fr_out, field_out, interp=False, comp=None):
+    def _get_runPODictHybrid(self, fr_in, field_in, target, fr_out, field_out, interp=False, comp=FieldComponents.NONE, start=None):
         runPODict = {
                 "fr_in"     : fr_in,
                 "t_name"    : target,
@@ -287,7 +289,8 @@ class Test_SystemPO_RT(unittest.TestCase):
                 "fr_out"    : fr_out,
                 "field_out" : field_out,
                 "interp"    : interp,
-                "comp"      : comp
+                "comp"      : comp,
+                "start"     : start
                 }
 
         return runPODict

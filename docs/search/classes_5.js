@@ -1,10 +1,13 @@
 var searchData=
 [
-  ['gpodict_0',['GPODict',['../structGPODict.html',1,'GPODict'],['../classPyPO_1_1Structs_1_1GPODict.html',1,'PyPO.Structs.GPODict']]],
-  ['gpodictf_1',['GPODictf',['../structGPODictf.html',1,'GPODictf'],['../classPyPO_1_1Structs_1_1GPODictf.html',1,'PyPO.Structs.GPODictf']]],
-  ['groupnameerror_2',['GroupNameError',['../classPyPO_1_1Checks_1_1GroupNameError.html',1,'PyPO::Checks']]],
-  ['groupwidget_3',['GroupWidget',['../classGUI_1_1ElementWidget_1_1GroupWidget.html',1,'GUI::ElementWidget']]],
-  ['grtdict_4',['GRTDict',['../structGRTDict.html',1,'GRTDict'],['../classPyPO_1_1Structs_1_1GRTDict.html',1,'PyPO.Structs.GRTDict']]],
-  ['grtdictf_5',['GRTDictf',['../structGRTDictf.html',1,'GRTDictf'],['../classPyPO_1_1Structs_1_1GRTDictf.html',1,'PyPO.Structs.GRTDictf']]],
-  ['guilogger_6',['GUILogger',['../classPyPO_1_1CustomLogger_1_1GUILogger.html',1,'PyPO::CustomLogger']]]
+  ['f2_0',['F2',['../classPyPO_1_1Sellmeier_1_1F2.html',1,'PyPO::Sellmeier']]],
+  ['fieldcomponents_1',['FieldComponents',['../classPyPO_1_1Enums_1_1FieldComponents.html',1,'PyPO::Enums']]],
+  ['fieldnameerror_2',['FieldNameError',['../classPyPO_1_1Checks_1_1FieldNameError.html',1,'PyPO::Checks']]],
+  ['fields_3',['fields',['../classPyPO_1_1PyPOTypes_1_1fields.html',1,'PyPO::PyPOTypes']]],
+  ['fieldswidget_4',['FieldsWidget',['../classGUI_1_1ElementWidget_1_1FieldsWidget.html',1,'GUI::ElementWidget']]],
+  ['formgenerator_5',['FormGenerator',['../classGUI_1_1ParameterForms_1_1formGenerator_1_1FormGenerator.html',1,'GUI::ParameterForms::formGenerator']]],
+  ['frame_6',['frame',['../classPyPO_1_1PyPOTypes_1_1frame.html',1,'PyPO::PyPOTypes']]],
+  ['framenameerror_7',['FrameNameError',['../classPyPO_1_1Checks_1_1FrameNameError.html',1,'PyPO::Checks']]],
+  ['framewidget_8',['FrameWidget',['../classGUI_1_1ElementWidget_1_1FrameWidget.html',1,'GUI::ElementWidget']]],
+  ['fs_9',['FS',['../classPyPO_1_1Sellmeier_1_1FS.html',1,'PyPO::Sellmeier']]]
 ];

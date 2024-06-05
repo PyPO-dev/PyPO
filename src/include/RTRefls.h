@@ -1,6 +1,4 @@
 #include <cmath>
-#define FLEPS 1.0E-8
-
 #include "Utils.h"
 
 #ifndef __RTRefls_h
@@ -20,40 +18,21 @@
 template<class T>
 class RTRefls
 {
-    T a, b, c;
-
 public:
-    RTRefls(T a, T b, T c);
-
     Utils<T> ut;
 
-    T common1(T t, T xr, T yr, T dxr, T dyr);
-    T common2(T t, T xr, T yr, T dxr, T dyr);
-    T gp(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr);
-    T gh(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr);
-    T ge(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr);
-    T gpl(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr);
+    static T common1(T t, T xr, T yr, T dxr, T dyr, T a, T b);
+    static T common2(T t, T xr, T yr, T dxr, T dyr, T a, T b);
+    static T gp(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr, T a, T b, T c);
+    static T gh(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr, T a, T b, T c);
+    static T ge(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr, T a, T b, T c);
+    static T gpl(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr, T a, T b, T c);
 
-    std::array<T, 3> np(T xr, T yr, T zr, int flip);
-    std::array<T, 3> nh(T xr, T yr, T zr, int flip);
-    std::array<T, 3> ne(T xr, T yr, T zr, int flip);
-    std::array<T, 3> npl(T xr, T yr, T zr, int flip);
+    static std::array<T, 3> np(T xr, T yr, T zr, int flip, T a, T b, T c);
+    static std::array<T, 3> nh(T xr, T yr, T zr, int flip, T a, T b, T c);
+    static std::array<T, 3> ne(T xr, T yr, T zr, int flip, T a, T b, T c);
+    static std::array<T, 3> npl(T xr, T yr, T zr, int flip, T a, T b, T c);
 };
-
-/**
- * Set a, b and c parameters for quadric surfaces.
- *
- * @param a Scale factor along x-axis, double/float.
- * @param b Scale factor along y-axis, double/float.
- * @param c Scale factor along z-axis, double/float (hyperboloid/ellipsoid only).
- */
-template<class T>
-RTRefls<T>::RTRefls(T a, T b, T c)
-{
-    this->a = a;
-    this->b = b;
-    this->c = c;
-}
 
 /**
  * Common factor 1 for all reflectors.
@@ -66,10 +45,12 @@ RTRefls<T>::RTRefls(T a, T b, T c)
  * @param yr Current y co-ordinate of ray, double/float.
  * @param dxr Component of ray direction along x-axis, double/float.
  * @param dyr Component of ray direction along y-axis, double/float.
+ * @param a Scale factor along x-axis, double/float.
+ * @param b Scale factor along y-axis, double/float.
  * @returns z Co-ordinate along z-axis on reflector, corresponding to ray co-ordinate, direction and scaling. Double/float.
  */
 template<class T>
-inline T RTRefls<T>::common1(T t, T xr, T yr, T dxr, T dyr)
+inline T RTRefls<T>::common1(T t, T xr, T yr, T dxr, T dyr, T a, T b)
 {
     return (xr + t*dxr)*(xr + t*dxr)/(a*a) + (yr + t*dyr)*(yr + t*dyr)/(b*b);
 }
@@ -85,10 +66,12 @@ inline T RTRefls<T>::common1(T t, T xr, T yr, T dxr, T dyr)
  * @param yr Current y co-ordinate of ray, double/float.
  * @param dxr Component of ray direction along x-axis.
  * @param dyr Component of ray direction along y-axis.
+ * @param a Scale factor along x-axis, double/float.
+ * @param b Scale factor along y-axis, double/float.
  * @returns z Co-ordinate along z-axis on reflector, corresponding to ray co-ordinate, direction and scaling. Double/float.
  */
 template<class T>
-inline T RTRefls<T>::common2(T t, T xr, T yr, T dxr, T dyr)
+inline T RTRefls<T>::common2(T t, T xr, T yr, T dxr, T dyr, T a, T b)
 {
     return (xr + t*dxr)*2*dxr/(a*a) + (yr + t*dyr)*2*dyr/(b*b);
 }
@@ -105,13 +88,16 @@ inline T RTRefls<T>::common2(T t, T xr, T yr, T dxr, T dyr)
  * @param dxr Component of ray direction along x-axis.
  * @param dyr Component of ray direction along y-axis.
  * @param dzr Component of ray direction along z-axis.
+ * @param a Scale factor along x-axis, double/float.
+ * @param b Scale factor along y-axis, double/float.
+ * @param c Scale factor along z-axis, double/float (hyperboloid/ellipsoid only).
  * @returns dz Difference between reflector and ray co-ordinate along z-axis.
  */
 template<class T>
-inline T RTRefls<T>::gp(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr)
+inline T RTRefls<T>::gp(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr, T a, T b, T c)
 {
-    return t - (zr + t*dzr - common1(t, xr, yr, dxr, dyr)) /
-                (dzr - common2(t, xr, yr, dxr, dyr));
+    return t - (zr + t*dzr - RTRefls::common1(t, xr, yr, dxr, dyr, a, b)) /
+                (dzr - RTRefls::common2(t, xr, yr, dxr, dyr, a, b));
 }
 
 /**
@@ -126,14 +112,17 @@ inline T RTRefls<T>::gp(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr)
  * @param dxr Component of ray direction along x-axis.
  * @param dyr Component of ray direction along y-axis.
  * @param dzr Component of ray direction along z-axis.
+ * @param a Scale factor along x-axis, double/float.
+ * @param b Scale factor along y-axis, double/float.
+ * @param c Scale factor along z-axis, double/float (hyperboloid/ellipsoid only).
  * @returns dz Difference between reflector and ray co-ordinate along z-axis.
  */
 template<class T>
-inline T RTRefls<T>::gh(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr)
+inline T RTRefls<T>::gh(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr, T a, T b, T c)
 {
-    return t - (zr + t*dzr - c*sqrt(common1(t, xr, yr, dxr, dyr) + 1)) /
-                (dzr - c/(2*sqrt(common1(t, xr, yr, dxr, dyr) + 1)) *
-                common2(t, xr, yr, dxr, dyr));
+    return t - (zr + t*dzr - c*sqrt(RTRefls::common1(t, xr, yr, dxr, dyr, a, b) + 1)) /
+                (dzr - c/(2*sqrt(RTRefls::common1(t, xr, yr, dxr, dyr, a, b) + 1)) *
+                RTRefls::common2(t, xr, yr, dxr, dyr, a, b));
 }
 
 /**
@@ -148,14 +137,17 @@ inline T RTRefls<T>::gh(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr)
  * @param dxr Component of ray direction along x-axis.
  * @param dyr Component of ray direction along y-axis.
  * @param dzr Component of ray direction along z-axis.
+ * @param a Scale factor along x-axis, double/float.
+ * @param b Scale factor along y-axis, double/float.
+ * @param c Scale factor along z-axis, double/float (hyperboloid/ellipsoid only).
  * @returns dz Difference between reflector and ray co-ordinate along z-axis.
  */
 template<class T>
-inline T RTRefls<T>::ge(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr)
+inline T RTRefls<T>::ge(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr, T a, T b, T c)
 {
-    return t - (zr + t*dzr - c*sqrt(1 - common1(t, xr, yr, dxr, dyr))) /
-                (dzr + c/(2*sqrt(1 - common1(t, xr, yr, dxr, dyr))) *
-                common2(t, xr, yr, dxr, dyr));
+    return t - (zr + t*dzr - c*sqrt(1 - RTRefls::common1(t, xr, yr, dxr, dyr, a, b))) /
+                (dzr + c/(2*sqrt(1 - RTRefls::common1(t, xr, yr, dxr, dyr, a, b))) *
+                RTRefls::common2(t, xr, yr, dxr, dyr, a, b));
 }
 
 /**
@@ -170,10 +162,13 @@ inline T RTRefls<T>::ge(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr)
  * @param dxr Component of ray direction along x-axis.
  * @param dyr Component of ray direction along y-axis.
  * @param dzr Component of ray direction along z-axis.
+ * @param a Scale factor along x-axis, double/float.
+ * @param b Scale factor along y-axis, double/float.
+ * @param c Scale factor along z-axis, double/float (hyperboloid/ellipsoid only).
  * @returns dz Difference between reflector and ray co-ordinate along z-axis.
  */
 template<class T>
-inline T RTRefls<T>::gpl(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr)
+inline T RTRefls<T>::gpl(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr, T a, T b, T c)
 {
     return t - (zr + t*dzr) / dzr;
 }
@@ -187,10 +182,13 @@ inline T RTRefls<T>::gpl(T t, T xr, T yr, T zr, T dxr, T dyr, T dzr)
  * @param yr Current y co-ordinate of ray, double/float.
  * @param zr Current z co-ordinate of ray, double/float.
  * @param flip Direction of normal vectors.
+ * @param a Scale factor along x-axis, double/float.
+ * @param b Scale factor along y-axis, double/float.
+ * @param c Scale factor along z-axis, double/float (hyperboloid/ellipsoid only).
  * @returns out Array of 3 double/float, containing components of normal vector.
  */
 template<class T>
-inline std::array<T, 3> RTRefls<T>::np(T xr, T yr, T zr, int flip)
+inline std::array<T, 3> RTRefls<T>::np(T xr, T yr, T zr, int flip, T a, T b, T c)
 {
     std::array<T, 3> out;
 
@@ -216,10 +214,13 @@ inline std::array<T, 3> RTRefls<T>::np(T xr, T yr, T zr, int flip)
  * @param yr Current y co-ordinate of ray, double/float.
  * @param zr Current z co-ordinate of ray, double/float.
  * @param flip Direction of normal vectors.
+ * @param a Scale factor along x-axis, double/float.
+ * @param b Scale factor along y-axis, double/float.
+ * @param c Scale factor along z-axis, double/float (hyperboloid/ellipsoid only).
  * @returns out Array of 3 double/float, containing components of normal vector.
  */
 template<class T>
-inline std::array<T, 3> RTRefls<T>::nh(T xr, T yr, T zr, int flip)
+inline std::array<T, 3> RTRefls<T>::nh(T xr, T yr, T zr, int flip, T a, T b, T c)
 {
     std::array<T, 3> out;
 
@@ -245,10 +246,13 @@ inline std::array<T, 3> RTRefls<T>::nh(T xr, T yr, T zr, int flip)
  * @param yr Current y co-ordinate of ray, double/float.
  * @param zr Current z co-ordinate of ray, double/float.
  * @param flip Direction of normal vectors.
+ * @param a Scale factor along x-axis, double/float.
+ * @param b Scale factor along y-axis, double/float.
+ * @param c Scale factor along z-axis, double/float (hyperboloid/ellipsoid only).
  * @returns out Array of 3 double/float, containing components of normal vector.
  */
 template<class T>
-inline std::array<T, 3> RTRefls<T>::ne(T xr, T yr, T zr, int flip)
+inline std::array<T, 3> RTRefls<T>::ne(T xr, T yr, T zr, int flip, T a, T b, T c)
 {
     std::array<T, 3> out;
 
@@ -275,10 +279,13 @@ inline std::array<T, 3> RTRefls<T>::ne(T xr, T yr, T zr, int flip)
  * @param yr Current y co-ordinate of ray, double/float.
  * @param zr Current z co-ordinate of ray, double/float.
  * @param flip Direction of normal vectors.
+ * @param a Scale factor along x-axis, double/float.
+ * @param b Scale factor along y-axis, double/float.
+ * @param c Scale factor along z-axis, double/float (hyperboloid/ellipsoid only).
  * @returns out Array of 3 double/float, containing components of normal vector.
  */
 template<class T>
-inline std::array<T, 3> RTRefls<T>::npl(T xr, T yr, T zr, int flip)
+inline std::array<T, 3> RTRefls<T>::npl(T xr, T yr, T zr, int flip, T a, T b, T c)
 {
     std::array<T, 3> out;
 

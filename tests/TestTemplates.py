@@ -5,6 +5,7 @@ This file contains commonly used input templates so that we do not have to type 
 
 import numpy as np
 from PyPO.System import System
+from PyPO.Enums import AperShapes
 
 TubeRTframe =  {
         "name"      : "testTubeRTframe",
@@ -268,7 +269,7 @@ plane_AoE = {
         }
 
 aperDictEll = {
-        "shape"     : "ellipse",
+        "shape"     : AperShapes.ELL,
         "plot"      : False,
         "center"    : np.array([0, 0]),
         "outer"     : np.array([0.5, 0.5]),
@@ -276,7 +277,7 @@ aperDictEll = {
         }
 
 aperDictRect = {
-        "shape"     : "rectangle",
+        "shape"     : AperShapes.RECT,
         "plot"      : False,
         "center"    : np.array([0, 0]),
         "outer_x"   : np.array([-0.5, 0.5]),

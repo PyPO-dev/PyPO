@@ -117,7 +117,7 @@ aperDict = {
         "inner_x"   : "Inner min x and max x values of aperture, in mm (Numpy array of length 2). Only when shape=='rectangle'.",
         "outer_y"   : "Outer  min y and max y values of aperture, in mm (Numpy array of length 2). Only when shape=='rectangle'.",
         "inner_y"   : "Inner min x and max x values of aperture,, in mm (Numpy array of length 2). Only when shape=='rectangle'.",
-        "shape"     : "Whether aperture is ellipse or rectangle."
+        "shape"     : "Whether aperture is ellipse or rectangle, enum type."
         }
 
 ##

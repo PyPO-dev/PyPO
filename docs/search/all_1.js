@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['abs_0',['abs',['../GUtils_8h.html#a5beb40dc060ea1c2df2955d79605bfe4',1,'abs():&#160;GUtils.h'],['../classUtils.html#a1576060aa3924e36416eafbcd50b487e',1,'Utils::abs()']]],
+  ['abs_0',['abs',['../classUtils.html#a1576060aa3924e36416eafbcd50b487e',1,'Utils::abs()'],['../GUtils_8h.html#a5beb40dc060ea1c2df2955d79605bfe4',1,'abs():&#160;GUtils.h']]],
   ['accordion_1',['Accordion',['../classGUI_1_1Accordion_1_1Accordion.html',1,'GUI::Accordion']]],
   ['accordion_2epy_2',['Accordion.py',['../Accordion_8py.html',1,'']]],
   ['accordionsection_3',['AccordionSection',['../classGUI_1_1Accordion_1_1Accordion_1_1AccordionSection.html',1,'GUI::Accordion::Accordion']]],
@@ -43,17 +43,18 @@ var searchData=
   ['allocate_5fc4bundle_40',['allocate_c4Bundle',['../BindUtils_8py.html#a61e4cc6d175b5704f37ca4b0dbc2fb65',1,'PyPO::BindUtils']]],
   ['allocate_5fcframe_41',['allocate_cframe',['../BindUtils_8py.html#aeb00be5e3bbad2cdbc46755ca3fa79e6',1,'PyPO::BindUtils']]],
   ['allocate_5freflcontainer_42',['allocate_reflcontainer',['../BindUtils_8py.html#a2ebde2902abeebd3d417c7e5e61cb41e',1,'PyPO::BindUtils']]],
-  ['angx0_43',['angx0',['../structRTDict.html#a0cb7d42914c6dc4662a1cc7b5860f9cd',1,'RTDict::angx0()'],['../structGRTDict.html#a9efa97d168b96234641b0ad9b30a0d5b',1,'GRTDict::angx0()'],['../structRTDictf.html#a51a3051614c53abd0d25ed06ec295868',1,'RTDictf::angx0()'],['../structGRTDictf.html#a63f4f94f2688a8bdc64f318ac35d0e87',1,'GRTDictf::angx0()']]],
-  ['angy0_44',['angy0',['../structGRTDictf.html#a5301a75169901b4be4b452e10c0751bc',1,'GRTDictf::angy0()'],['../structRTDictf.html#abb3c5062ca338f987b0b2a246e109b7e',1,'RTDictf::angy0()'],['../structGRTDict.html#aa56e376d1ec7cd4c85c110123bffb632',1,'GRTDict::angy0()'],['../structRTDict.html#adadd95c25b6de8e07e033cfcaeda9e19',1,'RTDict::angy0()']]],
+  ['angx0_43',['angx0',['../structGRTDictf.html#a63f4f94f2688a8bdc64f318ac35d0e87',1,'GRTDictf::angx0()'],['../structRTDictf.html#a51a3051614c53abd0d25ed06ec295868',1,'RTDictf::angx0()'],['../structGRTDict.html#a9efa97d168b96234641b0ad9b30a0d5b',1,'GRTDict::angx0()'],['../structRTDict.html#a0cb7d42914c6dc4662a1cc7b5860f9cd',1,'RTDict::angx0()']]],
+  ['angy0_44',['angy0',['../structGRTDict.html#aa56e376d1ec7cd4c85c110123bffb632',1,'GRTDict::angy0()'],['../structRTDictf.html#abb3c5062ca338f987b0b2a246e109b7e',1,'RTDictf::angy0()'],['../structGRTDictf.html#a5301a75169901b4be4b452e10c0751bc',1,'GRTDictf::angy0()'],['../structRTDict.html#adadd95c25b6de8e07e033cfcaeda9e19',1,'RTDict::angy0()']]],
   ['aoe_5fopts_45',['AoE_opts',['../formData_8py.html#a9895f1ca37a430b7a2a82fbe8adf1446',1,'GUI::ParameterForms::formData']]],
   ['aperdict_46',['aperDict',['../group__public__api__templates.html#gaa75cc979d969bd54a7abf8917747221a',1,'PyPO::Templates']]],
-  ['apertureerror_47',['ApertureError',['../classPyPO_1_1Checks_1_1ApertureError.html',1,'PyPO::Checks']]],
-  ['area_48',['area',['../structreflcontainerf.html#a65245cae517c44a51e234dbc378011b1',1,'reflcontainerf::area()'],['../structreflcontainer.html#a30e6e031b9a4549999a7f32367758b6f',1,'reflcontainer::area()']]],
-  ['arrc1_49',['arrC1',['../structarrC1.html',1,'arrC1'],['../classPyPO_1_1Structs_1_1arrC1.html',1,'PyPO.Structs.arrC1']]],
-  ['arrc1f_50',['arrC1f',['../structarrC1f.html',1,'arrC1f'],['../classPyPO_1_1Structs_1_1arrC1f.html',1,'PyPO.Structs.arrC1f']]],
-  ['arrc1toobj_51',['arrC1ToObj',['../BindUtils_8py.html#a0b0158a2b16734c576abf9535b784c61',1,'PyPO::BindUtils']]],
-  ['arrowlabel_52',['arrowLabel',['../classGUI_1_1Accordion_1_1Accordion_1_1AccordionSection.html#aa4e1f20c682530c5f6f9eabf805deca9',1,'GUI::Accordion::Accordion::AccordionSection']]],
-  ['arrr3_53',['arrR3',['../structarrR3.html',1,'arrR3'],['../classPyPO_1_1Structs_1_1arrR3.html',1,'PyPO.Structs.arrR3']]],
-  ['arrr3f_54',['arrR3f',['../structarrR3f.html',1,'arrR3f'],['../classPyPO_1_1Structs_1_1arrR3f.html',1,'PyPO.Structs.arrR3f']]],
-  ['autoconverge_55',['autoConverge',['../group__public__api__po.html#ga9fed5a1920ada927ea8712fae363d31f',1,'PyPO::System::System']]]
+  ['apershapes_47',['AperShapes',['../classPyPO_1_1Enums_1_1AperShapes.html',1,'PyPO::Enums']]],
+  ['apertureerror_48',['ApertureError',['../classPyPO_1_1Checks_1_1ApertureError.html',1,'PyPO::Checks']]],
+  ['area_49',['area',['../structreflcontainerf.html#a65245cae517c44a51e234dbc378011b1',1,'reflcontainerf::area()'],['../structreflcontainer.html#a30e6e031b9a4549999a7f32367758b6f',1,'reflcontainer::area()']]],
+  ['arrc1_50',['arrC1',['../structarrC1.html',1,'arrC1'],['../classPyPO_1_1Structs_1_1arrC1.html',1,'PyPO.Structs.arrC1']]],
+  ['arrc1f_51',['arrC1f',['../structarrC1f.html',1,'arrC1f'],['../classPyPO_1_1Structs_1_1arrC1f.html',1,'PyPO.Structs.arrC1f']]],
+  ['arrc1toobj_52',['arrC1ToObj',['../BindUtils_8py.html#a0b0158a2b16734c576abf9535b784c61',1,'PyPO::BindUtils']]],
+  ['arrowlabel_53',['arrowLabel',['../classGUI_1_1Accordion_1_1Accordion_1_1AccordionSection.html#aa4e1f20c682530c5f6f9eabf805deca9',1,'GUI::Accordion::Accordion::AccordionSection']]],
+  ['arrr3_54',['arrR3',['../structarrR3.html',1,'arrR3'],['../classPyPO_1_1Structs_1_1arrR3.html',1,'PyPO.Structs.arrR3']]],
+  ['arrr3f_55',['arrR3f',['../structarrR3f.html',1,'arrR3f'],['../classPyPO_1_1Structs_1_1arrR3f.html',1,'PyPO.Structs.arrR3f']]],
+  ['autoconverge_56',['autoConverge',['../group__public__api__po.html#ga9fed5a1920ada927ea8712fae363d31f',1,'PyPO::System::System']]]
 ];

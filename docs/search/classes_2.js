@@ -13,8 +13,9 @@ var searchData=
   ['currentnameerror_10',['CurrentNameError',['../classPyPO_1_1Checks_1_1CurrentNameError.html',1,'PyPO::Checks']]],
   ['currents_11',['currents',['../classPyPO_1_1PyPOTypes_1_1currents.html',1,'PyPO::PyPOTypes']]],
   ['currentwidget_12',['CurrentWidget',['../classGUI_1_1ElementWidget_1_1CurrentWidget.html',1,'GUI::ElementWidget']]],
-  ['customformatter_13',['CustomFormatter',['../classPyPO_1_1CustomLogger_1_1CustomFormatter.html',1,'PyPO::CustomLogger']]],
-  ['customguiformatter_14',['CustomGUIFormatter',['../classPyPO_1_1CustomLogger_1_1CustomGUIFormatter.html',1,'PyPO::CustomLogger']]],
-  ['customguilogger_15',['CustomGUILogger',['../classPyPO_1_1CustomLogger_1_1CustomGUILogger.html',1,'PyPO::CustomLogger']]],
-  ['customlogger_16',['CustomLogger',['../classPyPO_1_1CustomLogger_1_1CustomLogger.html',1,'PyPO::CustomLogger']]]
+  ['customenum_13',['CustomEnum',['../classPyPO_1_1Enums_1_1CustomEnum.html',1,'PyPO::Enums']]],
+  ['customformatter_14',['CustomFormatter',['../classPyPO_1_1CustomLogger_1_1CustomFormatter.html',1,'PyPO::CustomLogger']]],
+  ['customguiformatter_15',['CustomGUIFormatter',['../classPyPO_1_1CustomLogger_1_1CustomGUIFormatter.html',1,'PyPO::CustomLogger']]],
+  ['customguilogger_16',['CustomGUILogger',['../classPyPO_1_1CustomLogger_1_1CustomGUILogger.html',1,'PyPO::CustomLogger']]],
+  ['customlogger_17',['CustomLogger',['../classPyPO_1_1CustomLogger_1_1CustomLogger.html',1,'PyPO::CustomLogger']]]
 ];

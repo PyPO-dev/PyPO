@@ -1,0 +1,26 @@
+var NAVTREEINDEX0 =
+{
+"common_issues.html":[6],
+"contribguide.html":[5],
+"demos.html":[3],
+"explanations.html":[1],
+"index.html":[],
+"index.html":[0],
+"index.html#General":[0,1,0,0],
+"index.html#contact":[0,5],
+"index.html#cuda":[0,1,1],
+"index.html#devinstall":[0,1,0,4],
+"index.html#inst":[0,1],
+"index.html#intro_sec":[0,0],
+"index.html#license":[0,4],
+"index.html#linux":[0,1,0,1],
+"index.html#macos":[0,1,0,2],
+"index.html#main_contribguidelines":[0,3],
+"index.html#man":[0,2],
+"index.html#optdep":[0,1,2],
+"index.html#sdist":[0,1,0],
+"index.html#windows":[0,1,0,3],
+"pages.html":[],
+"pypodocs.html":[4],
+"tutorials.html":[2]
+};

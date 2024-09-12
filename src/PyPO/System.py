@@ -32,7 +32,7 @@ from PyPO.CustomLogger import CustomLogger
 import PyPO.Plotter as PPlot
 import PyPO.Efficiencies as Effs
 import PyPO.FitGauss as FGauss
-from PyPO.Enums import Projections, FieldComponents, CurrentComponents, Units, Scales
+from PyPO.Enums import Projections, FieldComponents, CurrentComponents, Units, Scales, Objects, Modes
 
 import PyPO.WorldParam as world
 
@@ -436,7 +436,7 @@ class System(object):
         self.system[_reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added plane {_reflDict['name']} to system.")
 
-    def rotateGrids(self, name, rotation, obj="element", mode="relative", pivot=None, keep_pol=False):
+    def rotateGrids(self, name, rotation, obj=Objects.ELEMENT, mode=Modes.REL, pivot=None, keep_pol=False):
         """!
         Rotate reflector grids.
         
@@ -450,17 +450,17 @@ class System(object):
         
         @param name Reflector name or list of reflector names.
         @param rotation Numpy ndarray of length 3, containing rotation angles around x, y and z axes, in degrees.
-        @param obj Whether the name corresponds to a single element or group.
-        @param mode Apply rotation relative ('relative') to current orientation, or rotate to specified orientation ('absolute').
+        @param obj Whether the name corresponds to a single element, group, or frame. Fields and currents are translated by translating the associated surface. Choose from Objects enum.
+        @param mode Apply rotation relative to current orientation (Modes.REL), or rotate to specified orientation (Modes.ABS).
         @param pivot Numpy ndarray of length 3, containing pivot x, y and z co-ordinates, in mm. Defaults to pos. 
         @param keep_pol Keep polarisation of a field/current defined on the surface, if present.
         """
         
-        if obj == "element":
+        if obj == Objects.ELEMENT:
             PChecks.check_elemSystem(name, self.system, self.clog, extern=True)
             pivot = self.system[name]["pos"] if pivot is None else pivot
             
-            if mode == "absolute":
+            if mode == Modes.ABS:
                 Rtot = self._absRotationMat(rotation, self.system[name]["ori"], pivot)
                 self.system[name]["transf"] = Rtot @ self.system[name]["transf"]
                 self.system[name]["transf"][:-1, :-1] = (MatTransf.MatRotate(rotation, pivot=pivot))[:-1, :-1]
@@ -473,7 +473,7 @@ class System(object):
 
                 self.clog.info(f"Rotated element {name} to {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
-            elif mode == "relative":
+            elif mode == Modes.REL:
                 self.system[name]["transf"] = MatTransf.MatRotate(rotation, self.system[name]["transf"], pivot)
                 
                 self.system[name]["pos"] = (MatTransf.MatRotate(rotation, pivot=pivot) @ np.append(self.system[name]["pos"], 1))[:-1]
@@ -484,11 +484,11 @@ class System(object):
             
                 self.clog.info(f"Rotated element {name} by {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
-        elif obj == "group":
+        elif obj == Objects.GROUP:
             PChecks.check_groupSystem(name, self.groups, self.clog, extern=True)
             pivot = self.groups[name]["pos"] if pivot is None else pivot
             
-            if mode == "absolute":
+            if mode == Modes.ABS:
                 Rtot = self._absRotationMat(rotation, self.groups[name]["ori"], pivot)
                 
                 for elem in self.groups[name]["members"]:
@@ -506,7 +506,7 @@ class System(object):
                 
                 self.clog.info(f"Rotated group {name} to {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
-            elif mode == "relative":
+            elif mode == Modes.REL:
                 for elem in self.groups[name]["members"]:
                     self.system[elem]["transf"] = MatTransf.MatRotate(rotation, self.system[elem]["transf"], pivot)
                     
@@ -521,11 +521,11 @@ class System(object):
                 
                 self.clog.info(f"Rotated group {name} by {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
-        if obj == "frame":
+        if obj == Objects.FRAME:
             PChecks.check_frameSystem(name, self.frames, self.clog, extern=True)
             pivot = self.frames[name].pos if pivot is None else pivot
             
-            if mode == "absolute":
+            if mode == Modes.ABS:
                 Rtot = self._absRotationMat(rotation, self.frames[name].ori, pivot)
 
                 self.frames[name].transf = Rtot
@@ -536,7 +536,7 @@ class System(object):
                 self.frames[name].ori = Rtot[:-1, :-1] @ self.frames[name].ori
                 self.clog.info(f"Rotated element {name} to {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
-            elif mode == "relative":
+            elif mode == Modes.REL:
                 self.frames[name].transf = MatTransf.MatRotate(rotation, pivot=pivot)
                 _fr = BTransf.transformRays(self.frames[name])
                 self.frames[name] = self.copyObj(_fr)
@@ -546,7 +546,7 @@ class System(object):
             
                 self.clog.info(f"Rotated frame {name} by {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
-    def translateGrids(self, name, translation, obj="element", mode="relative"):
+    def translateGrids(self, name, translation, obj=Objects.ELEMENT, mode=Modes.REL):
         """!
         Translate reflector grids.
         
@@ -557,27 +557,27 @@ class System(object):
         
         @param name Reflector name or list of reflector names.
         @param translation Numpy ndarray of length 3, containing translation x, y and z co-ordinates, in mm.
-        @param obj Whether the name corresponds to a single element or group.
+        @param obj Whether the name corresponds to a single element, group, or frame. Fields and currents are translated by translating the associated surface. Choose from Objects enum.
         @param mode Apply translation relative ('relative') to current position, or move to specified position ('absolute').
         """
 
         _translation = self.copyObj(translation)
         
-        if obj == "element":
-            if mode == "absolute":
+        if obj == Objects.ELEMENT:
+            if mode == Modes.ABS:
                 _translation -= self.system[name]["pos"]# - translation
             
             PChecks.check_elemSystem(name, self.system, self.clog, extern=True)
             self.system[name]["transf"] = MatTransf.MatTranslate(_translation, self.system[name]["transf"])
             self.system[name]["pos"] += _translation
             
-            if mode == "absolute":
+            if mode == Modes.ABS:
                 self.clog.info(f"Translated element {name} to {*['{:0.3e}'.format(x) for x in list(_translation)],} millimeters.")
             else:
                 self.clog.info(f"Translated element {name} by {*['{:0.3e}'.format(x) for x in list(_translation)],} millimeters.")
         
-        elif obj == "group":
-            if mode == "absolute":
+        elif obj == Objects.GROUP:
+            if mode == Modes.ABS:
                 _translation -= self.groups[name]["pos"]# - translation
             
             PChecks.check_groupSystem(name, self.groups, self.clog, extern=True)
@@ -587,14 +587,14 @@ class System(object):
             
             self.groups[name]["pos"] += _translation
             
-            if mode == "absolute":
+            if mode == Modes.ABS:
                 self.clog.info(f"Translated group {name} to {*['{:0.3e}'.format(x) for x in list(_translation)],} millimeters.")
             
             else:
                 self.clog.info(f"Translated group {name} by {*['{:0.3e}'.format(x) for x in list(_translation)],} millimeters.")
 
-        elif obj == "frame":
-            if mode == "absolute":
+        elif obj == Objects.FRAME:
+            if mode == Modes.ABS:
                 _translation -= self.frames[name].pos# - translation
             
             PChecks.check_frameSystem(name, self.frames, self.clog, extern=True)
@@ -605,12 +605,12 @@ class System(object):
             self.frames[name] = self.copyObj(_fr)
             self.frames[name].pos += _translation
             
-            if mode == "absolute":
+            if mode == Modes.ABS:
                 self.clog.info(f"Translated frame {name} to {*['{:0.3e}'.format(x) for x in list(_translation)],} millimeters.")
             else:
                 self.clog.info(f"Translated frame {name} by {*['{:0.3e}'.format(x) for x in list(_translation)],} millimeters.")
     
-    def homeReflector(self, name, obj="element", trans=True, rot=True):
+    def homeReflector(self, name, obj=Objects.ELEMENT, trans=True, rot=True):
         """!
         Home a reflector or a group back into default configuration.
         
@@ -624,7 +624,7 @@ class System(object):
         @param rot Home (rotate) back to home orientation.
         """
 
-        if obj == "group":
+        if obj == Objects.GROUP:
             PChecks.check_groupSystem(name, self.groups, self.clog, extern=True)
             if trans:
                 for elem in self.groups[name]["members"]:
@@ -663,7 +663,7 @@ class System(object):
             
             self.clog.info(f"Transforming element {name} to home position.")
  
-    def snapObj(self, name, snap_name, obj="element"):
+    def snapObj(self, name, snap_name, obj=Objects.ELEMENT):
         """!
         Take and store snapshot of object's current configuration.
         
@@ -676,7 +676,7 @@ class System(object):
         @param obj Whether object is an element, group or frame.
         """
 
-        if obj == "group":
+        if obj == Objects.GROUP:
             PChecks.check_groupSystem(name, self.groups, self.clog, extern=True)
             self.groups[name]["snapshots"][snap_name] = []
 
@@ -685,19 +685,19 @@ class System(object):
             
             self.clog.info(f"Saved snapshot {snap_name} for group {name}.")
         
-        elif obj == "element":
+        elif obj == Objects.ELEMENT:
             PChecks.check_elemSystem(name, self.system, self.clog, extern=True)
             self.system[name]["snapshots"][snap_name] = self.copyObj(self.system[name]["transf"])
 
             self.clog.info(f"Saved snapshot {snap_name} for element {name}.")
         
-        elif obj == "frame":
+        elif obj == Objects.FRAME:
             PChecks.check_frameSystem(name, self.frames, self.clog, extern=True)
             self.frames[name].snapshots[snap_name] = self.copyObj(self.frames[name].transf)
 
             self.clog.info(f"Saved snapshot {snap_name} for frame {name}.")
     
-    def revertToSnap(self, name, snap_name, obj="element"):
+    def revertToSnap(self, name, snap_name, obj=Objects.ELEMENT):
         """!
         Revert object configuration to a saved snapshot.
         
@@ -710,7 +710,7 @@ class System(object):
         @param obj Whether object is an element, group or frame.
         """
 
-        if obj == "group":
+        if obj == Objects.GROUP:
             PChecks.check_groupSystem(name, self.groups, self.clog, extern=True)
 
             for elem, snap in zip(self.groups[name]["members"], self.groups[name]["snapshots"][snap_name]):
@@ -720,13 +720,14 @@ class System(object):
             
             self.clog.info(f"Reverted group {name} to snapshot {snap_name}.")
 
-        elif obj == "element":
+        elif obj == Objects.ELEMENT:
             PChecks.check_elemSystem(name, self.system, self.clog, extern=True)
             self._checkBoundPO(name, MatTransf.InvertMat(self.system[name]["transf"]))
             self.system[name]["transf"] = self.copyObj(self.system[name]["snapshots"][snap_name])
             self._checkBoundPO(name, self.system[name]["transf"]) 
             self.clog.info(f"Reverted element {name} to snapshot {snap_name}.")
-        elif obj == "frame":
+        
+        elif obj == Objects.FRAME:
             PChecks.check_frameSystem(name, self.frames, self.clog, extern=True)
             self.frames[name].transf = self.copyObj(self.frames[name].snapshots[snap_name])
             
@@ -735,7 +736,7 @@ class System(object):
             
             self.clog.info(f"Reverted frame {name} to snapshot {snap_name}.")
     
-    def deleteSnap(self, name, snap_name, obj="element"):
+    def deleteSnap(self, name, snap_name, obj=Objects.ELEMENT):
         """!
         Delete a saved snapshot belonging to an object.
         
@@ -748,19 +749,19 @@ class System(object):
         @param obj Whether object is an element or a group.
         """
 
-        if obj == "group":
+        if obj == Objects.GROUP:
             PChecks.check_groupSystem(name, self.groups, self.clog, extern=True)
            
             del self.groups[name]["snapshots"][snap_name]
 
             self.clog.info(f"Deleted snapshot {snap_name} belonging to group {name}.")
 
-        elif obj == "element":
+        elif obj == Objects.ELEMENT:
             del self.system[name]["snapshots"][snap_name]
 
             self.clog.info(f"Deleted snapshot {snap_name} belonging to element {name}.")
         
-        elif obj == "frame":
+        elif obj == Objects.FRAME:
             del self.frames[name].snapshots[snap_name]
 
             self.clog.info(f"Deleted snapshot {snap_name} belonging to frame {name}.")
@@ -851,25 +852,6 @@ class System(object):
        
         with open(os.path.join(self.savePathSystems, f"{name}.pyposystem"), 'wb') as file:
             pickle.dump(self.__dict__, file)
-
-        
-        #with open(os.path.join(path, "system.pys"), 'wb') as file: 
-        #    pickle.dump(self.system, file)
-        #
-        #with open(os.path.join(path, "groups.pys"), 'wb') as file: 
-        #    pickle.dump(self.groups, file)
-        #
-        #with open(os.path.join(path, "frames.pys"), 'wb') as file: 
-        #    pickle.dump(self.frames, file)
-        #
-        #with open(os.path.join(path, "fields.pys"), 'wb') as file: 
-        #    pickle.dump(self.fields, file)
-       
-        #with open(os.path.join(path, "currents.pys"), 'wb') as file: 
-        #    pickle.dump(self.currents, file)
-        #
-        #with open(os.path.join(path, "scalarfields.pys"), 'wb') as file: 
-        #    pickle.dump(self.scalarfields, file)
         
         self.clog.info(f"Saved current system to {name}.")
 
@@ -899,25 +881,6 @@ class System(object):
                 self.__dict__ = pickle.load(file)
         except Exception as err:
             print_tb(err.__traceback__)
-            
-
-        #with open(os.path.join(path, "system.pys"), 'rb') as file: 
-        #    self.system = pickle.load(file)
-        #
-        #with open(os.path.join(path, "groups.pys"), 'rb') as file: 
-        #    self.groups = pickle.load(file)
-        #
-        #with open(os.path.join(path, "frames.pys"), 'rb') as file: 
-        #    self.frames = pickle.load(file)
-        #
-        #with open(os.path.join(path, "fields.pys"), 'rb') as file: 
-        #    self.fields = pickle.load(file)
-        #
-        #with open(os.path.join(path, "currents.pys"), 'rb') as file: 
-        #    self.currents = pickle.load(file)
-        #
-        #with open(os.path.join(path, "scalarfields.pys"), 'rb') as file: 
-        #    self.scalarfields = pickle.load(file)
 
     def mergeSystem(self, *systems):
         """!
@@ -1198,7 +1161,7 @@ class System(object):
         self.clog.work(f"*** Finished: {dtime:.3f} seconds ***")
         return out
 
-    def mergeBeams(self, *beams, obj="fields", merged_name="combined"):
+    def mergeBeams(self, *beams, obj=Objects.FIELD, merged_name="combined"):
         """!
         Merge multiple beams that are defined on the same surface.
         
@@ -1212,8 +1175,8 @@ class System(object):
         @param merged_name Name of merged object.
         """
 
-        PChecks.check_sameBound(beams, checkDict=getattr(self, obj), clog=self.clog) 
-        ex = getattr(self, obj)[beams[0]]
+        PChecks.check_sameBound(beams, checkDict=getattr(self, obj.value), clog=self.clog) 
+        ex = getattr(self, obj.value)[beams[0]]
 
         x1 = np.zeros(ex[0].shape, dtype=complex)
         x2 = np.zeros(ex[0].shape, dtype=complex)
@@ -1224,12 +1187,12 @@ class System(object):
         y3 = np.zeros(ex[0].shape, dtype=complex)
         
         for beam in beams:
-            if obj == "fields":
+            if obj == Objects.FIELD:
                 PChecks.check_fieldSystem(beam, self.fields, self.clog, extern=True)
-            if obj == "currents":
+            if obj == Objects.CURRENT:
                 PChecks.check_currentSystem(beam, self.currents, self.clog, extern=True)
             
-            beam = getattr(self, obj)[beam]
+            beam = getattr(self, obj.value)[beam]
             x1 += beam[0]
             x2 += beam[1]
             x3 += beam[2]
@@ -1238,13 +1201,13 @@ class System(object):
             y2 += beam[4]
             y3 += beam[5]
 
-        if obj == "fields":
+        if obj == Objects.FIELD:
             field = PTypes.fields(x1, x2, x3, y1, y2, y3)
-        if obj == "currents":
+        if obj == Objects.CURRENT:
             field = PTypes.currents(x1, x2, x3, y1, y2, y3)
         
         field.setMeta(ex.surf, ex.k)
-        getattr(self, obj)[merged_name] = field
+        getattr(self, obj.value)[merged_name] = field
 
     def createTubeFrame(self, argDict):
         """!
@@ -2148,7 +2111,7 @@ class System(object):
 
         self.scalarfields[_UDict["name"]] = sfield
    
-    def interpBeam(self, name, gridsize_new, obj_t="fields"):
+    def interpBeam(self, name, gridsize_new, obj=Objects.FIELD):
         """!
         Interpolate a PO beam. Only for beams defined on planar surfaces.
         
@@ -2163,27 +2126,27 @@ class System(object):
         @param obj Whether to interpolate currents or fields.
         """
 
-        if obj_t == "fields":
+        if obj == Objects.FIELD:
             PChecks.check_fieldSystem(name, self.fields, self.clog, extern=True)
-            obj = self.fields[name]
+            obj_out = self.fields[name]
 
-        elif obj_t == "currents":
+        elif obj == Objects.CURRENT:
             PChecks.check_currentSystem(name, self.currents, self.clog, extern=True)
-            obj = self.currents[name]
+            obj_out = self.currents[name]
 
-        self.copyElement(obj.surf, obj.surf + "_interp")
-        self.system[obj.surf + "_interp"]["gridsize"] = gridsize_new
-        self.system[obj.surf + "_interp"]["name"] = obj.surf + "_interp"
+        self.copyElement(obj_out.surf, obj_out.surf + "_interp")
+        self.system[obj_out.surf + "_interp"]["gridsize"] = gridsize_new
+        self.system[obj_out.surf + "_interp"]["name"] = obj_out.surf + "_interp"
 
-        grids = self.generateGrids(obj.surf)
-        grids_interp = self.generateGrids(obj.surf + "_interp")
+        grids = self.generateGrids(obj_out.surf)
+        grids_interp = self.generateGrids(obj_out.surf + "_interp")
         
         points = (grids.x.ravel(), grids.y.ravel())#, grids.z.ravel())
         points_interp = (grids_interp.x.ravel(), grids_interp.y.ravel())#, grids_interp.z.ravel())
         comp_l = []
 
         for i in range(6):
-            _comp = self.copyObj(obj[i])
+            _comp = self.copyObj(obj_out[i])
             _cr = np.real(_comp)
             _ci = np.imag(_comp)
 
@@ -2194,14 +2157,14 @@ class System(object):
 
             comp_l.append(_comp_interp.reshape(gridsize_new))
 
-        if obj_t == "fields":
+        if obj == Objects.FIELD:
             obj_interp = PTypes.fields(comp_l[0], comp_l[1], comp_l[2], comp_l[3], comp_l[4], comp_l[5])
-            obj_interp.setMeta(obj.surf + "_interp", obj.k)
+            obj_interp.setMeta(obj_out.surf + "_interp", obj_out.k)
             self.fields[name + "_interp"] = obj_interp
         
-        elif obj_t == "currents":
+        elif obj == Objects.CURRENT:
             obj_interp = PTypes.currents(comp_l[0], comp_l[1], comp_l[2], comp_l[3], comp_l[4], comp_l[5])
-            obj_interp.setMeta(obj.surf + "_interp", obj.k)
+            obj_interp.setMeta(obj_out.surf + "_interp", obj_out.k)
             self.currents[name + "_interp"] = obj_interp
 
     def plotBeam2D(self, name_obj, comp=FieldComponents.NONE, contour=None, contour_comp=FieldComponents.NONE,

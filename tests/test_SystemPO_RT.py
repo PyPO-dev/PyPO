@@ -21,7 +21,7 @@ import PyPO.Templates as pytemp
 
 from PyPO.System import System
 from PyPO.Checks import RunPOError, RunRTError, HybridPropError, check_runPODict, check_hybridDict, check_runRTDict
-from PyPO.Enums import FieldComponents, CurrentComponents
+from PyPO.Enums import FieldComponents, CurrentComponents, Objects
 
 class Test_SystemPO_RT(unittest.TestCase):
     def setUp(self):
@@ -200,7 +200,7 @@ class Test_SystemPO_RT(unittest.TestCase):
 
     def test_mergeBeams(self):
         self.s.mergeBeams(TestTemplates.GPOfield["name"], TestTemplates.PS_Ufield["name"], merged_name="test")
-        self.s.mergeBeams(TestTemplates.GPOfield["name"], TestTemplates.PS_Ufield["name"], obj="currents", merged_name="test", )
+        self.s.mergeBeams(TestTemplates.GPOfield["name"], TestTemplates.PS_Ufield["name"], obj=Objects.CURRENT, merged_name="test", )
         self.assertTrue("test" in self.s.fields)
         self.assertTrue("test" in self.s.currents)
     
@@ -208,8 +208,8 @@ class Test_SystemPO_RT(unittest.TestCase):
     def test_interpBeam(self, source):
         name = source["name"]
         gridsize_new = np.array([101, 101])
-        self.s.interpBeam(name, gridsize_new, obj_t="fields")
-        self.s.interpBeam(name, gridsize_new, obj_t="currents")
+        self.s.interpBeam(name, gridsize_new, obj=Objects.FIELD)
+        self.s.interpBeam(name, gridsize_new, obj=Objects.CURRENT)
     
         self.assertTrue(f"{name}_interp" in self.s.fields)
         self.assertTrue(f"{name}_interp" in self.s.currents)

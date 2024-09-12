@@ -131,6 +131,38 @@ class Scales(Enum):
     LIN = 0
     dB = 2
 
+class Objects(Enum):
+    """!
+    Enum types for objects such as elementys, groups, frames, etc.
+
+    Options:\n
+    ELEMENT   : Choose element\n
+    GROUP     : Choose a group\n
+    FRAME     : Choose frame
+
+    @ingroup public_api_argopts
+    """
+
+    ELEMENT = "elements"
+    GROUP = "groups"
+    FRAME = "frames"
+    FIELD = "fields"
+    CURRENT = "currents"
+
+class Modes(Enum):
+    """!
+    Enum types for transformation modes, absolute or relative.
+
+    Options:\n
+    REL       : Relative translation/rotation\n
+    ABS       : Absolute translation/rotation\n
+
+    @ingroup public_api_argopts
+    """
+
+    REL = 0
+    ABS = 1
+
 class AperShapes(Enum):
     """!
     Enum types for aperture object shapes.

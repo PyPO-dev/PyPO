@@ -14,6 +14,7 @@ except ImportError:
 from nose2.tools import params
 
 from PyPO.System import System
+from PyPO.Enums import Modes, Objects
 
 class Test_MatTransform(unittest.TestCase):
     def setUp(self):
@@ -51,8 +52,8 @@ class Test_MatTransform(unittest.TestCase):
 
         translation0abs = np.random.rand(3)
 
-        self.s.translateGrids(name_test, translation0abs, mode="absolute")
-        self.s.translateGrids(name_ref, translation0abs, mode="absolute")
+        self.s.translateGrids(name_test, translation0abs, mode=Modes.ABS)
+        self.s.translateGrids(name_ref, translation0abs, mode=Modes.ABS)
 
         for x0a, x0atest in zip(translation0abs, self.s.system[name_test]["pos"]):
             self.assertAlmostEqual(x0a, x0atest, delta=1e-6)
@@ -90,8 +91,8 @@ class Test_MatTransform(unittest.TestCase):
         rotation0abs = np.array([135, -67, 1.8])
         pivot0abs = np.array([1.8, 2, -43])
         
-        self.s.rotateGrids(name_test, rotation0abs, pivot=pivot0abs, mode="absolute")
-        self.s.rotateGrids(name_ref, rotation0abs, pivot=pivot0abs, mode="absolute")
+        self.s.rotateGrids(name_test, rotation0abs, pivot=pivot0abs, mode=Modes.ABS)
+        self.s.rotateGrids(name_ref, rotation0abs, pivot=pivot0abs, mode=Modes.ABS)
         
         for r0ref, r0test in zip(self.s.system[name_ref]["ori"], self.s.system[name_test]["ori"]):
             self.assertAlmostEqual(r0ref, r0test)
@@ -115,13 +116,13 @@ class Test_MatTransform(unittest.TestCase):
         self.s.groupElements("test", TestTemplates.plane_xy["name"], TestTemplates.paraboloid_foc_uv["name"])
 
         trans = np.array([0, 0, 1.])
-        self.s.translateGrids("test", trans, obj="group", mode="absolute")
+        self.s.translateGrids("test", trans, obj=Objects.GROUP, mode=Modes.ABS)
 
         for po, tr in zip(self.s.groups["test"]["pos"], trans):
             self.assertEqual(po, tr)
         
         trans = np.array([0, 0, -1.])
-        self.s.translateGrids("test", trans, obj="group")
+        self.s.translateGrids("test", trans, obj=Objects.GROUP)
 
         for po, tr in zip(self.s.groups["test"]["pos"], np.zeros(3)):
             self.assertEqual(po, tr)
@@ -130,13 +131,13 @@ class Test_MatTransform(unittest.TestCase):
         self.s.groupElements("test", TestTemplates.plane_xy["name"], TestTemplates.paraboloid_foc_uv["name"])
 
         rot = np.array([90, 0, 90])
-        self.s.rotateGrids("test", rot, obj="group", mode="absolute")
+        self.s.rotateGrids("test", rot, obj=Objects.GROUP, mode=Modes.ABS)
 
         for po, tr in zip(self.s.groups["test"]["ori"], np.array([1, 0, 0])):
             self.assertAlmostEqual(po, tr)
         
         rot = np.array([0, -90, 0])
-        self.s.rotateGrids("test", rot, obj="group")
+        self.s.rotateGrids("test", rot, obj=Objects.GROUP)
 
         for po, tr in zip(self.s.groups["test"]["ori"], np.array([0, 0, 1])):
             self.assertAlmostEqual(po, tr)
@@ -144,13 +145,13 @@ class Test_MatTransform(unittest.TestCase):
     @params(*TestTemplates.getFrameList())
     def test_translationsFrame(self, frame):
         trans = np.array([0, 0, 1.])
-        self.s.translateGrids(frame["name"], trans, obj="frame", mode="absolute")
+        self.s.translateGrids(frame["name"], trans, obj=Objects.FRAME, mode=Modes.ABS)
 
         for po, tr in zip(self.s.frames[frame["name"]].pos, trans):
             self.assertEqual(po, tr)
         
         trans = np.array([0, 0, -1.])
-        self.s.translateGrids(frame["name"], trans, obj="frame")
+        self.s.translateGrids(frame["name"], trans, obj=Objects.FRAME)
 
         for po, tr in zip(self.s.frames[frame["name"]].pos, np.zeros(3)):
             self.assertEqual(po, tr)
@@ -158,13 +159,13 @@ class Test_MatTransform(unittest.TestCase):
     @params(*TestTemplates.getFrameList())
     def test_rotationsFrame(self, frame):
         rot = np.array([90, 0, 90])
-        self.s.rotateGrids(frame["name"], rot, obj="frame", mode="absolute")
+        self.s.rotateGrids(frame["name"], rot, obj=Objects.FRAME, mode=Modes.ABS)
 
         for po, tr in zip(self.s.frames[frame["name"]].ori, np.array([1, 0, 0])):
             self.assertAlmostEqual(po, tr)
         
         rot = np.array([0, -90, 0])
-        self.s.rotateGrids(frame["name"], rot, obj="frame")
+        self.s.rotateGrids(frame["name"], rot, obj=Objects.FRAME)
 
         for po, tr in zip(self.s.frames[frame["name"]].ori, np.array([0, 0, 1])):
             self.assertAlmostEqual(po, tr)

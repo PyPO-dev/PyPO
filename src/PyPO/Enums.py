@@ -113,13 +113,13 @@ class Units(float, Enum):
     AM = 60
     AS = 3600
 
-class Modes(Enum):
+class Scales(Enum):
     """!
-    Enum types for units for setting scaling mode for quantities.
+    Enum types for units for setting scalings for quantities.
     
-    This special option is used for specifying the scaling mode of the heatmap for 2D plots, but also for the mode of beam cross-sections.
-    In addition, the scaling mode argument sets the scale for fitting Gaussians.
-    For example, using the mode argument, it is possible to fit a Gaussian to a beam pattern in linear, logarithmic and decibel space.
+    This special option is used for specifying the scaling of the heatmap for 2D plots, but also for the scaling of beam cross-sections.
+    In addition, the scaling argument sets the scale for fitting Gaussians.
+    For example, using the scale argument, it is possible to fit a Gaussian to a beam pattern in linear, logarithmic and decibel space.
 
     Options:\n
     LIN       : Set scaling mode to linear\n
@@ -130,6 +130,38 @@ class Modes(Enum):
 
     LIN = 0
     dB = 2
+
+class Objects(Enum):
+    """!
+    Enum types for objects such as elementys, groups, frames, etc.
+
+    Options:\n
+    ELEMENT   : Choose element\n
+    GROUP     : Choose a group\n
+    FRAME     : Choose frame
+
+    @ingroup public_api_argopts
+    """
+
+    ELEMENT = "elements"
+    GROUP = "groups"
+    FRAME = "frames"
+    FIELD = "fields"
+    CURRENT = "currents"
+
+class Modes(Enum):
+    """!
+    Enum types for transformation modes, absolute or relative.
+
+    Options:\n
+    REL       : Relative translation/rotation\n
+    ABS       : Absolute translation/rotation\n
+
+    @ingroup public_api_argopts
+    """
+
+    REL = 0
+    ABS = 1
 
 class AperShapes(Enum):
     """!

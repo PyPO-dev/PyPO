@@ -90,7 +90,6 @@ void Parabola_xy(T *parabola, U xu_lo, U xu_up, U yv_lo,
 
     U x;
     U y;
-    U prefac;
 
     U norm;
 
@@ -166,44 +165,51 @@ void Parabola_uv(T *parabola, U xu_lo, U xu_up, U yv_lo,
                 U yv_up, U xcenter, U ycenter, U ecc_uv, U rot_uv, U a, U b, int ncx, int ncy, int nfac,
                 U mat[16], bool transform)
 {
-    U du = (xu_up - xu_lo) / (ncx - 1);
+    U du0 = (xu_up - xu_lo) / (ncx - 1);
     U dv = (yv_up - yv_lo) / (ncy - 1);
 
     U majmin = sqrt(1 - ecc_uv*ecc_uv);
     
-    U u, duv;
-    U v;
-    U prefac;
+    U u, v, duv, dudv, dxdu, dxdv, dydu, dydv, dzdu, dzdv;
 
-    U x, y, xr, yr, r, norm;
+    U x, y, z, norm, ecc_fac;
 
     Utils<U> ut;
 
+    std::array<U, 3> inp, out, Qu, Qv;
 
-    std::array<U, 3> inp, out;
+    int idx;
 
     for (int i=0; i < ncx; i++)
     {
-        u = i * du + xu_lo;
         for (int j=0; j < ncy; j++)
         {
             v = (j * dv + yv_lo) * M_PI/180;
-            int idx = i*ncy + j;
+            ecc_fac = 1 / sqrt(1 - (ecc_uv*cos(v))*(ecc_uv*cos(v))); //consider moving into separate loop + array alloc
+            duv = du0 * majmin * ecc_fac; 
+            u = i*duv + xu_lo*ecc_fac;
+            dudv = -u * ecc_fac*ecc_fac * ecc_uv*ecc_uv * cos(v) * sin(v);
 
-            x = u * cos(v);
-            y = u * sin(v) * majmin;
+            idx = i*ncy + j;
 
-            r = sqrt(x*x + y*y);
+            x = u*cos(v)*cos(rot_uv) - u*sin(v)*sin(rot_uv) + xcenter;
+            y = u*cos(v)*sin(rot_uv) + u*sin(v)*cos(rot_uv) + ycenter;
+            z = x*x/a/a + y*y/b/b;
 
-            xr = x * cos(rot_uv) - y * sin(rot_uv);
-            yr = x * sin(rot_uv) + y * cos(rot_uv);
+            dxdu = cos(v)*cos(rot_uv) - sin(v)*sin(rot_uv);
+            dxdv = cos(v)*cos(rot_uv)*dudv - u*sin(v)*cos(rot_uv) - 
+                   sin(v)*sin(rot_uv)*dudv - u*cos(v)*sin(rot_uv);
+            
+            dydu = cos(v)*sin(rot_uv) + sin(v)*cos(rot_uv);
+            dydv = cos(v)*sin(rot_uv)*dudv - u*sin(v)*sin(rot_uv) + 
+                   sin(v)*cos(rot_uv)*dudv + u*cos(v)*cos(rot_uv);
 
-            x = xr + xcenter;
-            y = yr + ycenter;
+            dzdu = 2*x*dxdu/a/a + 2*y*dydu/b/b;
+            dzdv = 2*x*dxdv/a/a + 2*y*dydv/b/b;
 
             parabola->x[idx] = x;
             parabola->y[idx] = y;
-            parabola->z[idx] = x*x / (a*a) + y*y / (b*b);
+            parabola->z[idx] = z;
 
             parabola->nx[idx] = -2 * x / (a*a);
             parabola->ny[idx] = -2 * y / (b*b);
@@ -216,8 +222,13 @@ void Parabola_uv(T *parabola, U xu_lo, U xu_up, U yv_lo,
             parabola->ny[idx] = nfac * parabola->ny[idx] / norm;
             parabola->nz[idx] = nfac * parabola->nz[idx] / norm;
 
-            duv = sqrt(du*du*cos(v)*cos(v) + du*du*sin(v)*sin(v)*majmin*majmin);
-            parabola->area[idx] = norm * r * duv * dv;
+            Qu = {dxdu, dydu, dzdu};
+            Qv = {dxdv, dydv, dzdv};
+
+            ut.ext(Qu, Qv, out);
+            ut.abs(out, norm);
+
+            parabola->area[idx] = norm * duv * dv;
 
             if (transform)
             {
@@ -262,7 +273,6 @@ void Hyperbola_xy(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
 
     U x;
     U y;
-    U prefac;
 
     U norm;
 
@@ -338,47 +348,55 @@ void Hyperbola_uv(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
                   U yv_up, U xcenter, U ycenter, U ecc_uv, U rot_uv, U a, U b, U c, int ncx, int ncy, int nfac,
                   U mat[16], bool transform)
 {
-    U du = (xu_up - xu_lo) / (ncx - 1);
+    U du0 = (xu_up - xu_lo) / (ncx - 1);
     U dv = (yv_up - yv_lo) / (ncy - 1);
 
     U majmin = sqrt(1 - ecc_uv*ecc_uv);
     
-    U u, duv;
-    U v;
-    U prefac;
+    U u, v, duv, dudv, dxdu, dxdv, dydu, dydv, dzdu, dzdv;
 
-    U x, y, xr, yr, r, norm;
+    U x, y, z, norm, ecc_fac;
 
     Utils<U> ut;
 
-    std::array<U, 3> inp, out;
+    std::array<U, 3> inp, out, Qu, Qv;
+
+    int idx;
 
     for (int i=0; i < ncx; i++)
     {
-        u = i * du + xu_lo;
         for (int j=0; j < ncy; j++)
         {
             v = (j * dv + yv_lo) * M_PI/180;
-            int idx = i*ncy + j;
+            ecc_fac = 1 / sqrt(1 - (ecc_uv*cos(v))*(ecc_uv*cos(v))); //consider moving into separate loop + array alloc
+            duv = du0 * majmin * ecc_fac; 
+            u = i*duv + xu_lo*ecc_fac;
+            dudv = -u * ecc_fac*ecc_fac * ecc_uv*ecc_uv * cos(v) * sin(v);
 
-            x = u * cos(v);
-            y = u * sin(v) * majmin;
+            idx = i*ncy + j;
 
-            r = sqrt(x*x + y*y);
+            x = u*cos(v)*cos(rot_uv) - u*sin(v)*sin(rot_uv) + xcenter;
+            y = u*cos(v)*sin(rot_uv) + u*sin(v)*cos(rot_uv) + ycenter;
+            z = c * sqrt(x*x/a/a + y*y/b/b + 1);
 
-            xr = x * cos(rot_uv) - y * sin(rot_uv);
-            yr = x * sin(rot_uv) + y * cos(rot_uv);
+            dxdu = cos(v)*cos(rot_uv) - sin(v)*sin(rot_uv);
+            dxdv = cos(v)*cos(rot_uv)*dudv - u*sin(v)*cos(rot_uv) - 
+                   sin(v)*sin(rot_uv)*dudv - u*cos(v)*sin(rot_uv);
+            
+            dydu = cos(v)*sin(rot_uv) + sin(v)*cos(rot_uv);
+            dydv = cos(v)*sin(rot_uv)*dudv - u*sin(v)*sin(rot_uv) + 
+                   sin(v)*cos(rot_uv)*dudv + u*cos(v)*cos(rot_uv);
 
-            x = xr + xcenter;
-            y = yr + ycenter;
+            dzdu = c*c / z * (x*dxdu/a/a + y*dydu/b/b);
+            dzdv = c*c / z * (x*dxdv/a/a + y*dydv/b/b);
 
             hyperbola->x[idx] = x;
             hyperbola->y[idx] = y;
-            hyperbola->z[idx] = c * sqrt(x*x / (a*a) + y*y / (b*b) + 1);
+            hyperbola->z[idx] = z;
 
             hyperbola->nx[idx] = -2 * x / (a*a);
             hyperbola->ny[idx] = -2 * y / (b*b);
-            hyperbola->nz[idx] = 2 * hyperbola->z[idx] / (c*c);
+            hyperbola->nz[idx] = 2 * z / (c*c);
 
             norm = sqrt(hyperbola->nx[idx]*hyperbola->nx[idx] +
                         hyperbola->ny[idx]*hyperbola->ny[idx] +
@@ -388,8 +406,13 @@ void Hyperbola_uv(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
             hyperbola->ny[idx] = nfac * hyperbola->ny[idx] / norm;
             hyperbola->nz[idx] = nfac * hyperbola->nz[idx] / norm;
 
-            duv = sqrt(du*du*cos(v)*cos(v) + du*du*sin(v)*sin(v)*majmin*majmin);
-            hyperbola->area[idx] = norm * r * duv * dv;
+            Qu = {dxdu, dydu, dzdu};
+            Qv = {dxdv, dydv, dzdv};
+
+            ut.ext(Qu, Qv, out);
+            ut.abs(out, norm);
+
+            hyperbola->area[idx] = norm * duv * dv;
 
             if (transform)
             {
@@ -434,7 +457,6 @@ void Ellipse_xy(T *ellipse, U xu_lo, U xu_up, U yv_lo,
 
     U x;
     U y;
-    U prefac;
 
     U norm;
 
@@ -510,46 +532,55 @@ void Ellipse_uv(T *ellipse, U xu_lo, U xu_up, U yv_lo,
                 U yv_up, U xcenter, U ycenter, U ecc_uv, U rot_uv, U a, U b, U c, int ncx, int ncy, int nfac,
                 U mat[16], bool transform)
 {
-    U du = (xu_up - xu_lo) / (ncx - 1);
+    U du0 = (xu_up - xu_lo) / (ncx - 1);
     U dv = (yv_up - yv_lo) / (ncy - 1);
 
     U majmin = sqrt(1 - ecc_uv*ecc_uv);
-    U u, duv;
-    U v;
-    U prefac;
+    
+    U u, v, duv, dudv, dxdu, dxdv, dydu, dydv, dzdu, dzdv;
 
-    U x, y, xr, yr, r, norm;
+    U x, y, z, norm, ecc_fac;
 
     Utils<U> ut;
 
-    std::array<U, 3> inp, out;
+    std::array<U, 3> inp, out, Qu, Qv;
+
+    int idx;
 
     for (int i=0; i < ncx; i++)
     {
-        u = i * du + xu_lo;
         for (int j=0; j < ncy; j++)
         {
             v = (j * dv + yv_lo) * M_PI/180;
-            int idx = i*ncy + j;
+            ecc_fac = 1 / sqrt(1 - (ecc_uv*cos(v))*(ecc_uv*cos(v))); //consider moving into separate loop + array alloc
+            duv = du0 * majmin * ecc_fac; 
+            u = i*duv + xu_lo*ecc_fac;
+            dudv = -u * ecc_fac*ecc_fac * ecc_uv*ecc_uv * cos(v) * sin(v);
 
-            x = u * cos(v);
-            y = u * sin(v) * majmin;
+            idx = i*ncy + j;
 
-            r = sqrt(x*x + y*y);
+            x = u*cos(v)*cos(rot_uv) - u*sin(v)*sin(rot_uv) + xcenter;
+            y = u*cos(v)*sin(rot_uv) + u*sin(v)*cos(rot_uv) + ycenter;
+            z = c * sqrt(1 - x*x/a/a - y*y/b/b);
 
-            xr = x * cos(rot_uv) - y * sin(rot_uv);
-            yr = x * sin(rot_uv) + y * cos(rot_uv);
+            dxdu = cos(v)*cos(rot_uv) - sin(v)*sin(rot_uv);
+            dxdv = cos(v)*cos(rot_uv)*dudv - u*sin(v)*cos(rot_uv) - 
+                   sin(v)*sin(rot_uv)*dudv - u*cos(v)*sin(rot_uv);
+            
+            dydu = cos(v)*sin(rot_uv) + sin(v)*cos(rot_uv);
+            dydv = cos(v)*sin(rot_uv)*dudv - u*sin(v)*sin(rot_uv) + 
+                   sin(v)*cos(rot_uv)*dudv + u*cos(v)*cos(rot_uv);
 
-            x = xr + xcenter;
-            y = yr + ycenter;
+            dzdu = -c*c / z * (x*dxdu/a/a + y*dydu/b/b);
+            dzdv = -c*c / z * (x*dxdv/a/a + y*dydv/b/b);
 
             ellipse->x[idx] = x;
             ellipse->y[idx] = y;
-            ellipse->z[idx] = c * sqrt(1 - x*x / (a*a) - y*y / (b*b));
+            ellipse->z[idx] = z;
 
             ellipse->nx[idx] = 2 * x / (a*a);
             ellipse->ny[idx] = 2 * y / (b*b);
-            ellipse->nz[idx] = 2 * ellipse->z[idx] / (c*c);
+            ellipse->nz[idx] = 2 * z / (c*c);
 
             norm = sqrt(ellipse->nx[idx]*ellipse->nx[idx] +
                         ellipse->ny[idx]*ellipse->ny[idx] +
@@ -559,8 +590,13 @@ void Ellipse_uv(T *ellipse, U xu_lo, U xu_up, U yv_lo,
             ellipse->ny[idx] = nfac * ellipse->ny[idx] / norm;
             ellipse->nz[idx] = nfac * ellipse->nz[idx] / norm;
 
-            duv = sqrt(du*du*cos(v)*cos(v) + du*du*sin(v)*sin(v)*majmin*majmin);
-            ellipse->area[idx] = norm * r * duv * dv;
+            Qu = {dxdu, dydu, dzdu};
+            Qv = {dxdv, dydv, dzdv};
+
+            ut.ext(Qu, Qv, out);
+            ut.abs(out, norm);
+
+            ellipse->area[idx] = norm * duv * dv;
             
             if (transform)
             {
@@ -600,7 +636,6 @@ void Plane_xy(T *plane, U xu_lo, U xu_up, U yv_lo,
 
     U x;
     U y;
-    U prefac;
 
     U norm;
 
@@ -666,45 +701,41 @@ void Plane_uv(T *plane, U xu_lo, U xu_up, U yv_lo,
 {
 
 
-    U u, du, duv;
-    U v, dv, r;
-    U x, xr, y, yr;
+    U u, du0, duv;
+    U v, dv;
+    U x, y;
 
     U majmin = sqrt(1 - ecc_uv*ecc_uv);
     
-    du = (xu_up - xu_lo) / (ncx - 1);
+    du0 = (xu_up - xu_lo) / (ncx - 1);
     dv = (yv_up - yv_lo) / (ncy - 1) * M_PI/180;
 
-    U norm;
+    U ecc_fac;
 
     Utils<U> ut;
 
     std::array<U, 3> inp, out;
+    
+    int idx;
 
     for (int i=0; i < ncx; i++)
     {        
-        u = i * du + xu_lo;
-
         for (int j=0; j < ncy; j++)
         {
             v = (j * dv + yv_lo);
-            int idx = i*ncy + j;
+            ecc_fac = 1 / sqrt(1 - (ecc_uv*cos(v))*(ecc_uv*cos(v))); //consider moving into separate loop + array alloc
+            duv = du0 * majmin * ecc_fac; 
+            u = i*duv + xu_lo*ecc_fac;
+            
+            idx = i*ncy + j;
             
             // Calculate co-ordinate of ellipse in rest frame
-            x = u * cos(v);
-            y = u * sin(v) * majmin;
-
-            // Calculate distance of x, y point to origin in rest frame.
-            // Rotation preserves area elements
-            r = sqrt(x*x + y*y);
-            
-            // Rotate ellipse in rest frame
-            xr = x * cos(rot_uv) - y * sin(rot_uv);
-            yr = x * sin(rot_uv) + y * cos(rot_uv);
+            x = u*cos(v)*cos(rot_uv) - u*sin(v)*sin(rot_uv) + xcenter;
+            y = u*cos(v)*sin(rot_uv) + u*sin(v)*cos(rot_uv) + ycenter;
 
             // Add center offset to xy grids
-            plane->x[idx] = xr + xcenter;
-            plane->y[idx] = yr + ycenter;
+            plane->x[idx] = x;
+            plane->y[idx] = y;
             plane->z[idx] = 0;
 
             plane->nx[idx] = 0;
@@ -712,9 +743,7 @@ void Plane_uv(T *plane, U xu_lo, U xu_up, U yv_lo,
             plane->nz[idx] = nfac * 1;
 
             // Calculate du along value of v, dv unchanged.
-            duv = sqrt(du*du*cos(v)*cos(v) + du*du*sin(v)*sin(v)*majmin*majmin);
-
-            plane->area[idx] = r * duv * dv;            
+            plane->area[idx] = u * duv * dv;            
             if (transform)
             {
                 transformGrids<T, U>(plane, idx, inp, out, &ut, mat);

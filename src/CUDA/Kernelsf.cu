@@ -59,12 +59,12 @@ __constant__ int g_t;               // Gridsize on target
                                      make_cuFloatComplex(0., 1.),
                                      make_cuFloatComplex(0., 0.),
                                      make_cuFloatComplex(4., 0.)};
-
+     
      // Copy constant array to Device constant memory
-     gpuErrchk( cudaMemcpyToSymbol(con, &_con, CSIZE * sizeof(cuFloatComplex)) );
-     gpuErrchk( cudaMemcpyToSymbol(eye, &_eye, sizeof(_eye)) );
      gpuErrchk( cudaMemcpyToSymbol(g_s, &gs, sizeof(int)) );
      gpuErrchk( cudaMemcpyToSymbol(g_t, &gt, sizeof(int)) );
+     gpuErrchk( cudaMemcpyToSymbol(eye, &_eye, sizeof(_eye)) );
+     gpuErrchk( cudaMemcpyToSymbol(con, &_con, CSIZE * sizeof(cuFloatComplex)) );
 
      std::array<dim3, 2> BT;
      BT[0] = nrb;
@@ -1098,6 +1098,7 @@ void callKernelf_JM(c2Bundlef *res, reflparamsf source, reflparamsf target,
     // Initialize and copy constant memory to device
     std::array<dim3, 2> BT;
     BT = initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
+    cudaFuncSetCacheConfig(GpropagateBeam_0, cudaFuncCachePreferL1);
 
     MemUtils memutil;
 
@@ -1141,7 +1142,7 @@ void callKernelf_JM(c2Bundlef *res, reflparamsf source, reflparamsf target,
                                        vec_din[3], vec_din[4], vec_din[5],
                                        vec_dout[0], vec_dout[1], vec_dout[2],
                                        vec_dout[3], vec_dout[4], vec_dout[5]);
-    
+    gpuErrchk( cudaPeekAtLastError() );
     gpuErrchk( cudaDeviceSynchronize() );
     
     std::vector<cuFloatComplex*> vec_hout = memutil.cuMallComplexStack(n_out, ct->size);
@@ -1189,6 +1190,7 @@ void callKernelf_EH(c2Bundlef *res, reflparamsf source, reflparamsf target,
     // Initialize and copy constant memory to device
     std::array<dim3, 2> BT;
     BT = initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
+    cudaFuncSetCacheConfig(GpropagateBeam_1, cudaFuncCachePreferL1);
 
     MemUtils memutil;
 
@@ -1230,7 +1232,7 @@ void callKernelf_EH(c2Bundlef *res, reflparamsf source, reflparamsf target,
                                        vec_din[3], vec_din[4], vec_din[5],
                                        vec_dout[0], vec_dout[1], vec_dout[2],
                                        vec_dout[3], vec_dout[4], vec_dout[5]);
-    
+    gpuErrchk( cudaPeekAtLastError() );
     gpuErrchk( cudaDeviceSynchronize() );
     
     std::vector<cuFloatComplex*> vec_hout = memutil.cuMallComplexStack(n_out, ct->size);
@@ -1279,6 +1281,7 @@ void callKernelf_JMEH(c4Bundlef *res, reflparamsf source, reflparamsf target,
     // Initialize and copy constant memory to device
     std::array<dim3, 2> BT;
     BT = initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
+    cudaFuncSetCacheConfig(GpropagateBeam_2, cudaFuncCachePreferL1);
 
     MemUtils memutil;
 
@@ -1324,7 +1327,7 @@ void callKernelf_JMEH(c4Bundlef *res, reflparamsf source, reflparamsf target,
                                        vec_dout[3], vec_dout[4], vec_dout[5],
                                        vec_dout[6], vec_dout[7], vec_dout[8],
                                        vec_dout[9], vec_dout[10], vec_dout[11]);
-    
+    gpuErrchk( cudaPeekAtLastError() );
     gpuErrchk( cudaDeviceSynchronize() );
     
     std::vector<cuFloatComplex*> vec_hout = memutil.cuMallComplexStack(n_out, ct->size);
@@ -1375,6 +1378,7 @@ void callKernelf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf target,
     // Initialize and copy constant memory to device
     std::array<dim3, 2> BT;
     BT = initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
+    cudaFuncSetCacheConfig(GpropagateBeam_3, cudaFuncCachePreferL1);
 
     MemUtils memutil;
 
@@ -1477,6 +1481,7 @@ void callKernelf_FF(c2Bundlef *res, reflparamsf source, reflparamsf target,
     // Initialize and copy constant memory to device
     std::array<dim3, 2> BT;
     BT = initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
+    cudaFuncSetCacheConfig(GpropagateBeam_4, cudaFuncCachePreferL1);
 
     MemUtils memutil;
 
@@ -1517,7 +1522,7 @@ void callKernelf_FF(c2Bundlef *res, reflparamsf source, reflparamsf target,
                                        vec_din[3], vec_din[4], vec_din[5],
                                        vec_dout[0], vec_dout[1], vec_dout[2],
                                        vec_dout[3], vec_dout[4], vec_dout[5]);
-
+    gpuErrchk( cudaPeekAtLastError() );
     gpuErrchk( cudaDeviceSynchronize() );
     
     std::vector<cuFloatComplex*> vec_hout = memutil.cuMallComplexStack(n_out, ct->size);
@@ -1565,6 +1570,9 @@ void callKernelf_scalar(arrC1f *res, reflparamsf source, reflparamsf target,
     // Initialize and copy constant memory to device
     std::array<dim3, 2> BT;
     BT = initCUDA(k, epsilon, ct->size, cs->size, t_direction, nBlocks, nThreads);
+
+    cudaFuncSetCacheConfig(GpropagateBeam_5, cudaFuncCachePreferL1);
+
     //alsd
     // Create pointers to device arrays and allocate/copy source grid and area.
     MemUtils memutil;
@@ -1599,7 +1607,7 @@ void callKernelf_scalar(arrC1f *res, reflparamsf source, reflparamsf target,
     GpropagateBeam_5<<<BT[0], BT[1]>>>(vec_ds[0], vec_ds[1], vec_ds[2], vec_ds[3],
                                        vec_dt[0], vec_dt[1], vec_dt[2],
                                        d_sfs, d_sft);
-
+    gpuErrchk( cudaPeekAtLastError() );
     gpuErrchk( cudaDeviceSynchronize() );
 
     cuFloatComplex *h_sft = new cuFloatComplex[ct->size];

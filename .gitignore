@@ -197,3 +197,4 @@ src/GUI/Tests
 # Temporary: C++ unittest stuff
 src/build/*
 src/bin/*
+_testTypeHinting.py

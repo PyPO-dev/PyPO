@@ -65,7 +65,7 @@ class MainWidget(QWidget):
         self.clog_mgr = CustomGUILogger(os.path.basename(__file__))
         self.clog = self.clog_mgr.getCustomGUILogger(self.console)
         
-        self.stm = st.System(redirect=self.clog, context="G", override=False)
+        self.stm = st.System(redirect=self.clog, override=False)
        
         self.clog = self.stm.getSystemLogger()
         self.clog.info(f"STARTED PyPO GUI SESSION.")

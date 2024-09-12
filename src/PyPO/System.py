@@ -45,19 +45,16 @@ class System(object):
     customReflPath = os.getcwd()
     savePathSystems = os.getcwd()
 
-    def __init__(self, redirect=None, context=None, verbose=True, override=True):
+    def __init__(self, redirect : logging.RootLogger = None, verbose : bool = True, override : bool = True):
         """!
         Constructor. Initializes system state.
         
-        @param redirect Redirect all print statements within system to given stdout.
-        @param context Whether system is created in script or in GUI.
+        @param redirect Redirect all print statements within system to given stdout. To use, pass an instance of logging.RootLogger object or an object that inherrits from logging.RootLogger
         @param verbose Enable system logger.
         @param override Allow overriding names.
         """
-        self.context = context
         self.verbosity = verbose
 
-        Config.setContext(context)
         Config.setOverride(override)
 
         self.system = {}
@@ -91,8 +88,8 @@ class System(object):
         if not verbose:
             self.clog.setLevel(logging.CRITICAL)
 
-        if context == "S":
-            self.clog.info("INITIALIZED EMPTY SYSTEM.")
+        # if context == "S":
+        #     self.clog.info("INITIALIZED EMPTY SYSTEM.")
  
         if override == True:
             self.clog.warning("System override set to True.")
@@ -106,7 +103,7 @@ class System(object):
             del self.clog_mgr
             del self.clog
     
-    def getSystemLogger(self):
+    def getSystemLogger(self) -> logging.RootLogger:
         """!
         Obtain a reference to the custom logger used by system.
         
@@ -119,7 +116,7 @@ class System(object):
         """
         return self.clog
 
-    def __str__(self):
+    def __str__(self) -> str:
         """!
         Print system contents.
         """
@@ -145,7 +142,7 @@ class System(object):
             s += f"    {key}\n"
         return s
 
-    def setCustomBeamPath(self, path, append=False):
+    def setCustomBeamPath(self, path: str , append : bool = False) -> None:
         """!
         Set path to folder containing custom beam patterns.
         
@@ -162,7 +159,7 @@ class System(object):
         else:
             self.customBeamPath = path
 
-    def setSavePath(self, path, append=False):
+    def setSavePath(self, path : str, append : bool = False):
         """!
         Set path to folder were to save output plots.
         
@@ -204,7 +201,7 @@ class System(object):
         if not os.path.isdir(self.savePathSystems):
             os.makedirs(self.savePathSystems)
 
-    def setLoggingVerbosity(self, verbose=True, handler=None):
+    def setLoggingVerbosity(self, verbose : bool = True):
         """!
         Set the verbosity of the logging from within the system.
         
@@ -214,7 +211,6 @@ class System(object):
         @ingroup public_api_sysio
         
         @param verbose Whether to enable logging or not.
-        @param handler If multiple handlers are present, select which handler to adjust.
         """
 
         self.verbosity = verbose
@@ -223,7 +219,7 @@ class System(object):
         else:
             self.clog.setLevel(logging.CRITICAL)
 
-    def setOverride(self, override=True):
+    def setOverride(self, override : bool = True):
         """!
         Set the override toggle.
         
@@ -236,7 +232,7 @@ class System(object):
 
         Config.setOverride(override)
 
-    def addParabola(self, reflDict):
+    def addParabola(self, reflDict : dict[str, type]):
         """!
         Add a paraboloid reflector to the System.
         
@@ -288,7 +284,7 @@ class System(object):
         self.system[_reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added paraboloid {_reflDict['name']} to system.")
 
-    def addHyperbola(self, reflDict):
+    def addHyperbola(self, reflDict : dict[str, type]):
         """!
         Add a hyperboloid reflector to the System.
         
@@ -347,7 +343,7 @@ class System(object):
         self.system[_reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added hyperboloid {_reflDict['name']} to system.")
 
-    def addEllipse(self, reflDict):
+    def addEllipse(self, reflDict : dict[str, type]):
         """!
         Add an ellipsoid reflector to the System.
         
@@ -406,7 +402,7 @@ class System(object):
         self.system[_reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added ellipsoid {_reflDict['name']} to system.")
 
-    def addPlane(self, reflDict):
+    def addPlane(self, reflDict : dict[str, type]):
         """!
         Add a planar surface to the System.
         

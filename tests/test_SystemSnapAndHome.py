@@ -7,6 +7,7 @@ import unittest
 import numpy as np
 
 from PyPO.System import System
+from PyPO.Enums import Objects
 
 try:
     from . import TestTemplates
@@ -40,10 +41,10 @@ class Test_SystemSnapAndHome(unittest.TestCase):
                 
                 self.assertEqual(tr, trs)
 
-        self.s.translateGrids("testgroup", trans, obj="group")
-        self.s.rotateGrids("testgroup", rot, obj="group")
+        self.s.translateGrids("testgroup", trans, obj=Objects.GROUP)
+        self.s.rotateGrids("testgroup", rot, obj=Objects.GROUP)
         
-        self.s.snapObj("testgroup", "test", obj="group")
+        self.s.snapObj("testgroup", "test", obj=Objects.GROUP)
 
 
         for transfs, elem_name in zip(self.s.groups["testgroup"]["snapshots"]["test"], self.names):
@@ -54,9 +55,9 @@ class Test_SystemSnapAndHome(unittest.TestCase):
                 self.assertEqual(tr, trs)
 
         for fr_n in self.fr_names:
-            self.s.translateGrids(fr_n, trans, obj="frame")
-            self.s.rotateGrids(fr_n, rot, obj="frame")
-            self.s.snapObj(fr_n, "test", obj="frame")
+            self.s.translateGrids(fr_n, trans, obj=Objects.FRAME)
+            self.s.rotateGrids(fr_n, rot, obj=Objects.FRAME)
+            self.s.snapObj(fr_n, "test", obj=Objects.FRAME)
 
             self.assertFalse(id(self.s.frames[fr_n].snapshots["test"]) == id(self.s.frames[fr_n].transf))
             for tr, trs in zip(self.s.frames[fr_n].snapshots["test"].ravel(), 
@@ -85,10 +86,10 @@ class Test_SystemSnapAndHome(unittest.TestCase):
             for tr, trs in zip(np.eye(4).ravel(), self.s.system[name]["transf"].ravel()):
                 self.assertEqual(tr, trs)
 
-        self.s.translateGrids("testgroup", trans, obj="group")
-        self.s.rotateGrids("testgroup", rot, obj="group")
+        self.s.translateGrids("testgroup", trans, obj=Objects.GROUP)
+        self.s.rotateGrids("testgroup", rot, obj=Objects.GROUP)
         
-        self.s.revertToSnap("testgroup", "test", obj="group")
+        self.s.revertToSnap("testgroup", "test", obj=Objects.GROUP)
         for transfs, elem_name in zip(self.s.groups["testgroup"]["snapshots"]["test"], self.names):
             _transf = self.s.system[elem_name]["transf"]
             self.assertFalse(id(transfs) == id(_transf))
@@ -96,23 +97,23 @@ class Test_SystemSnapAndHome(unittest.TestCase):
             for tr, trs in zip(transfs.ravel(), _transf.ravel()): 
                 self.assertEqual(tr, trs)
 
-        self.s.deleteSnap("testgroup", "test", obj="group")
+        self.s.deleteSnap("testgroup", "test", obj=Objects.GROUP)
         self.assertFalse("test" in self.s.groups["testgroup"]["snapshots"])
         
-        self.s.homeReflector("testgroup", obj="group", rot=False)
+        self.s.homeReflector("testgroup", obj=Objects.GROUP, rot=False)
         for mem in self.s.groups["testgroup"]["members"]:
             for tr, trs in zip([0, 0, 0, 1], self.s.system[mem]["transf"][:,-1]):
                 self.assertEqual(tr, trs)
         
-        self.s.homeReflector("testgroup", obj="group", trans=False)
+        self.s.homeReflector("testgroup", obj=Objects.GROUP, trans=False)
         for mem in self.s.groups["testgroup"]["members"]:
             for tr, trs in zip(np.eye(4).ravel(), self.s.system[mem]["transf"].ravel()):
                 self.assertEqual(tr, trs)
 
         for fr_n in self.fr_names:
-            self.s.translateGrids(fr_n, trans, obj="frame")
-            self.s.rotateGrids(fr_n, rot, obj="frame")
-            self.s.revertToSnap(fr_n, "test", obj="frame")
+            self.s.translateGrids(fr_n, trans, obj=Objects.FRAME)
+            self.s.rotateGrids(fr_n, rot, obj=Objects.FRAME)
+            self.s.revertToSnap(fr_n, "test", obj=Objects.FRAME)
 
             self.assertFalse(id(self.s.frames[fr_n].snapshots["test"]) == id(self.s.frames[fr_n].transf))
             for tr, trs in zip(self.s.frames[fr_n].snapshots["test"].ravel(), 
@@ -120,7 +121,7 @@ class Test_SystemSnapAndHome(unittest.TestCase):
                 
                 self.assertEqual(tr, trs)
             
-            self.s.deleteSnap(fr_n, "test", obj="frame")
+            self.s.deleteSnap(fr_n, "test", obj=Objects.FRAME)
             self.assertFalse("test" in self.s.frames[fr_n].snapshots)
 
     def test_homeReflector(self):

@@ -8,7 +8,7 @@ from scipy.optimize import fmin
 
 import PyPO.BindRefl as BRefl
 import PyPO.MatUtils as MUtils
-from PyPO.Enums import Modes
+from PyPO.Enums import Scales
 
 def calcEstimates(x, y, area, field_norm):
     """!
@@ -68,7 +68,7 @@ def calcEstimates(x, y, area, field_norm):
     y0 = np.sqrt(_y0)
     return x0, y0, xm, ym, theta
 
-def fitGaussAbs(field, surfaceObject, thres, mode, ratio=1):
+def fitGaussAbs(field, surfaceObject, thres, scale, ratio=1):
     """!
     Fit a Gaussian to an amplitude pattern of a field component.
     First, the center and position angle of the pattern is calculated using the method of image moments.
@@ -96,11 +96,11 @@ def fitGaussAbs(field, surfaceObject, thres, mode, ratio=1):
     
     area = grids.area
 
-    if mode == Modes.dB:
+    if scale == Scales.dB:
         fit_field = 20 * np.log10(_field)
         mask_f = fit_field >= thres 
 
-    elif mode == Modes.LIN:
+    elif scale == Scales.LIN:
         fit_field = _field
         mask_f = fit_field >= 10**(thres/20)
 
@@ -136,16 +136,16 @@ def fitGaussAbs(field, surfaceObject, thres, mode, ratio=1):
     num = 0
 
     if ratio is None:
-        args = (surfaceObject, fit_field, _mask_f, mode)
+        args = (surfaceObject, fit_field, _mask_f, scale)
         popt = fmin(GaussAbs, p0, args, disp=False)
 
     else:
         while _ratio >= ratio:
-            if mode == Modes.dB:
+            if scale == Scales.dB:
                 fit_field = 20 * np.log10(_field)
                 mask_f = fit_field >= thres 
 
-            elif mode == Modes.LIN:
+            elif scale == Scales.LIN:
                 fit_field = _field
                 mask_f = fit_field >= 10**(thres/20)
 
@@ -154,10 +154,10 @@ def fitGaussAbs(field, surfaceObject, thres, mode, ratio=1):
             else:
                 _mask_f = mask_f
 
-            args = (surfaceObject, fit_field, _mask_f, mode)
+            args = (surfaceObject, fit_field, _mask_f, scale)
             popt = fmin(GaussAbs, p0, args, disp=False)
 
-            _Psi = generateGauss(popt, surfaceObject, mode=Modes.LIN)
+            _Psi = generateGauss(popt, surfaceObject, scale=Scales.LIN)
             _ratio = np.sum(_Psi**2) / np.sum(_field**2)
             
             if num > 1:
@@ -179,8 +179,8 @@ def GaussAbs(p0, *args):
     @returns epsilon Coupling of field with Gaussian.
     """
 
-    surfaceObject, field_est, mask, mode = args
-    Psi = generateGauss(p0, surfaceObject, mode)
+    surfaceObject, field_est, mask, scale = args
+    Psi = generateGauss(p0, surfaceObject, scale)
     coup = np.sum(np.absolute(Psi[mask])**2) / np.sum(np.absolute(field_est[mask])**2)
     epsilon = np.absolute(1 - coup)
     
@@ -195,13 +195,13 @@ def GaussAbs(p0, *args):
     
     return epsilon
 
-def generateGauss(p0, surfaceObject, mode):
+def generateGauss(p0, surfaceObject, scale):
     """!
     Generate a Gaussian from Gaussian and surface parameters.
 
     @param p0 Gaussian parameters.
     @param surfaceObject Surface on which Gaussian is defined.
-    @param mode Whether to generate Gaussian in linear or decibel space.
+    @param scale Whether to generate Gaussian in linear or decibel space.
 
     @returns Psi Gaussian distribution.
     """
@@ -216,10 +216,10 @@ def generateGauss(p0, surfaceObject, mode):
     c = np.sin(2 * theta) / (4 * x0**2) - np.sin(2 * theta) / (4 * y0**2)
     b = np.sin(theta)**2 / (2 * x0**2) + np.cos(theta)**2 / (2 * y0**2)
 
-    if mode == Modes.dB:
+    if scale == Scales.dB:
         Psi = 20*np.log10(np.exp(-(a*(x - xs)**2 + 2*c*(x - xs)*(y - ys) + b*(y - ys)**2)))
 
-    elif mode == Modes.LIN:
+    elif scale == Scales.LIN:
         Psi = np.exp(-(a*(x - xs)**2 + 2*c*(x - xs)*(y - ys) + b*(y - ys)**2))
     
     return Psi.reshape(x.shape)

@@ -82,7 +82,7 @@ var searchData=
   ['contact_79',['Contact',['../index.html#contact',1,'']]],
   ['content_80',['content',['../classGUI_1_1Accordion_1_1Accordion_1_1AccordionSection.html#a3b565145a0759d93c35f28119dee6a63',1,'GUI::Accordion::Accordion::AccordionSection']]],
   ['contributions_20development_81',['Instructions For Contributions &amp; Development',['../contribguide.html',1,'']]],
-  ['contributor_20guidelines_82',['Contributor Guidelines',['../contribguide.html#contrib',1,'Contributor Guidelines'],['../index.html#main_contribguidelines',1,'Contributor Guidelines']]],
+  ['contributor_20guidelines_82',['Contributor Guidelines',['../index.html#main_contribguidelines',1,'Contributor Guidelines'],['../contribguide.html#contrib',1,'Contributor Guidelines']]],
   ['copyelement_83',['copyElement',['../group__public__api__reflmeths.html#ga021bcc44f62bdf25fa18de8e97e44744',1,'PyPO::System::System']]],
   ['copyelementaction_84',['copyElementAction',['../classGUI_1_1MainWindow_1_1MainWidget.html#a11d4fffbf53999aa3af50796e59c2da7',1,'GUI::MainWindow::MainWidget']]],
   ['copyelementactionform_85',['copyElementActionForm',['../classGUI_1_1MainWindow_1_1MainWidget.html#a052f82b1c538cffa875ccbfcad3caa3e',1,'GUI::MainWindow::MainWidget']]],

@@ -40,7 +40,7 @@ var searchData=
   ['grtdict_37',['GRTDict',['../structGRTDict.html',1,'GRTDict'],['../classPyPO_1_1Structs_1_1GRTDict.html',1,'PyPO.Structs.GRTDict'],['../group__public__api__templates.html#ga096dd833d989be8e6a65d56a18831721',1,'PyPO.Templates.GRTDict']]],
   ['grtdictf_38',['GRTDictf',['../structGRTDictf.html',1,'GRTDictf'],['../classPyPO_1_1Structs_1_1GRTDictf.html',1,'PyPO.Structs.GRTDictf']]],
   ['gui_20tutorials_39',['GUI Tutorials',['../tutorials.html#guitut',1,'']]],
-  ['guidelines_40',['Guidelines',['../contribguide.html#contrib',1,'Contributor Guidelines'],['../index.html#main_contribguidelines',1,'Contributor Guidelines']]],
+  ['guidelines_40',['Guidelines',['../index.html#main_contribguidelines',1,'Contributor Guidelines'],['../contribguide.html#contrib',1,'Contributor Guidelines']]],
   ['guilogger_41',['GUILogger',['../classPyPO_1_1CustomLogger_1_1GUILogger.html',1,'PyPO::CustomLogger']]],
   ['gutils_2eh_42',['GUtils.h',['../GUtils_8h.html',1,'']]]
 ];

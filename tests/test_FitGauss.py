@@ -8,7 +8,7 @@ from nose2.tools import params
 
 from PyPO.System import System
 from PyPO.FitGauss import fitGaussAbs, generateGauss
-from PyPO.Enums import FieldComponents, CurrentComponents, Modes
+from PyPO.Enums import FieldComponents, CurrentComponents, Scales
 
 try:
     from . import TestTemplates
@@ -20,13 +20,13 @@ class Test_FitGauss(unittest.TestCase):
         self.s = TestTemplates.getSystemWithReflectors()
         self.s.setOverride(False) 
     
-    @params(Modes.dB, Modes.LIN)
-    def test_fitGauss(self, mode):
-            popt = self.s.fitGaussAbs(TestTemplates.GPOfield["name"], FieldComponents.Ex, thres=-100, mode=mode, full_output=True, ratio=None)
+    @params(Scales.dB, Scales.LIN)
+    def test_fitGauss(self, scale):
+            popt = self.s.fitGaussAbs(TestTemplates.GPOfield["name"], FieldComponents.Ex, thres=-100, scale=scale, full_output=True, ratio=None)
             self.assertTrue(len(popt) == 6)
             self.assertTrue(f"fitGauss_{TestTemplates.GPOfield['name']}" in self.s.scalarfields)
 
-            popt = self.s.fitGaussAbs(TestTemplates.GPOfield["name"], FieldComponents.Ex, thres=-100, mode=mode, full_output=True, ratio=1)
+            popt = self.s.fitGaussAbs(TestTemplates.GPOfield["name"], FieldComponents.Ex, thres=-100, scale=scale, full_output=True, ratio=1)
             self.assertTrue(len(popt) == 6)
             self.assertTrue(f"fitGauss_{TestTemplates.GPOfield['name']}" in self.s.scalarfields)
            

@@ -32,7 +32,7 @@ from PyPO.CustomLogger import CustomLogger
 import PyPO.Plotter as PPlot
 import PyPO.Efficiencies as Effs
 import PyPO.FitGauss as FGauss
-from PyPO.Enums import Projections, FieldComponents, CurrentComponents, Units, Modes
+from PyPO.Enums import Projections, FieldComponents, CurrentComponents, Units, Scales
 
 import PyPO.WorldParam as world
 
@@ -1729,7 +1729,7 @@ class System(object):
         
         return Effs.calcXpol(field_co, field_cr)
 
-    def fitGaussAbs(self, name_field, comp, thres=None, mode=Modes.LIN, full_output=False, ratio=1):
+    def fitGaussAbs(self, name_field, comp, thres=None, scale=Scales.LIN, full_output=False, ratio=1):
         """!
         Fit a Gaussian profile to the amplitude of a field component and adds the result to scalar field in system.
         
@@ -1742,7 +1742,7 @@ class System(object):
         @param name_field Name of field object.
         @param comp Component of field object. Instance of FieldComponents enum object.
         @param thres Threshold to fit to, in decibels.
-        @param mode Fit to amplitude in decibels, linear or logarithmically. Instance of Modes enum object.
+        @param scale Fit to amplitude in decibels, linear or logarithmic scale. Instance of Scales enum object.
         @param full_output Return fitted parameters and standard deviations.
         
         @returns popt Fitted beam parameters.
@@ -1756,9 +1756,9 @@ class System(object):
         surfaceObj = self.system[self.fields[name_field].surf]
         field = self.copyObj(np.absolute(self.fields[name_field][comp.value]))
 
-        popt = FGauss.fitGaussAbs(field, surfaceObj, thres, mode, ratio)
+        popt = FGauss.fitGaussAbs(field, surfaceObj, thres, scale, ratio)
 
-        Psi = PTypes.scalarfield(FGauss.generateGauss(popt, surfaceObj, mode=Modes.LIN))
+        Psi = PTypes.scalarfield(FGauss.generateGauss(popt, surfaceObj, scale=Scales.LIN))
         Psi.setMeta(self.fields[name_field].surf, self.fields[name_field].k)
        
         _name = f"fitGauss_{name_field}"
@@ -1773,7 +1773,7 @@ class System(object):
         if full_output:
             return popt
 
-    def calcMainBeam(self, name_field, comp, thres=None, mode=Modes.LIN):
+    def calcMainBeam(self, name_field, comp, thres=None, scale=Scales.LIN):
         """!
         Calculate main-beam efficiency of a beam pattern.
         
@@ -1789,7 +1789,7 @@ class System(object):
         @param name_field Name of field object.
         @param comp Component of field object. Instance of FieldComponents enum object.
         @param thres Threshold to fit to, in decibels.
-        @param mode Fit to amplitude in decibels, linear or logarithmically.
+        @param scale Fit to amplitude in decibels, linear or logarithmic scale.
         
         @returns eff Main-beam efficiency.
         """
@@ -1799,14 +1799,14 @@ class System(object):
 
         _thres = self.copyObj(thres)
 
-        self.fitGaussAbs(name_field, comp, thres, mode)
+        self.fitGaussAbs(name_field, comp, thres, scale)
         field = self.copyObj(self.fields[name_field][comp.value])
         surfaceObj = self.system[self.fields[name_field].surf]
         
         eff = Effs.calcMainBeam(field, surfaceObj, self.scalarfields[f"fitGauss_{name_field}"].S)
         return eff
     
-    def calcBeamCuts(self, name_field, comp, phi=0, center=True, align=True, norm=False, transform=False, mode=Modes.dB):
+    def calcBeamCuts(self, name_field, comp, phi=0, center=True, align=True, norm=False, transform=False, scale=Scales.dB):
         """!
         Calculate cross sections of a beam pattern.
         
@@ -1826,7 +1826,7 @@ class System(object):
         @param align Whether to align the cardinal planes to the beam pattern minor and major axes.
         @param norm Which component to normalise to. Defaults to comp. 
         @param transform Transform surface on which beam is defined. If False, will evaluate beam cuts as if surface is in restframe.
-        @param mode Return beamcuts in linear or decibel values. Instance of Modes enum object.
+        @param scale Return beamcuts in linear or decibel values. Instance of Scales enum object.
         
         @returns x_cut Beam cross section along the E-plane.
         @returns y_cut Beam cross section along the H-plane.
@@ -1847,7 +1847,7 @@ class System(object):
         self.snapObj(name_surf, "__pre")
 
         if center or align:
-            popt = self.fitGaussAbs(name_field, comp, mode=Modes.LIN, full_output=True)
+            popt = self.fitGaussAbs(name_field, comp, scale=Scales.LIN, full_output=True)
         
         if center:
             self.translateGrids(name_surf, np.array([-popt[2], -popt[3], 0]))
@@ -1876,20 +1876,20 @@ class System(object):
             x_cut = self.copyObj(20 * np.log10(field[:, idx_c[1]] / np.max(field)))
             y_cut = self.copyObj(20 * np.log10(field[idx_c[0], :] / np.max(field)))
             
-            if mode == Modes.dB:
+            if scale == Scales.dB:
                 x_cut = self.copyObj(20 * np.log10(field[:, idx_c[1]] / np.max(field)))
                 y_cut = self.copyObj(20 * np.log10(field[idx_c[0], :] / np.max(field)))
             
-            elif mode == Modes.LIN:
+            elif scale == Scales.LIN:
                 x_cut = self.copyObj(field[:, idx_c[1]] / np.max(field))
                 y_cut = self.copyObj(field[idx_c[0], :] / np.max(field))
         
         else:
-            if mode == Modes.dB:
+            if scale == Scales.dB:
                 x_cut = self.copyObj(20 * np.log10(field[:, idx_c[1]] / np.max(np.absolute(getattr(self.fields[name_field], norm)))))
                 y_cut = self.copyObj(20 * np.log10(field[idx_c[0], :] / np.max(np.absolute(getattr(self.fields[name_field], norm)))))
             
-            elif mode == Modes.LIN:
+            elif scale == Scales.LIN:
                 x_cut = self.copyObj(field[:, idx_c[1]] / np.max(np.absolute(getattr(self.fields[name_field], norm))))
                 y_cut = self.copyObj(field[idx_c[0], :] / np.max(np.absolute(getattr(self.fields[name_field], norm))))
 
@@ -1905,7 +1905,7 @@ class System(object):
 
         return x_cut, y_cut, x_strip, y_strip
    
-    def plotBeamCut(self, name_field, comp, comp_cross=FieldComponents.NONE, vmin=None, vmax=None, center=True, align=True, mode=Modes.dB, units=Units.DEG, name="", show=True, save=False, ret=False):
+    def plotBeamCut(self, name_field, comp, comp_cross=FieldComponents.NONE, vmin=None, vmax=None, center=True, align=True, scale=Scales.dB, units=Units.DEG, name="", show=True, save=False, ret=False):
         """!
         Plot beam pattern cross sections.
         
@@ -1922,7 +1922,7 @@ class System(object):
         @param vmax Maximum amplitude value to display. Default is 0.
         @param center Whether to calculate beam center and center the beam cuts on this point.
         @param align Whether to find position angle of beam cuts and align cut axes to this.
-        @param mode Plot in decibels or linear.
+        @param scale Plot in decibels or linear.
         @param units The units of the axes. Instance of Units enum object.
         @param name Name of .png file where plot is saved. Only when save=True. Default is "".
         @param show Show plot. Default is True.
@@ -1933,7 +1933,7 @@ class System(object):
         @returns ax Axes object.
         """
 
-        E_cut, H_cut, E_strip, H_strip = self.calcBeamCuts(name_field, comp, center=center, align=align, mode=mode)
+        E_cut, H_cut, E_strip, H_strip = self.calcBeamCuts(name_field, comp, center=center, align=align, scale=scale)
 
         #if comp_cross is not None:
             #cr45_cut, cr135_cut, cr45_strip, cr135_strip = self.calcBeamCuts(name_field, comp_cross, phi=45, align=False, center=False, norm="Ex")
@@ -2207,7 +2207,7 @@ class System(object):
     def plotBeam2D(self, name_obj, comp=FieldComponents.NONE, contour=None, contour_comp=FieldComponents.NONE,
                     vmin=None, vmax=None, levels=None, show=True, amp_only=False,
                     save=False, interpolation=None, norm=True,
-                    aperDict=None, mode=Modes.dB, project=Projections.xy,
+                    aperDict=None, scale=Scales.dB, project=Projections.xy,
                     units=Units.MM, name="", titleA="Power", titleP="Phase",
                     unwrap_phase=False, ret=False):
         """!
@@ -2231,7 +2231,7 @@ class System(object):
         @param interpolation What interpolation to use for displaying amplitude pattern. Default is None.
         @param norm Normalise field (only relevant when plotting linear scale). Default is True.
         @param aperDict Plot an aperture defined in an aperDict object along with the field or current patterns. Default is None.
-        @param mode Plot amplitude in linear or decibel values. Instance of Modes enum object.
+        @param scale Plot amplitude in linear or decibel values. Instance of Scales enum object.
         @param project Set abscissa and ordinate of plot. Should be given as an instance of the Projection enum. Default is Projection.xy.
         @param units The units of the axes. Instance of Units enum object.
         @param name Name of .png file where plot is saved. Only when save=True. Default is "".
@@ -2281,7 +2281,7 @@ class System(object):
         fig, ax = PPlot.plotBeam2D(plotObject, field_comp, contour_pl,
                         vmin, vmax, levels, show, amp_only,
                         save, interpolation, norm,
-                        aperDict, mode, project,
+                        aperDict, scale, project,
                         units, name, titleA, titleP, self.savePath, unwrap_phase)
 
         if ret:

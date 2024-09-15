@@ -133,7 +133,7 @@ class Scales(Enum):
 
 class Objects(Enum):
     """!
-    Enum types for objects such as elementys, groups, frames, etc.
+    Enum types for objects such as elements, groups, frames, etc.
 
     Options:\n
     ELEMENT   : Choose element\n

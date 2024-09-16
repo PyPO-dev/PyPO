@@ -19,10 +19,9 @@ import PyPO.BindRefl as BRefl
 from PyPO.Enums import Projections, FieldComponents, CurrentComponents, Units, Scales
 
 def plotBeam2D(plotObject, field, contour,
-                vmin, vmax, levels, show, amp_only,
-                save, interpolation, norm,
-                aperDict, scale, project,
-                units, name, titleA, titleP, savePath, unwrap_phase):
+                vmin, vmax, levels, amp_only,
+                norm,aperDict, scale, project,
+                units, titleA, titleP, unwrap_phase):
     """!
     Generate a 2D plot of a field or current.
 
@@ -32,19 +31,14 @@ def plotBeam2D(plotObject, field, contour,
     @param vmin Minimum amplitude value to display. Default is -30.
     @param vmax Maximum amplitude value to display. Default is 0.
     @param levels Levels for contourplot.
-    @param show Show plot. Default is True.
     @param amp_only Only plot amplitude pattern. Default is False.
-    @param save Save plot to /images/ folder.
-    @param interpolation What interpolation to use for displaying amplitude pattern. Default is None.
     @param norm Normalise field (only relevant when plotting linear scale).
     @param aperDict Plot an aperture defined in an aperDict object along with the field or current patterns. Default is None.
     @param scale Plot amplitude in decibels, logarithmic or linear scale. Instance of Scales enum object.
     @param project Set abscissa and ordinate of plot. Should be given as an instance of the Projection enum.
     @param units The units of the axes. Instance of Units enum object.
-    @param name Name of .png file where plot is saved. Only when save=True. Default is "".
     @param titleA Title of the amplitude plot. Default is "Amp".
     @param titleP Title of the phase plot. Default is "Phase".
-    @param savePath Path where plot will be saved if save = True.
     @param unwrap_phase Unwrap the phase patter. Prevents annular structure in phase pattern. Default is False.
 
     @returns fig Figure object containing plot.

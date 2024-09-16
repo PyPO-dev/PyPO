@@ -17,6 +17,7 @@ import copy
 import logging
 from pathlib import Path
 import pickle 
+from typing import Self, Union
 
 # PyPO-specific modules
 import PyPO.BindRefl as BRefl
@@ -40,24 +41,25 @@ from traceback import print_tb
 
 logging.getLogger(__name__)
 
+# type hinting objects
+fieldOrCurrentComponents = Union[FieldComponents, CurrentComponents]
+contourLevels = Union[int, np.ndarray]
+
 class System(object):
     customBeamPath = os.getcwd()
     customReflPath = os.getcwd()
     savePathSystems = os.getcwd()
 
-    def __init__(self, redirect=None, context=None, verbose=True, override=True):
+    def __init__(self, redirect : logging.RootLogger = None, verbose : bool = True, override : bool = True):
         """!
         Constructor. Initializes system state.
         
-        @param redirect Redirect all print statements within system to given stdout.
-        @param context Whether system is created in script or in GUI.
+        @param redirect Redirect all print statements within system to given stdout. To use, pass an instance of logging.RootLogger object or an object that inherrits from logging.RootLogger
         @param verbose Enable system logger.
         @param override Allow overriding names.
         """
-        self.context = context
         self.verbosity = verbose
 
-        Config.setContext(context)
         Config.setOverride(override)
 
         self.system = {}
@@ -91,8 +93,8 @@ class System(object):
         if not verbose:
             self.clog.setLevel(logging.CRITICAL)
 
-        if context == "S":
-            self.clog.info("INITIALIZED EMPTY SYSTEM.")
+        # if context == "S":
+        #     self.clog.info("INITIALIZED EMPTY SYSTEM.")
  
         if override == True:
             self.clog.warning("System override set to True.")
@@ -106,7 +108,7 @@ class System(object):
             del self.clog_mgr
             del self.clog
     
-    def getSystemLogger(self):
+    def getSystemLogger(self) -> logging.RootLogger:
         """!
         Obtain a reference to the custom logger used by system.
         
@@ -119,7 +121,7 @@ class System(object):
         """
         return self.clog
 
-    def __str__(self):
+    def __str__(self) -> str:
         """!
         Print system contents.
         """
@@ -145,7 +147,7 @@ class System(object):
             s += f"    {key}\n"
         return s
 
-    def setCustomBeamPath(self, path, append=False):
+    def setCustomBeamPath(self, path: str , append : bool = False) -> None:
         """!
         Set path to folder containing custom beam patterns.
         
@@ -162,7 +164,7 @@ class System(object):
         else:
             self.customBeamPath = path
 
-    def setSavePath(self, path, append=False):
+    def setSavePath(self, path : str, append : bool =pattern False):
         """!
         Set path to folder were to save output plots.
         
@@ -204,7 +206,7 @@ class System(object):
         if not os.path.isdir(self.savePathSystems):
             os.makedirs(self.savePathSystems)
 
-    def setLoggingVerbosity(self, verbose=True, handler=None):
+    def setLoggingVerbosity(self, verbose : bool = True):
         """!
         Set the verbosity of the logging from within the system.
         
@@ -214,7 +216,6 @@ class System(object):
         @ingroup public_api_sysio
         
         @param verbose Whether to enable logging or not.
-        @param handler If multiple handlers are present, select which handler to adjust.
         """
 
         self.verbosity = verbose
@@ -223,7 +224,7 @@ class System(object):
         else:
             self.clog.setLevel(logging.CRITICAL)
 
-    def setOverride(self, override=True):
+    def setOverride(self, override : bool = True):
         """!
         Set the override toggle.
         
@@ -236,7 +237,7 @@ class System(object):
 
         Config.setOverride(override)
 
-    def addParabola(self, reflDict):
+    def addParabola(self, reflDict : dict):
         """!
         Add a paraboloid reflector to the System.
         
@@ -288,7 +289,7 @@ class System(object):
         self.system[_reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added paraboloid {_reflDict['name']} to system.")
 
-    def addHyperbola(self, reflDict):
+    def addHyperbola(self, reflDict : dict):
         """!
         Add a hyperboloid reflector to the System.
         
@@ -347,7 +348,7 @@ class System(object):
         self.system[_reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added hyperboloid {_reflDict['name']} to system.")
 
-    def addEllipse(self, reflDict):
+    def addEllipse(self, reflDict : dict):
         """!
         Add an ellipsoid reflector to the System.
         
@@ -406,7 +407,7 @@ class System(object):
         self.system[_reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added ellipsoid {_reflDict['name']} to system.")
 
-    def addPlane(self, reflDict):
+    def addPlane(self, reflDict : dict):
         """!
         Add a planar surface to the System.
         
@@ -436,7 +437,13 @@ class System(object):
         self.system[_reflDict["name"]]["snapshots"] = {}
         self.clog.info(f"Added plane {_reflDict['name']} to system.")
 
-    def rotateGrids(self, name, rotation, obj=Objects.ELEMENT, mode=Modes.REL, pivot=None, keep_pol=False):
+    def rotateGrids(self, 
+                    name : str, 
+                    rotation : np.ndarray, 
+                    obj : Objects = Objects.ELEMENT, 
+                    mode : Modes = Modes.REL, 
+                    pivot : np.ndarray = None, 
+                    keep_pol :bool = False):
         """!
         Rotate reflector grids.
         
@@ -546,7 +553,7 @@ class System(object):
             
                 self.clog.info(f"Rotated frame {name} by {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
-    def translateGrids(self, name, translation, obj=Objects.ELEMENT, mode=Modes.REL):
+    def translateGrids(self, name : str, translation : np.ndarray, obj : Objects = Objects.ELEMENT, mode : Modes = Modes.REL):
         """!
         Translate reflector grids.
         
@@ -610,7 +617,7 @@ class System(object):
             else:
                 self.clog.info(f"Translated frame {name} by {*['{:0.3e}'.format(x) for x in list(_translation)],} millimeters.")
     
-    def homeReflector(self, name, obj=Objects.ELEMENT, trans=True, rot=True):
+    def homeReflector(self, name : str, obj : Objects = Objects.ELEMENT, trans : bool = True, rot : bool = True):
         """!
         Home a reflector or a group back into default configuration.
         
@@ -663,7 +670,7 @@ class System(object):
             
             self.clog.info(f"Transforming element {name} to home position.")
  
-    def snapObj(self, name, snap_name, obj=Objects.ELEMENT):
+    def snapObj(self, name : str, snap_name : str, obj : Objects = Objects.ELEMENT):
         """!
         Take and store snapshot of object's current configuration.
         
@@ -697,7 +704,7 @@ class System(object):
 
             self.clog.info(f"Saved snapshot {snap_name} for frame {name}.")
     
-    def revertToSnap(self, name, snap_name, obj=Objects.ELEMENT):
+    def revertToSnap(self, name : str, snap_name : str, obj : Objects = Objects.ELEMENT):
         """!
         Revert object configuration to a saved snapshot.
         
@@ -736,7 +743,7 @@ class System(object):
             
             self.clog.info(f"Reverted frame {name} to snapshot {snap_name}.")
     
-    def deleteSnap(self, name, snap_name, obj=Objects.ELEMENT):
+    def deleteSnap(self, name : str, snap_name : str, obj : Objects = Objects.ELEMENT):
         """!
         Delete a saved snapshot belonging to an object.
         
@@ -766,7 +773,7 @@ class System(object):
 
             self.clog.info(f"Deleted snapshot {snap_name} belonging to frame {name}.")
     
-    def groupElements(self, name_group, *names, pos=None, ori=None):
+    def groupElements(self, name_group : str, *names : str, pos : np.ndarray = None, ori : np.ndarray = None):
         """!
         Group elements together into a single block. After grouping, can translate, rotate and characterise as one.
         
@@ -778,8 +785,8 @@ class System(object):
         
         @param names Names of elements to put in group.
         @param name_group Name of the group.
-        @param pos Position tracker for the group.
-        @param ori Orientation tracker for group.
+        @param pos numpy.ndarray of length 3, position tracker for the group. Defaults to origin.
+        @param ori numpy.ndarray of length 3, orientation tracker for group. Deraults to unit vector in z direction. 
         """
         
         num = PChecks.getIndex(name_group, self.groups.keys())
@@ -800,7 +807,7 @@ class System(object):
                 }
         self.clog.info(f"Grouped elements {names} into group {name_group}.")
 
-    def removeGroup(self, name_group):
+    def removeGroup(self, name_group : str):
         """!
         Remove a group of elements from system. Note that this does not remove the elements inside the group.
         
@@ -816,7 +823,7 @@ class System(object):
         
         self.clog.info(f"Removed group {name_group} from system.")
 
-    def generateGrids(self, name, transform=True, spheric=True):
+    def generateGrids(self, name : str, transform :bool = True, spheric : bool = True) -> PTypes.reflGrids:
         """!
         Generate reflector grids and normals.
         
@@ -838,7 +845,7 @@ class System(object):
         grids = BRefl.generateGrid(self.system[name], transform, spheric)
         return grids
     
-    def saveSystem(self, name):
+    def saveSystem(self, name : str):
         """!
         Save a system object to disk. 
         
@@ -855,7 +862,7 @@ class System(object):
         
         self.clog.info(f"Saved current system to {name}.")
 
-    def loadSystem(self, name):
+    def loadSystem(self, name : str):
         """!
         Load a system object from the savePathSystems path. This loads all reflectors, fields, currents and frames in the system from disk.
         
@@ -882,7 +889,7 @@ class System(object):
         except Exception as err:
             print_tb(err.__traceback__)
 
-    def mergeSystem(self, *systems):
+    def mergeSystem(self, *systems : Self):
         """!
         Merge multiple systems together into current system.
         
@@ -907,7 +914,7 @@ class System(object):
             self.groups.update(sys_copy.groups)
             self.scalarfields.update(sys_copy.scalarfields)
     
-    def removeElement(self, name):
+    def removeElement(self, name : str):
         """!
         Remove reflector from system.
         
@@ -927,7 +934,7 @@ class System(object):
         del self.system[name]
         self.clog.info(f"Removed element {name} from system.")
     
-    def copyElement(self, name, name_copy):
+    def copyElement(self, name : str, name_copy : str):
         """!
         Copy reflector.
         
@@ -944,7 +951,7 @@ class System(object):
         self.system[name_copy] = self.copyObj(self.system[name])
         self.clog.info(f"Copied element {name} to {name_copy}.")
     
-    def copyGroup(self, name, name_copy):
+    def copyGroup(self, name : str, name_copy : str):
         """!
         Copy group.
         
@@ -963,7 +970,7 @@ class System(object):
         self.groups[name_copy] = self.copyObj(self.groups[name])
         self.clog.info(f"Copied group {name} to {name_copy}.")
     
-    def removeFrame(self, frameName):
+    def removeFrame(self, frameName : str):
         """!
         Remove a ray-trace frame from system.
         
@@ -979,7 +986,7 @@ class System(object):
         
         self.clog.info(f"Removed frame {frameName} from system.")
     
-    def removeField(self, fieldName):
+    def removeField(self, fieldName : str):
         """!
         Remove a PO field from system.
         
@@ -995,7 +1002,7 @@ class System(object):
         
         self.clog.info(f"Removed PO field {fieldName} from system.")
     
-    def removeCurrent(self, currentName):
+    def removeCurrent(self, currentName : str):
         """!
         Remove a PO current from system.
         
@@ -1011,7 +1018,7 @@ class System(object):
         
         self.clog.info(f"Removed PO current {currentName} from system.")
 
-    def removeScalarField(self, fieldName):
+    def removeScalarField(self, fieldName : str):
         """!
         Remove a scalar PO field from system.
         
@@ -1027,7 +1034,7 @@ class System(object):
         
         self.clog.info(f"Removed scalar PO field {fieldName} from system.")
     
-    def readCustomBeam(self, name_beam, name_source, comp, lam, normalise=True, scale=1):
+    def readCustomBeam(self, name_beam : str, name_source : str, comp : FieldComponents, lam : float, normalise : bool = True, scale : float = 1):
         """!
         Read a custom beam from disk into the system. 
         
@@ -1079,7 +1086,7 @@ class System(object):
 
         self.currents[name_beam] = currents_c
 
-    def runPO(self, runPODict):
+    def runPO(self, runPODict : dict):
         """!
         Instantiate a PO propagation. 
         
@@ -1161,7 +1168,7 @@ class System(object):
         self.clog.work(f"*** Finished: {dtime:.3f} seconds ***")
         return out
 
-    def mergeBeams(self, *beams, obj=Objects.FIELD, merged_name="combined"):
+    def mergeBeams(self, *beams : str, obj : Objects = Objects.FIELD, merged_name : str="combined"):
         """!
         Merge multiple beams that are defined on the same surface.
         
@@ -1209,7 +1216,7 @@ class System(object):
         field.setMeta(ex.surf, ex.k)
         getattr(self, obj.value)[merged_name] = field
 
-    def createTubeFrame(self, argDict):
+    def createTubeFrame(self, argDict : dict):
         """!
         Create a tube of rays from a TubeRTDict.
         
@@ -1234,7 +1241,7 @@ class System(object):
 
         self.clog.info(f"Added tubular frame {_argDict['name']} to system.")
     
-    def createGRTFrame(self, argDict): 
+    def createGRTFrame(self, argDict : dict): 
         """!
         Create a Gaussian beam distribution of rays from a GRTDict.
         
@@ -1270,7 +1277,7 @@ class System(object):
         self.clog.work(f"Succesfully sampled {_argDict['nRays']} rays: {dtime} seconds.")
         self.clog.info(f"Added Gaussian frame {_argDict['name']} to system.")
 
-    def calcRayLen(self, *frames, start=None):
+    def calcRayLen(self, *frames : str, start : np.ndarray = None) -> list[np.ndarray]:
         """!
         Calculate total length of a ray-trace beam.
         
@@ -1339,7 +1346,7 @@ class System(object):
 
         return out
 
-    def createGaussian(self, gaussDict, name_surface):
+    def createGaussian(self, gaussDict : dict, name_surface : str):
         """!
         Create a vectorial Gaussian beam.
         
@@ -1370,9 +1377,8 @@ class System(object):
 
         self.fields[_gaussDict["name"]] = gauss_in[0]
         self.currents[_gaussDict["name"]] = gauss_in[1]
-        #return gauss_in
     
-    def createScalarGaussian(self, gaussDict, name_surface):
+    def createScalarGaussian(self, gaussDict : dict, name_surface : str):
         """!
         Create a scalar Gaussian beam.
         
@@ -1402,7 +1408,7 @@ class System(object):
 
         self.scalarfields[_gaussDict["name"]] = gauss_in
 
-    def runRayTracer(self, runRTDict):
+    def runRayTracer(self, runRTDict : dict):
         """!
         Run a ray-trace propagation from a frame to a surface.
         
@@ -1441,7 +1447,7 @@ class System(object):
         
         self.frames[runRTDict["fr_out"]].setMeta(self.calcRTcenter(runRTDict["fr_out"]), self.calcRTtilt(runRTDict["fr_out"]), self.copyObj(world.INITM()))
     
-    def runHybridPropagation(self, hybridDict):
+    def runHybridPropagation(self, hybridDict : dict):
         """!
         Perform a hybrid RT/PO propagation, starting from a reflected field and set of Poynting vectors.
         
@@ -1495,7 +1501,14 @@ class System(object):
         self.assoc[hybridDict["t_name"]] = [hybridDict["field_out"], hybridDict["fr_out"]]
         self.clog.work(f"*** Finished: {dtime:.3f} seconds ***")
 
-    def interpFrame(self, name_fr_in, name_field, name_target, name_out, comp=FieldComponents.NONE, method="nearest"):
+    def interpFrame(self, 
+                    name_fr_in : str, 
+                    name_field : str, 
+                    name_target : str, 
+                    name_out : str, 
+                    comp : FieldComponents = FieldComponents.NONE, 
+                    method : str = "nearest"
+                    ) -> np.ndarray:
         """!
         Interpolate a frame and an associated field on a regular surface.
         
@@ -1558,7 +1571,7 @@ class System(object):
 
         return out
 
-    def calcRTcenter(self, name_frame):
+    def calcRTcenter(self, name_frame : str) -> np.ndarray:
         """!
         Calculate the geometric center of a ray-trace frame.
         
@@ -1576,7 +1589,7 @@ class System(object):
         c_f = Effs.calcRTcenter(frame)
         return c_f
 
-    def calcRTtilt(self, name_frame):
+    def calcRTtilt(self, name_frame : str) -> np.ndarray:
         """!
         Calculate the mean direction normal of a ray-trace frame.
         
@@ -1594,7 +1607,7 @@ class System(object):
         t_f = Effs.calcRTtilt(frame)
         return t_f
     
-    def calcSpotRMS(self, name_frame):
+    def calcSpotRMS(self, name_frame : str) -> float:
         """!
         Calculate the RMS spot size of a ray-trace frame.
         
@@ -1612,7 +1625,7 @@ class System(object):
         rms = Effs.calcRMS(frame)
         return rms
 
-    def calcSpillover(self, name_field, comp, aperDict):
+    def calcSpillover(self, name_field : str, comp : FieldComponents, aperDict : dict) -> float:
         """!
         Calculate spillover efficiency of a beam defined on a surface.
         
@@ -1638,7 +1651,7 @@ class System(object):
 
         return Effs.calcSpillover(field_comp, surfaceObj, aperDict)
 
-    def calcTaper(self, name_field, comp, aperDict=None):
+    def calcTaper(self, name_field : str, comp : FieldComponents, aperDict : dict = None) -> float:
         """!
         Calculate taper efficiency of a beam defined on a surface.
         
@@ -1668,7 +1681,7 @@ class System(object):
 
         return Effs.calcTaper(field_comp, surfaceObj, aperDict)
 
-    def calcXpol(self, name_field, comp_co, comp_cr):
+    def calcXpol(self, name_field : str, comp_co : FieldComponents, comp_cr : FieldComponents) -> float:
         """!
         Calculate cross-polar efficiency of a field defined on a surface.
        
@@ -1692,7 +1705,7 @@ class System(object):
         
         return Effs.calcXpol(field_co, field_cr)
 
-    def fitGaussAbs(self, name_field, comp, thres=None, scale=Scales.LIN, full_output=False, ratio=1):
+    def fitGaussAbs(self, name_field : str, comp : FieldComponents, thres : float = None, scale : Scales = Scales.LIN, full_output : bool = False, ratio : float = 1) -> np.ndarray:
         """!
         Fit a Gaussian profile to the amplitude of a field component and adds the result to scalar field in system.
         
@@ -1707,6 +1720,10 @@ class System(object):
         @param thres Threshold to fit to, in decibels.
         @param scale Fit to amplitude in decibels, linear or logarithmic scale. Instance of Scales enum object.
         @param full_output Return fitted parameters and standard deviations.
+        @param ratio Allowed maximal ratio of fit to actual beam. If "None", will just attempt to fit the Gaussian to supplied pattern. 
+            If given, will only accept a fit if the ratio of integrated power in the fitted Gaussian to the supplied beam pattern is less 
+            than or equal to the given value. Defaults to 1.
+
         
         @returns popt Fitted beam parameters.
         @returns perr Standard deviation of fitted parameters.
@@ -1736,7 +1753,7 @@ class System(object):
         if full_output:
             return popt
 
-    def calcMainBeam(self, name_field, comp, thres=None, scale=Scales.LIN):
+    def calcMainBeam(self, name_field : str, comp : FieldComponents, thres : float = None, scale : Scales = Scales.LIN) -> float:
         """!
         Calculate main-beam efficiency of a beam pattern.
         
@@ -1769,7 +1786,9 @@ class System(object):
         eff = Effs.calcMainBeam(field, surfaceObj, self.scalarfields[f"fitGauss_{name_field}"].S)
         return eff
     
-    def calcBeamCuts(self, name_field, comp, phi=0, center=True, align=True, norm=False, transform=False, scale=Scales.dB):
+    def calcBeamCuts(self, name_field : str, comp : FieldComponents, phi : float = 0, center : bool = True, align : bool = True,
+                      norm : bool = False, transform : bool = False, scale : Scales = Scales.dB
+                      ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """!
         Calculate cross sections of a beam pattern.
         
@@ -1868,7 +1887,10 @@ class System(object):
 
         return x_cut, y_cut, x_strip, y_strip
    
-    def plotBeamCut(self, name_field, comp, comp_cross=FieldComponents.NONE, vmin=None, vmax=None, center=True, align=True, scale=Scales.dB, units=Units.DEG, name="", show=True, save=False, ret=False):
+    def plotBeamCut(self, name_field : str, comp : FieldComponents, comp_cross : FieldComponents = FieldComponents.NONE, vmin : float = None, 
+                    vmax : float = None, center : bool = True, align : bool = True, scale : Scales = Scales.dB, units : Units = Units.DEG, 
+                    name : str = "", show : bool = True, save : bool = False, ret : bool = False
+                    ) -> tuple[pt.Figure, pt.Axes]:
         """!
         Plot beam pattern cross sections.
         
@@ -1917,7 +1939,7 @@ class System(object):
         elif show:
             pt.show()
 
-    def calcHPBW(self, name_field, comp, interp=50, center=False, align=False):
+    def calcHPBW(self, name_field : str, comp : FieldComponents, interp : int = 50, center : bool = False, align : float = False) -> tuple [float, float]:
         """!
         Calculate half-power beamwidth.
         
@@ -1951,7 +1973,7 @@ class System(object):
 
         return HPBW_E, HPBW_H
 
-    def createPointSource(self, PSDict, name_surface):
+    def createPointSource(self, PSDict : dict, name_surface : str):
         """!
         Generate point-source PO fields and currents.
         
@@ -2001,7 +2023,7 @@ class System(object):
         self.fields[_PSDict["name"]] = field
         self.currents[_PSDict["name"]] = current
 
-    def createUniformSource(self, UDict, name_surface):
+    def createUniformSource(self, UDict : dict, name_surface : str):
         """!
         Generate uniform PO fields and currents.
         
@@ -2044,7 +2066,7 @@ class System(object):
         self.fields[_UDict["name"]] = field
         self.currents[_UDict["name"]] = current
     
-    def createPointSourceScalar(self, PSDict, name_surface):
+    def createPointSourceScalar(self, PSDict : dict, name_surface : str):
         """!
         Generate point-source scalar PO field.
         
@@ -2081,7 +2103,7 @@ class System(object):
 
         self.scalarfields[_PSDict["name"]] = sfield
     
-    def createUniformSourceScalar(self, UDict, name_surface):
+    def createUniformSourceScalar(self, UDict : dict, name_surface : str):
         """!
         Generate scalar uniform PO fields and currents.
         
@@ -2111,7 +2133,7 @@ class System(object):
 
         self.scalarfields[_UDict["name"]] = sfield
    
-    def interpBeam(self, name, gridsize_new, obj=Objects.FIELD):
+    def interpBeam(self, name : str, gridsize_new : int, obj : Objects = Objects.FIELD):
         """!
         Interpolate a PO beam. Only for beams defined on planar surfaces.
         
@@ -2167,12 +2189,14 @@ class System(object):
             obj_interp.setMeta(obj_out.surf + "_interp", obj_out.k)
             self.currents[name + "_interp"] = obj_interp
 
-    def plotBeam2D(self, name_obj, comp=FieldComponents.NONE, contour=None, contour_comp=FieldComponents.NONE,
-                    vmin=None, vmax=None, levels=None, show=True, amp_only=False,
-                    save=False, interpolation=None, norm=True,
-                    aperDict=None, scale=Scales.dB, project=Projections.xy,
-                    units=Units.MM, name="", titleA="Power", titleP="Phase",
-                    unwrap_phase=False, ret=False):
+    def plotBeam2D(self, name_obj : str, comp : FieldComponents = FieldComponents.NONE, contour : str = None, 
+                    contour_comp : fieldOrCurrentComponents  = FieldComponents.NONE,
+                    vmin : float = None, vmax : float = None, levels : contourLevels = None, 
+                    show : bool = True, amp_only : bool = False, save : bool = False, norm : bool = True,
+                    aperDict : dict = None, scale : Scales = Scales.dB, project : Projections = Projections.xy,
+                    units : Units = Units.MM, name : str = "", titleA : str ="Power", titleP : str = "Phase",
+                    unwrap_phase : bool = False, ret : bool = False
+                    ) -> tuple[pt.Figure, pt.Axes]:
         """!
         Generate a 2D plot of a PO (scalar)field or current.
         
@@ -2191,7 +2215,6 @@ class System(object):
         @param show Show plot. Default is True.
         @param amp_only Only plot amplitude pattern. Default is False.
         @param save Save plot to /images/ folder.
-        @param interpolation What interpolation to use for displaying amplitude pattern. Default is None.
         @param norm Normalise field (only relevant when plotting linear scale). Default is True.
         @param aperDict Plot an aperture defined in an aperDict object along with the field or current patterns. Default is None.
         @param scale Plot amplitude in linear or decibel values. Instance of Scales enum object.
@@ -2203,6 +2226,9 @@ class System(object):
         @param unwrap_phase Unwrap the phase patter. Prevents annular structure in phase pattern. Default is False.
         @param ret Return the Figure and Axis object. Only called by GUI. Default is False.
         
+        @returns fig Figure object.
+        @returns ax Axes object.
+
         @see aperDict
         """
 
@@ -2242,10 +2268,9 @@ class System(object):
         plotObject = self.system[name_surface]
 
         fig, ax = PPlot.plotBeam2D(plotObject, field_comp, contour_pl,
-                        vmin, vmax, levels, show, amp_only,
-                        save, interpolation, norm,
-                        aperDict, scale, project,
-                        units, name, titleA, titleP, self.savePath, unwrap_phase)
+                        vmin, vmax, levels, amp_only,
+                        norm, aperDict, scale, project,
+                        units, titleA, titleP, unwrap_phase)
 
         if ret:
             return fig, ax
@@ -2258,8 +2283,10 @@ class System(object):
         elif show:
             pt.show()
 
-    def plot3D(self, name_surface, cmap=cm.cool,
-            norm=False, fine=2, show=True, foc1=False, foc2=False, save=False, ret=False):
+    def plot3D(self, name_surface : str, cmap : cm = cm.cool,
+            norm : bool = False, fine : int = 2, show : bool = True, foc1 : bool = False, 
+            foc2 : bool = False, save : bool = False, ret : bool = False
+            ) -> tuple[pt.Figure, pt.Axes]:
         """!
         Plot a 3D reflector.
         
@@ -2277,6 +2304,9 @@ class System(object):
         @param foc2 Plot focus 2. Default is False.
         @param save Save the plot.
         @param ret Return Figure and Axis. Only used in GUI.
+
+        @returns fig Figure object.
+        @returns ax Axes object.
         """
 
         fig, ax = pt.subplots(figsize=(10,10), subplot_kw={"projection": "3d"})
@@ -2302,8 +2332,10 @@ class System(object):
         elif show:
             pt.show()
 
-    def plotSystem(self, cmap=cm.cool,
-                norm=False, fine=2, show=True, foc1=False, foc2=False, save=False, ret=False, select=None, RTframes=None, RTcolor="black"):
+    def plotSystem(self, cmap : cm = cm.cool, norm : bool = False, fine : int = 2, show : bool = True, foc1 : bool = False, 
+                   foc2 : bool = False, save : bool = False, ret : bool = False, select : list[str] = None, RTframes : list[str] = None, 
+                   RTcolor : str = "black"
+                ) -> tuple[pt.Figure, pt.Axes]:
         """!
         Plot the current system. Plots the reflectors and optionally ray-trace frames in a 3D plot.
         
@@ -2324,6 +2356,9 @@ class System(object):
         @param ret Return Figure and Axis. Only used in GUI.
         @param select A list of names of reflectors to plot. If not given, plot all reflectors.
         @param RTframes A list of names of frame to plot. If not given, plot no ray-trace frames.
+
+        @returns fig Figure object.
+        @returns ax Axes object.
         """
 
 
@@ -2359,7 +2394,7 @@ class System(object):
         elif show:
             pt.show()
     
-    def plotGroup(self, name_group, show=True, ret=False):
+    def plotGroup(self, name_group : str, show : bool = True, ret : bool = False) -> tuple[pt.Figure, pt.Axes]:
         """!
         Plot a group of reflectors.
         
@@ -2371,6 +2406,9 @@ class System(object):
         @param name_group Name of group to be plotted.
         @param show Show the plot.
         @param ret Whether to return figure and axis.
+
+        @returns fig Figure object.
+        @returns ax Axes object.
         """
 
         select = [x for x in self.groups[name_group]["members"]]
@@ -2381,7 +2419,7 @@ class System(object):
         else:
             self.plotSystem(select=select, show=show)
 
-    def plotRTframe(self, name_frame, project=Projections.xy, ret=False, aspect=1, units=Units.MM):
+    def plotRTframe(self, name_frame : str, project : Projections = Projections.xy, ret : bool = False, aspect : float = 1, units : Units = Units.MM):
         """!
         Create a spot diagram of a ray-trace frame.
         
@@ -2395,6 +2433,9 @@ class System(object):
         @param ret Return Figure and Axis. Default is False.
         @param aspect Aspect ratio of plot. Default is 1.
         @param units Units of the axes for the plot. Instance of Units enum object.
+
+        @returns fig Figure object.
+        @returns ax Axes object.
         """
 
         PChecks.check_frameSystem(name_frame, self.frames, self.clog, extern=True)
@@ -2403,7 +2444,7 @@ class System(object):
         else:
             PPlot.plotRTframe(self.frames[name_frame], project, self.savePath, ret, aspect, units)
 
-    def findRTfocus(self, name_frame, f0=None, tol=1e-12):
+    def findRTfocus(self, name_frame : str, f0 : float = None, tol : float = 1e-12) -> np.ndarray:
         """!
         Find the focus of a ray-trace frame.
         
@@ -2473,7 +2514,7 @@ class System(object):
 
         return out
         
-    def copyObj(self, obj=None):
+    def copyObj(self, obj = None): #TODO: check typing
         """!
         Create a deep copy of any object.
         
@@ -2485,12 +2526,14 @@ class System(object):
         obj = self if obj is None else obj
         return copy.deepcopy(obj)
 
-    def findRotation(self, v, u):
+    def findRotation(self, v : np.ndarray, u : np.ndarray) -> np.ndarray:
         """!
         Find rotation matrix to rotate v onto u.
         
         @param v Numpy array of length 3. 
         @param u Numpy array of length 3.
+
+        @returns R_transf Rotation martix.
         """
 
         I = np.eye(3)
@@ -2517,7 +2560,7 @@ class System(object):
         
         return R_transf
     
-    def getAnglesFromMatrix(self, M):
+    def getAnglesFromMatrix(self, M : np.ndarray) -> np.ndarray:
         """!
         Find x, y and z rotation angles from general rotation matrix.
         Note that the angles are not necessarily the same as the original angles of the matrix.
@@ -2548,7 +2591,7 @@ class System(object):
 
         return r#, testM
     
-    def autoConverge(self, source_field, name_target, tol=1e-2, add=10, patch_size=1/9, max_iter=1000):
+    def autoConverge(self, source_field : str, name_target : str, tol : float = 1e-2, add : int = 10, patch_size : float = 1/9, max_iter : int = 1000) -> int:
         """!
         Calculate gridsize for which calculation converges.
         
@@ -2571,7 +2614,7 @@ class System(object):
         @param patch_size Factor for reducing size of target in order to save time. Should be smaller than 1.
         @param max_iter Maximum number of iterations before auto convergence errors.
         
-        @param returns gridsize Gridsize, scaled to full target, for which solution converged.
+        @returns gridsize Gridsize, scaled to full target, for which solution converged.
         """
 
         self.clog.work(f"*** Starting auto-convergence *** ")
@@ -2651,9 +2694,9 @@ class System(object):
         self.clog.result(f"Found converged solution, gridsize: {*['{:0.3e}'.format(x) for x in list(gridsize)],}")
         return gridsize
     
-    def runGUIPO(self, runPODict):
-        """!
-        Instantiate a GUI PO propagation. Stores desired output in the system.fields and/or system.currents lists.
+    def runGUIPO(self, runPODict : dict): #TODO: check typing
+        """!system
+        Instantiate a GUI PO propagation. Stores desired output in the system.fields and/or system.cursystemrents lists.
         If the 'EHP' mode is selected, the reflected Poynting frame is stored in system.frames.
         
         @param PODict Dictionary containing the PO propagation instructions.
@@ -2711,7 +2754,7 @@ class System(object):
 
         return out
     
-    def runGUIRayTracer(self, runRTDict):
+    def runGUIRayTracer(self, runRTDict : dict):
         """!
         Run a ray-trace propagation from a frame to a surface in the GUI.
         
@@ -2732,7 +2775,7 @@ class System(object):
         self.frames[runRTDict["fr_out"]] = frameObj
         self.frames[runRTDict["fr_out"]].setMeta(self.calcRTcenter(runRTDict["fr_out"]), self.calcRTtilt(runRTDict["fr_out"]), self.copyObj(world.INITM()))
     
-    def hybridGUIPropagation(self, hybridDict):
+    def hybridGUIPropagation(self, hybridDict : dict):
         """!
         Perform a hybrid RT/PO GUI propagation, starting from a reflected field and set of Poynting vectors.
         
@@ -2762,7 +2805,7 @@ class System(object):
         if hybridDict["interp"]:
             self.interpFrame(hybridDict["fr_out"], hybridDict["field_out"], hybridDict["t_name"], hybridDict["field_out"], comp=hybridDict["comp"])
     
-    def _loadFramePoynt(self, Poynting, name_source):
+    def _loadFramePoynt(self, Poynting : PTypes.rfield, name_source : str) -> PTypes.frame:
         """!
         Convert a Poynting vector grid to a frame object.
         
@@ -2784,7 +2827,7 @@ class System(object):
 
         return frame_in
     
-    def _optimiseFocus(self, f0, *args):
+    def _optimiseFocus(self, f0, *args) -> float: #TODO: check typing
         """!
         Cost function for finding a ray-trace frame focus.
         Optimises RMS spot size as function of tilt multiple f0.
@@ -2807,7 +2850,7 @@ class System(object):
         #self.removeFrame() 
         return RMS
     
-    def _checkBoundPO(self, name, transf):
+    def _checkBoundPO(self, name : str, transf : np.ndarray):
         """!
         Check if an element to be rotated is bound to a PO field/current.
         If so, rotate vectorial field/current components along.
@@ -2839,7 +2882,7 @@ class System(object):
                 out = BTransf.transformPO(self.currents[current], transf)
                 self.currents[current] = self.copyObj(out)
    
-    def _compToFields(self, comp, field):
+    def _compToFields(self, comp : str, field : np.ndarray): #TODO: check typing, Is comp actually a string
         """!
         Transform a single component to a filled fields object by setting all other components to zero.
         
@@ -2863,7 +2906,7 @@ class System(object):
 
         return field_c
    
-    def _absRotationMat(self, rotation, ori, pivot):
+    def _absRotationMat(self, rotation : np.ndarray, ori : np.ndarray, pivot): #TODO: check typing pivot
         """!
         Calculate an absolute rotation matrix. Private method.
 
@@ -2888,7 +2931,7 @@ class System(object):
         Rtot = Tp @ R @ Tpm
         return Rtot
 
-    def _fillCoeffs(self, name, a, b, c):
+    def _fillCoeffs(self, name : str, a : float, b : float, c : float): #TODO: check typing pivot
         """!
         Fill the coeffs values for an internal reflector dictionary.
         

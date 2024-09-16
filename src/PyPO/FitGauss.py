@@ -78,7 +78,9 @@ def fitGaussAbs(field, surfaceObject, thres, scale, ratio=1):
     @param surfaceObject Surface on which the field is defined.
     @param thres Threshold for fitting in decibels.
     @param mode Whether to fit the Gaussian in linear or logarithmic space.
-    @param ratio Allowed maximal ratio of fit to actual beam. If "None", will just attempt to fit the Gaussian to supplied pattern. If given, will only accept a fit if the ratio of integrated power in the fitted Gaussian to the supplied beam pattern is less than or equal to the given value. Defaults to 1.
+    @param ratio Allowed maximal ratio of fit to actual beam. If "None", will just attempt to fit the Gaussian to supplied pattern. 
+            If given, will only accept a fit if the ratio of integrated power in the fitted Gaussian to the supplied beam pattern is less 
+            than or equal to the given value. Defaults to 1.
 
     @returns popt Optimal parameters for Gaussian.
     """

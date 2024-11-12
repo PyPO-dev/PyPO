@@ -10,7 +10,7 @@ import re
 
 import PyPO.Config as Config
 import PyPO.WorldParam as world
-from PyPO.Enums import FieldComponents, CurrentComponents, AperShapes
+from PyPO.Enums import FieldComponents, CurrentComponents, AperShapes, Objects
 
 nThreads_cpu = os.cpu_count() - 1 if os.cpu_count() > 1 else 1
 PO_modelist = ["JM", "EH", "JMEH", "EHP", "FF", "scalar"]
@@ -1458,6 +1458,7 @@ def check_sameBound(beams, checkDict, clog):
 
     errStr = ""
     surf0 = checkDict[beams[0]].surf
+    print(beams)
     for i in range(len(beams) - 1):
         if checkDict[beams[i+1]].surf != surf0:
             errStr += errMsg_mergebeam(beams[i+1], surf0, checkDict[beams[i+1]].surf)

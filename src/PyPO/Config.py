@@ -3,6 +3,8 @@
 Functions to set context for the logging and error checking.
 """
 
+context = "S"
+
 def setContext(_context=None):
     """!
     Set the context in which PyPO is run.

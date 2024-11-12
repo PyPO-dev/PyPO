@@ -99,14 +99,14 @@ class System(object):
         if override == True:
             self.clog.warning("System override set to True.")
        
-    def __del__(self):
-        """!
-        Destructor. Deletes any reference to the logger assigned to current system.
-        """
-        if self.context != "G":
-            self.clog.info("EXITING SYSTEM.")
-            del self.clog_mgr
-            del self.clog
+    #def __del__(self):
+    #    """!
+    #    Destructor. Deletes any reference to the logger assigned to current system.
+    #    """
+    #    if self.context != "G":
+    #        self.clog.info("EXITING SYSTEM.")
+    #        del self.clog_mgr
+    #        del self.clog
     
     def getSystemLogger(self) -> logging.RootLogger:
         """!
@@ -164,7 +164,7 @@ class System(object):
         else:
             self.customBeamPath = path
 
-    def setSavePath(self, path : str, append : bool =pattern False):
+    def setSavePath(self, path : str, append : bool = False):
         """!
         Set path to folder were to save output plots.
         
@@ -1034,7 +1034,7 @@ class System(object):
         
         self.clog.info(f"Removed scalar PO field {fieldName} from system.")
     
-    def readCustomBeam(self, name_beam : str, name_source : str, comp : FieldComponents, lam : float, normalise : bool = True, scale : float = 1):
+    def readCustomBeam(self, name_beam : str, name_source : str, comp : FieldComponents, lam : float, normalise : bool = True, scale : float = 1, outname : str = None):
         """!
         Read a custom beam from disk into the system. 
         
@@ -1052,9 +1052,12 @@ class System(object):
         @param lam Wavelength of beam, in mm.
         @param normalise Whether or not to normalise beam to its maximum amplitude.
         @param scale Scale factor for beam. Defaults to 1.
+        @param outname Name of field/current objects written to system. Defaults to name_beam
         
         @see setCustomBeamPath
         """
+
+        outname = name_beam if outname is None else outname
 
         PChecks.check_elemSystem(name_source, self.system, self.clog, extern=True)
         
@@ -1080,11 +1083,11 @@ class System(object):
 
         fields_c = self._compToFields(comp, field)
         fields_c.setMeta(name_source, k)
-        self.fields[name_beam] = fields_c#.H()
+        self.fields[outname] = fields_c#.H()
         currents_c = BBeam.calcCurrents(fields_c, self.system[name_source], mode)
         currents_c.setMeta(name_source, k)
 
-        self.currents[name_beam] = currents_c
+        self.currents[outname] = currents_c
 
     def runPO(self, runPODict : dict):
         """!
@@ -2276,8 +2279,7 @@ class System(object):
             return fig, ax
 
         elif save:
-            pt.savefig(fname=self.savePath + '{}_{}.jpg'.format(plotObject["name"], name),
-                        bbox_inches='tight', dpi=300)
+            pt.savefig(fname=os.path.join(self.savePath, f'{plotObject["name"]}_{name}.jpg'), bbox_inches='tight', dpi=300)
             pt.close()
 
         elif show:

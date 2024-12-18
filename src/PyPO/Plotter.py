@@ -16,13 +16,12 @@ warnings.filterwarnings("ignore")
 import PyPO.PlotConfig
 import PyPO.Colormaps as cmaps
 import PyPO.BindRefl as BRefl
-from PyPO.Enums import Projections, FieldComponents, CurrentComponents, Units, Modes
+from PyPO.Enums import Projections, FieldComponents, CurrentComponents, Units, Scales
 
 def plotBeam2D(plotObject, field, contour,
-                vmin, vmax, levels, show, amp_only,
-                save, interpolation, norm,
-                aperDict, mode, project,
-                units, name, titleA, titleP, savePath, unwrap_phase):
+                vmin, vmax, levels, amp_only,
+                norm,aperDict, scale, project,
+                units, titleA, titleP, unwrap_phase):
     """!
     Generate a 2D plot of a field or current.
 
@@ -32,19 +31,14 @@ def plotBeam2D(plotObject, field, contour,
     @param vmin Minimum amplitude value to display. Default is -30.
     @param vmax Maximum amplitude value to display. Default is 0.
     @param levels Levels for contourplot.
-    @param show Show plot. Default is True.
     @param amp_only Only plot amplitude pattern. Default is False.
-    @param save Save plot to /images/ folder.
-    @param interpolation What interpolation to use for displaying amplitude pattern. Default is None.
     @param norm Normalise field (only relevant when plotting linear scale).
     @param aperDict Plot an aperture defined in an aperDict object along with the field or current patterns. Default is None.
-    @param mode Plot amplitude in decibels, logarithmic or linear scale. Instance of Modes enum object.
+    @param scale Plot amplitude in decibels, logarithmic or linear scale. Instance of Scales enum object.
     @param project Set abscissa and ordinate of plot. Should be given as an instance of the Projection enum.
     @param units The units of the axes. Instance of Units enum object.
-    @param name Name of .png file where plot is saved. Only when save=True. Default is "".
     @param titleA Title of the amplitude plot. Default is "Amp".
     @param titleP Title of the phase plot. Default is "Phase".
-    @param savePath Path where plot will be saved if save = True.
     @param unwrap_phase Unwrap the phase patter. Prevents annular structure in phase pattern. Default is False.
 
     @returns fig Figure object containing plot.
@@ -109,7 +103,7 @@ def plotBeam2D(plotObject, field, contour,
     if not amp_only:
         fig, ax = pt.subplots(1,2, figsize=(10,5), gridspec_kw={'wspace':0.5})
 
-        if mode == Modes.LIN:
+        if scale == Scales.LIN:
             if norm:
                 field_pl = np.absolute(field) / max_field
                 if contour is not None:
@@ -134,7 +128,7 @@ def plotBeam2D(plotObject, field, contour,
                 ax[0].clabel(cont0)
                 ax[1].clabel(cont1)
 
-        elif mode == Modes.dB:
+        elif scale == Scales.dB:
             if titleA == "Power":
                 titleA += " / dB"
             if titleP == "Phase":
@@ -191,7 +185,7 @@ def plotBeam2D(plotObject, field, contour,
         divider = make_axes_locatable(ax)
         cax = divider.append_axes('right', size='5%', pad=0.05)
 
-        if mode == Modes.LIN:
+        if scale == Scales.LIN:
             if norm:
                 field_pl = np.absolute(field) / max_field
                 if contour is not None:
@@ -212,7 +206,7 @@ def plotBeam2D(plotObject, field, contour,
                 cont = ax.contour(grid_x1 * units.value, grid_x2 * units.value, contour_pl**2, levels, cmap=cm.binary, linewidths=0.5)
                 ax.clabel(cont)
         
-        elif mode == Modes.dB:
+        elif scale == Scales.dB:
             if titleA == "Power":
                 titleA += " / dB"
             field_dB = 20 * np.log10(np.absolute(field) / max_field)

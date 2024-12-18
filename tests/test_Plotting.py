@@ -20,16 +20,16 @@ from matplotlib.pyplot import Axes, close
 
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 from PyPO.System import System
-from PyPO.Enums import Projections, FieldComponents, CurrentComponents, Modes
+from PyPO.Enums import Projections, FieldComponents, CurrentComponents, Scales
 
 class Test_Plotting(unittest.TestCase):
     def setUp(self):
         self.s = TestTemplates.getSystemWithReflectors()
         self.s.setOverride(False)
 
-    @params(Modes.dB, Modes.LIN)
-    def test_plotBeamCut(self, mode):
-        fig, ax = self.s.plotBeamCut(TestTemplates.GPOfield['name'], FieldComponents.Ex, center=False, align=False, ret=True, mode=mode)
+    @params(Scales.dB, Scales.LIN)
+    def test_plotBeamCut(self, scale):
+        fig, ax = self.s.plotBeamCut(TestTemplates.GPOfield['name'], FieldComponents.Ex, center=False, align=False, ret=True, scale=scale)
 
         self.assertEqual(type(fig), Figure)
         self.assertEqual(type(ax), Axes)
@@ -54,14 +54,14 @@ class Test_Plotting(unittest.TestCase):
                     ret=True, amp_only=True, project=project, aperDict=aperDict_plot))
                 
                 out_ax.append(self.s.plotBeam2D(TestTemplates.GPOfield['name'], FieldComponents.Ex, 
-                    ret=True, amp_only=True, mode=Modes.LIN, project=project))
+                    ret=True, amp_only=True, scale=Scales.LIN, project=project))
 
                 out_ar.append(self.s.plotBeam2D(TestTemplates.GPOfield['name'], FieldComponents.Ex, 
                     ret=True, project=project, aperDict=aper, contour=TestTemplates.GPOfield['name'], 
                     contour_comp=FieldComponents.Ex, levels=[0.5, 1]))
                 
                 out_ar.append(self.s.plotBeam2D(TestTemplates.GPOfield['name'], FieldComponents.Ex, 
-                    ret=True, mode=Modes.LIN, project=project, contour=TestTemplates.GPOfield['name'], 
+                    ret=True, scale=Scales.LIN, project=project, contour=TestTemplates.GPOfield['name'], 
                     contour_comp=FieldComponents.Ex, levels=[0.5, 1]))
                 
                 out_ax.append(self.s.plotBeam2D(TestTemplates.PS_Ufield_FF["name"], FieldComponents.Ex, ret=True, project=Projections.xy))

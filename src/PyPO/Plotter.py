@@ -100,6 +100,12 @@ def plotBeam2D(plotObject, field, contour,
             ff_flag = True
             comps = ["\mathrm{El}", "\mathrm{Az}"]
 
+        if not ((units == Units.DEG) or (units == Units.AM) or (units == Units.AS)):
+            units = Units.DEG
+        print(units)
+        print(units.name.lower())
+
+
     if not amp_only:
         fig, ax = pt.subplots(1,2, figsize=(10,5), gridspec_kw={'wspace':0.5})
 

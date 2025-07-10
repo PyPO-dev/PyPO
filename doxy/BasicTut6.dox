@@ -1,0 +1,46 @@
+/**
+\page basictut6 Optimising reflector/group configurations in PyPO
+\section basictut6_intro Introduction
+The original purpose of `PyPO` was to perform ray-traces through optical systems onto a terminal planar surface, in order to optimise their configuration, and then characterise the configuration using physical optics.
+The optimisation was originally not part of `PyPO`: this was taken care of in external scripts.
+However, we realised that it is actually quite convenient to have a more general optical system optimiser built into `PyPO` and on this page we will explain the basic principles and workflow behind optimising optical systems using `PyPO`. 
+
+\section basictut6_overview Global overview of optimising using PyPO
+Here we give a global overview of how an optimisation works in `PyPO`.
+For every part, we will go into more detail in the following sections. This is just to provide a comprehensive overview.
+First, an < b>initial ray-trace frame< /b> needs to be defined. 
+Secondly, the < b>reflector or group that is to be optimised< /b> needs to be selected. Also, a < b>terminating planar surface< /b> needs to be created.
+In the case of a single reflector, the initial frame will first be propagated onto the reflector and then onto the terminating surface. 
+For a group, the propagation will be performed in the order of insertion. So, for example, if two reflectors were placed in the group earlier, the propagation will go in the order in which the reflectors were supplied to the `System.groupElements()` method. After the propagations between group elements has been performed, the final propagation is again in the terminating surface.
+The next component in the optimisation is the < b>cost function< /b>. This is a user-defined function that takes as input, at minimum, the ray-trace frame evaluated on the terminal planar surface where the ray-trace frame co-ordinates or directions are used to assign a score to the configuration of the optical system through which the ray-trace was performed. 
+Note that the cost function does purely that: assign a user-defined score metric to the ray-trace frame, using the ray positions and directions. 
+Then, the optimiser in `PyPO` uses the differential evolution algorithm to optimise the configuration of the optical system.
+
+\section basictut6_optsystem Conventions regarding optimisiation of a configuration
+The optimiser accepts a reflector or a group. In case of a single reflector, the ray-trace order is as such:
+- initial frame -> reflector
+- reflector -> terminating surface
+
+For a group, the order is defined by insertion.
+
+Before optimisation, `PyPO` makes a copy of the element or group and uses that for optimising. In this way, the actual optical system is untouched during the optimisation.
+The translational and rotational degrees-of-freedom (DoFs) are supplied using enum datatypes.
+Translations and rotations are relative to the `pos` and `ori` parameters of the element or group.
+The pivot can be supplied, and defaults to the `pos` parameter of the element or group if not supplied.
+
+\section basictut6_costfunc The cost function
+An essential part of optimisation is the definition of an appropriate cost function.
+In `PyPO`, a cost function is defined by a user as a regular Python function which must contain at least the ray-trace frame propagated onto the terminating plane as argument.The optimiser in `PyPO` will anticipate this and pass this to the cost function. 
+Note that other arguments are allowed, such as functions or other data. 
+These must be passed before calling the optimiser, using the `partial` method from the `functools` package
+For example, if the `System.calcRTtilt` method is required, this can be defined as an argument to the cost function, and supplied before the optimisation using `partial`.
+
+section basictut6_call Calling the PyPO optimiser
+The optimiser in `PyPO` can be called as a method of `System`. It expects the following arguments:
+- The initial frame
+- The reflector or group to be optimised
+- The terminating surface
+- A list of DoFs
+- The pivot (optional, only relevant if rotational DoFs are used)
+- The (partially filled) cost function handle
+*/

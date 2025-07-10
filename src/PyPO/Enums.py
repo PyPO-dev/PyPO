@@ -179,6 +179,28 @@ class AperShapes(Enum):
     ELL = 0
     RECT = 1
 
+class OptDoF(Enum):
+    """!
+    Enum types for selecting degrees-of-freedom (DoF) for optimisation of an element or group.
+
+    Options:\n
+    TX      : Include x-translations\n
+    TY      : Include y-translations\n
+    TZ      : Include z-translations\n
+    RX      : Include x-rotations\n
+    RY      : Include y-rotations\n
+    RZ      : Include z-rotations
+    
+    @ingroup public_api_argopts
+    """
+
+    TX = 0
+    TY = 1
+    TZ = 2
+    RX = 3
+    RY = 4
+    RZ = 5
+
 class Dielectrics(Enum):
     """!
     Enum types for commonly used dielectrics for lens materials.

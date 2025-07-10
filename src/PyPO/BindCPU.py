@@ -23,7 +23,7 @@ def loadCPUlib():
 
     path_cur = pathlib.Path(__file__).parent.resolve()
     try:
-        lib = ctypes.CDLL(os.path.join(path_cur, "libpypocpu.dll"))
+        lib = ctypes.CDLL(os.path.join(path_cur, "pypocpu.dll"))
     except:
         try:
             lib = ctypes.CDLL(os.path.join(path_cur, "libpypocpu.so"))

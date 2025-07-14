@@ -24,7 +24,7 @@ def loadBeamlib():
 
     path_cur = pathlib.Path(__file__).parent.resolve()
     try:
-        lib = ctypes.CDLL(os.path.join(path_cur, "libpypobeam.dll"))
+        lib = ctypes.CDLL(os.path.join(path_cur, "pypobeam.dll"))
     except:
         try:
             lib = ctypes.CDLL(os.path.join(path_cur, "libpypobeam.so"))

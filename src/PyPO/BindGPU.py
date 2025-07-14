@@ -24,7 +24,7 @@ def loadGPUlib():
 
     path_cur = pathlib.Path(__file__).parent.resolve()
     try:
-        lib = ctypes.CDLL(os.path.join(path_cur, "libpypogpu.dll"))
+        lib = ctypes.CDLL(os.path.join(path_cur, "pypogpu.dll"))
     except:
         try:
             lib = ctypes.CDLL(os.path.join(path_cur, "libpypogpu.so"))

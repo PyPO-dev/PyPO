@@ -13,7 +13,7 @@
 #define CSIZERT 5
 
 #ifdef _WIN32
-#   define PYPO_DLL __declspec(dllexport);
+#   define PYPO_DLL __declspec(dllexport)
 #else
 #   define PYPO_DLL
 #endif

@@ -724,7 +724,7 @@ void Plane_uv(T *plane, U xu_lo, U xu_up, U yv_lo,
     This prevents both the 0 deg and 360 deg being included.  For limits less than
     360 deg (e.g. 180 deg) then we should still do this, as it would allow future
     use of symmetry to speed up calculations. */
-    U dv = (yv_up - yv_lo) / (ncy);
+    dv = (yv_up - yv_lo) / (ncy);
 
     U ecc_fac;
 

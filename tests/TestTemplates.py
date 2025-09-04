@@ -70,7 +70,7 @@ paraboloid_man_uv = {
         "gmode"     : "uv",
         "lims_u"    : np.array([0, 1]),
         "lims_v"    : np.array([0, 360]),
-        "gridsize"  : np.array([13, 13])
+        "gridsize"  : np.array([13, 12])
         }
 
 paraboloid_foc_xy = {
@@ -92,7 +92,7 @@ paraboloid_foc_uv = {
         "gmode"     : "uv",
         "lims_u"    : np.array([0, 1]),
         "lims_v"    : np.array([0, 360]),
-        "gridsize"  : np.array([13, 13])
+        "gridsize"  : np.array([13, 12])
         }
 
 #### HYPERBOLOIDS ####
@@ -115,7 +115,7 @@ hyperboloid_man_uv = {
         "gmode"     : "uv",
         "lims_u"    : np.array([0, 1]),
         "lims_v"    : np.array([0, 360]),
-        "gridsize"  : np.array([13, 13])
+        "gridsize"  : np.array([13, 12])
         }
 
 hyperboloid_foc_xy = {
@@ -139,7 +139,7 @@ hyperboloid_foc_uv = {
         "gmode"     : "uv",
         "lims_u"    : np.array([0, 1]),
         "lims_v"    : np.array([0, 360]),
-        "gridsize"  : np.array([13, 13])
+        "gridsize"  : np.array([13, 12])
         }
 
 #### ELLIPSOIDS ####
@@ -164,7 +164,7 @@ ellipsoid_z_man_uv = {
         "gmode"     : "uv",
         "lims_u"    : np.array([0, 1]),
         "lims_v"    : np.array([0, 360]),
-        "gridsize"  : np.array([13, 13])
+        "gridsize"  : np.array([13, 12])
         }
 
 ellipsoid_z_foc_xy = {
@@ -190,7 +190,7 @@ ellipsoid_z_foc_uv = {
         "gmode"     : "uv",
         "lims_u"    : np.array([0, 1]),
         "lims_v"    : np.array([0, 360]),
-        "gridsize"  : np.array([13, 13])
+        "gridsize"  : np.array([13, 12])
         }
 
 ellipsoid_x_man_xy = {
@@ -214,7 +214,7 @@ ellipsoid_x_man_uv = {
         "gmode"     : "uv",
         "lims_u"    : np.array([0, 0.1]),
         "lims_v"    : np.array([0, 360]),
-        "gridsize"  : np.array([13, 13])
+        "gridsize"  : np.array([13, 12])
         }
 
 ellipsoid_x_foc_xy = {
@@ -240,7 +240,7 @@ ellipsoid_x_foc_uv = {
         "gmode"     : "uv",
         "lims_u"    : np.array([0, 1]),
         "lims_v"    : np.array([0, 360]),
-        "gridsize"  : np.array([13, 13])
+        "gridsize"  : np.array([13, 12])
         }
 
 #### PLANES ####
@@ -257,7 +257,7 @@ plane_uv = {
         "gmode"     : "uv",
         "lims_u"    : np.array([0, 1]),
         "lims_v"    : np.array([0, 360]),
-        "gridsize"  : np.array([103, 103])
+        "gridsize"  : np.array([103, 102])
         }
 
 plane_AoE = {

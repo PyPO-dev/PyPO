@@ -13,4 +13,6 @@ Reading these explanations is recommended before diving into the \ref tutorials 
 \ref basictut4 "Gridding And Parameterisations In PyPO"
 
 \ref basictut5 "Some More PyPO Datatypes"
+
+\ref basictut6 "Optimising reflector/group configurations in PyPO"
 */

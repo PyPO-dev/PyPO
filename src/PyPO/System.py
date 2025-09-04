@@ -1064,7 +1064,7 @@ class System(object):
         rfield = np.loadtxt(os.path.join(self.customBeamPath, "r" + name_beam + ".txt"))
         ifield = np.loadtxt(os.path.join(self.customBeamPath, "i" + name_beam + ".txt"))
 
-        field = rfield + 1j*ifield
+        field = (rfield + 1j*ifield).T
 
         if normalise:
             maxf = np.max(field)

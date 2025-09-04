@@ -166,7 +166,11 @@ void Parabola_uv(T *parabola, U xu_lo, U xu_up, U yv_lo,
                 U mat[16], bool transform)
 {
     U du0 = (xu_up - xu_lo) / (ncx - 1);
-    U dv = (yv_up - yv_lo) / (ncy - 1);
+    /* For v (polar angle) range, drop the -1, so that the upper value is excluded 
+    This prevents both the 0 deg and 360 deg being included.  For limits less than
+    360 deg (e.g. 180 deg) then we should still do this, as it would allow future
+    use of symmetry to speed up calculations. */
+    U dv = (yv_up - yv_lo) / (ncy);
 
     U majmin = sqrt(1 - ecc_uv*ecc_uv);
     
@@ -349,7 +353,11 @@ void Hyperbola_uv(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
                   U mat[16], bool transform)
 {
     U du0 = (xu_up - xu_lo) / (ncx - 1);
-    U dv = (yv_up - yv_lo) / (ncy - 1);
+    /* For v (polar angle) range, drop the -1, so that the upper value is excluded 
+    This prevents both the 0 deg and 360 deg being included.  For limits less than
+    360 deg (e.g. 180 deg) then we should still do this, as it would allow future
+    use of symmetry to speed up calculations. */
+    U dv = (yv_up - yv_lo) / (ncy);
 
     U majmin = sqrt(1 - ecc_uv*ecc_uv);
     
@@ -533,7 +541,11 @@ void Ellipse_uv(T *ellipse, U xu_lo, U xu_up, U yv_lo,
                 U mat[16], bool transform)
 {
     U du0 = (xu_up - xu_lo) / (ncx - 1);
-    U dv = (yv_up - yv_lo) / (ncy - 1);
+    /* For v (polar angle) range, drop the -1, so that the upper value is excluded 
+    This prevents both the 0 deg and 360 deg being included.  For limits less than
+    360 deg (e.g. 180 deg) then we should still do this, as it would allow future
+    use of symmetry to speed up calculations. */
+    U dv = (yv_up - yv_lo) / (ncy);
 
     U majmin = sqrt(1 - ecc_uv*ecc_uv);
     
@@ -708,7 +720,11 @@ void Plane_uv(T *plane, U xu_lo, U xu_up, U yv_lo,
     U majmin = sqrt(1 - ecc_uv*ecc_uv);
     
     du0 = (xu_up - xu_lo) / (ncx - 1);
-    dv = (yv_up - yv_lo) / (ncy - 1) * M_PI/180;
+    /* For v (polar angle) range, drop the -1, so that the upper value is excluded 
+    This prevents both the 0 deg and 360 deg being included.  For limits less than
+    360 deg (e.g. 180 deg) then we should still do this, as it would allow future
+    use of symmetry to speed up calculations. */
+    dv = (yv_up - yv_lo) / (ncy);
 
     U ecc_fac;
 
@@ -722,7 +738,7 @@ void Plane_uv(T *plane, U xu_lo, U xu_up, U yv_lo,
     {        
         for (int j=0; j < ncy; j++)
         {
-            v = (j * dv + yv_lo);
+            v = (j * dv + yv_lo) * M_PI/180;
             ecc_fac = 1 / sqrt(1 - (ecc_uv*cos(v))*(ecc_uv*cos(v))); //consider moving into separate loop + array alloc
             duv = du0 * majmin * ecc_fac; 
             u = i*duv + xu_lo*ecc_fac;

@@ -412,8 +412,7 @@ def plotBeamCut(x_cut, y_cut, x_strip, y_strip, vmin, vmax, units):
     @returns fig Plot figure.
     @returns ax Plot axis.
     """
-
-    fig, ax = pt.subplots(1,1, figsize=(5,5))
+    fig, ax = pt.subplots(1,1, figsize=(5,5)) 
 
     ax.plot(x_strip / units.value, x_cut, color="blue", label="E-plane")
     ax.plot(y_strip / units.value, y_cut, color="red", ls="dashed", label="H-plane")

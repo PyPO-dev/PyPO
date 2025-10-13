@@ -323,6 +323,9 @@ def allfill_reflparams(inp, reflparams_py, ct_t):
     for i in range(16):
         inp.transf[i] = ct_t(reflparams_py["transf"].ravel()[i])
 
+    inp.rms = ct_t(reflparams_py["rms"])
+    inp.rms_seed = ctypes.c_uint(reflparams_py["rms_seed"])
+
 def allocate_reflcontainer(res, size, ct_t):
     """!
     Allocate ctypes reflcontainer or reflcontainerf.

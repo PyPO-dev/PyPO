@@ -504,6 +504,12 @@ def check_ElemDict(elemDict, nameList, clog):
     errStr = ""
    
     elemDict["transf"] = world.INITM() 
+
+    if not "rms" in elemDict:
+        elemDict["rms"] = -1
+
+    if not "rms_seed" in elemDict:
+        elemDict["rms_seed"] = 0
    
     if not "pos" in elemDict:
         elemDict["pos"] = world.ORIGIN()

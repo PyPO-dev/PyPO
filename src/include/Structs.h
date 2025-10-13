@@ -126,6 +126,8 @@ struct reflparams {
     int type;           /**<What type the reflector is. 0 is paraboloid, 1 is hyperboloid, 2 is ellipsoid and 3 is planar.*/
 
     double *transf;     /**<array of 16 double. Contains the transformation matrix of reflector surface.*/
+    double rms;         /**<Surface roughness rms of reflector in mm.*/
+    unsigned int rms_seed;
 
 };
 
@@ -314,6 +316,8 @@ struct reflparamsf {
     int type;           /**<What type the reflector is. 0 is paraboloid, 1 is hyperboloid, 2 is ellipsoid and 3 is planar.*/
 
     float *transf;     /**<array of 16 float. Contains the transformation matrix of reflector surface.*/
+    float rms;         /**<Surface roughness rms of reflector in mm.*/
+    unsigned int rms_seed;
 
 };
 

@@ -1,4 +1,5 @@
 #include "Structs.h"
+#include "Random.h"
 
 #ifndef __InterfaceReflector_h
 #define __InterfaceReflector_h

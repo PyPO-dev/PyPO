@@ -846,6 +846,28 @@ void Plane_AoE(T *plane, U xu_lo, U xu_up, U yv_lo,
     }
 }
 
+template<typename T, typename U, typename W>
+void add_surferr_uncorr(T refl, W *container)
+{
+    Random<U> normal; 
+    unsigned int seed = refl.rms_seed;
+    if(seed) {
+        Random<U> seed_normal(seed); 
+        normal = seed_normal; 
+    }
+
+    int num = refl.n_cells[0] * refl.n_cells[1];
+    
+    U store;
+    for (int n = 0; n < num; ++n) {
+        store = normal.generateNormal(refl.rms);
+        
+        container->x[n] += store * container->nx[n];
+        container->y[n] += store * container->ny[n];
+        container->z[n] += store * container->nz[n];
+    }
+}
+
 /**
  * Generate reflector/far-field grids.
  * 
@@ -946,6 +968,11 @@ void generateGrid(reflparams refl, reflcontainer *container, bool transform, boo
     {
         Plane_AoE<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
                                         yv_up, xcenter, ycenter, ncx, ncy, refl.transf, transform, spheric);
+    }
+
+    if (refl.rms > 0)
+    {
+        add_surferr_uncorr<reflparams, double, reflcontainer>(refl, container);
     }
 }
 
@@ -1050,5 +1077,10 @@ void generateGridf(reflparamsf refl, reflcontainerf *container, bool transform, 
     {
         Plane_AoE<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
                                         yv_up, xcenter, ycenter, ncx, ncy, refl.transf, transform, spheric);
+    }
+    
+    if (refl.rms > 0)
+    {
+        add_surferr_uncorr<reflparamsf, float, reflcontainerf>(refl, container);
     }
 }

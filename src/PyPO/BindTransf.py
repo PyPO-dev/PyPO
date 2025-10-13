@@ -24,7 +24,7 @@ def loadTransflib():
 
     path_cur = pathlib.Path(__file__).parent.resolve()
     try:
-        lib = ctypes.CDLL(os.path.join(path_cur, "libpypotransf.dll"))
+        lib = ctypes.CDLL(os.path.join(path_cur, "pypotransf.dll"))
     except:
         try:
             lib = ctypes.CDLL(os.path.join(path_cur, "libpypotransf.so"))

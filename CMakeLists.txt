@@ -35,7 +35,7 @@ check_language(CUDA)
 
 if(CMAKE_CUDA_COMPILER)
     enable_language(CUDA)
-    set(CMAKE_CUDA_STANDARD 11)
+    set(CMAKE_CUDA_STANDARD 14)
     file(GLOB CUDAfiles src/CUDA/*.cu)
 
     add_library(pypogpu SHARED ${CUDAfiles})

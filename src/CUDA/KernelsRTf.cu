@@ -361,7 +361,7 @@ __global__ void propagateRaysToTarget(float *xs, float *ys, float *zs,
 
             _t = t1;
         }
-        if ((abs(round(dx)) == 0 && abs(round(dy)) == 0 && abs(round(dz)) == 0) || std::isnan(_t)) 
+        if ((abs(round(dx)) == 0 && abs(round(dy)) == 0 && abs(round(dz)) == 0) || isnan(_t)) 
         {
             xt[idx] = x;
             yt[idx] = y;

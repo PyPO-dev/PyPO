@@ -22,7 +22,7 @@ def loadRefllib():
 
     path_cur = pathlib.Path(__file__).parent.resolve()
     try:
-        lib = ctypes.CDLL(os.path.join(path_cur, "libpyporefl.dll"))
+        lib = ctypes.CDLL(os.path.join(path_cur, "pyporefl.dll"))
     except:
         try:
             lib = ctypes.CDLL(os.path.join(path_cur, "libpyporefl.so"))

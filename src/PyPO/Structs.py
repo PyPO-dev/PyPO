@@ -109,7 +109,9 @@ class reflparams(ctypes.Structure):
                 ("ecc_uv", ctypes.c_double),
                 ("rot_uv", ctypes.c_double),
                 ("type", ctypes.c_int),
-                ("transf", ctypes.POINTER(ctypes.c_double))]
+                ("transf", ctypes.POINTER(ctypes.c_double)),
+                ("rms", ctypes.c_double),
+                ("rms_seed", ctypes.c_uint)]
 
 class reflcontainer(ctypes.Structure):
     """!
@@ -289,7 +291,9 @@ class reflparamsf(ctypes.Structure):
                 ("ecc_uv", ctypes.c_float),
                 ("rot_uv", ctypes.c_float),
                 ("type", ctypes.c_int),
-                ("transf", ctypes.POINTER(ctypes.c_float))]
+                ("transf", ctypes.POINTER(ctypes.c_float)),
+                ("rms", ctypes.c_float),
+                ("rms_seed", ctypes.c_uint)]
 
 class reflcontainerf(ctypes.Structure):
     """!

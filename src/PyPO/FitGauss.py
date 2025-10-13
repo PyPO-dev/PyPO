@@ -44,8 +44,8 @@ def calcEstimates(x, y, area, field_norm):
     Amp = 1 #M0 * np.sqrt(a * b - c**2) * area[0,0]
     theta = 0.5 * np.arctan(2 * c / (a - b))
 
-    #if a-b > 0: # Not HW1 but the largest axis corresponds to theta.
-    #    theta += np.pi/2
+    if a-b > 0: # Not HW1 but the largest axis corresponds to theta.
+        theta += np.pi/2
     #if theta < 0:
     #    theta += np.pi
     

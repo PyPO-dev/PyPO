@@ -133,7 +133,6 @@ def fitGaussAbs(field, surfaceObject, thres, scale, ratio=1):
 
     p0 = [x0, y0, xs, ys, theta, np.max(fit_field)]
 
-
     _ratio = ratio
     num = 0
 

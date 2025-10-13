@@ -56,6 +56,9 @@ class checkbox(inputWidgetInterface):
 
     @param inputDescription.prefill If set to true the checkbox will be checked by default.
     """
+
+    stateChanged = Signal(int)
+
     def __init__ (self, inputDescription:InputDescription):
         super().__init__()
         self.inputDescription = inputDescription
@@ -63,6 +66,7 @@ class checkbox(inputWidgetInterface):
         layout = QHBoxLayout()
         layout.setContentsMargins(5,4,20,0)
         self.box = QCheckBox()
+        self.box.stateChanged.connect(self.stateChanged)
         self.label = MyLabel(self.inputDescription.label)
         layout.addWidget(self.label)
         layout.addWidget(self.box)
@@ -88,6 +92,12 @@ class checkbox(inputWidgetInterface):
         
         except:
             raise Exception(f"Failed to read input: {self.inputDescription.label}")
+    
+    def currentState(self):
+        return self.box.isChecked()
+
+    def selectionChanged(self):
+        self.stateChanged.emit(self.box.isChecked())
         
 class VectorInput(inputWidgetInterface):
     """!

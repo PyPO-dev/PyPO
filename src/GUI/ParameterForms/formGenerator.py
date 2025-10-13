@@ -85,6 +85,10 @@ class FormGenerator(QWidget):
                 input = DynamicRadioWidget(inp)
                 self.inputs.append(input)
                 self.layout.addRow(input)
+            elif inp.inType == inType.dynamicCheckbox:
+                input = DynamicCheckboxWidget(inp)
+                self.inputs.append(input)
+                self.layout.addRow(input)
             elif inp.inType == inType.elementSelector:
                 input = ElementSelectionWidget(inp)
                 self.inputs.append(input)
@@ -330,6 +334,97 @@ class DynamicRadioWidget(inputWidgetInterface):
 
         if self.hasChildren:
             for input in self.currentChild.findChildren(inputWidgetInterface):
+                if input.parent().parent() == self.stackedWidget:
+                    paramDict.update(input.read())
+        return paramDict
+    
+class DynamicCheckboxWidget(inputWidgetInterface):
+    """!
+    Dynamic checkbox button.
+
+    Checkbox followed by a dynamic section that changes depending on users selection in the dropdown.
+    """
+    def __init__ (self, inp):
+        """!
+        Constructor. Creates the form section.
+        
+        @param inp InputDescription object received from formData.
+        """
+        super().__init__()
+        self.inputDescription = inp
+        self.setSizePolicy(QSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Fixed))
+        
+        self.layout = QFormLayout()
+        self.layout.setContentsMargins(0,0,0,0)
+        self.hasChildren = self.inputDescription.subDict != None
+        
+        self.mode = checkbox(InputDescription(inType.checkbox, self.inputDescription.outputName, self.inputDescription.label, toolTip=self.inputDescription.toolTip))
+        self.mode.stateChanged.connect(self.modeUpdate)
+        
+
+        self.layout.addRow(self.mode)
+
+        if self.hasChildren:
+            self.children = []
+            self.makeChildren()
+
+        self.setLayout(self.layout)
+        self.modeUpdate(-1)
+
+    def isChecked(self):
+        return self.mode.box.isChecked()
+
+    def makeChildren(self):
+        """!
+        Creates the nested forms.
+        """
+        self.stackedWidget = QStackedWidget()
+        placeholder = QWidget()
+        placeholder.setFixedSize(0,0)
+        self.stackedWidget.addWidget(placeholder)
+        self.layout.addRow(self.stackedWidget)
+        for childInDesList in self.inputDescription.subDict.values():
+            self.child = FormGenerator(childInDesList, addButtons=False, readAction=None)
+            self.child.setContentsMargins(0,0,0,0)
+            self.stackedWidget.addWidget(self.child)
+            self.children.append(self.child)
+
+    @Slot(int)
+    def modeUpdate(self, index):
+        """!
+        Updates the dynamic widget according to users selection.
+        
+        @param index Index of the option.
+        """
+        if self.isChecked():
+            self.stackedWidget.setCurrentIndex(1)
+            self.hasChildren = True
+        else:
+            self.stackedWidget.setCurrentIndex(0)
+            self.hasChildren = False
+
+    def clear(self):
+        """!
+        Clears all inputs of the form.
+        """
+        self.mode.clear()
+        for child in self.children:
+            child.clear()
+
+    def read(self):
+        """!
+        Reads the inputs.
+        
+        @return A dictionary containing the values read from the inputs.
+        """
+        try:
+            paramDict = {self.inputDescription.outputName: self.isChecked()}
+        except:
+            raise Exception(f"Failed to read input: {self.inputDescription.label}")
+
+
+        if self.hasChildren:
+            for input in self.child.findChildren(inputWidgetInterface):
                 if input.parent().parent() == self.stackedWidget:
                     paramDict.update(input.read())
         return paramDict

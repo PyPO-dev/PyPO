@@ -13,12 +13,29 @@ FieldComponentListStrings = [do.name for do in FieldComponentList]
 CurrentComponentList = [o for o in CurrentComponents]
 CurrentComponentListStrings = [do.name for do in CurrentComponents] 
 
+def surface_error():
+    """!
+    Options for adding surface error
+    """
+    "rms en rms_seed"
+    return[
+        InputDescription(inType.dynamicRadio, "error_checkbox", label = "Surface error", subDict={
+            "None"     : [],
+            "Yes"    : [
+                InputDescription(inType.vectorFloats, "rms", label= "Surface error RMS"),
+                InputDescription(inType.vectorIntegers, "rms_seed", label= "Surface error seed"),
+                ]
+            })
+    ]
+
 def xy_opts():
     """!
     Options for generating an element from an xy parametrisation.
     """
     return [InputDescription(inType.vectorFloats, "lims_x", label="X limits", oArray=True, numFields=2),
-            InputDescription(inType.vectorFloats, "lims_y", label="Y limits", oArray=True, numFields=2)]
+            InputDescription(inType.vectorFloats, "lims_y", label="Y limits", oArray=True, numFields=2),
+            
+            ]+surface_error()
 
 def uv_opts():
     """!
@@ -28,7 +45,9 @@ def uv_opts():
             InputDescription(inType.vectorFloats, "lims_v", label="V limits", prefill = True, hints=[0., 360.], oArray=True, numFields=2, toolTip = "V angle in degrees."),
             InputDescription(inType.vectorFloats, "gcenter", label="XY center", hints = [0.,0.], oArray=True, numFields=2, prefill = True),
             InputDescription(inType.vectorFloats, "ecc_uv", label="UV eccentricity", numFields=1, hints = [0.], prefill = True),
-            InputDescription(inType.vectorFloats, "rot_uv", label="UV position angle", numFields=1, hints = [0.], prefill = True)]
+            InputDescription(inType.vectorFloats, "rot_uv", label="UV position angle", numFields=1, hints = [0.], prefill = True),
+            
+            ]+surface_error()
 
 def AoE_opts():
     """!

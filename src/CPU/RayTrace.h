@@ -271,12 +271,7 @@ void RayTracer<T, U, V>::parallelRays(
     std::vector<V> errors(nTot, 0.);
 
     if(ctp.rms > 0) {
-        Random<V> normal; 
-        unsigned int seed = ctp.rms_seed;
-        if(seed) {
-            Random<V> seed_normal(seed); 
-            normal = seed_normal; 
-        }
+        Random<V> normal(ctp.rms_seed); 
 
         errors = normal.generateNormal(nTot, ctp.rms);
     }
@@ -303,10 +298,6 @@ void RayTracer<T, U, V>::parallelRays(
     }
     
     joinThreads();
-
-    if(ctp.rms > 0) {
-
-    }
 
     // Transform back to real frame
     transfRays(ctp, fr_in);

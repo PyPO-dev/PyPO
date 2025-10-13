@@ -7,6 +7,7 @@ import numpy as np
 import os
 import pathlib
 import re
+from time import time_ns
 
 import PyPO.Config as Config
 import PyPO.WorldParam as world
@@ -509,7 +510,7 @@ def check_ElemDict(elemDict, nameList, clog):
         elemDict["rms"] = -1
 
     if not "rms_seed" in elemDict:
-        elemDict["rms_seed"] = 0
+        elemDict["rms_seed"] = time_ns()
    
     if not "pos" in elemDict:
         elemDict["pos"] = world.ORIGIN()

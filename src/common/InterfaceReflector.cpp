@@ -849,12 +849,7 @@ void Plane_AoE(T *plane, U xu_lo, U xu_up, U yv_lo,
 template<typename T, typename U, typename W>
 void add_surferr_uncorr(T refl, W *container)
 {
-    Random<U> normal; 
-    unsigned int seed = refl.rms_seed;
-    if(seed) {
-        Random<U> seed_normal(seed); 
-        normal = seed_normal; 
-    }
+    Random<U> normal(reff.rms_seed); 
 
     int num = refl.n_cells[0] * refl.n_cells[1];
     

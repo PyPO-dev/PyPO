@@ -19,8 +19,7 @@ def surface_error():
     """
     "rms en rms_seed"
     return[
-        InputDescription(inType.dynamicRadio, "error_checkbox", label = "Surface error", subDict={
-            "None"     : [],
+        InputDescription(inType.dynamicCheckbox, "error_checkbox", label = "Surface error", subDict={
             "Yes"    : [
                 InputDescription(inType.vectorFloats, "rms", label= "Surface error RMS"),
                 InputDescription(inType.vectorIntegers, "rms_seed", label= "Surface error seed"),

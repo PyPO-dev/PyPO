@@ -161,7 +161,7 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
         s_mult(r_vec, r_inv, k_hat);
 
         dot(source_norm, k_hat, norm_dot_k_hat);
-        if (norm_dot_k_hat < 0) {continue;}
+        if ((norm_dot_k_hat < 0) && (con[6].x < 0)) {continue;}
 
         s_mult(k_hat, con[0].x, k_arr);
 

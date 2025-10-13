@@ -99,14 +99,14 @@ class System(object):
         if override == True:
             self.clog.warning("System override set to True.")
        
-    def __del__(self):
-        """!
-        Destructor. Deletes any reference to the logger assigned to current system.
-        """
-        if self.context != "G":
-            self.clog.info("EXITING SYSTEM.")
-            del self.clog_mgr
-            del self.clog
+    #def __del__(self):
+    #    """!
+    #    Destructor. Deletes any reference to the logger assigned to current system.
+    #    """
+    #    if self.context != "G":
+    #        self.clog.info("EXITING SYSTEM.")
+    #        del self.clog_mgr
+    #        del self.clog
     
     def getSystemLogger(self) -> logging.RootLogger:
         """!
@@ -164,7 +164,7 @@ class System(object):
         else:
             self.customBeamPath = path
 
-    def setSavePath(self, path : str, append : bool =pattern False):
+    def setSavePath(self, path : str, append : bool = False):
         """!
         Set path to folder were to save output plots.
         
@@ -443,7 +443,7 @@ class System(object):
                     obj : Objects = Objects.ELEMENT, 
                     mode : Modes = Modes.REL, 
                     pivot : np.ndarray = None, 
-                    keep_pol :bool = False):
+                    keep_pol : bool = False):
         """!
         Rotate reflector grids.
         
@@ -461,11 +461,16 @@ class System(object):
         @param mode Apply rotation relative to current orientation (Modes.REL), or rotate to specified orientation (Modes.ABS).
         @param pivot Numpy ndarray of length 3, containing pivot x, y and z co-ordinates, in mm. Defaults to pos. 
         @param keep_pol Keep polarisation of a field/current defined on the surface, if present.
+            If True, does not rotate polarisation of any defined fields/currents along with the rotation of reflector.
+            If False, rotates polarisation along with reflector. Defaults to False.
         """
-        
+
+        PChecks.check_array(rotation, self.clog)
+
         if obj == Objects.ELEMENT:
             PChecks.check_elemSystem(name, self.system, self.clog, extern=True)
             pivot = self.system[name]["pos"] if pivot is None else pivot
+            PChecks.check_array(pivot, self.clog)
             
             if mode == Modes.ABS:
                 Rtot = self._absRotationMat(rotation, self.system[name]["ori"], pivot)
@@ -494,6 +499,7 @@ class System(object):
         elif obj == Objects.GROUP:
             PChecks.check_groupSystem(name, self.groups, self.clog, extern=True)
             pivot = self.groups[name]["pos"] if pivot is None else pivot
+            PChecks.check_array(pivot, self.clog)
             
             if mode == Modes.ABS:
                 Rtot = self._absRotationMat(rotation, self.groups[name]["ori"], pivot)
@@ -531,6 +537,7 @@ class System(object):
         if obj == Objects.FRAME:
             PChecks.check_frameSystem(name, self.frames, self.clog, extern=True)
             pivot = self.frames[name].pos if pivot is None else pivot
+            PChecks.check_array(pivot, self.clog)
             
             if mode == Modes.ABS:
                 Rtot = self._absRotationMat(rotation, self.frames[name].ori, pivot)
@@ -553,7 +560,11 @@ class System(object):
             
                 self.clog.info(f"Rotated frame {name} by {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
-    def translateGrids(self, name : str, translation : np.ndarray, obj : Objects = Objects.ELEMENT, mode : Modes = Modes.REL):
+    def translateGrids(self, 
+                       name : str, 
+                       translation : np.ndarray, 
+                       obj : Objects = Objects.ELEMENT, 
+                       mode : Modes = Modes.REL) -> None:
         """!
         Translate reflector grids.
         
@@ -567,6 +578,8 @@ class System(object):
         @param obj Whether the name corresponds to a single element, group, or frame. Fields and currents are translated by translating the associated surface. Choose from Objects enum.
         @param mode Apply translation relative ('relative') to current position, or move to specified position ('absolute').
         """
+        
+        PChecks.check_array(translation, self.clog)
 
         _translation = self.copyObj(translation)
         
@@ -823,7 +836,11 @@ class System(object):
         
         self.clog.info(f"Removed group {name_group} from system.")
 
-    def generateGrids(self, name : str, transform :bool = True, spheric : bool = True) -> PTypes.reflGrids:
+    def generateGrids(self, 
+                      name : str, 
+                      transform :bool = True, 
+                      spheric : bool = True
+                      ) -> PTypes.reflGrids:
         """!
         Generate reflector grids and normals.
         
@@ -1034,7 +1051,7 @@ class System(object):
         
         self.clog.info(f"Removed scalar PO field {fieldName} from system.")
     
-    def readCustomBeam(self, name_beam : str, name_source : str, comp : FieldComponents, lam : float, normalise : bool = True, scale : float = 1):
+    def readCustomBeam(self, name_beam : str, name_source : str, comp : FieldComponents, lam : float, normalise : bool = True, scale : float = 1, outname : str = None):
         """!
         Read a custom beam from disk into the system. 
         
@@ -1052,16 +1069,19 @@ class System(object):
         @param lam Wavelength of beam, in mm.
         @param normalise Whether or not to normalise beam to its maximum amplitude.
         @param scale Scale factor for beam. Defaults to 1.
+        @param outname Name of field/current objects written to system. Defaults to name_beam
         
         @see setCustomBeamPath
         """
+
+        outname = name_beam if outname is None else outname
 
         PChecks.check_elemSystem(name_source, self.system, self.clog, extern=True)
         
         rfield = np.loadtxt(os.path.join(self.customBeamPath, "r" + name_beam + ".txt"))
         ifield = np.loadtxt(os.path.join(self.customBeamPath, "i" + name_beam + ".txt"))
 
-        field = rfield + 1j*ifield
+        field = (rfield + 1j*ifield).T
 
         if normalise:
             maxf = np.max(field)
@@ -1080,11 +1100,11 @@ class System(object):
 
         fields_c = self._compToFields(comp, field)
         fields_c.setMeta(name_source, k)
-        self.fields[name_beam] = fields_c#.H()
+        self.fields[outname] = fields_c#.H()
         currents_c = BBeam.calcCurrents(fields_c, self.system[name_source], mode)
         currents_c.setMeta(name_source, k)
 
-        self.currents[name_beam] = currents_c
+        self.currents[outname] = currents_c
 
     def runPO(self, runPODict : dict):
         """!
@@ -1786,9 +1806,18 @@ class System(object):
         eff = Effs.calcMainBeam(field, surfaceObj, self.scalarfields[f"fitGauss_{name_field}"].S)
         return eff
     
-    def calcBeamCuts(self, name_field : str, comp : FieldComponents, phi : float = 0, center : bool = True, align : bool = True,
-                      norm : bool = False, transform : bool = False, scale : Scales = Scales.dB
-                      ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    def calcBeamCuts(self, 
+                     name_field : str, 
+                     comp : FieldComponents, 
+                     interp : int = 1001, 
+                     phi : float = 0, 
+                     center : bool = True, 
+                     align : bool = True,
+                     norm : FieldComponents = FieldComponents.NONE, 
+                     transform : bool = False, 
+                     scale : Scales = Scales.dB,
+                     full_output : bool = False,
+                     ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """!
         Calculate cross sections of a beam pattern.
         
@@ -1803,12 +1832,14 @@ class System(object):
         
         @param name_field Name of field object.
         @param comp Component of field object. Instance of FieldComponents enum object.
+        @param interp Number of points in x and y strip. Defaults to 1001.
         @param phi Manual rotation of cuts w.r.t. to the x-y cardinal planes.
         @param center Whether to center the cardinal planes on the peak of the beam pattern.
         @param align Whether to align the cardinal planes to the beam pattern minor and major axes.
         @param norm Which component to normalise to. Defaults to comp. 
         @param transform Transform surface on which beam is defined. If False, will evaluate beam cuts as if surface is in restframe.
         @param scale Return beamcuts in linear or decibel values. Instance of Scales enum object.
+        @param full_output Return x-y coordinates of H and E cuts, instead of just distance to center.
         
         @returns x_cut Beam cross section along the E-plane.
         @returns y_cut Beam cross section along the H-plane.
@@ -1816,87 +1847,92 @@ class System(object):
         @returns y_strip Co-ordinate values for y_cut.
         """
 
+        norm = comp if norm is FieldComponents.NONE else norm
+
         PChecks.check_fieldSystem(name_field, self.fields, self.clog, extern=True)
  
         verbosity_init = self.verbosity
 
         self.setLoggingVerbosity(verbose=False)
-
+        
         name_surf = self.fields[name_field].surf
-        field = np.absolute(self.fields[name_field][comp.value])
-        _field = self.copyObj(self.fields[name_field])
+        self.snapObj(name_surf, "_")
 
-        self.snapObj(name_surf, "__pre")
+        self.homeReflector(name_surf)
+        grids = self.generateGrids(name_surf, transform=False, spheric=False)
+
+        x_edges = np.array([np.min(grids.x), np.max(grids.x)])
+        y_edges = np.array([np.min(grids.y), np.max(grids.y)])
+
+        field = np.absolute(self.fields[name_field][comp.value])
+        max_norm = np.nanmax(np.absolute(self.fields[name_field][norm.value]))
+
+        center_use = np.zeros(2)
+        rot_use = np.radians(phi)
 
         if center or align:
             popt = self.fitGaussAbs(name_field, comp, scale=Scales.LIN, full_output=True)
         
-        if center:
-            self.translateGrids(name_surf, np.array([-popt[2], -popt[3], 0]))
-        
-        grids_orig = self.generateGrids(name_surf, transform=False, spheric=False)
-            
-        
-        if align:
-            if popt[0] > popt[1]:
-                angf = 90
-            else:
-                angf = 0
+            if center:
+                center_use = np.array([popt[2], popt[3]])
             
             if align:
-                self.rotateGrids(name_surf, np.array([0, 0, angf + np.degrees(-popt[4])]), pivot=world.ORIGIN(), keep_pol=False)
+                rot_use += popt[4]
+
+        hx_edges = np.cos(rot_use) * x_edges + center_use[0]
+        hy_edges = np.sin(rot_use) * x_edges + center_use[1]
+        ex_edges = -np.sin(rot_use) * y_edges + center_use[0]
+        ey_edges = np.cos(rot_use) * y_edges + center_use[1]
         
-
-        self.rotateGrids(name_surf, np.array([0, 0, phi]), pivot=world.ORIGIN(), keep_pol=False)
-
-        grids_transf = self.generateGrids(name_surf, spheric=False)
+        hx_edges_interp = np.linspace(hx_edges[0], hx_edges[1], interp)
+        hy_edges_interp = np.linspace(hy_edges[0], hy_edges[1], interp)
+        ex_edges_interp = np.linspace(ex_edges[0], ex_edges[1], interp)
+        ey_edges_interp = np.linspace(ey_edges[0], ey_edges[1], interp)
         
-        middle = lambda x: [int(np.floor(d/2)) for d in x.shape]
-        idx_c = np.argwhere(np.isclose(grids_transf.x, 0) & np.isclose(grids_transf.y, 0))
-        idx_c = np.unravel_index(np.argmax(field), field.shape)
-        if not norm:
-            x_cut = self.copyObj(20 * np.log10(field[:, idx_c[1]] / np.max(field)))
-            y_cut = self.copyObj(20 * np.log10(field[idx_c[0], :] / np.max(field)))
-            
-            if scale == Scales.dB:
-                x_cut = self.copyObj(20 * np.log10(field[:, idx_c[1]] / np.max(field)))
-                y_cut = self.copyObj(20 * np.log10(field[idx_c[0], :] / np.max(field)))
-            
-            elif scale == Scales.LIN:
-                x_cut = self.copyObj(field[:, idx_c[1]] / np.max(field))
-                y_cut = self.copyObj(field[idx_c[0], :] / np.max(field))
+        h_cut = griddata((grids.x.ravel(), grids.y.ravel()), field.ravel(), (hx_edges_interp, hy_edges_interp), method="cubic") 
+        e_cut = griddata((grids.x.ravel(), grids.y.ravel()), field.ravel(), (ex_edges_interp, ey_edges_interp), method="cubic") 
         
-        else:
-            if scale == Scales.dB:
-                x_cut = self.copyObj(20 * np.log10(field[:, idx_c[1]] / np.max(np.absolute(getattr(self.fields[name_field], norm)))))
-                y_cut = self.copyObj(20 * np.log10(field[idx_c[0], :] / np.max(np.absolute(getattr(self.fields[name_field], norm)))))
-            
-            elif scale == Scales.LIN:
-                x_cut = self.copyObj(field[:, idx_c[1]] / np.max(np.absolute(getattr(self.fields[name_field], norm))))
-                y_cut = self.copyObj(field[idx_c[0], :] / np.max(np.absolute(getattr(self.fields[name_field], norm))))
+        if scale == Scales.dB:
+            h_cut = 20 * np.log10(h_cut / max_norm)
+            e_cut = 20 * np.log10(e_cut / max_norm)
+        
+        elif scale == Scales.LIN:
+            h_cut = h_cut / max_norm
+            e_cut = e_cut / max_norm
 
-
-        x_strip = self.copyObj(grids_orig.x[:, idx_c[1]])
-        y_strip = self.copyObj(grids_orig.y[idx_c[0], :])
-
-        self.revertToSnap(name_surf, "__pre")
-        self.deleteSnap(name_surf, "__pre")
+        h_strip = np.linspace(x_edges[0], x_edges[1], interp)
+        e_strip = np.linspace(y_edges[0], y_edges[1], interp)
+        
+        self.revertToSnap(name_surf, "_")
+        self.deleteSnap(name_surf, "_")
 
         self.setLoggingVerbosity(verbose=verbosity_init)
-        self.fields[name_field] = _field
-
-        return x_cut, y_cut, x_strip, y_strip
+        if full_output:
+            return h_cut, e_cut, h_strip, e_strip, hx_edges_interp, hy_edges_interp, ex_edges_interp, ey_edges_interp
    
-    def plotBeamCut(self, name_field : str, comp : FieldComponents, comp_cross : FieldComponents = FieldComponents.NONE, vmin : float = None, 
-                    vmax : float = None, center : bool = True, align : bool = True, scale : Scales = Scales.dB, units : Units = Units.DEG, 
-                    name : str = "", show : bool = True, save : bool = False, ret : bool = False
+        else:
+            return h_cut, e_cut, h_strip, e_strip
+
+    def plotBeamCut(self, 
+                    name_field : str, 
+                    comp : FieldComponents, 
+                    vmin : float = None, 
+                    vmax : float = None, 
+                    center : bool = True, 
+                    align : bool = True, 
+                    scale : Scales = Scales.dB, 
+                    units : Units = Units.DEG, 
+                    name : str = "", 
+                    show : bool = True, 
+                    save : bool = False, 
+                    ret : bool = False
                     ) -> tuple[pt.Figure, pt.Axes]:
         """!
         Plot beam pattern cross sections.
         
         Plot the beam cross sections for a PO field.
         In this case, calcBeamCuts() will try to translate and rotate the supplied beam pattern to lie along the x- and y-axes.
-        Note that using the "center" and "align" arguments sgould not be done when plotting beam cuts of very non-Gaussian beams. For these patterns, it is advised to set the arguments to False and calculate the beam cuts as-is. 
+        Note that using the "center" and "align" arguments should not be done when plotting beam cuts of very non-Gaussian beams. For these patterns, it is advised to set the arguments to False and calculate the beam cuts as-is. 
         
         @ingroup public_api_vis
         
@@ -1912,21 +1948,24 @@ class System(object):
         @param name Name of .png file where plot is saved. Only when save=True. Default is "".
         @param show Show plot. Default is True.
         @param save Save plot to savePath.
-        @param ret Return the Figure and Axis object. Only called by GUI. Default is False.
+        @param ret Return the Figure and Axis object. Default is False.
         
         @returns fig Figure object.
         @returns ax Axes object.
         """
 
-        E_cut, H_cut, E_strip, H_strip = self.calcBeamCuts(name_field, comp, center=center, align=align, scale=scale)
+        h_cut, e_cut, h_strip, e_strip = self.calcBeamCuts(name_field, comp, center=center, align=align, scale=scale)
 
-        #if comp_cross is not None:
-            #cr45_cut, cr135_cut, cr45_strip, cr135_strip = self.calcBeamCuts(name_field, comp_cross, phi=45, align=False, center=False, norm="Ex")
-
-        vmin = np.min([np.min(E_cut), np.min(H_cut)]) if vmin is None else vmin
-        vmax = np.max([np.max(E_cut), np.max(H_cut)]) if vmax is None else vmax
+        vmin = np.nanmin([np.nanmin(h_cut), np.nanmin(e_cut)]) if vmin is None else vmin
+        vmax = np.nanmax([np.nanmax(h_cut), np.nanmax(e_cut)]) if vmax is None else vmax
         
-        fig, ax = PPlot.plotBeamCut(E_cut, H_cut, E_strip, H_strip, vmin, vmax, units)
+        fig, ax = PPlot.plotBeamCut(h_cut, 
+                                    e_cut, 
+                                    h_strip, 
+                                    e_strip, 
+                                    vmin, 
+                                    vmax, 
+                                    units)
 
         if ret:
             return fig, ax
@@ -1939,7 +1978,12 @@ class System(object):
         elif show:
             pt.show()
 
-    def calcHPBW(self, name_field : str, comp : FieldComponents, interp : int = 50, center : bool = False, align : float = False) -> tuple [float, float]:
+    def calcHPBW(self, 
+                 name_field : str, 
+                 comp : FieldComponents, 
+                 center : bool = False, 
+                 align : float = False
+                 ) -> tuple [float, float]:
         """!
         Calculate half-power beamwidth.
         
@@ -1950,7 +1994,6 @@ class System(object):
         
         @param name_field Name of field object.
         @param comp Component of field object. Instance of FieldComponents enum object.
-        @param interp Interpolation factor for finding the HPBW. Defaults to 50.
         @param center Whether to center the beam cuts on amplitude center. Use only if beam has well defined amplitude center.
         @param align Whether to take beam cuts along cardinal planes rotated by the position angle.
         
@@ -1958,20 +2001,15 @@ class System(object):
         @returns HPBW_H Half-power beamwidth along H-plane in units of surface of beam.
         """
 
-        x_cut, y_cut, x_strip, y_strip = self.calcBeamCuts(name_field, comp, center, align)
+        h_cut, e_cut, h_strip, e_strip = self.calcBeamCuts(name_field, comp, center=center, align=align)
 
-        x_interp = np.linspace(np.min(x_strip), np.max(x_strip), num=len(x_strip) * interp)
-        y_interp = np.linspace(np.min(y_strip), np.max(y_strip), num=len(y_strip) * interp)
-        x_cut_interp = interp1d(x_strip, x_cut, kind="cubic")(x_interp)
-        y_cut_interp = interp1d(y_strip, y_cut, kind="cubic")(y_interp)
+        h_masked = h_strip[h_cut > -3]
+        e_masked = e_strip[e_cut > -3]
 
-        mask_x = (x_cut_interp > -3.01) & (x_cut_interp < -2.99)
-        mask_y = (y_cut_interp > -3.01) & (y_cut_interp < -2.99)
+        HPBW_h = np.absolute(np.max(h_masked) - np.min(h_masked))
+        HPBW_e = np.absolute(np.max(e_masked) - np.min(e_masked))
 
-        HPBW_E = np.mean(np.absolute(x_interp[mask_x]))
-        HPBW_H = np.mean(np.absolute(y_interp[mask_y]))
-
-        return HPBW_E, HPBW_H
+        return HPBW_h, HPBW_e
 
     def createPointSource(self, PSDict : dict, name_surface : str):
         """!
@@ -2224,7 +2262,7 @@ class System(object):
         @param titleA Title of the amplitude plot. Default is "Amp".
         @param titleP Title of the phase plot. Default is "Phase".
         @param unwrap_phase Unwrap the phase patter. Prevents annular structure in phase pattern. Default is False.
-        @param ret Return the Figure and Axis object. Only called by GUI. Default is False.
+        @param ret Return the Figure and Axis object. Default is False.
         
         @returns fig Figure object.
         @returns ax Axes object.
@@ -2276,8 +2314,7 @@ class System(object):
             return fig, ax
 
         elif save:
-            pt.savefig(fname=self.savePath + '{}_{}.jpg'.format(plotObject["name"], name),
-                        bbox_inches='tight', dpi=300)
+            pt.savefig(fname=os.path.join(self.savePath, f'{plotObject["name"]}_{name}.jpg'), bbox_inches='tight', dpi=300)
             pt.close()
 
         elif show:

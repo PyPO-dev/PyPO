@@ -5,6 +5,7 @@
 #include <thread>
 
 #include "Utils.h"
+#include "Random.h"
 #include "Structs.h"
 #include "RTRefls.h"
 
@@ -47,7 +48,7 @@ public:
     void transfRays(T ctp, U *fr, bool inv = false);
 
     void propagateRaysToTarget(int start, int stop,
-                      T ctp, U *fr_in, U *fr_out, V t0);
+                      T ctp, U *fr_in, U *fr_out, V t0, std::vector<V> errors);
 
     void parallelRays(T ctp, U *fr_in, U *fr_out, V t0);
 };
@@ -128,6 +129,7 @@ void RayTracer<T, U, V>::transfRays(T ctp, U *fr, bool inv)
  * @param fr_in Pointer to input cframe or cframef object.
  * @param fr_out Pointer to output cframe or cframef object.
  * @param t0 Starting guess for NR method, double/float.
+ * @param errors Vector containing surface errors, if any.
  *
  * @see reflparams
  * @see reflparamsf
@@ -135,8 +137,14 @@ void RayTracer<T, U, V>::transfRays(T ctp, U *fr, bool inv)
  * @see cframef
  */
 template<class T, class U, class V>
-void RayTracer<T, U, V>::propagateRaysToTarget(int start, int stop,
-                  T ctp, U *fr_in, U *fr_out, V t0)
+void RayTracer<T, U, V>::propagateRaysToTarget(
+        int start, 
+        int stop,
+        T ctp, 
+        U *fr_in, 
+        U *fr_out, 
+        V t0,
+        std::vector<V> errors)
 {
     int flip = 1;
 
@@ -227,6 +235,11 @@ void RayTracer<T, U, V>::propagateRaysToTarget(int start, int stop,
             fr_out->dx[i] = out[0];
             fr_out->dy[i] = out[1];
             fr_out->dz[i] = out[2];
+
+            // Add surface errors
+            fr_out->x[i] += errors[i] * norms[0];
+            fr_out->y[i] += errors[i] * norms[1];
+            fr_out->z[i] += errors[i] * norms[2];
         }
     }
 }
@@ -247,9 +260,21 @@ void RayTracer<T, U, V>::propagateRaysToTarget(int start, int stop,
  * @see cframef
  */
 template <class T, class U, class V>
-void RayTracer<T, U, V>::parallelRays(T ctp, U *fr_in, U *fr_out, V t0)
+void RayTracer<T, U, V>::parallelRays(
+        T ctp, 
+        U *fr_in, 
+        U *fr_out, 
+        V t0)
 {
     int final_step;
+
+    std::vector<V> errors(nTot, 0.);
+
+    if(ctp.rms > 0) {
+        Random<V> normal(ctp.rms_seed); 
+
+        errors = normal.generateNormal(nTot, ctp.rms);
+    }
 
     // Transform to reflector rest frame
     bool inv = true;
@@ -260,10 +285,18 @@ void RayTracer<T, U, V>::parallelRays(T ctp, U *fr_in, U *fr_out, V t0)
         if(n == (numThreads-1)) {final_step = nTot;}
         else {final_step = (n+1) * step;}
             
-        threadPool[n] = std::thread(&RayTracer::propagateRaysToTarget,
-                                        this, n * step, final_step,
-                                        ctp, fr_in, fr_out, t0);
+        threadPool[n] = std::thread(
+                &RayTracer::propagateRaysToTarget,
+                this, 
+                n * step, 
+                final_step,
+                ctp, 
+                fr_in, 
+                fr_out, 
+                t0,
+                errors);
     }
+    
     joinThreads();
 
     // Transform back to real frame

@@ -34,8 +34,12 @@ public:
 
     T generateUniform(T lower = -1.0);
     std::vector<T> generateUniform(int num, T lower = -1.0);
+    
+    T generateNormal(T stdev, T mean = 0.0);
+    std::vector<T> generateNormal(int num, 
+            T stdev, 
+            T mean = 0.0);
 };
-#endif
 
 /**
  * Initialize RNG. This constructor generates a random seed for the random draws.
@@ -95,3 +99,42 @@ std::vector<T> Random<T>::generateUniform(int num, T lower)
     }
     return out;
 }
+
+/**
+ * Generate single sample from normal distribution.
+ *
+ * @param stdev Standard deviation of normal distribution.
+ * @param mean Mean of normal distribution. Defauts to zero.
+ * 
+ * @returns out Draw of type T.
+ */
+template <typename T>
+T Random<T>::generateNormal(T stdev, T mean)
+{
+    std::normal_distribution<T> dis(mean, stdev);
+    return dis(this->gen);
+}
+
+/**
+ * Generate multiple random samples from normal distribution.
+ *
+ * @param num Number of samples to return
+ * @param stdev Standard deviation of normal distribution.
+ * @param mean Mean of normal distribution. Defauts to zero.
+ * 
+ * @returns out Vector containing num normal samples.
+ */
+template <typename T>
+std::vector<T> Random<T>::generateNormal(int num, 
+            T stdev, 
+            T mean)
+{
+    std::normal_distribution<T> dis(mean, stdev);
+    std::vector<T> out(num, 0);
+
+    for (int n = 0; n < num; ++n) {
+        out[n] = dis(this->gen);
+    }
+    return out;
+}
+#endif

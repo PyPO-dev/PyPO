@@ -100,6 +100,12 @@ def plotBeam2D(plotObject, field, contour,
             ff_flag = True
             comps = ["\mathrm{El}", "\mathrm{Az}"]
 
+        if not ((units == Units.DEG) or (units == Units.AM) or (units == Units.AS)):
+            units = Units.DEG
+        print(units)
+        print(units.name.lower())
+
+
     if not amp_only:
         fig, ax = pt.subplots(1,2, figsize=(10,5), gridspec_kw={'wspace':0.5})
 
@@ -117,13 +123,13 @@ def plotBeam2D(plotObject, field, contour,
             vmin = np.min(field_pl) if vmin is None else vmin
             vmax = np.max(field_pl) if vmax is None else vmax
             
-            ampfig = ax[0].pcolormesh(grid_x1 * units.value, grid_x2 * units.value, field_pl**2,
+            ampfig = ax[0].pcolormesh(grid_x1 / units.value, grid_x2 / units.value, field_pl**2,
                                     vmin=vmin, vmax=vmax, cmap=cmaps.parula, shading='auto')
-            phasefig = ax[1].pcolormesh(grid_x1 * units.value, grid_x2 * units.value, np.angle(field), cmap=cmaps.parula, shading='auto')
+            phasefig = ax[1].pcolormesh(grid_x1 / units.value, grid_x2 / units.value, np.angle(field), cmap=cmaps.parula, shading='auto')
 
             if contour is not None:
-                cont0 = ax[0].contour(grid_x1 * units.value, grid_x2 * units.value, contour**2, levels, cmap=cm.binary, linewidths=0.5)
-                cont1 = ax[1].contour(grid_x1 * units.value, grid_x2 * units.value, np.angle(contour), levels, cmap=cm.binary, linewidths=0.5)
+                cont0 = ax[0].contour(grid_x1 / units.value, grid_x2 / units.value, contour**2, levels, cmap=cm.binary, linewidths=0.5)
+                cont1 = ax[1].contour(grid_x1 / units.value, grid_x2 / units.value, np.angle(contour), levels, cmap=cm.binary, linewidths=0.5)
 
                 ax[0].clabel(cont0)
                 ax[1].clabel(cont1)
@@ -147,14 +153,14 @@ def plotBeam2D(plotObject, field, contour,
             else:
                 phase = np.angle(field)
             
-            ampfig = ax[0].pcolormesh(grid_x1 * units.value, grid_x2 * units.value, field_dB,
+            ampfig = ax[0].pcolormesh(grid_x1 / units.value, grid_x2 / units.value, field_dB,
                                     vmin=vmin, vmax=vmax, cmap=cmaps.parula, shading='auto')
-            phasefig = ax[1].pcolormesh(grid_x1 * units.value, grid_x2 * units.value, phase, cmap=cmaps.parula, shading='auto')
+            phasefig = ax[1].pcolormesh(grid_x1 / units.value, grid_x2 / units.value, phase, cmap=cmaps.parula, shading='auto')
             
 
             if contour is not None:
-                cont0 = ax[0].contour(grid_x1 * units.value, grid_x2 * units.value, contour_dB, levels, cmap=cm.binary, linewidths=0.5)
-                cont1 = ax[1].contour(grid_x1 * units.value, grid_x2 * units.value, np.angle(contour), levels, cmap=cm.binary, linewidths=0.5)
+                cont0 = ax[0].contour(grid_x1 / units.value, grid_x2 / units.value, contour_dB, levels, cmap=cm.binary, linewidths=0.5)
+                cont1 = ax[1].contour(grid_x1 / units.value, grid_x2 / units.value, np.angle(contour), levels, cmap=cm.binary, linewidths=0.5)
                 
                 ax[0].clabel(cont0)
                 ax[1].clabel(cont1)
@@ -199,11 +205,11 @@ def plotBeam2D(plotObject, field, contour,
             vmin = np.min(field_pl) if vmin is None else vmin
             vmax = np.max(field_pl) if vmax is None else vmax
             
-            ampfig = ax.pcolormesh(grid_x1 * units.value, grid_x2 * units.value, field_pl**2,
+            ampfig = ax.pcolormesh(grid_x1 / units.value, grid_x2 / units.value, field_pl**2,
                                     vmin=vmin, vmax=vmax, cmap=cmaps.parula, shading='auto')
 
             if contour is not None:
-                cont = ax.contour(grid_x1 * units.value, grid_x2 * units.value, contour_pl**2, levels, cmap=cm.binary, linewidths=0.5)
+                cont = ax.contour(grid_x1 / units.value, grid_x2 / units.value, contour_pl**2, levels, cmap=cm.binary, linewidths=0.5)
                 ax.clabel(cont)
         
         elif scale == Scales.dB:
@@ -217,11 +223,11 @@ def plotBeam2D(plotObject, field, contour,
             vmin = np.min(field_dB) if vmin is None else vmin
             vmax = np.max(field_dB) if vmax is None else vmax
             
-            ampfig = ax.pcolormesh(grid_x1 * units.value, grid_x2 * units.value, field_dB,
+            ampfig = ax.pcolormesh(grid_x1 / units.value, grid_x2 / units.value, field_dB,
                                     vmin=vmin, vmax=vmax, cmap=cmaps.parula, shading='auto')
             
             if contour is not None:
-                cont = ax.contour(grid_x1 * units.value, grid_x2 * units.value, contour_dB, levels, cmap=cm.binary, linewidths=0.5)
+                cont = ax.contour(grid_x1 / units.value, grid_x2 / units.value, contour_dB, levels, cmap=cm.binary, linewidths=0.5)
                 ax.clabel(cont)
 
         ax.set_ylabel(r"${}$ / {}".format(comps[1], units.name.lower()))
@@ -406,13 +412,12 @@ def plotBeamCut(x_cut, y_cut, x_strip, y_strip, vmin, vmax, units):
     @returns fig Plot figure.
     @returns ax Plot axis.
     """
+    fig, ax = pt.subplots(1,1, figsize=(5,5)) 
 
-    fig, ax = pt.subplots(1,1, figsize=(5,5))
+    ax.plot(x_strip / units.value, x_cut, color="blue", label="E-plane")
+    ax.plot(y_strip / units.value, y_cut, color="red", ls="dashed", label="H-plane")
 
-    ax.plot(x_strip * units.value, x_cut, color="blue", label="E-plane")
-    ax.plot(y_strip * units.value, y_cut, color="red", ls="dashed", label="H-plane")
-
-    ax.set_xlim(np.min(x_strip * units.value), np.max(x_strip * units.value))
+    ax.set_xlim(np.min(x_strip / units.value), np.max(x_strip / units.value))
     ax.set_ylim(vmin, vmax)
 
     ax.set_xlabel(r"$\theta$ / {}".format(units.name.lower()))
@@ -438,32 +443,32 @@ def plotRTframe(frame, project, savePath, returns, aspect, units):
     idx_good = np.argwhere((frame.dx**2 + frame.dy**2 + frame.dz**2) > 0.8)
 
     if project == Projections.xy:
-        ax.scatter(frame.x[idx_good] * units.value, frame.y[idx_good] * units.value, color="black", s=10)
+        ax.scatter(frame.x[idx_good] / units.value, frame.y[idx_good] / units.value, color="black", s=10)
         ax.set_xlabel(r"$x$ / {}".format(units.name.lower()))
         ax.set_ylabel(r"$y$ / {}".format(units.name.lower()))
 
     elif project == Projections.xz:
-        ax.scatter(frame.x[idx_good] * units.value, frame.z[idx_good] * units.value, color="black", s=10)
+        ax.scatter(frame.x[idx_good] / units.value, frame.z[idx_good] / units.value, color="black", s=10)
         ax.set_xlabel(r"$x$ / {}".format(units.name.lower()))
         ax.set_ylabel(r"$z$ / {}".format(units.name.lower()))
     
     elif project == Projections.yz:
-        ax.scatter(frame.y[idx_good] * units.value, frame.z[idx_good] * units.value, color="black", s=10)
+        ax.scatter(frame.y[idx_good] / units.value, frame.z[idx_good] / units.value, color="black", s=10)
         ax.set_xlabel(r"$y$ / {}".format(units.name.lower()))
         ax.set_ylabel(r"$z$ / {}".format(units.name.lower()))
     
     elif project == Projections.yx:
-        ax.scatter(frame.y[idx_good] * units.value, frame.x[idx_good] * units.value, color="black", s=10)
+        ax.scatter(frame.y[idx_good] / units.value, frame.x[idx_good] / units.value, color="black", s=10)
         ax.set_xlabel(r"$y$ / {}".format(units.name.lower()))
         ax.set_ylabel(r"$x$ / {}".format(units.name.lower()))
 
     elif project == Projections.zy:
-        ax.scatter(frame.z[idx_good] * units.value, frame.y[idx_good] * units.value, color="black", s=10)
+        ax.scatter(frame.z[idx_good] / units.value, frame.y[idx_good] / units.value, color="black", s=10)
         ax.set_xlabel(r"$z$ / {}".format(units.name.lower()))
         ax.set_ylabel(r"$y$ / {}".format(units.name.lower()))
     
     elif project == Projections.zx:
-        ax.scatter(frame.z[idx_good] * units.value, frame.x[idx_good] * units.value, color="black", s=10)
+        ax.scatter(frame.z[idx_good] / units.value, frame.x[idx_good] / units.value, color="black", s=10)
         ax.set_xlabel(r"$z$ / {}".format(units.name.lower()))
         ax.set_ylabel(r"$x$ / {}".format(units.name.lower()))
 

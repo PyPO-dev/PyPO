@@ -7,10 +7,11 @@ import numpy as np
 import os
 import pathlib
 import re
+from time import time_ns
 
 import PyPO.Config as Config
 import PyPO.WorldParam as world
-from PyPO.Enums import FieldComponents, CurrentComponents, AperShapes
+from PyPO.Enums import FieldComponents, CurrentComponents, AperShapes, Objects
 
 nThreads_cpu = os.cpu_count() - 1 if os.cpu_count() > 1 else 1
 PO_modelist = ["JM", "EH", "JMEH", "EHP", "FF", "scalar"]
@@ -214,6 +215,13 @@ def check_groupSystem(name, groups, clog, errStr="", extern=False):
     
     else:
         return errStr
+
+class InputTransformError(Exception):
+    """!
+    Input transformation error. Raised when an error is encountered in input for translations/rotations.
+    """
+
+    pass
 
 class InputReflError(Exception):
     """!
@@ -463,6 +471,37 @@ def errMsg_mergebeam(beamName, surf0, surfd):
 
     return f"Cannot merge {beamName}, defined on {surfd}, on merging surface {surf0}.\n"
 
+def check_array(array,
+                clog,
+                array_type=np.ndarray, 
+                array_shape=(3,)):
+    """!
+    Error message when and array is of incorrect type/shape.
+
+    @param array Array to check.
+    @param array_type Expected type of array.
+    @param array_shape Expected shape of array.
+    """
+    
+    errStr = ""
+
+    if not isinstance(array, array_type):
+        errStr += f"Array of incorrect type {array_type}.\n"
+    else:
+        if not array.shape == array_shape:
+            errStr += f"Array of incorrect shape {array_shape}, expected {array_shape}.\n"
+    
+    if errStr:
+        errList = errStr.split("\n")[:-1]
+
+        for err in errList:
+            clog.error(err)
+        raise InputTransformError()
+    
+    else:
+        return 0
+
+
 def block_ndarray(fieldName, elemDict, shape, cust_name=False):
     """!
     Check if an input array has correct shape.
@@ -504,6 +543,12 @@ def check_ElemDict(elemDict, nameList, clog):
     errStr = ""
    
     elemDict["transf"] = world.INITM() 
+
+    if not "rms" in elemDict:
+        elemDict["rms"] = -1
+
+    if not "rms_seed" in elemDict:
+        elemDict["rms_seed"] = time_ns()
    
     if not "pos" in elemDict:
         elemDict["pos"] = world.ORIGIN()
@@ -1458,6 +1503,7 @@ def check_sameBound(beams, checkDict, clog):
 
     errStr = ""
     surf0 = checkDict[beams[0]].surf
+    print(beams)
     for i in range(len(beams) - 1):
         if checkDict[beams[i+1]].surf != surf0:
             errStr += errMsg_mergebeam(beams[i+1], surf0, checkDict[beams[i+1]].surf)

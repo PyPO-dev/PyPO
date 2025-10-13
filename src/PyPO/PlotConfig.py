@@ -6,7 +6,7 @@ Also enables LaTeX backend if present.
 
 import matplotlib.pyplot as pt
 import matplotlib
-from distutils.spawn import find_executable
+from shutil import which as find_executable
 
 if find_executable('latex'):
 

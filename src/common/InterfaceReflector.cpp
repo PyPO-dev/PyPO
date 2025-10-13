@@ -166,7 +166,11 @@ void Parabola_uv(T *parabola, U xu_lo, U xu_up, U yv_lo,
                 U mat[16], bool transform)
 {
     U du0 = (xu_up - xu_lo) / (ncx - 1);
-    U dv = (yv_up - yv_lo) / (ncy - 1);
+    /* For v (polar angle) range, drop the -1, so that the upper value is excluded 
+    This prevents both the 0 deg and 360 deg being included.  For limits less than
+    360 deg (e.g. 180 deg) then we should still do this, as it would allow future
+    use of symmetry to speed up calculations. */
+    U dv = (yv_up - yv_lo) / (ncy);
 
     U majmin = sqrt(1 - ecc_uv*ecc_uv);
     
@@ -349,7 +353,11 @@ void Hyperbola_uv(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
                   U mat[16], bool transform)
 {
     U du0 = (xu_up - xu_lo) / (ncx - 1);
-    U dv = (yv_up - yv_lo) / (ncy - 1);
+    /* For v (polar angle) range, drop the -1, so that the upper value is excluded 
+    This prevents both the 0 deg and 360 deg being included.  For limits less than
+    360 deg (e.g. 180 deg) then we should still do this, as it would allow future
+    use of symmetry to speed up calculations. */
+    U dv = (yv_up - yv_lo) / (ncy);
 
     U majmin = sqrt(1 - ecc_uv*ecc_uv);
     
@@ -533,7 +541,11 @@ void Ellipse_uv(T *ellipse, U xu_lo, U xu_up, U yv_lo,
                 U mat[16], bool transform)
 {
     U du0 = (xu_up - xu_lo) / (ncx - 1);
-    U dv = (yv_up - yv_lo) / (ncy - 1);
+    /* For v (polar angle) range, drop the -1, so that the upper value is excluded 
+    This prevents both the 0 deg and 360 deg being included.  For limits less than
+    360 deg (e.g. 180 deg) then we should still do this, as it would allow future
+    use of symmetry to speed up calculations. */
+    U dv = (yv_up - yv_lo) / (ncy);
 
     U majmin = sqrt(1 - ecc_uv*ecc_uv);
     
@@ -708,7 +720,11 @@ void Plane_uv(T *plane, U xu_lo, U xu_up, U yv_lo,
     U majmin = sqrt(1 - ecc_uv*ecc_uv);
     
     du0 = (xu_up - xu_lo) / (ncx - 1);
-    dv = (yv_up - yv_lo) / (ncy - 1) * M_PI/180;
+    /* For v (polar angle) range, drop the -1, so that the upper value is excluded 
+    This prevents both the 0 deg and 360 deg being included.  For limits less than
+    360 deg (e.g. 180 deg) then we should still do this, as it would allow future
+    use of symmetry to speed up calculations. */
+    dv = (yv_up - yv_lo) / (ncy);
 
     U ecc_fac;
 
@@ -722,7 +738,7 @@ void Plane_uv(T *plane, U xu_lo, U xu_up, U yv_lo,
     {        
         for (int j=0; j < ncy; j++)
         {
-            v = (j * dv + yv_lo);
+            v = (j * dv + yv_lo) * M_PI/180;
             ecc_fac = 1 / sqrt(1 - (ecc_uv*cos(v))*(ecc_uv*cos(v))); //consider moving into separate loop + array alloc
             duv = du0 * majmin * ecc_fac; 
             u = i*duv + xu_lo*ecc_fac;
@@ -830,6 +846,23 @@ void Plane_AoE(T *plane, U xu_lo, U xu_up, U yv_lo,
     }
 }
 
+template<typename T, typename U, typename W>
+void add_surferr_uncorr(T refl, W *container)
+{
+    Random<U> normal(reff.rms_seed); 
+
+    int num = refl.n_cells[0] * refl.n_cells[1];
+    
+    U store;
+    for (int n = 0; n < num; ++n) {
+        store = normal.generateNormal(refl.rms);
+        
+        container->x[n] += store * container->nx[n];
+        container->y[n] += store * container->ny[n];
+        container->z[n] += store * container->nz[n];
+    }
+}
+
 /**
  * Generate reflector/far-field grids.
  * 
@@ -930,6 +963,11 @@ void generateGrid(reflparams refl, reflcontainer *container, bool transform, boo
     {
         Plane_AoE<reflcontainer, double>(container, xu_lo, xu_up, yv_lo,
                                         yv_up, xcenter, ycenter, ncx, ncy, refl.transf, transform, spheric);
+    }
+
+    if (refl.rms > 0)
+    {
+        add_surferr_uncorr<reflparams, double, reflcontainer>(refl, container);
     }
 }
 
@@ -1034,5 +1072,10 @@ void generateGridf(reflparamsf refl, reflcontainerf *container, bool transform, 
     {
         Plane_AoE<reflcontainerf, float>(container, xu_lo, xu_up, yv_lo,
                                         yv_up, xcenter, ycenter, ncx, ncy, refl.transf, transform, spheric);
+    }
+    
+    if (refl.rms > 0)
+    {
+        add_surferr_uncorr<reflparamsf, float, reflcontainerf>(refl, container);
     }
 }

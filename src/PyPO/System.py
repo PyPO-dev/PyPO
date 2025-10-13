@@ -443,7 +443,7 @@ class System(object):
                     obj : Objects = Objects.ELEMENT, 
                     mode : Modes = Modes.REL, 
                     pivot : np.ndarray = None, 
-                    keep_pol :bool = False):
+                    keep_pol : bool = False):
         """!
         Rotate reflector grids.
         
@@ -461,11 +461,16 @@ class System(object):
         @param mode Apply rotation relative to current orientation (Modes.REL), or rotate to specified orientation (Modes.ABS).
         @param pivot Numpy ndarray of length 3, containing pivot x, y and z co-ordinates, in mm. Defaults to pos. 
         @param keep_pol Keep polarisation of a field/current defined on the surface, if present.
+            If True, does not rotate polarisation of any defined fields/currents along with the rotation of reflector.
+            If False, rotates polarisation along with reflector. Defaults to False.
         """
-        
+
+        PChecks.check_array(rotation, self.clog)
+
         if obj == Objects.ELEMENT:
             PChecks.check_elemSystem(name, self.system, self.clog, extern=True)
             pivot = self.system[name]["pos"] if pivot is None else pivot
+            PChecks.check_array(pivot, self.clog)
             
             if mode == Modes.ABS:
                 Rtot = self._absRotationMat(rotation, self.system[name]["ori"], pivot)
@@ -494,6 +499,7 @@ class System(object):
         elif obj == Objects.GROUP:
             PChecks.check_groupSystem(name, self.groups, self.clog, extern=True)
             pivot = self.groups[name]["pos"] if pivot is None else pivot
+            PChecks.check_array(pivot, self.clog)
             
             if mode == Modes.ABS:
                 Rtot = self._absRotationMat(rotation, self.groups[name]["ori"], pivot)
@@ -531,6 +537,7 @@ class System(object):
         if obj == Objects.FRAME:
             PChecks.check_frameSystem(name, self.frames, self.clog, extern=True)
             pivot = self.frames[name].pos if pivot is None else pivot
+            PChecks.check_array(pivot, self.clog)
             
             if mode == Modes.ABS:
                 Rtot = self._absRotationMat(rotation, self.frames[name].ori, pivot)
@@ -553,7 +560,11 @@ class System(object):
             
                 self.clog.info(f"Rotated frame {name} by {*['{:0.3e}'.format(x) for x in list(rotation)],} degrees around {*['{:0.3e}'.format(x) for x in list(pivot)],}.")
 
-    def translateGrids(self, name : str, translation : np.ndarray, obj : Objects = Objects.ELEMENT, mode : Modes = Modes.REL):
+    def translateGrids(self, 
+                       name : str, 
+                       translation : np.ndarray, 
+                       obj : Objects = Objects.ELEMENT, 
+                       mode : Modes = Modes.REL) -> None:
         """!
         Translate reflector grids.
         
@@ -567,6 +578,8 @@ class System(object):
         @param obj Whether the name corresponds to a single element, group, or frame. Fields and currents are translated by translating the associated surface. Choose from Objects enum.
         @param mode Apply translation relative ('relative') to current position, or move to specified position ('absolute').
         """
+        
+        PChecks.check_array(translation, self.clog)
 
         _translation = self.copyObj(translation)
         

@@ -15,6 +15,7 @@ from nose2.tools import params
 
 from PyPO.System import System
 from PyPO.Enums import Modes, Objects
+from PyPO.Checks import InputTransformError
 
 class Test_MatTransform(unittest.TestCase):
     def setUp(self):
@@ -69,6 +70,11 @@ class Test_MatTransform(unittest.TestCase):
         
         for z0atest, z0aref in zip(g0atest.z.ravel(), g0aref.z.ravel()):
             self.assertAlmostEqual(z0atest, z0aref, delta=1e-6)
+        
+        trans_bad = 6.66
+
+        self.assertRaises(InputTransformError, self.s.translateGrids, name_test, 
+                                             trans_bad)
 
     @params(*TestTemplates.getAllReflectorList())
     def test_rotations(self, element):
@@ -111,6 +117,14 @@ class Test_MatTransform(unittest.TestCase):
         
         for a0atest, a0aref in zip(g0atest.area.ravel(), g0aref.area.ravel()):
             self.assertAlmostEqual(a0atest, a0aref)
+
+        rotation_bad = 8
+        pivot_bad = 42
+        
+        self.assertRaises(InputTransformError, self.s.rotateGrids, name_test, 
+                                             rotation_bad, 
+                                             pivot=pivot_bad, 
+                                             mode=Modes.ABS)
    
     def test_translationsGroup(self):
         self.s.groupElements("test", TestTemplates.plane_xy["name"], TestTemplates.paraboloid_foc_uv["name"])
@@ -126,6 +140,12 @@ class Test_MatTransform(unittest.TestCase):
 
         for po, tr in zip(self.s.groups["test"]["pos"], np.zeros(3)):
             self.assertEqual(po, tr)
+        
+        trans_bad = 6.66
+
+        self.assertRaises(InputTransformError, self.s.translateGrids, "test", 
+                                             trans_bad,
+                                             obj=Objects.GROUP)
 
     def test_rotationsGroup(self):
         self.s.groupElements("test", TestTemplates.plane_xy["name"], TestTemplates.paraboloid_foc_uv["name"])
@@ -141,6 +161,15 @@ class Test_MatTransform(unittest.TestCase):
 
         for po, tr in zip(self.s.groups["test"]["ori"], np.array([0, 0, 1])):
             self.assertAlmostEqual(po, tr)
+        
+        rotation_bad = 8
+        pivot_bad = 42
+        
+        self.assertRaises(InputTransformError, self.s.rotateGrids, "test", 
+                                             rotation_bad, 
+                                             pivot=pivot_bad,
+                                             obj=Objects.GROUP,
+                                             mode=Modes.ABS)
 
     @params(*TestTemplates.getFrameList())
     def test_translationsFrame(self, frame):
@@ -155,6 +184,12 @@ class Test_MatTransform(unittest.TestCase):
 
         for po, tr in zip(self.s.frames[frame["name"]].pos, np.zeros(3)):
             self.assertEqual(po, tr)
+        
+        trans_bad = 6.66
+
+        self.assertRaises(InputTransformError, self.s.translateGrids, frame["name"], 
+                                             trans_bad,
+                                             obj=Objects.FRAME)
 
     @params(*TestTemplates.getFrameList())
     def test_rotationsFrame(self, frame):
@@ -169,6 +204,15 @@ class Test_MatTransform(unittest.TestCase):
 
         for po, tr in zip(self.s.frames[frame["name"]].ori, np.array([0, 0, 1])):
             self.assertAlmostEqual(po, tr)
+        
+        rotation_bad = 8
+        pivot_bad = 42
+        
+        self.assertRaises(InputTransformError, self.s.rotateGrids, frame["name"], 
+                                             rotation_bad, 
+                                             pivot=pivot_bad,
+                                             obj=Objects.FRAME,
+                                             mode=Modes.ABS)
 
 if __name__ == "__main__":
     import nose2

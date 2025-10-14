@@ -1861,8 +1861,8 @@ class System(object):
         self.homeReflector(name_surf)
         grids = self.generateGrids(name_surf, transform=False, spheric=False)
 
-        x_edges = np.array([np.min(grids.x), np.max(grids.x)])
-        y_edges = np.array([np.min(grids.y), np.max(grids.y)])
+        x_edges = np.array([np.nanmin(grids.x), np.nanmax(grids.x)])
+        y_edges = np.array([np.nanmin(grids.y), np.nanmax(grids.y)])
 
         field = np.absolute(self.fields[name_field][comp.value])
         max_norm = np.nanmax(np.absolute(self.fields[name_field][norm.value]))
@@ -1872,6 +1872,7 @@ class System(object):
 
         if center or align:
             popt = self.fitGaussAbs(name_field, comp, scale=Scales.LIN, full_output=True)
+            print(popt)
         
             if center:
                 center_use = np.array([popt[2], popt[3]])

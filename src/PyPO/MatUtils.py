@@ -9,6 +9,7 @@ import numpy as np
 def findConnectedSubsets(mat, component, idx_start):
     """!
     Find extent of centered connected subset in a matrix.
+    Note that this method is agnostic of the underlying coordinatisation, i.e the extent is given in indices w.r.t the supplied matrix itself.
 
     @param mat Matrix of which to find largest connected subset.
     @param component Value on which to differentiate subset.
@@ -118,4 +119,4 @@ def getAnglesFromMatrix(self, M):
 
     r = np.degrees(np.array([rx, ry, rz]))
 
-    return r#, testM
+    return r

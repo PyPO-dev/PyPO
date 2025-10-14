@@ -4,20 +4,21 @@ File containing methods for fitting Gaussian distributions to field components.
 """
 
 import numpy as np
+from copy import deepcopy
 from scipy.optimize import fmin
+from scipy.interpolate import griddata
 
 import PyPO.BindRefl as BRefl
 import PyPO.MatUtils as MUtils
 from PyPO.Enums import Scales
 
-def calcEstimates(x, y, area, field_norm):
+def calcEstimates(x, y, field_norm):
     """!
     Calculate estimates for beam parameters from an input field component.
     These estimates are used as initial values for Gaussian fitting.
 
     @param x Grid of x co-ordinates of input field.
     @param y Grid of y co-ordinates of input field.
-    @param area Grid of area elements.
     @param field_norm Normalised input field component.
 
     @returns x0 Semi-major axis size of estimate.
@@ -27,13 +28,13 @@ def calcEstimates(x, y, area, field_norm):
     @returns theta Position angle of estimate.
     """
 
-    M0 = np.sum(field_norm)
-    xm = np.sum(x * field_norm) / M0
-    ym = np.sum(y * field_norm) / M0
+    M0 = np.nansum(field_norm)
+    xm = np.nansum(x * field_norm) / M0
+    ym = np.nansum(y * field_norm) / M0
 
-    Mxx = np.sum(x**2 * field_norm) / M0 - xm**2
-    Myy = np.sum(y**2 * field_norm) / M0 - ym**2
-    Mxy = np.sum(x*y * field_norm) / M0 - xm*ym
+    Mxx = np.nansum(x**2 * field_norm) / M0 - xm**2
+    Myy = np.nansum(y**2 * field_norm) / M0 - ym**2
+    Mxy = np.nansum(x*y * field_norm) / M0 - xm*ym
 
     D = 1 / (2 * (Mxx*Myy - Mxy**2))
 
@@ -87,16 +88,31 @@ def fitGaussAbs(field, surfaceObject, thres, scale, ratio=1):
 
     global thres_g
     thres_g = thres
-    
-    # Normalize
-    _field = np.absolute(field) / np.max(np.absolute(field))
-    #grids = generateGrid(surfaceObject, transform=True, spheric=False)
+
     grids = BRefl.generateGrid(surfaceObject, transform=False, spheric=False)
 
-    x = grids.x
-    y = grids.y
-    
-    area = grids.area
+    if surfaceObject["gmode"] == 1:
+        cp_field = deepcopy(field)
+        pr_x = grids.x
+        pr_y = grids.y
+
+        x, y = np.mgrid[np.nanmin(pr_x):np.nanmax(pr_x):1j*surfaceObject["gridsize"][0],
+                        np.nanmin(pr_y):np.nanmax(pr_y):1j*surfaceObject["gridsize"][1]]
+
+        reg_field = griddata((pr_x.ravel(), pr_y.ravel()), 
+                             np.absolute(field).ravel(),
+                             (x, y))
+
+        import matplotlib.pyplot as plt
+        plt.imshow(reg_field)
+        plt.show()
+
+        _field = np.absolute(reg_field) / np.nanmax(np.absolute(reg_field))
+
+    else:
+        _field = np.absolute(field) / np.nanmax(np.absolute(field))
+        x = grids.x
+        y = grids.y
 
     if scale == Scales.dB:
         fit_field = 20 * np.log10(_field)
@@ -106,17 +122,17 @@ def fitGaussAbs(field, surfaceObject, thres, scale, ratio=1):
         fit_field = _field
         mask_f = fit_field >= 10**(thres/20)
 
-    idx_max = np.unravel_index(np.argmax(fit_field), fit_field.shape)
+    idx_max = np.unravel_index(np.nanargmax(fit_field), fit_field.shape)
 
     x_max = x[idx_max]
     y_max = y[idx_max] 
 
     idx_rows, idx_cols = MUtils.findConnectedSubsets(mask_f, 1, idx_max)
-    _xmin = x[np.min(idx_cols), idx_max[0]]
-    _xmax = x[np.max(idx_cols), idx_max[0]]
+    _xmin = x[np.nanmin(idx_cols), idx_max[0]]
+    _xmax = x[np.nanmax(idx_cols), idx_max[0]]
    
-    _ymin = y[idx_max[1], np.min(idx_rows)]
-    _ymax = y[idx_max[1], np.max(idx_rows)]
+    _ymin = y[idx_max[1], np.nanmin(idx_rows)]
+    _ymax = y[idx_max[1], np.nanmax(idx_rows)]
     
     x_cond = (x > _xmin) & (x < _xmax)
     y_cond = (y > _ymin) & (y < _ymax)
@@ -129,7 +145,7 @@ def fitGaussAbs(field, surfaceObject, thres, scale, ratio=1):
     if not _mask_f.any():
         _mask_f = np.ones(_mask_f.shape, dtype=int)
     
-    x0, y0, xs, ys, theta = calcEstimates(x[_mask_f], y[_mask_f], area[_mask_f], fit_field[_mask_f])
+    x0, y0, xs, ys, theta = calcEstimates(x[_mask_f], y[_mask_f], fit_field[_mask_f])
 
     p0 = [x0, y0, xs, ys, theta, np.max(fit_field)]
 
@@ -159,7 +175,7 @@ def fitGaussAbs(field, surfaceObject, thres, scale, ratio=1):
             popt = fmin(GaussAbs, p0, args, disp=False)
 
             _Psi = generateGauss(popt, surfaceObject, scale=Scales.LIN)
-            _ratio = np.sum(_Psi**2) / np.sum(_field**2)
+            _ratio = np.nansum(_Psi**2) / np.nansum(_field**2)
             
             if num > 1:
                 if thres < -3:

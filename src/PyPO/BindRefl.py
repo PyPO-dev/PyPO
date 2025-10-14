@@ -61,8 +61,6 @@ def generateGrid(reflparams_py, transform=True, spheric=True):
 
     lib.generateGrid(inp, ctypes.byref(res), transform, spheric)
     
-
     grids = BUtils.creflToObj(res, reflparams_py["gridsize"], np.float64)
-    
 
     return grids

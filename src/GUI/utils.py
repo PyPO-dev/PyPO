@@ -28,7 +28,8 @@ class inType(Enum):
     xyzRadio = 7
     dynamicDropdown = 8
     dynamicRadio = 9
-    elementSelector = 10
+    dynamicCheckbox = 10
+    elementSelector = 11
 
 class WSSections(Enum):
     """!

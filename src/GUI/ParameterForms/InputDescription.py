@@ -92,7 +92,7 @@ class InputDescription:
         """
         vectorTypes = [inType.vectorFloats, inType.vectorIntegers, inType.vectorStrings]
         selectionTypes = [inType.radio, inType.dropdown]
-        dynamicTypes = [inType.dynamicRadio, inType.dynamicDropdown]
+        dynamicTypes = [inType.dynamicRadio, inType.dynamicDropdown, inType.dynamicCheckbox]
         # Validation for inType
         if type(self.inType) != inType:
             raise InputDescriptionError("Cannot define an input description without an inType.")
@@ -136,7 +136,9 @@ class InputDescription:
         if self.subDict:
             if self.inType not in dynamicTypes:
                 raise InputDescriptionError(f"Cannot set subDict for InputDescription of inType:{self.inType}.")
-            if len(self.subDict) < 2:
+            if len(self.subDict) != 1 and self.inType == inType.dynamicCheckbox:
+                raise InputDescriptionError(f"The subDict for a dynamic checkbox should have one and only one entry. For {self.outputName} it has {len(self.subDict)} entries.")
+            if len(self.subDict) < 2 and self.inType != inType.dynamicCheckbox:
                 raise InputDescriptionError(f"The subDict of a dynamic type inputDescription should have at least two entries.")
             for key, value in self.subDict.items():
                 if type(key) != str:

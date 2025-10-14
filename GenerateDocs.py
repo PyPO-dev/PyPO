@@ -4,7 +4,6 @@ PyPO docs generator.
 
 For this script to work properly, you should have installed the docs prerequisites.
 """
-
 import os
 import shutil
 import traceback

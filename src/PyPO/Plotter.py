@@ -417,8 +417,8 @@ def plotBeamCut(x_cut, y_cut, x_strip, y_strip, vmin, vmax, units):
     ax.plot(x_strip / units.value, x_cut, color="blue", label="E-plane")
     ax.plot(y_strip / units.value, y_cut, color="red", ls="dashed", label="H-plane")
 
-    ax.set_xlim(np.min(x_strip / units.value), np.max(x_strip / units.value))
-    ax.set_ylim(vmin, vmax)
+    ax.set_xlim(np.nanmin(x_strip / units.value), np.nanmax(x_strip / units.value))
+    #ax.set_ylim(vmin, vmax)
 
     ax.set_xlabel(r"$\theta$ / {}".format(units.name.lower()))
     ax.set_ylabel("Power / dB")

@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['physical_20optics_20methods_0',['Physical Optics Methods',['../group__public__api__po.html',1,'']]],
-  ['pypo_20datatype_20reference_1',['PyPO Datatype Reference',['../group__public__api__types.html',1,'']]]
+  ['hybrid_20rt_20po_20methods_0',['Hybrid RT/PO Methods',['../group__public__api__hybrid.html',1,'']]]
 ];

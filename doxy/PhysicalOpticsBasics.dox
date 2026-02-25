@@ -42,6 +42,26 @@ These currents are only present in the region of the scatterer directly illumina
 field. An additional approximation within the Physical Optics method for PEC scatterers is that the currents on portions of the scatterer 
 that are shadowed from the source (under geometric ray optics) are exactly zero.
 
+\section pobasics_fieldnorm Field normalization
+
+The electric and magnetic fields and currents in PyPO are rms values measured in normalized units:
+
+$$\mathbf{E} = \frac{1}{k\sqrt{2Z}} \mathbf{E}_{SI} $$
+$$\mathbf{H} = \frac{\sqrt{Z}}{k\sqrt{2}} \mathbf{H}_{SI} $$
+$$\mathbf{J} = \frac{\sqrt{Z}}{k\sqrt{2}} \mathbf{J}_{SI} $$
+$$\mathbf{E} = \frac{1}{k\sqrt{2Z}} \mathbf{E}_{SI} $$
+
+where:
+
+\f$k = \frac{2 \pi c}{n \lambda} = \omega\sqrt{\epsilon\mu}\f$ is the wave number.
+
+\f$Z = \sqrt{\frac{\mu_r \mu_0}{\epsilon_r \epsilon_0}}\f$ is the impedance of the background media
+
+This choice eliminates the physical constants \f$\epsilon_0\f$ and \f$\mu_0\f$ from the electromagnetic equations, and keeps the 
+field values closer to unity, which aids in numerical accuracy of the computations.
+
+The time factor \f$e^{i\omega t}\f$ is suppressed throughout.
+
 \section pobasics_fieldcalc Calculation of fields at a point
 
 Once the electric and magnetic currents induced at each point across the scatterer have been calculated, it is then necessary to
@@ -55,7 +75,6 @@ $$ \mathbf{E}(\mathbf{r}) = - k Z_m \int_{S} \Big( 1 + \frac{1}{k^2}\mathbf{\nab
 
 $$ \mathbf{H}(\mathbf{r}) = - k Z_m \int_{S} \Big( 1 + \frac{1}{k^2}\mathbf{\nabla}\mathbf{\nabla} \Big) G(\mathbf{r}, \mathbf{r_q}) \cdot \mathbf{M}(\mathbf{r_s}) d s_q + \int_{S} \mathbf{J}(\mathbf{r_q}) \times \mathbf{\nabla} G(\mathbf{r}, \mathbf{r_q}) d s_q $$
 
-
 where:
 
 \f$\mathbf{r}_q\f$ is a point on the source scatterer.
@@ -64,16 +83,27 @@ where:
 
 \f$d s_q\f$ is an area element of the source scatterer surface centered at \f$\mathbf{r}_q\f$
 
-\f$k = \frac{2 \pi c}{n \lambda}\f$ is the wave number.
-
-\f$Z_m = \sqrt{\frac{\mu_r \mu_0}{\epsilon_r \epsilon_0}}\f$ is the impedance of the background media
-
 \f$G = \frac{e^{-i k R}}{4 \pi R}\f$ is the freespace Green's function
 
 \f$R = |\mathbf{r_q} - \mathbf{r}|\f$ is the distance between the observation point and the point on the source scatterer.
 
+Applying these two equations to propagation in a linear lossless medium yields:
 
-\section pobasics_process
+$$ \mathbf{E}(\mathbf{r}) =  \int_{S} \frac{k^2}{4\pi} e^{-ikR} \Bigg[ Z_m \Bigg[ \mathbf{J} (\mathbf{r_s}) \Bigg(\frac{-i}{k R} - \frac{1}{k^2 R^2} + \frac{i}{k^3 R^3} \Bigg)  + \Big(\mathbf{J} (\mathbf{r_s})\cdot\mathbf{\hat{R}}\Big) \mathbf{\hat{R}} \Bigg( \frac{i}{kR} + \frac{3}{k^2 R^2} - \frac{3 i}{k^3 R^3} \Bigg) \Bigg] - \mathbf{M}(\mathbf{r}) \times \mathbf{\hat{R}} \Bigg( \frac{1}{k^2 R^2} + \frac{i}{kR}\Bigg) \Bigg] ds $$
+
+$$ \mathbf{H}(\mathbf{r}) = \int_{S} \frac{k^2}{4\pi} e^{-ikR} \Bigg[ \frac{1}{Z_m} \Bigg[ \mathbf{M} (\mathbf{r_s}) \Bigg(\frac{-i}{k R} - \frac{1}{k^2 R^2} + \frac{i}{k^3 R^3} \Bigg)  + \Big(\mathbf{M} (\mathbf{r_s})\cdot\mathbf{\hat{R}}\Big) \mathbf{\hat{R}} \Bigg( \frac{i}{kR} + \frac{3}{k^2 R^2} - \frac{3 i}{k^3 R^3} \Bigg) \Bigg] + \mathbf{J}(\mathbf{r}) \times \mathbf{\hat{R}} \Bigg( \frac{1}{k^2 R^2} + \frac{i}{kR}\Bigg) \Bigg] ds $$
+
+\subsection pobasics_farfields Farfields
+
+In the far field limit \f($R\rightarrow\infty$\f), the above expressions reduce to:
+
+$$\mathbf{E}(\mathbf{\hat{r}}) = \int_S \frac{-i k^2}{4\pi} e^{ik\mathbf{r}_s\cdot\mathbf{\hat{r}}} \Big[ Z_m\big(\mathbf{J} - (\mathbf{J}\cdot\mathbf{\hat{r}})\big) - \mathbf{\hat{r}}\times \mathbf{M}\Big] ds $$
+
+$$\mathbf{H}(\mathbf{\hat{r}}) = \int_S \frac{-i k^2}{4\pi} e^{ik\mathbf{r}_s\cdot\mathbf{\hat{r}}} \Big[ \frac{1}{Z_m}\big(\mathbf{M} - (\mathbf{M}\cdot\mathbf{\hat{r}})\big) + \mathbf{\hat{r}}\times \mathbf{J}\Big] ds $$
+
+where \f$\mathbf{\hat{r}}\f$ is the farfield direction vector.
+
+\section pobasics_process PO Process
 
 Physical optics simulations of a system of scatterings proceeds by:
 1. A source of electrical and magnetic currents is defined¸ either directly, or from a specified \f$\mathbf{E}\f$ and \f$\mathbf{H}\f$
@@ -85,6 +115,67 @@ fields due to the source are calculated at each grid point on the target scatter
 4. The output fields are calculated from the currents induced on the final scatterer.
 
 In general, the fields on each scattering and output plane can be calculated due to multiple sources by simply adding the fields from each individual source.
+
+\section pobasics_integration The Surface Integral
+
+Evaluation of the surface integral in the calculation of the incident field on a scatterer is the main computational challenge in performing PO calculations.
+
+For moderately large surfaces and non-paraxial angles between the source surface normal and the target point, the complex phase of the 
+integrands oscilates rapidly due to both the Green's function's \f$e^{-i k R}\f$ term, and to phase wraps in the source current distribution.
+
+The integral is performed using the rectangular method first over the \f$y\f$ or \f$\phi\f$ directions, followed by the \f$x\f$ or \f$\rho\f$ directions. 
+
+Performing the integration in this order allows for the future use of lower numbers of PO points near the center of a polar grid, 
+where the \f$\phi\f$ grid is oversampled.
+
+Each evaluation of the integrands at a specific source point needs to know the value of the current element at that point.  
+Using a fully automatic integration routine like those in scipy.integrate to perform the integration would require that the 
+field at each point on the source scatterer be evaluated by performing a similar integral over the source that is illuminating that scatterer.  
+This would require that the whole PO chain be calculated at once.
+
+We can avoid this problem by dividing the integration routine into several steps: 
+1. First designate the integration points on the source scatterer. This is equivalent to manually setting the number of points to be used.
+2. Calculate the current elements at those points.
+3. Calculate the fields at the target point(s).
+
+This sequence can be repeated for each scatterer in the optics chain.
+
+\subsection pobasics_convergence Convergence of the integrals
+
+The surface integrals converge fastest for focused reflectors at points close to the main lobe of the radiation pattern - in 
+this region, the integrand only oscillates slowly in phase as the position across the source is varied.  As the observation 
+point moves away from the main lobe into the far sidelobe regions, the phase of the integrand varies more rapidly, and a finer 
+grid of points is required to adequately sample the integrands.
+
+In general for the integral to converge, at least one sample per period of oscillation is required - the cycle of oscillation 
+includes both the distance from source to the scattering, and from the scattering to the target point.  Thus we require a point 
+spacing on the scatterer of \f$ \Delta r + \Delta r' \lt \lambda / 2 \f$.  For the worst case of illumination of a scatterer at an 
+angle nearly parallel to the surface, and an observation point nearly anti-parallel to the incoming ray, this means that 
+integration points on the scatterer must be spaced \f$ \lambda / 2 \f$ apart.  This gives an upper limit on the number of points required.
+
+For a reflector with a circular rim, the spacing between integration points on the rim is 
+
+$$ \Delta r = \pi \frac{D}{n_\phi} $$
+
+Thus the integral will converge if
+
+$$ n_\phi \gt 2\pi \frac{D}{\lambda} $$
+
+For a focused reflector with a circular rim of diameter \f$D\f$  observed at an angle \f$ \theta \f$ to the main beam, the integral will converge if:
+
+$$ n_\rho \gt 2.4\Bigg(1.09\cdot\pi\frac{D}{\lambda}\sin\theta + 10 \Bigg) $$
+
+and 
+
+$$ n_\phi \gt 1.09\cdot\pi\frac{D}{\lambda}\sin\theta + 10 $$
+
+For a focused reflector with a rectangular rim, the integral will converge for
+
+$$ n_{x,y} = 1.75\cdot \frac{D_{x,y}}{\lambda}\sin \theta_{x,y} +10 $$
+
+Again, the worst case is that a point spacing of 
+
+$$ n_{x, y} = 3.5 \frac{D_{x,y}}{\lambda} $$
 
 \section pobasics_materialproperties Material Properties
 

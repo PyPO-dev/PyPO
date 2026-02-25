@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['common_20transformation_20methods_0',['Common Transformation Methods',['../group__public__api__common.html',1,'']]]
+  ['arguments_0',['Special Option Arguments',['../group__public__api__argopts.html',1,'']]]
 ];

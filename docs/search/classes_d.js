@@ -2,8 +2,8 @@ var searchData=
 [
   ['scalarfield_0',['scalarfield',['../classPyPO_1_1PyPOTypes_1_1scalarfield.html',1,'PyPO::PyPOTypes']]],
   ['scalarfieldnameerror_1',['ScalarFieldNameError',['../classPyPO_1_1Checks_1_1ScalarFieldNameError.html',1,'PyPO::Checks']]],
-  ['scalargpodict_2',['ScalarGPODict',['../classPyPO_1_1Structs_1_1ScalarGPODict.html',1,'PyPO.Structs.ScalarGPODict'],['../structScalarGPODict.html',1,'ScalarGPODict']]],
-  ['scalargpodictf_3',['ScalarGPODictf',['../classPyPO_1_1Structs_1_1ScalarGPODictf.html',1,'PyPO.Structs.ScalarGPODictf'],['../structScalarGPODictf.html',1,'ScalarGPODictf']]],
+  ['scalargpodict_2',['scalargpodict',['../classPyPO_1_1Structs_1_1ScalarGPODict.html',1,'PyPO.Structs.ScalarGPODict'],['../structScalarGPODict.html',1,'ScalarGPODict']]],
+  ['scalargpodictf_3',['scalargpodictf',['../classPyPO_1_1Structs_1_1ScalarGPODictf.html',1,'PyPO.Structs.ScalarGPODictf'],['../structScalarGPODictf.html',1,'ScalarGPODictf']]],
   ['scales_4',['Scales',['../classPyPO_1_1Enums_1_1Scales.html',1,'PyPO::Enums']]],
   ['selectionwidgetinterface_5',['selectionWidgetInterface',['../classGUI_1_1ParameterForms_1_1inputWidgetInterfaces_1_1selectionWidgetInterface.html',1,'GUI::ParameterForms::inputWidgetInterfaces']]],
   ['selfclosingdialog_6',['selfClosingDialog',['../classGUI_1_1Dialogs_1_1selfClosingDialog.html',1,'GUI::Dialogs']]],

@@ -5,7 +5,7 @@ Set global world parameters for PyPO.
 
 import numpy as np
 
-ORIGIN      = np.zeros(3)
+ORIGIN    = np.zeros(3)
 XAX       = np.array([1, 0, 0])
 YAX       = np.array([0, 1, 0])
 ZAX       = np.array([0, 0, 1])

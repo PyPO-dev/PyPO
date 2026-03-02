@@ -9,7 +9,7 @@
 #include "MemUtils.h"
 #include "Debug.h"
 
-#define CSIZE 10
+#define CSIZE 12
 #define CSIZERT 5
 
 #ifdef _WIN32

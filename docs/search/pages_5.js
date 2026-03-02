@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['generating_20reflectors_20elements_0',['Generating Reflectors/Elements',['../basictut3.html',1,'']]],
-  ['gridding_20and_20parameterisations_1',['Gridding And Parameterisations',['../basictut4.html',1,'']]],
-  ['group_20configurations_20in_20pypo_2',['Optimising reflector/group configurations in PyPO',['../basictut6.html',1,'']]]
+  ['installation_1399',['Installation',['../install.html',1,'']]],
+  ['instructions_20for_20contributions_20_26_20development_1400',['Instructions For Contributions &amp; Development',['../contribguide.html',1,'']]],
+  ['introduction_20to_20physical_20optics_1401',['Introduction To Physical Optics',['../pobasics.html',1,'']]],
+  ['introduction_20to_20pypo_20_26_20design_20principles_1402',['Introduction To PyPO &amp; Design Principles',['../basictut1.html',1,'']]]
 ];

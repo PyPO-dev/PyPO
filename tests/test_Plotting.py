@@ -27,7 +27,7 @@ class Test_Plotting(unittest.TestCase):
         self.s = TestTemplates.getSystemWithReflectors()
         self.s.setOverride(False)
 
-    @params(*list(Scales))
+    @params(Scales.dB, Scales.LIN)
     def test_plotBeamCut(self, scale):
         fig, ax = self.s.plotBeamCut(TestTemplates.GPOfield['name'], FieldComponents.Ex, center=False, align=False, ret=True, scale=scale)
 
@@ -36,7 +36,8 @@ class Test_Plotting(unittest.TestCase):
         
         close('all')
 
-    @params(*list(Projections))
+    @params(Projections.xy, Projections.yz, Projections.zx,
+            Projections.yx, Projections.zy, Projections.xz)
     def test_plotBeam2D(self, project):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
@@ -88,6 +89,7 @@ class Test_Plotting(unittest.TestCase):
         self.assertEqual(type(ax), Axes3D)
 
         close('all')
+
             
     def test_plotSystem(self):
         fig, ax = self.s.plotSystem(ret=True)
@@ -108,6 +110,7 @@ class Test_Plotting(unittest.TestCase):
 
         close('all')
         
+        
     def test_plotGroup(self):
         self.s.groupElements('testGroup', 
                           TestTemplates.paraboloid_man_xy['name'],
@@ -126,7 +129,8 @@ class Test_Plotting(unittest.TestCase):
         close('all')
         
         
-    @params(*list(Projections))
+    @params(Projections.xy, Projections.yz, Projections.zx,
+            Projections.yx, Projections.zy, Projections.xz)
     def test_plotRTframe(self, project):
         for frameName in [TestTemplates.TubeRTframe['name'], TestTemplates.GaussRTframe['name']]:
             fig = self.s.plotRTframe(frameName, ret=True, project=project)

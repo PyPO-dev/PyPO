@@ -443,7 +443,7 @@ class System(object):
                     obj : Objects = Objects.ELEMENT, 
                     mode : Modes = Modes.REL, 
                     pivot : np.ndarray = None, 
-                    keep_pol :bool = False) -> None:
+                    keep_pol : bool = False):
         """!
         Rotate reflector grids.
         
@@ -461,17 +461,16 @@ class System(object):
         @param mode Apply rotation relative to current orientation (Modes.REL), or rotate to specified orientation (Modes.ABS).
         @param pivot Numpy ndarray of length 3, containing pivot x, y and z co-ordinates, in mm. Defaults to pos. 
         @param keep_pol Keep polarisation of a field/current defined on the surface, if present.
+            If True, does not rotate polarisation of any defined fields/currents along with the rotation of reflector.
+            If False, rotates polarisation along with reflector. Defaults to False.
         """
+
         PChecks.check_array(rotation, self.clog)
-        rotation = self.copyObj(rotation).astype(np.float64)
-        
-        if pivot is not None:
-            PChecks.check_array(pivot, self.clog)
-            pivot = self.copyObj(pivot).astype(np.float64)
-        
+
         if obj == Objects.ELEMENT:
             PChecks.check_elemSystem(name, self.system, self.clog, extern=True)
             pivot = self.system[name]["pos"] if pivot is None else pivot
+            PChecks.check_array(pivot, self.clog)
             
             if mode == Modes.ABS:
                 Rtot = self._absRotationMat(rotation, self.system[name]["ori"], pivot)
@@ -500,6 +499,7 @@ class System(object):
         elif obj == Objects.GROUP:
             PChecks.check_groupSystem(name, self.groups, self.clog, extern=True)
             pivot = self.groups[name]["pos"] if pivot is None else pivot
+            PChecks.check_array(pivot, self.clog)
             
             if mode == Modes.ABS:
                 Rtot = self._absRotationMat(rotation, self.groups[name]["ori"], pivot)
@@ -537,6 +537,7 @@ class System(object):
         if obj == Objects.FRAME:
             PChecks.check_frameSystem(name, self.frames, self.clog, extern=True)
             pivot = self.frames[name].pos if pivot is None else pivot
+            PChecks.check_array(pivot, self.clog)
             
             if mode == Modes.ABS:
                 Rtot = self._absRotationMat(rotation, self.frames[name].ori, pivot)
@@ -563,8 +564,7 @@ class System(object):
                        name : str, 
                        translation : np.ndarray, 
                        obj : Objects = Objects.ELEMENT, 
-                       mode : Modes = Modes.REL
-                       ) -> None:
+                       mode : Modes = Modes.REL) -> None:
         """!
         Translate reflector grids.
         
@@ -581,54 +581,54 @@ class System(object):
         
         PChecks.check_array(translation, self.clog)
 
-        translation = self.copyObj(translation).astype(np.float64)
+        _translation = self.copyObj(translation)
         
         if obj == Objects.ELEMENT:
             if mode == Modes.ABS:
-                translation -= self.system[name]["pos"]# - translation
+                _translation -= self.system[name]["pos"]# - translation
             
             PChecks.check_elemSystem(name, self.system, self.clog, extern=True)
-            self.system[name]["transf"] = MatTransf.MatTranslate(translation, self.system[name]["transf"])
-            self.system[name]["pos"] += translation
+            self.system[name]["transf"] = MatTransf.MatTranslate(_translation, self.system[name]["transf"])
+            self.system[name]["pos"] += _translation
             
             if mode == Modes.ABS:
-                self.clog.info(f"Translated element {name} to {*['{:0.3e}'.format(x) for x in list(translation)],} millimeters.")
+                self.clog.info(f"Translated element {name} to {*['{:0.3e}'.format(x) for x in list(_translation)],} millimeters.")
             else:
-                self.clog.info(f"Translated element {name} by {*['{:0.3e}'.format(x) for x in list(translation)],} millimeters.")
+                self.clog.info(f"Translated element {name} by {*['{:0.3e}'.format(x) for x in list(_translation)],} millimeters.")
         
         elif obj == Objects.GROUP:
             if mode == Modes.ABS:
-                translation -= self.groups[name]["pos"]# - translation
+                _translation -= self.groups[name]["pos"]# - translation
             
             PChecks.check_groupSystem(name, self.groups, self.clog, extern=True)
             for elem in self.groups[name]["members"]:
-                self.system[elem]["transf"] = MatTransf.MatTranslate(translation, self.system[elem]["transf"])
-                self.system[elem]["pos"] += translation
+                self.system[elem]["transf"] = MatTransf.MatTranslate(_translation, self.system[elem]["transf"])
+                self.system[elem]["pos"] += _translation
             
-            self.groups[name]["pos"] += translation
+            self.groups[name]["pos"] += _translation
             
             if mode == Modes.ABS:
-                self.clog.info(f"Translated group {name} to {*['{:0.3e}'.format(x) for x in list(translation)],} millimeters.")
+                self.clog.info(f"Translated group {name} to {*['{:0.3e}'.format(x) for x in list(_translation)],} millimeters.")
             
             else:
-                self.clog.info(f"Translated group {name} by {*['{:0.3e}'.format(x) for x in list(translation)],} millimeters.")
+                self.clog.info(f"Translated group {name} by {*['{:0.3e}'.format(x) for x in list(_translation)],} millimeters.")
 
         elif obj == Objects.FRAME:
             if mode == Modes.ABS:
-                translation -= self.frames[name].pos# - translation
+                _translation -= self.frames[name].pos# - translation
             
             PChecks.check_frameSystem(name, self.frames, self.clog, extern=True)
             
 
-            self.frames[name].transf = MatTransf.MatTranslate(translation)
+            self.frames[name].transf = MatTransf.MatTranslate(_translation)
             _fr = BTransf.transformRays(self.frames[name])
             self.frames[name] = self.copyObj(_fr)
-            self.frames[name].pos += translation
+            self.frames[name].pos += _translation
             
             if mode == Modes.ABS:
-                self.clog.info(f"Translated frame {name} to {*['{:0.3e}'.format(x) for x in list(translation)],} millimeters.")
+                self.clog.info(f"Translated frame {name} to {*['{:0.3e}'.format(x) for x in list(_translation)],} millimeters.")
             else:
-                self.clog.info(f"Translated frame {name} by {*['{:0.3e}'.format(x) for x in list(translation)],} millimeters.")
+                self.clog.info(f"Translated frame {name} by {*['{:0.3e}'.format(x) for x in list(_translation)],} millimeters.")
     
     def homeReflector(self, name : str, obj : Objects = Objects.ELEMENT, trans : bool = True, rot : bool = True):
         """!
@@ -1397,6 +1397,7 @@ class System(object):
 
         self.fields[_gaussDict["name"]] = gauss_in[0]
         self.currents[_gaussDict["name"]] = gauss_in[1]
+        
     
     def createScalarGaussian(self, gaussDict : dict, name_surface : str):
         """!
@@ -1907,7 +1908,6 @@ class System(object):
         self.deleteSnap(name_surf, "_")
 
         self.setLoggingVerbosity(verbose=verbosity_init)
-
         if full_output:
             return h_cut, e_cut, h_strip, e_strip, hx_edges_interp, hy_edges_interp, ex_edges_interp, ey_edges_interp
    
@@ -1917,7 +1917,6 @@ class System(object):
     def plotBeamCut(self, 
                     name_field : str, 
                     comp : FieldComponents, 
-                    comp_cross : FieldComponents = FieldComponents.NONE, 
                     vmin : float = None, 
                     vmax : float = None, 
                     center : bool = True, 
@@ -1950,21 +1949,24 @@ class System(object):
         @param name Name of .png file where plot is saved. Only when save=True. Default is "".
         @param show Show plot. Default is True.
         @param save Save plot to savePath.
-        @param ret Return the Figure and Axis object. Only called by GUI. Default is False.
+        @param ret Return the Figure and Axis object. Default is False.
         
         @returns fig Figure object.
         @returns ax Axes object.
         """
 
-        E_cut, H_cut, E_strip, H_strip = self.calcBeamCuts(name_field, comp, center=center, align=align, scale=scale)
+        h_cut, e_cut, h_strip, e_strip = self.calcBeamCuts(name_field, comp, center=center, align=align, scale=scale)
 
-        if comp_cross is not FieldComponents.NONE:
-            cr45_cut, cr135_cut, cr45_strip, cr135_strip = self.calcBeamCuts(name_field, comp_cross, phi=45, align=False, center=False, norm="Ex")
-
-        vmin = np.nanmin([np.nanmin(E_cut), np.nanmin(H_cut)]) if vmin is None else vmin
-        vmax = np.nanmax([np.nanmax(E_cut), np.nanmax(H_cut)]) if vmax is None else vmax
+        vmin = np.nanmin([np.nanmin(h_cut), np.nanmin(e_cut)]) if vmin is None else vmin
+        vmax = np.nanmax([np.nanmax(h_cut), np.nanmax(e_cut)]) if vmax is None else vmax
         
-        fig, ax = PPlot.plotBeamCut(E_cut, H_cut, E_strip, H_strip, vmin, vmax, units)
+        fig, ax = PPlot.plotBeamCut(h_cut, 
+                                    e_cut, 
+                                    h_strip, 
+                                    e_strip, 
+                                    vmin, 
+                                    vmax, 
+                                    units)
 
         if ret:
             return fig, ax
@@ -1980,7 +1982,6 @@ class System(object):
     def calcHPBW(self, 
                  name_field : str, 
                  comp : FieldComponents, 
-                 interp : int = 50, 
                  center : bool = False, 
                  align : float = False
                  ) -> tuple [float, float]:
@@ -1994,7 +1995,6 @@ class System(object):
         
         @param name_field Name of field object.
         @param comp Component of field object. Instance of FieldComponents enum object.
-        @param interp Interpolation factor for finding the HPBW. Defaults to 50.
         @param center Whether to center the beam cuts on amplitude center. Use only if beam has well defined amplitude center.
         @param align Whether to take beam cuts along cardinal planes rotated by the position angle.
         
@@ -2002,20 +2002,15 @@ class System(object):
         @returns HPBW_H Half-power beamwidth along H-plane in units of surface of beam.
         """
 
-        x_cut, y_cut, x_strip, y_strip = self.calcBeamCuts(name_field, comp, center=center, align=align)
+        h_cut, e_cut, h_strip, e_strip = self.calcBeamCuts(name_field, comp, center=center, align=align)
 
-        x_interp = np.linspace(np.min(x_strip), np.max(x_strip), num=len(x_strip) * interp)
-        y_interp = np.linspace(np.min(y_strip), np.max(y_strip), num=len(y_strip) * interp)
-        x_cut_interp = interp1d(x_strip, x_cut, kind="cubic")(x_interp)
-        y_cut_interp = interp1d(y_strip, y_cut, kind="cubic")(y_interp)
+        h_masked = h_strip[h_cut > -3]
+        e_masked = e_strip[e_cut > -3]
 
-        mask_x = (x_cut_interp > -3.01) & (x_cut_interp < -2.99)
-        mask_y = (y_cut_interp > -3.01) & (y_cut_interp < -2.99)
+        HPBW_h = np.absolute(np.max(h_masked) - np.min(h_masked))
+        HPBW_e = np.absolute(np.max(e_masked) - np.min(e_masked))
 
-        HPBW_E = np.mean(np.absolute(x_interp[mask_x]))
-        HPBW_H = np.mean(np.absolute(y_interp[mask_y]))
-
-        return HPBW_E, HPBW_H
+        return HPBW_h, HPBW_e
 
     def createPointSource(self, PSDict : dict, name_surface : str):
         """!
@@ -2233,7 +2228,7 @@ class System(object):
             obj_interp.setMeta(obj_out.surf + "_interp", obj_out.k)
             self.currents[name + "_interp"] = obj_interp
 
-    def plotBeam2D(self, name_obj : str, comp : fieldOrCurrentComponents = FieldComponents.Ex, contour : str = None, 
+    def plotBeam2D(self, name_obj : str, comp : FieldComponents = FieldComponents.NONE, contour : str = None, 
                     contour_comp : fieldOrCurrentComponents  = FieldComponents.NONE,
                     vmin : float = None, vmax : float = None, levels : contourLevels = None, 
                     show : bool = True, amp_only : bool = False, save : bool = False, norm : bool = True,
@@ -2268,7 +2263,7 @@ class System(object):
         @param titleA Title of the amplitude plot. Default is "Amp".
         @param titleP Title of the phase plot. Default is "Phase".
         @param unwrap_phase Unwrap the phase patter. Prevents annular structure in phase pattern. Default is False.
-        @param ret Return the Figure and Axis object. Only called by GUI. Default is False.
+        @param ret Return the Figure and Axis object. Default is False.
         
         @returns fig Figure object.
         @returns ax Axes object.
@@ -2315,6 +2310,7 @@ class System(object):
                         vmin, vmax, levels, amp_only,
                         norm, aperDict, scale, project,
                         units, titleA, titleP, unwrap_phase)
+
         if ret:
             return fig, ax
 

@@ -106,6 +106,9 @@ __constant__ int g_t;               // Gridsize on target
  * @param d_Mz Array containing source M z-component.
  * @param point Array of 3 float, containing xyz coordinates of target point.
  * @param d_A Array containing area elements.
+ * @param gmode Int indicating the type of source grid.
+ * @param ncx  Int the number of x/u points in the source grid.
+ * @param ncy  Int the number of y/v points in the source grid
  * @param d_ei Array of 3 cuFloatComplex, to be filled with E-field at point.
  * @param d_hi Array of 3 cuFloatComplex, to be filled with H-field at point.
  */
@@ -113,10 +116,11 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
                     float *d_nxs, float *d_nys, float *d_nzs,
                     cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
                     cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz,
-                    float (&point)[3], float *d_A,
+                    float (&point)[3], float *d_A, int gmode, int ncx, int ncy,
                     cuFloatComplex (&d_ei)[3], cuFloatComplex (&d_hi)[3])
 {
-    // Scalars (float & complex float)
+    int i;                // index in grids
+    // Scalars (float & complex float)    
     float R;                            // Distance between source and target points
     float R_inv;                        // 1 / R
     float kR;                           // k*R
@@ -139,6 +143,8 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
     // Arrays of complex floats
     cuFloatComplex e_field[3] = {con[10], con[10], con[10]}; // Electric field on target
     cuFloatComplex h_field[3] = {con[10], con[10], con[10]}; // Magnetic field on target
+    cuFloatComplex ye_field[3] = {con[10], con[10], con[10]}; // Intermediate electric field due to integral over y/v
+    cuFloatComplex yh_field[3] = {con[10], con[10], con[10]}; // Intermediate magnetic field due to integral over y/v
     cuFloatComplex js[3];             // Electric current at source point
     cuFloatComplex ms[3];             // Magnetic current at source point
     cuFloatComplex js_dot_R_R[3];     // Electric current contribution to e-field
@@ -148,99 +154,130 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
     cuFloatComplex e_temp[3];           // Temporary container for intermediate values
     cuFloatComplex h_temp[3];           // Temporary container for intermediate values
 
-    for(int i=0; i<g_s; i++)
-
+    // Integrate over each source point
+    // We split the integral into two parts, with the outer loop over the 
+    // x/u axis, and the inner loop over the y/v axis
+    for(int xu=0; xu<ncx; xu++)
     {
-        js[0] = d_Jx[i];
-        js[1] = d_Jy[i];
-        js[2] = d_Jz[i];
+        for (int n=0; n<3; n++) 
+        {
+            ye_field[n] = con[10]; // Intermediate electric field due to integral over y/v
+            yh_field[n] = con[10]; // Intermediate magnetic field due to integral over y/v
+        }
 
-        ms[0] = d_Mx[i];
-        ms[1] = d_My[i];
-        ms[2] = d_Mz[i];
+        for(int yv=0; yv<ncy; yv++)
+        {
+            i = xu*ncx + yv;
 
-        //printf("ms      : (%.16g+%.16gi, %.16g+%.16gi, %.16g+%.16gi)\n", ms[0].x, ms[0].y, ms[1].x, ms[1].y, ms[2].x, ms[2].y);
+            js[0] = d_Jx[i];
+            js[1] = d_Jy[i];
+            js[2] = d_Jz[i];
 
+            ms[0] = d_Mx[i];
+            ms[1] = d_My[i];
+            ms[2] = d_Mz[i];
 
-        source_point[0] = d_xs[i];
-        source_point[1] = d_ys[i];
-        source_point[2] = d_zs[i];
-        
-        source_norm[0] = d_nxs[i];
-        source_norm[1] = d_nys[i];
-        source_norm[2] = d_nzs[i];
+            //printf("ms      : (%.16g+%.16gi, %.16g+%.16gi, %.16g+%.16gi)\n", ms[0].x, ms[0].y, ms[1].x, ms[1].y, ms[2].x, ms[2].y);
 
-
-        diff(point, source_point, R_vec);
-        //printf("R_vec               : (%.16g, %.16g, %.16g)\n", R_vec[0], R_vec[1], R_vec[2]);
-
-        abs(R_vec, R);
-        
-        R_inv = 1/R;
-
-        s_mult(R_vec, R_inv, R_hat);
-        //printf("R_hat               : (%.16g, %.16g, %.16g)\n", R_hat[0], R_hat[1], R_hat[2]);
-
-        dot(source_norm, R_hat, norm_dot_R_hat);
-        //printf("(x, y, z), norm_dot_R_hat      : (%.16g, %.16g, %.16g), %.16g\n", source_point[0], source_point[1], source_point[2], norm_dot_R_hat);
-        
-        if ((norm_dot_R_hat < 0) && (con[8].x < 0)) {
-            continue;}
-
-        kR = con[0].x * R;
-        //printf("kR                  : %.16g\n", kR);
-        kR_inv = 1.0f/kR;
-        //printf("kR_inv              : %.16g\n", kR_inv);
-
-        // Calculate the complex sums that appear in the integral
-        kR_inv_sum1 = make_cuFloatComplex(cuCrealf(con[8])*kR_inv*kR_inv, kR_inv*(kR_inv*kR_inv - 1));
-        kR_inv_sum2 = make_cuFloatComplex(-cuCrealf(con[8])*3*kR_inv*kR_inv, kR_inv*(1 - 3*kR_inv*kR_inv));
-        kR_inv_sum3 = cuCmulf(con[8], make_cuFloatComplex(kR_inv*kR_inv, kR_inv));
-
-        //printf("kR_inv_sum1         : %.16g+%.16gi\n", kR_inv_sum1.x, kR_inv_sum1.y);
-        //printf("kR_inv_sum2         : %.16g+%.16gi\n", kR_inv_sum2.x, kR_inv_sum2.y);
-        //printf("kR_inv_sum3         : %.16g+%.16gi\n", kR_inv_sum3.x, kR_inv_sum3.y);
-
-        // Vector calculatoins
-        // e-field
-        dot(js, R_hat, js_dot_R);
-        //printf("js_dot_R         : %.16g+%.16gi\n", js_dot_R.x, js_dot_R.y);
-        
-        s_mult(R_hat, js_dot_R, js_dot_R_R);
-        //printf("js_dot_R_R       : (%.16g+%.16gi, %.16g+%.16gi, %.16g+%.16gi)\n", js_dot_R_R[0].x, js_dot_R_R[0].y, js_dot_R_R[1].x, js_dot_R_R[1].y, js_dot_R_R[2].x, js_dot_R_R[2].y);
-
-        ext(ms, R_hat, ms_cross_R);
-        //printf("ms_cross_R       : (%.16g+%.16gi, %.16g+%.16gi, %.16g+%.16gi)\n", ms_cross_R[0].x, ms_cross_R[0].y, ms_cross_R[1].x, ms_cross_R[1].y, ms_cross_R[2].x, ms_cross_R[2].y);
+            source_point[0] = d_xs[i];
+            source_point[1] = d_ys[i];
+            source_point[2] = d_zs[i];
+            
+            source_norm[0] = d_nxs[i];
+            source_norm[1] = d_nys[i];
+            source_norm[2] = d_nzs[i];
 
 
-        // h-field
-        dot(ms, R_hat, ms_dot_R);
-        //printf("ms_dot_R        : %.16g+%.16gi\n", ms_dot_R.x, ms_dot_R.y);
-        
-        s_mult(R_hat, ms_dot_R, ms_dot_R_R);
-        //printf("ms_dot_R_R      : (%.16g+%.16gi, %.16g+%.16gi, %.16g+%.16gi)\n", ms_dot_R_R[0].x, ms_dot_R_R[0].y, ms_dot_R_R[1].x, ms_dot_R_R[1].y, ms_dot_R_R[2].x, ms_dot_R_R[2].y);
+            diff(point, source_point, R_vec);
+            //printf("R_vec               : (%.16g, %.16g, %.16g)\n", R_vec[0], R_vec[1], R_vec[2]);
 
-        ext(js, R_hat, js_cross_R);
-        //printf("js_cross_R      : (%.16g+%.16gi, %.16g+%.16gi, %.16g+%.16gi)\n", js_cross_R[0].x, js_cross_R[0].y, js_cross_R[1].x, js_cross_R[1].y, js_cross_R[2].x, js_cross_R[2].y);
+            abs(R_vec, R);
+            
+            R_inv = 1/R;
 
-        cuFloatComplex d_Ac = make_cuFloatComplex(d_A[i], 0.);
-        //printf("dA              : %.16g\n", d_Ac.x);
+            s_mult(R_vec, R_inv, R_hat);
+            //printf("R_hat               : (%.16g, %.16g, %.16g)\n", R_hat[0], R_hat[1], R_hat[2]);
 
-        Green = cuCmulf(cuCmulf(con[1], cuCexpf(cuCmulf(con[8], make_cuFloatComplex(0, kR)))), d_Ac);
-        //printf("Green           : %.16g+%.16gi\n", Green.x, Green.y);
-        
+            dot(source_norm, R_hat, norm_dot_R_hat);
+            //printf("(x, y, z), norm_dot_R_hat      : (%.16g, %.16g, %.16g), %.16g\n", source_point[0], source_point[1], source_point[2], norm_dot_R_hat);
+            
+            if ((norm_dot_R_hat < 0) && (con[8].x < 0)) {
+                continue;}
+
+            kR = con[0].x * R;
+            //printf("kR                  : %.16g\n", kR);
+            kR_inv = 1.0f/kR;
+            //printf("kR_inv              : %.16g\n", kR_inv);
+
+            // Calculate the complex sums that appear in the integral
+            kR_inv_sum1 = make_cuFloatComplex(cuCrealf(con[8])*kR_inv*kR_inv, kR_inv*(kR_inv*kR_inv - 1));
+            kR_inv_sum2 = make_cuFloatComplex(-cuCrealf(con[8])*3*kR_inv*kR_inv, kR_inv*(1 - 3*kR_inv*kR_inv));
+            kR_inv_sum3 = cuCmulf(con[8], make_cuFloatComplex(kR_inv*kR_inv, kR_inv));
+
+            //printf("kR_inv_sum1         : %.16g+%.16gi\n", kR_inv_sum1.x, kR_inv_sum1.y);
+            //printf("kR_inv_sum2         : %.16g+%.16gi\n", kR_inv_sum2.x, kR_inv_sum2.y);
+            //printf("kR_inv_sum3         : %.16g+%.16gi\n", kR_inv_sum3.x, kR_inv_sum3.y);
+
+            // Vector calculatoins
+            // e-field
+            dot(js, R_hat, js_dot_R);
+            //printf("js_dot_R         : %.16g+%.16gi\n", js_dot_R.x, js_dot_R.y);
+            
+            s_mult(R_hat, js_dot_R, js_dot_R_R);
+            //printf("js_dot_R_R       : (%.16g+%.16gi, %.16g+%.16gi, %.16g+%.16gi)\n", js_dot_R_R[0].x, js_dot_R_R[0].y, js_dot_R_R[1].x, js_dot_R_R[1].y, js_dot_R_R[2].x, js_dot_R_R[2].y);
+
+            ext(ms, R_hat, ms_cross_R);
+            //printf("ms_cross_R       : (%.16g+%.16gi, %.16g+%.16gi, %.16g+%.16gi)\n", ms_cross_R[0].x, ms_cross_R[0].y, ms_cross_R[1].x, ms_cross_R[1].y, ms_cross_R[2].x, ms_cross_R[2].y);
+
+
+            // h-field
+            dot(ms, R_hat, ms_dot_R);
+            //printf("ms_dot_R        : %.16g+%.16gi\n", ms_dot_R.x, ms_dot_R.y);
+            
+            s_mult(R_hat, ms_dot_R, ms_dot_R_R);
+            //printf("ms_dot_R_R      : (%.16g+%.16gi, %.16g+%.16gi, %.16g+%.16gi)\n", ms_dot_R_R[0].x, ms_dot_R_R[0].y, ms_dot_R_R[1].x, ms_dot_R_R[1].y, ms_dot_R_R[2].x, ms_dot_R_R[2].y);
+
+            ext(js, R_hat, js_cross_R);
+            //printf("js_cross_R      : (%.16g+%.16gi, %.16g+%.16gi, %.16g+%.16gi)\n", js_cross_R[0].x, js_cross_R[0].y, js_cross_R[1].x, js_cross_R[1].y, js_cross_R[2].x, js_cross_R[2].y);
+
+            cuFloatComplex d_Ac = make_cuFloatComplex(d_A[i], 0.);
+            //printf("dA              : %.16g\n", d_Ac.x);
+
+            Green = cuCmulf(cuCmulf(con[1], cuCexpf(cuCmulf(con[8], make_cuFloatComplex(0, kR)))), d_Ac);
+            //printf("Green           : %.16g+%.16gi\n", Green.x, Green.y);
+            
+
+            for( int n=0; n<3; n++)
+            {
+                // If this is an integral over an incomplete period of v, or over y/el, only add half of the first and last points
+                if ((gmode!=1) && (yv==0) || (yv==ncy-1))
+                {
+                    ye_field[n] = cuCaddf(cuCmulf(make_cuFloatComplex(0.5,0), cuCmulf(cuCaddf(cuCmulf(con[4], cuCaddf(cuCmulf(js[n], kR_inv_sum1), cuCmulf(js_dot_R_R[n], kR_inv_sum2))), cuCmulf(ms_cross_R[n], kR_inv_sum3)), Green)), e_field[n]);
+                
+                    yh_field[n] = cuCaddf(cuCmulf(make_cuFloatComplex(0.5,0), cuCmulf(cuCsubf(cuCmulf(con[5], cuCaddf(cuCmulf(ms[n], kR_inv_sum1), cuCmulf(ms_dot_R_R[n], kR_inv_sum2))), cuCmulf(js_cross_R[n], kR_inv_sum3)), Green)), h_field[n]);
+                }
+                else  // add the full value of the points
+                {
+                    ye_field[n] = cuCaddf(cuCmulf(cuCaddf(cuCmulf(con[4], cuCaddf(cuCmulf(js[n], kR_inv_sum1), cuCmulf(js_dot_R_R[n], kR_inv_sum2))), cuCmulf(ms_cross_R[n], kR_inv_sum3)), Green), e_field[n]);
+                
+                    yh_field[n] = cuCaddf(cuCmulf(cuCsubf(cuCmulf(con[5], cuCaddf(cuCmulf(ms[n], kR_inv_sum1), cuCmulf(ms_dot_R_R[n], kR_inv_sum2))), cuCmulf(js_cross_R[n], kR_inv_sum3)), Green), h_field[n]);
+                }
+            }
+        }  // End of y/v loop
 
         for( int n=0; n<3; n++)
         {
-            //e_temp[n] = cuCmulf(js[n], kR_inv_sum1);
-            
-            e_field[n] = cuCaddf(cuCmulf(cuCaddf(cuCmulf(con[4], cuCaddf(cuCmulf(js[n], kR_inv_sum1), cuCmulf(js_dot_R_R[n], kR_inv_sum2))), cuCmulf(ms_cross_R[n], kR_inv_sum3)), Green), e_field[n]);
-            //h_temp[n] = cuCmulf(ms[n], kR_inv_sum1);
-            
-            h_field[n] = cuCaddf(cuCmulf(cuCsubf(cuCmulf(con[5], cuCaddf(cuCmulf(ms[n], kR_inv_sum1), cuCmulf(ms_dot_R_R[n], kR_inv_sum2))), cuCmulf(js_cross_R[n], kR_inv_sum3)), Green), h_field[n]);
+            if ((xu==0) || (xu=ncx-1)) // Only add half the point value
+            {
+                e_field[n] = cuCaddf(cuCmulf(ye_field[n], make_cuFloatComplex(0.5,0)), e_field[n]);
+                h_field[n] = cuCaddf(cuCmulf(yh_field[n], make_cuFloatComplex(0.5,0)), h_field[n]);
+            }
+            else 
+            {
+                e_field[n] = cuCaddf(ye_field[n], e_field[n]);
+                h_field[n] = cuCaddf(yh_field[n], h_field[n]);
+            }
         }
-        //printf("e_temp      : %.16g+%.16gi, %.16g+%.16gi, %.16g+%.16gi)\n", e_temp[0].x, e_temp[0].y, e_temp[1].x, e_temp[1].y, e_temp[2].x, e_temp[2].y);
-        //printf("h_temp      : (%.16g+%.16gi, %.16g+%.16gi, %.16g+%.16gi)\n", h_temp[0].x, h_temp[0].y, h_temp[1].x, h_temp[1].y, h_temp[2].x, h_temp[2].y);
     }
 
     d_ei[0] = e_field[0];
@@ -271,6 +308,9 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
  * @param d_nxt Array containing target norms x-component.
  * @param d_nyt Array containing target norms y-component.
  * @param d_nzt Array containing target norms z-component.
+ * @param gmode Int the mode of source grid.
+ * @param ncx   Int number of x/u points in source grid.
+ * @param ncy   Int number of y/v points in source grid.
  * @param d_Jx Array containing source J x-component.
  * @param d_Jy Array containing source J y-component.
  * @param d_Jz Array containing source J z-component.
@@ -285,9 +325,11 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
  * @param d_Mzt Array to be filled with target M z-component.
  */
 __global__ void GpropagateBeam_0_PEC(float *d_xs, float *d_ys, float *d_zs,
-                                float *d_A, float *d_xt, float *d_yt, float *d_zt,
+                                float *d_A, 
+                                float *d_xt, float *d_yt, float *d_zt,
                                 float *d_nxs, float *d_nys, float *d_nzs,
                                 float *d_nxt, float *d_nyt, float *d_nzt,
+                                int gmode, int ncx, int ncy,
                                 cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
                                 cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz,
                                 cuFloatComplex *d_Jxt, cuFloatComplex *d_Jyt, cuFloatComplex *d_Jzt,
@@ -320,7 +362,9 @@ __global__ void GpropagateBeam_0_PEC(float *d_xs, float *d_ys, float *d_zs,
                     d_nxs, d_nys, d_nzs,
                     d_Jx, d_Jy, d_Jz,
                     d_Mx, d_My, d_Mz,
-                    point, d_A, d_ei, d_hi);
+                    point, d_A, 
+                    gmode, ncx, ncy, 
+                    d_ei, d_hi);
 
         ext(norms, d_hi, d_je);
 
@@ -352,6 +396,9 @@ __global__ void GpropagateBeam_0_PEC(float *d_xs, float *d_ys, float *d_zs,
  * @param d_nxt Array containing target norms x-component.
  * @param d_nyt Array containing target norms y-component.
  * @param d_nzt Array containing target norms z-component.
+ * @param gmode Int indicating the type of source grid.
+ * @param ncx  Int the number of x/u points in the source grid.
+ * @param ncy  Int the number of y/v points in the source grid
  * @param d_Jx Array containing source J x-component.
  * @param d_Jy Array containing source J y-component.
  * @param d_Jz Array containing source J z-component.
@@ -369,6 +416,7 @@ __global__ void GpropagateBeam_0(float *d_xs, float *d_ys, float *d_zs,
                                 float *d_A, float *d_xt, float *d_yt, float *d_zt,
                                 float *d_nxs, float *d_nys, float *d_nzs,
                                 float *d_nxt, float *d_nyt, float *d_nzt,
+                                int gmode, int ncx, int ncy,
                                 cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
                                 cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz,
                                 cuFloatComplex *d_Jxt, cuFloatComplex *d_Jyt, cuFloatComplex *d_Jzt,
@@ -419,7 +467,8 @@ __global__ void GpropagateBeam_0(float *d_xs, float *d_ys, float *d_zs,
                     d_nxs, d_nys, d_nzs,
                     d_Jx, d_Jy, d_Jz,
                     d_Mx, d_My, d_Mz,
-                    point, d_A, d_ei, d_hi);
+                    point, d_A, gmode, ncx, ncy,
+                    d_ei, d_hi);
 
         // Calculate normalised incoming Poynting vector.
         conja(d_hi, temp1);                        // h_conj
@@ -501,6 +550,9 @@ __global__ void GpropagateBeam_0(float *d_xs, float *d_ys, float *d_zs,
  * @param d_nxt Array containing target norms x-component.
  * @param d_nyt Array containing target norms y-component.
  * @param d_nzt Array containing target norms z-component.
+ * @param gmode Int indicating the type of source grid.
+ * @param ncx  Int the number of x/u points in the source grid.
+ * @param ncy  Int the number of y/v points in the source grid
  * @param d_Jx Array containing source J x-component.
  * @param d_Jy Array containing source J y-component.
  * @param d_Jz Array containing source J z-component.
@@ -524,6 +576,7 @@ __global__ void GpropagateBeam_2_PEC(float *d_xs, float *d_ys, float *d_zs,
                                 float *d_A, float *d_xt, float *d_yt, float *d_zt,
                                 float *d_nxs, float *d_nys, float *d_nzs,
                                 float *d_nxt, float *d_nyt, float *d_nzt,
+                                int gmode, int ncx, int ncy,
                                 cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
                                 cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz,
                                 cuFloatComplex *d_Jxt, cuFloatComplex *d_Jyt, cuFloatComplex *d_Jzt,
@@ -558,7 +611,8 @@ __global__ void GpropagateBeam_2_PEC(float *d_xs, float *d_ys, float *d_zs,
                     d_nxs, d_nys, d_nzs,
                     d_Jx, d_Jy, d_Jz,
                     d_Mx, d_My, d_Mz,
-                    point, d_A, d_ei, d_hi);
+                    point, d_A, gmode, ncx, ncy,
+                    d_ei, d_hi);
 
         d_Ext[idx] = d_ei[0];
         d_Eyt[idx] = d_ei[1];
@@ -598,6 +652,9 @@ __global__ void GpropagateBeam_2_PEC(float *d_xs, float *d_ys, float *d_zs,
  * @param d_nxs Array containing source normals x-component.
  * @param d_nys Array containing source normals y-component.
  * @param d_nzs Array containing source normals z-component.
+ * @param gmode Int indicating the type of source grid.
+ * @param ncx  Int the number of x/u points in the source grid.
+ * @param ncy  Int the number of y/v points in the source grid
  * @param d_Jx Array containing source J x-component.
  * @param d_Jy Array containing source J y-component.
  * @param d_Jz Array containing source J z-component.
@@ -614,6 +671,7 @@ __global__ void GpropagateBeam_2_PEC(float *d_xs, float *d_ys, float *d_zs,
 __global__ void GpropagateBeam_1(float* d_xs, float* d_ys, float* d_zs,
                                 float *d_A, float *d_xt, float *d_yt, float *d_zt,
                                 float *d_nxs, float *d_nys, float *d_nzs,
+                                int gmode, int ncx, int ncy,
                                 cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
                                 cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz,
                                 cuFloatComplex *d_Ext, cuFloatComplex *d_Eyt, cuFloatComplex *d_Ezt,
@@ -638,7 +696,8 @@ __global__ void GpropagateBeam_1(float* d_xs, float* d_ys, float* d_zs,
                     d_nxs, d_nys, d_nzs,
                     d_Jx, d_Jy, d_Jz,
                     d_Mx, d_My, d_Mz,
-                    point, d_A, d_ei, d_hi);
+                    point, d_A, gmode, ncx, ncy,
+                    d_ei, d_hi);
 
         d_Ext[idx] = d_ei[0];
         d_Eyt[idx] = d_ei[1];
@@ -668,6 +727,9 @@ __global__ void GpropagateBeam_1(float* d_xs, float* d_ys, float* d_zs,
  * @param d_nxt Array containing target norms x-component.
  * @param d_nyt Array containing target norms y-component.
  * @param d_nzt Array containing target norms z-component.
+ * @param gmode Int indicating the type of source grid.
+ * @param ncx  Int the number of x/u points in the source grid.
+ * @param ncy  Int the number of y/v points in the source grid
  * @param d_Jx Array containing source J x-component.
  * @param d_Jy Array containing source J y-component.
  * @param d_Jz Array containing source J z-component.
@@ -691,6 +753,7 @@ __global__ void GpropagateBeam_2(float *d_xs, float *d_ys, float *d_zs,
                                 float *d_A, float *d_xt, float *d_yt, float *d_zt,
                                 float *d_nxs, float *d_nys, float *d_nzs,
                                 float *d_nxt, float *d_nyt, float *d_nzt,
+                                int gmode, int ncx, int ncy,
                                 cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
                                 cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz,
                                 cuFloatComplex *d_Jxt, cuFloatComplex *d_Jyt, cuFloatComplex *d_Jzt,
@@ -743,7 +806,8 @@ __global__ void GpropagateBeam_2(float *d_xs, float *d_ys, float *d_zs,
                     d_nxs, d_nys, d_nzs,
                     d_Jx, d_Jy, d_Jz,
                     d_Mx, d_My, d_Mz,
-                    point, d_A, d_ei, d_hi);
+                    point, d_A, gmode, ncx, ncy,
+                    d_ei, d_hi);
 
         d_Ext[idx] = d_ei[0];
         d_Eyt[idx] = d_ei[1];
@@ -831,6 +895,9 @@ __global__ void GpropagateBeam_2(float *d_xs, float *d_ys, float *d_zs,
  * @param d_nxt Array containing target norms x-component.
  * @param d_nyt Array containing target norms y-component.
  * @param d_nzt Array containing target norms z-component.
+ * @param gmode Int indicating the type of source grid.
+ * @param ncx  Int the number of x/u points in the source grid.
+ * @param ncy  Int the number of y/v points in the source grid
  * @param d_Jx Array containing source J x-component.
  * @param d_Jy Array containing source J y-component.
  * @param d_Jz Array containing source J z-component.
@@ -851,6 +918,7 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
                                 float *d_A, float *d_xt, float *d_yt, float *d_zt,
                                 float *d_nxs, float *d_nys, float *d_nzs,
                                 float *d_nxt, float *d_nyt, float *d_nzt,
+                                int gmode, int ncx, int ncy,
                                 cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
                                 cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz,
                                 cuFloatComplex *d_Ext, cuFloatComplex *d_Eyt, cuFloatComplex *d_Ezt,
@@ -900,7 +968,8 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
                     d_nxs, d_nys, d_nzs,
                     d_Jx, d_Jy, d_Jz,
                     d_Mx, d_My, d_Mz,
-                    point, d_A, d_ei, d_hi);
+                    point, d_A, gmode, ncx, ncy,
+                    d_ei, d_hi);
 
         // Calculate normalised incoming Poynting vector.
         conja(d_hi, temp1);                        // h_conj
@@ -975,13 +1044,19 @@ __global__ void GpropagateBeam_3(float *d_xs, float *d_ys, float *d_zs,
  * @param d_Mz Array containing source M z-component.
  * @param r_hat Array of 3 float, containing xyz coordinates of target point direction.
  * @param d_A Array containing area elements.
+ * @param gmode Int indicating the type of source grid.
+ * @param ncx  Int the number of x/u points in the source grid.
+ * @param ncy  Int the number of y/v points in the source grid.
  * @param e Array of 3 cuFloatComplex, to be filled with E-field at point.
+ * @param h Array of 3 cuFloatComplex, to be filled with H-field at point.
  */
 __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs, float *d_nxs, float *d_nys, float *d_nzs,
                                 cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
                                 cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz,
-                                float (&r_hat)[3], float *d_A, cuFloatComplex (&e)[3], cuFloatComplex (&h)[3])
+                                float (&r_hat)[3], float *d_A, int gmode, int ncx, int ncy,
+                                cuFloatComplex (&e)[3], cuFloatComplex (&h)[3])
 {
+    int i;                // index in grids
     // Scalars (float & complex float)
     cuFloatComplex exp;                 // Container for the exponential part of the Green's function
     cuFloatComplex Green;               // Container for Green's function
@@ -998,6 +1073,8 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs, float *d_
     // Arrays of complex floats
     cuFloatComplex e_field[3] = {con[10], con[10], con[10]}; // Electric field on target
     cuFloatComplex h_field[3] = {con[10], con[10], con[10]}; // Magnetic field on target
+    cuFloatComplex ye_field[3] = {con[10], con[10], con[10]}; // Intermediate electric field due to integral over y/v
+    cuFloatComplex yh_field[3] = {con[10], con[10], con[10]}; // Intermediate magnetic field due to integral over y/v
     cuFloatComplex js[3];             // Electric current at source point
     cuFloatComplex ms[3];             // Magnetic current at source point
     cuFloatComplex js_dot_R_R[3];     // Electric current contribution to e-field
@@ -1007,87 +1084,114 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs, float *d_
     cuFloatComplex e_temp[3];           // Temporary container for intermediate values
     cuFloatComplex h_temp[3];           // Temporary container for intermediate values
 
-    for(int i=0; i<g_s; i++)
-
+    // Integrate over each source point
+    // We split the integral into two parts, with the outer loop over the 
+    // x/u axis, and the inner loop over the y/v axis
+    for(int xu=0; xu<ncx; xu++)
     {
-        js[0] = d_Jx[i];
-        js[1] = d_Jy[i];
-        js[2] = d_Jz[i];
+        for (int n=0; n<3; n++) 
+        {
+            ye_field[n] = con[10]; // Zero intermediate electric field due to integral over y/v
+            yh_field[n] = con[10]; // Zero intermediate magnetic field due to integral over y/v
+        }
 
-        ms[0] = d_Mx[i];
-        ms[1] = d_My[i];
-        ms[2] = d_Mz[i];
+        for(int yv=0; yv<ncy; yv++)
+        {
+            i = xu*ncx + yv;
 
-        //printf("ms      : (%.16g+%.16gi, %.16g+%.16gi, %.16g+%.16gi)\n", ms[0].x, ms[0].y, ms[1].x, ms[1].y, ms[2].x, ms[2].y);
-        source_point[0] = d_xs[i];
-        source_point[1] = d_ys[i];
-        source_point[2] = d_zs[i];
+            js[0] = d_Jx[i];
+            js[1] = d_Jy[i];
+            js[2] = d_Jz[i];
+
+            ms[0] = d_Mx[i];
+            ms[1] = d_My[i];
+            ms[2] = d_Mz[i];
+
+            //printf("ms      : (%.16g+%.16gi, %.16g+%.16gi, %.16g+%.16gi)\n", ms[0].x, ms[0].y, ms[1].x, ms[1].y, ms[2].x, ms[2].y);
+            source_point[0] = d_xs[i];
+            source_point[1] = d_ys[i];
+            source_point[2] = d_zs[i];
+            
+            source_norm[0] = d_nxs[i];
+            source_norm[1] = d_nys[i];
+            source_norm[2] = d_nzs[i];
+
+            dot(source_norm, r_hat, norm_dot_R_hat);
+            //printf("(x, y, z), norm_dot_R_hat      : (%.16g, %.16g, %.16g), %.16g\n", source_point[0], source_point[1], source_point[2], norm_dot_R_hat);
+            
+            if ((norm_dot_R_hat < 0)) {
+                continue;}
+
+            // Vector calculatoins
+            // e-field
+            dot(js, r_hat, js_dot_R);
+            
+            s_mult(r_hat, js_dot_R, js_dot_R_R);
+            
+            ext(r_hat, ms, R_cross_ms);
+
+            // h-field
+            dot(ms, r_hat, ms_dot_R);
+            
+            s_mult(r_hat, ms_dot_R, ms_dot_R_R);
+            
+            ext(r_hat, js, R_cross_js);
+            
+            cuFloatComplex d_Ac = make_cuFloatComplex(d_A[i], 0.);
+            
+            dot(source_point, r_hat, source_point_dot_r_hat);
+
+            // ∓k  con[8]=∓1, con[0]=k
+            //cuCmulf(con[8], con[0]);
+
+            // ∓k (-i) r'.rhat = ±ik r'.rhat 
+            //cuCmulf(cuCmulf(con[8], con[0]), make_cuFloatComplex(0, -source_point_dot_r_hat)
+
+            // e^{±i k r'.rhat}
+            exp = cuCexpf(cuCmulf(cuCmulf(con[8], con[0]), make_cuFloatComplex(0, -source_point_dot_r_hat)));
+
+            // -i * k^2/4π * dA * e^{±i k r'.rhat}, k^2/4π = con[1]
+            // cuCmulf(make_cuFloatComplex(0, -1), cuCmulf(con[1], exp))
+
+            Green = cuCmulf(cuCmulf(make_cuFloatComplex(0, -1), cuCmulf(con[1], exp)), make_cuFloatComplex(d_A[i], 0));
+            //printf("Green           : %.16g+%.16gi\n", Green.x, Green.y);
+
+            for( int n=0; n<3; n++)
+            {
+                // If this is an integral over an incomplete period of v, or over y/el, only add half of the first and last points
+                if ((gmode!=1) && (yv==0) || (yv==ncy-1))
+                {
+                    ye_field[n] = cuCaddf(cuCmulf(cuCmulf(cuCaddf(cuCmulf(con[4], cuCsubf(js[n], js_dot_R_R[n])), cuCmulf(con[8], R_cross_ms[n])), Green), make_cuFloatComplex(0.5,0)), ye_field[n]);
+                
+                    yh_field[n] = cuCaddf(cuCmulf(cuCmulf(cuCsubf(cuCmulf(con[5], cuCsubf(ms[n], ms_dot_R_R[n])), cuCmulf(con[8], R_cross_js[n])), Green), make_cuFloatComplex(0.5,0)), yh_field[n]);
+                }
+                else
+                {
+                    ye_field[n] = cuCaddf(cuCmulf(cuCaddf(cuCmulf(con[4], cuCsubf(js[n], js_dot_R_R[n])), cuCmulf(con[8], R_cross_ms[n])), Green), ye_field[n]);
+                
+                    yh_field[n] = cuCaddf(cuCmulf(cuCsubf(cuCmulf(con[5], cuCsubf(ms[n], ms_dot_R_R[n])), cuCmulf(con[8], R_cross_js[n])), Green), yh_field[n]);
+                }
+            }
+            //printf("e_field      : (%.16g+%.16gi, %.16g+%.16gi, %.16g+%.16gi)\n", e_temp[0].x, e_temp[0].y, e_temp[1].x, e_temp[1].y, e_temp[2].x, e_temp[2].y);
+            //printf("h_field      : (%.16g+%.16gi, %.16g+%.16gi, %.16g+%.16gi)\n", h_temp[0].x, h_temp[0].y, h_temp[1].x, h_temp[1].y, h_temp[2].x, h_temp[2].y);
         
-        source_norm[0] = d_nxs[i];
-        source_norm[1] = d_nys[i];
-        source_norm[2] = d_nzs[i];
-
-        dot(source_norm, r_hat, norm_dot_R_hat);
-        //printf("(x, y, z), norm_dot_R_hat      : (%.16g, %.16g, %.16g), %.16g\n", source_point[0], source_point[1], source_point[2], norm_dot_R_hat);
-        
-        if ((norm_dot_R_hat < 0)) {
-            continue;}
-
-        // Vector calculatoins
-        // e-field
-        dot(js, r_hat, js_dot_R);
-        
-        s_mult(r_hat, js_dot_R, js_dot_R_R);
-        
-        ext(r_hat, ms, R_cross_ms);
-
-        // h-field
-        dot(ms, r_hat, ms_dot_R);
-        
-        s_mult(r_hat, ms_dot_R, ms_dot_R_R);
-        
-        ext(r_hat, js, R_cross_js);
-        
-        cuFloatComplex d_Ac = make_cuFloatComplex(d_A[i], 0.);
-        
-        dot(source_point, r_hat, source_point_dot_r_hat);
-
-        // ∓k  con[8]=∓1, con[0]=k
-        //cuCmulf(con[8], con[0]);
-
-        // ∓k (-i) r'.rhat = ±ik r'.rhat 
-        //cuCmulf(cuCmulf(con[8], con[0]), make_cuFloatComplex(0, -source_point_dot_r_hat)
-
-        // e^{±i k r'.rhat}
-        exp = cuCexpf(cuCmulf(cuCmulf(con[8], con[0]), make_cuFloatComplex(0, -source_point_dot_r_hat)));
-
-        // -i * k^2/4π * dA * e^{±i k r'.rhat}, k^2/4π = con[1]
-        // cuCmulf(make_cuFloatComplex(0, -1), cuCmulf(con[1], exp))
-
-        Green = cuCmulf(cuCmulf(make_cuFloatComplex(0, -1), cuCmulf(con[1], exp)), make_cuFloatComplex(d_A[i], 0));
-        //printf("Green           : %.16g+%.16gi\n", Green.x, Green.y);
-
+        } // End of y/v loop
+    
         for( int n=0; n<3; n++)
         {
-            
-            // Z (js - (js.Rhat)*Rhat)
-            //cuCmulf(con[4], cuCsubf(js[n], js_dot_R_R[n]));
-            // ∓(Rhat cross ms)  (con[8] = -1+0j in fwd dir)
-            //cuCmulf(con[8], R_cross_ms[n]);
-
-            // (Z (js - (js.Rhat)Rhat) ∓ Rhat x ms)
-            //cuCsubf(cuCmulf(con[4], cuCsubf(js[n], js_dot_R_R[n])), cuCmulf(con[8], R_cross_ms[n]) );
-
-            // Z (js- (js.Rhat)Rhat) ∓ Rhat x ms) Green
-            //cuCmulf(cuCaddf(cuCmulf(con[4], cuCsubf(js[n], js_dot_R_R[n])), cuCmulf(con[8], R_cross_ms[n]) ), Green);
-
-            e_field[n] = cuCaddf(cuCmulf(cuCaddf(cuCmulf(con[4], cuCsubf(js[n], js_dot_R_R[n])), cuCmulf(con[8], R_cross_ms[n])), Green), e_field[n]);
-            
-            h_field[n] = cuCaddf(cuCmulf(cuCsubf(cuCmulf(con[5], cuCsubf(ms[n], ms_dot_R_R[n])), cuCmulf(con[8], R_cross_js[n])), Green), h_field[n]);
+            if ((xu==0) || (xu=ncx-1)) // Only add half the point value
+            {
+                e_field[n] = cuCaddf(cuCmulf(ye_field[n], make_cuFloatComplex(0.5,0)), e_field[n]);
+                h_field[n] = cuCaddf(cuCmulf(yh_field[n], make_cuFloatComplex(0.5,0)), h_field[n]);
+            }
+            else 
+            {
+                e_field[n] = cuCaddf(ye_field[n], e_field[n]);
+                h_field[n] = cuCaddf(yh_field[n], h_field[n]);
+            }
         }
-        //printf("e_field      : (%.16g+%.16gi, %.16g+%.16gi, %.16g+%.16gi)\n", e_temp[0].x, e_temp[0].y, e_temp[1].x, e_temp[1].y, e_temp[2].x, e_temp[2].y);
-        //printf("h_field      : (%.16g+%.16gi, %.16g+%.16gi, %.16g+%.16gi)\n", h_temp[0].x, h_temp[0].y, h_temp[1].x, h_temp[1].y, h_temp[2].x, h_temp[2].y);
-    }
+    
+    } // End of x/u loops
 
     e[0] = e_field[0];
     e[1] = e_field[1];
@@ -1109,6 +1213,9 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs, float *d_
  * @param d_A Array containing area elements.
  * @param d_xt Array containing target direction x-coordinate.
  * @param d_yt Array containing target direction y-coordinate.
+ * @param gmode Int indicating the type of source grid.
+ * @param ncx  Int the number of x/u points in the source grid.
+ * @param ncy  Int the number of y/v points in the source grid.
  * @param d_Jx Array containing source J x-component.
  * @param d_Jy Array containing source J y-component.
  * @param d_Jz Array containing source J z-component.
@@ -1124,6 +1231,7 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs, float *d_
  */
 void __global__ GpropagateBeam_4(float *d_xs, float *d_ys, float *d_zs, float *d_nxs, float *d_nys, float *d_nzs,
                                 float *d_A, float *d_xt, float *d_yt,
+                                int gmode, int ncx, int ncy,
                                 cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz,
                                 cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz,
                                 cuFloatComplex *d_Ext, cuFloatComplex *d_Eyt, cuFloatComplex *d_Ezt,
@@ -1154,7 +1262,8 @@ void __global__ GpropagateBeam_4(float *d_xs, float *d_ys, float *d_zs, float *d
         farfieldAtPoint(d_xs, d_ys, d_zs, d_nxs, d_nys, d_nzs,
                       d_Jx, d_Jy, d_Jz,
                       d_Mx, d_My, d_Mz,
-                      r_hat, d_A, e, h);
+                      r_hat, d_A, gmode, ncx, ncy,
+                      e, h);
 
         d_Ext[idx] = e[0];
         d_Eyt[idx] = e[1];
@@ -1178,11 +1287,18 @@ void __global__ GpropagateBeam_4(float *d_xs, float *d_ys, float *d_zs, float *d
  * @param d_sfs Array containing source scalarfield.
  * @param point Array containing target point.
  * @param d_A Array containing area elements.
+ * @param gmode Int indicating the type of source grid.
+ * @param ncx  Int the number of x/u points in the source grid.
+ * @param ncy  Int the number of y/v points in the source grid.
  * @param e Array to be filled with results.
  */
 void __device__ scalarfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
-                                   cuFloatComplex *d_sfs, float (&point)[3], float *d_A, cuFloatComplex &e)
+                                   cuFloatComplex *d_sfs, float (&point)[3], 
+                                   float *d_A, int gmode, int ncx, int ncy,
+                                   cuFloatComplex &e)
 {
+    int i; // grid index
+    
     float r;
     float r_vec[3];
     float source_point[3];
@@ -1190,21 +1306,49 @@ void __device__ scalarfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
     e = con[10];  // initialize field to 0+0j
     cuFloatComplex expo;
     cuFloatComplex cfact;
+    cuFloatComplex ye; // intermediate field result
 
-    for(int i=0; i<g_s; i++)
+    for(int xu=0; xu<ncx; xu++)
     {
-        source_point[0] = d_xs[i];
-        source_point[1] = d_ys[i];
-        source_point[2] = d_zs[i];
+        for (int n=0; n<3; n++) 
+        {
+            ye = con[10]; // Intermediate field due to integral over y/v
+        }
 
-        diff(point, source_point, r_vec);
-        abs(r_vec, r);
-
-        expo = cuCexpf(cuCmulf(con[9], make_cuFloatComplex(con[8].x * con[0].x * r, 0)));
-        cfact = make_cuFloatComplex(-con[0].x * con[0].x / (4 * r * con[4].x) * d_A[i], 0);
+        for(int yv=0; yv<ncy; yv++)
+        {
+            i = xu*ncx + yv;
         
-        e = cuCaddf(cuCmulf(cuCmulf(cfact, expo), d_sfs[i]), e);
-    }
+            source_point[0] = d_xs[i];
+            source_point[1] = d_ys[i];
+            source_point[2] = d_zs[i];
+
+            diff(point, source_point, r_vec);
+            abs(r_vec, r);
+
+            expo = cuCexpf(cuCmulf(con[9], make_cuFloatComplex(con[8].x * con[0].x * r, 0)));
+            cfact = make_cuFloatComplex(-con[0].x * con[0].x / (4 * r * con[4].x) * d_A[i], 0);
+            
+            // If this is an integral over an incomplete period of v, or over y/el, only add half of the first and last points
+            if ((gmode!=1) && (yv==0) || (yv==ncy-1))
+            {
+                e = cuCaddf(cuCmulf(cuCmulf(cuCmulf(cfact, expo), d_sfs[i]), make_cuFloatComplex(0.5, 0)), e);
+            }
+            else
+            {
+                e = cuCaddf(cuCmulf(cuCmulf(cfact, expo), d_sfs[i]), e);
+            }
+        } // end of y/v loop
+        
+        if ((xu==0) || (xu=ncx-1)) // Only add half the point value
+        {
+            e = cuCaddf(cuCmulf(ye, make_cuFloatComplex(0.5,0)), e);
+        }
+        else 
+        {
+            e = cuCaddf(ye, e);
+        }
+    } // end of x/u loop
 }
 
 /**
@@ -1216,6 +1360,9 @@ void __device__ scalarfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
  * @param d_ys Array containing source points y-coordinate.
  * @param d_zs Array containing source points z-coordinate.
  * @param d_A Array containing area elements.
+ * @param gmode Int indicating the type of source grid.
+ * @param ncx  Int the number of x/u points in the source grid.
+ * @param ncy  Int the number of y/v points in the source grid.
  * @param d_xt Array containing target direction x-coordinate.
  * @param d_yt Array containing target direction y-coordinate.
  * @param d_zt Array containing target direction z-coordinate.
@@ -1223,7 +1370,9 @@ void __device__ scalarfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
  * @param d_sft Array to be filled with target scalar field.
  */
 void __global__ GpropagateBeam_5(float *d_xs, float *d_ys, float *d_zs,
-                                float *d_A, float *d_xt, float *d_yt, float *d_zt,
+                                float *d_A, 
+                                int gmode, int ncx, int ncy,
+                                float *d_xt, float *d_yt, float *d_zt,
                                 cuFloatComplex *d_sfs, cuFloatComplex *d_sft)
 {
     // Arrays of floats
@@ -1241,7 +1390,7 @@ void __global__ GpropagateBeam_5(float *d_xs, float *d_ys, float *d_zs,
 
         // Calculate total incoming E field at point on far-field
         scalarfieldAtPoint(d_xs, d_ys, d_zs,
-                      d_sfs, point, d_A, e);
+                      d_sfs, point, d_A, gmode, ncx, ncy, e);
 
         d_sft[idx] = e;
     }
@@ -1415,6 +1564,7 @@ void callKernelf_JM(c2Bundlef *res, reflparamsf source, reflparamsf target,
                                        vec_dt[0], vec_dt[1], vec_dt[2],
                                        vec_ds[4], vec_ds[5], vec_ds[6],
                                        vec_dt[3], vec_dt[4], vec_dt[5],
+                                       source.gmode, source.n_cells[0], source.n_cells[1],
                                        vec_din[0], vec_din[1], vec_din[2],
                                        vec_din[3], vec_din[4], vec_din[5],
                                        vec_dout[0], vec_dout[1], vec_dout[2],
@@ -1505,6 +1655,7 @@ void callKernelf_EH(c2Bundlef *res, reflparamsf source, reflparamsf target,
     GpropagateBeam_1<<<BT[0], BT[1]>>>(vec_ds[0], vec_ds[1], vec_ds[2], vec_ds[3],
                                        vec_dt[0], vec_dt[1], vec_dt[2],
                                        vec_ds[4], vec_ds[5], vec_ds[6],
+                                       source.gmode, source.n_cells[0], source.n_cells[1],
                                        vec_din[0], vec_din[1], vec_din[2],
                                        vec_din[3], vec_din[4], vec_din[5],
                                        vec_dout[0], vec_dout[1], vec_dout[2],
@@ -1598,6 +1749,7 @@ void callKernelf_JMEH(c4Bundlef *res, reflparamsf source, reflparamsf target,
                                        vec_dt[0], vec_dt[1], vec_dt[2],
                                        vec_ds[4], vec_ds[5], vec_ds[6],
                                        vec_dt[3], vec_dt[4], vec_dt[5],
+                                       source.gmode, source.n_cells[0], source.n_cells[1],
                                        vec_din[0], vec_din[1], vec_din[2],
                                        vec_din[3], vec_din[4], vec_din[5],
                                        vec_dout[0], vec_dout[1], vec_dout[2],
@@ -1697,6 +1849,7 @@ void callKernelf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf target,
                                        vec_dt[0], vec_dt[1], vec_dt[2],
                                        vec_ds[4], vec_ds[5], vec_ds[6],
                                        vec_dt[3], vec_dt[4], vec_dt[5],
+                                       source.gmode, source.n_cells[0], source.n_cells[1],
                                        vec_din[0], vec_din[1], vec_din[2],
                                        vec_din[3], vec_din[4], vec_din[5],
                                        vec_dout[0], vec_dout[1], vec_dout[2],
@@ -1794,7 +1947,8 @@ void callKernelf_FF(c2Bundlef *res, reflparamsf source, reflparamsf target,
     memutil.deallocComplexHost(vec_hin);
 
     GpropagateBeam_4<<<BT[0], BT[1]>>>(vec_ds[0], vec_ds[1], vec_ds[2], vec_ds[3], vec_ds[4], vec_ds[5], vec_ds[6],
-                                       vec_dt[0], vec_dt[1], 
+                                       vec_dt[0], vec_dt[1],
+                                       source.gmode, source.n_cells[0], source.n_cells[1], 
                                        vec_din[0], vec_din[1], vec_din[2],
                                        vec_din[3], vec_din[4], vec_din[5],
                                        vec_dout[0], vec_dout[1], vec_dout[2],
@@ -1882,6 +2036,7 @@ void callKernelf_scalar(arrC1f *res, reflparamsf source, reflparamsf target,
     gpuErrchk( cudaMalloc((void**)&d_sft, ct->size * sizeof(cuFloatComplex)) );
 
     GpropagateBeam_5<<<BT[0], BT[1]>>>(vec_ds[0], vec_ds[1], vec_ds[2], vec_ds[3],
+                                       source.gmode, source.n_cells[0], source.n_cells[1],
                                        vec_dt[0], vec_dt[1], vec_dt[2],
                                        d_sfs, d_sft);
     gpuErrchk( cudaPeekAtLastError() );

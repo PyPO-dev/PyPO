@@ -14,7 +14,7 @@ except ImportError:
 from nose2.tools import params
 
 from PyPO.System import System
-from PyPO.Enums import Modes, Objects
+from PyPO.Enums import Modes, Objects, Units
 from PyPO.Checks import InputTransformError
 
 class Test_MatTransform(unittest.TestCase):
@@ -37,8 +37,8 @@ class Test_MatTransform(unittest.TestCase):
 
         name_test = element["name"]
         name_ref = par_ref["name"]
-        translation0 = np.array([12, -42, 187])
-        translation1 = np.array([-97.3, 237, 66])
+        translation0 = np.array([12, -42, 187])*Units.MM
+        translation1 = np.array([-97.3, 237, 66])*Units.MM
 
         pos_add0 = self.s.copyObj(self.s.system[name_test]["pos"])
         self.s.translateGrids(name_test, translation0)
@@ -71,10 +71,10 @@ class Test_MatTransform(unittest.TestCase):
         for z0atest, z0aref in zip(g0atest.z.ravel(), g0aref.z.ravel()):
             self.assertAlmostEqual(z0atest, z0aref, delta=1e-6)
         
-        trans_bad = 6.66
+        trans_bad = 6.66*Units.MM
 
-        self.assertRaises(InputTransformError, self.s.translateGrids, name_test, 
-                                             trans_bad)
+        with self.assertRaises(InputTransformError): 
+            self.s.translateGrids(name_test, trans_bad)
 
     @params(*TestTemplates.getAllReflectorList())
     def test_rotations(self, element):
@@ -85,17 +85,17 @@ class Test_MatTransform(unittest.TestCase):
         name_test = element["name"]
         name_ref = par_ref["name"]
 
-        rotation0 = np.array([12, -42, 187])
-        rotation0 = np.array([-97.3, 237, 66])
+        rotation0 = np.array([12, -42, 187])*Units.DEG
+        rotation0 = np.array([-97.3, 237, 66])*Units.DEG
 
-        pivot0 = np.array([1, 5, 3])
-        pivot0 = np.array([10, 50, 30])
+        pivot0 = np.array([1, 5, 3])*Units.MM
+        pivot0 = np.array([10, 50, 30])*Units.MM
 
         # rotate test parabola by given amount
         self.s.rotateGrids(name_test, rotation0, pivot=pivot0)
         
-        rotation0abs = np.array([135, -67, 1.8])
-        pivot0abs = np.array([1.8, 2, -43])
+        rotation0abs = np.array([135, -67, 1.8])*Units.DEG
+        pivot0abs = np.array([1.8, 2, -43])*Units.MM
         
         self.s.rotateGrids(name_test, rotation0abs, pivot=pivot0abs, mode=Modes.ABS)
         self.s.rotateGrids(name_ref, rotation0abs, pivot=pivot0abs, mode=Modes.ABS)
@@ -118,13 +118,11 @@ class Test_MatTransform(unittest.TestCase):
         for a0atest, a0aref in zip(g0atest.area.ravel(), g0aref.area.ravel()):
             self.assertAlmostEqual(a0atest, a0aref)
 
-        rotation_bad = 8
-        pivot_bad = 42
+        rotation_bad = 8*Units.DEG
+        pivot_bad = 42*Units.MM
         
-        self.assertRaises(InputTransformError, self.s.rotateGrids, name_test, 
-                                             rotation_bad, 
-                                             pivot=pivot_bad, 
-                                             mode=Modes.ABS)
+        with self.assertRaises(InputTransformError): 
+            self.s.rotateGrids(name_test, rotation_bad, pivot=pivot_bad, mode=Modes.ABS)
    
     def test_translationsGroup(self):
         self.s.groupElements("test", TestTemplates.plane_xy["name"], TestTemplates.paraboloid_foc_uv["name"])
@@ -165,11 +163,8 @@ class Test_MatTransform(unittest.TestCase):
         rotation_bad = 8
         pivot_bad = 42
         
-        self.assertRaises(InputTransformError, self.s.rotateGrids, "test", 
-                                             rotation_bad, 
-                                             pivot=pivot_bad,
-                                             obj=Objects.GROUP,
-                                             mode=Modes.ABS)
+        with self.assertRaises(InputTransformError): 
+            self.s.rotateGrids("test", rotation_bad, pivot=pivot_bad, obj=Objects.GROUP, mode=Modes.ABS)
 
     @params(*TestTemplates.getFrameList())
     def test_translationsFrame(self, frame):
@@ -187,9 +182,8 @@ class Test_MatTransform(unittest.TestCase):
         
         trans_bad = 6.66
 
-        self.assertRaises(InputTransformError, self.s.translateGrids, frame["name"], 
-                                             trans_bad,
-                                             obj=Objects.FRAME)
+        with self.assertRaises(InputTransformError): 
+            self.s.translateGrids(frame["name"], trans_bad, obj=Objects.FRAME)
 
     @params(*TestTemplates.getFrameList())
     def test_rotationsFrame(self, frame):
@@ -208,11 +202,8 @@ class Test_MatTransform(unittest.TestCase):
         rotation_bad = 8
         pivot_bad = 42
         
-        self.assertRaises(InputTransformError, self.s.rotateGrids, frame["name"], 
-                                             rotation_bad, 
-                                             pivot=pivot_bad,
-                                             obj=Objects.FRAME,
-                                             mode=Modes.ABS)
+        with self.assertRaises(InputTransformError): 
+            self.s.rotateGrids(frame["name"], rotation_bad, pivot=pivot_bad, obj=Objects.FRAME, mode=Modes.ABS)
 
 if __name__ == "__main__":
     import nose2

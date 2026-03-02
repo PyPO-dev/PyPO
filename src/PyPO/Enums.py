@@ -5,13 +5,33 @@ File containing enum types for PyPO methods.
 
 from enum import Enum
 
-from numpy import pi
+import numpy as np
 
-class CustomEnum(Enum):
+class CustomEnumScalar(Enum):
     def __str__(self):
         return self.name
 
-class FieldComponents(CustomEnum):
+class CustomEnumString(Enum):
+    def __str__(self):
+        return self.name
+    
+    def __rmul__(self, other):
+        return NotImplemented
+    
+    def __rtruediv__(self, other):
+        return NotImplemented
+
+class CustomEnumTuple(Enum):
+    def __str__(self):
+        return self.name
+    
+    def __rmul__(self, other):
+        return other * self.value[0]
+    
+    def rdiv(self, other):
+        return other / self.value[0]
+
+class FieldComponents(CustomEnumScalar):
     """!
     Enum types for electric and magnetic field components.
    
@@ -38,7 +58,7 @@ class FieldComponents(CustomEnum):
     Hz = 5
     NONE = None
 
-class CurrentComponents(CustomEnum):
+class CurrentComponents(CustomEnumScalar):
     """!
     These are special options that are used whenever a specific component of a field or current distribution is required.
     This could be, for example, for visualisation or an efficiency calculation.
@@ -61,7 +81,7 @@ class CurrentComponents(CustomEnum):
     My = 4
     Mz = 5
 
-class Projections(CustomEnum):
+class Projections(CustomEnumScalar):
     """!
     Enum types for projections on two axes for plotting purposes.
     
@@ -86,7 +106,7 @@ class Projections(CustomEnum):
     zy = 4
     xz = 5
 
-class Units(float, Enum):
+class Units(CustomEnumTuple):
     """!
     Enum types for units for display and conversion.
     
@@ -113,24 +133,25 @@ class Units(float, Enum):
 
     @ingroup public_api_argopts
     """
-    M = 1e3
-    CM = 1e-2*M
-    MM = 1e-3*M
-    UM = 1e-6*M
-    NM = 1e-9*M
-    IN = 25.4*MM
-    MIL = IN*1e-3
-    THOU = IN*1e-3
-    UIN = IN*1e-6
-    FT = 12*IN
-    DEG = 1
-    AM = 60
-    AS = 3600
-    RAD = 180/pi*DEG
-    MRAD = RAD*1e-3
-    URAD = RAD*1e-6
+    
+    M = (1e3, "spatial")
+    CM = (1e-2*M[0], "spatial")
+    MM = (1e-3*M[0], "spatial")
+    UM = (1e-6*M[0], "spatial")
+    NM = (1e-9*M[0], "spatial")
+    IN = (25.4*MM[0], "spatial")
+    MIL = (IN[0]*1e-3, "spatial")
+    THOU = (IN[0]*1e-3, "spatial")
+    UIN = (IN[0]*1e-6, "spatial")
+    FT = (12*IN[0], "spatial")
+    DEG = (1., "angular")
+    AM = (60., "angular")
+    AS = (3600., "angular")
+    RAD = (180/np.pi*DEG[0], "angular")
+    MRAD = (RAD[0]*1e-3, "angular")
+    URAD = (RAD[0]*1e-6, "angular")
 
-class Scales(Enum):
+class Scales(CustomEnumScalar):
     """!
     Enum types for units for setting scalings for quantities.
     
@@ -150,7 +171,7 @@ class Scales(Enum):
     AMP = 1
     dB = 2
 
-class Objects(Enum):
+class Objects(CustomEnumString):
     """!
     Enum types for objects such as elements, groups, frames, etc.
 
@@ -168,7 +189,7 @@ class Objects(Enum):
     FIELD = "fields"
     CURRENT = "currents"
 
-class Modes(Enum):
+class Modes(CustomEnumScalar):
     """!
     Enum types for transformation modes, absolute or relative.
 
@@ -182,7 +203,7 @@ class Modes(Enum):
     REL = 0
     ABS = 1
 
-class AperShapes(Enum):
+class AperShapes(CustomEnumScalar):
     """!
     Enum types for aperture object shapes.
 
@@ -198,7 +219,7 @@ class AperShapes(Enum):
     ELL = 0
     RECT = 1
 
-class OptDoF(Enum):
+class OptDoF(CustomEnumScalar):
     """!
     Enum types for selecting degrees-of-freedom (DoF) for optimisation of an element or group.
 
@@ -220,7 +241,7 @@ class OptDoF(Enum):
     RY = 4
     RZ = 5
 
-class Dielectrics(Enum):
+class Dielectrics(CustomEnumScalar):
     """!
     Enum types for commonly used dielectrics for lens materials.
     

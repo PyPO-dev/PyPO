@@ -69,18 +69,18 @@ class Test_SystemOps(unittest.TestCase):
         test_str = self.s0.__str__()
         self.assertTrue(isinstance(test_str, str))
 
-    @params(FieldComponents.Ex, FieldComponents.Ey, FieldComponents.Ez, 
-            FieldComponents.Hx, FieldComponents.Hy, FieldComponents.Hz) 
+    @params(*list(FieldComponents)) 
     def test_compToFields(self, comp):
         test_arr = np.zeros((3,3))
         out = self.s0._compToFields(comp, test_arr)
         
         self.assertTrue(isinstance(out, fields))
 
-    @params(Units.M, Units.CM, Units.MM, Units.UM, Units.NM, Units.DEG, Units.AM, Units.AS) 
+    @params(*list(Units)) 
     def test_units(self, unit):
         self.assertTrue(isinstance(unit.name, str))
-        self.assertTrue(isinstance(unit.value, float))
+        self.assertTrue(isinstance(unit.value[0], float))
+        self.assertTrue(isinstance(unit.value[1], str))
         
 if __name__ == "__main__":
     import nose2

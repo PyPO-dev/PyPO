@@ -134,15 +134,47 @@ def plotBeam2D(plotObject, field, contour,
                 ax[0].clabel(cont0)
                 ax[1].clabel(cont1)
 
-        elif scale == Scales.dB:
+        if scale == Scales.AMP:
+            if norm:
+                field_pl = np.absolute(field) / max_field
+                if contour is not None:
+                    contour = np.absolute(contour) / np.max(np.absolute(contour))
+            
+            else:
+                field_pl = np.absolute(field)
+                if contour is not None:
+                    contour = np.absolute(contour)
+
+            vmin = np.min(field_pl) if vmin is None else vmin
+            vmax = np.max(field_pl) if vmax is None else vmax
+            
+            ampfig = ax[0].pcolormesh(grid_x1 / units.value, grid_x2 / units.value, field_pl,
+                                    vmin=vmin, vmax=vmax, cmap=cmaps.parula, shading='auto')
+            phasefig = ax[1].pcolormesh(grid_x1 / units.value, grid_x2 / units.value, np.angle(field), cmap=cmaps.parula, shading='auto')
+
+            if contour is not None:
+                cont0 = ax[0].contour(grid_x1 / units.value, grid_x2 / units.value, contour, levels, cmap=cm.binary, linewidths=0.5)
+                cont1 = ax[1].contour(grid_x1 / units.value, grid_x2 / units.value, np.angle(contour), levels, cmap=cm.binary, linewidths=0.5)
+
+                ax[0].clabel(cont0)
+                ax[1].clabel(cont1)
+
+        else: #  scale == Scales.dB
             if titleA == "Power":
                 titleA += " / dB"
             if titleP == "Phase":
                 titleP += " / rad"
-            field_dB = 20 * np.log10(np.absolute(field) / max_field)
+                
+            if norm:
+                field_dB = 20 * np.log10(np.absolute(field) / max_field)
+            else:
+                field_dB = 20 * np.log10(np.absolute(field))
             
             if contour is not None:
-                contour_dB = 20 * np.log10(np.absolute(contour) / np.max(np.absolute(contour)))
+                if norm:
+                    contour_dB = 20 * np.log10(np.absolute(contour) / np.max(np.absolute(contour)))
+                else:
+                    contour_dB = 20 * np.log10(np.absolute(contour))
             
             vmin = np.min(field_dB) if vmin is None else vmin
             vmax = np.max(field_dB) if vmax is None else vmax

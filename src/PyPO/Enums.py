@@ -139,13 +139,15 @@ class Scales(Enum):
     For example, using the scale argument, it is possible to fit a Gaussian to a beam pattern in linear, logarithmic and decibel space.
 
     Options:\n
-    LIN       : Set scaling mode to linear\n
+    LIN       : Set scaling mode to linear power\n
+    AMP       : Set scaling mode to linear amplitude\n
     dB        : Set scaling to decibels
 
     @ingroup public_api_argopts
     """
 
     LIN = 0
+    AMP = 1
     dB = 2
 
 class Objects(Enum):

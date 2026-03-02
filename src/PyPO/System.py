@@ -2731,6 +2731,216 @@ class System(object):
         
         self.clog.result(f"Found converged solution, gridsize: {*['{:0.3e}'.format(x) for x in list(gridsize)],}")
         return gridsize
+
+    def convergeOnTarget(self, source_field : str, name_scatterer : str, name_target : str, tol : float = 1e-2, target_gridsize : np.ndarray = None, mult : int = 2, div : int = 3, max_iter : int = 16) -> int:
+        """!
+        Calculate gridsize for which calculation converges.
+        
+        This function calculates the gridsize for a scattering surface in order to obtain a convergent solution
+        on a target surface.
+        
+        First, some extreme points are selected on the target surface.
+        The strongest component of the source distribution is then selected and copied into a PO scalarfield object.
+        The scalarfield is propagated to a test grid on the scatterer, and then to the target test points.
+        At each step, the power in the test points is calculated and compared with the previous result.
+        If the difference in results is smaller than the given tolerance, the next largest gridsize is accepted as an upper limit on the
+        converged gridsize. If not, another iteration is started, with a grid size multiplied by `mult`.
+        Once an upper limit is found, the difference between the last unconverged and first converged gridsizes is
+        divided in two, and the convergence of the new grid size tested against the converged result. If
+        the new grid size is also converged, then it becomes the new first converged gridsize. This subdivision
+        process will take place up to `div` times.
+        
+        If the maximal number of iterations is exceeded, `PyPO` will throw an error and stop.
+        
+        This process is carried out seperately for each grid dimension, with a minimal number of points
+        in the untested direction.
+        
+        @ingroup public_api_po
+        
+        @param source_field Name of source field to use. Should be the field that is to be propagated to the scatterer.
+        @param name_scatterer Name of the reflector to calculate the converged grid size for
+        @param name_target Name of target surface for the next step in the propagation.
+        @param tol Tolerance for specifying when convergence has been reached.
+        @param target_gridsize Size of the grid on the target to use for evaluating the accuracy.
+        @param mult Multiplication in linear gridsize for each iteration.
+        @param div Number of divisions to make when subdividing a converged grid .
+        @param max_iter Maximum number of times to increase grid size before error.
+        
+        @returns gridsize Gridsize for which solution converged.
+        """
+
+        self.clog.work(f"*** Starting auto-convergence of {name_scatterer} on {name_target} *** ")
+        logstate = self.verbosity
+        self.setLoggingVerbosity(False)
+        diff = 1e99
+
+        P0 = 1e99
+
+        # Find the strongest component of the source field/current
+        max_Field = []
+        if source_field in self.fields:
+            for i in range(6):
+                if i>2: # Treat E and H fields on an equal basis
+                    m = 377**2  # Scaling between E and H fields is impedance of media squared
+                else:
+                    m = 1
+                max_Field.append(m*np.max(np.absolute(self.fields[source_field][i])))
+            
+            comp = self.fields[source_field][np.argmax(np.array(max_Field))]
+  
+            self.scalarfields[f"_{source_field}"] = PTypes.scalarfield(comp)
+            self.scalarfields[f"_{source_field}"].setMeta(self.fields[source_field].surf, self.fields[source_field].k)
+            
+        elif source_field in self.currents:
+            for i in range(6):
+                if i>2: # Treat J and M fields on an equal basis
+                    m = 377**2  # Scaling between J and M currents is impedance of media squared
+                else:
+                    m = 1
+                max_Field.append(m*np.max(np.absolute(self.currents[source_field][i])))
+            
+            comp = self.currents[source_field][np.argmax(np.array(max_Field))]
+  
+            self.scalarfields[f"_{source_field}"] = PTypes.scalarfield(comp)
+            self.scalarfields[f"_{source_field}"].setMeta(self.currents[source_field].surf, self.currents[source_field].k)
+        elif source_field in self.scalarfields:
+            max_Field.append(np.max(np.absolute(self.scalarfields[source_field])))
+            self.scalarfields[f"_{source_field}"] = self.scalarfields[source_field]
+            
+        # Create target grid
+        #
+        # We create a grid on the target with a minimal number of points
+        # 
+        # For an xy grid, we choose a 3x3 grid across the scatterer. This 
+        # places points on symmetry and 45° planes, and at the center, which
+        # should avoid issues with symmetric systems that have zeroes along
+        # the E and H-plane symmetry axes.
+        #
+        # For UV grids, we choose a 3x6 grid
+        # This places points on the 60° planes - again avoiding placing
+        # points on the symmetry axes only.
+        self.copyElement(name_target, '_conv_target')
+        
+        gmode = self.system['_conv_target']['gmode']
+        if target_gridsize:
+            self.system['_conv_target']['gridsize'] = target_gridsize
+        else:
+            if gmode == 1: # UV grid
+                self.system['_conv_target']['gridsize'] = np.array((3, 6))
+            else: # XY or AoE grid
+                self.system['_conv_target']['gridsize'] = np.array((5, 5))
+        
+        # Create copy of scatterer for tests
+        self.copyElement(name_scatterer, '_conv_scatterer')
+        
+        # initialize test scatterer
+        if gmode == 1:
+            # V axis is ~3x larger than U axis for circular grids
+            self.system['_conv_scatterer']['gridsize'] = np.array((10, 30))
+        else:
+            self.system['_conv_scatterer']['gridsize'] = np.array((10, 10))
+        
+        # Create PO dicts
+        runPODict1 = {
+                "t_name"    : '_conv_scatterer',
+                "s_scalarfield" : f"_{source_field}",
+                "mode"      : "scalar",
+                "name_field"   : "_S_conv_scat"
+                }
+        
+        runPODict2 = {
+                "t_name"    : "_conv_target",
+                "s_scalarfield" : f"_S_conv_scat",
+                "mode"      : "scalar",
+                "name_field"   : "_S_conv_target"
+                }
+
+        # Run initial test
+        self.runPO(runPODict1)
+        self.runPO(runPODict2)
+        
+        # We will determine the error by finding the target point with the maximum 
+        # difference between steps
+        init_field = self.scalarfields['_S_conv_target'].S.copy()
+        
+        conv_grid = np.array([10, 10])
+        
+        # Run convergence in each grid direction
+        for i in range(2):
+            field = init_field.copy()
+            n=0
+            
+            diff = 1e99
+            
+            self.system['_conv_scatterer']["gridsize"] = np.array([10,10])
+            
+            while np.absolute(diff) > tol:
+                last_field = field.copy()
+                
+                gridsize = self.system['_conv_scatterer']['gridsize'][i]*mult
+                self.system['_conv_scatterer']["gridsize"][i] = gridsize
+            
+                self.runPO(runPODict1)
+                self.runPO(runPODict2)
+                
+                field = self.scalarfields['_S_conv_target'].S.copy()
+                diff_field = np.abs(np.abs((field - last_field)))
+                diff = np.max(diff_field)/np.max(np.abs(field))
+                
+                self.setLoggingVerbosity(logstate)
+                self.clog.work(f"Axis {i:d} Step {n+1:d}: Difference {diff:.3e} at gridsize[{gridsize:d}]")
+                self.setLoggingVerbosity(False)
+            
+                
+                n += 1
+                if n >= max_iter:
+                    break
+            
+            if n >= max_iter:
+                self.setLoggingVerbosity(logstate)
+                self.clog.error(f"Could not find converged solution for axis {i:d}, increase max_iter from {max_iter:d}")
+                self.clog.error(f"Returning 10*{mult:f}^{max_iter:d} = {gridsize:d}")
+                conv_grid[i] = gridsize
+                self.setLoggingVerbosity(False)
+                break
+            
+            conv_gridsize = gridsize
+            nonconv_gridsize = gridsize/mult
+            conv_field = last_field.copy()
+            
+            d = 0
+            while d < div:
+                next_grid = int((conv_gridsize + nonconv_gridsize) / 2)
+                self.system['_conv_scatterer']["gridsize"][i] = next_grid
+            
+                self.runPO(runPODict1)
+                self.runPO(runPODict2)
+                
+                field = self.scalarfields['_S_conv_target'].S.copy()
+                diff_field = np.abs(np.abs((field - conv_field)))
+                diff = np.max(diff_field)/np.max(np.abs(field))
+                
+                self.setLoggingVerbosity(logstate)
+                self.clog.work(f"Axis {i:d} Step {n + d+1:d}: Difference {diff:.3e} at gridsize[{next_grid:d}]")
+                self.setLoggingVerbosity(False)
+                if diff < tol: 
+                    # We are still converged at this gridsize, update converged gridsize and field
+                    conv_gridsize = next_grid
+                    conv_field = field.copy()
+                else:
+                    # This size is not converged, so update the largest nonconverged grid
+                    nonconv_gridsize = next_grid
+                    
+                d += 1
+                
+            conv_grid[i] = conv_gridsize
+        
+        
+        self.system[name_scatterer]["gridsize"] = conv_grid
+        self.setLoggingVerbosity(logstate)
+        self.clog.result(f"Found converged solution, gridsize: {*['{:d}'.format(x) for x in list(conv_grid)],}")
+        return conv_grid
+
     
     def runGUIPO(self, runPODict : dict): #TODO: check typing
         """!system

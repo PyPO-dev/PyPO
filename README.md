@@ -3,6 +3,6 @@
 
 # Welcome to the Python Physical Optics (PyPO) package!
 
-Version 1.2.1
+Version 1.2.2
 
 For full documentation and instructions on how to install and use PyPO, we kindly refer to the [documentation page](https://pypo-dev.github.io/PyPO/).

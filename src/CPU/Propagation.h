@@ -164,8 +164,8 @@ Propagation<T, U, V, W>::Propagation(T k, int numThreads, int gs, int gt, T epsi
 {
     this->Three = 3.0f;
     this->PIf = 3.14159265359f;
-    this->C_L = 2.99792458e8f; // m s^-1
-    this->MU_0 = 1.2566370614e-6f; // kg m s^-2 A^-2
+    this->C_L = 2.99792458e11f; // mm s^-1
+    this->MU_0 = 1.2566370614e-3f; // kg mm s^-2 A^-2
     this->EPS_VAC = 1 / (MU_0 * C_L*C_L);
     this->EPS = epsilon * EPS_VAC; // epsilon is relative permeability
     this->ZETA = sqrt(MU_0 / EPS);

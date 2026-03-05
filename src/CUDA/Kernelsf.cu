@@ -34,8 +34,8 @@ __constant__ int g_t;               // Gridsize on target
     dim3 nrb(nBlocks); dim3 nrt(nThreads);
 
     float PIf = 3.1415926; /* pi */
-    float C_L = 2.9979246e8; // mm s^-1
-    float MU_0 = 1.256637e-6; // kg mm s^-2 A^-2
+    float C_L = 2.9979246e11; // mm s^-1
+    float MU_0 = 1.256637e-3; // kg mm s^-2 A^-2
     float EPS_VAC = 1 / (MU_0 * C_L*C_L);
     float EPS = EPS_VAC * epsilon;
     float ZETA = sqrt( MU_0 / EPS);
@@ -43,16 +43,17 @@ __constant__ int g_t;               // Gridsize on target
 
     float prefactor = k*k/(4*PIf);
 
-    //printf("PIf         : %.16g\n", PIf);
-    //printf("C_L         : %.16g\n", C_L);
-    //printf("MU_0        : %.16g\n", MU_0);
-    //printf("EPS_VAC     : %.16g\n", EPS_VAC);
-    //printf("EPS         : %.16g\n", EPS);
-    //printf("ZETA        : %.16g\n", ZETA);
-    //printf("ZETA_INV    : %.16g\n", ZETA_INV);
+    // printf("PIf         : %.16g\n", PIf);
+    // printf("C_L         : %.16g\n", C_L);
+    // printf("MU_0        : %.16g\n", MU_0);
+    // printf("EPS_VAC     : %.16g\n", EPS_VAC);
+    // printf("EPS         : %.16g\n", EPS);
+    // printf("ZETA        : %.16g\n", ZETA);
+    // printf("ZETA_INV    : %.16g\n", ZETA_INV);
+    // printf("t_direction : %.3g\n", t_direction); 
     
-    //printf("k           : %.16g\n", k);
-    //printf("prefactor   : %.16g\n", prefactor);
+    // printf("k           : %.16g\n", k);
+    // printf("prefactor   : %.16g\n", prefactor);
 
 
     // Fill ID matrix
@@ -205,44 +206,58 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
                 continue;}
 
             kR = con[0].x * R;
-            //printf("kR                  : %.16g\n", kR);
+            // printf("kR                  : %.16g\n", kR);
             kR_inv = 1.0f/kR;
-            //printf("kR_inv              : %.16g\n", kR_inv);
+            // printf("kR_inv              : %.16g\n", kR_inv);
 
             // Calculate the complex sums that appear in the integral
-            kR_inv_sum1 = make_cuFloatComplex(cuCrealf(con[8])*kR_inv*kR_inv, kR_inv*(kR_inv*kR_inv - 1));
-            kR_inv_sum2 = make_cuFloatComplex(-cuCrealf(con[8])*3*kR_inv*kR_inv, kR_inv*(1 - 3*kR_inv*kR_inv));
+            // con[8] = ∓1 for forward and backward propagation
+            // -i/(kR) ∓ 1/(kR)² + i/(kR)³
+            kR_inv_sum1 = make_cuFloatComplex(cuCrealf(con[8])*kR_inv*kR_inv, -kR_inv + (kR_inv*kR_inv*kR_inv));
+
+            // i/(kR) ± 3/(kR)² - 3i/(kR)³
+            kR_inv_sum2 = make_cuFloatComplex(-cuCrealf(con[8])*3*kR_inv*kR_inv, kR_inv - 3*(kR_inv*kR_inv*kR_inv));
+
+            // ∓i/(kR) ∓ 1/(kR)²
             kR_inv_sum3 = cuCmulf(con[8], make_cuFloatComplex(kR_inv*kR_inv, kR_inv));
 
             //printf("kR_inv_sum1         : %.16g+%.16gi\n", kR_inv_sum1.x, kR_inv_sum1.y);
             //printf("kR_inv_sum2         : %.16g+%.16gi\n", kR_inv_sum2.x, kR_inv_sum2.y);
             //printf("kR_inv_sum3         : %.16g+%.16gi\n", kR_inv_sum3.x, kR_inv_sum3.y);
 
-            // Vector calculatoins
+            // Vector calculati0ns
             // e-field
+            // J.Rh
             dot(js, R_hat, js_dot_R);
             //printf("js_dot_R         : %.16g+%.16gi\n", js_dot_R.x, js_dot_R.y);
             
+            // (J.Rh)Rh
             s_mult(R_hat, js_dot_R, js_dot_R_R);
             //printf("js_dot_R_R       : (%.16g+%.16gi, %.16g+%.16gi, %.16g+%.16gi)\n", js_dot_R_R[0].x, js_dot_R_R[0].y, js_dot_R_R[1].x, js_dot_R_R[1].y, js_dot_R_R[2].x, js_dot_R_R[2].y);
 
+            // Rh x M
             ext(R_hat, ms, R_cross_ms);
             //printf("R_cross_ms       : (%.16g+%.16gi, %.16g+%.16gi, %.16g+%.16gi)\n", R_cross_ms[0].x, R_cross_ms[0].y, R_cross_ms[1].x, R_cross_ms[1].y, R_cross_ms[2].x, R_cross_ms[2].y);
 
 
             // h-field
+            // M.Rh
             dot(ms, R_hat, ms_dot_R);
             //printf("ms_dot_R        : %.16g+%.16gi\n", ms_dot_R.x, ms_dot_R.y);
             
+            // (M.Rh)Rh
             s_mult(R_hat, ms_dot_R, ms_dot_R_R);
             //printf("ms_dot_R_R      : (%.16g+%.16gi, %.16g+%.16gi, %.16g+%.16gi)\n", ms_dot_R_R[0].x, ms_dot_R_R[0].y, ms_dot_R_R[1].x, ms_dot_R_R[1].y, ms_dot_R_R[2].x, ms_dot_R_R[2].y);
 
+            // Rh x J
             ext(R_hat, js, R_cross_js);
             //printf("R_cross_js      : (%.16g+%.16gi, %.16g+%.16gi, %.16g+%.16gi)\n", R_cross_js[0].x, R_cross_js[0].y, R_cross_js[1].x, R_cross_js[1].y, R_cross_js[2].x, R_cross_js[2].y);
 
+            // Green's function
             cuFloatComplex d_Ac = make_cuFloatComplex(d_A[i], 0.);
             //printf("dA              : %.16g\n", d_Ac.x);
 
+            // k²/(4π) e^{∓ikR} dA
             Green = cuCmulf(cuCmulf(con[1], cuCexpf(cuCmulf(con[8], make_cuFloatComplex(0, kR)))), d_Ac);
             //printf("Green           : %.16g+%.16gi\n", Green.x, Green.y);
             
@@ -258,9 +273,39 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
                 }
                 else  // add the full value of the points
                 {
-                    ye_field[n] = cuCaddf(cuCmulf(cuCaddf(cuCmulf(con[4], cuCaddf(cuCmulf(js[n], kR_inv_sum1), cuCmulf(js_dot_R_R[n], kR_inv_sum2))), cuCmulf(R_cross_ms[n], kR_inv_sum3)), Green), e_field[n]);
+                    ye_field[n] = cuCaddf(
+                                    cuCmulf(
+                                        cuCaddf(
+                                            cuCmulf(
+                                                con[4], 
+                                                cuCaddf(
+                                                    cuCmulf(js[n], kR_inv_sum1), 
+                                                    cuCmulf(js_dot_R_R[n], kR_inv_sum2)
+                                                )
+                                            ), 
+                                            cuCmulf(R_cross_ms[n], kR_inv_sum3)
+                                            ), 
+                                            Green
+                                        ), 
+                                        e_field[n]
+                                    );
                 
-                    yh_field[n] = cuCaddf(cuCmulf(cuCsubf(cuCmulf(con[5], cuCaddf(cuCmulf(ms[n], kR_inv_sum1), cuCmulf(ms_dot_R_R[n], kR_inv_sum2))), cuCmulf(R_cross_js[n], kR_inv_sum3)), Green), h_field[n]);
+                    yh_field[n] = cuCaddf(
+                                    cuCmulf(
+                                        cuCsubf(
+                                            cuCmulf(
+                                                con[5], 
+                                                cuCaddf(
+                                                    cuCmulf(ms[n], kR_inv_sum1), 
+                                                    cuCmulf(ms_dot_R_R[n], kR_inv_sum2)
+                                                    )
+                                                ), 
+                                            cuCmulf(R_cross_js[n], kR_inv_sum3)
+                                            ), 
+                                            Green
+                                        ), 
+                                        h_field[n]
+                                    );
                 }
             }
         }  // End of y/v loop
@@ -1122,7 +1167,7 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs, float *d_
             if ((norm_dot_R_hat < 0)) {
                 continue;}
 
-            // Vector calculatoins
+            // Vector calculations
             // e-field
             dot(js, r_hat, js_dot_R);
             

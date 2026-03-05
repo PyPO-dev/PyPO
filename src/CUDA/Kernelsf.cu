@@ -1152,8 +1152,8 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs, float *d_
     cuFloatComplex ms[3];             // Magnetic current at source point
     cuFloatComplex js_dot_R_R[3];     // Electric current contribution to e-field
     cuFloatComplex ms_dot_R_R[3];    // Magnetic current contribution to h-field
-    cuFloatComplex ms_cross_R[3];     // Outer product between R_hat and ms
-    cuFloatComplex js_cross_R[3];     // Outer product between R_hat and js
+    cuFloatComplex R_cross_ms[3];     // Outer product between R_hat and ms
+    cuFloatComplex R_cross_js[3];     // Outer product between R_hat and js
     cuFloatComplex e_temp[3];           // Temporary container for intermediate values
     cuFloatComplex h_temp[3];           // Temporary container for intermediate values
 
@@ -1190,28 +1190,34 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs, float *d_
             source_norm[2] = d_nzs[i];
 
             dot(source_norm, r_hat, norm_dot_R_hat);
-            //printf("(x, y, z), norm_dot_R_hat      : (%.16g, %.16g, %.16g), %.16g\n", source_point[0], source_point[1], source_point[2], norm_dot_R_hat);
             
             if ((norm_dot_R_hat < 0)) {
                 continue;}
 
             // Vector calculations
             // e-field
+            // J.rh
             dot(js, r_hat, js_dot_R);
             
+            // (J.rh)rh
             s_mult(r_hat, js_dot_R, js_dot_R_R);
-            
-            ext(r_hat, ms, ms_cross_R);
+
+            // rh x M
+            ext(r_hat, ms, R_cross_ms);
 
             // h-field
+            // M.rh
             dot(ms, r_hat, ms_dot_R);
             
+            // (M.rh)rh
             s_mult(r_hat, ms_dot_R, ms_dot_R_R);
             
-            ext(r_hat, js, js_cross_R);
+            // rh x J
+            ext(r_hat, js, R_cross_js);
             
             cuFloatComplex d_Ac = make_cuFloatComplex(d_A[i], 0.);
             
+            // r'.rhat
             dot(source_point, r_hat, source_point_dot_r_hat);
 
             // ∓k  con[8]=∓1, con[0]=k
@@ -1223,12 +1229,15 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs, float *d_
             // e^{±i k r'.rhat}
             exp = cuCexpf(cuCmulf(cuCmulf(con[8], con[0]), make_cuFloatComplex(0, -source_point_dot_r_hat)));
 
-            // -i * k^2/4π * dA * e^{±i k r'.rhat}, k^2/4π = con[1]
+            // -(ik²/4π) * dA * e^{±i k r'.rhat}, k^2/4π = con[1]
             // cuCmulf(make_cuFloatComplex(0, -1), cuCmulf(con[1], exp))
 
             Green = cuCmulf(cuCmulf(make_cuFloatComplex(0, -1), cuCmulf(con[1], exp)), make_cuFloatComplex(d_A[i], 0));
             //printf("Green           : %.16g+%.16gi\n", Green.x, Green.y);
 
+            // Field calculations
+            // E = -(ik²/4π) * ( Z(J - (J.r)r) + ∓ r x M ) e^(±i k r'.rh) dA
+            // H = -(ik²/4π) * ( (1/Z)(J - (J.r)r) - ∓ r x M ) e^(±i k r'.rh) dA
             for( int n=0; n<3; n++)
             {
                 // If this is an integral over an incomplete period of v, or over y/el, only add half of the first and last points
@@ -1237,12 +1246,12 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs, float *d_
                     ye_field[n] = cuCaddf(
                                     cuCmulf(
                                         cuCmulf(
-                                            cuCaddf(
-                                                cuCmulf(
+                                            cuCaddf( // Z (M - (M.rh)rh) + ∓ rh x J
+                                                cuCmulf( // Z (J - (J.rh)rh)
                                                     con[4], 
                                                     cuCsubf(js[n], js_dot_R_R[n])
                                                 ), 
-                                                cuCmulf(con[8], ms_cross_R[n])
+                                                cuCmulf(con[8], R_cross_ms[n])  // ∓ rh x M
                                             ), Green
                                         ), 
                                         make_cuFloatComplex(0.5,0)
@@ -1253,14 +1262,14 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs, float *d_
                     yh_field[n] = cuCaddf(
                                     cuCmulf(
                                         cuCmulf(
-                                            cuCsubf(
-                                                cuCmulf(
+                                            cuCsubf( // (1/Z) (M - (M.rh)rh) - ∓ rh x J
+                                                cuCmulf(  // (1/Z) (M - (M.rh)rh)
                                                     con[5], 
-                                                    cuCsubf(ms[n], ms_dot_R_R[n])
+                                                    cuCsubf(ms[n], ms_dot_R_R[n]) // M - (M.rh)rh
                                                 ), 
                                                 cuCmulf(
                                                     con[8], 
-                                                    js_cross_R[n])
+                                                    R_cross_js[n]) // ∓ rh x J
                                                 ), 
                                                 Green
                                             ), 
@@ -1273,12 +1282,12 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs, float *d_
                 {
                     ye_field[n] = cuCaddf(
                                     cuCmulf(
-                                        cuCaddf(
-                                            cuCmulf(
+                                        cuCaddf( // Z (J - (J.rh)rh) + ∓ rh x M
+                                            cuCmulf( // Z (J - (J.rh)rh)
                                                 con[4], 
                                                 cuCsubf(js[n], js_dot_R_R[n])
                                             ), 
-                                            cuCmulf(con[8], ms_cross_R[n])
+                                            cuCmulf(con[8], R_cross_ms[n]) // ∓ rh x M
                                         ), 
                                         Green
                                     ), 
@@ -1287,12 +1296,12 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs, float *d_
                 
                     yh_field[n] = cuCaddf(
                                     cuCmulf(
-                                        cuCsubf(
-                                            cuCmulf(
+                                        cuCsubf( // (1/Z)(M - (M.rh)rh) - ∓ rh x J
+                                            cuCmulf( // (1/Z)(M - (M.rh)rh)
                                                 con[5], 
                                                 cuCsubf(ms[n], ms_dot_R_R[n])
                                             ), 
-                                            cuCmulf(con[8], js_cross_R[n])
+                                            cuCmulf(con[8], R_cross_js[n]) // ∓ rh x J
                                         ), 
                                         Green
                                     ), yh_field[n]

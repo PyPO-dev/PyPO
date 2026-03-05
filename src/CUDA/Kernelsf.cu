@@ -267,9 +267,44 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
                 // If this is an integral over an incomplete period of v, or over y/el, only add half of the first and last points
                 if ((gmode!=1) && (yv==0) || (yv==ncy-1))
                 {
-                    ye_field[n] = cuCaddf(cuCmulf(make_cuFloatComplex(0.5,0), cuCmulf(cuCaddf(cuCmulf(con[4], cuCaddf(cuCmulf(js[n], kR_inv_sum1), cuCmulf(js_dot_R_R[n], kR_inv_sum2))), cuCmulf(ms_cross_R[n], kR_inv_sum3)), Green)), e_field[n]);
+                    // 0.5*
+                    ye_field[n] = cuCaddf(
+                                    cuCmulf(
+                                        make_cuFloatComplex(0.5,0), 
+                                        cuCmulf(
+                                            cuCaddf(
+                                                cuCmulf(
+                                                    con[4], 
+                                                    cuCaddf(
+                                                        cuCmulf(js[n], kR_inv_sum1), 
+                                                        cuCmulf(js_dot_R_R[n], kR_inv_sum2)
+                                                    )
+                                                ), 
+                                                cuCmulf(ms_cross_R[n], kR_inv_sum3)
+                                            ), 
+                                            Green
+                                        )
+                                    ), 
+                                    ye_field[n]
+                                )  ;
                 
-                    yh_field[n] = cuCaddf(cuCmulf(make_cuFloatComplex(0.5,0), cuCmulf(cuCsubf(cuCmulf(con[5], cuCaddf(cuCmulf(ms[n], kR_inv_sum1), cuCmulf(ms_dot_R_R[n], kR_inv_sum2))), cuCmulf(js_cross_R[n], kR_inv_sum3)), Green)), h_field[n]);
+                    yh_field[n] = cuCaddf(
+                                    cuCmulf(
+                                        make_cuFloatComplex(0.5,0), 
+                                        cuCmulf(
+                                            cuCsubf(
+                                                cuCmulf(
+                                                    con[5], 
+                                                    cuCaddf(
+                                                        cuCmulf(ms[n], kR_inv_sum1), 
+                                                        cuCmulf(ms_dot_R_R[n], kR_inv_sum2)
+                                                    )
+                                                ), 
+                                                cuCmulf(js_cross_R[n], kR_inv_sum3)
+                                            ), Green
+                                        )
+                                    ), yh_field[n]
+                                  );
                 }
                 else  // add the full value of the points
                 {
@@ -284,11 +319,11 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
                                                 )
                                             ), 
                                             cuCmulf(ms_cross_R[n], kR_inv_sum3)
-                                            ), 
-                                            Green
                                         ), 
-                                        e_field[n]
-                                    );
+                                        Green
+                                    ), 
+                                    ye_field[n]
+                                  );
                 
                     yh_field[n] = cuCaddf(
                                     cuCmulf(
@@ -301,11 +336,11 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
                                                     )
                                                 ), 
                                             cuCmulf(js_cross_R[n], kR_inv_sum3)
-                                            ), 
-                                            Green
                                         ), 
-                                        h_field[n]
-                                    );
+                                        Green
+                                    ), 
+                                    yh_field[n]
+                                  );
                 }
             }
         }  // End of y/v loop
@@ -314,8 +349,20 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
         {
             if ((xu==0) || (xu=ncx-1)) // Only add half the point value
             {
-                e_field[n] = cuCaddf(cuCmulf(ye_field[n], make_cuFloatComplex(0.5,0)), e_field[n]);
-                h_field[n] = cuCaddf(cuCmulf(yh_field[n], make_cuFloatComplex(0.5,0)), h_field[n]);
+                e_field[n] = cuCaddf(
+                                cuCmulf(
+                                    ye_field[n], 
+                                    make_cuFloatComplex(0.5,0)
+                                ), 
+                                e_field[n]
+                            );
+                h_field[n] = cuCaddf(
+                                cuCmulf(
+                                    yh_field[n], 
+                                    make_cuFloatComplex(0.5,0)
+                                ), 
+                                h_field[n]
+                            );
             }
             else 
             {

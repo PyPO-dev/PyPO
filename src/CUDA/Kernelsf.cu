@@ -246,7 +246,7 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
             {
                 // If this is an integral over y/el, only add half of 
                 // the first and last points
-                if ((gmode!=1) && (yv==0) || (yv==ncy-1))
+                if ((gmode!=1) && ((yv==0) || (yv==ncy-1)))
                 {
                     // 0.5*
                     ye_field[n] = cuCaddf(
@@ -1162,6 +1162,7 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs, float *d_
     // x/u axis, and the inner loop over the y/v axis
     for(int xu=0; xu<ncx; xu++)
     {
+        // Reset ye_field and yh_field to zero
         for (int n=0; n<3; n++) 
         {
             ye_field[n] = con[10]; // Zero intermediate electric field due to integral over y/v
@@ -1227,12 +1228,22 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs, float *d_
             //cuCmulf(cuCmulf(con[8], con[0]), make_cuFloatComplex(0, -source_point_dot_r_hat)
 
             // e^{±i k r'.rhat}
-            exp = cuCexpf(cuCmulf(cuCmulf(con[8], con[0]), make_cuFloatComplex(0, -source_point_dot_r_hat)));
+            exp = cuCexpf(
+                    cuCmulf(
+                        cuCmulf(con[8], con[0]), 
+                        make_cuFloatComplex(0, -source_point_dot_r_hat)
+                    )
+                );
 
-            // -(ik²/4π) * dA * e^{±i k r'.rhat}, k^2/4π = con[1]
-            // cuCmulf(make_cuFloatComplex(0, -1), cuCmulf(con[1], exp))
-
-            Green = cuCmulf(cuCmulf(make_cuFloatComplex(0, -1), cuCmulf(con[1], exp)), make_cuFloatComplex(d_A[i], 0));
+            // -(ik²/4π) * dA * e^{±i k r'.rhat}, 
+            // k^2/4π = con[1]
+            Green = cuCmulf(
+                        cuCmulf(
+                            make_cuFloatComplex(0, -1), 
+                            cuCmulf(con[1], exp)
+                            ), 
+                            make_cuFloatComplex(d_A[i], 0)
+                        );
             //printf("Green           : %.16g+%.16gi\n", Green.x, Green.y);
 
             // Field calculations
@@ -1241,12 +1252,12 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs, float *d_
             for( int n=0; n<3; n++)
             {
                 // If this is an integral over an incomplete period of v, or over y/el, only add half of the first and last points
-                if ((gmode!=1) && (yv==0) || (yv==ncy-1))
+                if ((gmode!=1) && ((yv==0) || (yv==ncy-1)))
                 {
                     ye_field[n] = cuCaddf(
                                     cuCmulf(
                                         cuCmulf(
-                                            cuCaddf( // Z (M - (M.rh)rh) + ∓ rh x J
+                                            cuCsubf( // Z (M - (M.rh)rh) + ∓ rh x J
                                                 cuCmulf( // Z (J - (J.rh)rh)
                                                     con[4], 
                                                     cuCsubf(js[n], js_dot_R_R[n])
@@ -1262,7 +1273,7 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs, float *d_
                     yh_field[n] = cuCaddf(
                                     cuCmulf(
                                         cuCmulf(
-                                            cuCsubf( // (1/Z) (M - (M.rh)rh) - ∓ rh x J
+                                            cuCaddf( // (1/Z) (M - (M.rh)rh) - ∓ rh x J
                                                 cuCmulf(  // (1/Z) (M - (M.rh)rh)
                                                     con[5], 
                                                     cuCsubf(ms[n], ms_dot_R_R[n]) // M - (M.rh)rh
@@ -1315,7 +1326,7 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs, float *d_
     
         for( int n=0; n<3; n++)
         {
-            if ((xu==0) || (xu=ncx-1)) // Only add half the point value
+            if ((xu==0) || (xu==ncx-1)) // Only add half the point value
             {
                 e_field[n] = cuCaddf(cuCmulf(ye_field[n], make_cuFloatComplex(0.5,0)), e_field[n]);
                 h_field[n] = cuCaddf(cuCmulf(yh_field[n], make_cuFloatComplex(0.5,0)), h_field[n]);

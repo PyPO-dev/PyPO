@@ -1464,16 +1464,16 @@ void __device__ scalarfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
             abs(r_vec, r);
 
             expo = cuCexpf(make_cuFloatComplex(0, con[8].x * con[0].x * r));
-            cfact = make_cuFloatComplex(-con[0].x * con[0].x / (4 * r * con[4].x) * d_A[i], 0);
+            cfact = make_cuFloatComplex(-con[0].x * con[0].x / (4 * r) * d_A[i], 0);
             
             // If this is an integral over an incomplete period of v, or over y/el, only add half of the first and last points
             if ((gmode!=1) && (yv==0) || (yv==ncy-1))
             {
-                e = cuCaddf(cuCmulf(cuCmulf(cuCmulf(cfact, expo), d_sfs[i]), make_cuFloatComplex(0.5, 0)), e);
+                ye = cuCaddf(cuCmulf(cuCmulf(cuCmulf(cfact, expo), d_sfs[i]), make_cuFloatComplex(0.5, 0)), ye);
             }
             else
             {
-                e = cuCaddf(cuCmulf(cuCmulf(cfact, expo), d_sfs[i]), e);
+                ye = cuCaddf(cuCmulf(cuCmulf(cfact, expo), d_sfs[i]), ye);
             }
         } // end of y/v loop
         

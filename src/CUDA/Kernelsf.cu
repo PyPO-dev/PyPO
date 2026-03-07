@@ -168,7 +168,7 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
 
         for(int yv=0; yv<ncy; yv++)
         {
-            i = xu*ncx + yv;
+            i = xu*ncy + yv;
 
             js[0] = d_Jx[i];
             js[1] = d_Jy[i];
@@ -1170,7 +1170,7 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs, float *d_
 
         for(int yv=0; yv<ncy; yv++)
         {
-            i = xu*ncx + yv;
+            i = xu*ncy + yv;
 
             js[0] = d_Jx[i];
             js[1] = d_Jy[i];
@@ -1453,7 +1453,7 @@ void __device__ scalarfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
 
         for(int yv=0; yv<ncy; yv++)
         {
-            i = xu*ncx + yv;
+            i = xu*ncy + yv;
         
             source_point[0] = d_xs[i];
             source_point[1] = d_ys[i];

@@ -1274,18 +1274,11 @@ void __global__ GpropagateBeam_4(float *d_xs, float *d_ys, float *d_zs, float *d
  * @param d_sfs Array containing source scalarfield.
  * @param point Array containing target point.
  * @param d_A Array containing area elements.
- * @param gmode Int indicating the type of source grid.
- * @param ncx  Int the number of x/u points in the source grid.
- * @param ncy  Int the number of y/v points in the source grid.
  * @param e Array to be filled with results.
  */
 void __device__ scalarfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
-                                   cuFloatComplex *d_sfs, float (&point)[3], 
-                                   float *d_A, int gmode, int ncx, int ncy,
-                                   cuFloatComplex &e)
+                                   cuFloatComplex *d_sfs, float (&point)[3], float *d_A, cuFloatComplex &e)
 {
-    int i; // grid index
-    
     float r;
     float r_vec[3];
     float source_point[3];
@@ -1293,50 +1286,22 @@ void __device__ scalarfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
     e = con[10];  // initialize field to 0+0j
     cuFloatComplex expo;
     cuFloatComplex cfact;
-    cuFloatComplex ye; // intermediate field result
 
-    for(int xu=0; xu<ncx; xu++)
+    for(int i=0; i<g_s; i++)
     {
-        for (int n=0; n<3; n++) 
-        {
-            ye = con[10]; // Intermediate field due to integral over y/v
-        }
+        source_point[0] = d_xs[i];
+        source_point[1] = d_ys[i];
+        source_point[2] = d_zs[i];
 
-        for(int yv=0; yv<ncy; yv++)
-        {
-            i = xu*ncx + yv;
+        diff(point, source_point, r_vec);
+        abs(r_vec, r);
+
+        expo = cuCexpf(cuCmulf(con[9], make_cuFloatComplex(con[8].x * con[0].x * r, 0)));
+        cfact = make_cuFloatComplex(-con[0].x * con[0].x / (4 * r * con[4].x) * d_A[i], 0);
         
-            source_point[0] = d_xs[i];
-            source_point[1] = d_ys[i];
-            source_point[2] = d_zs[i];
-
-            diff(point, source_point, r_vec);
-            abs(r_vec, r);
-
-            expo = cuCexpf(cuCmulf(con[9], make_cuFloatComplex(con[8].x * con[0].x * r, 0)));
-            cfact = make_cuFloatComplex(-con[0].x * con[0].x / (4 * r * con[4].x) * d_A[i], 0);
-            
-            // If this is an integral over an incomplete period of v, or over y/el, only add half of the first and last points
-            if ((gmode!=1) && (yv==0) || (yv==ncy-1))
-            {
-                e = cuCaddf(cuCmulf(cuCmulf(cuCmulf(cfact, expo), d_sfs[i]), make_cuFloatComplex(0.5, 0)), e);
-            }
-            else
-            {
-                e = cuCaddf(cuCmulf(cuCmulf(cfact, expo), d_sfs[i]), e);
-            }
-        } // end of y/v loop
-        
-        if ((xu==0) || (xu=ncx-1)) // Only add half the point value
-        {
-            e = cuCaddf(cuCmulf(ye, make_cuFloatComplex(0.5,0)), e);
-        }
-        else 
-        {
-            e = cuCaddf(ye, e);
-        }
-    } // end of x/u loop
-}
+        e = cuCaddf(cuCmulf(cuCmulf(cfact, expo), d_sfs[i]), e);
+    }
+};
 
 /**
  * Calculate scalar field on target.
@@ -1358,7 +1323,7 @@ void __device__ scalarfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
  */
 void __global__ GpropagateBeam_5(float *d_xs, float *d_ys, float *d_zs,
                                 float *d_A, 
-                                int gmode, int ncx, int ncy,
+                                //int gmode, int ncx, int ncy,
                                 float *d_xt, float *d_yt, float *d_zt,
                                 cuFloatComplex *d_sfs, cuFloatComplex *d_sft)
 {
@@ -1377,7 +1342,9 @@ void __global__ GpropagateBeam_5(float *d_xs, float *d_ys, float *d_zs,
 
         // Calculate total incoming E field at point on far-field
         scalarfieldAtPoint(d_xs, d_ys, d_zs,
-                      d_sfs, point, d_A, gmode, ncx, ncy, e);
+                      d_sfs, point, d_A, 
+                      //gmode, ncx, ncy, 
+                      e);
 
         d_sft[idx] = e;
     }
@@ -2023,7 +1990,7 @@ void callKernelf_scalar(arrC1f *res, reflparamsf source, reflparamsf target,
     gpuErrchk( cudaMalloc((void**)&d_sft, ct->size * sizeof(cuFloatComplex)) );
 
     GpropagateBeam_5<<<BT[0], BT[1]>>>(vec_ds[0], vec_ds[1], vec_ds[2], vec_ds[3],
-                                       source.gmode, source.n_cells[0], source.n_cells[1],
+                                       //source.gmode, source.n_cells[0], source.n_cells[1],
                                        vec_dt[0], vec_dt[1], vec_dt[2],
                                        d_sfs, d_sft);
     gpuErrchk( cudaPeekAtLastError() );

@@ -328,7 +328,7 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
 
         for( int n=0; n<3; n++)
         {
-            if ((xu==0) || (xu=ncx-1)) // Only add half the point value
+            if ((xu==0) || (xu==ncx-1)) // Only add half the point value
             {
                 e_field[n] = cuCaddf(
                                 cuCmulf(
@@ -1316,7 +1316,7 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs, float *d_
     
         for( int n=0; n<3; n++)
         {
-            if ((xu==0) || (xu=ncx-1)) // Only add half the point value
+            if ((xu==0) || (xu==ncx-1)) // Only add half the point value
             {
                 e_field[n] = cuCaddf(cuCmulf(ye_field[n], make_cuFloatComplex(0.5,0)), e_field[n]);
                 h_field[n] = cuCaddf(cuCmulf(yh_field[n], make_cuFloatComplex(0.5,0)), h_field[n]);
@@ -1434,7 +1434,7 @@ void __device__ scalarfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
                                    float *d_A, int gmode, int ncx, int ncy,
                                    cuFloatComplex &e)
 {
-    int i; // grid index
+    int i = 0; // grid index
     
     float r;
     float r_vec[3];
@@ -1445,26 +1445,45 @@ void __device__ scalarfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
     cuFloatComplex cfact;
     cuFloatComplex ye; // intermediate field result
 
+    // printf("gmode %d, ncx %d, ncy %d\n", gmode, ncx, ncy);
+    // printf("point: (%.5f, %.5f, %.5f)\n", point[0], point[1], point[2]);
+
+
     for(int xu=0; xu<ncx; xu++)
     {
-        for (int n=0; n<3; n++) 
-        {
-            ye = con[10]; // Intermediate field due to integral over y/v
-        }
+        ye = con[10]; // Intermediate field due to integral over y/v
+
+        //printf("gmode %d, ncx %d, ncy %d, xu %d, i %d\n", gmode, ncx, ncy, xu, i);
 
         for(int yv=0; yv<ncy; yv++)
         {
             i = xu*ncy + yv;
+
+            // if (i % 100 ==0)
+            // {
+            //     printf("xu, yv, i, source point: %d, %d, %d, (%.5f, %.5f, %.5f)\n", i, xu, yv, d_xs[i], d_ys[i], d_zs[i]);
+            // }
         
             source_point[0] = d_xs[i];
             source_point[1] = d_ys[i];
             source_point[2] = d_zs[i];
 
             diff(point, source_point, r_vec);
+
             abs(r_vec, r);
 
+            // if (i % 100 ==0)
+            // {
+            //     printf("i %d, xu %d, yv %d, point (%.5f, %.5f), r %.5f, r_vec: (%.5f, %.5f, %.5f)\n", i, xu, yv, point[0], point[1], r, r_vec[0], r_vec[1], r_vec[2]);
+            // }
+
             expo = cuCexpf(make_cuFloatComplex(0, con[8].x * con[0].x * r));
-            cfact = make_cuFloatComplex(-con[0].x * con[0].x / (4 * r) * d_A[i], 0);
+            cfact = make_cuFloatComplex(-con[0].x * con[0].x / (4 * con[6].x * r) * d_A[i], 0);
+
+            // if (i % 50 == 0)
+            // {
+            //     printf("i %d, xu %d, yv %d, point (%.5f, %.5f), d_sfs %.5f+%.5fi, cfact %.5f+%.5fi\n", i, xu, yv, point[0], point[1], d_sfs[i].x, d_sfs[i].y, cfact.x*1e3, cfact.y*1e3);
+            // }
             
             // If this is an integral over an incomplete period of v, or over y/el, only add half of the first and last points
             if ((gmode!=1) && (yv==0) || (yv==ncy-1))
@@ -1477,7 +1496,7 @@ void __device__ scalarfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
             }
         } // end of y/v loop
         
-        if ((xu==0) || (xu=ncx-1)) // Only add half the point value
+        if ((xu==0) || (xu==ncx-1)) // Only add half the point value
         {
             e = cuCaddf(cuCmulf(ye, make_cuFloatComplex(0.5,0)), e);
         }

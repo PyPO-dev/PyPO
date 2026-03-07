@@ -206,10 +206,10 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
             // Calculate the complex sums that appear in the integral
             // con[8] = ∓1 for forward and backward propagation
             // -i/(kR) ∓ 1/(kR)² + i/(kR)³
-            kR_inv_sum1 = make_cuFloatComplex(cuCrealf(con[8])*kR_inv*kR_inv, -kR_inv + (kR_inv*kR_inv*kR_inv));
+            kR_inv_sum1 = make_cuFloatComplex(cuCrealf(con[8])*kR_inv*kR_inv, kR_inv*(kR_inv*kR_inv - 1));
 
             // i/(kR) ± 3/(kR)² - 3i/(kR)³
-            kR_inv_sum2 = make_cuFloatComplex(-cuCrealf(con[8])*3*kR_inv*kR_inv, kR_inv - 3*(kR_inv*kR_inv*kR_inv));
+            kR_inv_sum2 = make_cuFloatComplex(-cuCrealf(con[8])*3*kR_inv*kR_inv, kR_inv*(1 - 3*kR_inv*kR_inv));
 
             // ∓i/(kR) ∓ 1/(kR)²
             kR_inv_sum3 = cuCmulf(con[8], make_cuFloatComplex(kR_inv*kR_inv, kR_inv));
@@ -222,8 +222,8 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
             // (J.Rh)Rh
             s_mult(R_hat, js_dot_R, js_dot_R_R);
             
-            // Rh x M
-            ext(R_hat, ms, ms_cross_R);
+            // M x Rh
+            ext(ms, R_hat, ms_cross_R);
             
 
             // h-field
@@ -233,8 +233,8 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
             // (M.Rh)Rh
             s_mult(R_hat, ms_dot_R, ms_dot_R_R);
             
-            // Rh x J
-            ext(R_hat, js, js_cross_R);
+            // j x Rh
+            ext(js, R_hat, js_cross_R);
             
             // Green's function
             cuFloatComplex d_Ac = make_cuFloatComplex(d_A[i], 0.);
@@ -1146,8 +1146,8 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs, float *d_
     // Arrays of complex floats
     cuFloatComplex e_field[3] = {con[10], con[10], con[10]}; // Electric field on target
     cuFloatComplex h_field[3] = {con[10], con[10], con[10]}; // Magnetic field on target
-    cuFloatComplex ye_field[3] = {con[10], con[10], con[10]}; // Intermediate electric field due to integral over y/v
-    cuFloatComplex yh_field[3] = {con[10], con[10], con[10]}; // Intermediate magnetic field due to integral over y/v
+    cuFloatComplex ye_field[3]; // Intermediate electric field due to integral over y/v
+    cuFloatComplex yh_field[3]; // Intermediate magnetic field due to integral over y/v
     cuFloatComplex js[3];             // Electric current at source point
     cuFloatComplex ms[3];             // Magnetic current at source point
     cuFloatComplex js_dot_R_R[3];     // Electric current contribution to e-field
@@ -1162,6 +1162,7 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs, float *d_
     // x/u axis, and the inner loop over the y/v axis
     for(int xu=0; xu<ncx; xu++)
     {
+        // Reset yv integral field to zero.
         for (int n=0; n<3; n++) 
         {
             ye_field[n] = con[10]; // Zero intermediate electric field due to integral over y/v

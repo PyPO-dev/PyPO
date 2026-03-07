@@ -232,7 +232,7 @@ void Parabola_uv(T *parabola, U xu_lo, U xu_up, U yv_lo,
             ut.ext(Qu, Qv, out);
             ut.abs(out, norm);
 
-            parabola->area[idx] = norm * duv * dv;
+            parabola->area[idx] = norm * duv * dv * M_PI/180;
 
             if (transform)
             {
@@ -420,7 +420,7 @@ void Hyperbola_uv(T *hyperbola, U xu_lo, U xu_up, U yv_lo,
             ut.ext(Qu, Qv, out);
             ut.abs(out, norm);
 
-            hyperbola->area[idx] = norm * duv * dv;
+            hyperbola->area[idx] = norm * duv * dv * M_PI/180;
 
             if (transform)
             {
@@ -608,7 +608,7 @@ void Ellipse_uv(T *ellipse, U xu_lo, U xu_up, U yv_lo,
             ut.ext(Qu, Qv, out);
             ut.abs(out, norm);
 
-            ellipse->area[idx] = norm * duv * dv;
+            ellipse->area[idx] = norm * duv * dv * M_PI/180;
             
             if (transform)
             {
@@ -759,7 +759,7 @@ void Plane_uv(T *plane, U xu_lo, U xu_up, U yv_lo,
             plane->nz[idx] = nfac * 1;
 
             // Calculate du along value of v, dv unchanged.
-            plane->area[idx] = u * duv * dv;            
+            plane->area[idx] = u * duv * dv * M_PI/180;            
             if (transform)
             {
                 transformGrids<T, U>(plane, idx, inp, out, &ut, mat);

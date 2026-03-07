@@ -246,7 +246,7 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
             {
                 // If this is an integral over y/el, only add half of 
                 // the first and last points
-                if ((gmode!=1) && (yv==0) || (yv==ncy-1))
+                if ((gmode != 1) && ((yv==0) || (yv==ncy-1)))
                 {
                     // 0.5*
                     ye_field[n] = cuCaddf(
@@ -1148,6 +1148,8 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs, float *d_
     cuFloatComplex h_field[3] = {con[10], con[10], con[10]}; // Magnetic field on target
     cuFloatComplex ye_field[3]; // Intermediate electric field due to integral over y/v
     cuFloatComplex yh_field[3]; // Intermediate magnetic field due to integral over y/v
+    cuFloatComplex de_field[3] = {con[10], con[10], con[10]}; // Electric field contribution from source point on target
+    cuFloatComplex dh_field[3] = {con[10], con[10], con[10]}; // Magnetic field contribution from source point on target
     cuFloatComplex js[3];             // Electric current at source point
     cuFloatComplex ms[3];             // Magnetic current at source point
     cuFloatComplex js_dot_R_R[3];     // Electric current contribution to e-field
@@ -1241,71 +1243,53 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs, float *d_
             // H = -(ik²/4π) * ( (1/Z)(J - (J.r)r) - ∓ r x M ) e^(±i k r'.rh) dA
             for( int n=0; n<3; n++)
             {
-                // If this is an integral over an incomplete period of v, or over y/el, only add half of the first and last points
-                if ((gmode!=1) && (yv==0) || (yv==ncy-1))
-                {
-                    ye_field[n] = cuCaddf(
-                                    cuCmulf(
-                                        cuCmulf(
-                                            cuCaddf( // Z (M - (M.rh)rh) + ∓ rh x J
-                                                cuCmulf( // Z (J - (J.rh)rh)
-                                                    con[4], 
-                                                    cuCsubf(js[n], js_dot_R_R[n])
-                                                ), 
-                                                cuCmulf(con[8], R_cross_ms[n])  // ∓ rh x M
-                                            ), Green
+                de_field[n] =   cuCmulf(
+                                    cuCaddf( // Z (M - (M.rh)rh) + ∓ rh x J
+                                        cuCmulf( // Z (J - (J.rh)rh)
+                                            con[4], 
+                                            cuCsubf(js[n], js_dot_R_R[n])
                                         ), 
-                                        make_cuFloatComplex(0.5,0)
-                                    ), 
-                                    ye_field[n]
+                                        cuCmulf(con[8], R_cross_ms[n])  // ∓ rh x M
+                                    ), Green
                                 );
+
+                dh_field[n] =   cuCmulf(
+                                    cuCsubf( // (1/Z) (M - (M.rh)rh) - ∓ rh x J
+                                        cuCmulf(  // (1/Z) (M - (M.rh)rh)
+                                            con[5], 
+                                            cuCsubf(ms[n], ms_dot_R_R[n]) // M - (M.rh)rh
+                                        ), 
+                                        cuCmulf(
+                                            con[8], 
+                                            R_cross_js[n]) // ∓ rh x J
+                                        ), 
+                                        Green
+                                    );
+                            
+                // If this is an integral over an incomplete period of v, or over y/el, only add half of the first and last points
+                if ((gmode != 1) && ((yv==0) || (yv==ncy-1)))
+                {
+                    // printf("Got gmode %d at endpoint, using trapezoidal endpoints.\n", gmode);
+                    ye_field[n] = cuCaddf(
+                                        cuCmulf(de_field[n], make_cuFloatComplex(0.5,0)), 
+                                        ye_field[n]
+                                    );
                 
                     yh_field[n] = cuCaddf(
-                                    cuCmulf(
-                                        cuCmulf(
-                                            cuCsubf( // (1/Z) (M - (M.rh)rh) - ∓ rh x J
-                                                cuCmulf(  // (1/Z) (M - (M.rh)rh)
-                                                    con[5], 
-                                                    cuCsubf(ms[n], ms_dot_R_R[n]) // M - (M.rh)rh
-                                                ), 
-                                                cuCmulf(
-                                                    con[8], 
-                                                    R_cross_js[n]) // ∓ rh x J
-                                                ), 
-                                                Green
-                                            ), 
-                                            make_cuFloatComplex(0.5,0)
-                                        ), 
+                                        cuCmulf(dh_field[n], make_cuFloatComplex(0.5,0)), 
                                         yh_field[n]
                                     );
                 }
                 else
                 {
                     ye_field[n] = cuCaddf(
-                                    cuCmulf(
-                                        cuCaddf( // Z (J - (J.rh)rh) + ∓ rh x M
-                                            cuCmulf( // Z (J - (J.rh)rh)
-                                                con[4], 
-                                                cuCsubf(js[n], js_dot_R_R[n])
-                                            ), 
-                                            cuCmulf(con[8], R_cross_ms[n]) // ∓ rh x M
-                                        ), 
-                                        Green
-                                    ), 
+                                    de_field[n], 
                                     ye_field[n]
                                 );
                 
                     yh_field[n] = cuCaddf(
-                                    cuCmulf(
-                                        cuCsubf( // (1/Z)(M - (M.rh)rh) - ∓ rh x J
-                                            cuCmulf( // (1/Z)(M - (M.rh)rh)
-                                                con[5], 
-                                                cuCsubf(ms[n], ms_dot_R_R[n])
-                                            ), 
-                                            cuCmulf(con[8], R_cross_js[n]) // ∓ rh x J
-                                        ), 
-                                        Green
-                                    ), yh_field[n]
+                                    dh_field[n], 
+                                    yh_field[n]
                                 );
                 }
             }
@@ -1486,7 +1470,7 @@ void __device__ scalarfieldAtPoint(float *d_xs, float *d_ys, float *d_zs,
             // }
             
             // If this is an integral over an incomplete period of v, or over y/el, only add half of the first and last points
-            if ((gmode!=1) && (yv==0) || (yv==ncy-1))
+            if ((gmode != 1) && ((yv==0) || (yv==ncy-1)))
             {
                 ye = cuCaddf(cuCmulf(cuCmulf(cuCmulf(cfact, expo), d_sfs[i]), make_cuFloatComplex(0.5, 0)), ye);
             }

@@ -150,8 +150,8 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
     cuFloatComplex ms[3];             // Magnetic current at source point
     cuFloatComplex js_dot_R_R[3];     // Electric current contribution to e-field
     cuFloatComplex ms_dot_R_R[3];    // Magnetic current contribution to h-field
-    cuFloatComplex ms_cross_R[3];     // Outer product between R_hat and ms
-    cuFloatComplex js_cross_R[3];     // Outer product between R_hat and js
+    cuFloatComplex ms_cross_R[3];     // Outer product between ms and R_hat 
+    cuFloatComplex js_cross_R[3];     // Outer product between js and R_hat 
     cuFloatComplex e_temp[3];           // Temporary container for intermediate values
     cuFloatComplex h_temp[3];           // Temporary container for intermediate values
 

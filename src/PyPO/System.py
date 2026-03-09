@@ -2784,11 +2784,7 @@ class System(object):
         max_Field = []
         if source_field in self.fields:
             for i in range(6):
-                if i>2: # Treat E and H fields on an equal basis
-                    m = 377**2  # Scaling between E and H fields is impedance of media squared
-                else:
-                    m = 1
-                max_Field.append(m*np.max(np.absolute(self.fields[source_field][i])))
+                max_Field.append(np.max(np.absolute(self.fields[source_field][i])))
             
             comp = self.fields[source_field][np.argmax(np.array(max_Field))]
   
@@ -2797,11 +2793,7 @@ class System(object):
             
         elif source_field in self.currents:
             for i in range(6):
-                if i>2: # Treat J and M fields on an equal basis
-                    m = 377**2  # Scaling between J and M currents is impedance of media squared
-                else:
-                    m = 1
-                max_Field.append(m*np.max(np.absolute(self.currents[source_field][i])))
+                max_Field.append(np.max(np.absolute(self.currents[source_field][i])))
             
             comp = self.currents[source_field][np.argmax(np.array(max_Field))]
   

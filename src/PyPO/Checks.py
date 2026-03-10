@@ -1201,6 +1201,8 @@ def check_vecGPODict(vecGPODict, nameList, clog):
 
     @see VecvecGPODict
     """
+    errStr = ""
+    
     if "name" not in vecGPODict:
         vecGPODict["name"] = "GaussianBeamPO"
     
@@ -1225,7 +1227,7 @@ def check_vecGPODict(vecGPODict, nameList, clog):
         errStr += errMsg_field("lam", "vecGPODict")
     
     try:
-        calc_beam(vecGPODict)
+        calc_beam(vecGPODict, errStr)
     except ValueError:
         errStr += errMsg_field("w0, w, z, R", "vecGPODict", "Need at least two of these fields to define Gaussian beam.")
         
@@ -1240,8 +1242,8 @@ def check_vecGPODict(vecGPODict, nameList, clog):
         vecGPODict["n"] = 1
 
     if "power" in vecGPODict:
-        if not ((isinstance(vecGPODict["E0"], float) or isinstance(vecGPODict["E0"], int))):
-            errStr += errMsg_type("E0", type(vecGPODict["E0"]), "vecGPODict", [float, int])
+        if not ((isinstance(vecGPODict["power"], float) or isinstance(vecGPODict["power"], int))):
+            errStr += errMsg_type("power", type(vecGPODict["power"]), "vecGPODict", [float, int])
     else:
         vecGPODict["power"] = 4*np.pi
 
@@ -1262,7 +1264,7 @@ def calc_beam(vecGPODict, errStr):
             vecGPODict["z"] = np.pi*w0 / lam * np.sqrt(w**2 - w0**2)
         elif "R" in vecGPODict:
             R = vecGPODict["R"]
-            vecGPODict["z"] = R/2 * (1 + np.sqrt(1 - (2*np.pi*w0**2 / (lam * R))**2))
+            vecGPODict["z"] = R/2 * (1 - np.sqrt(1 - (2*np.pi*w0**2 / (lam * R))**2))
             return
         else:
             errStr += errMsg_field("w0, z, w, R", "vecGPODict", "Not enough fields set to define beam.")
@@ -1282,8 +1284,8 @@ def calc_beam(vecGPODict, errStr):
         if "R" in vecGPODict:
             w = vecGPODict["w"]
             R = vecGPODict["R"]
-            vecGPODict["w0"] = w0 / 
-            vecGPODict["z"] = R / (1 - ((lam*R)/()))
+            vecGPODict["w0"] = w / np.sqrt(1 + ((np.pi*w**2)/(lam*R))**2)
+            vecGPODict["z"] = R / (1 + ((lam*R)/(np.pi*w**2))**2)
         else:
             errStr += errMsg_field("w0, z, w, R", "vecGPODict", "Not enough fields set to define beam.")
     else:

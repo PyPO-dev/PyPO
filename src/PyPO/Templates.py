@@ -68,10 +68,11 @@ GRTDict = {
         }
 
 ##
-# Template for a GPODict, containing parameters for constructing a Gaussian physical optics beam.
+# Template for a GPODict, containing parameters for constructing a Gaussian E field and
+# associated magnetic currents.  No cross-polar elements are calculated.
 # 
-# The beam is always initialised along the positive z-axis with the x focus at z = 0.
-# Evaluation of the beam, however, can be on an arbitrary oriented/positioned plane along the beam.
+# The field is always initialised along the positive z-axis with the x focus at z = 0.
+# Evaluation of the field, however, can be on an arbitrary oriented/positioned plane along the beam.
 # The beam can have elliptical contours, an arbitrary position angle and general astigmatism.
 # Note that the x focus is always at z = 0, and the y focus is at -dxyz, with dxyz the astigmatic distance. 
 # The template for a scalar beam is similar, except that the polarisation is not needed.
@@ -86,6 +87,31 @@ GPODict = {
         "E0"        : "Peak amplitude (real)",
         "dxyz"      : "Astigmatic distance between x and y focus in mm (real)",
         "pol"       : "Polarisation of beam (Numpy array of length 3)"
+        }
+
+##
+# Template for a VecPODict, containing parameters for constructing a symmetric vectorial Gaussian beam 
+# using the complex source point method.
+# 
+# The beam is always initialised along the positive z-axis, with the E-field polarized in the +x direction.
+# The beam waist is set a distance `z` from the origin of the z-axis.
+# The beam is evaluate on an arbitrary oriented/positioned plane along the beam.
+# The beam can have elliptical contours, an arbitrary position angle and general astigmatism.
+# Note that the x focus is always at z = 0, and the y focus is at -dxyz, with dxyz the astigmatic distance. 
+# The template for a scalar beam is similar, except that the polarisation is not needed.
+#
+# Priority order for beam variables is: w0, z, w, R.  Redundant variables are overwritten.
+# 
+# @ingroup public_api_templates
+VecGPODict = {
+        "name"      : "Name of Gaussian beam",
+        "lam"       : "Wavelength of Gaussian beam in mm (positive real)",
+        "w0"        : "Focal beamwaist of beam along x-axis in mm (positive real). Calculated from w, z, R if two are set.",
+        "w"         : "Alternative to w0x, defined at some distance `z` along the beam (positive real). Calculated from w, z, R if two are set.",
+        "z"         : "Set the distance z along the beam that wx is defined at (real). Defaults to zero. Calculated from w0, w, R if two are set.",
+        "R"         : "Radius of phase curvature in the x direction (real). Calculated from `w0`, `w`, `z`, if any pair are set. Ignored if <0.01 `lam`.",
+        "n"         : "Refractive index of medium. Defaults to 1.0.",
+        "power"     : "Total power contained in the beam (real). Defaults to 4pi if not set.",
         }
 
 ##

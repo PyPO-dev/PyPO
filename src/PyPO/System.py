@@ -1368,10 +1368,10 @@ class System(object):
 
     def createGaussian(self, gaussDict : dict, name_surface : str):
         """!
-        Create a vectorial Gaussian beam.
+        Create a Gaussian field.
         
-        This method creates a general, potentially astigmatic, vectorial Gaussian beam.
-        The beam is evaluated with the focus at z = 0. 
+        This method creates a general, potentially astigmatic, Gaussian field/
+        The field is evaluated with the focus at z = 0. 
         The surface on which the beam is calculated, defined by "name_source", does not have to lie in or be parallel to the xy-plane.
         Instead, the Gaussian beam is evaluated on the surface as-is, evaluating the Gaussian beam at the xyz-points on the surface.
         Still, the focus is at z = 0. If one wishes to displace the focal point, the PO fields and currents need to be translated after generating the Gaussian beam.

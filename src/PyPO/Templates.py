@@ -106,7 +106,7 @@ GPODict = {
 # and currents need to be translated after generating the Gaussian beam.
 # 
 # @ingroup public_api_templates
-VecGPODict = {
+vecGPODict = {
         "name"      : "Name of Gaussian beam",
         "lam"       : "Wavelength of Gaussian beam in mm (positive real)",
         "w0"        : "Focal beamwaist of beam along x-axis in mm (positive real). Calculated from `w`, `z`, `R` if two are set.",

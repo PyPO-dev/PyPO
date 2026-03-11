@@ -489,6 +489,25 @@ def allfill_GPODict(res, gdict_py, ct_t):
 
     res.pol = (ct_t * 3)(*gdict_py["pol"].tolist())
 
+
+def allfill_vecGPODict(res, gdict_py, ct_t):
+    """!
+    Allocate and fill a vecGPODict, for generating a Gaussian beam using the complex source point method.
+
+    @param res A vecGPODict or vecGPODictf struct.
+    @param gdict_py A vecGPODict.
+    @param ct_t Type of field in struct.
+
+    @see GPODict
+    @see GPODictf
+    """
+    res.lam = ct_t(gdict_py["lam"])
+    res.w0 = ct_t(gdict_py["w0"])
+    res.z = ct_t(gdict_py["z"])
+    res.n = ct_t(gdict_py["n"])
+    res.power = ct_t(gdict_py["power"])
+
+
 def allfill_SGPODict(res, sgdict_py, ct_t):
     """!
     Allocate and fill  a ScalarGPODict, for generating a scalar Gaussian beam field.

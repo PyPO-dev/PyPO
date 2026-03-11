@@ -23,7 +23,9 @@ extern "C"
     PYPO_DLL void makeGRTframe(GRTDict grdict, cframe *fr);
 
     PYPO_DLL void makeGauss(GPODict gdict, reflparams plane, c2Bundle *res_field, c2Bundle *res_current);
-    
+
+    PYPO_DLL void makeGaussBeam(vecGPODict gdict, reflparams plane, c2Bundle *res_field, c2Bundle *res_current);
+
     PYPO_DLL void makeScalarGauss(ScalarGPODict sgdict, reflparams plane, arrC1 *res_field);
 
     PYPO_DLL void calcCurrents(c2Bundle *res_field, c2Bundle *res_current, reflparams rdict, int mode);

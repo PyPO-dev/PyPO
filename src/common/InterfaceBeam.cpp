@@ -73,6 +73,31 @@ void makeGauss(GPODict gdict, reflparams plane, c2Bundle *res_field, c2Bundle *r
 
 
 /** 
+ * Initialize Gaussian beam from vecGPODict or vecGPODictf.
+ *
+ * Takes a GPODict or GPODictf and generates two arrC3 or arrC3f objects, which contain the field and 
+ *      associated currents and are allocated to passed pointer arguments. Wrapper for initGauss.
+ *
+ * @param gdict GPODict or GPODictf object from which to generate a Gaussian beam.
+ * @param plane reflparams or reflparamsf object corresponding to surface on
+ *      which to generate the Gaussian beam.
+ * @param res_field Pointer to c2Bundle or c2Bundlef object.
+ * @param res_current Pointer to c2Bundle or c2Bundlef object.
+ *
+ * @see initGaussBeam()
+ * @see vecGPODict
+ * @see vecGPODictf
+ * @see reflparams
+ * @see reflparamsf
+ * @see c2Bundle
+ * @see c2Bundlef
+ */
+void makeGaussBeam(vecGPODict gdict, reflparams plane, c2Bundle *res_field, c2Bundle *res_current)
+{
+    initGaussBeam<vecGPODict, reflparams, c2Bundle, reflcontainer, double>(gdict, plane, res_field ,res_current);
+}
+
+/** 
  * Initialize Gaussian beam from GPODict or GPODictf.
  *
  * Takes a GPODict or GPODictf and generates two arrC3 or arrC3f objects, which contain the field and 

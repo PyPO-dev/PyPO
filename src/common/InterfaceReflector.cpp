@@ -879,14 +879,15 @@ void add_surferr_uncorr(T refl, W *container)
  */
 void generateGrid(reflparams refl, reflcontainer *container, bool transform, bool spheric)
 {
+    printf("In generateGrid\n");
     double xu_lo = refl.lxu[0];
     double xu_up = refl.lxu[1];
     double yv_lo = refl.lyv[0];
     double yv_up = refl.lyv[1];
-
+    printf("generateGrid: Got reflparams limits\n");
     double xcenter = refl.gcenter[0];
     double ycenter = refl.gcenter[1];
-
+    printf("generateGrid: Got reflparams center\n");
     double ecc_uv = refl.ecc_uv;
     double rot_uv = refl.rot_uv * M_PI / 180;
 
@@ -903,6 +904,8 @@ void generateGrid(reflparams refl, reflcontainer *container, bool transform, boo
     {
         nfac = -1;
     }
+
+    printf("generateGrid: Got all reflparams\n");
 
     if (refl.gmode == 0)
     {

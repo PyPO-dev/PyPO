@@ -1428,8 +1428,11 @@ class System(object):
         _gaussDict = self.copyObj(gaussDict)
         PChecks.check_vecGPODict(_gaussDict, self.fields, self.clog)
         
-        gauss_in = BBeam.makeGaussBeam(_gaussDict, self.system[name_surface])
-
+        refldict = self.system[name_surface]
+        print(refldict)
+        
+        gauss_in = BBeam.makeGaussBeam(_gaussDict, refldict)
+        
         k = 2 * np.pi / _gaussDict["lam"]
         gauss_in[0].setMeta(name_surface, k)
         gauss_in[1].setMeta(name_surface, k)

@@ -338,6 +338,24 @@ def errMsg_field(fieldName, elemName, msg=None):
         msg = ""
 
     return f"Missing field \"{fieldName}\", element {elemName}.{msg}\n"
+    
+def warnMsg_field(fieldName, elemName, msg=None):
+    """!
+    Error message when a mandatory field has not been filled in a dictionary.
+
+    @param fieldName Name of field in dictionary that is not filled.
+    @param elemName Name of dictionary where error occurred. 
+    @param msg Extra text to show to user.
+
+    @returns errStr The errorstring.
+    """
+
+    if msg is not None:
+        msg = " " + msg
+    else:
+        msg = ""
+
+    return f"Warning for field \"{fieldName}\", element {elemName}.{msg}\n"
 
 def errMsg_type(fieldName, inpType, elemName, fieldType):
     """!
@@ -1239,7 +1257,7 @@ def check_vecGPODict(vecGPODict, nameList, clog):
             clog.warning("Refractive indices smaller than unity are not allowed. Changing to 1.")
 
     else:
-        vecGPODict["n"] = 1
+        vecGPODict["n"] = 1.0
 
     if "power" in vecGPODict:
         if not ((isinstance(vecGPODict["power"], float) or isinstance(vecGPODict["power"], int))):
@@ -1264,7 +1282,9 @@ def calc_beam(vecGPODict, errStr):
             vecGPODict["z"] = np.pi*w0 / lam * np.sqrt(w**2 - w0**2)
         elif "R" in vecGPODict:
             R = vecGPODict["R"]
-            vecGPODict["z"] = R/2 * (1 - np.sqrt(1 - (2*np.pi*w0**2 / (lam * R))**2))
+            z = R/2 * (1 + np.sqrt(1 - (2*np.pi*w0**2 / (lam * R))**2))
+            errStr += warnMsg_field("w0, R", "vecGPODict", "Setting z from w0 and R is ambiguous, with two solutions. We choose the larger solution (i.e. z > zc).")
+            vecGPODict["z"] = z
             return
         else:
             errStr += errMsg_field("w0, z, w, R", "vecGPODict", "Not enough fields set to define beam.")
@@ -1272,7 +1292,8 @@ def calc_beam(vecGPODict, errStr):
         z = vecGPODict["z"]
         if "w" in vecGPODict:
             w = vecGPODict["w"]
-            vecGPODict["w0"] = np.sqrt(w**2)/2 * (1 + np.sqrt(1 - ((2*lam*z)/(np.pi*w**2))**2))
+            vecGPODict["w0"] = np.sqrt(w**2/2 * (1 - np.sqrt(1 - ((2*lam*z)/(np.pi*w**2))**2)))
+            errStr += warnMsg_field("z, w", "vecGPODict", "Setting w0 from z and w is ambiguous, with two solutions. We choose the smaller beamwaist (i.e. z > zc).")
             return
         elif "R" in vecGPODict:
             R = vecGPODict["R"]

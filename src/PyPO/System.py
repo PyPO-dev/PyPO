@@ -1397,6 +1397,45 @@ class System(object):
 
         self.fields[_gaussDict["name"]] = gauss_in[0]
         self.currents[_gaussDict["name"]] = gauss_in[1]
+
+    def createVectorGaussian(self, gaussDict : dict, name_surface : str):
+        """!
+        Create a symmetric vector Gaussian beam using the complex source point method.
+        
+        This method creates a vectorial Gaussian beam propagating along the positive z-axis, with the primary E-field
+        polarized along the positive x-axis. Unless specified, the power in the beam is normalized to 4pi √W (this ensures
+        that the farfields are in dBi).
+        
+        The beam is defined by a pair of Gaussian beam parameters from w0, z, w, and R, in that precedence order, defined on
+        the z=0 plane. 
+        
+        The surface on which the beam is calculated, defined by "name_source", does not have to lie in or be parallel to 
+        the xy-plane.  Instead, the Gaussian beam is evaluated on the surface as-is, evaluating the Gaussian beam at the 
+        xyz-points on the surface. Still, the focus is at z = 0. If one wishes to displace the focal point, the PO fields 
+        and currents need to be translated after generating the Gaussian beam.
+        
+        @ingroup public_api_po
+        
+        @param gaussDict A vecGPODict containing parameters for the Gaussian beam.
+        @param name_surface Name of plane on which to define Gaussian.
+        
+        @see GDict
+        """
+
+        PChecks.check_elemSystem(name_surface, self.system, self.clog, extern=True)
+
+        _gaussDict = self.copyObj(gaussDict)
+        PChecks.check_vecGPODict(_gaussDict, self.fields, self.clog)
+        
+        gauss_in = BBeam.makeGaussBeam(_gaussDict, self.system[name_surface])
+
+        k = 2 * np.pi / _gaussDict["lam"]
+        gauss_in[0].setMeta(name_surface, k)
+        gauss_in[1].setMeta(name_surface, k)
+
+        self.fields[_gaussDict["name"]] = gauss_in[0]
+        self.currents[_gaussDict["name"]] = gauss_in[1]
+
     
     def createScalarGaussian(self, gaussDict : dict, name_surface : str):
         """!

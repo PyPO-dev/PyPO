@@ -91,6 +91,6 @@ GPODict = {
         "pol"   : np.array([1, 0, 0])
 }
 
-# s.createGaussian(GPODict, 'source_plane')
+#s.createGaussian(GPODict, 'source_plane')
 
 s.createGaussianBeam(vecGPODict, 'source_plane')

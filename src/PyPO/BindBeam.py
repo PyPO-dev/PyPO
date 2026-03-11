@@ -175,6 +175,8 @@ def makeGaussBeam(gdict_py, source):
     @see currents
     """
 
+    print("In BBeam.makeGaussBeam")
+    
     lib = loadBeamlib()
 
     source_shape = (source["gridsize"][0], source["gridsize"][1])
@@ -183,20 +185,14 @@ def makeGaussBeam(gdict_py, source):
     c_gdict = PStructs.vecGPODict()
     c_source = PStructs.reflparams()
     
-    print("In BBeam.makeGaussBeam")
-
     BUtils.allfill_vecGPODict(c_gdict, gdict_py, ctypes.c_double)
     BUtils.allfill_reflparams(c_source, source, ctypes.c_double)
-    
-    print(c_source.lxu[0], c_source.lxu[1])
-    print(c_source.lyv[0], c_source.lyv[1])
 
     res_field = PStructs.c2Bundle()
     res_current = PStructs.c2Bundle()
     BUtils.allocate_c2Bundle(res_field, source_size, ctypes.c_double)
     BUtils.allocate_c2Bundle(res_current, source_size, ctypes.c_double)
-
-    print("Calling lib.makeGaussBeam")
+    
     lib.makeGaussBeam(c_gdict, c_source, ctypes.byref(res_field), ctypes.byref(res_current))
 
     out_field = BUtils.c2BundleToObj(res_field, shape=source_shape, obj_t='fields', np_t=np.float64)

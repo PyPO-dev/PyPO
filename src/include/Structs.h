@@ -196,8 +196,6 @@ struct vecGPODict {
     double lam;       /**<Wavelength of beam, in millimeters.*/
     double w0;        /**<Beamwaist radius, in millimeters.*/
     double z;         /**<Distance along beam in z-direction, in millimeters.*/
-    double w;         /**<Beam radius at z , in millimeters.*/
-    double R;         /**<Beam radius of phase curvature at z, in millimeters.*/
     double n;         /**<Refractive index of medium.*/
     double power;     /**<Peak electric field value.*/
 };

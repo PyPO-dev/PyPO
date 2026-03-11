@@ -307,6 +307,10 @@ void initGauss(T gdict, U refldict, V *res_field, V *res_current)
     Utils<G> ut;
 
     bool transform = true;
+    printf("initGauss calling generateGrid\n");
+    generateGrid(refldict, &reflc, transform);
+
+    printf("initGauss returned from generateGrid\n");
 
     G zRx      = M_PI * gdict.w0x*gdict.w0x * gdict.n / gdict.lam;
     G zRy      = M_PI * gdict.w0y*gdict.w0y * gdict.n / gdict.lam;
@@ -406,8 +410,6 @@ void initGauss(T gdict, U refldict, V *res_field, V *res_current)
 template<typename T, typename U, typename V, typename W, typename G>
 void initGaussBeam(T gdict, U refldict, V *res_field, V *res_current)
 {
-    printf("In initGaussBeam\n");
-
     int nTot = refldict.n_cells[0] * refldict.n_cells[1];
 
 
@@ -426,12 +428,8 @@ void initGaussBeam(T gdict, U refldict, V *res_field, V *res_current)
     reflc.area = new G[nTot];
 
     bool transform = true;
-    printf("Sending refldict to generateGrid\n");
-    printf("  lxu: ({%d}, {%d})\n", refldict.lxu[0], refldict.lxu[1]);
-    printf("  lyv: ({%d}, {%d})\n", refldict.lyv[0], refldict.lyv[1]);
     
     generateGrid(refldict, &reflc, transform);
-    printf("Returned from generateGrid\n");
 
     Utils<G> ut;
 

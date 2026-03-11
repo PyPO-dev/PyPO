@@ -1370,11 +1370,12 @@ class System(object):
         """!
         Create a Gaussian field.
         
-        This method creates a general, potentially astigmatic, Gaussian field/
-        The field is evaluated with the focus at z = 0. 
+        This method creates a potentially astigmatic Gaussian beam, evaluated with the beamwaist at z = 0 
+        and propagating in the positive z-direction.  Only the co-polar E field is created.
+        
         The surface on which the beam is calculated, defined by "name_source", does not have to lie in or be parallel to the xy-plane.
         Instead, the Gaussian beam is evaluated on the surface as-is, evaluating the Gaussian beam at the xyz-points on the surface.
-        Still, the focus is at z = 0. If one wishes to displace the focal point, the PO fields and currents need to be translated after generating the Gaussian beam.
+        If one wishes to displace the beamwaist, the PO fields and currents need to be translated after generating the Gaussian beam.
         
         @ingroup public_api_po
         
@@ -1398,7 +1399,7 @@ class System(object):
         self.fields[_gaussDict["name"]] = gauss_in[0]
         self.currents[_gaussDict["name"]] = gauss_in[1]
 
-    def createVectorGaussian(self, gaussDict : dict, name_surface : str):
+    def createGaussianBeam(self, gaussDict : dict, name_surface : str):
         """!
         Create a symmetric vector Gaussian beam using the complex source point method.
         
@@ -1406,12 +1407,12 @@ class System(object):
         polarized along the positive x-axis. Unless specified, the power in the beam is normalized to 4pi √W (this ensures
         that the farfields are in dBi).
         
-        The beam is defined by a pair of Gaussian beam parameters from w0, z, w, and R, in that precedence order, defined on
-        the z=0 plane. 
+        The beam is defined by any pair of Gaussian beam parameters from w0, z, w, and R (in order of precedence), defined on
+        the z=0 plane. Positive R offsets the beamwaist in the negative z-direction.
         
-        The surface on which the beam is calculated, defined by "name_source", does not have to lie in or be parallel to 
-        the xy-plane.  Instead, the Gaussian beam is evaluated on the surface as-is, evaluating the Gaussian beam at the 
-        xyz-points on the surface. Still, the focus is at z = 0. If one wishes to displace the focal point, the PO fields 
+        The surface on which the beam is calculated, defined by "name_source", does not have to lie on or be parallel to 
+        the xy-plane at z=0.  Instead, the Gaussian beam is evaluated on the surface as-is, evaluating the Gaussian beam at the 
+        xyz-points on the surface. If one wishes to displace the plane on which the beam is defined, the PO fields 
         and currents need to be translated after generating the Gaussian beam.
         
         @ingroup public_api_po

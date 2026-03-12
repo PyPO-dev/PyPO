@@ -164,8 +164,8 @@ Propagation<T, U, V, W>::Propagation(T k, int numThreads, int gs, int gt, T epsi
 {
     this->Three = 3.0f;
     this->PIf = 3.14159265359f;
-    this->C_L = 2.99792458e11f; // mm s^-1
-    this->MU_0 = 1.2566370614e-3f; // kg mm s^-2 A^-2
+    this->C_L = 2.99792458e8f; // m s^-1
+    this->MU_0 = 1.2566370614e-6f; // kg m s^-2 A^-2
     this->EPS_VAC = 1 / (MU_0 * C_L*C_L);
     this->EPS = epsilon * EPS_VAC; // epsilon is relative permeability
     this->ZETA = sqrt(MU_0 / EPS);
@@ -1032,7 +1032,7 @@ std::array<std::array<std::complex<T>, 3>, 2> Propagation<T, U, V, W>::fieldAtPo
 
         for( int n=0; n<3; n++)
         {
-            e_field[n] += (ZETA * (js[n] * kR_inv_sum1 + js_dot_R_R[n] * kR_inv_sum2) + ms_cross_R[n] * kR_inv_sum3) * Green;
+            e_field[n] += ((js[n] * kR_inv_sum1 + js_dot_R_R[n] * kR_inv_sum2) + ZETA_INV*ms_cross_R[n] * kR_inv_sum3) * Green;
             h_field[n] += (ZETA_INV * (ms[n] * kR_inv_sum1 + ms_dot_R_R[n] * kR_inv_sum2) - js_cross_R[n] * kR_inv_sum3) * Green;
         }
         

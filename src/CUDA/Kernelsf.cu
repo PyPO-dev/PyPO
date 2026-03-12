@@ -34,8 +34,8 @@ __constant__ int g_t;               // Gridsize on target
     dim3 nrb(nBlocks); dim3 nrt(nThreads);
 
     float PIf = 3.1415926; /* pi */
-    float C_L = 2.9979246e11; // mm s^-1
-    float MU_0 = 1.256637e-3; // kg mm s^-2 A^-2
+    float C_L = 2.9979246e8; // m s^-1
+    float MU_0 = 1.256637e-6; // kg m s^-2 A^-2
     float EPS_VAC = 1 / (MU_0 * C_L*C_L);
     float EPS = EPS_VAC * epsilon;
     float ZETA = sqrt( MU_0 / EPS);
@@ -254,14 +254,15 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
                                         make_cuFloatComplex(0.5,0), 
                                         cuCmulf(
                                             cuCaddf(
+                                                cuCaddf(
+                                                    cuCmulf(js[n], kR_inv_sum1), 
+                                                    cuCmulf(js_dot_R_R[n], kR_inv_sum2)
+                                                )
+                                                , 
                                                 cuCmulf(
-                                                    con[4], 
-                                                    cuCaddf(
-                                                        cuCmulf(js[n], kR_inv_sum1), 
-                                                        cuCmulf(js_dot_R_R[n], kR_inv_sum2)
-                                                    )
-                                                ), 
-                                                cuCmulf(ms_cross_R[n], kR_inv_sum3)
+                                                    con[5], 
+                                                    cuCmulf(ms_cross_R[n], kR_inv_sum3)
+                                                )
                                             ), 
                                             Green
                                         )
@@ -292,15 +293,15 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
                     ye_field[n] = cuCaddf(
                                     cuCmulf(
                                         cuCaddf(
+                                            cuCaddf(
+                                                cuCmulf(js[n], kR_inv_sum1), 
+                                                cuCmulf(js_dot_R_R[n], kR_inv_sum2)
+                                            ),
                                             cuCmulf(
-                                                con[4], 
-                                                cuCaddf(
-                                                    cuCmulf(js[n], kR_inv_sum1), 
-                                                    cuCmulf(js_dot_R_R[n], kR_inv_sum2)
-                                                )
-                                            ), 
-                                            cuCmulf(ms_cross_R[n], kR_inv_sum3)
-                                        ), 
+                                                con[5], 
+                                                cuCmulf(ms_cross_R[n], kR_inv_sum3)
+                                            )
+                                        ),
                                         Green
                                     ), 
                                     ye_field[n]
@@ -1245,12 +1246,13 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs, float *d_
             {
                 de_field[n] =   cuCmulf(
                                     cuCaddf( // Z (M - (M.rh)rh) + ∓ rh x J
-                                        cuCmulf( // Z (J - (J.rh)rh)
-                                            con[4], 
-                                            cuCsubf(js[n], js_dot_R_R[n])
-                                        ), 
-                                        cuCmulf(con[8], R_cross_ms[n])  // ∓ rh x M
-                                    ), Green
+                                        cuCsubf(js[n], js_dot_R_R[n]),
+                                        cuCmulf(
+                                            con[5], 
+                                            cuCmulf(con[8], R_cross_ms[n])  // ∓ rh x M
+                                        )
+                                    ), 
+                                    Green
                                 );
 
                 dh_field[n] =   cuCmulf(

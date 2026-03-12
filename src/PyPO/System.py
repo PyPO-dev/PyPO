@@ -1429,7 +1429,6 @@ class System(object):
         PChecks.check_vecGPODict(_gaussDict, self.fields, self.clog)
         
         refldict = self.system[name_surface]
-        print(refldict)
         
         gauss_in = BBeam.makeGaussBeam(_gaussDict, refldict)
         

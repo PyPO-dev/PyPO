@@ -438,7 +438,10 @@ void initGaussBeam(T gdict, U refldict, V *res_field, V *res_current)
     // k, the wavenumber
     G k = 2* M_PI / gdict.lam;
     // zc, the confocal distance
-    G zc = k*gdict.w0*gdict.w0;
+    G zc = k*gdict.w0*gdict.w0/2.0;
+
+    G Z0 = 376.73031341259 / gdict.n;
+    G sqrtZ0 = sqrt(Z0);
     
     // R, the complex 3-vector distance from the reflector to the source
     std::array<std::complex <G>, 3> R;
@@ -447,7 +450,7 @@ void initGaussBeam(T gdict, U refldict, V *res_field, V *res_current)
     std::complex <G> r;
     // expo and prefactor, the w_0 k^2 / √2 e^{-i k r - k^2 w_0^2/2} that is applied to every field
     std::complex <G> expo;
-    G prefactor = gdict.w0*k*k * sqrt(gdict.power / 2);
+    G prefactor = gdict.w0*k * sqrt(gdict.power / (8*M_PI));
     // the inverse sums that multiply terms in the field calculations
     std::complex <G> kr_inv;
     std::complex <G> kr_sum_1;
@@ -476,7 +479,7 @@ void initGaussBeam(T gdict, U refldict, V *res_field, V *res_current)
         r = sqrt(R[0]*R[0] + R[1]*R[1] + R[2]*R[2]);
         
         // Calculate the exponential term
-        expo = exp(-j*k*r - k*k*gdict.w0*gdict.w0);
+        expo = exp(-j*k*r - k*k*gdict.w0*gdict.w0/2.0);
 
         // Calculate the 1/kr power series
         kr_inv = 1.0/(k*r);
@@ -487,12 +490,12 @@ void initGaussBeam(T gdict, U refldict, V *res_field, V *res_current)
 
         // Calculate the E and H fields
         efield[0] = prefactor*expo*(kr_sum_1 + kr_sum_2*(R[0]*R[0] / (r*r)) - kr_sum_3*(R[2] / r));
-        efield[1] = - prefactor*expo*kr_sum_2*R[0]*R[1]/(r*r);
-        efield[2] = - prefactor*expo*(kr_sum_2*R[0]*R[2]/(r*r) + kr_sum_3*R[0]/r);
+        efield[1] = prefactor*expo*kr_sum_2*R[0]*R[1]/(r*r);
+        efield[2] = prefactor*expo*(kr_sum_2*R[0]*R[2]/(r*r) + kr_sum_3*R[0]/r);
 
-        hfield[0] = - prefactor*expo*kr_sum_2*R[0]*R[1]/(r*r);
+        hfield[0] = prefactor*expo*kr_sum_2*R[0]*R[1]/(r*r);
         hfield[1] = prefactor*expo*(kr_sum_1 + kr_sum_2*(R[1]*R[1] / (r*r)) - kr_sum_3*(R[2] / r));
-        hfield[2] = - prefactor*expo*(kr_sum_2*R[1]*R[2]/(r*r) + kr_sum_3*R[1]/r);
+        hfield[2] = prefactor*expo*(kr_sum_2*R[1]*R[2]/(r*r) + kr_sum_3*R[1]/r);
 
         // Calculate the M and J currents
         n_source[0] = reflc.nx[i];

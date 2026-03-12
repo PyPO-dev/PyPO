@@ -473,26 +473,26 @@ void initGaussBeam(T gdict, U refldict, V *res_field, V *res_current)
         R[1] = std::complex<G>(reflc.y[i], 0.0);
         R[2] = reflc.z[i] + gdict.z + j*zc;
         
-        ut.dot(R, R, rsq);
-        r = sqrt(rsq);
-
+        r = sqrt(R[0]*R[0] + R[1]*R[1] + R[2]*R[2]);
+        
         // Calculate the exponential term
-        expo = exp(-k*r - k*k*gdict.w0*gdict.w0);
+        expo = exp(-j*k*r - k*k*gdict.w0*gdict.w0);
 
         // Calculate the 1/kr power series
         kr_inv = 1.0/(k*r);
+        
         kr_sum_1 = (-j*kr_inv - kr_inv*kr_inv + j*kr_inv*kr_inv*kr_inv);
-        kr_sum_2 = (j*kr_inv + 3.0*kr_inv*kr_inv + 3.0*j*kr_inv*kr_inv*kr_inv);
+        kr_sum_2 = (j*kr_inv + 3.0*kr_inv*kr_inv - 3.0*j*kr_inv*kr_inv*kr_inv);
         kr_sum_3 = (j*kr_inv + kr_inv*kr_inv);
 
         // Calculate the E and H fields
         efield[0] = prefactor*expo*(kr_sum_1 + kr_sum_2*(R[0]*R[0] / (r*r)) - kr_sum_3*(R[2] / r));
         efield[1] = - prefactor*expo*kr_sum_2*R[0]*R[1]/(r*r);
-        efield[2] = - prefactor*expo*(kr_sum_2*R[0]*R[2]/(r*r) - kr_sum_3*R[0]/r);
+        efield[2] = - prefactor*expo*(kr_sum_2*R[0]*R[2]/(r*r) + kr_sum_3*R[0]/r);
 
         hfield[0] = - prefactor*expo*kr_sum_2*R[0]*R[1]/(r*r);
-        hfield[1] = prefactor*expo*(kr_sum_1 + kr_sum_2*(R[1]*R[1] / (r*r)) + kr_sum_3*(R[2] / r));
-        hfield[2] = - prefactor*expo*(kr_sum_2*R[1]*R[2]/(r*r) + kr_sum_3*R[0]/r);
+        hfield[1] = prefactor*expo*(kr_sum_1 + kr_sum_2*(R[1]*R[1] / (r*r)) - kr_sum_3*(R[2] / r));
+        hfield[2] = - prefactor*expo*(kr_sum_2*R[1]*R[2]/(r*r) + kr_sum_3*R[1]/r);
 
         // Calculate the M and J currents
         n_source[0] = reflc.nx[i];

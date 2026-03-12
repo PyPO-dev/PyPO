@@ -174,8 +174,6 @@ def makeGaussBeam(gdict_py, source):
     @see fields
     @see currents
     """
-
-    print("In BBeam.makeGaussBeam")
     
     lib = loadBeamlib()
 
@@ -197,7 +195,7 @@ def makeGaussBeam(gdict_py, source):
 
     out_field = BUtils.c2BundleToObj(res_field, shape=source_shape, obj_t='fields', np_t=np.float64)
     out_current = BUtils.c2BundleToObj(res_current, shape=source_shape, obj_t='currents', np_t=np.float64)
-
+    
     return out_field, out_current
 
 

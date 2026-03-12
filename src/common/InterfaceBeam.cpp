@@ -94,11 +94,6 @@ void makeGauss(GPODict gdict, reflparams plane, c2Bundle *res_field, c2Bundle *r
  */
 void makeGaussBeam(vecGPODict gdict, reflparams plane, c2Bundle *res_field, c2Bundle *res_current)
 {
-    printf("in makeGaussBeam\n");
-    printf("w0 : {%f}\n", gdict.w0);
-    printf("z  : {%f}\n", gdict.z);
-    printf("lxu[0] lxu[1]: {%f}, {%f}\n", plane.lxu[0], plane.lxu[1]);
-    printf("lyv[0] lyv[1]: {%f}, {%f}\n", plane.lyv[0], plane.lyv[1]);
     initGaussBeam<vecGPODict, reflparams, c2Bundle, reflcontainer, double>(gdict, plane, res_field ,res_current);
 }
 

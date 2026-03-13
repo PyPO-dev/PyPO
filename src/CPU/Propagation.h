@@ -1013,7 +1013,7 @@ std::array<std::array<std::complex<T>, 3>, 2> Propagation<T, U, V, W>::fieldAtPo
         kR_inv_sum2 = kR_inv * (j - t_direction*Three*kR_inv - Three*j * kR_inv*kR_inv);
         //printf("kR_inv_sum2: %.16g+%16gi\n", kR_inv_sum2.real(), kR_inv_sum2.imag()); // %s is format specifier
         
-        kR_inv_sum3 = t_direction * kR_inv * (kR_inv + j);
+        kR_inv_sum3 = t_direction * (j*kR_inv - t_direction*kR_inv*kR_inv);
         //printf("kR_inv_sum3: %.16g+%16gi\n", kR_inv_sum3.real(), kR_inv_sum3.imag()); // %s is format specifier
         
 

@@ -211,8 +211,8 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
             // i/(kR) ± 3/(kR)² - 3i/(kR)³
             kR_inv_sum2 = make_cuFloatComplex(-cuCrealf(con[8])*3*kR_inv*kR_inv, kR_inv*(1 - 3*kR_inv*kR_inv));
 
-            // ∓i/(kR) ∓ 1/(kR)²
-            kR_inv_sum3 = cuCmulf(con[8], make_cuFloatComplex(kR_inv*kR_inv, kR_inv));
+            // ∓(i/(kR) ∓ 1/(kR)²)
+            kR_inv_sum3 = cuCmulf(con[8], make_cuFloatComplex(-cuCrealf(con[8])*kR_inv*kR_inv, kR_inv));
 
             // Vector calculations
             // e-field

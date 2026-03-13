@@ -1,0 +1,8 @@
+Using Python 3.14.3 environment at: /home/pgrimes/miniforge3/envs/pypo
+Resolved 13 packages in 567ms
+   Building pypo-pkg @ file:///home/pgrimes/github/PyPO
+      Built pypo-pkg @ file:///home/pgrimes/github/PyPO
+Prepared 1 package in 2.23s
+Uninstalled 1 package in 5ms
+Installed 1 package in 1ms
+ ~ pypo-pkg==1.2.1 (from file:///home/pgrimes/github/PyPO)

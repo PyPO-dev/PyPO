@@ -112,23 +112,37 @@ $(document).ready(function(){initNavTree('classPyPO_1_1Enums_1_1Scales.html','')
 Inheritance diagram for PyPO.Enums.Scales:</div>
 <div class="dyncontent">
  <div class="center">
-  <img src="classPyPO_1_1Enums_1_1Scales.png" alt=""/>
- </div></div>
+  <img src="classPyPO_1_1Enums_1_1Scales.png" usemap="#PyPO.Enums.Scales_map" alt=""/>
+  <map id="PyPO.Enums.Scales_map" name="PyPO.Enums.Scales_map">
+<area href="classPyPO_1_1Enums_1_1CustomEnumScalar.html" alt="PyPO.Enums.CustomEnumScalar" shape="rect" coords="0,56,199,80"/>
+  </map>
+</div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
 <tr class="memitem:ae9c2eb55e90cc02ad921afa51f58e0b2"><td class="memItemLeft" align="right" valign="top"><a id="ae9c2eb55e90cc02ad921afa51f58e0b2"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>LIN</b> = 0</td></tr>
 <tr class="separator:ae9c2eb55e90cc02ad921afa51f58e0b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0294f2a987b568aae344f72fa67dc257"><td class="memItemLeft" align="right" valign="top"><a id="a0294f2a987b568aae344f72fa67dc257"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>AMP</b> = 1</td></tr>
+<tr class="separator:a0294f2a987b568aae344f72fa67dc257"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab027847dc6b56d136cbd2f4fedb4e430"><td class="memItemLeft" align="right" valign="top"><a id="ab027847dc6b56d136cbd2f4fedb4e430"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>dB</b> = 2</td></tr>
 <tr class="separator:ab027847dc6b56d136cbd2f4fedb4e430"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pub_methods_classPyPO_1_1Enums_1_1CustomEnumScalar"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classPyPO_1_1Enums_1_1CustomEnumScalar')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classPyPO_1_1Enums_1_1CustomEnumScalar.html">PyPO.Enums.CustomEnumScalar</a></td></tr>
+<tr class="memitem:a22a892a8c92473dd549e68460e0af962 inherit pub_methods_classPyPO_1_1Enums_1_1CustomEnumScalar"><td class="memItemLeft" align="right" valign="top"><a id="a22a892a8c92473dd549e68460e0af962"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>__str__</b> (self)</td></tr>
+<tr class="separator:a22a892a8c92473dd549e68460e0af962 inherit pub_methods_classPyPO_1_1Enums_1_1CustomEnumScalar"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Enum types for units for setting scalings for quantities. </p>
 <p>This special option is used for specifying the scaling of the heatmap for 2D plots, but also for the scaling of beam cross-sections. In addition, the scaling argument sets the scale for fitting Gaussians. For example, using the scale argument, it is possible to fit a Gaussian to a beam pattern in linear, logarithmic and decibel space.</p>
 <p>Options:<br  />
- LIN : Set scaling mode to linear<br  />
+ LIN : Set scaling mode to linear power<br  />
+ AMP : Set scaling mode to linear amplitude<br  />
  dB : Set scaling to decibels </p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>src/PyPO/<a class="el" href="Enums_8py.html">Enums.py</a></li>

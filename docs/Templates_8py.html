@@ -120,8 +120,11 @@ Variables</h2></td></tr>
 <tr class="memdesc:ga66155c60ce6aaa3cfc9b679200e8ba69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Template for a <a class="el" href="structGRTDict.html">GRTDict</a>, containing parameters for constructing a Gaussian ray-trace frame.  <a href="group__public__api__templates.html#ga66155c60ce6aaa3cfc9b679200e8ba69">More...</a><br /></td></tr>
 <tr class="separator:ga66155c60ce6aaa3cfc9b679200e8ba69"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gad18cf91cf1ffdbc45a06fcec997b2058"><td class="memItemLeft" align="right" valign="top">dictionary&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__templates.html#gad18cf91cf1ffdbc45a06fcec997b2058">PyPO.Templates.GPODict</a></td></tr>
-<tr class="memdesc:gad18cf91cf1ffdbc45a06fcec997b2058"><td class="mdescLeft">&#160;</td><td class="mdescRight">Template for a <a class="el" href="structGPODict.html">GPODict</a>, containing parameters for constructing a Gaussian physical optics beam.  <a href="group__public__api__templates.html#gad18cf91cf1ffdbc45a06fcec997b2058">More...</a><br /></td></tr>
+<tr class="memdesc:gad18cf91cf1ffdbc45a06fcec997b2058"><td class="mdescLeft">&#160;</td><td class="mdescRight">Template for a <a class="el" href="structGPODict.html">GPODict</a>, containing parameters for constructing a Gaussian E field and associated magnetic currents.  <a href="group__public__api__templates.html#gad18cf91cf1ffdbc45a06fcec997b2058">More...</a><br /></td></tr>
 <tr class="separator:gad18cf91cf1ffdbc45a06fcec997b2058"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8e1909d166b468409257588b1af1391c"><td class="memItemLeft" align="right" valign="top">dictionary&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Templates_8py.html#a8e1909d166b468409257588b1af1391c">PyPO.Templates.vecGPODict</a></td></tr>
+<tr class="memdesc:a8e1909d166b468409257588b1af1391c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Template for a VecPODict, containing parameters for constructing a symmetric vectorial Gaussian beam using the complex source point method.  <a href="Templates_8py.html#a8e1909d166b468409257588b1af1391c">More...</a><br /></td></tr>
+<tr class="separator:a8e1909d166b468409257588b1af1391c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga977239d8aff8c2d4b22317d8a600eb05"><td class="memItemLeft" align="right" valign="top">dictionary&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__templates.html#ga977239d8aff8c2d4b22317d8a600eb05">PyPO.Templates.PSDict</a></td></tr>
 <tr class="memdesc:ga977239d8aff8c2d4b22317d8a600eb05"><td class="mdescLeft">&#160;</td><td class="mdescRight">Template for a point source dictionary.  <a href="group__public__api__templates.html#ga977239d8aff8c2d4b22317d8a600eb05">More...</a><br /></td></tr>
 <tr class="separator:ga977239d8aff8c2d4b22317d8a600eb05"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -141,7 +144,35 @@ Variables</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Templates for commonly used PyPO dictionaries. </p>
 <p>For each key, a short summary of the key is given. </p>
-</div></div><!-- contents -->
+</div><h2 class="groupheader">Variable Documentation</h2>
+<a id="a8e1909d166b468409257588b1af1391c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8e1909d166b468409257588b1af1391c">&#9670;&nbsp;</a></span>vecGPODict</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">dictionary PyPO.Templates.vecGPODict</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;=  {</div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;        <span class="stringliteral">&quot;name&quot;</span>      : <span class="stringliteral">&quot;Name of Gaussian beam&quot;</span>,</div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;        <span class="stringliteral">&quot;lam&quot;</span>       : <span class="stringliteral">&quot;Wavelength of Gaussian beam in mm (positive real)&quot;</span>,</div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;        <span class="stringliteral">&quot;w0&quot;</span>        : <span class="stringliteral">&quot;Focal beamwaist of beam along x-axis in mm (positive real). Calculated from `w`, `z`, `R` if two are set.&quot;</span>,</div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;        <span class="stringliteral">&quot;z&quot;</span>         : <span class="stringliteral">&quot;Set the distance z along the beam that wx is defined at (real). Defaults to zero. Calculated from `w0`, `w`, `R` if two are set.&quot;</span>,</div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;        <span class="stringliteral">&quot;w&quot;</span>         : <span class="stringliteral">&quot;Beam radius at some distance `z` along the beam (positive real). Calculated from `w0`, `z`, `R` if two are set.&quot;</span>,</div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;        <span class="stringliteral">&quot;R&quot;</span>         : <span class="stringliteral">&quot;Radius of phase curvature in the x direction (real). Calculated from `w0`, `w`, `z` if any pair are set. Ignored if &lt;0.01 `lam`.&quot;</span>,</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;        <span class="stringliteral">&quot;n&quot;</span>         : <span class="stringliteral">&quot;Refractive index of medium. Defaults to 1.0.&quot;</span>,</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;        <span class="stringliteral">&quot;power&quot;</span>     : <span class="stringliteral">&quot;Total power contained in the beam (real). Defaults to 4pi if not set.&quot;</span>,</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;        }</div>
+</div><!-- fragment -->
+<p>Template for a VecPODict, containing parameters for constructing a symmetric vectorial Gaussian beam using the complex source point method. </p>
+<p>This template defines a vectorial Gaussian beam propagating along the positive z-axis, with the primary E-field polarized along the positive x-axis. Unless specified, the power in the beam is normalized to 4pi √W (this ensures that the farfields are in dBi). </p>
+
+</div>
+</div>
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

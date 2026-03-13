@@ -120,7 +120,7 @@ Variables</h2></td></tr>
 <tr class="memdesc:ga66155c60ce6aaa3cfc9b679200e8ba69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Template for a <a class="el" href="structGRTDict.html">GRTDict</a>, containing parameters for constructing a Gaussian ray-trace frame.  <a href="group__public__api__templates.html#ga66155c60ce6aaa3cfc9b679200e8ba69">More...</a><br /></td></tr>
 <tr class="separator:ga66155c60ce6aaa3cfc9b679200e8ba69"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gad18cf91cf1ffdbc45a06fcec997b2058"><td class="memItemLeft" align="right" valign="top">dictionary&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__templates.html#gad18cf91cf1ffdbc45a06fcec997b2058">PyPO.Templates.GPODict</a></td></tr>
-<tr class="memdesc:gad18cf91cf1ffdbc45a06fcec997b2058"><td class="mdescLeft">&#160;</td><td class="mdescRight">Template for a <a class="el" href="structGPODict.html">GPODict</a>, containing parameters for constructing a Gaussian physical optics beam.  <a href="group__public__api__templates.html#gad18cf91cf1ffdbc45a06fcec997b2058">More...</a><br /></td></tr>
+<tr class="memdesc:gad18cf91cf1ffdbc45a06fcec997b2058"><td class="mdescLeft">&#160;</td><td class="mdescRight">Template for a <a class="el" href="structGPODict.html">GPODict</a>, containing parameters for constructing a Gaussian E field and associated magnetic currents.  <a href="group__public__api__templates.html#gad18cf91cf1ffdbc45a06fcec997b2058">More...</a><br /></td></tr>
 <tr class="separator:gad18cf91cf1ffdbc45a06fcec997b2058"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga977239d8aff8c2d4b22317d8a600eb05"><td class="memItemLeft" align="right" valign="top">dictionary&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__public__api__templates.html#ga977239d8aff8c2d4b22317d8a600eb05">PyPO.Templates.PSDict</a></td></tr>
 <tr class="memdesc:ga977239d8aff8c2d4b22317d8a600eb05"><td class="mdescLeft">&#160;</td><td class="mdescRight">Template for a point source dictionary.  <a href="group__public__api__templates.html#ga977239d8aff8c2d4b22317d8a600eb05">More...</a><br /></td></tr>
@@ -191,8 +191,9 @@ Variables</h2></td></tr>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;        <span class="stringliteral">&quot;pol&quot;</span>       : <span class="stringliteral">&quot;Polarisation of beam (Numpy array of length 3)&quot;</span></div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;        }</div>
 </div><!-- fragment -->
-<p>Template for a <a class="el" href="structGPODict.html">GPODict</a>, containing parameters for constructing a Gaussian physical optics beam. </p>
-<p>The beam is always initialised along the positive z-axis with the x focus at z = 0. Evaluation of the beam, however, can be on an arbitrary oriented/positioned plane along the beam. The beam can have elliptical contours, an arbitrary position angle and general astigmatism. Note that the x focus is always at z = 0, and the y focus is at -dxyz, with dxyz the astigmatic distance. The template for a scalar beam is similar, except that the polarisation is not needed. </p>
+<p>Template for a <a class="el" href="structGPODict.html">GPODict</a>, containing parameters for constructing a Gaussian E field and associated magnetic currents. </p>
+<p>No cross-polar elements are calculated.</p>
+<p>The field is always initialised along the positive z-axis with the x focus at z = 0. Evaluation of the field, however, can be on an arbitrary oriented/positioned plane along the beam. The beam can have elliptical contours, an arbitrary position angle and general astigmatism. Note that the x focus is always at z = 0, and the y focus is at -dxyz, with dxyz the astigmatic distance. The template for a scalar beam is similar, except that the polarisation is not needed. </p>
 
 </div>
 </div>

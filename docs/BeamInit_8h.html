@@ -141,6 +141,9 @@ Functions</h2></td></tr>
 <tr class="memitem:aebee209858ba31b61058c5691e9a7cba"><td class="memTemplParams" colspan="2">template&lt;typename T , typename U , typename V , typename W , typename G &gt; </td></tr>
 <tr class="memitem:aebee209858ba31b61058c5691e9a7cba"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="BeamInit_8h.html#aebee209858ba31b61058c5691e9a7cba">initGauss</a> (T gdict, U refldict, V *res_field, V *res_current)</td></tr>
 <tr class="separator:aebee209858ba31b61058c5691e9a7cba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b2ec72480f9933edd25b3b42e56fa6b"><td class="memTemplParams" colspan="2">template&lt;typename T , typename U , typename V , typename W , typename G &gt; </td></tr>
+<tr class="memitem:a5b2ec72480f9933edd25b3b42e56fa6b"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="BeamInit_8h.html#a5b2ec72480f9933edd25b3b42e56fa6b">initGaussBeam</a> (T gdict, U refldict, V *res_field, V *res_current)</td></tr>
+<tr class="separator:a5b2ec72480f9933edd25b3b42e56fa6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a49b77bfbe46f02936242f02e9e6a3a9f"><td class="memTemplParams" colspan="2">template&lt;typename T , typename U , typename V , typename W , typename G &gt; </td></tr>
 <tr class="memitem:a49b77bfbe46f02936242f02e9e6a3a9f"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="BeamInit_8h.html#a49b77bfbe46f02936242f02e9e6a3a9f">initScalarGauss</a> (T sgdict, U refldict, V *res_field)</td></tr>
 <tr class="separator:a49b77bfbe46f02936242f02e9e6a3a9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -298,8 +301,73 @@ template&lt;typename T , typename U , typename V , typename W , typename G &gt; 
       </table>
 </div><div class="memdoc">
 <p>Initialize Gaussian beam from <a class="el" href="structGPODict.html">GPODict</a> or <a class="el" href="structGPODictf.html">GPODictf</a>.</p>
-<p>The generated Gaussian has E-field and magnetic currents only. This <em>is</em> what you want as a source in PO calculations.</p>
+<p>The generated Gaussian has copolar E-field and magnetic currents only.</p>
 <p>Takes a <a class="el" href="structGPODict.html">GPODict</a> or <a class="el" href="structGPODictf.html">GPODictf</a> and generates two <a class="el" href="structc2Bundle.html">c2Bundle</a> or <a class="el" href="structc2Bundlef.html">c2Bundlef</a> objects, which contain the field and associated currents and are allocated to passed pointer arguments.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">gdict</td><td><a class="el" href="structGPODict.html">GPODict</a> or <a class="el" href="structGPODictf.html">GPODictf</a> object from which to generate a Gaussian beam. </td></tr>
+    <tr><td class="paramname">refldict</td><td>reflparams or reflparamsf object corresponding to surface on which to generate the Gaussian beam. </td></tr>
+    <tr><td class="paramname">res_field</td><td>Pointer to <a class="el" href="structc2Bundle.html">c2Bundle</a> or <a class="el" href="structc2Bundlef.html">c2Bundlef</a> object. </td></tr>
+    <tr><td class="paramname">res_current</td><td>Pointer to <a class="el" href="structc2Bundle.html">c2Bundle</a> or <a class="el" href="structc2Bundlef.html">c2Bundlef</a> object.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="structGPODict.html">GPODict</a> </dd>
+<dd>
+<a class="el" href="structGPODictf.html">GPODictf</a> </dd>
+<dd>
+<a class="el" href="structreflparams.html">reflparams</a> </dd>
+<dd>
+<a class="el" href="structreflparamsf.html">reflparamsf</a> </dd>
+<dd>
+<a class="el" href="structc2Bundle.html">c2Bundle</a> </dd>
+<dd>
+<a class="el" href="structc2Bundlef.html">c2Bundlef</a> </dd></dl>
+
+</div>
+</div>
+<a id="a5b2ec72480f9933edd25b3b42e56fa6b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5b2ec72480f9933edd25b3b42e56fa6b">&#9670;&nbsp;</a></span>initGaussBeam()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T , typename U , typename V , typename W , typename G &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void initGaussBeam </td>
+          <td>(</td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>gdict</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">U&#160;</td>
+          <td class="paramname"><em>refldict</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">V *&#160;</td>
+          <td class="paramname"><em>res_field</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">V *&#160;</td>
+          <td class="paramname"><em>res_current</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Initialize Gaussian beam from <a class="el" href="structvecGPODict.html">vecGPODict</a> or <a class="el" href="structvecGPODictf.html">vecGPODictf</a>.</p>
+<p>The Gaussian beam is generated using the complex source point method, which generates a symmetrized Gaussian beam from combined Helmholtz electric and magnetic dipoles placed at an imaginary positive z-distance equal to <code>z_c</code>, the Gaussian beam confocal distance.</p>
+<p>Takes a <a class="el" href="structvecGPODict.html">vecGPODict</a> or <a class="el" href="structvecGPODictf.html">vecGPODictf</a> and a surface definition and generates two <a class="el" href="structc2Bundle.html">c2Bundle</a> or <a class="el" href="structc2Bundlef.html">c2Bundlef</a> objects, which contain the field and associated currents and are allocated to passed pointer arguments.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">gdict</td><td><a class="el" href="structGPODict.html">GPODict</a> or <a class="el" href="structGPODictf.html">GPODictf</a> object from which to generate a Gaussian beam. </td></tr>

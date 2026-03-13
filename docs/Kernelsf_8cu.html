@@ -114,28 +114,28 @@ $(document).ready(function(){initNavTree('Kernelsf_8cu.html',''); initResizable(
 Functions</h2></td></tr>
 <tr class="memitem:a6fc6cdb15c485da8b4385042082df39e"><td class="memItemLeft" align="right" valign="top">__host__ std::array&lt; dim3, 2 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a6fc6cdb15c485da8b4385042082df39e">initCUDA</a> (float k, float epsilon, int gt, int gs, float t_direction, int nBlocks, int nThreads)</td></tr>
 <tr class="separator:a6fc6cdb15c485da8b4385042082df39e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab22e5a6574f3f494b1c4310706c24ebc"><td class="memItemLeft" align="right" valign="top">__device__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#ab22e5a6574f3f494b1c4310706c24ebc">fieldAtPoint</a> (float *d_xs, float *d_ys, float *d_zs, float *d_nxs, float *d_nys, float *d_nzs, cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz, cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz, float(&amp;point)[3], float *d_A, cuFloatComplex(&amp;d_ei)[3], cuFloatComplex(&amp;d_hi)[3])</td></tr>
-<tr class="separator:ab22e5a6574f3f494b1c4310706c24ebc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a19f9847c3f891afb0c985171aa0051bf"><td class="memItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a19f9847c3f891afb0c985171aa0051bf">GpropagateBeam_0_PEC</a> (float *d_xs, float *d_ys, float *d_zs, float *d_A, float *d_xt, float *d_yt, float *d_zt, float *d_nxs, float *d_nys, float *d_nzs, float *d_nxt, float *d_nyt, float *d_nzt, cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz, cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz, cuFloatComplex *d_Jxt, cuFloatComplex *d_Jyt, cuFloatComplex *d_Jzt, cuFloatComplex *d_Mxt, cuFloatComplex *d_Myt, cuFloatComplex *d_Mzt)</td></tr>
-<tr class="separator:a19f9847c3f891afb0c985171aa0051bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a817a0f3da2b844d700e54b5e5efe97c2"><td class="memItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a817a0f3da2b844d700e54b5e5efe97c2">GpropagateBeam_0</a> (float *d_xs, float *d_ys, float *d_zs, float *d_A, float *d_xt, float *d_yt, float *d_zt, float *d_nxs, float *d_nys, float *d_nzs, float *d_nxt, float *d_nyt, float *d_nzt, cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz, cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz, cuFloatComplex *d_Jxt, cuFloatComplex *d_Jyt, cuFloatComplex *d_Jzt, cuFloatComplex *d_Mxt, cuFloatComplex *d_Myt, cuFloatComplex *d_Mzt)</td></tr>
-<tr class="separator:a817a0f3da2b844d700e54b5e5efe97c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af0265ceceaef5d8a7fea65f61e0c6e1d"><td class="memItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#af0265ceceaef5d8a7fea65f61e0c6e1d">GpropagateBeam_2_PEC</a> (float *d_xs, float *d_ys, float *d_zs, float *d_A, float *d_xt, float *d_yt, float *d_zt, float *d_nxs, float *d_nys, float *d_nzs, float *d_nxt, float *d_nyt, float *d_nzt, cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz, cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz, cuFloatComplex *d_Jxt, cuFloatComplex *d_Jyt, cuFloatComplex *d_Jzt, cuFloatComplex *d_Mxt, cuFloatComplex *d_Myt, cuFloatComplex *d_Mzt, cuFloatComplex *d_Ext, cuFloatComplex *d_Eyt, cuFloatComplex *d_Ezt, cuFloatComplex *d_Hxt, cuFloatComplex *d_Hyt, cuFloatComplex *d_Hzt)</td></tr>
-<tr class="separator:af0265ceceaef5d8a7fea65f61e0c6e1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab60962be9be4532b07ada14f2eb1468b"><td class="memItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#ab60962be9be4532b07ada14f2eb1468b">GpropagateBeam_1</a> (float *d_xs, float *d_ys, float *d_zs, float *d_A, float *d_xt, float *d_yt, float *d_zt, float *d_nxs, float *d_nys, float *d_nzs, cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz, cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz, cuFloatComplex *d_Ext, cuFloatComplex *d_Eyt, cuFloatComplex *d_Ezt, cuFloatComplex *d_Hxt, cuFloatComplex *d_Hyt, cuFloatComplex *d_Hzt)</td></tr>
-<tr class="separator:ab60962be9be4532b07ada14f2eb1468b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a25dc459636e1862df37a303aa104251b"><td class="memItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a25dc459636e1862df37a303aa104251b">GpropagateBeam_2</a> (float *d_xs, float *d_ys, float *d_zs, float *d_A, float *d_xt, float *d_yt, float *d_zt, float *d_nxs, float *d_nys, float *d_nzs, float *d_nxt, float *d_nyt, float *d_nzt, cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz, cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz, cuFloatComplex *d_Jxt, cuFloatComplex *d_Jyt, cuFloatComplex *d_Jzt, cuFloatComplex *d_Mxt, cuFloatComplex *d_Myt, cuFloatComplex *d_Mzt, cuFloatComplex *d_Ext, cuFloatComplex *d_Eyt, cuFloatComplex *d_Ezt, cuFloatComplex *d_Hxt, cuFloatComplex *d_Hyt, cuFloatComplex *d_Hzt)</td></tr>
-<tr class="separator:a25dc459636e1862df37a303aa104251b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a02659619500ae56f94e67aab87875ddf"><td class="memItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a02659619500ae56f94e67aab87875ddf">GpropagateBeam_3</a> (float *d_xs, float *d_ys, float *d_zs, float *d_A, float *d_xt, float *d_yt, float *d_zt, float *d_nxs, float *d_nys, float *d_nzs, float *d_nxt, float *d_nyt, float *d_nzt, cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz, cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz, cuFloatComplex *d_Ext, cuFloatComplex *d_Eyt, cuFloatComplex *d_Ezt, cuFloatComplex *d_Hxt, cuFloatComplex *d_Hyt, cuFloatComplex *d_Hzt, float *d_Prxt, float *d_Pryt, float *d_Przt)</td></tr>
-<tr class="separator:a02659619500ae56f94e67aab87875ddf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a55e46bb6610f758af4785d373b09ea7e"><td class="memItemLeft" align="right" valign="top">__device__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a55e46bb6610f758af4785d373b09ea7e">farfieldAtPoint</a> (float *d_xs, float *d_ys, float *d_zs, float *d_nxs, float *d_nys, float *d_nzs, cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz, cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz, float(&amp;r_hat)[3], float *d_A, cuFloatComplex(&amp;e)[3], cuFloatComplex(&amp;h)[3])</td></tr>
-<tr class="separator:a55e46bb6610f758af4785d373b09ea7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a60d1190a04ec94144fff10b285aa2887"><td class="memItemLeft" align="right" valign="top">void __global__&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a60d1190a04ec94144fff10b285aa2887">GpropagateBeam_4</a> (float *d_xs, float *d_ys, float *d_zs, float *d_nxs, float *d_nys, float *d_nzs, float *d_A, float *d_xt, float *d_yt, cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz, cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz, cuFloatComplex *d_Ext, cuFloatComplex *d_Eyt, cuFloatComplex *d_Ezt, cuFloatComplex *d_Hxt, cuFloatComplex *d_Hyt, cuFloatComplex *d_Hzt)</td></tr>
-<tr class="separator:a60d1190a04ec94144fff10b285aa2887"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a49925cbda435fea312a83f1b0c441389"><td class="memItemLeft" align="right" valign="top">void __device__&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a49925cbda435fea312a83f1b0c441389">scalarfieldAtPoint</a> (float *d_xs, float *d_ys, float *d_zs, cuFloatComplex *d_sfs, float(&amp;point)[3], float *d_A, cuFloatComplex &amp;e)</td></tr>
-<tr class="separator:a49925cbda435fea312a83f1b0c441389"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac63efbfa4cb6c7f63ed98f0137184ed3"><td class="memItemLeft" align="right" valign="top">void __global__&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#ac63efbfa4cb6c7f63ed98f0137184ed3">GpropagateBeam_5</a> (float *d_xs, float *d_ys, float *d_zs, float *d_A, float *d_xt, float *d_yt, float *d_zt, cuFloatComplex *d_sfs, cuFloatComplex *d_sft)</td></tr>
-<tr class="separator:ac63efbfa4cb6c7f63ed98f0137184ed3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ceea33491f44feaca541627ad099e74"><td class="memItemLeft" align="right" valign="top">__device__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a8ceea33491f44feaca541627ad099e74">fieldAtPoint</a> (float *d_xs, float *d_ys, float *d_zs, float *d_nxs, float *d_nys, float *d_nzs, cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz, cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz, float(&amp;point)[3], float *d_A, int gmode, int ncx, int ncy, cuFloatComplex(&amp;d_ei)[3], cuFloatComplex(&amp;d_hi)[3])</td></tr>
+<tr class="separator:a8ceea33491f44feaca541627ad099e74"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b92ce3c95de414405bb7a2d13352c32"><td class="memItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a0b92ce3c95de414405bb7a2d13352c32">GpropagateBeam_0_PEC</a> (float *d_xs, float *d_ys, float *d_zs, float *d_A, float *d_xt, float *d_yt, float *d_zt, float *d_nxs, float *d_nys, float *d_nzs, float *d_nxt, float *d_nyt, float *d_nzt, int gmode, int ncx, int ncy, cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz, cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz, cuFloatComplex *d_Jxt, cuFloatComplex *d_Jyt, cuFloatComplex *d_Jzt, cuFloatComplex *d_Mxt, cuFloatComplex *d_Myt, cuFloatComplex *d_Mzt)</td></tr>
+<tr class="separator:a0b92ce3c95de414405bb7a2d13352c32"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a541ff03189feebd4887b7d13e9ccc26c"><td class="memItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a541ff03189feebd4887b7d13e9ccc26c">GpropagateBeam_0</a> (float *d_xs, float *d_ys, float *d_zs, float *d_A, float *d_xt, float *d_yt, float *d_zt, float *d_nxs, float *d_nys, float *d_nzs, float *d_nxt, float *d_nyt, float *d_nzt, int gmode, int ncx, int ncy, cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz, cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz, cuFloatComplex *d_Jxt, cuFloatComplex *d_Jyt, cuFloatComplex *d_Jzt, cuFloatComplex *d_Mxt, cuFloatComplex *d_Myt, cuFloatComplex *d_Mzt)</td></tr>
+<tr class="separator:a541ff03189feebd4887b7d13e9ccc26c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af4882d30c7156278267f4ab1dc992abf"><td class="memItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#af4882d30c7156278267f4ab1dc992abf">GpropagateBeam_2_PEC</a> (float *d_xs, float *d_ys, float *d_zs, float *d_A, float *d_xt, float *d_yt, float *d_zt, float *d_nxs, float *d_nys, float *d_nzs, float *d_nxt, float *d_nyt, float *d_nzt, int gmode, int ncx, int ncy, cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz, cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz, cuFloatComplex *d_Jxt, cuFloatComplex *d_Jyt, cuFloatComplex *d_Jzt, cuFloatComplex *d_Mxt, cuFloatComplex *d_Myt, cuFloatComplex *d_Mzt, cuFloatComplex *d_Ext, cuFloatComplex *d_Eyt, cuFloatComplex *d_Ezt, cuFloatComplex *d_Hxt, cuFloatComplex *d_Hyt, cuFloatComplex *d_Hzt)</td></tr>
+<tr class="separator:af4882d30c7156278267f4ab1dc992abf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d7be87b116bbaa982460aaca7dda124"><td class="memItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a5d7be87b116bbaa982460aaca7dda124">GpropagateBeam_1</a> (float *d_xs, float *d_ys, float *d_zs, float *d_A, float *d_xt, float *d_yt, float *d_zt, float *d_nxs, float *d_nys, float *d_nzs, int gmode, int ncx, int ncy, cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz, cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz, cuFloatComplex *d_Ext, cuFloatComplex *d_Eyt, cuFloatComplex *d_Ezt, cuFloatComplex *d_Hxt, cuFloatComplex *d_Hyt, cuFloatComplex *d_Hzt)</td></tr>
+<tr class="separator:a5d7be87b116bbaa982460aaca7dda124"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a260e8c128b127a43fcf76959ada6f758"><td class="memItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a260e8c128b127a43fcf76959ada6f758">GpropagateBeam_2</a> (float *d_xs, float *d_ys, float *d_zs, float *d_A, float *d_xt, float *d_yt, float *d_zt, float *d_nxs, float *d_nys, float *d_nzs, float *d_nxt, float *d_nyt, float *d_nzt, int gmode, int ncx, int ncy, cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz, cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz, cuFloatComplex *d_Jxt, cuFloatComplex *d_Jyt, cuFloatComplex *d_Jzt, cuFloatComplex *d_Mxt, cuFloatComplex *d_Myt, cuFloatComplex *d_Mzt, cuFloatComplex *d_Ext, cuFloatComplex *d_Eyt, cuFloatComplex *d_Ezt, cuFloatComplex *d_Hxt, cuFloatComplex *d_Hyt, cuFloatComplex *d_Hzt)</td></tr>
+<tr class="separator:a260e8c128b127a43fcf76959ada6f758"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adcbe6076f70a5ac6152e779e8c71723b"><td class="memItemLeft" align="right" valign="top">__global__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#adcbe6076f70a5ac6152e779e8c71723b">GpropagateBeam_3</a> (float *d_xs, float *d_ys, float *d_zs, float *d_A, float *d_xt, float *d_yt, float *d_zt, float *d_nxs, float *d_nys, float *d_nzs, float *d_nxt, float *d_nyt, float *d_nzt, int gmode, int ncx, int ncy, cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz, cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz, cuFloatComplex *d_Ext, cuFloatComplex *d_Eyt, cuFloatComplex *d_Ezt, cuFloatComplex *d_Hxt, cuFloatComplex *d_Hyt, cuFloatComplex *d_Hzt, float *d_Prxt, float *d_Pryt, float *d_Przt)</td></tr>
+<tr class="separator:adcbe6076f70a5ac6152e779e8c71723b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4fccd5e9d77e54a1ab05127cf8d919f8"><td class="memItemLeft" align="right" valign="top">__device__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a4fccd5e9d77e54a1ab05127cf8d919f8">farfieldAtPoint</a> (float *d_xs, float *d_ys, float *d_zs, float *d_nxs, float *d_nys, float *d_nzs, cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz, cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz, float(&amp;r_hat)[3], float *d_A, int gmode, int ncx, int ncy, cuFloatComplex(&amp;e)[3], cuFloatComplex(&amp;h)[3])</td></tr>
+<tr class="separator:a4fccd5e9d77e54a1ab05127cf8d919f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa218594ad5f7ed53492ff6495528b338"><td class="memItemLeft" align="right" valign="top">void __global__&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#aa218594ad5f7ed53492ff6495528b338">GpropagateBeam_4</a> (float *d_xs, float *d_ys, float *d_zs, float *d_nxs, float *d_nys, float *d_nzs, float *d_A, float *d_xt, float *d_yt, int gmode, int ncx, int ncy, cuFloatComplex *d_Jx, cuFloatComplex *d_Jy, cuFloatComplex *d_Jz, cuFloatComplex *d_Mx, cuFloatComplex *d_My, cuFloatComplex *d_Mz, cuFloatComplex *d_Ext, cuFloatComplex *d_Eyt, cuFloatComplex *d_Ezt, cuFloatComplex *d_Hxt, cuFloatComplex *d_Hyt, cuFloatComplex *d_Hzt)</td></tr>
+<tr class="separator:aa218594ad5f7ed53492ff6495528b338"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55b519c80c2baaba3b15f77b6a3eea93"><td class="memItemLeft" align="right" valign="top">void __device__&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a55b519c80c2baaba3b15f77b6a3eea93">scalarfieldAtPoint</a> (float *d_xs, float *d_ys, float *d_zs, cuFloatComplex *d_sfs, float(&amp;point)[3], float *d_A, int gmode, int ncx, int ncy, cuFloatComplex &amp;e)</td></tr>
+<tr class="separator:a55b519c80c2baaba3b15f77b6a3eea93"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec9ce79716ed8562b9a01d9240c63224"><td class="memItemLeft" align="right" valign="top">void __global__&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#aec9ce79716ed8562b9a01d9240c63224">GpropagateBeam_5</a> (float *d_xs, float *d_ys, float *d_zs, float *d_A, int gmode, int ncx, int ncy, float *d_xt, float *d_yt, float *d_zt, cuFloatComplex *d_sfs, cuFloatComplex *d_sft)</td></tr>
+<tr class="separator:aec9ce79716ed8562b9a01d9240c63224"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1536f5d7be6659c3b4c717597cbb621b"><td class="memItemLeft" align="right" valign="top">__host__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a1536f5d7be6659c3b4c717597cbb621b">_arrC1ToCUDAC</a> (float *rarr, float *iarr, cuFloatComplex *carr, int size)</td></tr>
 <tr class="separator:a1536f5d7be6659c3b4c717597cbb621b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0a8dc68cd14e31c1262b3f001eeb7374"><td class="memItemLeft" align="right" valign="top">__host__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Kernelsf_8cu.html#a0a8dc68cd14e31c1262b3f001eeb7374">_arrC3ToCUDAC</a> (float *r1arr, float *r2arr, float *r3arr, float *i1arr, float *i2arr, float *i3arr, cuFloatComplex *c1arr, cuFloatComplex *c2arr, cuFloatComplex *c3arr, int size)</td></tr>
@@ -1094,8 +1094,8 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
 
 </div>
 </div>
-<a id="a55e46bb6610f758af4785d373b09ea7e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a55e46bb6610f758af4785d373b09ea7e">&#9670;&nbsp;</a></span>farfieldAtPoint()</h2>
+<a id="a4fccd5e9d77e54a1ab05127cf8d919f8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4fccd5e9d77e54a1ab05127cf8d919f8">&#9670;&nbsp;</a></span>farfieldAtPoint()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1187,6 +1187,24 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>gmode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ncx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ncy</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">cuFloatComplex(&amp;)&#160;</td>
           <td class="paramname"><em>e</em>[3], </td>
         </tr>
@@ -1220,15 +1238,19 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
     <tr><td class="paramname">d_Mz</td><td>Array containing source M z-component. </td></tr>
     <tr><td class="paramname">r_hat</td><td>Array of 3 float, containing xyz coordinates of target point direction. </td></tr>
     <tr><td class="paramname">d_A</td><td>Array containing area elements. </td></tr>
+    <tr><td class="paramname">gmode</td><td>Int indicating the type of source grid. </td></tr>
+    <tr><td class="paramname">ncx</td><td>Int the number of x/u points in the source grid. </td></tr>
+    <tr><td class="paramname">ncy</td><td>Int the number of y/v points in the source grid. </td></tr>
     <tr><td class="paramname">e</td><td>Array of 3 cuFloatComplex, to be filled with E-field at point. </td></tr>
+    <tr><td class="paramname">h</td><td>Array of 3 cuFloatComplex, to be filled with H-field at point. </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="ab22e5a6574f3f494b1c4310706c24ebc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab22e5a6574f3f494b1c4310706c24ebc">&#9670;&nbsp;</a></span>fieldAtPoint()</h2>
+<a id="a8ceea33491f44feaca541627ad099e74"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8ceea33491f44feaca541627ad099e74">&#9670;&nbsp;</a></span>fieldAtPoint()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1320,6 +1342,24 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>gmode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ncx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ncy</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">cuFloatComplex(&amp;)&#160;</td>
           <td class="paramname"><em>d_ei</em>[3], </td>
         </tr>
@@ -1353,6 +1393,9 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
     <tr><td class="paramname">d_Mz</td><td>Array containing source M z-component. </td></tr>
     <tr><td class="paramname">point</td><td>Array of 3 float, containing xyz coordinates of target point. </td></tr>
     <tr><td class="paramname">d_A</td><td>Array containing area elements. </td></tr>
+    <tr><td class="paramname">gmode</td><td>Int indicating the type of source grid. </td></tr>
+    <tr><td class="paramname">ncx</td><td>Int the number of x/u points in the source grid. </td></tr>
+    <tr><td class="paramname">ncy</td><td>Int the number of y/v points in the source grid </td></tr>
     <tr><td class="paramname">d_ei</td><td>Array of 3 cuFloatComplex, to be filled with E-field at point. </td></tr>
     <tr><td class="paramname">d_hi</td><td>Array of 3 cuFloatComplex, to be filled with H-field at point. </td></tr>
   </table>
@@ -1361,8 +1404,8 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
 
 </div>
 </div>
-<a id="a817a0f3da2b844d700e54b5e5efe97c2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a817a0f3da2b844d700e54b5e5efe97c2">&#9670;&nbsp;</a></span>GpropagateBeam_0()</h2>
+<a id="a541ff03189feebd4887b7d13e9ccc26c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a541ff03189feebd4887b7d13e9ccc26c">&#9670;&nbsp;</a></span>GpropagateBeam_0()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1444,6 +1487,24 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
           <td></td>
           <td class="paramtype">float *&#160;</td>
           <td class="paramname"><em>d_nzt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>gmode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ncx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ncy</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1541,6 +1602,9 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
     <tr><td class="paramname">d_nxt</td><td>Array containing target norms x-component. </td></tr>
     <tr><td class="paramname">d_nyt</td><td>Array containing target norms y-component. </td></tr>
     <tr><td class="paramname">d_nzt</td><td>Array containing target norms z-component. </td></tr>
+    <tr><td class="paramname">gmode</td><td>Int indicating the type of source grid. </td></tr>
+    <tr><td class="paramname">ncx</td><td>Int the number of x/u points in the source grid. </td></tr>
+    <tr><td class="paramname">ncy</td><td>Int the number of y/v points in the source grid </td></tr>
     <tr><td class="paramname">d_Jx</td><td>Array containing source J x-component. </td></tr>
     <tr><td class="paramname">d_Jy</td><td>Array containing source J y-component. </td></tr>
     <tr><td class="paramname">d_Jz</td><td>Array containing source J z-component. </td></tr>
@@ -1559,8 +1623,8 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
 
 </div>
 </div>
-<a id="a19f9847c3f891afb0c985171aa0051bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a19f9847c3f891afb0c985171aa0051bf">&#9670;&nbsp;</a></span>GpropagateBeam_0_PEC()</h2>
+<a id="a0b92ce3c95de414405bb7a2d13352c32"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0b92ce3c95de414405bb7a2d13352c32">&#9670;&nbsp;</a></span>GpropagateBeam_0_PEC()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1642,6 +1706,24 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
           <td></td>
           <td class="paramtype">float *&#160;</td>
           <td class="paramname"><em>d_nzt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>gmode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ncx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ncy</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1739,6 +1821,9 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
     <tr><td class="paramname">d_nxt</td><td>Array containing target norms x-component. </td></tr>
     <tr><td class="paramname">d_nyt</td><td>Array containing target norms y-component. </td></tr>
     <tr><td class="paramname">d_nzt</td><td>Array containing target norms z-component. </td></tr>
+    <tr><td class="paramname">gmode</td><td>Int the mode of source grid. </td></tr>
+    <tr><td class="paramname">ncx</td><td>Int number of x/u points in source grid. </td></tr>
+    <tr><td class="paramname">ncy</td><td>Int number of y/v points in source grid. </td></tr>
     <tr><td class="paramname">d_Jx</td><td>Array containing source J x-component. </td></tr>
     <tr><td class="paramname">d_Jy</td><td>Array containing source J y-component. </td></tr>
     <tr><td class="paramname">d_Jz</td><td>Array containing source J z-component. </td></tr>
@@ -1757,8 +1842,8 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
 
 </div>
 </div>
-<a id="ab60962be9be4532b07ada14f2eb1468b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab60962be9be4532b07ada14f2eb1468b">&#9670;&nbsp;</a></span>GpropagateBeam_1()</h2>
+<a id="a5d7be87b116bbaa982460aaca7dda124"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5d7be87b116bbaa982460aaca7dda124">&#9670;&nbsp;</a></span>GpropagateBeam_1()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1822,6 +1907,24 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
           <td></td>
           <td class="paramtype">float *&#160;</td>
           <td class="paramname"><em>d_nzs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>gmode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ncx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ncy</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1916,6 +2019,9 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
     <tr><td class="paramname">d_nxs</td><td>Array containing source normals x-component. </td></tr>
     <tr><td class="paramname">d_nys</td><td>Array containing source normals y-component. </td></tr>
     <tr><td class="paramname">d_nzs</td><td>Array containing source normals z-component. </td></tr>
+    <tr><td class="paramname">gmode</td><td>Int indicating the type of source grid. </td></tr>
+    <tr><td class="paramname">ncx</td><td>Int the number of x/u points in the source grid. </td></tr>
+    <tr><td class="paramname">ncy</td><td>Int the number of y/v points in the source grid </td></tr>
     <tr><td class="paramname">d_Jx</td><td>Array containing source J x-component. </td></tr>
     <tr><td class="paramname">d_Jy</td><td>Array containing source J y-component. </td></tr>
     <tr><td class="paramname">d_Jz</td><td>Array containing source J z-component. </td></tr>
@@ -1934,8 +2040,8 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
 
 </div>
 </div>
-<a id="a25dc459636e1862df37a303aa104251b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a25dc459636e1862df37a303aa104251b">&#9670;&nbsp;</a></span>GpropagateBeam_2()</h2>
+<a id="a260e8c128b127a43fcf76959ada6f758"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a260e8c128b127a43fcf76959ada6f758">&#9670;&nbsp;</a></span>GpropagateBeam_2()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2017,6 +2123,24 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
           <td></td>
           <td class="paramtype">float *&#160;</td>
           <td class="paramname"><em>d_nzt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>gmode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ncx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ncy</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -2150,6 +2274,9 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
     <tr><td class="paramname">d_nxt</td><td>Array containing target norms x-component. </td></tr>
     <tr><td class="paramname">d_nyt</td><td>Array containing target norms y-component. </td></tr>
     <tr><td class="paramname">d_nzt</td><td>Array containing target norms z-component. </td></tr>
+    <tr><td class="paramname">gmode</td><td>Int indicating the type of source grid. </td></tr>
+    <tr><td class="paramname">ncx</td><td>Int the number of x/u points in the source grid. </td></tr>
+    <tr><td class="paramname">ncy</td><td>Int the number of y/v points in the source grid </td></tr>
     <tr><td class="paramname">d_Jx</td><td>Array containing source J x-component. </td></tr>
     <tr><td class="paramname">d_Jy</td><td>Array containing source J y-component. </td></tr>
     <tr><td class="paramname">d_Jz</td><td>Array containing source J z-component. </td></tr>
@@ -2174,8 +2301,8 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
 
 </div>
 </div>
-<a id="af0265ceceaef5d8a7fea65f61e0c6e1d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af0265ceceaef5d8a7fea65f61e0c6e1d">&#9670;&nbsp;</a></span>GpropagateBeam_2_PEC()</h2>
+<a id="af4882d30c7156278267f4ab1dc992abf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af4882d30c7156278267f4ab1dc992abf">&#9670;&nbsp;</a></span>GpropagateBeam_2_PEC()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2257,6 +2384,24 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
           <td></td>
           <td class="paramtype">float *&#160;</td>
           <td class="paramname"><em>d_nzt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>gmode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ncx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ncy</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -2390,6 +2535,9 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
     <tr><td class="paramname">d_nxt</td><td>Array containing target norms x-component. </td></tr>
     <tr><td class="paramname">d_nyt</td><td>Array containing target norms y-component. </td></tr>
     <tr><td class="paramname">d_nzt</td><td>Array containing target norms z-component. </td></tr>
+    <tr><td class="paramname">gmode</td><td>Int indicating the type of source grid. </td></tr>
+    <tr><td class="paramname">ncx</td><td>Int the number of x/u points in the source grid. </td></tr>
+    <tr><td class="paramname">ncy</td><td>Int the number of y/v points in the source grid </td></tr>
     <tr><td class="paramname">d_Jx</td><td>Array containing source J x-component. </td></tr>
     <tr><td class="paramname">d_Jy</td><td>Array containing source J y-component. </td></tr>
     <tr><td class="paramname">d_Jz</td><td>Array containing source J z-component. </td></tr>
@@ -2414,8 +2562,8 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
 
 </div>
 </div>
-<a id="a02659619500ae56f94e67aab87875ddf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a02659619500ae56f94e67aab87875ddf">&#9670;&nbsp;</a></span>GpropagateBeam_3()</h2>
+<a id="adcbe6076f70a5ac6152e779e8c71723b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adcbe6076f70a5ac6152e779e8c71723b">&#9670;&nbsp;</a></span>GpropagateBeam_3()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2497,6 +2645,24 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
           <td></td>
           <td class="paramtype">float *&#160;</td>
           <td class="paramname"><em>d_nzt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>gmode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ncx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ncy</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -2612,6 +2778,9 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
     <tr><td class="paramname">d_nxt</td><td>Array containing target norms x-component. </td></tr>
     <tr><td class="paramname">d_nyt</td><td>Array containing target norms y-component. </td></tr>
     <tr><td class="paramname">d_nzt</td><td>Array containing target norms z-component. </td></tr>
+    <tr><td class="paramname">gmode</td><td>Int indicating the type of source grid. </td></tr>
+    <tr><td class="paramname">ncx</td><td>Int the number of x/u points in the source grid. </td></tr>
+    <tr><td class="paramname">ncy</td><td>Int the number of y/v points in the source grid </td></tr>
     <tr><td class="paramname">d_Jx</td><td>Array containing source J x-component. </td></tr>
     <tr><td class="paramname">d_Jy</td><td>Array containing source J y-component. </td></tr>
     <tr><td class="paramname">d_Jz</td><td>Array containing source J z-component. </td></tr>
@@ -2633,8 +2802,8 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
 
 </div>
 </div>
-<a id="a60d1190a04ec94144fff10b285aa2887"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a60d1190a04ec94144fff10b285aa2887">&#9670;&nbsp;</a></span>GpropagateBeam_4()</h2>
+<a id="aa218594ad5f7ed53492ff6495528b338"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa218594ad5f7ed53492ff6495528b338">&#9670;&nbsp;</a></span>GpropagateBeam_4()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2692,6 +2861,24 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
           <td></td>
           <td class="paramtype">float *&#160;</td>
           <td class="paramname"><em>d_yt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>gmode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ncx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ncy</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -2782,6 +2969,9 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
     <tr><td class="paramname">d_A</td><td>Array containing area elements. </td></tr>
     <tr><td class="paramname">d_xt</td><td>Array containing target direction x-coordinate. </td></tr>
     <tr><td class="paramname">d_yt</td><td>Array containing target direction y-coordinate. </td></tr>
+    <tr><td class="paramname">gmode</td><td>Int indicating the type of source grid. </td></tr>
+    <tr><td class="paramname">ncx</td><td>Int the number of x/u points in the source grid. </td></tr>
+    <tr><td class="paramname">ncy</td><td>Int the number of y/v points in the source grid. </td></tr>
     <tr><td class="paramname">d_Jx</td><td>Array containing source J x-component. </td></tr>
     <tr><td class="paramname">d_Jy</td><td>Array containing source J y-component. </td></tr>
     <tr><td class="paramname">d_Jz</td><td>Array containing source J z-component. </td></tr>
@@ -2800,8 +2990,8 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
 
 </div>
 </div>
-<a id="ac63efbfa4cb6c7f63ed98f0137184ed3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac63efbfa4cb6c7f63ed98f0137184ed3">&#9670;&nbsp;</a></span>GpropagateBeam_5()</h2>
+<a id="aec9ce79716ed8562b9a01d9240c63224"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec9ce79716ed8562b9a01d9240c63224">&#9670;&nbsp;</a></span>GpropagateBeam_5()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2829,6 +3019,24 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
           <td></td>
           <td class="paramtype">float *&#160;</td>
           <td class="paramname"><em>d_A</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>gmode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ncx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ncy</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -2875,6 +3083,9 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
     <tr><td class="paramname">d_ys</td><td>Array containing source points y-coordinate. </td></tr>
     <tr><td class="paramname">d_zs</td><td>Array containing source points z-coordinate. </td></tr>
     <tr><td class="paramname">d_A</td><td>Array containing area elements. </td></tr>
+    <tr><td class="paramname">gmode</td><td>Int indicating the type of source grid. </td></tr>
+    <tr><td class="paramname">ncx</td><td>Int the number of x/u points in the source grid. </td></tr>
+    <tr><td class="paramname">ncy</td><td>Int the number of y/v points in the source grid. </td></tr>
     <tr><td class="paramname">d_xt</td><td>Array containing target direction x-coordinate. </td></tr>
     <tr><td class="paramname">d_yt</td><td>Array containing target direction y-coordinate. </td></tr>
     <tr><td class="paramname">d_zt</td><td>Array containing target direction z-coordinate. </td></tr>
@@ -2959,8 +3170,8 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
 
 </div>
 </div>
-<a id="a49925cbda435fea312a83f1b0c441389"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a49925cbda435fea312a83f1b0c441389">&#9670;&nbsp;</a></span>scalarfieldAtPoint()</h2>
+<a id="a55b519c80c2baaba3b15f77b6a3eea93"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a55b519c80c2baaba3b15f77b6a3eea93">&#9670;&nbsp;</a></span>scalarfieldAtPoint()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3004,6 +3215,24 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>gmode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ncx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ncy</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">cuFloatComplex &amp;&#160;</td>
           <td class="paramname"><em>e</em>&#160;</td>
         </tr>
@@ -3024,6 +3253,9 @@ __constant__ int&#160;</td><td class="memItemRight" valign="bottom"><b>g_t</b></
     <tr><td class="paramname">d_sfs</td><td>Array containing source scalarfield. </td></tr>
     <tr><td class="paramname">point</td><td>Array containing target point. </td></tr>
     <tr><td class="paramname">d_A</td><td>Array containing area elements. </td></tr>
+    <tr><td class="paramname">gmode</td><td>Int indicating the type of source grid. </td></tr>
+    <tr><td class="paramname">ncx</td><td>Int the number of x/u points in the source grid. </td></tr>
+    <tr><td class="paramname">ncy</td><td>Int the number of y/v points in the source grid. </td></tr>
     <tr><td class="paramname">e</td><td>Array to be filled with results. </td></tr>
   </table>
   </dd>

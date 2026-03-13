@@ -122,6 +122,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a44c9e78bde868cb2e67abf7c70238fba"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BindBeam_8py.html#a44c9e78bde868cb2e67abf7c70238fba">PyPO.BindBeam.makeGauss</a> (gdict_py, source)</td></tr>
 <tr class="memdesc:a44c9e78bde868cb2e67abf7c70238fba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a polarised Gaussian beam.  <a href="BindBeam_8py.html#a44c9e78bde868cb2e67abf7c70238fba">More...</a><br /></td></tr>
 <tr class="separator:a44c9e78bde868cb2e67abf7c70238fba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa1becc2af67181b4f7c50867a0be2de0"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BindBeam_8py.html#aa1becc2af67181b4f7c50867a0be2de0">PyPO.BindBeam.makeGaussBeam</a> (gdict_py, source)</td></tr>
+<tr class="memdesc:aa1becc2af67181b4f7c50867a0be2de0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a Gaussian beam using the complex source method.  <a href="BindBeam_8py.html#aa1becc2af67181b4f7c50867a0be2de0">More...</a><br /></td></tr>
+<tr class="separator:aa1becc2af67181b4f7c50867a0be2de0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acbe38d1271e81e331f86d6edc2c06e9c"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BindBeam_8py.html#acbe38d1271e81e331f86d6edc2c06e9c">PyPO.BindBeam.makeScalarGauss</a> (gdict_py, source)</td></tr>
 <tr class="memdesc:acbe38d1271e81e331f86d6edc2c06e9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a scalar Gaussian beam.  <a href="BindBeam_8py.html#acbe38d1271e81e331f86d6edc2c06e9c">More...</a><br /></td></tr>
 <tr class="separator:acbe38d1271e81e331f86d6edc2c06e9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -241,6 +244,54 @@ currents </dd></dl>
 <dd>
 out_current Current object containing the electromagnetic currents associated with the Gaussian.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="structGPODict.html">GPODict</a> </dd>
+<dd>
+reflDict </dd>
+<dd>
+fields </dd>
+<dd>
+currents </dd></dl>
+
+</div>
+</div>
+<a id="aa1becc2af67181b4f7c50867a0be2de0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa1becc2af67181b4f7c50867a0be2de0">&#9670;&nbsp;</a></span>makeGaussBeam()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def PyPO.BindBeam.makeGaussBeam </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>gdict_py</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>source</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Generate a Gaussian beam using the complex source method. </p>
+<p>The beam is always defined parallel to the x, y plane. The z-coordinate can be adjusted. In order to tilt the beam, you have to tilt the underlying plane AFTER defining the beam on it.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">gdict_py</td><td>A <a class="el" href="structvecGPODict.html">vecGPODict</a> dictionary containing relevant Gaussian beam parameters. </td></tr>
+    <tr><td class="paramname">source</td><td>A reflDict dictionary describing the plane on which the Gaussian is defined.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>out_field Field object containing the electromagnetic fields associated with the Gaussian. </dd>
+<dd>
+out_current Current object containing the electromagnetic currents associated with the Gaussian.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="structvecGPODict.html">vecGPODict</a> </dd>
 <dd>
 reflDict </dd>
 <dd>

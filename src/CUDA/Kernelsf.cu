@@ -259,10 +259,7 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
                                                     cuCmulf(js_dot_R_R[n], kR_inv_sum2)
                                                 )
                                                 , 
-                                                cuCmulf(
-                                                    con[5], 
-                                                    cuCmulf(ms_cross_R[n], kR_inv_sum3)
-                                                )
+                                                cuCmulf(ms_cross_R[n], kR_inv_sum3)
                                             ), 
                                             Green
                                         )
@@ -275,12 +272,9 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
                                         make_cuFloatComplex(0.5,0), 
                                         cuCmulf(
                                             cuCsubf(
-                                                cuCmulf(
-                                                    con[5], 
-                                                    cuCaddf(
-                                                        cuCmulf(ms[n], kR_inv_sum1), 
-                                                        cuCmulf(ms_dot_R_R[n], kR_inv_sum2)
-                                                    )
+                                                cuCaddf(
+                                                    cuCmulf(ms[n], kR_inv_sum1), 
+                                                    cuCmulf(ms_dot_R_R[n], kR_inv_sum2)
                                                 ), 
                                                 cuCmulf(js_cross_R[n], kR_inv_sum3)
                                             ), Green
@@ -297,10 +291,7 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
                                                 cuCmulf(js[n], kR_inv_sum1), 
                                                 cuCmulf(js_dot_R_R[n], kR_inv_sum2)
                                             ),
-                                            cuCmulf(
-                                                con[5], 
-                                                cuCmulf(ms_cross_R[n], kR_inv_sum3)
-                                            )
+                                            cuCmulf(ms_cross_R[n], kR_inv_sum3)
                                         ),
                                         Green
                                     ), 
@@ -310,13 +301,10 @@ __device__ void fieldAtPoint(float *d_xs, float *d_ys, float*d_zs,
                     yh_field[n] = cuCaddf(
                                     cuCmulf(
                                         cuCsubf(
-                                            cuCmulf(
-                                                con[5], 
-                                                cuCaddf(
-                                                    cuCmulf(ms[n], kR_inv_sum1), 
-                                                    cuCmulf(ms_dot_R_R[n], kR_inv_sum2)
-                                                    )
-                                                ), 
+                                            cuCaddf(
+                                                cuCmulf(ms[n], kR_inv_sum1), 
+                                                cuCmulf(ms_dot_R_R[n], kR_inv_sum2)
+                                            ), 
                                             cuCmulf(js_cross_R[n], kR_inv_sum3)
                                         ), 
                                         Green
@@ -1247,23 +1235,15 @@ __device__ void farfieldAtPoint(float *d_xs, float *d_ys, float *d_zs, float *d_
                 de_field[n] =   cuCmulf(
                                     cuCaddf( // Z (M - (M.rh)rh) + ∓ rh x J
                                         cuCsubf(js[n], js_dot_R_R[n]),
-                                        cuCmulf(
-                                            con[5], 
-                                            cuCmulf(con[8], R_cross_ms[n])  // ∓ rh x M
-                                        )
+                                        cuCmulf(con[8], R_cross_ms[n])  // ∓ rh x M
                                     ), 
                                     Green
                                 );
 
                 dh_field[n] =   cuCmulf(
                                     cuCsubf( // (1/Z) (M - (M.rh)rh) - ∓ rh x J
-                                        cuCmulf(  // (1/Z) (M - (M.rh)rh)
-                                            con[5], 
-                                            cuCsubf(ms[n], ms_dot_R_R[n]) // M - (M.rh)rh
-                                        ), 
-                                        cuCmulf(
-                                            con[8], 
-                                            R_cross_js[n]) // ∓ rh x J
+                                        cuCsubf(ms[n], ms_dot_R_R[n]), // M - (M.rh)rh
+                                        cuCmulf(con[8], R_cross_js[n]) // ∓ rh x J
                                         ), 
                                         Green
                                     );

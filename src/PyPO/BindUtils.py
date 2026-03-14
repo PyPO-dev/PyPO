@@ -351,6 +351,31 @@ def allocate_reflcontainer(res, size, ct_t):
 
     res.area = (ct_t * size)()
 
+def allfill_reflcontainer(res, reflc_py, ct_t):
+    """!
+    Allocate ctypes reflcontainer or reflcontainerf.
+
+    @param res A ctypes reflcontainer or reflcontainerf struct.
+    @param reflc_py A Python reflcontainer
+    @param ct_t Type of point in struct.
+
+    @see reflcontainer
+    @see reflcontainerf
+    @see reflDict
+    """
+
+    res.size = ctypes.c_int(reflc_py["size"])
+
+    res.x = (ct_t * res.size)(*(reflc_py.x.ravel().tolist()))
+    res.y = (ct_t * res.size)(*(reflc_py.y.ravel().tolist()))
+    res.z = (ct_t * res.size)(*(reflc_py.z.ravel().tolist()))
+
+    res.nx = (ct_t * res.size)(*(reflc_py.nx.ravel().tolist()))
+    res.ny = (ct_t * res.size)(*(reflc_py.ny.ravel().tolist()))
+    res.nz = (ct_t * res.size)(*(reflc_py.nz.ravel().tolist()))
+
+    res.area = (ct_t * res.size)(*(reflc_py.area.ravel().tolist()))
+
 def allocate_cframe(res, size, ct_t):
     """!
     Allocate a ctypes cframe or cframef struct.

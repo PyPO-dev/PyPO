@@ -439,9 +439,6 @@ void initGaussBeam(T gdict, U refldict, V *res_field, V *res_current)
     G k = 2* M_PI / gdict.lam;
     // zc, the confocal distance
     G zc = k*gdict.w0*gdict.w0/2.0;
-
-    G Z0 = 376.73031341259 / gdict.n;
-    G sqrtZ0 = sqrt(Z0);
     
     // R, the complex 3-vector distance from the reflector to the source
     std::array<std::complex <G>, 3> R;
@@ -527,24 +524,24 @@ void initGaussBeam(T gdict, U refldict, V *res_field, V *res_current)
         res_field->i2z[i] = hfield[2].imag();
 
         // Fill electric currents
-        res_current->r1x[i] = 2*J[0].real();
-        res_current->i1x[i] = 2*J[0].imag();
+        res_current->r1x[i] = J[0].real();
+        res_current->i1x[i] = J[0].imag();
 
-        res_current->r1y[i] = 2*J[1].real();
-        res_current->i1y[i] = 2*J[1].imag();
+        res_current->r1y[i] = J[1].real();
+        res_current->i1y[i] = J[1].imag();
 
-        res_current->r1z[i] = 2*J[2].real();
-        res_current->i1z[i] = 2*J[2].imag();
+        res_current->r1z[i] = J[2].real();
+        res_current->i1z[i] = J[2].imag();
 
         // Fill magnetic currents
-        res_current->r2x[i] = -2*M[0].real();
-        res_current->i2x[i] = -2*M[0].imag();
+        res_current->r2x[i] = -M[0].real();
+        res_current->i2x[i] = -M[0].imag();
 
-        res_current->r2y[i] = -2*M[1].real();
-        res_current->i2y[i] = -2*M[1].imag();
+        res_current->r2y[i] = -M[1].real();
+        res_current->i2y[i] = -M[1].imag();
 
-        res_current->r2z[i] = -2*M[2].real();
-        res_current->i2z[i] = -2*M[2].imag();
+        res_current->r2z[i] = -M[2].real();
+        res_current->i2z[i] = -M[2].imag();
     }
     
     delete reflc.x;

@@ -1108,13 +1108,13 @@ std::array<std::array<std::complex<T>, 3>, 2> Propagation<T, U, V, W>::fieldAtPo
             {
                 if ((gmode != 1) && ((yv==0) || (yv==ncy-1)))
                 {
-                    ye_field[n] += half*((js[n] * kR_inv_sum1 + js_dot_R_R[n] * kR_inv_sum2) + ZETA_INV*ms_cross_R[n] * kR_inv_sum3) * Green;
-                    yh_field[n] += half*(ZETA_INV * (ms[n] * kR_inv_sum1 + ms_dot_R_R[n] * kR_inv_sum2) - js_cross_R[n] * kR_inv_sum3) * Green;
+                    ye_field[n] += half*(js[n] * kR_inv_sum1 + js_dot_R_R[n] * kR_inv_sum2 + ms_cross_R[n] * kR_inv_sum3) * Green;
+                    yh_field[n] += half*(ms[n] * kR_inv_sum1 + ms_dot_R_R[n] * kR_inv_sum2 - js_cross_R[n] * kR_inv_sum3) * Green;
                 }
                 else
                 {
-                    ye_field[n] += ((js[n] * kR_inv_sum1 + js_dot_R_R[n] * kR_inv_sum2) + ZETA_INV*ms_cross_R[n] * kR_inv_sum3) * Green;
-                    yh_field[n] += (ZETA_INV * (ms[n] * kR_inv_sum1 + ms_dot_R_R[n] * kR_inv_sum2) - js_cross_R[n] * kR_inv_sum3) * Green;
+                    ye_field[n] += (js[n] * kR_inv_sum1 + js_dot_R_R[n] * kR_inv_sum2 + ms_cross_R[n] * kR_inv_sum3) * Green;
+                    yh_field[n] += (ms[n] * kR_inv_sum1 + ms_dot_R_R[n] * kR_inv_sum2 - js_cross_R[n] * kR_inv_sum3) * Green;
                 }
             }
         } // End of yv loop
@@ -1743,13 +1743,13 @@ std::array<std::array<std::complex<T>, 3>, 2> Propagation<T, U, V, W>::farfieldA
             {
                 if ((gmode != 1) && ((yv==0) || (yv==ncy-1)))
                 {
-                    ye_field[n] += half*(ZETA * (js[n] - js_dot_R_R[n]) + t_direction * R_cross_ms[n]) * Green;
-                    yh_field[n] += half*(ZETA_INV * (ms[n] - ms_dot_R_R[n]) - t_direction * R_cross_js[n]) * Green;
+                    ye_field[n] += half*(js[n] - js_dot_R_R[n] + t_direction * R_cross_ms[n]) * Green;
+                    yh_field[n] += half*(ms[n] - ms_dot_R_R[n] - t_direction * R_cross_js[n]) * Green;
                 }
                 else
                 {
-                    ye_field[n] += (ZETA * (js[n] - js_dot_R_R[n]) + t_direction * R_cross_ms[n]) * Green;
-                    yh_field[n] += (ZETA_INV * (ms[n] - ms_dot_R_R[n]) - t_direction * R_cross_js[n]) * Green;
+                    ye_field[n] += (js[n] - js_dot_R_R[n] + t_direction * R_cross_ms[n]) * Green;
+                    yh_field[n] += (ms[n] - ms_dot_R_R[n] - t_direction * R_cross_js[n]) * Green;
                 }
             }
         

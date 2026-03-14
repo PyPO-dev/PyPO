@@ -76,29 +76,42 @@ public:
     // Functions for propagating fields between two surfaces
     void propagateBeam_JM_PEC(int start, int stop,
                           V *cs, V *ct,
-                          W *currents, U *res);
+                          W *currents, 
+                          int gmode, int ncx, int ncy,
+                          U *res);
 
     void propagateBeam_JM(int start, int stop,
                           V *cs, V *ct,
-                          W *currents, U *res);
+                          W *currents, 
+                          int gmode, int ncx, int ncy,
+                          U *res);
 
     void propagateBeam_EH(int start, int stop,
                           V *cs, V *ct,
-                          W *currents, U *res);
+                          W *currents, 
+                          int gmode, int ncx, int ncy,
+                          U *res);
 
     void propagateBeam_JMEH_PEC(int start, int stop,
                           V *cs, V *ct,
-                          W *currents, U *res);
+                          W *currents, 
+                          int gmode, int ncx, int ncy,
+                          U *res);
 
     void propagateBeam_JMEH(int start, int stop,
                           V *cs, V *ct,
-                          W *currents, U *res);
+                          W *currents, 
+                          int gmode, int ncx, int ncy,
+                          U *res);
 
     void propagateBeam_EHP(int start, int stop,
                           V *cs, V *ct,
-                          W *currents, U *res);
+                          W *currents, 
+                          int gmode, int ncx, int ncy,
+                          U *res);
 
     std::array<std::array<std::complex<T>, 3>, 2> fieldAtPoint(V *cs, W *currents,
+                                              int gmode, int ncx, int ncy,    
                                               const std::array<T, 3> &point_target);
     
     std::array<std::array<std::complex<T>, 3>, 2> fieldAtPoint_Old(V *cs, W *currents,
@@ -106,42 +119,60 @@ public:
 
 
     void parallelProp_JM(V *cs, V *ct,
-                        W *currents, U *res);
+                        W *currents, 
+                        int gmode, int ncx, int ncy,
+                        U *res);
 
     void parallelProp_EH(V *cs, V *ct,
-                        W *currents, U *res);
+                        W *currents, 
+                        int gmode, int ncx, int ncy,
+                        U *res);
 
     void parallelProp_JMEH(V *cs, V *ct,
-                        W *currents, U *res);
+                        W *currents, 
+                        int gmode, int ncx, int ncy,
+                        U *res);
 
     void parallelProp_EHP(V *cs, V *ct,
-                        W *currents, U *res);
+                        W *currents, 
+                        int gmode, int ncx, int ncy,
+                        U *res);
 
     // Functions for calculating angular far-field from reflector directly - no phase term
     void propagateToFarField(int start, int stop,
                               V *cs, V *ct,
-                              W *currents, U *res);
+                              W *currents, 
+                              int gmode, int ncx, int ncy,
+                              U *res);
 
     std::array<std::array<std::complex<T>, 3>, 2> farfieldAtPoint(V *cs, W *currents,
+                                              int gmode, int ncx, int ncy,
                                               const std::array<T, 3> &point_target);
 
     std::array<std::array<std::complex<T>, 3>, 2> farfieldAtPoint_Old(V *cs, W *currents,
                                               const std::array<T, 3> &point_target);
 
     void parallelFarField(V *cs, V *ct,
-                        W *currents, U *res);
+                        W *currents, 
+                        int gmode, int ncx, int ncy,
+                        U *res);
 
     // Scalar propagation
     void propagateScalarBeam(int start, int stop,
                           V *cs, V *ct,
-                          W *field, U *res);
+                          W *field, 
+                          int gmode, int ncx, int ncy,
+                          U *res);
 
 
     std::complex<T> fieldScalarAtPoint(V *cs, W *field,
+                                      int gmode, int ncx, int ncy,
                                       const std::array<T, 3> &point_target);
 
     void parallelPropScalar(V *cs, V *ct,
-                            W *field, U *res);
+                            W *field, 
+                            int gmode, int ncx, int ncy,
+                            U *res);
 
 };
 
@@ -164,8 +195,8 @@ Propagation<T, U, V, W>::Propagation(T k, int numThreads, int gs, int gt, T epsi
 {
     this->Three = 3.0f;
     this->PIf = 3.14159265359f;
-    this->C_L = 2.99792458e11f; // mm s^-1
-    this->MU_0 = 1.2566370614e-3f; // kg mm s^-2 A^-2
+    this->C_L = 2.99792458e8f; // m s^-1
+    this->MU_0 = 1.2566370614e-6f; // kg m s^-2 A^-2
     this->EPS_VAC = 1 / (MU_0 * C_L*C_L);
     this->EPS = epsilon * EPS_VAC; // epsilon is relative permeability
     this->ZETA = sqrt(MU_0 / EPS);
@@ -238,7 +269,9 @@ Propagation<T, U, V, W>::Propagation(T k, int numThreads, int gs, int gt, T epsi
 template <class T, class U, class V, class W>
 void Propagation<T,U, V, W>::propagateBeam_JM_PEC(int start, int stop,
                                               V *cs, V *ct,
-                                              W *currents, U *res)
+                                              W *currents, 
+                                              int gmode, int ncx, int ncy,
+                                              U *res)
 {
     // Arrays of Ts
     std::array<T, 3> point;            // Point on target
@@ -265,7 +298,9 @@ void Propagation<T,U, V, W>::propagateBeam_JM_PEC(int start, int stop,
         norms[2] = ct->nz[i];
 
         // Calculate total incoming E and H field at point on target
-        beam_e_h = fieldAtPoint(cs, currents, point);
+        beam_e_h = fieldAtPoint(cs, currents, 
+                                gmode, ncx, ncy, 
+                                point);
 
         ut.ext(norms, beam_e_h[1], jt);
         
@@ -307,7 +342,9 @@ void Propagation<T,U, V, W>::propagateBeam_JM_PEC(int start, int stop,
 template <class T, class U, class V, class W>
 void Propagation<T,U, V, W>::propagateBeam_JM(int start, int stop,
                                               V *cs, V *ct,
-                                              W *currents, U *res)
+                                              W *currents, 
+                                              int gmode, int ncx, int ncy,
+                                              U *res)
 {
     // Scalars (T & complex T)
     std::complex<T> e_dot_p_r_perp;    // E-field - perpendicular reflected POI polarization vector dot product
@@ -352,7 +389,9 @@ void Propagation<T,U, V, W>::propagateBeam_JM(int start, int stop,
         norms[2] = ct->nz[i];
 
         // Calculate total incoming E and H field at point on target
-        beam_e_h = fieldAtPoint(cs, currents, point);
+        beam_e_h = fieldAtPoint(cs, currents, 
+                                gmode, ncx, ncy,
+                                point);
 
         // Calculate normalized incoming poynting vector.
         ut.conj(beam_e_h[1], temp1);                        // h_conj
@@ -443,7 +482,9 @@ void Propagation<T,U, V, W>::propagateBeam_JM(int start, int stop,
 template <class T, class U, class V, class W>
 void Propagation<T,U, V, W>::propagateBeam_JMEH_PEC(int start, int stop,
                                               V *cs, V *ct,
-                                              W *currents, U *res)
+                                              W *currents, 
+                                              int gmode, int ncx, int ncy,
+                                              U *res)
 {
     // Arrays of Ts
     std::array<T, 3> point;            // Point on target
@@ -470,7 +511,9 @@ void Propagation<T,U, V, W>::propagateBeam_JMEH_PEC(int start, int stop,
         norms[2] = ct->nz[i];
 
         // Calculate total incoming E and H field at point on target
-        beam_e_h = fieldAtPoint(cs, currents, point);
+        beam_e_h = fieldAtPoint(cs, currents, 
+                                gmode, ncx, ncy,
+                                point);
 
         res->r3x[i] = beam_e_h[0][0].real();
         res->r3y[i] = beam_e_h[0][1].real();
@@ -531,7 +574,9 @@ void Propagation<T,U, V, W>::propagateBeam_JMEH_PEC(int start, int stop,
 template <class T, class U, class V, class W>
 void Propagation<T, U, V, W>::propagateBeam_EH(int start, int stop,
                                               V *cs, V *ct,
-                                              W *currents, U *res)
+                                              W *currents, 
+                                              int gmode, int ncx, int ncy,
+                                              U *res)
 {
     // Arrays of Ts
     std::array<T, 3> point;            // Point on target
@@ -549,7 +594,9 @@ void Propagation<T, U, V, W>::propagateBeam_EH(int start, int stop,
         point[2] = ct->z[i];
 
         // Calculate total incoming E and H field at point on target
-        beam_e_h = fieldAtPoint(cs, currents, point);
+        beam_e_h = fieldAtPoint(cs, currents, 
+                                gmode, ncx, ncy,
+                                point);
 
         res->r1x[i] = beam_e_h[0][0].real();
         res->r1y[i] = beam_e_h[0][1].real();
@@ -591,7 +638,9 @@ void Propagation<T, U, V, W>::propagateBeam_EH(int start, int stop,
 template <class T, class U, class V, class W>
 void Propagation<T, U, V, W>::propagateBeam_JMEH(int start, int stop,
                                                 V *cs, V *ct,
-                                                W *currents, U *res)
+                                                W *currents, 
+                                                int gmode, int ncx, int ncy,
+                                                U *res)
 {
     // Scalars (T & complex T)
     std::complex<T> e_dot_p_r_perp;    // E-field - perpendicular reflected POI polarization vector dot product
@@ -636,7 +685,9 @@ void Propagation<T, U, V, W>::propagateBeam_JMEH(int start, int stop,
         norms[2] = ct->nz[i];
 
         // Calculate total incoming E and H field at point on target
-        beam_e_h = fieldAtPoint(cs, currents, point);
+        beam_e_h = fieldAtPoint(cs, currents, 
+                                gmode, ncx, ncy,
+                                point);
 
         //res->r1x[i] = 0.;//beam_e_h[0][0].real();
 
@@ -754,7 +805,9 @@ void Propagation<T, U, V, W>::propagateBeam_JMEH(int start, int stop,
 template <class T, class U, class V, class W>
 void Propagation<T, U, V, W>::propagateBeam_EHP(int start, int stop,
                                                 V *cs, V *ct,
-                                                W *currents, U *res)
+                                                W *currents, 
+                                                int gmode, int ncx, int ncy,
+                                                U *res)
 {
     // Scalars (T & complex T)
     std::complex<T> e_dot_p_r_perp;    // E-field - perpendicular reflected POI polarization vector dot product
@@ -796,7 +849,8 @@ void Propagation<T, U, V, W>::propagateBeam_EHP(int start, int stop,
         norms[2] = ct->nz[i];
 
         // Calculate total incoming E and H field at point on target
-        beam_e_h = fieldAtPoint(cs, currents, point);
+        beam_e_h = fieldAtPoint(cs, currents, gmode, ncx, ncy,
+                                point);
 
         // Calculate normalised incoming poynting vector.
         ut.conj(beam_e_h[1], temp1);                        // h_conj
@@ -879,7 +933,9 @@ void Propagation<T, U, V, W>::propagateBeam_EHP(int start, int stop,
 template <class T, class U, class V, class W>
 void Propagation<T, U, V, W>::propagateScalarBeam(int start, int stop,
                                                   V *cs, V *ct,
-                                                  W *field, U *res)
+                                                  W *field, 
+                                                  int gmode, int ncx, int ncy,
+                                                  U *res)
 {
     std::array<T, 3> point_target;
     std::complex<T> ets;
@@ -890,7 +946,9 @@ void Propagation<T, U, V, W>::propagateScalarBeam(int start, int stop,
         point_target[1] = ct->y[i];
         point_target[2] = ct->z[i];
 
-        ets = fieldScalarAtPoint(cs, field, point_target);
+        ets = fieldScalarAtPoint(cs, field, 
+                                gmode, ncx, ncy,
+                                point_target);
 
         res->x[i] = ets.real();
         res->y[i] = ets.imag();
@@ -918,14 +976,18 @@ void Propagation<T, U, V, W>::propagateScalarBeam(int start, int stop,
  */
 template <class T, class U, class V, class W>
 std::array<std::array<std::complex<T>, 3>, 2> Propagation<T, U, V, W>::fieldAtPoint(V *cs,
-                                                                             W *currents, const std::array<T, 3> &point_target)
+                                                                             W *currents, 
+                                                                             int gmode, int ncx, int ncy, 
+                                                                             const std::array<T, 3> &point_target)
 {
+    int i;
     // Scalars (T & complex T)
     T R;                           // Distance between source and target points
     T R_inv;                       // 1 / R
     T kR;                          // The product of the wavevector and the the distance
     T kR_inv;                      // The inverse of the product of the wavevector and the the distance
     T norm_dot_R_hat;              // Source normal dotted with wavevector direction
+    T half = 0.5;
 
     std::complex<T> Green;         // Container for Green's function
     std::complex<T> js_dot_R;      // Magnitude of electric currents on to R_hat
@@ -945,6 +1007,8 @@ std::array<std::array<std::complex<T>, 3>, 2> Propagation<T, U, V, W>::fieldAtPo
     // Arrays of complex Ts
     std::array<std::complex<T>, 3> e_field;        // Electric field surface integral at point
     std::array<std::complex<T>, 3> h_field;        // Magnetic field surface integral at point
+    std::array<std::complex<T>, 3> ye_field;        // Electric field surface integral at point
+    std::array<std::complex<T>, 3> yh_field;        // Magnetic field surface integral at point
     std::array<std::complex<T>, 3> js;             // Electric current at source point
     std::array<std::complex<T>, 3> ms;             // Magnetic current at source point
     std::array<std::complex<T>, 3> k_out_ms;       // Outer product between k and ms
@@ -961,82 +1025,114 @@ std::array<std::array<std::complex<T>, 3>, 2> Propagation<T, U, V, W>::fieldAtPo
     e_field.fill(z0);
     h_field.fill(z0);
 
-    for(int i=0; i<gs; i++)
+    for(int xu=0; xu<ncx; xu++)
     {
-        source_point[0] = cs->x[i];
-        source_point[1] = cs->y[i];
-        source_point[2] = cs->z[i];
-        
-        source_norm[0] = cs->nx[i];
-        source_norm[1] = cs->ny[i];
-        source_norm[2] = cs->nz[i];
-
-        js[0] = {currents->r1x[i], currents->i1x[i]};
-        js[1] = {currents->r1y[i], currents->i1y[i]};
-        js[2] = {currents->r1z[i], currents->i1z[i]};
-
-        ms[0] = {currents->r2x[i], currents->i2x[i]};
-        ms[1] = {currents->r2y[i], currents->i2y[i]};
-        ms[2] = {currents->r2z[i], currents->i2z[i]};
-
-        ut.diff(point_target, source_point, R_vec);
-        ut.abs(R_vec, R);
-
-        //printf("R %.16g\n", R); // %s is format specifier
-
-        R_inv = 1 / R;
-
-        //printf("1/R %.16g\n", R_inv); // %s is format specifier
-        
-        kR = k*R;
-
-        //printf("kR %.16g\n", kR); // %s is format specifier
-
-        kR_inv = 1/kR;
-
-        //printf("1/kR %.16g\n", kR_inv); // %s is format specifier
-
-        ut.s_mult(R_vec, R_inv, R_hat);
-
-        //printf("R_hat: (%.16g, %.16g, %.16g)\n", R_hat[0], R_hat[1], R_hat[2]); // %s is format specifier
-
-        // Check if source point illuminates target point or not.
-        ut.dot(source_norm, R_hat, norm_dot_R_hat);
-        //printf("source_norm: (%.16g, %.16g, %.16g)\n", source_norm[0], source_norm[1], source_norm[2]); // %s is format specifier
-        //printf("n . R_hat: %.16g\n", norm_dot_R_hat); // %s is format specifier
-        if (norm_dot_R_hat < 0) {continue;}
-
-        // Calculate the complex sums that appear in the integral
-        kR_inv_sum1 = kR_inv * (-j + t_direction*kR_inv + j*kR_inv*kR_inv);
-        //printf("kR_inv_sum1: %.16g+%16gi\n", kR_inv_sum1.real(), kR_inv_sum1.imag()); // %s is format specifier
-        
-        kR_inv_sum2 = kR_inv * (j - t_direction*Three*kR_inv - Three*j * kR_inv*kR_inv);
-        //printf("kR_inv_sum2: %.16g+%16gi\n", kR_inv_sum2.real(), kR_inv_sum2.imag()); // %s is format specifier
-        
-        kR_inv_sum3 = t_direction * kR_inv * (kR_inv + j);
-        //printf("kR_inv_sum3: %.16g+%16gi\n", kR_inv_sum3.real(), kR_inv_sum3.imag()); // %s is format specifier
-        
-
-        // e-field
-        ut.dot(js, R_hat, js_dot_R);
-        ut.s_mult(R_hat, js_dot_R, js_dot_R_R);
-        ut.ext(ms, R_hat, ms_cross_R);
-
-        // h-field
-        ut.dot(ms, R_hat, ms_dot_R);
-        ut.s_mult(R_hat, ms_dot_R, ms_dot_R_R);
-        ut.ext(js, R_hat, js_cross_R);
-
-        Green = prefactor * exp(t_direction * j * k * R) * cs->area[i];
-        //printf("%.16g, %.16g\n", Green.real(), Green.imag()); // %s is format specifier
-
-        for( int n=0; n<3; n++)
+        for (int n=0; n<3; n++) 
         {
-            e_field[n] += (ZETA * (js[n] * kR_inv_sum1 + js_dot_R_R[n] * kR_inv_sum2) + ms_cross_R[n] * kR_inv_sum3) * Green;
-            h_field[n] += (ZETA_INV * (ms[n] * kR_inv_sum1 + ms_dot_R_R[n] * kR_inv_sum2) - js_cross_R[n] * kR_inv_sum3) * Green;
+            ye_field[n] = z0; // Intermediate electric field due to integral over y/v
+            yh_field[n] = z0; // Intermediate magnetic field due to integral over y/v
         }
-        
-    }
+
+        for(int yv=0; yv<ncy; yv++)
+        {
+            i = xu*ncy + yv;
+
+            source_point[0] = cs->x[i];
+            source_point[1] = cs->y[i];
+            source_point[2] = cs->z[i];
+            
+            source_norm[0] = cs->nx[i];
+            source_norm[1] = cs->ny[i];
+            source_norm[2] = cs->nz[i];
+
+            js[0] = {currents->r1x[i], currents->i1x[i]};
+            js[1] = {currents->r1y[i], currents->i1y[i]};
+            js[2] = {currents->r1z[i], currents->i1z[i]};
+
+            ms[0] = {currents->r2x[i], currents->i2x[i]};
+            ms[1] = {currents->r2y[i], currents->i2y[i]};
+            ms[2] = {currents->r2z[i], currents->i2z[i]};
+
+            ut.diff(point_target, source_point, R_vec);
+            ut.abs(R_vec, R);
+
+            //printf("R %.16g\n", R); // %s is format specifier
+
+            R_inv = 1 / R;
+
+            //printf("1/R %.16g\n", R_inv); // %s is format specifier
+            
+            kR = k*R;
+
+            //printf("kR %.16g\n", kR); // %s is format specifier
+
+            kR_inv = 1/kR;
+
+            //printf("1/kR %.16g\n", kR_inv); // %s is format specifier
+
+            ut.s_mult(R_vec, R_inv, R_hat);
+
+            //printf("R_hat: (%.16g, %.16g, %.16g)\n", R_hat[0], R_hat[1], R_hat[2]); // %s is format specifier
+
+            // Check if source point illuminates target point or not.
+            ut.dot(source_norm, R_hat, norm_dot_R_hat);
+            //printf("source_norm: (%.16g, %.16g, %.16g)\n", source_norm[0], source_norm[1], source_norm[2]); // %s is format specifier
+            //printf("n . R_hat: %.16g\n", norm_dot_R_hat); // %s is format specifier
+            if (norm_dot_R_hat < 0) {continue;}
+
+            // Calculate the complex sums that appear in the integral
+            kR_inv_sum1 = kR_inv * (-j + t_direction*kR_inv + j*kR_inv*kR_inv);
+            //printf("kR_inv_sum1: %.16g+%16gi\n", kR_inv_sum1.real(), kR_inv_sum1.imag()); // %s is format specifier
+            
+            kR_inv_sum2 = kR_inv * (j - t_direction*Three*kR_inv - Three*j * kR_inv*kR_inv);
+            //printf("kR_inv_sum2: %.16g+%16gi\n", kR_inv_sum2.real(), kR_inv_sum2.imag()); // %s is format specifier
+            
+            kR_inv_sum3 = t_direction * (j*kR_inv - t_direction*kR_inv*kR_inv);
+            //printf("kR_inv_sum3: %.16g+%16gi\n", kR_inv_sum3.real(), kR_inv_sum3.imag()); // %s is format specifier
+            
+
+            // e-field
+            ut.dot(js, R_hat, js_dot_R);
+            ut.s_mult(R_hat, js_dot_R, js_dot_R_R);
+            ut.ext(ms, R_hat, ms_cross_R);
+
+            // h-field
+            ut.dot(ms, R_hat, ms_dot_R);
+            ut.s_mult(R_hat, ms_dot_R, ms_dot_R_R);
+            ut.ext(js, R_hat, js_cross_R);
+
+            Green = prefactor * exp(t_direction * j * k * R) * cs->area[i];
+            //printf("%.16g, %.16g\n", Green.real(), Green.imag()); // %s is format specifier
+
+            for( int n=0; n<3; n++)
+            {
+                if ((gmode != 1) && ((yv==0) || (yv==ncy-1)))
+                {
+                    ye_field[n] += half*(js[n] * kR_inv_sum1 + js_dot_R_R[n] * kR_inv_sum2 + ms_cross_R[n] * kR_inv_sum3) * Green;
+                    yh_field[n] += half*(ms[n] * kR_inv_sum1 + ms_dot_R_R[n] * kR_inv_sum2 - js_cross_R[n] * kR_inv_sum3) * Green;
+                }
+                else
+                {
+                    ye_field[n] += (js[n] * kR_inv_sum1 + js_dot_R_R[n] * kR_inv_sum2 + ms_cross_R[n] * kR_inv_sum3) * Green;
+                    yh_field[n] += (ms[n] * kR_inv_sum1 + ms_dot_R_R[n] * kR_inv_sum2 - js_cross_R[n] * kR_inv_sum3) * Green;
+                }
+            }
+        } // End of yv loop
+        for (int n=0; n<3; n++)
+        {
+            if ((xu==0) || (xu==ncx-1)) // Only add half the point value
+            {
+                e_field[n] += half*ye_field[n];
+                h_field[n] += half*yh_field[n];
+            }
+            else
+            {
+                e_field[n] += ye_field[n];
+                h_field[n] += yh_field[n];
+            }
+        }
+
+    } // End of xu loop
 
     // Pack e and h together in single container
     e_h_field[0] = e_field;
@@ -1182,29 +1278,54 @@ std::array<std::array<std::complex<T>, 3>, 2> Propagation<T, U, V, W>::fieldAtPo
  */
 template <class T, class U, class V, class W>
 std::complex<T> Propagation<T, U, V, W>::fieldScalarAtPoint(V *cs,
-                                   W *field, const std::array<T, 3> &point_target)
+                                   W *field, 
+                                   int gmode, int ncx, int ncy,
+                                   const std::array<T, 3> &point_target)
 {
+    int i;
     std::complex<T> out(0., 0.);
     std::complex<T> j(0., 1.);
     std::complex<T> _field;
+    std::complex<T> _yfield;
+    T half = 0.5;
 
     T r;
     std::array<T, 3> r_vec;
     std::array<T, 3> source_point;
 
-    for(int i=0; i<gs; i++)
+    for(int xu=0; xu<ncx; xu++)
     {
-        source_point[0] = cs->x[i];
-        source_point[1] = cs->y[i];
-        source_point[2] = cs->z[i];
+        _yfield = z0; // Intermediate electric field due to integral over y/v
 
-        _field = {field->x[i], field->y[i]};
+        for(int yv=0; yv<ncy; yv++)
+        {
+            i = xu*ncy + yv;
+            source_point[0] = cs->x[i];
+            source_point[1] = cs->y[i];
+            source_point[2] = cs->z[i];
 
-        ut.diff(point_target, source_point, r_vec);
-        ut.abs(r_vec, r);
+            _field = {field->x[i], field->y[i]};
 
-        out += - k * k * _field * exp(this->t_direction * -j * k * r) / (4 * PIf * r) * cs->area[i];
+            ut.diff(point_target, source_point, r_vec);
+            ut.abs(r_vec, r);
 
+            if ((gmode != 1) && ((yv==0) || (yv==ncy-1)))
+            {
+                _yfield += - half * k * k * _field * exp(this->t_direction * -j * k * r) / (4 * PIf * r) * cs->area[i];
+            }
+            else
+            {
+                _yfield += - k * k * _field * exp(this->t_direction * -j * k * r) / (4 * PIf * r) * cs->area[i];
+            }
+        } // End of yv loop
+        if ((xu==0) || (xu==ncx-1)) // Only add half the point value
+        {
+            out += half*_yfield;
+        }
+        else
+        {
+            out += _yfield;
+        }
     }
     return out;
 }
@@ -1226,7 +1347,9 @@ std::complex<T> Propagation<T, U, V, W>::fieldScalarAtPoint(V *cs,
  */
 template <class T, class U, class V, class W>
 void Propagation<T, U, V, W>::parallelProp_JM(V *cs, V *ct,
-                                              W *currents, U *res)
+                                              W *currents, 
+                                              int gmode, int ncx, int ncy,
+                                              U *res)
 {
     int final_step;
 
@@ -1247,7 +1370,9 @@ void Propagation<T, U, V, W>::parallelProp_JM(V *cs, V *ct,
 
         threadPool[n] = std::thread(&Propagation::propagateBeam_JM_PEC,
                                     this, n * step, final_step,
-                                    cs, ct, currents, res);
+                                    cs, ct, currents,
+                                    gmode, ncx, ncy,
+                                    res);
     }
     joinThreads();
 }
@@ -1269,7 +1394,9 @@ void Propagation<T, U, V, W>::parallelProp_JM(V *cs, V *ct,
  */
 template <class T, class U, class V, class W>
 void Propagation<T, U, V, W>::parallelProp_EH(V *cs, V *ct,
-                                              W *currents, U *res)
+                                              W *currents,
+                                              int gmode, int ncx, int ncy,
+                                              U *res)
 {
     int final_step;
 
@@ -1290,7 +1417,9 @@ void Propagation<T, U, V, W>::parallelProp_EH(V *cs, V *ct,
 
         threadPool[n] = std::thread(&Propagation::propagateBeam_EH,
                                     this, n * step, final_step,
-                                    cs, ct, currents, res);
+                                    cs, ct, currents, 
+                                    gmode, ncx, ncy,
+                                    res);
     }
     joinThreads();
 }
@@ -1314,7 +1443,9 @@ void Propagation<T, U, V, W>::parallelProp_EH(V *cs, V *ct,
  */
 template <class T, class U, class V, class W>
 void Propagation<T, U, V, W>::parallelProp_JMEH(V *cs, V *ct,
-                                                W *currents, U *res)
+                                                W *currents, 
+                                                int gmode, int ncx, int ncy,
+                                                U *res)
 {
     int final_step;
 
@@ -1332,7 +1463,9 @@ void Propagation<T, U, V, W>::parallelProp_JMEH(V *cs, V *ct,
 
         threadPool[n] = std::thread(&Propagation::propagateBeam_JMEH_PEC,
                                     this, n * step, final_step,
-                                    cs, ct, currents, res);
+                                    cs, ct, currents, 
+                                    gmode, ncx, ncy,
+                                    res);
     }
     joinThreads();
 }
@@ -1356,7 +1489,9 @@ void Propagation<T, U, V, W>::parallelProp_JMEH(V *cs, V *ct,
  */
 template <class T, class U, class V, class W>
 void Propagation<T, U, V, W>::parallelProp_EHP(V *cs, V *ct,
-                                              W *currents, U *res)
+                                              W *currents, 
+                                              int gmode, int ncx, int ncy,
+                                              U *res)
 {
     int final_step;
 
@@ -1375,7 +1510,9 @@ void Propagation<T, U, V, W>::parallelProp_EHP(V *cs, V *ct,
 
         threadPool[n] = std::thread(&Propagation::propagateBeam_EHP,
                                     this, n * step, final_step,
-                                    cs, ct, currents, res);
+                                    cs, ct, currents, 
+                                    gmode, ncx, ncy,
+                                    res);
     }
     joinThreads();
 }
@@ -1397,7 +1534,9 @@ void Propagation<T, U, V, W>::parallelProp_EHP(V *cs, V *ct,
  */
 template <class T, class U, class V, class W>
 void Propagation<T, U, V, W>::parallelPropScalar(V *cs, V *ct,
-                                              W *field, U *res)
+                                              W *field, 
+                                              int gmode, int ncx, int ncy,
+                                              U *res)
 {
     int final_step;
 
@@ -1415,7 +1554,9 @@ void Propagation<T, U, V, W>::parallelPropScalar(V *cs, V *ct,
 
         threadPool[n] = std::thread(&Propagation::propagateScalarBeam,
                                     this, n * step, final_step,
-                                    cs, ct, field, res);
+                                    cs, ct, field, 
+                                    gmode, ncx, ncy,
+                                    res);
     }
     joinThreads();
 }
@@ -1440,7 +1581,9 @@ void Propagation<T, U, V, W>::parallelPropScalar(V *cs, V *ct,
 template <class T, class U, class V, class W>
 void Propagation<T, U, V, W>::propagateToFarField(int start, int stop,
                                               V *cs, V *ct,
-                                              W *currents, U *res)
+                                              W *currents,
+                                              int gmode, int ncx, int ncy, 
+                                              U *res)
 {
     // Scalars (T & complex T)
     T theta;
@@ -1472,7 +1615,9 @@ void Propagation<T, U, V, W>::propagateToFarField(int start, int stop,
         r_hat[2] = cos(phi);
 
         // Calculate total incoming E and H field at point on target
-        eh = farfieldAtPoint(cs, currents, r_hat);
+        eh = farfieldAtPoint(cs, currents, 
+                                gmode, ncx, ncy,
+                                r_hat);
 
         res->r1x[i] = eh[0][0].real();
         res->r1y[i] = eh[0][1].real();
@@ -1511,10 +1656,13 @@ void Propagation<T, U, V, W>::propagateToFarField(int start, int stop,
 template <class T, class U, class V, class W>
 std::array<std::array<std::complex<T>, 3>, 2> Propagation<T, U, V, W>::farfieldAtPoint(V *cs,
                                                 W *currents,
+                                                int gmode, int ncx, int ncy,
                                                 const std::array<T, 3> &r_hat)
 {
+    int i;
     // Scalars (T & complex T)
     T norm_dot_R_hat;              // Source normal dotted with wavevector direction
+    T half = 0.5;
 
     std::complex<T> Green;         // Container for Green's function
     std::complex<T> js_dot_R;      // Magnitude of electric currents on to R_hat
@@ -1528,6 +1676,8 @@ std::array<std::array<std::complex<T>, 3>, 2> Propagation<T, U, V, W>::farfieldA
     // Arrays of complex Ts
     std::array<std::complex<T>, 3> e_field;        // Electric field surface integral at point
     std::array<std::complex<T>, 3> h_field;        // Magnetic field surface integral at point
+    std::array<std::complex<T>, 3> ye_field;       // Electric field surface integral at point
+    std::array<std::complex<T>, 3> yh_field;       // Magnetic field surface integral at point
     std::array<std::complex<T>, 3> js;             // Electric current at source point
     std::array<std::complex<T>, 3> ms;             // Magnetic current at source point
     std::array<std::complex<T>, 3> js_dot_R_R;     // Electric currents projected on to R_hat
@@ -1542,51 +1692,84 @@ std::array<std::array<std::complex<T>, 3>, 2> Propagation<T, U, V, W>::farfieldA
     e_field.fill(z0);
     h_field.fill(z0);
 
-    for(int i=0; i<gs; i++)
+    for(int xu=0; xu<ncx; xu++)
     {
-        source_point[0] = cs->x[i];
-        source_point[1] = cs->y[i];
-        source_point[2] = cs->z[i];
-        
-        source_norm[0] = cs->nx[i];
-        source_norm[1] = cs->ny[i];
-        source_norm[2] = cs->nz[i];
-
-        js[0] = {currents->r1x[i], currents->i1x[i]};
-        js[1] = {currents->r1y[i], currents->i1y[i]};
-        js[2] = {currents->r1z[i], currents->i1z[i]};
-
-        ms[0] = {currents->r2x[i], currents->i2x[i]};
-        ms[1] = {currents->r2y[i], currents->i2y[i]};
-        ms[2] = {currents->r2z[i], currents->i2z[i]};
-
-        // Check if source point illuminates target point or not.
-        ut.dot(source_norm, r_hat, norm_dot_R_hat);
-        //printf("norm_dot_R_hat: %.16g\n", norm_dot_R_hat); // %s is format specifier
-        if ((norm_dot_R_hat < 0)) {continue;}
-
-        // e-field
-        ut.dot(js, r_hat, js_dot_R);
-        ut.s_mult(r_hat, js_dot_R, js_dot_R_R);
-        ut.ext(r_hat, ms, R_cross_ms);
-
-        // h-field
-        ut.dot(ms, r_hat, ms_dot_R);
-        ut.s_mult(r_hat, ms_dot_R, ms_dot_R_R);
-        ut.ext(r_hat, js, R_cross_js);
-
-        ut.dot(source_point, r_hat, Rprime_dot_R_hat);
-
-        Green = -prefactor * j * exp(-t_direction * j * k * Rprime_dot_R_hat) * cs->area[i];
-        //printf("%.16g, %.16g\n", Green.real(), Green.imag()); // %s is format specifier
-
-        for( int n=0; n<3; n++)
+        for (int n=0; n<3; n++) 
         {
-            e_field[n] += (ZETA * (js[n] - js_dot_R_R[n]) + t_direction * R_cross_ms[n]) * Green;
-            h_field[n] += (ZETA_INV * (ms[n] - ms_dot_R_R[n]) - t_direction * R_cross_js[n]) * Green;
+            ye_field[n] = z0; // Intermediate electric field due to integral over y/v
+            yh_field[n] = z0; // Intermediate magnetic field due to integral over y/v
         }
+
+        for(int yv=0; yv<ncy; yv++)
+        {
+            i = xu*ncy + yv;
+            source_point[0] = cs->x[i];
+            source_point[1] = cs->y[i];
+            source_point[2] = cs->z[i];
+            
+            source_norm[0] = cs->nx[i];
+            source_norm[1] = cs->ny[i];
+            source_norm[2] = cs->nz[i];
+
+            js[0] = {currents->r1x[i], currents->i1x[i]};
+            js[1] = {currents->r1y[i], currents->i1y[i]};
+            js[2] = {currents->r1z[i], currents->i1z[i]};
+
+            ms[0] = {currents->r2x[i], currents->i2x[i]};
+            ms[1] = {currents->r2y[i], currents->i2y[i]};
+            ms[2] = {currents->r2z[i], currents->i2z[i]};
+
+            // Check if source point illuminates target point or not.
+            ut.dot(source_norm, r_hat, norm_dot_R_hat);
+            //printf("norm_dot_R_hat: %.16g\n", norm_dot_R_hat); // %s is format specifier
+            if ((norm_dot_R_hat < 0)) {continue;}
+
+            // e-field
+            ut.dot(js, r_hat, js_dot_R);
+            ut.s_mult(r_hat, js_dot_R, js_dot_R_R);
+            ut.ext(r_hat, ms, R_cross_ms);
+
+            // h-field
+            ut.dot(ms, r_hat, ms_dot_R);
+            ut.s_mult(r_hat, ms_dot_R, ms_dot_R_R);
+            ut.ext(r_hat, js, R_cross_js);
+
+            ut.dot(source_point, r_hat, Rprime_dot_R_hat);
+
+            Green = -prefactor * j * exp(-t_direction * j * k * Rprime_dot_R_hat) * cs->area[i];
+            //printf("%.16g, %.16g\n", Green.real(), Green.imag()); // %s is format specifier
+
+            for( int n=0; n<3; n++)
+            {
+                if ((gmode != 1) && ((yv==0) || (yv==ncy-1)))
+                {
+                    ye_field[n] += half*(js[n] - js_dot_R_R[n] + t_direction * R_cross_ms[n]) * Green;
+                    yh_field[n] += half*(ms[n] - ms_dot_R_R[n] - t_direction * R_cross_js[n]) * Green;
+                }
+                else
+                {
+                    ye_field[n] += (js[n] - js_dot_R_R[n] + t_direction * R_cross_ms[n]) * Green;
+                    yh_field[n] += (ms[n] - ms_dot_R_R[n] - t_direction * R_cross_js[n]) * Green;
+                }
+            }
         
-    }
+        } // End of yv loop
+        for (int n=0; n<3; n++)
+        {
+            if ((xu==0) || (xu==ncx-1)) // Only add half the point value
+            {
+                e_field[n] += half*ye_field[n];
+                h_field[n] += half*yh_field[n];
+            }
+            else
+            {
+                e_field[n] += ye_field[n];
+                h_field[n] += yh_field[n];
+            }
+        }
+
+    } // End of xu loop
+
 
     // Pack e and h together in single container
     e_h_field[0] = e_field;
@@ -1727,7 +1910,9 @@ std::array<std::array<std::complex<T>, 3>, 2> Propagation<T, U, V, W>::farfieldA
  */
 template <class T, class U, class V, class W>
 void Propagation<T, U, V, W>::parallelFarField(V *cs, V *ct,
-                                              W *currents, U *res)
+                                              W *currents, 
+                                              int gmode, int ncx, int ncy,
+                                              U *res)
 {
     int final_step;
 
@@ -1745,7 +1930,9 @@ void Propagation<T, U, V, W>::parallelFarField(V *cs, V *ct,
 
         threadPool[n] = std::thread(&Propagation::propagateToFarField,
                                     this, n * step, final_step,
-                                    cs, ct, currents, res);
+                                    cs, ct, currents, 
+                                    gmode, ncx, ncy,
+                                    res);
     }
     joinThreads();
 }

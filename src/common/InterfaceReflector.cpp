@@ -815,19 +815,22 @@ void Plane_AoE(T *plane, U xu_lo, U xu_up, U yv_lo,
 
             if (spheric)
             {
-                plane->x[idx] = sqrt(Az*Az + El*El) * M_PI/180;
+                U r = sqrt(Az*Az + El*El) * M_PI/180;
+                plane->x[idx] = r;
                 plane->y[idx] = atan2(El, Az);
 
                     if (plane->y[idx] != plane->y[idx])
                     {
                         plane->y[idx] = 0;
                     }
+                plane->area[idx] = cos(El*M_PI/180)*dA*dE*M_PI*M_PI/180/180;
             }
 
             else
             {
                 plane->x[idx] = Az;
                 plane->y[idx] = El;
+                plane->area[idx] = cos(El*M_PI/180)*dA*dE*M_PI*M_PI/180/180;
             }
 
             plane->z[idx] = 0;
@@ -835,8 +838,6 @@ void Plane_AoE(T *plane, U xu_lo, U xu_up, U yv_lo,
             plane->nx[idx] = 0;
             plane->ny[idx] = 0;
             plane->nz[idx] = 1;
-
-            plane->area[idx] = 1;
 
             if (transform)
             {
@@ -883,10 +884,8 @@ void generateGrid(reflparams refl, reflcontainer *container, bool transform, boo
     double xu_up = refl.lxu[1];
     double yv_lo = refl.lyv[0];
     double yv_up = refl.lyv[1];
-
     double xcenter = refl.gcenter[0];
     double ycenter = refl.gcenter[1];
-
     double ecc_uv = refl.ecc_uv;
     double rot_uv = refl.rot_uv * M_PI / 180;
 

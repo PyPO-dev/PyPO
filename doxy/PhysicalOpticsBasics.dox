@@ -20,6 +20,30 @@ $$ \mathbf{H}_{scat} = \mathbf{H}_{ref} + \mathbf{H}_{trans} $$
 The scattered fields can be taken as entirely due to electric and magnetic currents, 
 \f$\mathbf{J}\f$ and \f$\mathbf{M}\f$, induced on the surface(s) of the scatterer by the incident fields.
 
+\section pobasic_normalization Field Normalization and Units
+
+Throughout PyPO, a time factor of \f$e^{i\omega t}\f$ is suppressed.
+
+In PyPO, we find it convenient to work in normalized rms field units, defined as:
+
+$$ \mathbf{E} = \frac{1}{k} \sqrt{\frac{1}{2 Z_m}} \mathbf{E}_{SI} $$
+$$ \mathbf{H} = \frac{1}{k} \sqrt{\frac{Z_m}{2}} \mathbf{H}_{SI} $$
+$$ \mathbf{J} = \frac{1}{k} \sqrt{\frac{Z_m}{2}} \mathbf{J}_{SI} $$
+$$ \mathbf{M} = \frac{1}{k} \sqrt{\frac{1}{2 Z_m}} \mathbf{M}_{SI} $$
+
+This keeps both the E and H fields and J and M currents of similar magnitude, and directly ensures that the field duality principle
+is maintained.  As a consequence of this choice, the units of all four quantities are \f$\sqrt{\mathrm{Watt}}\f$.  This is particularly
+convenient if the power radiated by a feed is chosen to be \f$4\pi\f$ Watts, as the powers of E and H fields in the farfield limits 
+become the directivity of the antenna.
+
+The field duality principle states that the solutions to Maxwell's equations should be invariant under the following
+substitutions: (in our normalized field units)
+
+$$ \mathbf{E} \rightarrow - \mathbf{H} $$
+$$ \mathbf{H} \rightarrow \mathbf{E} $$
+$$ \mathbf{J} \rightarrow - \mathbf{M} $$
+$$ \mathbf{M} \rightarrow \mathbf{J} $$
+
 \section pobasics_approx The Physical Optics Approximation
 
 The Physical Optics approximation consists of assuming that the surface electric and magnetic currents at a specific point
@@ -51,11 +75,11 @@ integrating over the current distribution induced on the scatterer surface.
 
 For the electric component of the field, this is given by:
 
-$$ \mathbf{E}(\mathbf{r}) = - k Z_m \int_{S} \Big( 1 + \frac{1}{k^2}\mathbf{\nabla}\mathbf{\nabla} \Big) G(\mathbf{r}, \mathbf{r_s}) \cdot \mathbf{J}(\mathbf{r_s}) d s_q + \int_{S} \mathbf{M}(\mathbf{r_s}) \times \mathbf{\nabla} G(\mathbf{r}, \mathbf{r_q}) d s $$
+$$ \mathbf{E}(\mathbf{r}) = - k Z_m \int_{S} \Big( 1 + \frac{1}{k^2}\mathbf{\nabla}\mathbf{\nabla} \Big) G(\mathbf{r}, \mathbf{r_s}) \cdot \mathbf{J}(\mathbf{r_s}) d s + \int_{S} \mathbf{M}(\mathbf{r_s}) \times \mathbf{\nabla} G(\mathbf{r}, \mathbf{r_q}) d s $$
 
 And for the magnetic component
 
-$$ \mathbf{H}(\mathbf{r}) = - k Z_m \int_{S} \Big( 1 + \frac{1}{k^2}\mathbf{\nabla}\mathbf{\nabla} \Big) G(\mathbf{r}, \mathbf{r_s}) \cdot \mathbf{M}(\mathbf{r_s}) d s_q + \int_{S} \mathbf{J}(\mathbf{r_s}) \times \mathbf{\nabla} G(\mathbf{r}, \mathbf{r_q}) d s $$
+$$ \mathbf{H}(\mathbf{r}) = - k \frac{1}{Z_m} \int_{S} \Big( 1 + \frac{1}{k^2}\mathbf{\nabla}\mathbf{\nabla} \Big) G(\mathbf{r}, \mathbf{r_s}) \cdot \mathbf{M}(\mathbf{r_s}) d s + \int_{S} \mathbf{J}(\mathbf{r_s}) \times \mathbf{\nabla} G(\mathbf{r}, \mathbf{r_q}) d s $$
 
 where:
 
@@ -75,19 +99,19 @@ where:
 
 \f$R = |\mathbf{R}| = |\mathbf{r_s} - \mathbf{r}|\f$ is the distance between the observation point and the point on the source scatterer.
 
-\f$\mathbf{\hat{R}} \f$ is the unit vector in the direction of 
+\f$\mathbf{\hat{R}} \f$ is the unit vector in the direction of \f$\mathbf{R}\f$.
 
-Which yields:
+Which yields in our normalized field units:
 
-$$ \mathbf{E} = \frac{k^2}{4\pi} \int_S Z \Bigg[J \Bigg( \frac{-i}{kR} - \frac{1}{(kR)^2} + \frac{i}{(kR)^3}\Bigg) + (\mathbf{J}\cdot\mathbf{\hat{R}})\mathbf{\hat{R}}\Bigg( \frac{i}{kR} + \frac{3}{(kR)^2} - \frac{3i}{(kR)^3} \Bigg)\Bigg] - \mathrm{M}\times\mathrm{\hat{R}}\Bigg(\frac{i}{kR}+\frac{1}{(kR)^2}\Bigg) e^{-ikR} ds $$
+$$ \mathbf{E} = \frac{k^2}{4\pi} \int_S \Bigg[J \Bigg( \frac{-i}{kR} - \frac{1}{(kR)^2} + \frac{i}{(kR)^3}\Bigg) + (\mathbf{J}\cdot\mathbf{\hat{R}})\mathbf{\hat{R}}\Bigg( \frac{i}{kR} + \frac{3}{(kR)^2} - \frac{3i}{(kR)^3} \Bigg) - \mathrm{M}\times\mathrm{\hat{R}}\Bigg(\frac{i}{kR}+\frac{1}{(kR)^2}\Bigg)\Bigg] e^{-ikR} ds $$
 
-$$ \mathbf{H} = \frac{k^2}{4\pi} \int_S \frac{1}{Z} \Bigg[M \Bigg( \frac{-i}{kR} - \frac{1}{(kR)^2} + \frac{j}{(kR)^3}\Bigg) + (\mathbf{M}\cdot\mathbf{\hat{R}})\mathbf{\hat{R}}\Bigg( \frac{i}{kR} + \frac{3}{(kR)^2} - \frac{3i}{(kR)^3} \Bigg)\Bigg]  + \mathrm{J}\times\mathrm{\hat{R}}\Bigg(\frac{i}{kR}+\frac{1}{(kR)^2}\Bigg) e^{-ikR} ds $$
+$$ \mathbf{H} = \frac{k^2}{4\pi} \int_S \Bigg[M \Bigg( \frac{-i}{kR} - \frac{1}{(kR)^2} + \frac{j}{(kR)^3}\Bigg) + (\mathbf{M}\cdot\mathbf{\hat{R}})\mathbf{\hat{R}}\Bigg( \frac{i}{kR} + \frac{3}{(kR)^2} - \frac{3i}{(kR)^3} \Bigg)  + \mathrm{J}\times\mathrm{\hat{R}}\Bigg(\frac{i}{kR}+\frac{1}{(kR)^2}\Bigg)\Bigg] e^{-ikR} ds $$
 
 For backwards propagation, we change the Green's functon to \f$G_{r} = \frac{e^{i k R}}{4 \pi R}\f$, yielding:
 
-$$ \mathbf{E} = \frac{k^2}{4\pi} \int_S Z \Bigg[J \Bigg( \frac{-i}{kR} + \frac{1}{(kR)^2} + \frac{j}{(kR)^3}\Bigg) + (\mathbf{J}\cdot\mathbf{\hat{R}})\mathbf{\hat{R}}\Bigg( \frac{i}{kR} - \frac{3}{(kR)^2} - \frac{3i}{(kR)^3} \Bigg)\Bigg] + \mathrm{M}\times\mathrm{\hat{R}}\Bigg(\frac{i}{kR}+\frac{1}{(kR)^2}\Bigg) e^{ikR} ds$$
+$$ \mathbf{E} = \frac{k^2}{4\pi} \int_S \Bigg[J \Bigg( \frac{-i}{kR} + \frac{1}{(kR)^2} + \frac{j}{(kR)^3}\Bigg) + (\mathbf{J}\cdot\mathbf{\hat{R}})\mathbf{\hat{R}}\Bigg( \frac{i}{kR} - \frac{3}{(kR)^2} - \frac{3i}{(kR)^3} \Bigg) + \frac{1}{Z}\mathrm{M}\times\mathrm{\hat{R}}\Bigg(\frac{i}{kR}-\frac{1}{(kR)^2}\Bigg)\Bigg] e^{ikR} ds$$
 
-$$ \mathbf{H} = \frac{k^2}{4\pi} \int_S \frac{1}{Z} \Bigg[M \Bigg( \frac{-i}{kR} + \frac{1}{(kR)^2} + \frac{j}{(kR)^3}\Bigg) + (\mathbf{M}\cdot\mathbf{\hat{R}})\mathbf{\hat{R}}\Bigg( \frac{i}{kR} - \frac{3}{(kR)^2} - \frac{3i}{(kR)^3} \Bigg)\Bigg] - \mathrm{J}\times\mathrm{\hat{R}}\Bigg(\frac{i}{kR}+\frac{1}{(kR)^2}\Bigg) e^{ikR} ds $$
+$$ \mathbf{H} = \frac{k^2}{4\pi} \int_S \Bigg[M \Bigg( \frac{-i}{kR} + \frac{1}{(kR)^2} + \frac{j}{(kR)^3}\Bigg) + (\mathbf{M}\cdot\mathbf{\hat{R}})\mathbf{\hat{R}}\Bigg( \frac{i}{kR} - \frac{3}{(kR)^2} - \frac{3i}{(kR)^3} \Bigg) - \mathrm{J}\times\mathrm{\hat{R}}\Bigg(\frac{i}{kR}-\frac{1}{(kR)^2}\Bigg)\Bigg] e^{ikR} ds $$
 
 \subsection pobasics_farfields Far fields
 
@@ -100,17 +124,17 @@ where \f$r\f$ = \f$|\mathbf{r}|\f$.
 
 Inserting the above equations for forward propagation gives:
 
-$$ \mathbf{E}_{far} = -\frac{ik^2}{4\pi} \int_S \Bigg(Z \Big(\mathbf{J} - (\mathbf{J}\cdot\mathbf{\hat{r}})\mathbf{\hat{r}}\Big) - \mathbf{\hat{r}} \times \mathbf{M} \Bigg) e^{ik\mathbf{r}_s\cdot\mathbf{\hat{r}}} ds $$
+$$ \mathbf{E}_{far} = -\frac{ik^2}{4\pi} \int_S \Bigg(\mathbf{J} - (\mathbf{J}\cdot\mathbf{\hat{r}})\mathbf{\hat{r}} - \mathbf{\hat{r}} \times \mathbf{M} \Bigg) e^{ik\mathbf{r}_s\cdot\mathbf{\hat{r}}} ds $$
 
 
-$$ \mathbf{H}_{far} = -\frac{ik^2}{4\pi} \int_S \Bigg(\frac{1}{Z} \Big(\mathbf{M} - (\mathbf{M}\cdot\mathbf{\hat{r}})\mathbf{\hat{r}}\Big) + \mathbf{\hat{r}} \times \mathbf{J} \Bigg) e^{ik\mathbf{r}_s\cdot\mathbf{\hat{r}}} ds $$
+$$ \mathbf{H}_{far} = -\frac{ik^2}{4\pi} \int_S \Bigg(\mathbf{M} - (\mathbf{M}\cdot\mathbf{\hat{r}})\mathbf{\hat{r}} + \mathbf{\hat{r}} \times \mathbf{J} \Bigg) e^{ik\mathbf{r}_s\cdot\mathbf{\hat{r}}} ds $$
 
 For backward propagation, the farfield is given by:
 
-$$ \mathbf{E}_{far} = -\frac{ik^2}{4\pi} \int_S \Bigg(Z \Big(\mathbf{J} - (\mathbf{J}\cdot\mathbf{\hat{r}})\mathbf{\hat{r}}\Big) + \mathbf{\hat{r}} \times \mathbf{M} \Bigg) e^{-ik\mathbf{r}_s\cdot\mathbf{\hat{r}}} ds $$
+$$ \mathbf{E}_{far} = -\frac{ik^2}{4\pi} \int_S \Bigg(\mathbf{J} - (\mathbf{J}\cdot\mathbf{\hat{r}})\mathbf{\hat{r}} + \mathbf{\hat{r}} \times \mathbf{M} \Bigg) e^{-ik\mathbf{r}_s\cdot\mathbf{\hat{r}}} ds $$
 
 
-$$ \mathbf{H}_{far} = -\frac{ik^2}{4\pi} \int_S \Bigg(\frac{1}{Z} \Big(\mathbf{M} - (\mathbf{M}\cdot\mathbf{\hat{r}})\mathbf{\hat{r}}\Big) - \mathbf{\hat{r}} \times \mathbf{J} \Bigg) e^{-ik\mathbf{r}_s\cdot\mathbf{\hat{r}}} ds $$
+$$ \mathbf{H}_{far} = -\frac{ik^2}{4\pi} \int_S \Bigg(\mathbf{M} - (\mathbf{M}\cdot\mathbf{\hat{r}})\mathbf{\hat{r}} - \mathbf{\hat{r}} \times \mathbf{J} \Bigg) e^{-ik\mathbf{r}_s\cdot\mathbf{\hat{r}}} ds $$
 
 \section pobasics_process The PO Simulation Process
 

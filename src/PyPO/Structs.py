@@ -166,7 +166,7 @@ class GRTDict(ctypes.Structure):
 
 class GPODict(ctypes.Structure):
     """!
-    Parameters for initializing a Gaussian PO beam.
+    Parameters for initializing a Gaussian PO field.
     """
 
     _fields_ = [("lam", ctypes.c_double),
@@ -177,6 +177,19 @@ class GPODict(ctypes.Structure):
                 ("dxyz", ctypes.c_double),
                 ("pol", ctypes.POINTER(ctypes.c_double))]
 
+class vecGPODict(ctypes.Structure):
+    """!
+    Parameters for initializing a Gaussian PO beam.
+    
+    We omit w and R - these are used by `check_vecGPODict` to calculate `w0` and `z`.
+    """
+
+    _fields_ = [("lam", ctypes.c_double),
+                ("w0", ctypes.c_double),
+                ("z", ctypes.c_double),
+                ("n", ctypes.c_double),
+                ("power", ctypes.c_double)]
+    
 class ScalarGPODict(ctypes.Structure):
     """!
     Parameters for initializing a scalar Gaussian PO beam.
@@ -348,7 +361,7 @@ class GRTDictf(ctypes.Structure):
 
 class GPODictf(ctypes.Structure):
     """!
-    Parameters for initializing a Gaussian PO beam.
+    Parameters for initializing a Gaussian PO field.
     """
 
     _fields_ = [("lam", ctypes.c_float),
@@ -358,6 +371,17 @@ class GPODictf(ctypes.Structure):
                 ("E0", ctypes.c_float),
                 ("dxyz", ctypes.c_float),
                 ("pol", ctypes.POINTER(ctypes.c_float))]
+
+class vecGPODictf(ctypes.Structure):
+    """!
+    Parameters for initializing a Gaussian PO beam.
+    """
+
+    _fields_ = [("lam", ctypes.c_float),
+                ("w0", ctypes.c_float),
+                ("z", ctypes.c_float),
+                ("w", ctypes.c_float),
+                ("power", ctypes.c_float)]
 
 class ScalarGPODictf(ctypes.Structure):
     """!

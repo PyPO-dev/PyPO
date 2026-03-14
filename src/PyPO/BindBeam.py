@@ -39,6 +39,9 @@ def loadBeamlib():
 
     lib.makeGauss.argtypes = [PStructs.GPODict, PStructs.reflparams, ctypes.POINTER(PStructs.c2Bundle), ctypes.POINTER(PStructs.c2Bundle)]
     lib.makeGauss.restype = None
+    
+    lib.makeGaussBeam.argtypes = [PStructs.vecGPODict, PStructs.reflparams, ctypes.POINTER(PStructs.c2Bundle), ctypes.POINTER(PStructs.c2Bundle)]
+    lib.makeGaussBeam.restype = None
 
     lib.makeScalarGauss.argtypes = [PStructs.ScalarGPODict, PStructs.reflparams, ctypes.POINTER(PStructs.arrC1)]
     lib.makeScalarGauss.restype = None
@@ -151,6 +154,48 @@ def makeGauss(gdict_py, source):
     out_field = BUtils.c2BundleToObj(res_field, shape=source_shape, obj_t='fields', np_t=np.float64)
     out_current = BUtils.c2BundleToObj(res_current, shape=source_shape, obj_t='currents', np_t=np.float64)
 
+    return out_field, out_current
+
+
+def makeGaussBeam(gdict_py, source):
+    """!
+    Generate a Gaussian beam using the complex source method.
+    The beam is always defined parallel to the x, y plane. The z-coordinate can be adjusted.
+    In order to tilt the beam, you have to tilt the underlying plane AFTER defining the beam on it.
+
+    @param gdict_py A vecGPODict dictionary containing relevant Gaussian beam parameters.
+    @param source A reflDict dictionary describing the plane on which the Gaussian is defined.
+
+    @returns out_field Field object containing the electromagnetic fields associated with the Gaussian.
+    @returns out_current Current object containing the electromagnetic currents associated with the Gaussian.
+
+    @see vecGPODict
+    @see reflDict
+    @see fields
+    @see currents
+    """
+    
+    lib = loadBeamlib()
+
+    source_shape = (source["gridsize"][0], source["gridsize"][1])
+    source_size = source["gridsize"][0] * source["gridsize"][1]
+
+    c_gdict = PStructs.vecGPODict()
+    c_source = PStructs.reflparams()
+    
+    BUtils.allfill_vecGPODict(c_gdict, gdict_py, ctypes.c_double)
+    BUtils.allfill_reflparams(c_source, source, ctypes.c_double)
+
+    res_field = PStructs.c2Bundle()
+    res_current = PStructs.c2Bundle()
+    BUtils.allocate_c2Bundle(res_field, source_size, ctypes.c_double)
+    BUtils.allocate_c2Bundle(res_current, source_size, ctypes.c_double)
+    
+    lib.makeGaussBeam(c_gdict, c_source, ctypes.byref(res_field), ctypes.byref(res_current))
+
+    out_field = BUtils.c2BundleToObj(res_field, shape=source_shape, obj_t='fields', np_t=np.float64)
+    out_current = BUtils.c2BundleToObj(res_current, shape=source_shape, obj_t='currents', np_t=np.float64)
+    
     return out_field, out_current
 
 

@@ -66,8 +66,7 @@ T pdfGauss(std::vector<T> vars, std::vector<T> scales);
 /** 
  * Initialize Gaussian beam from GPODict or GPODictf.
  *
- * The generated Gaussian has E-field and magnetic currents only. This _is_ what you want
- * as a source in PO calculations.
+ * The generated Gaussian has copolar E-field and magnetic currents only.
  * 
  * Takes a GPODict or GPODictf and generates two c2Bundle or c2Bundlef objects, which contain the field and 
  *      associated currents and are allocated to passed pointer arguments.
@@ -87,6 +86,34 @@ T pdfGauss(std::vector<T> vars, std::vector<T> scales);
  */
 template<typename T, typename U, typename V, typename W, typename G>
 void initGauss(T gdict, U refldict, V *res_field, V *res_current);
+
+/** 
+ * Initialize Gaussian beam from vecGPODict or vecGPODictf.
+ *
+ * The Gaussian beam is generated using the complex source point method, which
+ * generates a symmetrized Gaussian beam from combined Helmholtz electric and 
+ * magnetic dipoles placed at an imaginary positive z-distance equal to `z_c`,
+ * the Gaussian beam confocal distance.
+ * 
+ * Takes a vecGPODict or vecGPODictf and a surface definition and generates 
+ * two c2Bundle or c2Bundlef objects, which contain the field and 
+ * associated currents and are allocated to passed pointer arguments.
+ *
+ * @param gdict GPODict or GPODictf object from which to generate a Gaussian beam.
+ * @param refldict reflparams or reflparamsf object corresponding to surface on
+ *      which to generate the Gaussian beam.
+ * @param res_field Pointer to c2Bundle or c2Bundlef object.
+ * @param res_current Pointer to c2Bundle or c2Bundlef object.
+ *
+ * @see GPODict
+ * @see GPODictf
+ * @see reflparams
+ * @see reflparamsf
+ * @see c2Bundle
+ * @see c2Bundlef
+ */
+template<typename T, typename U, typename V, typename W, typename G>
+void initGaussBeam(T gdict, U refldict, V *res_field, V *res_current);
 
 
 /** 
@@ -280,8 +307,10 @@ void initGauss(T gdict, U refldict, V *res_field, V *res_current)
     Utils<G> ut;
 
     bool transform = true;
+    printf("initGauss calling generateGrid\n");
     generateGrid(refldict, &reflc, transform);
 
+    printf("initGauss returned from generateGrid\n");
 
     G zRx      = M_PI * gdict.w0x*gdict.w0x * gdict.n / gdict.lam;
     G zRy      = M_PI * gdict.w0y*gdict.w0y * gdict.n / gdict.lam;
@@ -375,6 +404,156 @@ void initGauss(T gdict, U refldict, V *res_field, V *res_current)
     delete reflc.nz;
 
     delete reflc.area;
+}
+
+
+template<typename T, typename U, typename V, typename W, typename G>
+void initGaussBeam(T gdict, U refldict, V *res_field, V *res_current)
+{
+    int nTot = refldict.n_cells[0] * refldict.n_cells[1];
+
+
+    W reflc;
+
+    reflc.size = nTot;
+
+    reflc.x = new G[nTot];
+    reflc.y = new G[nTot];
+    reflc.z = new G[nTot];
+
+    reflc.nx = new G[nTot];
+    reflc.ny = new G[nTot];
+    reflc.nz = new G[nTot];
+
+    reflc.area = new G[nTot];
+
+    bool transform = true;
+    
+    generateGrid(refldict, &reflc, transform);
+
+    Utils<G> ut;
+
+    // * Start calculation of the E and H fields
+    // Define variables that will be used
+    // k, the wavenumber
+    G k = 2* M_PI / gdict.lam;
+    // zc, the confocal distance
+    G zc = k*gdict.w0*gdict.w0/2.0;
+    
+    // R, the complex 3-vector distance from the reflector to the source
+    std::array<std::complex <G>, 3> R;
+    // r, the (complex) magnitude of R
+    std::complex <G> rsq;
+    std::complex <G> r;
+    // expo and prefactor, the w_0 k^2 / √2 e^{-i k r - k^2 w_0^2/2} that is applied to every field
+    std::complex <G> expo;
+    G prefactor = gdict.w0*k * sqrt(gdict.power / (8*M_PI));
+    // the inverse sums that multiply terms in the field calculations
+    std::complex <G> kr_inv;
+    std::complex <G> kr_sum_1;
+    std::complex <G> kr_sum_2;
+    std::complex <G> kr_sum_3;
+
+    std::complex<G> j(0, 1);
+    
+    // fields at a point
+    std::array<std::complex<G>, 3> efield;
+    std::array<std::complex<G>, 3> hfield;
+    
+    // currents at a point
+    std::array<G, 3> n_source;
+    std::array<std::complex<G>, 3> J;
+    std::array<std::complex<G>, 3> M;
+
+    
+    for (int i=0; i<nTot; i++)
+    {
+        // Calculate the complex vector R and its complex magnitude r
+        R[0] = std::complex<G>(reflc.x[i], 0.0);
+        R[1] = std::complex<G>(reflc.y[i], 0.0);
+        R[2] = reflc.z[i] + gdict.z + j*zc;
+        
+        r = sqrt(R[0]*R[0] + R[1]*R[1] + R[2]*R[2]);
+        
+        // Calculate the exponential term
+        expo = exp(-j*k*r - k*k*gdict.w0*gdict.w0/2.0);
+
+        // Calculate the 1/kr power series
+        kr_inv = 1.0/(k*r);
+        
+        kr_sum_1 = (-j*kr_inv - kr_inv*kr_inv + j*kr_inv*kr_inv*kr_inv);
+        kr_sum_2 = (j*kr_inv + 3.0*kr_inv*kr_inv - 3.0*j*kr_inv*kr_inv*kr_inv);
+        kr_sum_3 = (j*kr_inv + kr_inv*kr_inv);
+
+        // Calculate the E and H fields
+        efield[0] = prefactor*expo*(kr_sum_1 + kr_sum_2*(R[0]*R[0] / (r*r)) - kr_sum_3*(R[2] / r));
+        efield[1] = prefactor*expo*kr_sum_2*R[0]*R[1]/(r*r);
+        efield[2] = prefactor*expo*(kr_sum_2*R[0]*R[2]/(r*r) + kr_sum_3*R[0]/r);
+
+        hfield[0] = prefactor*expo*kr_sum_2*R[0]*R[1]/(r*r);
+        hfield[1] = prefactor*expo*(kr_sum_1 + kr_sum_2*(R[1]*R[1] / (r*r)) - kr_sum_3*(R[2] / r));
+        hfield[2] = prefactor*expo*(kr_sum_2*R[1]*R[2]/(r*r) + kr_sum_3*R[1]/r);
+
+        // Calculate the M and J currents
+        n_source[0] = reflc.nx[i];
+        n_source[1] = reflc.ny[i];
+        n_source[2] = reflc.nz[i];
+
+        ut.ext(n_source, efield, M);
+        ut.ext(n_source, hfield, J);
+
+        // Transfer the outputs to the C2 bundles
+        // Fill E-field
+        res_field->r1x[i] = efield[0].real();
+        res_field->i1x[i] = efield[0].imag();
+
+        res_field->r1y[i] = efield[1].real();
+        res_field->i1y[i] = efield[1].imag();
+
+        res_field->r1z[i] = efield[2].real();
+        res_field->i1z[i] = efield[2].imag();
+
+        // Fill H-field
+        res_field->r2x[i] = hfield[0].real();
+        res_field->i2x[i] = hfield[0].imag();
+
+        res_field->r2y[i] = hfield[1].real();
+        res_field->i2y[i] = hfield[1].imag();
+
+        res_field->r2z[i] = hfield[2].real();
+        res_field->i2z[i] = hfield[2].imag();
+
+        // Fill electric currents
+        res_current->r1x[i] = J[0].real();
+        res_current->i1x[i] = J[0].imag();
+
+        res_current->r1y[i] = J[1].real();
+        res_current->i1y[i] = J[1].imag();
+
+        res_current->r1z[i] = J[2].real();
+        res_current->i1z[i] = J[2].imag();
+
+        // Fill magnetic currents
+        res_current->r2x[i] = -M[0].real();
+        res_current->i2x[i] = -M[0].imag();
+
+        res_current->r2y[i] = -M[1].real();
+        res_current->i2y[i] = -M[1].imag();
+
+        res_current->r2z[i] = -M[2].real();
+        res_current->i2z[i] = -M[2].imag();
+    }
+    
+    delete reflc.x;
+    delete reflc.y;
+    delete reflc.z;
+
+    delete reflc.nx;
+    delete reflc.ny;
+    delete reflc.nz;
+
+    delete reflc.area;
+    
 }
 
 template<typename T, typename U, typename V, typename W, typename G>

@@ -191,6 +191,16 @@ struct GPODict {
     double *pol;    /**<array of 3 double. Polarization components along x, y and z axes.*/
 };
 
+/** Object for initializing a Gaussian beam.*/
+struct vecGPODict {
+    double lam;       /**<Wavelength of beam, in millimeters.*/
+    double w0;        /**<Beamwaist radius, in millimeters.*/
+    double z;         /**<Distance along beam in z-direction, in millimeters.*/
+    double n;         /**<Refractive index of medium.*/
+    double power;     /**<Peak electric field value.*/
+};
+
+
 /** Object for initializing a scalar Gaussian beam.*/
 struct ScalarGPODict {
     double lam;     /**<Wavelength of beam, in millimeters.*/
@@ -384,6 +394,16 @@ struct GPODictf {
     float dxyz;    /**<Astigmatic distance between x-focus and y-focus, in millimeters.*/
     float *pol;    /**<array of 3 float. Polarization components along x, y and z axes.*/
 };
+
+/** Object for initializing a Gaussian beam.*/
+struct vecGPODictf {
+    float lam;       /**<Wavelength of beam, in millimeters.*/
+    float w0;        /**<Beamwaist radius, in millimeters.*/
+    float z;         /**<Distance along beam in z-direction, in millimeters.*/
+    float n;         /**<Refractive index of medium.*/
+    float power;     /**<Peak electric field value.*/
+};
+
 
 /** Object for initializing a scalar Gaussian beam.*/
 struct ScalarGPODictf {

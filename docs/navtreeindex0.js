@@ -1,6 +1,5 @@
 var NAVTREEINDEX0 =
 {
-"classes.html":[428],
 "common_issues.html":[7],
 "contribguide.html":[6],
 "demos.html":[4],

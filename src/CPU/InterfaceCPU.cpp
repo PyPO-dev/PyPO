@@ -38,7 +38,7 @@ void propagateToGrid_JM(c2Bundle *res, reflparams source, reflparams target,
     generateGrid(source, cs);
     generateGrid(target, ct);
 
-    prop.parallelProp_JM(cs, ct, currents, res);
+    prop.parallelProp_JM(cs, ct, currents, source.gmode, source.n_cells[0], source.n_cells[1], res);
 }
 
 /**
@@ -73,7 +73,7 @@ void propagateToGrid_EH(c2Bundle *res, reflparams source, reflparams target,
     generateGrid(source, cs);
     generateGrid(target, ct);
 
-    prop.parallelProp_EH(cs, ct, currents, res);
+    prop.parallelProp_EH(cs, ct, currents, source.gmode, source.n_cells[0], source.n_cells[1], res);
 }
 
 /**
@@ -109,7 +109,7 @@ void propagateToGrid_JMEH(c4Bundle *res, reflparams source, reflparams target,
     generateGrid(source, cs);
     generateGrid(target, ct);
 
-    prop.parallelProp_JMEH(cs, ct, currents, res);
+    prop.parallelProp_JMEH(cs, ct, currents, source.gmode, source.n_cells[0], source.n_cells[1], res);
 }
 
 /**
@@ -145,7 +145,7 @@ void propagateToGrid_EHP(c2rBundle *res, reflparams source, reflparams target,
     generateGrid(source, cs);
     generateGrid(target, ct);
 
-    prop.parallelProp_EHP(cs, ct, currents, res);
+    prop.parallelProp_EHP(cs, ct, currents, source.gmode, source.n_cells[0], source.n_cells[1], res);
 }
 
 /**
@@ -180,7 +180,7 @@ void propagateToGrid_scalar(arrC1 *res, reflparams source, reflparams target,
     generateGrid(source, cs);
     generateGrid(target, ct);
 
-    prop.parallelPropScalar(cs, ct, field, res);
+    prop.parallelPropScalar(cs, ct, field, source.gmode, source.n_cells[0], source.n_cells[1], res);
 }
 
 /**
@@ -215,7 +215,7 @@ void propagateToFarField(c2Bundle *res, reflparams source, reflparams target,
     generateGrid(source, cs);
     generateGrid(target, ct);
 
-    prop.parallelFarField(cs, ct, currents, res);
+    prop.parallelFarField(cs, ct, currents, source.gmode, source.n_cells[0], source.n_cells[1], res);
 }
 
 /**
@@ -274,7 +274,7 @@ void propagateToGridf_JM(c2Bundlef *res, reflparamsf source, reflparamsf target,
     generateGridf(source, cs);
     generateGridf(target, ct);
     
-    prop.parallelProp_JM(cs, ct, currents, res);
+    prop.parallelProp_JM(cs, ct, currents, source.gmode, source.n_cells[0], source.n_cells[1], res);
 }
 
 /**
@@ -309,7 +309,7 @@ void propagateToGridf_EH(c2Bundlef *res, reflparamsf source, reflparamsf target,
     generateGridf(source, cs);
     generateGridf(target, ct);
 
-    prop.parallelProp_EH(cs, ct, currents, res);
+    prop.parallelProp_EH(cs, ct, currents, source.gmode, source.n_cells[0], source.n_cells[1], res);
 }
 
 /**
@@ -345,7 +345,7 @@ void propagateToGridf_JMEH(c4Bundlef *res, reflparamsf source, reflparamsf targe
     generateGridf(source, cs);
     generateGridf(target, ct);
 
-    prop.parallelProp_JMEH(cs, ct, currents, res);
+    prop.parallelProp_JMEH(cs, ct, currents, source.gmode, source.n_cells[0], source.n_cells[1], res);
 }
 
 /**
@@ -381,7 +381,7 @@ void propagateToGridf_EHP(c2rBundlef *res, reflparamsf source, reflparamsf targe
     generateGridf(source, cs);
     generateGridf(target, ct);
 
-    prop.parallelProp_EHP(cs, ct, currents, res);
+    prop.parallelProp_EHP(cs, ct, currents, source.gmode, source.n_cells[0], source.n_cells[1], res);
 }
 
 /**
@@ -416,7 +416,7 @@ void propagateToGridf_scalar(arrC1f *res, reflparamsf source, reflparamsf target
     generateGridf(source, cs);
     generateGridf(target, ct);
 
-    prop.parallelPropScalar(cs, ct, field, res);
+    prop.parallelPropScalar(cs, ct, field, source.gmode, source.n_cells[0], source.n_cells[1], res);
 }
 
 /**
@@ -451,5 +451,5 @@ void propagateToFarFieldf(c2Bundlef *res, reflparamsf source, reflparamsf target
     generateGridf(source, cs);
     generateGridf(target, ct);
 
-    prop.parallelFarField(cs, ct, currents, res);
+    prop.parallelFarField(cs, ct, currents, source.gmode, source.n_cells[0], source.n_cells[1], res);
 }

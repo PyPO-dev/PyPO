@@ -321,17 +321,41 @@ class ApertureError(Exception):
 
     pass
 
-def errMsg_field(fieldName, elemName):
+def errMsg_field(fieldName, elemName, msg=None):
     """!
     Error message when a mandatory field has not been filled in a dictionary.
 
     @param fieldName Name of field in dictionary that is not filled.
     @param elemName Name of dictionary where error occurred. 
+    @param msg Extra text to show to user.
 
     @returns errStr The errorstring.
     """
 
-    return f"Missing field \"{fieldName}\", element {elemName}.\n"
+    if msg is not None:
+        msg = " " + msg
+    else:
+        msg = ""
+
+    return f"Missing field \"{fieldName}\", element {elemName}.{msg}\n"
+    
+def warnMsg_field(fieldName, elemName, msg=None):
+    """!
+    Error message when a mandatory field has not been filled in a dictionary.
+
+    @param fieldName Name of field in dictionary that is not filled.
+    @param elemName Name of dictionary where error occurred. 
+    @param msg Extra text to show to user.
+
+    @returns errStr The errorstring.
+    """
+
+    if msg is not None:
+        msg = " " + msg
+    else:
+        msg = ""
+
+    return f"Warning for field \"{fieldName}\", element {elemName}.{msg}\n"
 
 def errMsg_type(fieldName, inpType, elemName, fieldType):
     """!
@@ -1183,6 +1207,111 @@ def check_GPODict(GPODict, nameList, clog):
         for err in errList:
             clog.error(err)
         raise InputPOError()
+
+def check_vecGPODict(vecGPODict, nameList, clog):
+    """!
+    Check a vectorial Gaussian beam, calculating the missing
+    Gaussian beam parameters.
+    
+    @param vecvecGPODict A vecGPODict object.
+    @param nameList List containing names of fields in System.
+    @param clog CustomLogger object.
+
+    @see VecvecGPODict
+    """
+    errStr = ""
+    
+    if "name" not in vecGPODict:
+        vecGPODict["name"] = "GaussianBeamPO"
+    
+    num = getIndex(vecGPODict["name"], nameList)
+
+    if num > 0:
+        vecGPODict["name"] = vecGPODict["name"] + "_{}".format(num)
+
+    if "lam" in vecGPODict:
+        if vecGPODict["lam"] == 0 + 0j:
+            clog.info(f"Never heard of a complex-valued wavelength of zero, but good try.. Therefore changing wavelength now to 'lam' equals {np.pi:.42f}!")
+            vecGPODict["lam"] = np.pi
+
+        if not ((isinstance(vecGPODict["lam"], float) or isinstance(vecGPODict["lam"], int))):
+            errStr += errMsg_type("lam", type(vecGPODict["lam"]), "vecGPODict", [float, int])
+        
+        elif vecGPODict["lam"] < 0:
+            clog.warning(f"Encountered negative value {vecGPODict['lam']} in field 'lam' in vecGPODict {vecGPODict['name']}. Changing sign.")
+            vecGPODict["lam"] *= -1
+
+    else:
+        errStr += errMsg_field("lam", "vecGPODict")
+    
+    try:
+        calc_beam(vecGPODict, errStr)
+    except ValueError:
+        errStr += errMsg_field("w0, w, z, R", "vecGPODict", "Need at least two of these fields to define Gaussian beam.")
+        
+    if "n" in vecGPODict:
+        if not ((isinstance(vecGPODict["n"], float) or isinstance(vecGPODict["n"], int))):
+            errStr += errMsg_type("n", type(vecGPODict["n"]), "vecGPODict", [float, int])
+
+        elif vecGPODict["n"] < 1 and vecGPODict >= 0:
+            clog.warning("Refractive indices smaller than unity are not allowed. Changing to 1.")
+
+    else:
+        vecGPODict["n"] = 1.0
+
+    if "power" in vecGPODict:
+        if not ((isinstance(vecGPODict["power"], float) or isinstance(vecGPODict["power"], int))):
+            errStr += errMsg_type("power", type(vecGPODict["power"]), "vecGPODict", [float, int])
+    else:
+        vecGPODict["power"] = 4*np.pi
+
+def calc_beam(vecGPODict, errStr):
+    """!
+    Calculate and fill in the parameters of a vectorial Gaussian beam from at least two of w0, z, w and R.
+    
+    @param vecGPODict A VecGPODict.
+    @param clog CustomLogger object."""
+    lam = vecGPODict["lam"]
+    if "w0" in vecGPODict:
+        w0 = vecGPODict["w0"]
+        if "z" in vecGPODict:
+            # No need to do anything, as these are our base variables in the calculation
+            return
+        elif "w" in vecGPODict:
+            w = vecGPODict["w"]
+            vecGPODict["z"] = np.pi*w0 / lam * np.sqrt(w**2 - w0**2)
+        elif "R" in vecGPODict:
+            R = vecGPODict["R"]
+            z = R/2 * (1 + np.sqrt(1 - (2*np.pi*w0**2 / (lam * R))**2))
+            errStr += warnMsg_field("w0, R", "vecGPODict", "Setting z from w0 and R is ambiguous, with two solutions. We choose the larger solution (i.e. z > zc).")
+            vecGPODict["z"] = z
+            return
+        else:
+            errStr += errMsg_field("w0, z, w, R", "vecGPODict", "Not enough fields set to define beam.")
+    elif "z" in vecGPODict:
+        z = vecGPODict["z"]
+        if "w" in vecGPODict:
+            w = vecGPODict["w"]
+            vecGPODict["w0"] = np.sqrt(w**2/2 * (1 - np.sqrt(1 - ((2*lam*z)/(np.pi*w**2))**2)))
+            errStr += warnMsg_field("z, w", "vecGPODict", "Setting w0 from z and w is ambiguous, with two solutions. We choose the smaller beamwaist (i.e. z > zc).")
+            return
+        elif "R" in vecGPODict:
+            R = vecGPODict["R"]
+            vecGPODict["w0"] = np.sqrt(lam/np.pi * np.sqrt(z*(R-z))) 
+            return
+        else:
+            errStr += errMsg_field("w0, z, w, R", "vecGPODict", "Not enough fields set to define beam.")
+    elif "w" in vecGPODict:
+        if "R" in vecGPODict:
+            w = vecGPODict["w"]
+            R = vecGPODict["R"]
+            vecGPODict["w0"] = w / np.sqrt(1 + ((np.pi*w**2)/(lam*R))**2)
+            vecGPODict["z"] = R / (1 + ((lam*R)/(np.pi*w**2))**2)
+        else:
+            errStr += errMsg_field("w0, z, w, R", "vecGPODict", "Not enough fields set to define beam.")
+    else:
+        errStr += errMsg_field("w0, z, w, R", "vecGPODict", "Not enough fields set to define beam.")
+        
 
 def check_runPODict(runPODict, elements, fields, currents, scalarfields, frames, clog):
     """!

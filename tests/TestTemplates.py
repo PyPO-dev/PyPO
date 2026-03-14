@@ -38,6 +38,60 @@ GPOfield =  {
         "pol"       : np.array([1,0,0])
         }
 
+vecGPObeam_w0z = {
+        "name"      : "testGaussBeam_w0z",
+        "lam"       : 1.0,
+        "w0"        : 5.0,
+        "z"         : 50.0,
+        "n"         : 1,
+        "power"     : 1
+}
+
+vecGPObeam_w0w = {
+        "name"      : "testGaussBeam_w0w",
+        "lam"       : 1.0,
+        "w0"        : 5.0,
+        "w"         : 10.0,
+        "n"         : 1,
+        "power"     : 1
+}
+
+vecGPObeam_w0R = {
+        "name"      : "testGaussBeam_w0R",
+        "lam"       : 1.0,
+        "w0"        : 5.0,
+        "R"         : 100.0,
+        "n"         : 1,
+        "power"     : 1
+}
+
+vecGPObeam_zw = {
+        "name"      : "testGaussBeam_zw",
+        "lam"       : 1.0,
+        "z"         : 50.0,
+        "w"         : 10.0,
+        "n"         : 1,
+        "power"     : 1
+}
+
+vecGPObeam_zR = {
+        "name"      : "testGaussBeam_zR",
+        "lam"       : 1.0,
+        "z"         : 50.0,
+        "R"         : 100.0,
+        "n"         : 1,
+        "power"     : 1
+}
+
+vecGPObeam_wR = {
+        "name"      : "testGaussBeam_wR",
+        "lam"       : 1.0,
+        "w"         : 10.0,
+        "R"         : 100.0,
+        "n"         : 1,
+        "power"     : 1
+}
+
 PS_Ufield =  {
         "name"      : "testPS_UField",
         "lam"       : 1,

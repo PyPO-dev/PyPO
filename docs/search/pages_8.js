@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['the_20pypo_20system_1405',['The PyPO System',['../basictut2.html',1,'']]],
-  ['tutorials_1406',['Tutorials',['../tutorials.html',1,'']]]
+  ['more_20pypo_20dataclasses_0',['Some More PyPO Dataclasses',['../basictut5.html',1,'']]]
 ];

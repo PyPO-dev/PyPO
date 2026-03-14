@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['home_1398',['Home',['../index.html',1,'']]]
+  ['for_20contributions_20development_0',['Instructions For Contributions &amp; Development',['../contribguide.html',1,'']]]
 ];

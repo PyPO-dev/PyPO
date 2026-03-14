@@ -1368,13 +1368,14 @@ class System(object):
 
     def createGaussian(self, gaussDict : dict, name_surface : str):
         """!
-        Create a vectorial Gaussian beam.
+        Create a Gaussian field.
         
-        This method creates a general, potentially astigmatic, vectorial Gaussian beam.
-        The beam is evaluated with the focus at z = 0. 
+        This method creates a potentially astigmatic Gaussian beam, evaluated with the beamwaist at z = 0 
+        and propagating in the positive z-direction.  Only the co-polar E field is created.
+        
         The surface on which the beam is calculated, defined by "name_source", does not have to lie in or be parallel to the xy-plane.
         Instead, the Gaussian beam is evaluated on the surface as-is, evaluating the Gaussian beam at the xyz-points on the surface.
-        Still, the focus is at z = 0. If one wishes to displace the focal point, the PO fields and currents need to be translated after generating the Gaussian beam.
+        If one wishes to displace the beamwaist, the PO fields and currents need to be translated after generating the Gaussian beam.
         
         @ingroup public_api_po
         
@@ -1397,6 +1398,47 @@ class System(object):
 
         self.fields[_gaussDict["name"]] = gauss_in[0]
         self.currents[_gaussDict["name"]] = gauss_in[1]
+
+    def createGaussianBeam(self, gaussDict : dict, name_surface : str):
+        """!
+        Create a symmetric vector Gaussian beam using the complex source point method.
+        
+        This method creates a vectorial Gaussian beam propagating along the positive z-axis, with the primary E-field
+        polarized along the positive x-axis. Unless specified, the power in the beam is normalized to 4pi √W (this ensures
+        that the farfields are in dBi).
+        
+        The beam is defined by any pair of Gaussian beam parameters from w0, z, w, and R (in order of precedence), defined on
+        the z=0 plane. Positive R offsets the beamwaist in the negative z-direction.
+        
+        The surface on which the beam is calculated, defined by "name_source", does not have to lie on or be parallel to 
+        the xy-plane at z=0.  Instead, the Gaussian beam is evaluated on the surface as-is, evaluating the Gaussian beam at the 
+        xyz-points on the surface. If one wishes to displace the plane on which the beam is defined, the PO fields 
+        and currents need to be translated after generating the Gaussian beam.
+        
+        @ingroup public_api_po
+        
+        @param gaussDict A vecGPODict containing parameters for the Gaussian beam.
+        @param name_surface Name of plane on which to define Gaussian.
+        
+        @see GDict
+        """
+
+        PChecks.check_elemSystem(name_surface, self.system, self.clog, extern=True)
+
+        _gaussDict = self.copyObj(gaussDict)
+        PChecks.check_vecGPODict(_gaussDict, self.fields, self.clog)
+        
+        refldict = self.system[name_surface]
+        
+        gauss_in = BBeam.makeGaussBeam(_gaussDict, refldict)
+        
+        k = 2 * np.pi / _gaussDict["lam"]
+        gauss_in[0].setMeta(name_surface, k)
+        gauss_in[1].setMeta(name_surface, k)
+
+        self.fields[_gaussDict["name"]] = gauss_in[0]
+        self.currents[_gaussDict["name"]] = gauss_in[1]
+
     
     def createScalarGaussian(self, gaussDict : dict, name_surface : str):
         """!

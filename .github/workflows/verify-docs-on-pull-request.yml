@@ -57,7 +57,7 @@ jobs:
           push: false
           # This caches docker layers to github actions cache
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to: type=gha,mode=min
 
       - name: Run Tests
         uses: addnab/docker-run-action@v3

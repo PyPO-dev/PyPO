@@ -67,7 +67,7 @@ jobs:
           push: false
           # This caches docker layers to github actions cache
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to: type=gha,mode=min
 
       # Don't need to run tests -- this should have been done
       # on pull request creation in the other workflow file

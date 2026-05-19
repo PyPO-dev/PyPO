@@ -1,0 +1,113 @@
+name: Deploy docs to github pages
+
+# This is more reasonable but will break
+# arcanely if the pull request comes from a fork
+
+#on:
+#  pull_request:
+#    types:
+#      - closed
+#    branches:
+#      - main
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  packages: write
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # uncomment this in case running into storage limitation
+      # Thanks to
+      # <https://carlosbecker.com/posts/github-actions-disk-space/>
+      # for this hack!
+      #
+      # ################# SNIP #################
+      #
+      #- run: df -h
+
+      #- name: Free up disk space
+      #  run: |
+      #    sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+      #    sudo docker image prune --all --force
+      #    sudo docker builder prune -a
+
+      #- run: df -h
+      #
+      #
+      #
+      # ################# /SNIP #################
+      #
+      #
+      #
+      #
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: set up docker build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: "Dockerfile.cicd"
+          tags: pypo-cicd:latest
+          load: true
+          push: false
+          # This caches docker layers to github actions cache
+          cache-from: type=gha
+          cache-to: type=gha,mode=min
+
+      # Don't need to run tests -- this should have been done
+      # on pull request creation in the other workflow file
+      #
+      #- name: Run Tests
+      #  uses: addnab/docker-run-action@v3
+      #  with:
+      #    image: pypo-cicd:latest
+      #    run: |
+      #      set -e
+      #      . /venv/bin/activate
+      #      pip install -r requirements-dev.txt -e .[dev]
+      #      nose2
+      #    options: -v ${{ github.workspace }}:/app
+
+
+      - name: Build Docs
+        uses: addnab/docker-run-action@v3
+        with:
+          image: pypo-cicd:latest
+          run: |
+            . /venv/bin/activate
+            ./GenerateDocs.py -tgd
+          options: -v ${{ github.workspace }}:/app
+
+      - name: Upload docs artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./docs
+
+  pages:
+    runs-on: ubuntu-latest
+
+    permissions:
+      pages: write
+      id-token: write
+
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+

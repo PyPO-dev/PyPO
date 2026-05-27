@@ -4,7 +4,7 @@ Defines an attr dataclass used to store the data of parameter forms.
 """
 
 from attrs import define, field, Factory
-from src.GUI.utils import inType, InputDescriptionError
+from GUI.utils import inType, InputDescriptionError
 
 @define
 class InputDescription:

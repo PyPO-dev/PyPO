@@ -4,7 +4,7 @@ This file contains all forms used by the GUI for interaction with the user.
 Because all functions return lists containing forms, the return will not be explicitly stated per form.
 """
 
-from src.GUI.ParameterForms.InputDescription import inType, InputDescription
+from GUI.ParameterForms.InputDescription import inType, InputDescription
 from PyPO.Enums import FieldComponents, CurrentComponents, Projections, Modes
 
 FieldComponentList = [o for o in FieldComponents]

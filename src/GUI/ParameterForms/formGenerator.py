@@ -7,10 +7,10 @@ This script contains the form generator and dynamic inputWidgets.
 
 from PySide6.QtWidgets import QWidget, QFormLayout, QVBoxLayout, QHBoxLayout, QPushButton, QStackedWidget, QSpacerItem, QSizePolicy
 from PySide6.QtCore import Qt, Slot, Signal
-from src.GUI.utils import *
-from src.GUI.ParameterForms.simpleInputWidgets import checkbox, StaticInput, VectorInput, SimpleRadio, SimpleDropdown, XYZRadio, ElementSelectionWidget
-from src.GUI.ParameterForms.InputDescription import *
-from src.GUI.ParameterForms.inputWidgetInterfaces import *
+from GUI.utils import *
+from GUI.ParameterForms.simpleInputWidgets import checkbox, StaticInput, VectorInput, SimpleRadio, SimpleDropdown, XYZRadio, ElementSelectionWidget
+from GUI.ParameterForms.InputDescription import *
+from GUI.ParameterForms.inputWidgetInterfaces import *
 
 class FormGenerator(QWidget):
     """!

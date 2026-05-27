@@ -6,9 +6,9 @@ Provides implementation of form inputs.
 from PySide6.QtWidgets import QHBoxLayout, QCheckBox, QFormLayout, QGridLayout, QWidget, QButtonGroup, QRadioButton, QComboBox, QListWidget, QSizePolicy, QLabel
 from PySide6.QtCore import Signal
 from PyPO.Enums import Projections
-from src.GUI.utils import MyLabel, MyEdit, makeLabelFromString, inType, getValidator
-from src.GUI.ParameterForms.InputDescription import InputDescription
-from src.GUI.ParameterForms.inputWidgetInterfaces import inputWidgetInterface, selectionWidgetInterface
+from GUI.utils import MyLabel, MyEdit, makeLabelFromString, inType, getValidator
+from GUI.ParameterForms.InputDescription import InputDescription
+from GUI.ParameterForms.inputWidgetInterfaces import inputWidgetInterface, selectionWidgetInterface
 from numpy import array 
 
 class EmptyFieldException(Exception):

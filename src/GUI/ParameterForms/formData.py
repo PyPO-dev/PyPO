@@ -4,8 +4,8 @@ This file contains all forms used by the GUI for interaction with the user.
 Because all functions return lists containing forms, the return will not be explicitly stated per form.
 """
 
-from src.GUI.ParameterForms.InputDescription import inType, InputDescription
-from PyPO.Enums import FieldComponents, CurrentComponents, Projections
+from GUI.ParameterForms.InputDescription import inType, InputDescription
+from PyPO.Enums import FieldComponents, CurrentComponents, Projections, Modes
 
 FieldComponentList = [o for o in FieldComponents]
 FieldComponentList.pop()
@@ -151,9 +151,8 @@ def makeTransformationForm(name, obj="element"):
     """
     return[
         InputDescription(inType.static, obj, staticValue=name),
-        InputDescription(inType.radio, "mode", label="Transformation mode", options=[
-            "Relative", "Absolute"
-            ]),
+        InputDescription(inType.radio, "mode", label="Transformation mode", 
+                         hints=["Relative", "Absolute"], options=[Modes.REL, Modes.ABS]),
         InputDescription(inType.dynamicRadio, "type", subDict={
             "Translation":[
                 InputDescription(inType.vectorFloats, "vector", label="Translation Vector", hints=[0.,0.,0.], numFields=3,oArray=True, prefill = True)],

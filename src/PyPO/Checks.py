@@ -1285,8 +1285,8 @@ def check_vecGPODict(vecGPODict, nameList, clog):
             if vecGPODict['mode'] not in range(3):
                 errStr += errMsg_value('mode', vecGPODict['mode'], 'vecGPODict')
     else:
-        errStr += warnMsg_field('mode', 'vecGPODict', 'No mode given, assuming PEC')
-        vecGPODict['mode'] = 2
+        clog.warning(warnMsg_field('mode', 'vecGPODict', 'No mode given, assuming full'))
+        vecGPODict['mode'] = 0
         
     if errStr:
         errList = errStr.split("\n")[:-1]
@@ -1314,6 +1314,8 @@ def calc_beam(vecGPODict, errStr):
         elif "R" in vecGPODict:
             R = vecGPODict["R"]
             z = R/2 * (1 + np.sqrt(1 - (2*np.pi*w0**2 / (lam * R))**2))
+            if np.isnan(z):
+                z = R/2 * (1 - np.sqrt(1 - (2*np.pi*w0**2 / (lam * R))**2))
             errStr += warnMsg_field("w0, R", "vecGPODict", "Setting z from w0 and R is ambiguous, with two solutions. We choose the larger solution (i.e. z > zc).")
             vecGPODict["z"] = z
             return
@@ -1323,8 +1325,11 @@ def calc_beam(vecGPODict, errStr):
         z = vecGPODict["z"]
         if "w" in vecGPODict:
             w = vecGPODict["w"]
-            vecGPODict["w0"] = np.sqrt(w**2/2 * (1 - np.sqrt(1 - ((2*lam*z)/(np.pi*w**2))**2)))
-            errStr += warnMsg_field("z, w", "vecGPODict", "Setting w0 from z and w is ambiguous, with two solutions. We choose the smaller beamwaist (i.e. z > zc).")
+            w0 = np.sqrt(w**2/2 * (1 - np.sqrt(1 - ((2*lam*z)/(np.pi*w**2))**2)))
+            if np.isnan(w0):
+                w0 = np.sqrt(w**2/2 * (1 + np.sqrt(1 - ((2*lam*z)/(np.pi*w**2))**2)))
+            vecGPODict["w0"] = w0
+            errStr += warnMsg_field("z, w", "vecGPODict", "Setting w0 from z and w is ambiguous, with two solutions. We choose the smaller beamwaist (i.e. z > zc) first.")
             return
         elif "R" in vecGPODict:
             R = vecGPODict["R"]

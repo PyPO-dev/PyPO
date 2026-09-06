@@ -17,14 +17,15 @@ from PySide6.QtGui import QTextCursor, QPixmap, QAction
 from PySide6.QtCore import Qt
 import qdarktheme
 
-from src.GUI.ParameterForms import formGenerator
-from src.GUI.ParameterForms.InputDescription import InputDescription
-from src.GUI.utils import inType
-import src.GUI.ParameterForms.formData as fData
-from src.GUI.PlotScreen import PlotScreen
-from src.GUI.WorkSpace import Workspace
-from src.GUI.Dialogs import UnsavedChangesDialog
-from src.GUI.SubprocessManager import SubprocessManager, copySystem
+from GUI.ParameterForms import formGenerator
+from GUI.ParameterForms.InputDescription import InputDescription
+from GUI.utils import inType
+import GUI.ParameterForms.formData as fData
+from GUI.PlotScreen import PlotScreen
+from GUI.WorkSpace import Workspace
+from GUI.Dialogs import UnsavedChangesDialog
+from GUI.SubprocessManager import SubprocessManager, copySystem
+from PyPO.Enums import Objects
 
 from PyPO.CustomLogger import CustomGUILogger
 
@@ -740,9 +741,9 @@ class MainWidget(QWidget):
             vector = dd["vector"]
 
             if transformationType == "Translation":
-                self.stm.translateGrids(dd["element"], vector, mode=dd["mode"].lower())
+                self.stm.translateGrids(dd["element"], vector, mode=dd["mode"])
             elif transformationType == "Rotation":
-                self.stm.rotateGrids(dd["element"], vector, pivot=dd["pivot"], mode=dd["mode"].lower())
+                self.stm.rotateGrids(dd["element"], vector, pivot=dd["pivot"], mode=dd["mode"])
             self.unsavedChanges = True
         except Exception as err:
             print(err)
@@ -767,9 +768,9 @@ class MainWidget(QWidget):
             vector = dd["vector"]
 
             if transformationType == "Translation":
-                self.stm.translateGrids(dd["group"], vector, mode=dd["mode"].lower(), obj="group")
+                self.stm.translateGrids(dd["group"], vector, mode=dd["mode"], obj=Objects.GROUP)
             elif transformationType == "Rotation":
-                self.stm.rotateGrids(dd["group"], vector, pivot=dd["pivot"], mode=dd["mode"].lower(), obj="group")
+                self.stm.rotateGrids(dd["group"], vector, pivot=dd["pivot"], mode=dd["mode"], obj=Objects.GROUP)
             self.unsavedChanges = True
         except Exception as err:
             print(err)
@@ -786,9 +787,9 @@ class MainWidget(QWidget):
             vector = dd["vector"]
         
             if transformationType == "Translation":
-                self.stm.translateGrids(dd["frame"], vector, mode=dd["mode"].lower(), obj="frame")
+                self.stm.translateGrids(dd["frame"], vector, mode=dd["mode"], obj=Objects.FRAME)
             elif transformationType == "Rotation":
-                self.stm.rotateGrids(dd["frame"], vector, pivot=dd["pivot"], mode=dd["mode"].lower(), obj="frame")
+                self.stm.rotateGrids(dd["frame"], vector, pivot=dd["pivot"], mode=dd["mode"], obj=Objects.FRAME)
             self.unsavedChanges = True
         except Exception as err:
             print(err)
@@ -1434,7 +1435,7 @@ class MainWidget(QWidget):
         """
         try:
             MergeDict = self.ParameterWid.read()
-            self.stm.mergeBeams(*MergeDict["beams"], obj="fields", merged_name=MergeDict["merged_name"])
+            self.stm.mergeBeams(*MergeDict["beams"], obj=Objects.FIELD, merged_name=MergeDict["merged_name"])
             
             self.addFieldWidget(MergeDict["merged_name"])
             self.unsavedChanges = True
@@ -1449,7 +1450,7 @@ class MainWidget(QWidget):
         """
         try:
             MergeDict = self.ParameterWid.read()
-            mergeBeams(*MergeDict["beams"], obj="currents", merged_name=MergeDict["merged_name"])
+            self.stm.mergeBeams(*MergeDict["beams"], obj=Objects.CURRENT, merged_name=MergeDict["merged_name"])
             
             self.addCurrentWidget(MergeDict["merged_name"])
             self.unsavedChanges = True

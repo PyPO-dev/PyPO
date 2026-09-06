@@ -1448,7 +1448,6 @@ class System(object):
 
         _gaussDict = self.copyObj(gaussDict)
         PChecks.check_vecGPODict(_gaussDict, self.fields, self.clog)
-        print(_gaussDict)
         
         refldict = self.system[name_surface]
         

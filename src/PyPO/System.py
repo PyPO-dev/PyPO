@@ -131,24 +131,24 @@ class System(object):
         """
         
         s = "Contents of system:\n"
-        s += f"Reflectors {len(self.system)}:\n"
+        s += f"Reflectors : {len(self.system)}\n"
         for key in self.system.keys():
-            s += f"    {key}\n"
-        s += f"Groups {len(self.groups)}:\n"
+            s += f"    - {key}\n"
+        s += f"Groups : {len(self.groups)}\n"
         for key in self.groups.keys():
-            s += f"    {key}\n"
-        s += f"Frames {len(self.frames)}:\n"
+            s += f"    - {key}\n"
+        s += f"Frames : {len(self.frames)}\n"
         for key in self.frames.keys():
-            s += f"    {key}\n"
-        s += f"Currents {len(self.currents)}:\n"
+            s += f"    - {key}\n"
+        s += f"Currents : {len(self.currents)}\n"
         for key in self.currents.keys():
-            s += f"    {key}\n"
-        s += f"Fields {len(self.fields)}:\n"
+            s += f"    - {key}\n"
+        s += f"Fields : {len(self.fields)}\n"
         for key in self.fields.keys():
-            s += f"    {key}\n"
-        s += f"Scalar Fields {len(self.scalarfields)}:\n"
+            s += f"    - {key}\n"
+        s += f"Scalar Fields : {len(self.scalarfields)}\n"
         for key in self.scalarfields.keys():
-            s += f"    {key}\n"
+            s += f"    - {key}\n"
         return s
 
     def setCustomBeamPath(self, path: str , append : bool = False) -> None:
@@ -1055,13 +1055,22 @@ class System(object):
         
         self.clog.info(f"Removed scalar PO field {fieldName} from system.")
     
-    def readCustomBeam(self, name_beam : str, name_source : str, comp : FieldComponents, lam : float, normalise : bool = True, scale : float = 1, outname : str = None):
+    def readCustomBeam(self, 
+                       name_beam : str, 
+                       name_source : str, 
+                       comp : FieldComponents, 
+                       lam : float,
+                       normalise : bool = True,
+                       convention : str = "prefix",
+                       scale : float = 1, 
+                       outname : str = None) -> None:
         """!
         Read a custom beam from disk into the system. 
         
-        The system will look in the customBeamPath, which defaults to the current working directory and can be set with the setCustomBeamPath() method.
-        Note that the custom beam pattern needs to contain a real and imaginary part, and that these need to be stored in separate .txt files, stored as
-        such: r<name_beam>.txt and i<name_beam>.txt, where 'r' and 'i' refer to the real and imaginary part, respectively.
+        The system will look in the customBeamPath, 
+        which defaults to the current working directory and can be set with the setCustomBeamPath() method.
+        Note that the custom beam pattern needs to contain a real and imaginary part, 
+        and that these need to be stored in separate .txt files.
         If the beam pattern is a component of the E-field, the currents will be calculated assuming a PMC surface.
         If, on the other hand, the beam pattern is a component of the H-field, the currents will be calculated assuming a PEC surface.
 
@@ -1072,6 +1081,9 @@ class System(object):
         @param comp Polarisation component of beam. Instance of FieldComponents enum object.
         @param lam Wavelength of beam, in mm.
         @param normalise Whether or not to normalise beam to its maximum amplitude.
+        @param convention Whether the 'r' and 'i' are a prefix, or suffix.
+                If a suffix, an underscore is prepended.
+                Defaults to 'prefix'.
         @param scale Scale factor for beam. Defaults to 1.
         @param outname Name of field/current objects written to system. Defaults to name_beam
         
@@ -1082,8 +1094,13 @@ class System(object):
 
         PChecks.check_elemSystem(name_source, self.system, self.clog, extern=True)
         
-        rfield = np.loadtxt(os.path.join(self.customBeamPath, "r" + name_beam + ".txt"))
-        ifield = np.loadtxt(os.path.join(self.customBeamPath, "i" + name_beam + ".txt"))
+        nb_full = lambda x : x + name_beam + ".txt"
+
+        if convention == "suffix":
+            nb_full = lambda x : name_beam + f"_{x}.txt"
+        
+        rfield = np.loadtxt(os.path.join(self.customBeamPath, nb_full("r")))
+        ifield = np.loadtxt(os.path.join(self.customBeamPath, nb_full("i")))
 
         field = (rfield + 1j*ifield).T
 

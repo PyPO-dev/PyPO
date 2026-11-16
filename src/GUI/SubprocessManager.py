@@ -90,7 +90,7 @@ def copySystem(system :st.System, cSystem = True, cFrames = None, cFields = None
     cScalarFields = [] if cScalarFields is None else cScalarFields
     cAssoc = [] if cAssoc is None else cAssoc
     
-    sCopy = st.System(context="G", override=False)
+    sCopy = st.System(override=False)
     if cSystem:
         sCopy.system.update(deepcopy(system.system))
     for frame in cFrames:

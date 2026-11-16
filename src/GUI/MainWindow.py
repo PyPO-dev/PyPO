@@ -885,7 +885,7 @@ class MainWidget(QWidget):
       
             dialStr = f"Calculating Gaussian ray-trace frame {GRTDict['name']}..."
 
-            scopy = st.System(context="G", override=False)
+            scopy = st.System(override=False)
 
             mgr = Manager()
             returnDict = mgr.dict()
